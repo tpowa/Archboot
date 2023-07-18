@@ -200,7 +200,7 @@ _gpg_check() {
 _create_container() {
     # create container without package cache
     if [[ -n "${_L_COMPLETE}" ]]; then
-        "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp >"$_LOG}" 2>&1 || exit 1
+        "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp >"${_LOG}" 2>&1 || exit 1
     fi
     # create container with package cache
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
@@ -208,14 +208,14 @@ _create_container() {
         # add the db too on reboot
         install -D -m644 /var/cache/pacman/pkg/archboot.db "${_W_DIR}"/var/cache/pacman/pkg/archboot.db
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
-            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file:///var/cache/pacman/pkg >"$_LOG}" 2>&1 || exit 1
+            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file:///var/cache/pacman/pkg >"${_LOG}" 2>&1 || exit 1
         fi
         # needed for checks
         cp "${_W_DIR}"/var/cache/pacman/pkg/archboot.db /var/cache/pacman/pkg/archboot.db
     else
         #online mode
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
-            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >"$_LOG}" 2>&1 || exit 1
+            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >"${_LOG}" 2>&1 || exit 1
         fi
     fi
 }
@@ -334,8 +334,8 @@ _prepare_graphic() {
         ! -path '*/sv/*' ! -path '*/uk/*' -delete &>"${_NO_LOG}"
         find /usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>"${_NO_LOG}"
     fi
-    systemd-sysusers >"$_LOG}" 2>&1
-    systemd-tmpfiles --create >"$_LOG}" 2>&1
+    systemd-sysusers >"${_LOG}" 2>&1
+    systemd-tmpfiles --create >"${_LOG}" 2>&1
     # fixing dbus requirements
     systemctl reload dbus
     systemctl reload dbus-org.freedesktop.login1.service
@@ -379,7 +379,7 @@ _new_environment() {
     echo -e "\e[1mStep ${_S_APPEND}5/${_STEPS}:\e[m Collecting rootfs files in ${_W_DIR}..."
     echo "${_S_EMPTY}          This will need some time..."
     # write initramfs to "${_W_DIR}"/tmp
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >"$_LOG}" 2>&1 || exit 1
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1 || exit 1
     echo -e "\e[1mStep ${_S_APPEND}6/${_STEPS}:\e[m Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
@@ -491,8 +491,8 @@ _full_system() {
     echo -e "\e[1mInitializing full Arch Linux system...\e[m"
     echo -e "\e[1mStep 1/3:\e[m Reinstalling packages and adding info/man-pages..."
     echo "          This will need some time..."
-    pacman -Sy >"$_LOG}" 2>&1 || exit 1
-    pacman -Qqn | pacman -S --noconfirm man-db man-pages texinfo - >"$_LOG}" 2>&1 || exit 1
+    pacman -Sy >"${_LOG}" 2>&1 || exit 1
+    pacman -Qqn | pacman -S --noconfirm man-db man-pages texinfo - >"${_LOG}" 2>&1 || exit 1
     echo -e "\e[1mStep 2/3:\e[m Checking kernel version..."
     _kernel_check
     echo -e "\e[1mStep 3/3:\e[m Trigger kernel module loading..."
@@ -516,32 +516,32 @@ _new_image() {
     cd /archboot || exit 1
     _W_DIR="$(mktemp -u archboot-release.XXX)"
     # create container
-    archboot-"${_RUNNING_ARCH}"-create-container.sh "${_W_DIR}" -cc > "$_LOG}" || exit 1
-    _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg > "$_LOG}"
+    archboot-"${_RUNNING_ARCH}"-create-container.sh "${_W_DIR}" -cc > "${_LOG}" || exit 1
+    _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg > "${_LOG}"
     # riscv64 does not support kexec at the moment
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
         # removing not working lvm2 from latest image
-        echo "Removing lvm2 from container ${_W_DIR}..." > "$_LOG}"
+        echo "Removing lvm2 from container ${_W_DIR}..." > "${_LOG}"
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>"${_NO_LOG}"
         # generate latest tarball in container
-        echo "Generating local ISO..." > "$_LOG}"
+        echo "Generating local ISO..." > "${_LOG}"
         # generate local iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
-        -i=${_ISONAME}-local-${_RUNNING_ARCH}" > "$_LOG}" || exit 1
+        -i=${_ISONAME}-local-${_RUNNING_ARCH}" > "${_LOG}" || exit 1
         rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
         _ram_check
-        echo "Generating latest ISO..." > "$_LOG}"
+        echo "Generating latest ISO..." > "${_LOG}"
         # generate latest iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
-        -i=${_ISONAME}-latest-${_RUNNING_ARCH}" > "$_LOG}" || exit 1
-        echo "Installing lvm2 to container ${_W_DIR}..." > "$_LOG}"
+        -i=${_ISONAME}-latest-${_RUNNING_ARCH}" > "${_LOG}" || exit 1
+        echo "Installing lvm2 to container ${_W_DIR}..." > "${_LOG}"
         ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>"${_NO_LOG}"
     fi
-    echo "Generating normal ISO..." > "$_LOG}"
+    echo "Generating normal ISO..." > "${_LOG}"
     # generate iso in container
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_RUNNING_ARCH}-iso.sh -g \
-    -i=${_ISONAME}-${_RUNNING_ARCH}" > "$_LOG}" || exit 1
+    -i=${_ISONAME}-${_RUNNING_ARCH}" > "${_LOG}" || exit 1
     # move iso out of container
     mv "${_W_DIR}"/*.iso ./ &>"${_NO_LOG}"
     mv "${_W_DIR}"/*.img ./ &>"${_NO_LOG}"
@@ -581,9 +581,9 @@ _prepare_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
         echo -e "\e[1mStep 1/3:\e[m Installing GNOME desktop now..."
         echo "          This will need some time..."
-        _prepare_graphic "${_PACKAGES}" >"$_LOG}" 2>&1
+        _prepare_graphic "${_PACKAGES}" >"${_LOG}" 2>&1
         echo -e "\e[1mStep 2/3:\e[m Configuring GNOME desktop..."
-        _configure_gnome >"$_LOG}" 2>&1
+        _configure_gnome >"${_LOG}" 2>&1
     else
         echo -e "\e[1mStep 1/3:\e[m Installing GNOME desktop already done..."
         echo -e "\e[1mStep 2/3:\e[m Configuring GNOME desktop already done..."
@@ -594,9 +594,9 @@ _prepare_plasma() {
     if ! [[ -e /usr/bin/startplasma-x11 ]]; then
         echo -e "\e[1mStep 1/3:\e[m Installing KDE/Plasma desktop now..."
         echo "          This will need some time..."
-        _prepare_graphic "${_PACKAGES}" >"$_LOG}" 2>&1
+        _prepare_graphic "${_PACKAGES}" >"${_LOG}" 2>&1
         echo -e "\e[1mStep 2/3:\e[m Configuring KDE/Plasma desktop..."
-        _configure_plasma >"$_LOG}" 2>&1
+        _configure_plasma >"${_LOG}" 2>&1
     else
         echo -e "\e[1mStep 1/3:\e[m Installing KDE/Plasma desktop already done..."
         echo -e "\e[1mStep 2/3:\e[m Configuring KDE/Plasma desktop already done..."
@@ -607,9 +607,9 @@ _prepare_sway() {
     if ! [[ -e /usr/bin/sway ]]; then
         echo -e "\e[1mStep 1/3:\e[m Installing Sway desktop now..."
         echo "          This will need some time..."
-        _prepare_graphic "${_PACKAGES}" >"$_LOG}" 2>&1
+        _prepare_graphic "${_PACKAGES}" >"${_LOG}" 2>&1
         echo -e "\e[1mStep 2/3:\e[m Configuring Sway desktop..."
-        _configure_sway >"$_LOG}" 2>&1
+        _configure_sway >"${_LOG}" 2>&1
     else
         echo -e "\e[1mStep 1/3:\e[m Installing Sway desktop already done..."
         echo -e "\e[1mStep 2/3:\e[m Configuring Sway desktop already done..."
@@ -809,12 +809,12 @@ _custom_wayland_xorg() {
     if [[ -n "${_CUSTOM_WAYLAND}" ]]; then
         echo -e "\e[1mStep 1/3:\e[m Installing custom wayland..."
         echo "          This will need some time..."
-        _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > "$_LOG}" 2>&1
+        _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > "${_LOG}" 2>&1
     fi
     if [[ -n "${_CUSTOM_X}" ]]; then
         echo -e "\e[1mStep 1/3:\e[m Installing custom xorg..."
         echo "          This will need some time..."
-        _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > "$_LOG}" 2>&1
+        _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > "${_LOG}" 2>&1
     fi
     echo -e "\e[1mStep 2/3:\e[m Starting avahi-daemon..."
     systemctl start avahi-daemon.service
@@ -824,7 +824,7 @@ _custom_wayland_xorg() {
 }
 
 _chromium_flags() {
-    echo "Adding chromium flags to /etc/chromium-flags.conf..." >"$_LOG}"
+    echo "Adding chromium flags to /etc/chromium-flags.conf..." >"${_LOG}"
     cat << EOF >/etc/chromium-flags.conf
 --no-sandbox
 --test-type
@@ -836,7 +836,7 @@ EOF
 _firefox_flags() {
     if [[ -f "/usr/lib/firefox/browser/defaults/preferences/vendor.js" ]]; then
         if ! grep -q startup /usr/lib/firefox/browser/defaults/preferences/vendor.js; then
-            echo "Adding firefox flags vendor.js..." >"$_LOG}"
+            echo "Adding firefox flags vendor.js..." >"${_LOG}"
             cat << EOF >> /usr/lib/firefox/browser/defaults/preferences/vendor.js
 pref("browser.aboutwelcome.enabled", false, locked);
 pref("browser.startup.homepage_override.once", false, locked);
@@ -850,10 +850,10 @@ EOF
 }
 
 _autostart_vnc() {
-    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW}..." >"$_LOG}"
+    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW}..." >"${_LOG}"
     echo "${_VNC_PW}" | vncpasswd -f > /etc/tigervnc/passwd
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
-    echo "Autostarting tigervnc..." >"$_LOG}"
+    echo "Autostarting tigervnc..." >"${_LOG}"
     cat << EOF > /etc/xdg/autostart/tigervnc.desktop
 [Desktop Entry]
 Type=Application
