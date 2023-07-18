@@ -57,7 +57,7 @@ _auto_network()
     fi
     _dialog --infobox "Enable network and proxy settings on installed system..." 3 70
     # copy iwd keys and enable iwd
-    if grep -q 'wlan' /tmp/.network-interface; then
+    if grep -q 'wlan' /.network-interface; then
         cp -r /var/lib/iwd "${_DESTDIR}"/var/lib
         chroot "${_DESTDIR}" systemctl enable iwd &>"${_NO_LOG}"
     fi

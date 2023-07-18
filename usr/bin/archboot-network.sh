@@ -106,7 +106,7 @@ _network() {
                 _abort
             fi
         done
-        echo "${_INTERFACE}" >/tmp/.network-interface
+        echo "${_INTERFACE}" >/.network-interface
         # iwd renames wireless devices to wlanX
         if echo "${_INTERFACE}" | grep -q wlan; then
             _CONNECTION="wireless"

@@ -429,6 +429,7 @@ _new_environment() {
         rm "${_C_DIR}"/etc/systemd/network/10-wired-auto-dhcp.network
         [[ -e '/etc/profile.d/proxy.sh' ]] && cp /etc/profile.d/proxy.sh "${_C_DIR}"/etc/profile.d/proxy.sh
         cp /.network "${_C_DIR}"/
+        cp /.network-interface "${_C_DIR}"/
     fi
     if [[ -e '/.pacsetup' ]]; then
         cp /etc/pacman.conf "${_C_DIR}"/etc
