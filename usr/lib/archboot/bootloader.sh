@@ -42,12 +42,12 @@ _prepare_shim_files () {
 ### RISC64: https://fedoraproject.org/wiki/Architectures/RISC-V/GRUB2
 _prepare_uefi_X64() {
     echo "Preparing X64 Grub..."
-    grub-mkstandalone -d /usr/lib/grub/x86_64-efi -O x86_64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video bli boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="ter-u16n" --locales="" --themes="" -o grub-efi/grubx64.efi "boot/grub/grub.cfg=${_GRUB_ISO}"
+    grub-mkstandalone -d /usr/lib/grub/x86_64-efi -O x86_64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="ter-u16n" --locales="" --themes="" -o grub-efi/grubx64.efi "boot/grub/grub.cfg=${_GRUB_ISO}"
 }
 
 _prepare_uefi_IA32() {
     echo "Preparing IA32 Grub..."
-    grub-mkstandalone -d /usr/lib/grub/i386-efi -O i386-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video bli boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="ter-u16n" --locales="" --themes="" -o grub-efi/grubia32.efi "boot/grub/grub.cfg=${_GRUB_ISO}"
+    grub-mkstandalone -d /usr/lib/grub/i386-efi -O i386-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="ter-u16n" --locales="" --themes="" -o grub-efi/grubia32.efi "boot/grub/grub.cfg=${_GRUB_ISO}"
 }
 
 _prepare_uefi_AA64() {
@@ -55,7 +55,7 @@ _prepare_uefi_AA64() {
     ${_NSPAWN} "${1}" pacman -Sy grub --noconfirm
     cp ${_GRUB_ISO} "${1}"/archboot-iso-grub.cfg
     echo "Preparing AA64 Grub..."
-    ${_NSPAWN} "${1}" grub-mkstandalone -d /usr/lib/grub/arm64-efi -O arm64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video bli boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="ter-u16n" --locales="" --themes="" -o /grubaa64.efi "boot/grub/grub.cfg=/archboot-iso-grub.cfg"
+    ${_NSPAWN} "${1}" grub-mkstandalone -d /usr/lib/grub/arm64-efi -O arm64-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="ter-u16n" --locales="" --themes="" -o /grubaa64.efi "boot/grub/grub.cfg=/archboot-iso-grub.cfg"
     mv "${1}"/grubaa64.efi grub-efi/
 }
 
@@ -64,7 +64,7 @@ _prepare_uefi_RISCV64() {
    ${_NSPAWN} "${1}" pacman -Sy grub --noconfirm
     cp ${_GRUB_ISO} "${1}"/archboot-iso-grub.cfg
     echo "Preparing RISCV64 Grub..."
-   ${_NSPAWN} "${1}" grub-mkstandalone -d /usr/lib/grub/riscv64-efi -O riscv64-efi --sbat=/usr/share/grub/sbat.csv --compress=xz --modules="boot bli cat configfile echo f2fs fat font iso9660 linux loadenv loopback minicmd normal part_apple part_gpt part_msdos regexp search search_fs_file search_fs_uuid search_label serial sleep" --fonts="ter-u16n" --locales="" --themes="" -o /BOOTRISCV64.efi "boot/grub/grub.cfg=/archboot-iso-grub.cfg"
+   ${_NSPAWN} "${1}" grub-mkstandalone -d /usr/lib/grub/riscv64-efi -O riscv64-efi --sbat=/usr/share/grub/sbat.csv --compress=xz --modules="boot cat configfile echo f2fs fat font iso9660 linux loadenv loopback minicmd normal part_apple part_gpt part_msdos regexp search search_fs_file search_fs_uuid search_label serial sleep" --fonts="ter-u16n" --locales="" --themes="" -o /BOOTRISCV64.efi "boot/grub/grub.cfg=/archboot-iso-grub.cfg"
     mv "${1}"/BOOTRISCV64.efi grub-efi/
     cp grub-efi/BOOTRISCV64.efi grub-efi/grubriscv64.efi
 }
