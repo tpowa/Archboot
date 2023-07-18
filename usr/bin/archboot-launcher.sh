@@ -5,7 +5,7 @@
 _TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Launcher"
 
 _show_login() {
-    [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
+    [[ -e /.launcher-running ]] && rm /.launcher-running
     clear
     echo ""
     agetty --show-issue
@@ -30,7 +30,7 @@ _check_manage() {
 
 _desktop () {
     _dialog --cancel-label "Back" --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>${_ANSWER} || return 1
-    [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
+    [[ -e /.launcher-running ]] && rm /.launcher-running
     _EXIT="$(cat ${_ANSWER})"
     if [[ "${_EXIT}" == "GNOME" ]]; then
         if _dialog --defaultno --yesno "Gnome Desktop:\nDo you want to use the Wayland Backend?" 6 45; then
@@ -61,7 +61,7 @@ _desktop () {
 _manage() {
     _dialog --cancel-label "Back" --title " Manage Archboot Menu " --menu "" 9 50 5 "${_MANAGE[@]}" 2>${_ANSWER} || return 1
     clear
-    [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
+    [[ -e /.launcher-running ]] && rm /.launcher-running
     _EXIT="$(cat ${_ANSWER})"
     if [[ "${_EXIT}" == "FULL" ]]; then
         update -full-system
@@ -81,7 +81,7 @@ _exit() {
     "3" "Poweroff System" 2>${_ANSWER} || return 1
         _EXIT="$(cat ${_ANSWER})"
     if [[ "${_EXIT}" == "1" ]]; then
-        [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
+        [[ -e /.launcher-running ]] && rm /.launcher-running
         _show_login
         exit 0
     elif [[ "${_EXIT}" == "2" ]]; then
@@ -109,7 +109,7 @@ _launcher() {
     "1" "Launch Archboot Setup" "${_MENU[@]}" 2>${_ANSWER}
     case $(cat ${_ANSWER}) in
         "1")
-            [[ -e /tmp/.launcher-running ]] && rm /tmp/.launcher-running
+            [[ -e /.launcher-running ]] && rm /.launcher-running
             setup
             exit 0 ;;
         "2")
