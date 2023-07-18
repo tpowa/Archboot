@@ -13,9 +13,7 @@ Environment Changes:
 - use BLAKE2b/b2sum instead of sha256sum
 - shortened MOTD and init message
 - run Basic Setup scripts on first login
-- added interactive launcher script
-- added network script
-- added pacsetup script
+- added launcher, network, pacsetup script
 - renamed km to vconsole script
 - renamed tz to clock script
 - renamed archboot-locale script to localize script
