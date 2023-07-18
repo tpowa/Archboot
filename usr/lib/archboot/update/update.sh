@@ -401,7 +401,7 @@ _new_environment() {
         systemctl start initrd-cleanup.service
         systemctl start initrd-switch-root.target
     fi
-    echo -e "\e[1mStep ${_S_APPEND}7/${_STEPS}:\e[m Preserving Basic Setup values ${_RAM}/${_INITRD}..."
+    echo -e "\e[1mStep ${_S_APPEND}7/${_STEPS}:\e[m Preserving Basic Setup values..."
     if [[ -e '/.localize' ]]; then
         cp /etc/{locale.gen,locale.conf} "${_W_DIR}"/tmp/etc
         cp /.localize "${_W_DIR}"/tmp/
