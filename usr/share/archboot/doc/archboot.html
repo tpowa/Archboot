@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 18.07.2023 09:04</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 18.07.2023 10:02</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -35,7 +35,7 @@
 <li><a href="#interactive-launcher" id="toc-interactive-launcher"><span class="toc-section-number">3.4</span> Interactive Launcher</a></li>
 <li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">3.5</span> Interactive Setup</a></li>
 <li><a href="#for-experts-quickinst-installation" id="toc-for-experts-quickinst-installation"><span class="toc-section-number">3.6</span> For Experts: Quickinst Installation</a></li>
-<li><a href="#manage-archboot" id="toc-manage-archboot"><span class="toc-section-number">3.7</span> CLI Manage Environment</a></li>
+<li><a href="#cli-manage-archboot" id="toc-manage-archboot"><span class="toc-section-number">3.7</span> For Experts CLI Manage Environment</a></li>
 <li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">3.8</span> Tools For Backup And Copying Of An Existing System</a></li>
 <li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">3.9</span> Restoring An USB Device To FAT32 State</a></li>
 <li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.10</span> System configuration on installed system</a></li>
@@ -492,7 +492,7 @@
 <h4 data-number="3.3.4" id="clock"><span class="header-section-number">3.3.4</span> <strong>Clock Configuration</strong></h4>
 <p>You set your <a href="https://wiki.archlinux.org/title/Timezone" title="Timezone"><strong>timezone</strong></a> and <a href="https://wiki.archlinux.org/title/Date" title="Date"><strong>date</strong></a> with the <strong>clock</strong> script.</p>
 <h4 data-number="3.3.5" id="pacman"><span class="header-section-number">3.3.5</span> <strong>Pacman Setup</strong></h4>
-<p>Your <a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>pacman</strong></a> will be configured by <strong>pacsetup</strong> script.</p>
+<p><a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>Pacman</strong></a> will be configured by <strong>pacsetup</strong> script.</p>
 <ul>
 <li><strong>Offline Mode (local medium)</strong>:
 <ul>
@@ -539,7 +539,7 @@
 </ul>
 <h5 data-number="3.4.2.3" id="create-new-images"><span class="header-section-number">3.4.2.3</span> <strong>Create New Images</strong></h5>
 <ul>
-<li>You get will <strong>new</strong> images with <strong>latest</strong> packages.</li>
+<li>You will get <strong>new</strong> images with <strong>latest</strong> packages.</li>
 </ul>
 <h3 data-number="3.5" id="interactive-setup"><span class="header-section-number">3.5</span> <strong>Interactive Setup</strong></h3>
 <ul>
@@ -595,7 +595,7 @@
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.7" id="cli-manage-archboot"><span class="header-section-number">3.7</span> <strong>CLI Manage Environment</strong></h3>
+<h3 data-number="3.7" id="cli-manage-archboot"><span class="header-section-number">3.7</span> <strong>For Experts CLI Manage Environment</strong></h3>
 <p>You can always bump your image to <strong>latest</strong> available possibilities.</p>
 <table>
 <thead>
@@ -742,13 +742,13 @@ The calculated size to boot the image follows the formula:<br>
 <td class="MyYes">&#10004;</td>
 </tr>
 <tr class="odd">
-<td>Archboot installer</td>
+<td>Interactive Setup</td>
 <td class="MyYes">&#10004;</td>
 <td class="MyNo">&#10006;</td>
 </tr>
 <tr class="even">
 <td><a href="https://wiki.archlinux.org/title/Archinstall" title="Archinstall"><strong>Archinstall</strong></a></td>
-<td class="MyOpt">&#9733;</td>
+<td class="MyNo">&#9733;</td>
 <td class="MyYes">&#10004;</td>
 </tr>
 <tr class="odd">
@@ -774,11 +774,6 @@ The calculated size to boot the image follows the formula:<br>
 <td>Internal update feature</td>
 <td class="MyYes">&#10004;</td>
 <td class="MyNo">&#10006;</td>
-</tr>
-<tr class="even">
-<td>Glibc Localization Switch</td>
-<td class="MyYes">&#10004;</td>
-<td class="MyOpt">&#9733;</td>
 </tr>
 <tr class="odd">
 <td><a href="https://wiki.archlinux.org/title/Accessibility" title="Accessibility"><strong>Accessibility</strong></a> support</td>
