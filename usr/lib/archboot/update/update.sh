@@ -343,7 +343,7 @@ _new_environment() {
     _update_installer_check
     touch /.update
     _kill_w_dir
-    _STEPS="10"
+    _STEPS="11"
     _S_APPEND="0"
     _S_EMPTY="  "
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
@@ -401,28 +401,27 @@ _new_environment() {
         systemctl start initrd-cleanup.service
         systemctl start initrd-switch-root.target
     fi
-    # copy configs to new container
+    echo -e "\e[1mStep ${_S_APPEND}7/${_STEPS}:\e[m Preserving Basic Setup values ${_RAM}/${_INITRD}..."
     if [[ -e '/.localize' ]]; then
-        cp /etc/locale.gen "${_W_DIR}"/tmp/etc
-        cp /etc/locale.conf "${_W_DIR}"/tmp/etc
+        cp /etc/{locale.gen,locale.conf} "${_W_DIR}"/tmp/etc
         cp /.localize "${_W_DIR}"/tmp/
-        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "locale-gen"
+        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "locale-gen" &>/dev/null
     fi
     if [[ -e '/.vconsole' ]]; then
-        cp /etc/vconsole "${_W_DIR}"/tmp/etc
+        cp /etc/vconsole.conf "${_W_DIR}"/tmp/etc
         cp /.vconsole "${_W_DIR}"/tmp/
     fi
     if [[ -e '/.clock' ]]; then
         cp -a /etc/{adjtime,localtime} "${_W_DIR}"/tmp/etc
-        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable systemd-timesyncd.service;timedatectl set-ntp 1"
-        cp /.vconsole "${_W_DIR}"/tmp/
+        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable systemd-timesyncd.service" &>/dev/null
+        cp /.clock "${_W_DIR}"/tmp/
     fi
     if [[ -e '/.network' ]]; then
         cp -r /var/lib/iwd "${_W_DIR}"/tmp/var/lib
-        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable iwd"
+        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable iwd" &>/dev/null
         cp /etc/systemd/network/* "${_W_DIR}"/tmp//etc/systemd/network/
-        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable systemd-networkd"
-        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable systemd-resolved"
+        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable systemd-networkd" &>/dev/null
+        ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable systemd-resolved" &>/dev/null
         rm "${_W_DIR}"/tmp/etc/systemd/network/10-wired-auto-dhcp.network
         [[ -e '/etc/profile.d/proxy.sh' ]] && cp /etc/profile.d/proxy.sh "${_W_DIR}"/tmp/etc/profile.d/proxy.sh
         cp /.network "${_W_DIR}"/tmp/
@@ -431,17 +430,16 @@ _new_environment() {
         cp /etc/pacman.conf "${_W_DIR}"/tmp/etc
         cp /etc/pacman.d/mirrorlist "${_W_DIR}"/tmp/etc/pacman.d/
         cp -ar /etc/pacman.d/gnupg "${_W_DIR}"/tmp/etc/pacman.d
-        rm "${_W_DIR}"/tmp/etc/systemd/system/pacman-init.service
         cp /.pacsetup "${_W_DIR}"/tmp/
     fi
-    echo -e "\e[1mStep ${_S_APPEND}7/${_STEPS}:\e[m Creating initramfs ${_RAM}/${_INITRD}..."
+    echo -e "\e[1mStep ${_S_APPEND}8/${_STEPS}:\e[m Creating initramfs ${_RAM}/${_INITRD}..."
     echo "            This will need some time..."
     _create_initramfs
-    echo -e "\e[1mStep ${_S_APPEND}8/${_STEPS}:\e[m Cleanup ${_W_DIR}..."
+    echo -e "\e[1mStep ${_S_APPEND}9/${_STEPS}:\e[m Cleanup ${_W_DIR}..."
     cd /
     _kill_w_dir
     _clean_kernel_cache
-    echo -e "\e[1mStep ${_S_APPEND}9/${_STEPS}:\e[m Waiting for kernel to free RAM..."
+    echo -e "\e[1mStep ${_S_APPEND}10/${_STEPS}:\e[m Waiting for kernel to free RAM..."
     echo "            This will need some time..."
     # wait until enough memory is available!
     while true; do
