@@ -410,6 +410,7 @@ _new_environment() {
     if [[ -e '/.vconsole' ]]; then
         cp /etc/vconsole.conf "${_W_DIR}"/tmp/etc
         cp /.vconsole "${_W_DIR}"/tmp/
+        : >"${_W_DIR}"/tmp/.vconsole-run
     fi
     if [[ -e '/.clock' ]]; then
         cp -a /etc/{adjtime,localtime} "${_W_DIR}"/tmp/etc
@@ -419,7 +420,7 @@ _new_environment() {
     if [[ -e '/.network' ]]; then
         cp -r /var/lib/iwd "${_W_DIR}"/tmp/var/lib
         ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable iwd" &>/dev/null
-        cp /etc/systemd/network/* "${_W_DIR}"/tmp//etc/systemd/network/
+        cp /etc/systemd/network/* "${_W_DIR}"/tmp/etc/systemd/network/
         ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable systemd-networkd" &>/dev/null
         ${_NSPAWN} "${_W_DIR}"/tmp /bin/bash -c "systemctl enable systemd-resolved" &>/dev/null
         rm "${_W_DIR}"/tmp/etc/systemd/network/10-wired-auto-dhcp.network
@@ -439,7 +440,7 @@ _new_environment() {
     cd /
     _kill_w_dir
     _clean_kernel_cache
-    echo -e "\e[1mStep ${_S_APPEND}10/${_STEPS}:\e[m Waiting for kernel to free RAM..."
+    echo -e "\e[1mStep 10/${_STEPS}:\e[m Waiting for kernel to free RAM..."
     echo "            This will need some time..."
     # wait until enough memory is available!
     while true; do
