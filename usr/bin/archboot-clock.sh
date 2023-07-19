@@ -50,6 +50,7 @@ _timeset() {
     # check internet connection
     if ping -c1 www.google.com &>/dev/null; then
         _dialog --infobox "Syncing clock with NTP pool..." 3 45
+        sleep 3
         # sync immediatly with standard pool
         if ! systemctl restart systemd-timesyncd; then
             _dialog --msgbox "An error has occured, time was not changed!" 0 0
