@@ -21,6 +21,15 @@ _dialog() {
     return $?
 }
 
+_show_login() {
+    [[ -e "/.${_ANSWER}-running" ]] && rm "/.${_ANSWER}-running"
+    clear
+    echo ""
+    agetty --show-issue
+    echo ""
+    cat /etc/motd
+}
+
 _abort() {
     if _dialog --yesno "Abort$(echo ${_TITLE} | cut -d '|' -f3) ?" 5 45; then
         [[ -e "${_ANSWER}-running" ]] && rm "${_ANSWER}-running"

@@ -4,15 +4,6 @@
 . /usr/lib/archboot/basic-common.sh
 _TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Launcher"
 
-_show_login() {
-    [[ -e /.launcher-running ]] && rm /.launcher-running
-    clear
-    echo ""
-    agetty --show-issue
-    echo ""
-    cat /etc/motd
-}
-
 _check_desktop() {
     _DESKTOP=()
     update | grep -q Gnome && _DESKTOP+=( "GNOME" "Simple Beautiful Elegant" )

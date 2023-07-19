@@ -206,7 +206,7 @@ if [[ -e /usr/bin/setup ]]; then
         fi
     else
         # run launcher on latest/normal medium once!
-        if [[ ! -e /tmp/.launcher ]]; then
+        if [[ ! -e /.launcher ]]; then
             launcher
         fi
     fi
