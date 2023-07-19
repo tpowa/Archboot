@@ -23,6 +23,7 @@ _desktop () {
     _dialog --cancel-label "Back" --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>${_ANSWER} || return 1
     [[ -e /.launcher-running ]] && rm /.launcher-running
     _EXIT="$(cat ${_ANSWER})"
+    source /etc/locale.conf
     if [[ "${_EXIT}" == "GNOME" ]]; then
         if _dialog --defaultno --yesno "Gnome Desktop:\nDo you want to use the Wayland Backend?" 6 45; then
             clear
