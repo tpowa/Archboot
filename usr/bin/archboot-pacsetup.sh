@@ -17,8 +17,8 @@ _select_mirror() {
     # FIXME: this regex doesn't honor commenting
     _MIRRORS=$(grep -E -o '((http)|(https))://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
     #shellcheck disable=SC2086
-    _dialog --no-cancel --title " Package Mirror " --menu "" 13 55 7 \
-    "Custom" "_"  ${_MIRRORS} 2>${_ANSWER} || return 1
+    _dialog --cancel-label "Exit" --title " Package Mirror " --menu "" 13 55 7 \
+    "Custom" "_"  ${_MIRRORS} 2>${_ANSWER} || abort
     #shellcheck disable=SC2155
     local _SERVER=$(cat "${_ANSWER}")
     if [[ "${_SERVER}" == "Custom" ]]; then
@@ -115,9 +115,14 @@ _update_environment() {
 }
 
 _check
+if ! ping -c1 www.google.com &>/dev/null; then
+    _dialog --title " ERROR " --infobox "Your network is not working. Please reconfigure it." 3 60
+    sleep 5
+    abort
+fi
 while true; do
     _enable_testing
-    _select_mirror
+    _select_mirror || exit 1
     if _prepare_pacman; then
         break
     else
