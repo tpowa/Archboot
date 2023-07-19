@@ -114,12 +114,12 @@ _launcher() {
             setup
             exit 0 ;;
         "2")
-            _desktop
             _DEFAULTITEM=2
+            _desktop
             ;;
         "3")
-            _manage
             _DEFAULTITEM=3
+            _manage
             ;;
         *)
             _exit
