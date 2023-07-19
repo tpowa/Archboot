@@ -105,7 +105,6 @@ _launcher() {
     if [[ -n "${_MANAGE[@]}" ]]; then
         _MENU+=( "3" "Manage Archboot Environment" )
     fi
-    _DEFAULTITEM=1
     _dialog  --default-item "${_DEFAULTITEM}" --cancel-label "Exit" --title " Main Menu " --menu "" 9 40 5 \
     "1" "Launch Archboot Setup" "${_MENU[@]}" 2>${_ANSWER}
     case $(cat ${_ANSWER}) in
@@ -128,6 +127,7 @@ _launcher() {
 }
 
 _check
+_DEFAULTITEM=1
 while true; do
     _check_desktop
     _check_manage
