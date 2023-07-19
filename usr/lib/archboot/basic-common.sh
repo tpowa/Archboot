@@ -49,10 +49,14 @@ _cleanup() {
     exit 0
 }
 
-_run_update_environment() {
+_show_coffee() {
     clear
     echo -e "\e[93mGo and get a cup of coffee. Depending on your system setup,\e[m"
     echo -e "\e[93myou can \e[1mstart\e[m\e[93m with your tasks in about \e[1m5\e[m\e[93m minutes...\e[m"
+}
+
+_run_update_environment() {
+    _show_coffee
     if update | grep -q latest-install; then
         update -latest-install
     else
