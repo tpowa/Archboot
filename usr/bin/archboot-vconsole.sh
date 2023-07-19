@@ -59,7 +59,7 @@ _vconsole_keymap() {
         fi
         if [[ -n "${_CONTINUE}" ]]; then
             _KEYMAPS=""
-            for i in $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep -v '^carpalx' | grep -v 'defkey' | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
+            for i in $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep -v 'olpc' | grep -v 'mobii' | grep -v 'alt' | grep -v '^carpalx' | grep -v 'defkey' | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
                 _KEYMAPS="${_KEYMAPS} ${i} -"
             done
             #shellcheck disable=SC2086
