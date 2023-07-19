@@ -18,6 +18,7 @@ Environment Changes:
 - renamed archboot-locale script to localize script
 - preserving Basic Setup values when running kexec task
 - load archboot.com and wiki.archlinux.org on firefox startup
+- always enable NTP by default
 localize:
 - fixed abort dialog
 update:
