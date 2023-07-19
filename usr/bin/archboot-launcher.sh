@@ -106,7 +106,7 @@ _launcher() {
         _MENU+=( "3" "Manage Archboot Environment" )
     fi
     _DEFAULTITEM=1
-    _dialog --cancel-label --default-item "${_DEFAULTITEM}" "Exit" --title " Main Menu " --menu "" 9 40 5 \
+    _dialog  --default-item "${_DEFAULTITEM}" --cancel-label "Exit" --title " Main Menu " --menu "" 9 40 5 \
     "1" "Launch Archboot Setup" "${_MENU[@]}" 2>${_ANSWER}
     case $(cat ${_ANSWER}) in
         "1")
