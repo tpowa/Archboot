@@ -49,18 +49,15 @@ _timeset() {
     _hwclock
     # check internet connection
     if ping -c1 www.google.com &>/dev/null; then
-        if _dialog --yesno \
-        "Do you want to use the Network Time Protocol (NTP) for syncing your clock, by using the internet clock pool?" 6 60; then
-            _dialog --infobox "Syncing clock with NTP pool..." 3 45
-            # sync immediatly with standard pool
-            if ! systemctl restart systemd-timesyncd; then
-                _dialog --msgbox "An error has occured, time was not changed!" 0 0
-                _SET_TIME=""
-            else
-                # enable background syncing
-                timedatectl set-ntp 1
-                _SET_TIME="1"
-            fi
+        _dialog --infobox "Syncing clock with NTP pool..." 3 45
+        # sync immediatly with standard pool
+        if ! systemctl restart systemd-timesyncd; then
+            _dialog --msgbox "An error has occured, time was not changed!" 0 0
+            _SET_TIME=""
+        else
+            # enable background syncing
+            timedatectl set-ntp 1
+            _SET_TIME="1"
         fi
     fi
     if [[ -z "${_SET_TIME}" ]]; then
