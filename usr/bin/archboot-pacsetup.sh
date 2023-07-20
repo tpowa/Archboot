@@ -115,10 +115,12 @@ _update_environment() {
 }
 
 _check
-if ! ping -c1 www.google.com &>/dev/null; then
-    _dialog --title " ERROR " --infobox "Your network is not working. Please reconfigure it." 3 60
-    sleep 5
-    _abort
+if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+    if ! ping -c1 www.google.com &>/dev/null; then
+        _dialog --title " ERROR " --infobox "Your network is not working. Please reconfigure it." 3 60
+        sleep 5
+        _abort
+    fi
 fi
 while true; do
     if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
