@@ -131,6 +131,7 @@ while true; do
         echo "LocalFileSigLevel = Optional" >> "${_PACMAN_CONF}"
         echo "[archboot]" >> "${_PACMAN_CONF}"
         echo "Server = file:///var/cache/pacman/pkg" >> "${_PACMAN_CONF}"
+        pacman -Sy >>"${_LOG}"
         break
     fi
     _enable_testing
