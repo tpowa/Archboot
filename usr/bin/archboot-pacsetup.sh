@@ -124,7 +124,7 @@ if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
 fi
 while true; do
     if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
-        PACMAN_CONF="/etc/pacman.conf"
+        _PACMAN_CONF="/etc/pacman.conf"
         echo "[options]" > "${_PACMAN_CONF}"
         echo "Architecture = auto" >> "${_PACMAN_CONF}"
         echo "SigLevel    = Required DatabaseOptional" >> "${_PACMAN_CONF}"
