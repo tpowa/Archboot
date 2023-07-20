@@ -196,17 +196,8 @@ if [[ -e /usr/bin/setup ]]; then
     if [[ ! -e /.pacsetup ]]; then
         pacsetup
     fi
-    # switch for setup or launcher
-    if [[ -e "${_CACHEDIR}/archboot.db" ]]; then
-        if [[ ! -e /tmp/.setup ]]; then
-            # run setup on local medium once!
-            setup
-        fi
-    else
-        # run launcher on latest/normal medium once!
-        if [[ ! -e /.launcher ]]; then
-            launcher
-        fi
+    if [[ ! -e /.launcher ]]; then
+        launcher
     fi
 # latest image, fail if less than 2GB RAM available
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 1970000 ]]; then
