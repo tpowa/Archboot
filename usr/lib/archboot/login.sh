@@ -189,7 +189,7 @@ if [[ -e /usr/bin/setup ]]; then
     if ! [[ -e /.vconsole ]]; then
         vconsole
     fi
-    if [[ ! -e /.network && ! -e "${_CACHEDIR}/archboot.db" ]]; then
+    if [[ ! -e /.network ]]; then
         network
     fi
     if ! [[ -e /.clock ]]; then

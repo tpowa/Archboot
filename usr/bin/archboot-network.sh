@@ -12,6 +12,14 @@ _printk()
     esac
 }
 
+_online_switch() {
+    if _dialog --default-no --yesno "You are running in Offline Mode.\n\nDo you want to switch to Online Mode?" 5 40; then
+        rm /var/cache/pacman/pkg/archboot.db
+    else
+        return 0
+    fi
+}
+
 _net_interfaces() {
     find /sys/class/net/* -type l ! -name 'lo' -printf '%f ' -exec cat {}/address \;
 }
@@ -93,6 +101,9 @@ _wireless() {
 }
 
 _network() {
+    if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+        _online_switch || return 0
+    fi
     _NETPARAMETERS=""
     while [[ -z "${_NETPARAMETERS}" ]]; do
         # select network interface
