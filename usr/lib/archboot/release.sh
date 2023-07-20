@@ -34,6 +34,8 @@ _create_iso() {
     cd "${1}" || exit 1
     # create container
     archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
+    echo "Downloading man-db man-pages texinfo to container ${_W_DIR}..."
+    ${_NSPAWN} "${_W_DIR}" pacman -Syw man-db man-pages texinfo --noconfirm &>/dev/null
     _create_archboot_db "${_W_DIR}${_CACHEDIR}"
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
@@ -41,8 +43,6 @@ _create_iso() {
         # removing not working lvm2 from latest and local image first
         echo "Removing lvm2 from container ${_W_DIR}..."
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>/dev/null
-        echo "Downloading man-db man-pages texinfo to container ${_W_DIR}..."
-        ${_NSPAWN} "${_W_DIR}" pacman -Sw man-db man-pages texinfo --noconfirm &>/dev/null
         echo "Generating local ISO..."
         # generate local iso in container
         #if [[ "${_ARCH}" == "x86_64" ]]; then
