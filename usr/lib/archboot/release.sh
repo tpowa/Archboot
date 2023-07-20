@@ -41,6 +41,8 @@ _create_iso() {
         # removing not working lvm2 from latest and local image first
         echo "Removing lvm2 from container ${_W_DIR}..."
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>/dev/null
+        echo "Downloading man-db man-pages texinfo to container ${_W_DIR}..."
+        ${_NSPAWN} "${_W_DIR}" pacman -Sw man-db man-pages texinfo --noconfirm &>/dev/null
         echo "Generating local ISO..."
         # generate local iso in container
         #if [[ "${_ARCH}" == "x86_64" ]]; then
