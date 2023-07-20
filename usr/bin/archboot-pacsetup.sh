@@ -121,6 +121,16 @@ if ! ping -c1 www.google.com &>/dev/null; then
     _abort
 fi
 while true; do
+    if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+        PACMAN_CONF="/etc/pacman.conf"
+        echo "[options]" >> "${_PACMAN_CONF}"
+        echo "Architecture = auto" >> "${_PACMAN_CONF}"
+        echo "SigLevel    = Required DatabaseOptional" >> "${_PACMAN_CONF}"
+        echo "LocalFileSigLevel = Optional" >> "${_PACMAN_CONF}"
+        echo "[archboot]" >> "${_PACMAN_CONF}"
+        echo "Server = file:///var/cache/pacman/pkg" >> "${_PACMAN_CONF}"
+        break
+    fi
     _enable_testing
     _select_mirror || exit 1
     if _prepare_pacman; then
@@ -130,7 +140,9 @@ while true; do
         sleep 5
     fi
 done
-_update_environment
+if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+    _update_environment
+fi
 _dialog --infobox "Pacman configuration completed successfully." 3 60
 sleep 3
 _cleanup

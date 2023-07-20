@@ -972,12 +972,6 @@ _install_bootloader() {
         _set_guid
         _set_device_name_scheme || return 1
     fi
-    if [[ -z "${_S_SRC}" ]]; then
-        if ! _setsource; then
-            _NEXTITEM="4"
-            return 1
-        fi
-    fi
     if [[ -n "${_UCODE}" ]]; then
         if ! [[ -f "${_DESTDIR}/boot/${_UCODE}" ]]; then
             _PACKAGES="${_UCODE_PKG}"

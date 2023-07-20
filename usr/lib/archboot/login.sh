@@ -193,7 +193,7 @@ if [[ -e /usr/bin/setup ]]; then
     if ! [[ -e /.clock ]]; then
         clock
     fi
-    if [[ ! -e /.pacsetup && ! -e "${_CACHEDIR}/archboot.db" ]]; then
+    if [[ ! -e /.pacsetup ]]; then
         pacsetup
     fi
     # switch for setup or launcher

@@ -1,15 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_setsource() {
-    if [[ -z ${_S_SRC} ]]; then
-        _PACMAN_CONF=""
-        if [[ -e "${_LOCAL_DB}" ]]; then
-            _local_pacman_conf
-        fi
-    fi
-    _S_SRC=1
-}
 
 _run_pacman(){
     _chroot_mount
@@ -45,7 +36,6 @@ _run_pacman(){
 
 _install_packages() {
     _destdir_mounts || return 1
-    _setsource
     _PACKAGES=""
     # add packages from archboot defaults
     _PACKAGES=$(grep '^_PACKAGES' /etc/archboot/defaults | sed -e 's#_PACKAGES=##g' -e 's#"##g')

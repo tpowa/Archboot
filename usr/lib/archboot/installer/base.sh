@@ -10,7 +10,6 @@ fi
 _VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
 _VC="VC${_VC_NUM}"
 # install stages
-_S_SRC=""         # source set
 _S_QUICK_SETUP="" # guided fs/format
 # menu item tracker- autoselect the next item
 _NEXTITEM=""
@@ -21,9 +20,6 @@ _LSBLK="lsblk -rpno"
 _BLKID="blkid -c ${_NO_LOG}"
 _FINDMNT="findmnt -vno SOURCE"
 _DLPROG="wget -q"
-if [[ ${_DESTDIR} == "/" ]]; then
-    _S_SRC=1
-fi
 
 _set_title() {
     if [[ "${_DESTDIR}" == "/" ]]; then
