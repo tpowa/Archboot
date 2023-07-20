@@ -19,6 +19,7 @@ Environment Changes:
 - always enable NTP by default
 - renamed archboot-locale script to localize script
 - load archboot.com and wiki.archlinux.org on firefox startup
+- allow -full-system on local medium
 localize:
 - fixed abort dialog
 update:
