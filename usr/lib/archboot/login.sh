@@ -18,8 +18,6 @@ _local_mode () {
             # bring down network
             systemctl stop systemd-networkd 2>/dev/null
             systemctl stop systemd-resolved 2>/dev/null
-            echo -e "To \e[1mswitch\e[m to \e[1mOnline Mode\e[m:\e[1m\e[91m# rm ${_CACHEDIR}/archboot.db\e[m\e[1m"
-            echo ""
         fi
     fi
 }
