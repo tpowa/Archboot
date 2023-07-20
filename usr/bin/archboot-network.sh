@@ -13,7 +13,7 @@ _printk()
 }
 
 _online_switch() {
-    if _dialog --defaultno --yesno "You are running in Offline Mode.\n\nDo you want to switch to Online Mode?" 5 40; then
+    if _dialog --defaultno --yesno "You are running in Offline Mode.\n\nDo you want to switch to Online Mode?" 5 50; then
         rm /var/cache/pacman/pkg/archboot.db
     else
         return 0
