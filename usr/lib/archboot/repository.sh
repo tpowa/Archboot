@@ -19,7 +19,7 @@ _download_packages() {
     else
         _pacman_key_system
     fi
-    _PACKAGES="${_PACKAGES} ${_ARCHBOOT} ${_KEYRING}"
+    _PACKAGES="${_PACKAGES} ${_ARCHBOOT} ${_KEYRING} ${_MAN_INFO_PACKAGES}"
     echo "Downloading ${_PACKAGES} to ${1}..."
     #shellcheck disable=SC2086
     ${_PACMAN} -Syw ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>/dev/null || exit 1

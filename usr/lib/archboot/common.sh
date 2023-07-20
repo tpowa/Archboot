@@ -27,6 +27,7 @@ _STANDARD_PACKAGES="gparted xorg-xhost mtools nss-mdns"
 # chromium is now working on riscv64
 [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _STANDARD_BROWSER="firefox"
 _NSPAWN="systemd-nspawn -q -D"
+_MAN_INFO_PACKAGES="man-db man-pages texinfo"
 
 ### check for root
 _root_check() {
