@@ -69,7 +69,7 @@ _localize() {
     localectl set-locale "${_LOCALE}.UTF-8" &>/dev/null
     sed -i -e "s:^[a-z]:#&:g" /etc/locale.gen
     sed -i -e "s:^#${_LOCALE}.UTF-8:${_LOCALE}.UTF-8:g" /etc/locale.gen
-    _dialog --infobox "Setting locale to ${_LOCALE}.UTF-8,\nvconsole font ${_FONT} and keymap ${_KEYMAP}..." 4 60
+    _dialog --infobox "Setting locale to ${_LOCALE}.UTF-8,\nvconsole font ${_FONT} and keymap ${_KEYMAP}..." 4 70
     locale-gen &>/dev/null
     sleep 3
     _dialog --infobox "Localization completed successfully." 3 40
