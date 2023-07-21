@@ -9,14 +9,14 @@ _select_mirror() {
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _dialog --infobox "Downloading latest mirrorlist..." 3 40
         _COUNTRY="$(curl -s "http://ip-api.com/csv/?fields=countryCode")"
-        ${_DLPROG} "https://www.archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
+        ${_DLPROG} "https://www.archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
         if grep -q '#Server = https:' /tmp/pacman_mirrorlist.txt; then
             mv "${_MIRRORLIST}" "${_MIRRORLIST}.bak"
             cp /tmp/pacman_mirrorlist.txt "${_MIRRORLIST}"
         fi
     fi
     # FIXME: this regex doesn't honor commenting
-    _MIRRORS=$(grep -E -o '(https))://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
+    _MIRRORS=$(grep -E -o '(https)://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
     #shellcheck disable=SC2086
     _dialog --cancel-label "Exit" --title " Package Mirror " --menu "" 13 55 7 \
     "Custom" "_"  ${_MIRRORS} 2>${_ANSWER} || _abort
