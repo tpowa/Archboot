@@ -17,22 +17,25 @@ _select_mirror() {
     fi
     # FIXME: this regex doesn't honor commenting
     _MIRRORS=$(grep -E -o '(https)://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
-    #shellcheck disable=SC2086
-    _dialog --cancel-label "Exit" --title " Package Mirror " --menu "" 13 55 7 \
-    "Custom" "_"  ${_MIRRORS} 2>${_ANSWER} || _abort
-    #shellcheck disable=SC2155
-    local _SERVER=$(cat "${_ANSWER}")
-    if [[ "${_SERVER}" == "Custom" ]]; then
-        _dialog --inputbox "Enter the full URL to repositories." 8 65 \
-            "" 2>"${_ANSWER}" || return 1
-            _SYNC_URL=$(cat "${_ANSWER}")
-    else
-        # Form the full URL for our mirror by grepping for the server name in
-        # our mirrorlist and pulling the full URL out. Substitute 'core' in
-        # for the repository name, and ensure that if it was listed twice we
-        # only return one line for the mirror.
-        _SYNC_URL=$(grep -E -o "${_SERVER}.*" "${_MIRRORLIST}" | head -n1)
-    fi
+    _SYNC_URL=""
+    while [[ -z "${_SYNC_URL}" ]]; do
+        #shellcheck disable=SC2086
+        _dialog --cancel-label "Exit" --title " Package Mirror " --menu "" 13 55 7 \
+        "Custom" "_"  ${_MIRRORS} 2>${_ANSWER} || _abort
+        #shellcheck disable=SC2155
+        local _SERVER=$(cat "${_ANSWER}")
+        if [[ "${_SERVER}" == "Custom" ]]; then
+            _dialog --cancel-label "Back" --inputbox "Enter the full URL to repositories." 8 65 \
+                "" 2>"${_ANSWER}" || _SYNC_URL=""
+                _SYNC_URL=$(cat "${_ANSWER}")
+        else
+            # Form the full URL for our mirror by grepping for the server name in
+            # our mirrorlist and pulling the full URL out. Substitute 'core' in
+            # for the repository name, and ensure that if it was listed twice we
+            # only return one line for the mirror.
+            _SYNC_URL=$(grep -E -o "${_SERVER}.*" "${_MIRRORLIST}" | head -n1)
+        fi
+    done
     echo "Using mirror: ${_SYNC_URL}" >"${_LOG}"
     #shellcheck disable=SC2027,SC2086
     echo "Server = "${_SYNC_URL}"" >> /etc/pacman.d/mirrorlist
