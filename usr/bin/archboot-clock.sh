@@ -74,8 +74,6 @@ _timeset() {
         timedatectl set-time "${_DATETIME}"
         _SET_TIME="1"
     fi
-    _dialog --infobox "Clock configuration completed successfully." 3 50
-    sleep 3
 }
 
 _check
@@ -84,5 +82,7 @@ while [[ -z "${_SET_TIME}" ]]; do
     _timezone
     _timeset
 done
+_dialog --infobox "Clock configuration completed successfully." 3 50
+sleep 3
 _cleanup
 # vim: set ts=4 sw=4 et:
