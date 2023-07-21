@@ -59,11 +59,11 @@ _vconsole_keymap() {
         _KEYMAPS="${_KEYMAPS} ${i} -"
     done
     #shellcheck disable=SC2086
-    if _dialog --cancel-label "Exit" --title " Keymap Layout " --menu "" 13 40 7 ${_KEYMAPS} 2>${_ANSWER}; then
+    if _dialog --cancel-label "Back" --title " Keymap Layout " --menu "" 13 40 7 ${_KEYMAPS} 2>${_ANSWER}; then
         #shellcheck disable=SC2086
         _KEYMAP=$(cat ${_ANSWER})
     else
-        _abort
+        _LOCALE=""
     fi
 }
 
@@ -79,9 +79,9 @@ _vconsole() {
 _check
 while [[ -z ${_LOCALE} ]]; do
     _localize_menu
+    _vconsole_keymap
 done
 _vconsole_font
-_vconsole_keymap
 _vconsole
 _localize
 _cleanup
