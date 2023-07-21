@@ -79,7 +79,7 @@ _localize() {
 }
 
 _check
-while [[ -z ${_LOCALE} ]]; do
+while [[ -z "${_LOCALE}" ]]; do
     _locale_menu
     _vconsole_keymap
 done
