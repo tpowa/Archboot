@@ -8,7 +8,7 @@ _select_mirror() {
     ## Download updated mirrorlist, if possible (only on x86_64)
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _dialog --infobox "Downloading latest mirrorlist..." 3 40
-        ${_DLPROG} "https://www.archlinux.org/mirrorlist/?country=$(curl http://ip-api.com/csv/?fields=countryCode)&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
+        ${_DLPROG} "https://www.archlinux.org/mirrorlist/?country=$(curl -s http://ip-api.com/csv/?fields=countryCode)&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
         if grep -q '#Server = http:' /tmp/pacman_mirrorlist.txt; then
             mv "${_MIRRORLIST}" "${_MIRRORLIST}.bak"
             cp /tmp/pacman_mirrorlist.txt "${_MIRRORLIST}"
