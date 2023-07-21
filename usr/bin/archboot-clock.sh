@@ -15,7 +15,7 @@ _hwclock() {
 _timezone () {
     _SET_ZONE=""
     if ping -c1 www.google.com &>/dev/null; then
-        _ZONE="$(curl http://ip-api.com | grep timezone | cut -d ':' -f 2 | sed -e 's#["|,| ]##g')"
+        _ZONE="$(curl http://ip-api.com/csv/?fields=timezone)"
         _SET_ZONE=1
     fi
     while [[ -z "${_SET_ZONE}" ]]; do
