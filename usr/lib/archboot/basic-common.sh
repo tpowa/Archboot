@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 LANG=C
-_ANSWER="/.$(basename ${0})"
+_ANSWER="/.$(basename "${0}")"
 _RUNNING_ARCH="$(uname -m)"
 _LOG="/dev/tty7"
 _NO_LOG="/dev/null"
@@ -31,9 +31,9 @@ _show_login() {
 }
 
 _abort() {
-    if _dialog --yesno "Abort$(echo ${_TITLE} | cut -d '|' -f3) ?" 5 45; then
+    if _dialog --yesno "Abort$(echo "${_TITLE}" | cut -d '|' -f3) ?" 5 45; then
         [[ -e "${_ANSWER}-running" ]] && rm "${_ANSWER}-running"
-        [[ -e "${_ANSWER}" ]] && rm ${_ANSWER}
+        [[ -e "${_ANSWER}" ]] && rm "${_ANSWER}"
         clear
         exit 1
     else
