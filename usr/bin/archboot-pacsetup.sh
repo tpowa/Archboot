@@ -16,7 +16,7 @@ _select_mirror() {
         fi
     fi
     # FIXME: this regex doesn't honor commenting
-    _MIRRORS=$(grep -E -o '(https))://[^/]*' "${_MIRRORLIST}" | sed "s|$| _${_COUNTRY}|g")
+    _MIRRORS=$(grep -E -o '(https))://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
     #shellcheck disable=SC2086
     _dialog --cancel-label "Exit" --title " Package Mirror " --menu "" 13 55 7 \
     "Custom" "Own Mirror"  ${_MIRRORS} 2>${_ANSWER} || _abort
