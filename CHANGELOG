@@ -14,7 +14,7 @@ Environment Changes:
 - run Basic Setup scripts on first login
 - preserving Basic Setup values when running kexec task
 - added launcher, network, pacsetup script
-- renamed km to vconsole script
+- merged km into localize script
 - renamed tz to clock script
 - always enable NTP by default
 - renamed archboot-locale script to localize script
