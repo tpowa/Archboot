@@ -56,22 +56,20 @@ _vconsole() {
     else
         _FONT="ter-v16n"
     fi
-    _dialog --infobox "Setting vconsole font ${_FONT} and keymap ${_KEYMAP}..." 3 80
     echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
     echo FONT="${_FONT}" >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
-    sleep 3
     return 0
 }
 
 _localize() {
-    _dialog --infobox "Localization set to ${_LOCALE}.UTF-8..." 3 50
     echo "LANG=${_LOCALE}.UTF-8" > /etc/locale.conf
     echo "LANG=${_LOCALE}.UTF-8" > /.localize
     echo LC_COLLATE=C >> /etc/locale.conf
     localectl set-locale "${_LOCALE}.UTF-8" &>/dev/null
     sed -i -e "s:^[a-z]:#&:g" /etc/locale.gen
     sed -i -e "s:^#${_LOCALE}.UTF-8:${_LOCALE}.UTF-8:g" /etc/locale.gen
+    _dialog --infobox "Setting locale to ${_LOCALE}.UTF-8,\nvconsole font ${_FONT} and keymap ${_KEYMAP}..." 4 80
     locale-gen &>/dev/null
     sleep 3
     _dialog --infobox "Localization completed successfully." 3 40
