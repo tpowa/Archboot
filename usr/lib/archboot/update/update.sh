@@ -36,7 +36,7 @@ usage () {
     echo -e "\e[1m-----------------------------------------\e[m"
     echo -e " \e[1m-help\e[m            This message."
     if [[ ! -e "/var/cache/pacman/pkg/archboot.db" || -e "/usr/bin/setup" ]]; then
-        echo -e " \e[1m-update\e[m          Update scripts: setup, quickinst, clock, vconsole and helpers."
+        echo -e " \e[1m-update\e[m          Update scripts: setup, quickinst, network, clock and helpers."
     fi
     # latest image
     if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2000000 && ! -e "/.full_system" && ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
@@ -103,7 +103,7 @@ _download_latest() {
         # helper binaries
         echo -e "\e[1mStep 2/4:\e[m Downloading latest scripts..."
         # main binaries
-        BINS="quickinst setup vconsole clock launcher localize network pacsetup update copy-mountpoint rsync-backup restore-usbstick"
+        BINS="quickinst setup clock launcher localize network pacsetup update copy-mountpoint rsync-backup restore-usbstick"
         for i in ${BINS}; do
             [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
         done
@@ -409,10 +409,7 @@ _new_environment() {
         cp /etc/{locale.gen,locale.conf} "${_C_DIR}"/etc
         cp /.localize "${_C_DIR}"/
         ${_NSPAWN} "${_C_DIR}" /bin/bash -c "locale-gen" &>"${_NO_LOG}"
-    fi
-    if [[ -e '/.vconsole' ]]; then
         cp /etc/vconsole.conf "${_C_DIR}"/etc
-        cp /.vconsole "${_C_DIR}"/
         : >"${_C_DIR}"/.vconsole-run
     fi
     if [[ -e '/.clock' ]]; then

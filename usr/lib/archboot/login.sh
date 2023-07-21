@@ -179,13 +179,10 @@ if [[ -e /usr/bin/setup ]]; then
     # wait on user interaction!
     _enter_shell
     # Basic Setup:
-    # glibc locale, vconsole, network, clock, pacman
+    # localization, network, clock, pacman
     if ! [[ -e /.localize ]]; then
         localize
         source /etc/locale.conf
-    fi
-    if ! [[ -e /.vconsole ]]; then
-        vconsole
     fi
     if [[ ! -e /.network ]]; then
         network

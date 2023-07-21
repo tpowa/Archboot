@@ -36,10 +36,41 @@ _localize() {
     sleep 3
 }
 
+_vconsole_font() {
+    # Terminus font size detection
+    if grep -q '^FONT=.*32' /etc/vconsole.conf; then
+        _FONT="ter-v32n"
+    else
+        _FONT="ter-v16n"
+    fi
+}
+
+_vconsole_keymap() {
+    _KEYMAPS="us de es fr pt be bg br ca cz dk et fi gr hu it l lv mk nl no pl ro ru sk sr sv uk"
+    _LOW_LOCALE="$(echo ${_LOCALE} | tr A-Z a-z)"
+    _KEYMAP=""
+    for i in _KEYMAPS; do
+        echo $i | grep -q "${_LOW_LOCALE}" && _KEYMAP="${i}"
+        [[ -n ${_KEYMAP} ]] && break
+    done
+}
+
+_vconsole() {
+    _dialog --infobox "Setting vconsole font ${_FONT} and keymap ${_KEYMAP}..." 3 80
+    echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
+    echo FONT="${_FONT}" >> /etc/vconsole.conf
+    systemctl restart systemd-vconsole-setup
+    sleep 3
+    return 0
+}
+
 _check
 while [[ -z ${_LOCALE} ]]; do
     _localize_menu
 done
+_vconsole_font
+_vconsole_keymap
+_vconsole
 _localize
 _cleanup
 # vim: set ts=4 sw=4 et:
