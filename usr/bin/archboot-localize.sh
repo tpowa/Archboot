@@ -4,7 +4,7 @@
 . /usr/lib/archboot/basic-common.sh
 _TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Localization"
 
-_localize_menu() {
+_locale_menu() {
     _LOCALE=""
     _LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese OTHER Other"
     _OTHER_LOCALES="be_BY Belarusian bg_BG Bulgarian cs_CZ Czech da_DK Dansk fi_FI Finnish el_GR Greek hu_HU Hungarian it_IT Italian lt_LT Lithuanian lv_LV Latvian mk_MK Macedonian nl_NL Dutch nn_NO Norwegian pl_PL Polish ro_RO Romanian  ru_RU Russian sk_SK Slovak sr_RS Serbian sv_SE Swedish uk_UA Ukrainian"
@@ -44,16 +44,13 @@ _vconsole_keymap() {
     fi
 }
 
-_vconsole_font() {
+_vconsole() {
     # Terminus font size detection
     if grep -q '^FONT=.*32' /etc/vconsole.conf; then
         _FONT="ter-v32n"
     else
         _FONT="ter-v16n"
     fi
-}
-
-_vconsole() {
     _dialog --infobox "Setting vconsole font ${_FONT} and keymap ${_KEYMAP}..." 3 80
     echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
     echo FONT="${_FONT}" >> /etc/vconsole.conf
@@ -78,10 +75,9 @@ _localize() {
 
 _check
 while [[ -z ${_LOCALE} ]]; do
-    _localize_menu
+    _locale_menu
     _vconsole_keymap
 done
-_vconsole_font
 _vconsole
 _localize
 _cleanup
