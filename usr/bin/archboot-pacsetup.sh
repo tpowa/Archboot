@@ -126,12 +126,14 @@ while true; do
     if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
         _dialog --infobox "Setting local mirror..." 3 40
         _PACMAN_CONF="/etc/pacman.conf"
-        echo "[options]" > "${_PACMAN_CONF}"
-        echo "Architecture = auto" >> "${_PACMAN_CONF}"
-        echo "SigLevel    = Required DatabaseOptional" >> "${_PACMAN_CONF}"
-        echo "LocalFileSigLevel = Optional" >> "${_PACMAN_CONF}"
-        echo "[archboot]" >> "${_PACMAN_CONF}"
-        echo "Server = file:///var/cache/pacman/pkg" >> "${_PACMAN_CONF}"
+        cat << EOF > "${_PACMAN_CONF}"
+[options]
+Architecture = auto
+SigLevel    = Required DatabaseOptional
+LocalFileSigLevel = Optional
+[archboot]
+Server = file:///var/cache/pacman/pkg
+EOF
         pacman -Sy >>"${_LOG}"
         sleep 3
         break
