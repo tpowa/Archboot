@@ -164,7 +164,7 @@ _install_archboot() {
     else
         _pacman_key_system
     fi
-    echo "Installing ${_ARCHBOOT} to ${1}..."
+    echo "Installing ${_ARCHBOOT} ${_MAN_INFO_PACKAGES} to ${1}..."
     #shellcheck disable=SC2086
     ${_PACMAN} -Sy ${_ARCHBOOT} ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} &>/dev/null || exit 1
     # cleanup
