@@ -51,7 +51,7 @@ _vconsole_keymap() {
     _LOW_LOCALE="$(echo ${_LOCALE} | tr A-Z a-z)"
     _KEYMAP=""
     for i in ${_KEYMAPS}; do
-        echo $i | grep -q "${_LOW_LOCALE}" && _KEYMAP="${i}"
+        echo "${_LOW_LOCALE}" | grep -q "${i}" && _KEYMAP="${i}"
         [[ -n ${_KEYMAP} ]] && break
     done
     _KEYMAPS=""
