@@ -11,6 +11,8 @@ else
     # blue for normal user,host green, print full working dir
     PS1='[\[\e[1;34m\]\u\[\e[m\]@\[\e[1;32m\]\h\[\e[m\] \w]\$ '
 fi
+# color man pages
+GROFF_NO_SGR=1
 # keep history clean from dups and spaces
 HISTCONTROL="erasedups:ignorespace"
 # if installed set  neovim as default editor
