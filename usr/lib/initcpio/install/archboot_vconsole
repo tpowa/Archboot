@@ -5,7 +5,6 @@
 build ()
 {
     add_full_dir "/usr/share/kbd"
-    add_file /usr/bin/archboot-vconsole.sh /usr/bin/vconsole
     #add kbd binaries
     map add_binary dumpkeys kbd_mode chvt deallocvt fgconsole getkeycodes kbdinfo kbdrate loadunimap mapscrn openvt psfaddtable psfgettable psfstriptable psfxtable setkeycodes setleds setmetamode setvtrgb showconsolefont showkey unicode_start unicode_stop vlock
     # only add resizecons on x86_64 
