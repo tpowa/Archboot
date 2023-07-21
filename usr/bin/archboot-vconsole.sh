@@ -17,22 +17,11 @@ _vconsole() {
 }
 
 _vconsole_font() {
-    _CONTINUE=""
-    while [[ -z "${_CONTINUE}" ]]; do
-        if grep -q '^FONT=.*32' /etc/vconsole.conf; then
-            _FONTS="ter-v32n Worldwide latarcyrheb-sun32 'Default Font'"
-        else
-            _FONTS='ter-v16n "Default Font" latarcyrheb-sun16 Worldwide eurlatgr Europe'
-        fi
-        #shellcheck disable=SC2086
-        if _dialog --cancel-label "${_LABEL}" --title " Vconsole Font " --menu "" 9 40 3 ${_FONTS} 2>${_ANSWER}; then
-            #shellcheck disable=SC2086
-            _FONT=$(cat ${_ANSWER})
-            _CONTINUE=1
-        else
-            _abort
-        fi
-    done
+    if grep -q '^FONT=.*32' /etc/vconsole.conf; then
+        _FONT="ter-v32n"
+    else
+        _FONT="ter-v16n"
+    fi
 }
 
 _vconsole_keymap() {
@@ -43,7 +32,7 @@ _vconsole_keymap() {
         _KEYMAPS="us English de German es Spanish fr French pt Portuguese OTHER More"
         _OTHER_KEYMAPS="be Belarusian bg Bulgarian br Brazil ca Canada cz Czech dk Dansk et Estonian fi Finnish gr Greek hu Hungarian it Italian lt Lithuanian lv Latvian mk Macedonian nl Dutch no Norwegian pl Polish ro Romanian ru Russian sk Slovak sr Serbian sv Swedish uk Ukrainian"
         #shellcheck disable=SC2086
-        if _dialog --no-cancel --title " Keymap Region " --menu "" 12 40 6 ${_KEYMAPS} 2>${_ANSWER}; then
+        if _dialog --cancel-label "Exit" --title " Keymap Region " --menu "" 12 40 6 ${_KEYMAPS} 2>${_ANSWER}; then
             _KEYMAP=$(cat ${_ANSWER})
             _CONTINUE="1"
             if [[ "${_KEYMAP}" == "OTHER" ]]; then
