@@ -20,9 +20,9 @@ _vconsole_font() {
     _CONTINUE=""
     while [[ -z "${_CONTINUE}" ]]; do
         if grep -q '^FONT=.*32' /etc/vconsole.conf; then
-            _FONTS="ter-v32n Worldwide latarcyrheb-sun32 Worldwide"
+            _FONTS="ter-v32n Worldwide latarcyrheb-sun32 'Default Font'"
         else
-            _FONTS="ter-v16n Worldwide latarcyrheb-sun16 Worldwide eurlatgr Europe"
+            _FONTS="ter-v16n 'Default Font' latarcyrheb-sun16 Worldwide eurlatgr Europe"
         fi
         #shellcheck disable=SC2086
         if _dialog --cancel-label "${_LABEL}" --title " Vconsole Font " --menu "" 9 40 3 ${_FONTS} 2>${_ANSWER}; then
