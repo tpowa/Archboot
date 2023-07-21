@@ -17,6 +17,7 @@ _vconsole() {
 }
 
 _vconsole_font() {
+    # Terminus font size detection
     if grep -q '^FONT=.*32' /etc/vconsole.conf; then
         _FONT="ter-v32n"
     else
