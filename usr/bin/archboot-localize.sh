@@ -13,7 +13,7 @@ _locale_menu() {
         _CANCEL=""
         #shellcheck disable=SC2086
         _dialog --cancel-label "Exit" --title " Locale " --menu "" 12 35 5 ${_LOCALES} 2>${_ANSWER} || _abort
-        _LOCALE=$(cat ${_ANSWER})
+        _LOCALE=$(cat "${_ANSWER}")
         if [[ "${_LOCALE}" == "OTHER" ]]; then
             #shellcheck disable=SC2086
             if _dialog --cancel-label "Back" --title " Other Locale " --menu "" 17 35 11 ${_OTHER_LOCALES} 2>${_ANSWER}; then
@@ -28,7 +28,7 @@ _locale_menu() {
 _vconsole_keymap() {
     _LIST_MAPS="localectl list-keymaps --no-pager"
     _KEYMAPS="us de es fr pt be bg br ca cz dk et fi gr hu it l lv mk nl no pl ro ru sk sr sv uk"
-    _LOW_LOCALE="$(echo ${_LOCALE} | tr A-Z a-z)"
+    _LOW_LOCALE="$(echo "${_LOCALE}" | tr "[:upper:]" "[:lower:]")"
     _KEYMAP=""
     for i in ${_KEYMAPS}; do
         echo "${_LOW_LOCALE}" | grep -q "${i}" && _KEYMAP="${i}"
