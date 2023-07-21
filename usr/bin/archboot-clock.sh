@@ -72,14 +72,10 @@ _timeset() {
         # DD/MM/YYYY hh:mm:ss -> YYYY-MM-DD hh:mm:ss
         _DATETIME="$(echo "${_DATE}" "${_TIME}" | sed 's#\(..\)/\(..\)/\(....\) \(..\):\(..\):\(..\)#\3-\2-\1 \4:\5:\6#g')"
         timedatectl set-time "${_DATETIME}"
-    fi
-    if _dialog --cr-wrap --title " Summary " --yesno "$(${_DATE_PROGRAM})" 0 0; then
-        _dialog --infobox "Clock configuration completed successfully." 3 50
         _SET_TIME="1"
-        sleep 3
-    else
-        _SET_TIME=""
     fi
+    _dialog --infobox "Clock configuration completed successfully." 3 50
+    sleep 3
 }
 
 _check
