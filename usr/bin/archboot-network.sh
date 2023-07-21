@@ -16,7 +16,7 @@ _online_switch() {
     if _dialog --title " Offline Mode " --defaultno --yesno "Do you want to switch to Online Mode?" 5 45; then
         rm /var/cache/pacman/pkg/archboot.db
     else
-        return 1
+        _cleanup
     fi
 }
 
@@ -102,10 +102,7 @@ _wireless() {
 
 _network() {
     if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
-        if ! _online_switch; then
-            _cleanup
-            exit 0
-        fi
+        _online_switch
     fi
     _NETPARAMETERS=""
     while [[ -z "${_NETPARAMETERS}" ]]; do
