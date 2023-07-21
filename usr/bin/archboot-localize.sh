@@ -46,13 +46,25 @@ _vconsole_font() {
 }
 
 _vconsole_keymap() {
+    _LIST_MAPS="localectl list-keymaps --no-pager"
     _KEYMAPS="us de es fr pt be bg br ca cz dk et fi gr hu it l lv mk nl no pl ro ru sk sr sv uk"
     _LOW_LOCALE="$(echo ${_LOCALE} | tr A-Z a-z)"
     _KEYMAP=""
-    for i in _KEYMAPS; do
+    for i in ${_KEYMAPS}; do
         echo $i | grep -q "${_LOW_LOCALE}" && _KEYMAP="${i}"
         [[ -n ${_KEYMAP} ]] && break
     done
+    _KEYMAPS=""
+    for i in $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep -v 'olpc' | grep -v 'mobii' | grep -v 'alt' | grep -v '^carpalx' | grep -v 'defkey' | grep -v 'mac' | grep -v 'amiga' | grep -v 'sun' | grep -v 'atari'); do
+        _KEYMAPS="${_KEYMAPS} ${i} -"
+    done
+    #shellcheck disable=SC2086
+    if _dialog --cancel-label "Exit" --title " Keymap Layout " --menu "" 13 40 7 ${_KEYMAPS} 2>${_ANSWER}; then
+        #shellcheck disable=SC2086
+        _KEYMAP=$(cat ${_ANSWER})
+    else
+        _abort
+    fi
 }
 
 _vconsole() {
