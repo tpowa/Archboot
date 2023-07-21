@@ -14,6 +14,10 @@ _hwclock() {
 
 _timezone () {
     _SET_ZONE=""
+    if ping -c1 www.google.com &>/dev/null; then
+        _ZONE="$(curl http://ip-api.com | grep timezone | cut -d ':' -f 2 | sed -e 's#["|,| ]##g')"
+        _SET_ZONE=1
+    fi
     while [[ -z "${_SET_ZONE}" ]]; do
         _CONTINUE=""
         while [[ -z "${_CONTINUE}" ]]; do
@@ -36,13 +40,13 @@ _timezone () {
             _SET_ZONE="1"
             _ZONE=$(cat ${_ANSWER})
             [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
-            _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 50
-            timedatectl set-timezone "${_ZONE}"
-            sleep 3
         else
             _SET_ZONE=""
         fi
     done
+    _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 50
+    timedatectl set-timezone "${_ZONE}"
+    sleep 3
 }
 
 _timeset() {
