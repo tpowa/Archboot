@@ -144,7 +144,9 @@ EOF
         sleep 2
         break
     fi
-    _enable_testing
+    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
+        _enable_testing
+    fi
     _select_mirror || exit 1
     if _prepare_pacman; then
         break
