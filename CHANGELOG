@@ -21,6 +21,8 @@ Environment Changes:
 - load archboot.com and wiki.archlinux.org on firefox startup
 - allow -full-system on local medium
 - removed font selection
+- GEOIP based timezone setting
+- GEOIP based mirror listing
 localize:
 - fixed abort dialog
 update:
