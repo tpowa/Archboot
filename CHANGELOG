@@ -23,7 +23,7 @@ localize:
 - fixed abort dialog
 clock:
 - GeoIP based timezone setting
-- always enable NTP by default
+- always enable timesyncd by default
 pacsetup:
 - GeoIP based mirror listing
 update:
