@@ -482,13 +482,15 @@
 </ul></li>
 </ul>
 <h4 data-number="3.3.3" id="clock"><span class="header-section-number">3.3.3</span> <strong>Clock Configuration</strong></h4>
-<p>You set your <a href="https://wiki.archlinux.org/title/Timezone" title="Timezone"><strong>timezone</strong></a> and <a href="https://wiki.archlinux.org/title/Date" title="Date"><strong>date</strong></a> with the <strong>clock</strong> script.</p>
-<li>In <strong>Online Mode</strong> the timezone will be set by your GeoIP.</li>
+<ul>
+<li>Your <a href="https://wiki.archlinux.org/title/Timezone" title="Timezone"><strong>timezone</strong></a> and <a href="https://wiki.archlinux.org/title/Date" title="Date"><strong>date</strong></a> will be configured by the <strong>clock</strong> script.</li>
+<li>In <strong>Online Mode</strong> the timezone will be configured by your <a href="http://ip-api.com" title="GeoIP"><strong>GeoIP</strong></a> and  <a href="https://wiki.archlinux.org/title/Systemd-timesyncd" title="timesyncd"><strong>timesyncd</strong></a> will be activated.</li>
+</ul>
 <h4 data-number="3.3.4" id="pacman"><span class="header-section-number">3.3.4</span> <strong>Pacman Setup (Online Mode)</strong></h4>
 <p><a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>Pacman</strong></a> will be configured by <strong>pacsetup</strong> script.</p>
 <ul>
 <li>You will be asked if you want to activate the <a href="https://wiki.archlinux.org/title/Testing" title="Testing"><strong>testing</strong></a> repository <strong>&lt;default=no&gt;</strong>.</li>
-<li>Latest <a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>pacman</strong></a> <a href="https://wiki.archlinux.org/title/Mirror" title="Mirror"><strong>mirrors</strong></a> will be GeoIP synced and you have to select your favourite mirror.</li>
+<li>Latest <a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>pacman</strong></a> <a href="https://wiki.archlinux.org/title/Mirror" title="Mirror"><strong>mirrors</strong></a> will be <a href="http://ip-api.com" title="GeoIP"><strong>GeoIP</strong></a> synced and you have to select your <strong>favourite</strong> mirror.</li>
 <li>If a new kernel is online available, you can decide to load the latest archboot environment <strong>&lt;default=no&gt;</strong>.</li>
 </ul></li>
 </ul>
