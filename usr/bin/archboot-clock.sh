@@ -47,6 +47,7 @@ _timezone () {
     _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 50
     timedatectl set-timezone "${_ZONE}"
     sleep 2
+}
 
 _timeset() {
     _hwclock
