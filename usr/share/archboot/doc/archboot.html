@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 21.07.2023 16:13</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 22.07.2023 08:18</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -483,11 +483,12 @@
 </ul>
 <h4 data-number="3.3.3" id="clock"><span class="header-section-number">3.3.3</span> <strong>Clock Configuration</strong></h4>
 <p>You set your <a href="https://wiki.archlinux.org/title/Timezone" title="Timezone"><strong>timezone</strong></a> and <a href="https://wiki.archlinux.org/title/Date" title="Date"><strong>date</strong></a> with the <strong>clock</strong> script.</p>
+<li>In <strong>Online Mode</strong> the timezone will be set by your GeoIP.</li>
 <h4 data-number="3.3.4" id="pacman"><span class="header-section-number">3.3.4</span> <strong>Pacman Setup (Online Mode)</strong></h4>
 <p><a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>Pacman</strong></a> will be configured by <strong>pacsetup</strong> script.</p>
 <ul>
 <li>You will be asked if you want to activate the <a href="https://wiki.archlinux.org/title/Testing" title="Testing"><strong>testing</strong></a> repository <strong>&lt;default=no&gt;</strong>.</li>
-<li>Latest <a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>pacman</strong></a> <a href="https://wiki.archlinux.org/title/Mirror" title="Mirror"><strong>mirrors</strong></a> will be synced and you have to select your favourite mirror.</li>
+<li>Latest <a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>pacman</strong></a> <a href="https://wiki.archlinux.org/title/Mirror" title="Mirror"><strong>mirrors</strong></a> will be GeoIP synced and you have to select your favourite mirror.</li>
 <li>If a new kernel is online available, you can decide to load the latest archboot environment <strong>&lt;default=no&gt;</strong>.</li>
 </ul></li>
 </ul>
