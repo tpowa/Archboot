@@ -20,7 +20,7 @@ build ()
 help ()
 {
 cat<<HELPEOF
-  This hook includes the keymaps and fonts on an archboot image.
+  This hook includes the vconsole keymaps and fonts on an archboot image.
 HELPEOF
 }
 # vim: set ft=sh ts=4 sw=4 et:
