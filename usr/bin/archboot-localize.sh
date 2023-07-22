@@ -70,6 +70,7 @@ _localize() {
     sed -i -e "s:^#${_LOCALE}.UTF-8:${_LOCALE}.UTF-8:g" /etc/locale.gen
     _dialog --infobox "Setting locale to ${_LOCALE}.UTF-8..." 3 50
     locale-gen &>/dev/null
+    sleep 2
     _dialog --infobox "Setting vconsole font to ${_FONT}..." 3 50
     sleep 2
     _dialog --infobox "Setting keymap to ${_KEYMAP}..." 3 50
