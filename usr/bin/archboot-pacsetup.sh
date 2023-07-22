@@ -5,7 +5,7 @@
 _TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Pacman Configuration"
 
 _select_mirror() {
-    ## Download updated mirrorlist, if possible (only on x86_64)
+    # Download updated mirrorlist, if possible (only on x86_64)
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _COUNTRY="$(curl -s "http://ip-api.com/csv/?fields=countryCode")"
         _dialog --infobox "Downloading latest mirrorlist for Region ${_COUNTRY}..." 3 60
@@ -16,7 +16,7 @@ _select_mirror() {
             cp /tmp/pacman_mirrorlist.txt "${_MIRRORLIST}"
         fi
     fi
-    # FIXME: this regex doesn't honor commenting
+    # This regex doesn't honor commenting
     _MIRRORS=$(grep -E -o '(https)://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
     _SYNC_URL=""
     while [[ -z "${_SYNC_URL}" ]]; do
