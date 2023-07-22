@@ -34,7 +34,6 @@ update:
 - allow -full-system on local medium
 setup:
 - silence _LSBLK errors
-- added grub bli efi module to grub.cfg
 - switched to infobox on reboot and poweroff
 - removed network code
 - removed localization code
