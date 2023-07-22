@@ -8,7 +8,7 @@ _select_mirror() {
     ## Download updated mirrorlist, if possible (only on x86_64)
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _COUNTRY="$(curl -s "http://ip-api.com/csv/?fields=countryCode")"
-        _dialog --infobox "Downloading latest mirrorlist for Region ${_COUNTRY}..." 3 40
+        _dialog --infobox "Downloading latest mirrorlist for Region ${_COUNTRY}..." 3 60
         ${_DLPROG} "https://www.archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
         sleep 2
         if grep -q '#Server = https:' /tmp/pacman_mirrorlist.txt; then
