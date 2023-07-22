@@ -53,7 +53,7 @@ _timeset() {
     _hwclock
     # check internet connection
     if ping -c1 www.google.com &>/dev/null; then
-        _dialog --infobox "Syncing clock with NTP pool..." 3 45
+        _dialog --infobox "Syncing clock with NTP pool and enable timesyncd..." 3 65
         sleep 2
         # sync immediatly with standard pool
         if ! systemctl restart systemd-timesyncd; then
