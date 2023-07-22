@@ -21,13 +21,12 @@ Environment Changes:
 - allow -full-system on local medium
 localize:
 - removed font selection
+- fixed abort dialog
 clock:
 - GeoIP based timezone setting
 - always enable NTP by default
 pacsetup:
 - GeoIP based mirror listing
-localize:
-- fixed abort dialog
 update:
 - trigger kernel module loading on -full-system
 - lower RAM requiremens for graphical environments
