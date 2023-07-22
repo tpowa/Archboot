@@ -25,7 +25,7 @@ _select_mirror() {
         "Custom / Own Mirror" "_"  ${_MIRRORS} 2>${_ANSWER} || _abort
         #shellcheck disable=SC2155
         local _SERVER=$(cat "${_ANSWER}")
-        if [[ "${_SERVER}" == "Custom" ]]; then
+        if [[ "${_SERVER}" == "Custom / Own Mirror" ]]; then
             _dialog --cancel-label "Back" --inputbox "Enter the full URL to repositories." 8 65 \
                 "" 2>"${_ANSWER}" || _SYNC_URL=""
                 _SYNC_URL=$(cat "${_ANSWER}")
