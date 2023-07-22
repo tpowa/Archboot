@@ -59,7 +59,6 @@ _vconsole() {
     echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
     echo FONT="${_FONT}" >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
-    return 0
 }
 
 _localize() {
