@@ -22,7 +22,7 @@ _select_mirror() {
     while [[ -z "${_SYNC_URL}" ]]; do
         #shellcheck disable=SC2086
         _dialog --cancel-label "Exit" --title " Package Mirror " --menu "" 13 55 7 \
-        "Custom" "_"  ${_MIRRORS} 2>${_ANSWER} || _abort
+        "Custom / Own Mirror" "_"  ${_MIRRORS} 2>${_ANSWER} || _abort
         #shellcheck disable=SC2155
         local _SERVER=$(cat "${_ANSWER}")
         if [[ "${_SERVER}" == "Custom" ]]; then
