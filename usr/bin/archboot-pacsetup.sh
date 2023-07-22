@@ -93,7 +93,7 @@ _update_environment() {
                 _LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 if  [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
                     #shellcheck disable=SC2086
-                _   ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+                    _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 else
                     if [[ -n "${_DOTESTING}" ]]; then
                         #shellcheck disable=SC2086
