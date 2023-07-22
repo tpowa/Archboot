@@ -39,6 +39,8 @@ _select_mirror() {
         fi
     done
     echo "Using mirror: ${_SYNC_URL}" >"${_LOG}"
+    # comment already existing entries
+    sed -i -e 's|^Server|#Server|g' /etc/pacman.d/mirrorlist
     #shellcheck disable=SC2027,SC2086
     echo "Server = "${_SYNC_URL}"" >> /etc/pacman.d/mirrorlist
     return 0
