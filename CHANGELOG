@@ -5,9 +5,9 @@ Environment Changes:
 - run Basic Setup scripts on first login
 - preserving Basic Setup values when running kexec task
 - added launcher, network, pacsetup script
+- renamed archboot-locale script to localize script
 - merged km into localize script
 - renamed tz to clock script
-- renamed archboot-locale script to localize script
 - added Sway to preconfigured desktop environments
 - added ttyd remote http terminal support
 - renamed initramfs to initrd
@@ -27,7 +27,7 @@ clock:
 pacsetup:
 - GeoIP based mirror listing
 update:
-- trigger kernel module loading on -full-system
+- trigger kernel module loading after -full-system run
 - lower RAM requiremens for graphical environments
 - remove reinstalled packages too from package cache
 - added qxl module detection
