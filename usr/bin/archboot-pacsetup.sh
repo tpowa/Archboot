@@ -18,6 +18,7 @@ _select_mirror() {
     fi
     # This regex doesn't honor commenting
     _MIRRORS=$(grep -E -o '(https)://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
+    [[ -z ${_MIRRORS} ]] && _MIRRORS=$(grep -E -o '(http)://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
     _SYNC_URL=""
     while [[ -z "${_SYNC_URL}" ]]; do
         #shellcheck disable=SC2086
