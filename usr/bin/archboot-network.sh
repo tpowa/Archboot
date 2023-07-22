@@ -205,9 +205,9 @@ _network() {
         return 1
     fi
     _dialog --infobox "Link is up. Network is ready." 3 50
-    sleep 3
+    sleep 2
     _dialog --infobox "Network configuration completed successfully." 3 50
-    sleep 3
+    sleep 2
     return 0
 }
 

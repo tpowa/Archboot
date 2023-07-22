@@ -106,7 +106,7 @@ _update_environment() {
                 sleep 2
                 if [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
                     _dialog --infobox "No new kernel online available. Skipping update environment." 3 70
-                    sleep 3
+                    sleep 2
                 else
                     _dialog --title " New Kernel Available " --defaultno --yesno "Do you want to update the Archboot Environment to ${_ONLINE_KERNEL}?\n\nATTENTION:\nThis will reboot the system using kexec!" 9 60 && _UPDATE_ENVIRONMENT=1
                     if [[ -n "${_UPDATE_ENVIRONMENT}" ]]; then
@@ -139,7 +139,7 @@ LocalFileSigLevel = Optional
 Server = file:///var/cache/pacman/pkg
 EOF
         pacman -Sy >>"${_LOG}"
-        sleep 3
+        sleep 2
         break
     fi
     _enable_testing
@@ -155,6 +155,6 @@ if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
     _update_environment
 fi
 _dialog --infobox "Pacman configuration completed successfully." 3 60
-sleep 3
+sleep 2
 _cleanup
 # vim: set ft=sh ts=4 sw=4 et:
