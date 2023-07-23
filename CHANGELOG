@@ -1,6 +1,10 @@
-On the road to 2023.07:
+On the road to 2023.08:
+2023.07 Highlights:
 - kernel 6.4.x
 - grub 2.12rc1-1
+- New interactive login routine
+- added Sway to preconfigured desktop environments
+- added ttyd remote http terminal support
 Environment Changes:
 - run Basic Setup scripts on first login
 - preserving Basic Setup values when running kexec task
@@ -8,8 +12,6 @@ Environment Changes:
 - renamed archboot-locale script to localize script
 - merged km into localize script
 - renamed tz to clock script
-- added Sway to preconfigured desktop environments
-- added ttyd remote http terminal support
 - renamed initramfs to initrd
 - stripped off archboot from kernel name
 - renamed Locale Mode to Offline Mode
