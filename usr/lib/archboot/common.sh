@@ -68,7 +68,7 @@ _kver() {
     # requirement for CONFIG_LOCALVERSION to be set.
     local kver re='^[[:digit:]]+(\.[[:digit:]]+)+'
     local arch bytes reader
-    arch="${_ARCH}"
+    arch="${_RUNNING_ARCH}"
     if [[ $arch == @(i?86|x86_64) ]]; then
         local -i offset
         offset="$(od -An -j0x20E -dN2 "$1")" || return

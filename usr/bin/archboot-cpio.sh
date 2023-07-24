@@ -8,6 +8,9 @@
 
 shopt -s extglob
 
+# shellcheck source=functions
+. /usr/lib/archboot/common.sh
+. /usr/lib/archboot/cpio.sh
 # needed files/directories
 _f_config=
 _d_install=/lib/initcpio/install
@@ -160,9 +163,7 @@ if ! [[ ${UID} -eq 0 ]]; then
     echo "ERROR: Please run as root user!"
     exit 1
 fi
-# shellcheck source=functions
-. /usr/lib/archboot/common.sh
-. /usr/lib/archboot/cpio.sh
+
 _opt_short='c:d:g:hk:'
 parseopts "$_opt_short" -- "$@" || exit 1
 set -- "${OPTRET[@]}"

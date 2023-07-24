@@ -35,7 +35,7 @@ _create_iso() {
     archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
     _create_archboot_db "${_W_DIR}${_CACHEDIR}"
     . "${_W_DIR}/etc/archboot/presets/${_ARCH}"
-    _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver ${_W_DIR}/${ALL_kver})"
+    _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(${_NSPAWN} ${_W_DIR} _kver ${ALL_kver})"
     unset ALL_kver MKINITCPIO_CONFIG
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
@@ -51,7 +51,7 @@ _create_iso() {
         #    wget -q "https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig" -P "${_W_DIR}/var/cache/pacman/pkg"
         #fi
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -s \
-            -p=${_PRESET_LOCAL}  -i=${_ISONAME}-local-${_ARCH}" || exit 1
+            -p=${_PRESET_LOCAL} -i=${_ISONAME}-local-${_ARCH}" || exit 1
         echo "Generating latest ISO..."
         # generate latest iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g \
