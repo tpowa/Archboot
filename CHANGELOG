@@ -20,6 +20,7 @@ Environment Changes:
 - use BLAKE2b/b2sum instead of sha256sum
 - shortened MOTD and init message
 - load archboot.com and wiki.archlinux.org on firefox startup
+- added Ventoy support
 localize:
 - removed font selection
 - fixed abort dialog
