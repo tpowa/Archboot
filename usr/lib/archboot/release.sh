@@ -16,8 +16,6 @@ else
 fi
 _PRESET_LATEST="${_ARCH}-latest"
 _PRESET_LOCAL="${_ARCH}-local"
-. /etc/archboot/presets/${_ARCH}
-_ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver ${ALL_kver})"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 
 _usage () {
@@ -42,6 +40,7 @@ _create_iso() {
         # removing not working lvm2 from latest and local image first
         echo "Removing lvm2 from container ${_W_DIR}..."
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>/dev/null
+        ${_NSPAWN} "${_W_DIR}" /bin/bash -c ". /etc/archboot/presets/${_ARCH};_ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver ${ALL_kver})""
         echo "Generating local ISO..."
         # generate local iso in container
         #if [[ "${_ARCH}" == "x86_64" ]]; then
