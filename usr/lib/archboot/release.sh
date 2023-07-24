@@ -36,6 +36,7 @@ _create_iso() {
     _create_archboot_db "${_W_DIR}${_CACHEDIR}"
     . "${_W_DIR}/etc/archboot/presets/${_ARCH}"
     _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver ${_W_DIR}/${ALL_kver})"
+    unset ALL_kver MKINITCPIO_CONFIG
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
         # generate tarball in container, umount tmp container tmpfs, else weird things could happen
