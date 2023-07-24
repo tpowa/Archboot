@@ -5,7 +5,7 @@
 build() {
     ### init modules
     map add_module vfat? iso9660? nls_cp437? nls_ascii? cdrom? exfat?
-    map add_binary bash sh blkid mount switch_root bsdcpio mkfs.btrfs setfont \
+    map add_binary bash sh blkid mount mountpoint switch_root bsdcpio mkfs.btrfs setfont \
         /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod insmod modprobe \
         gzip uname cat cp dmesg grep ln ls mv rm umount lsblk rmmod cut sed find mkdir
     add_file "/usr/share/kbd/consolefonts/ter-v16n.psf.gz" "/consolefont-16.psf.gz"
