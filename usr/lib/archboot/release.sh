@@ -41,7 +41,7 @@ _create_iso() {
         echo "Removing lvm2 from container ${_W_DIR}..."
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>/dev/null
         . "${_W_DIR}/etc/archboot/presets/${_ARCH}"
-        _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver ${_W_DIR}/${ALL_kver})""
+        _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver ${_W_DIR}/${ALL_kver})"
         echo "Generating local ISO..."
         # generate local iso in container
         #if [[ "${_ARCH}" == "x86_64" ]]; then
