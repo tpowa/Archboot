@@ -49,8 +49,9 @@ while true; do
     mount UUID=1234-ABCD /mnt &>/dev/null && break
     # ventoy
     if mount LABEL=Ventoy /ventoy &>/dev/null; then
-        mount /ventoy/archboot-*.iso /cdrom &>/dev/null
-        break
+        mount /ventoy/archboot-*-*-$(uname -r)-$(uname -m).iso /cdrom &>/dev/null && break
+        mount /ventoy/archboot-*-*-$(uname -r)-latest-$(uname -m).iso /cdrom &>/dev/null && break
+        mount /ventoy/archboot-*-*-$(uname -r)-local-$(uname -m).iso /cdrom &>/dev/null && break
     fi
     if [[ -b /dev/sr0 ]]; then
         mount /dev/sr0 /cdrom &>/dev/null && break

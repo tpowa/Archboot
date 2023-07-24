@@ -40,7 +40,9 @@ _config() {
     # set defaults, if nothing given
     [[ -z "${_PRESET}" ]] && _PRESET="${_ARCH}"
     _PRESET="${_PRESET_DIR}/${_PRESET}"
-    [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_ARCH}"
+    #shellcheck disable=SC1090
+    source "${_PRESET}"
+    [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver ${ALL_kver})-${_ARCH}"
 }
 
 ### EFI status of RISCV64:
@@ -54,8 +56,6 @@ _config() {
 #   https://sourceware.org/bugzilla/show_bug.cgi?id=29009
 # - only left option is extlinux support in u-boot loader
 _prepare_kernel_initrd_files() {
-    #shellcheck disable=SC1090
-    source "${_PRESET}"
     mkdir -p "${_ISODIR}"/EFI/{BOOT,TOOLS}
     mkdir -p "${_ISODIR}/boot"
     # needed to hash the kernel for secureboot enabled systems

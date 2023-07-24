@@ -9,7 +9,6 @@
 shopt -s extglob
 
 # needed files/directories
-_f_functions=/usr/lib/archboot/cpio.sh
 _f_config=
 _d_install=/lib/initcpio/install
 # options and runtime data
@@ -62,7 +61,7 @@ resolve_kernver() {
         error "specified kernel image does not exist: '%s'" "$kernel"
         return 1
     fi
-    kver "$kernel" && return
+    _kver "$kernel" && return
     error "invalid kernel specified: '%s'" "$1"
     return 1
 }
@@ -162,7 +161,8 @@ if ! [[ ${UID} -eq 0 ]]; then
     exit 1
 fi
 # shellcheck source=functions
-. "$_f_functions"
+. /usr/lib/archboot/common.sh
+. /usr/lib/archboot/cpio.sh
 _opt_short='c:d:g:hk:'
 parseopts "$_opt_short" -- "$@" || exit 1
 set -- "${OPTRET[@]}"

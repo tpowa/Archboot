@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
-_ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)"
 _AMD_UCODE="boot/amd-ucode.img"
 _INTEL_UCODE="boot/intel-ucode.img"
 _INITRD="boot/initrd-${_ARCH}.img"
@@ -17,6 +16,8 @@ else
 fi
 _PRESET_LATEST="${_ARCH}-latest"
 _PRESET_LOCAL="${_ARCH}-local"
+. /etc/archboot/presets/${_ARCH}
+_ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver ${ALL_kver})"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 
 _usage () {
