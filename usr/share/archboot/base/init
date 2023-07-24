@@ -116,13 +116,13 @@ bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i <"/mnt/boot/initrd-$(unam
 echo -e "\e[1mStep 7/7:\e[m Unmounting archboot rootfs..."
 while true; do
     if mountpoint /ventoy &>/dev/null; then
-        for i in /mnt /cdrom /ventoy: do
+        for i in /mnt /cdrom /ventoy; do
             umount -q -A "${i}" 2>/dev/null
         done
         break
     fi
     if mountpoint /cdrom &>/dev/null; then
-        for i in /mnt /cdrom
+        for i in /mnt /cdrom; do
             umount -q -A "${i}" 2>/dev/null
         done
         break
