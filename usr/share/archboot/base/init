@@ -42,7 +42,7 @@ _title
 # it needs one echo before, in order to reset the consolefont!
 setfont consolefont-16.psf.gz -C /dev/console
 echo -e "\e[1mStep 1/7:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
-echo -e "          Trying for 10 seconds /dev/sr0 and UUID=1234-ABCD..."
+echo -e "          Trying for 10 seconds /dev/sr0, LABEL=Ventoy and UUID=1234-ABCD..."
 _COUNT=0
 while true; do
     # dd / rufus
