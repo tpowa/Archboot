@@ -45,7 +45,13 @@ echo -e "\e[1mStep 1/7:\e[m Searching for archboot rootfs on usb/hd/cdrom device
 echo -e "          Trying for 10 seconds /dev/sr0 and UUID=1234-ABCD..."
 _COUNT=0
 while true; do
+    # dd / rufus
     mount UUID=1234-ABCD /mnt &>/dev/null && break
+    # ventoy
+    if mount LABEL=Ventoy /ventoy &>/dev/null; then
+        mount /ventoy/archboot-*.iso /cdrom &>/dev/null
+        break
+    fi
     if [[ -b /dev/sr0 ]]; then
         mount /dev/sr0 /cdrom &>/dev/null && break
     fi
