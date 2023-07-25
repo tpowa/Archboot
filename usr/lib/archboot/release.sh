@@ -34,7 +34,7 @@ _create_iso() {
     # create container
     archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
     _create_archboot_db "${_W_DIR}${_CACHEDIR}"
-    _KERNEL_VERSION="$(${_NSPAWN} ${_W_DIR} /bin/bash -c ". /etc/archboot/presets/${_ARCH};. /usr/lib/archboot/common.sh; _kver ${ALL_kver}")"
+    _KERNEL_VERSION="$(${_NSPAWN} ${_W_DIR} /bin/bash -c ". /etc/archboot/presets/${_RUNNING_ARCH};. /usr/lib/archboot/common.sh; _kver ${ALL_kver}")"
     _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_KERNEL_VERSION}"
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
