@@ -61,7 +61,7 @@ _create_iso() {
     fi
     echo "Generating normal ISO..."
     # generate iso in container
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g \
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g -s \
         -i=${_ISONAME}-${_ARCH}"  || exit 1
     # move iso out of container
     mv "${_W_DIR}"/*.iso ./ &>/dev/null
