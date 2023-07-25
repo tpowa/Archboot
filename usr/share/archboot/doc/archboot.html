@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 24.07.2023 15:17</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 25.07.2023 17:11</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -1161,7 +1161,7 @@ There are the following configuration files for ISO creation:
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ qemu-system-aarch64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -usbdevice tablet --enable-kvm -boot d -m &lt;memory&gt; \<br>-bios /usr/share/edk2-armvirt/aarch64/QEMU_EFI.fd \<br>-machine virt -cpu cortex-a57 -device virtio-gpu-pci \<br>-device nec-usb-xhci -device usb-tablet \<br>-device usb-kbd</code></td>
+<td><code>$ qemu-system-aarch64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -boot d -bios /usr/share/edk2-armvirt/aarch64/QEMU_EFI.fd \<br>-machine virt -cpu cortex-a57 -device virtio-gpu-pci \<br>-device nec-usb-xhci -device usb-tablet \<br>-device usb-kbd -m &lt;memory&gt; </code></td>
 </tr>
 </tbody>
 </table>
@@ -1174,7 +1174,7 @@ There are the following configuration files for ISO creation:
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ qemu-system-riscv64 -M virt \<br>-kernel /usr/share/archboot/u-boot/qemu-riscv64_smode/uboot.elf \<br>-device virtio-gpu-pci -device virtio-net-device,netdev=eth0 \<br>-netdev user,id=eth0,hostfwd=tcp::2222-:22 \<br>-device nec-usb-xhci -device usb-tablet -device usb-kbd \<br>-object rng-random,filename=/dev/urandom,id=rng \<br>-device virtio-rng-device,rng=rng \<br>-drive file=&lt;yourimage&gt;,if=virtio,format=raw -m &lt;yourmemory&gt;</code></td>
+<td><code>$ qemu-system-riscv64 -M virt \<br>-kernel /usr/share/archboot/u-boot/qemu-riscv64_smode/uboot.elf \<br>-device virtio-gpu-pci -device virtio-net-device,netdev=eth0 \<br>-netdev user,id=eth0,hostfwd=tcp::2222-:22 \<br>-device nec-usb-xhci -device usb-tablet -device usb-kbd \<br>-object rng-random,filename=/dev/urandom,id=rng \<br>-device virtio-rng-device,rng=rng \<br>-drive file=&lt;yourimage&gt;,if=virtio,format=raw -m &lt;memory&gt;</code></td>
 </tr>
 </tbody>
 </table>
@@ -1213,7 +1213,7 @@ There are the following configuration files for ISO creation:
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ qemu-system-x86_64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -usbdevice tablet --enable-kvm -boot d -m &lt;memory&gt; \<br>--bios /usr/share/edk2-ovmf/x64/OVMF.fd</code></td>
+<td><code>$ qemu-system-x86_64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -usbdevice tablet --enable-kvm -boot d \<br>--bios /usr/share/edk2-ovmf/x64/OVMF.fd -m &lt;memory&gt;</code></td>
 </tr>
 </tbody>
 </table>
@@ -1225,7 +1225,7 @@ There are the following configuration files for ISO creation:
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ qemu-system-x86_64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -usbdevice tablet --enable-kvm -boot d -m &lt;memory&gt; \<br>--bios /usr/share/edk2-ovmf/ia32/OVMF.fd</code></td>
+<td><code>$ qemu-system-x86_64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -usbdevice tablet --enable-kvm -boot d \<br>--bios /usr/share/edk2-ovmf/ia32/OVMF.fd -m &lt;memory&gt; </code></td>
 </tr>
 </tbody>
 </table>
@@ -1251,7 +1251,7 @@ There are the following configuration files for ISO creation:
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ qemu-system-x86_64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -usbdevice tablet --enable-kvm -boot d -m &lt;memory&gt; \<br>-drive if=pflash,format=raw,readonly=on,\<br>file=/usr/share/ovmf/x64/OVMF_CODE.secboot.fd \<br>-drive if=pflash,format=raw,file=./OVMF_VARS.secboot.fd \<br>-global driver=cfi.pflash01,property=secure,value=on \<br>-machine q35,smm=on,accel=kvm \<br>-global ICH9-LPC.disable_s3=1</code></td>
+<td><code>$ qemu-system-x86_64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -usbdevice tablet --enable-kvm -boot d \<br>-drive if=pflash,format=raw,readonly=on,\<br>file=/usr/share/ovmf/x64/OVMF_CODE.secboot.fd \<br>-drive if=pflash,format=raw,file=./OVMF_VARS.secboot.fd \<br>-global driver=cfi.pflash01,property=secure,value=on \<br>-machine q35,smm=on,accel=kvm \<br>-global ICH9-LPC.disable_s3=1 -m &lt;memory&gt;</code></td>
 </tr>
 </tbody>
 </table>
@@ -1263,7 +1263,7 @@ There are the following configuration files for ISO creation:
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ qemu-system-x86_64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -usbdevice tablet --enable-kvm -boot d -m &lt;memory&gt; \<br>-drive if=pflash,format=raw,readonly=on,\<br>file=/usr/share/ovmf/ia32/OVMF_CODE.secboot.fd \<br>-drive if=pflash,format=raw,file=./OVMF_VARS.secboot.fd \<br>-global driver=cfi.pflash01,property=secure,value=on \<br>-machine q35,smm=on,accel=kvm \<br>-global ICH9-LPC.disable_s3=1</code></td>
+<td><code>$ qemu-system-x86_64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -usbdevice tablet --enable-kvm -boot d \<br>-drive if=pflash,format=raw,readonly=on,\<br>file=/usr/share/ovmf/ia32/OVMF_CODE.secboot.fd \<br>-drive if=pflash,format=raw,file=./OVMF_VARS.secboot.fd \<br>-global driver=cfi.pflash01,property=secure,value=on \<br>-machine q35,smm=on,accel=kvm \<br>-global ICH9-LPC.disable_s3=1 -m &lt;memory&gt; </code></td>
 </tr>
 </tbody>
 </table>
