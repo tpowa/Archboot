@@ -200,14 +200,15 @@ _network() {
     # add sleep here for systemd-resolve get correct values
     _COUNT=0
     while true; do
+        sleep 1
         if getent hosts www.google.com &>"${_LOG}"; then
             _dialog --infobox "Network configuration completed successfully." 3 50
             sleep 2
             return 0
         fi
         _COUNT=$((_COUNT+1))
-        [[ "${_COUNT}" == 5 ]] && break
-        sleep 1
+        # abort after 10 seconds
+        [[ "${_COUNT}" == 10 ]] && break
     done
     if ! getent hosts www.google.com &>"${_LOG}"; then
         _dialog --title " ERROR " --infobox "Your network is not working correctly, please configure again!" 3 60
