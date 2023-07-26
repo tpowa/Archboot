@@ -204,7 +204,7 @@ label linux
     menu label Boot System (automatic boot in 10 seconds...)
     kernel /boot/vmlinuz-${_ARCH}
     initrd /boot/init-${_ARCH}.img
-    append console=ttyS0,115200 console=tty0 audit=0 ${_SMP}
+    append console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto
 EOF
 }
 
