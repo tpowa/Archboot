@@ -198,14 +198,22 @@ _network() {
     systemctl restart systemd-resolved
     _dialog --infobox "Waiting for network link to come up..." 3 50
     # add sleep here for systemd-resolve get correct values
-    sleep 5
+    _COUNT=0
+    while true; do
+        if getent hosts www.google.com &>"${_LOG}"; then
+            _dialog --infobox "Link is up. Network is ready." 3 50
+            sleep 2
+            break
+        fi
+        _COUNT=$((_COUNT+1))
+        [[ "${_COUNT}" == 5 ]] && break
+        sleep 1
+    done
     if ! getent hosts www.google.com &>"${_LOG}"; then
         _dialog --title " ERROR " --infobox "Your network is not working correctly, please configure again!" 3 60
-        sleep 5
+        sleep 3
         return 1
     fi
-    _dialog --infobox "Link is up. Network is ready." 3 50
-    sleep 2
     _dialog --infobox "Network configuration completed successfully." 3 50
     sleep 2
     return 0
