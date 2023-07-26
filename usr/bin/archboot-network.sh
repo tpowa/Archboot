@@ -201,9 +201,9 @@ _network() {
     _COUNT=0
     while true; do
         if getent hosts www.google.com &>"${_LOG}"; then
-            _dialog --infobox "Link is up. Network is ready." 3 50
+            _dialog --infobox "Network configuration completed successfully." 3 50
             sleep 2
-            break
+            return 0
         fi
         _COUNT=$((_COUNT+1))
         [[ "${_COUNT}" == 5 ]] && break
@@ -214,9 +214,6 @@ _network() {
         sleep 3
         return 1
     fi
-    _dialog --infobox "Network configuration completed successfully." 3 50
-    sleep 2
-    return 0
 }
 
 _check
