@@ -22,6 +22,7 @@ Environment Changes:
 - load archboot.com and wiki.archlinux.org on firefox startup
 - added Ventoy support
 - added used kernel to image name
+- silence systemd messages
 localize:
 - removed font selection
 - fixed abort dialog
