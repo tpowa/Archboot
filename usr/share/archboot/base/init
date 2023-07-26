@@ -18,6 +18,14 @@ _udev_trigger() {
     udevadm trigger --action=add --type=devices
     udevadm settle
 }
+_step1() {
+echo -e "\e[1mStep 1/7:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
+echo -e "          Trying for 10 seconds /dev/sr0, LABEL=Ventoy and UUID=1234-ABCD..."
+}
+_step2() {
+echo -e "\e[1mStep 2/7:\e[m Copying and loading modules from initrd-$(uname -m).img..."
+echo -e "          This may need some time..."
+}
 # mount kernel filesystems
 mount -t proc proc /proc -o nosuid,noexec,nodev
 mount -t sysfs sys /sys -o nosuid,noexec,nodev
@@ -41,8 +49,7 @@ echo 1 > /proc/sys/kernel/sysrq
 _title
 # it needs one echo before, in order to reset the consolefont!
 setfont consolefont-16.psf.gz -C /dev/console
-echo -e "\e[1mStep 1/7:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
-echo -e "          Trying for 10 seconds /dev/sr0, LABEL=Ventoy and UUID=1234-ABCD..."
+_step1
 _COUNT=0
 while true; do
     # dd / rufus
@@ -71,8 +78,7 @@ if ! [[ -f "/mnt/boot/initrd-$(uname -m).img" ]] ; then
 fi
 cd /
 # move in modules from main initrd
-echo -e "\e[1mStep 2/7:\e[m Copying and loading modules from initrd-$(uname -m).img..."
-echo -e "          This may need some time..."
+_step2
 bsdcpio -u -i "*/lib/modules/" "*/lib/firmware/" <"/mnt/boot/initrd-$(uname -m).img" &>/dev/null || _emergency_shell
 # reinitialize available modules
 udevadm control -R
@@ -90,10 +96,8 @@ else
 fi
 setfont consolefont-${SIZE}.psf.gz -C /dev/console
 _title
-echo -e "\e[1mStep 1/7:\e[m Searching for archboot rootfs on usb/hd/cdrom device..."
-echo -e "          Trying for 10 seconds /dev/sr0 and UUID=1234-ABCD..."
-echo -e "\e[1mStep 2/7:\e[m Copying and loading modules from initrd-$(uname -m).img..."
-echo -e "          This may need some time..."
+_step1
+_step2
 echo -e "\e[1mStep 3/7:\e[m Removing firmware and modules..."
 # keep ethernet NIC firmware
 rm -rf /lib/firmware/{RTL8192E,advansys,amd*,ar3k,ath*,atmel,brcm,cavium,cirrus,cxgb*,cypress,dvb*,ene-ub6250,i915,imx,intel,iwlwifi-[8-9]*,iwlwifi-[a-z]*,iwlwifi-[A-Z]*,keyspan*,korg,libertas,matrox,mediatek,mrvl,mwl*,nvidia,nxp,qca,radeon,r128,rsi,rtlwifi,rtl_bt,rtw*,ti-connectivity,tehuti,wfx,yam,yamaha}
@@ -137,12 +141,10 @@ echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
 echo -e "\e[1;96mArchboot\e[m \e[1m- Arch Linux Environment finished.\e[m"
 echo -e "\e[1mSystemd will be launched in a second...\e[m"
 echo -e "\e[1;92mThe boot medium can be safely removed now! \e[m"
-read -r -t 3
+read -r -t 1
 # remove mkinitcpio files and directories
 rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
 rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
-# clear screen
-printf "\ec"
 exec switch_root /sysroot /usr/bin/init "$@"
 
 # vim: set ft=sh ts=4 sw=4 et:
