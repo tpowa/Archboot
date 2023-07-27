@@ -826,6 +826,7 @@ _chromium_flags() {
 --test-type
 --incognito
 archboot.com
+wiki.archlinux.org
 EOF
 }
 
