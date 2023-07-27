@@ -195,9 +195,9 @@ _network() {
     fi
     echo "Using setup's network profile ${_NETWORK_PROFILE} now..." >"${_LOG}"
     systemctl restart systemd-networkd
-    systemctl restart avahi-daemon
+    systemctl restart systemd-resolved
     _dialog --infobox "Waiting for network link to come up..." 3 50
-    # add sleep here to get correct values
+    # add sleep here for systemd-resolve get correct values
     _COUNT=0
     while true; do
         sleep 1

@@ -17,6 +17,7 @@ _local_mode () {
         if [[ -e /usr/bin/setup ]] ; then
             # bring down network
             systemctl stop systemd-networkd 2>/dev/null
+            systemctl stop systemd-resolved 2>/dev/null
         fi
     fi
 }
@@ -166,7 +167,7 @@ if ! mount | grep -q zram0; then
     _switch_root_zram | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 else
     systemctl start systemd-networkd
-    systemctl start avahi-daemon
+    systemctl start systemd-resolved
     # initialize pacman keyring
     if [[ -e /etc/systemd/system/pacman-init.service ]]; then
         systemctl start pacman-init
