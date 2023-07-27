@@ -805,19 +805,16 @@ EOF
 
 _custom_wayland_xorg() {
     if [[ -n "${_CUSTOM_WAYLAND}" ]]; then
-        echo -e "\e[1mStep 1/3:\e[m Installing custom wayland..."
+        echo -e "\e[1mStep 1/2:\e[m Installing custom wayland..."
         echo "          This will need some time..."
         _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > "${_LOG}" 2>&1
     fi
     if [[ -n "${_CUSTOM_X}" ]]; then
-        echo -e "\e[1mStep 1/3:\e[m Installing custom xorg..."
+        echo -e "\e[1mStep 1/2:\e[m Installing custom xorg..."
         echo "          This will need some time..."
         _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > "${_LOG}" 2>&1
     fi
-    echo -e "\e[1mStep 2/3:\e[m Masking avahi-daemon..."
-    systemctl stop avahi-daemon.service
-    systemctl mask avahi-daemon.service
-    echo -e "\e[1mStep 3/3:\e[m Setting up browser...\e[m"
+    echo -e "\e[1mStep 2/2:\e[m Setting up browser...\e[m"
     which firefox &>"${_NO_LOG}"  && _firefox_flags
     which chromium &>"${_NO_LOG}" && _chromium_flags
 }
