@@ -213,7 +213,7 @@ _create_container() {
         # needed for checks
         cp "${_W_DIR}"/var/cache/pacman/pkg/archboot.db /var/cache/pacman/pkg/archboot.db
     else
-        #online mode
+        # online mode
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
             "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >"${_LOG}" 2>&1 || exit 1
         fi
