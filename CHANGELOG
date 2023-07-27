@@ -24,6 +24,7 @@ Environment Changes:
 - added used kernel to image name
 - silenced systemd messages
 - added shutdown / reboot wall messages
+- enabled MulticastDNS=yes mdns support
 localize:
 - removed font selection
 - fixed abort dialog
