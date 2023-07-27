@@ -814,8 +814,9 @@ _custom_wayland_xorg() {
         echo "          This will need some time..."
         _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > "${_LOG}" 2>&1
     fi
-    echo -e "\e[1mStep 2/3:\e[m Starting avahi-daemon..."
-    systemctl start avahi-daemon.service
+    echo -e "\e[1mStep 2/3:\e[m Masking avahi-daemon..."
+    systemctl stop avahi-daemon.service
+    systemctl mask avahi-daemon.service
     echo -e "\e[1mStep 3/3:\e[m Setting up browser...\e[m"
     which firefox &>"${_NO_LOG}"  && _firefox_flags
     which chromium &>"${_NO_LOG}" && _chromium_flags

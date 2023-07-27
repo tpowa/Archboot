@@ -166,6 +166,7 @@ _network() {
     echo "Name=${_INTERFACE}" >> "${_NETWORK_PROFILE}"
     echo "" >> "${_NETWORK_PROFILE}"
     echo "[Network]" >> "${_NETWORK_PROFILE}"
+    echo "MulticastDNS=yes" >> "${_NETWORK_PROFILE}"
     [[ "${_IP}" == "dhcp" ]] && echo "DHCP=yes" >> "${_NETWORK_PROFILE}"
     if [[ "${_CONNECTION}" == "wireless" ]]; then
         #shellcheck disable=SC2129
