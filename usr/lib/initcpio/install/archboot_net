@@ -6,12 +6,9 @@ build ()
 {
     map add_binary traceroute arping clockdiff tracepath ssh genl \
       ifstat ctstat rtstat lnstat nstat rtacct rtmon ss tc bridge \
-      dcb devlink rdma tipc vdpa ethtool elinks weechat brctl
+      dcb devlink rdma tipc vdpa ethtool elinks weechat brctl avahi-*
     # add avahi and nss-mdns
     add_full_dir /etc/avahi
-    for i in /usr/bin/avahi-*; do
-      add_binary "${i}"
-    done
     for i in  /usr/lib/libnss_mdns*; do
       add_file "${i}"
     done
