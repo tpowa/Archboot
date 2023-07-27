@@ -2,4 +2,5 @@
 [Match]
 Name=en*
 [Network]
+MulticastDNS=yes
 DHCP=yes
