@@ -89,7 +89,7 @@ _exit() {
         _dialog --infobox "Powering off in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
         sleep 10
         clear
-        wall -n "Powering off the system...\e[m"
+        wall -n "Powering off the system..."
         sleep 3
         poweroff
     fi
