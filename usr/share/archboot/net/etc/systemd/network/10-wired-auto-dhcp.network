@@ -1,6 +1,7 @@
 # Archboot autostart dhcp on wired devices
 [Match]
 Name=en*
+Name=eth*
 [Network]
 MulticastDNS=yes
 DHCP=yes
