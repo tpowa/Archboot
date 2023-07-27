@@ -19,7 +19,7 @@ Environment Changes:
 - removed uninstalled packages
 - use BLAKE2b/b2sum instead of sha256sum
 - shortened MOTD and init message
-- load archboot.com and wiki.archlinux.org on firefox startup
+- load archboot.com and wiki.archlinux.org on firefox and chromium startup
 - added Ventoy support
 - added used kernel to image name
 - silenced systemd messages
@@ -39,6 +39,7 @@ update:
 - remove reinstalled packages too from package cache
 - added qxl module detection
 - allow -full-system on local medium
+- removed avahi leftovers
 setup:
 - silence _LSBLK errors
 - switched to infobox on reboot and poweroff
