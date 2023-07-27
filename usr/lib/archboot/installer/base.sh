@@ -278,13 +278,15 @@ _mainmenu() {
                 _dialog --infobox "Rebooting in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
                 sleep 10
                 clear
-                wall "Rebooting the system..."
+                wall -n "Rebooting the system..."
+                sleep 3
                 reboot
             elif [[ "${_EXIT}" == "3" ]]; then
                 _dialog --infobox "Powering off in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
                 sleep 10
                 clear
-                wall "Powering off the system..."
+                wall -n "Powering off the system..."
+                sleep 3
                 poweroff
             fi
             ;;
