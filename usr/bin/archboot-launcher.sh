@@ -79,14 +79,14 @@ _exit() {
         _show_login
         exit 0
     elif [[ "${_EXIT}" == "2" ]]; then
-        _dialog --infobox "Rebooting in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
+        _dialog --no-mouse --infobox "Rebooting in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
         sleep 10
         clear
         wall -n "Rebooting the system..."
         sleep 3
         reboot
     elif [[ "${_EXIT}" == "3" ]]; then
-        _dialog --infobox "Powering off in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
+        _dialog --no-mouse --infobox "Powering off in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
         sleep 10
         clear
         wall -n "Powering off the system..."

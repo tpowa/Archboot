@@ -119,7 +119,7 @@ _btrfsraid_level() {
             break
         else
             if [[ "${_BTRFS_LEVEL}" == "raid5" || "${_BTRFS_LEVEL}" == "raid6" ]]; then
-                _dialog --infobox "BTRFS DATA RAID OPTIONS:\n\nRAID5/6 are for testing purpose. Use with extreme care!" 0 0
+                _dialog --no-mouse --infobox "BTRFS DATA RAID OPTIONS:\n\nRAID5/6 are for testing purpose. Use with extreme care!" 0 0
                 sleep 5
             fi
             # take selected device as 1st device, add additional devices in part below.
@@ -183,7 +183,7 @@ _prepare_btrfs_subvolume() {
 _check_btrfs_subvolume(){
     [[ -n "${_DOMKFS}" && "${_FSTYPE}" == "btrfs" ]] && _DETECT_CREATE_FILESYSTEM=1
     if [[ -z "$(cat "${_ANSWER}")" ]]; then
-        _dialog --title " ERROR " --infobox "You have defined an empty name! Please enter another name." 3 70
+        _dialog --title " ERROR " --no-mouse --infobox "You have defined an empty name! Please enter another name." 3 70
         sleep 3
         _BTRFS_SUBVOLUME="NONE"
     fi
@@ -191,7 +191,7 @@ _check_btrfs_subvolume(){
         _mount_btrfs
         for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d " " -f 9); do
             if echo "${i}" | grep -q "${_BTRFS_SUBVOLUME}"; then
-                _dialog --title " ERROR " --infobox "You have defined 2 identical SUBVOLUMES! Please enter another name." 3 75
+                _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical SUBVOLUMES! Please enter another name." 3 75
                 sleep 3
                 _BTRFS_SUBVOLUME="NONE"
             fi
@@ -201,7 +201,7 @@ _check_btrfs_subvolume(){
         # existing subvolumes
         _subvolumes_in_use
         if echo "${_SUBVOLUME_IN_USE}" | grep -Eq "${_BTRFS_SUBVOLUME}"; then
-            _dialog --title " ERROR " --infobox "You have defined 2 identical SUBVOLUMES! Please enter another name." 3 75
+            _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical SUBVOLUMES! Please enter another name." 3 75
             sleep 3
             _BTRFS_SUBVOLUME="NONE"
         fi
@@ -236,7 +236,7 @@ _choose_btrfs_subvolume () {
         _btrfs_compress || return 1
     else
         if [[ -n "${_SUBVOLUMES_DETECTED}" ]]; then
-            _dialog --title " ERROR " --infobox "All subvolumes of the device are already in use. Switching to create a new one now." 3 65
+            _dialog --title " ERROR " --no-mouse --infobox "All subvolumes of the device are already in use. Switching to create a new one now." 3 65
             sleep 5
             _prepare_btrfs_subvolume || return 1
         fi

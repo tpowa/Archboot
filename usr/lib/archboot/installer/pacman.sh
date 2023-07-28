@@ -7,7 +7,7 @@ _run_pacman(){
     # Set up the necessary directories for pacman use
     [[ ! -d "${_DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${_DESTDIR}/var/cache/pacman/pkg"
     [[ ! -d "${_DESTDIR}/var/lib/pacman" ]] && mkdir -p "${_DESTDIR}/var/lib/pacman"
-    _dialog --title " Pacman " --infobox "Installing package(s) to ${_DESTDIR}:\n${_PACKAGES}...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress..." 8 70
+    _dialog --title " Pacman " --no-mouse --infobox "Installing package(s) to ${_DESTDIR}:\n${_PACKAGES}...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress..." 8 70
     echo "Installing Packages..." >/tmp/pacman.log
     sleep 5
     #shellcheck disable=SC2086,SC2069
@@ -25,7 +25,7 @@ _run_pacman(){
         _dialog --title "${_RESULT}" --exit-label "Continue" \
         --textbox "/tmp/pacman.log" 18 70 || return 1
     else
-        _dialog --infobox "Package installation complete." 3 40
+        _dialog --no-mouse --infobox "Package installation complete." 3 40
         sleep 3
     fi
     rm /tmp/.pacman-retcode
@@ -50,7 +50,7 @@ _install_packages() {
     _chroot_mount
     # automagic time!
     # any automatic configuration should go here
-    _dialog --infobox "Writing base configuration..." 6 40
+    _dialog --no-mouse --infobox "Writing base configuration..." 6 40
     _auto_timesetting
     _auto_network
     _auto_fstab

@@ -8,7 +8,7 @@ _select_mirror() {
     # Download updated mirrorlist, if possible (only on x86_64)
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _COUNTRY="$(curl -s "http://ip-api.com/csv/?fields=countryCode")"
-        _dialog --infobox "Downloading latest mirrorlist for Region ${_COUNTRY}..." 3 60
+        _dialog --no-mouse --infobox "Downloading latest mirrorlist for Region ${_COUNTRY}..." 3 60
         ${_DLPROG} "https://www.archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
         sleep 2
         if grep -q '#Server = https:' /tmp/pacman_mirrorlist.txt; then
@@ -59,7 +59,7 @@ _enable_testing() {
 }
 
 _prepare_pacman() {
-    _dialog --infobox "Waiting for Arch Linux keyring initialization..." 3 40
+    _dialog --no-mouse --infobox "Waiting for Arch Linux keyring initialization..." 3 40
     # pacman-key process itself
     while pgrep -x pacman-key &>"${_NO_LOG}"; do
         sleep 1
@@ -69,12 +69,12 @@ _prepare_pacman() {
         sleep 1
     done
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
-    _dialog --infobox "Update Arch Linux keyring..." 3 50
+    _dialog --no-mouse --infobox "Update Arch Linux keyring..." 3 50
     _KEYRING="archlinux-keyring"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
     if ! pacman -Sy --noconfirm --noprogressbar ${_KEYRING} &>"${_LOG}"; then
-        _dialog --title " ERROR " --infobox "Keyring update failed! Check ${_LOG} for errors." 3 60
+        _dialog --title " ERROR " --no-mouse --infobox "Keyring update failed! Check ${_LOG} for errors." 3 60
         sleep 5
         return 1
     fi
@@ -87,10 +87,10 @@ _update_environment() {
     if update | grep -q '\-latest'; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-                _dialog --infobox "Refreshing package database..." 3 50
+                _dialog --no-mouse --infobox "Refreshing package database..." 3 50
                 pacman -Sy &>"${_LOG}"
                 sleep 1
-                _dialog --infobox "Checking on new online kernel version..." 3 50
+                _dialog --no-mouse --infobox "Checking on new online kernel version..." 3 50
                 #shellcheck disable=SC2086
                 _LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
                 if  [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
@@ -109,7 +109,7 @@ _update_environment() {
                 echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
                 sleep 2
                 if [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
-                    _dialog --infobox "No new kernel online available. Skipping update environment." 3 70
+                    _dialog --no-mouse --infobox "No new kernel online available. Skipping update environment." 3 70
                     sleep 2
                 else
                     _dialog --title " New Kernel Available " --defaultno --yesno "Do you want to update the Archboot Environment to ${_ONLINE_KERNEL}?\n\nATTENTION:\nThis will reboot the system using kexec!" 9 60 && _UPDATE_ENVIRONMENT=1
@@ -125,14 +125,14 @@ _update_environment() {
 _check
 if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
     if ! ping -c1 www.google.com &>/dev/null; then
-        _dialog --title " ERROR " --infobox "Your network is not working. Please reconfigure it." 3 60
+        _dialog --title " ERROR " --no-mouse --infobox "Your network is not working. Please reconfigure it." 3 60
         sleep 5
         _abort
     fi
 fi
 while true; do
     if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
-        _dialog --infobox "Setting local mirror..." 3 40
+        _dialog --no-mouse --infobox "Setting local mirror..." 3 40
         _PACMAN_CONF="/etc/pacman.conf"
         cat << EOF > "${_PACMAN_CONF}"
 [options]
@@ -153,14 +153,14 @@ EOF
     if _prepare_pacman; then
         break
     else
-        _dialog --title " ERROR " --infobox "Please reconfigure pacman." 3 40
+        _dialog --title " ERROR " --no-mouse --infobox "Please reconfigure pacman." 3 40
         sleep 5
     fi
 done
 if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
     _update_environment
 fi
-_dialog --infobox "Pacman configuration completed successfully." 3 60
+_dialog --no-mouse --infobox "Pacman configuration completed successfully." 3 60
 sleep 2
 _cleanup
 # vim: set ft=sh ts=4 sw=4 et:

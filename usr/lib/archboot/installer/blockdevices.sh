@@ -212,9 +212,9 @@ _activate_lvm2()
     if [[ -e /usr/bin/lvm ]]; then
         _OLD_LVM2_GROUPS=${_LVM2_GROUPS}
         _OLD_LVM2_VOLUMES=${_LVM2_VOLUMES}
-        _dialog --infobox "Scanning logical volumes..." 0 0
+        _dialog --no-mouse --infobox "Scanning logical volumes..." 0 0
         lvm vgscan --ignorelockingfailure &>"${_NO_LOG}"
-        _dialog --infobox "Activating logical volumes..." 0 0
+        _dialog --no-mouse --infobox "Activating logical volumes..." 0 0
         lvm vgchange --ignorelockingfailure --ignoremonitoring -ay &>"${_NO_LOG}"
         _LVM2_GROUPS="$(vgs -o vg_name --noheading 2>"${_NO_LOG}")"
         _LVM2_VOLUMES="$(lvs -o vg_name,lv_name --noheading --separator - 2>"${_NO_LOG}")"
@@ -226,7 +226,7 @@ _activate_md()
 {
     _RAID_READY=""
     if [[ -e /usr/bin/mdadm ]]; then
-        _dialog --infobox "Activating RAID arrays..." 0 0
+        _dialog --no-mouse --infobox "Activating RAID arrays..." 0 0
         mdadm --assemble --scan &>"${_NO_LOG}" || _RAID_READY="1"
     fi
 }
@@ -235,7 +235,7 @@ _activate_luks()
 {
     _LUKS_READY=""
     if [[ -e /usr/bin/cryptsetup ]]; then
-        _dialog --infobox "Scanning for luks encrypted devices..." 0 0
+        _dialog --no-mouse --infobox "Scanning for luks encrypted devices..." 0 0
         if ${_LSBLK} FSTYPE | grep -q "crypto_LUKS"; then
             for part in $(${_LSBLK} NAME,FSTYPE | grep " crypto_LUKS$" | cut -d' ' -f 1); do
                 # skip already encrypted devices, device mapper!
@@ -299,7 +299,7 @@ _umountall()
         for dev in $(findmnt --list --submounts "${_DESTDIR}" -o TARGET -n | tac); do
             umount "${dev}"
         done
-        _dialog --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR}..." 4 60
+        _dialog --no-mouse --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR}..." 4 60
         sleep 3
     fi
 }
@@ -316,7 +316,7 @@ _stopmd()
                 wipefs -a -f "/dev/${dev}" &>"${_NO_LOG}"
                 mdadm --manage --stop "/dev/${dev}" &>"${_LOG}"
             done
-            _dialog --infobox "Removing software raid device(s) done." 3 50
+            _dialog --no-mouse --infobox "Removing software raid device(s) done." 3 50
             sleep 3
         fi
     fi
@@ -331,7 +331,7 @@ _stopmd()
         for dev in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
             _clean_disk "${dev}"
         done
-        _dialog --infobox "Removing superblock(s) on software raid devices done." 3 60
+        _dialog --no-mouse --infobox "Removing superblock(s) on software raid devices done." 3 60
         sleep 3
     fi
 }
@@ -360,7 +360,7 @@ _stoplvm()
         for dev in ${_LV_PHYSICAL}; do
             pvremove -f "${dev}" 2>"${_NO_LOG}" >"${_LOG}"
         done
-        _dialog --infobox "Removing logical volume(s), logical group(s)\nand physical volume(s) done." 3 60
+        _dialog --no-mouse --infobox "Removing logical volume(s), logical group(s)\nand physical volume(s) done." 3 60
         sleep 3
     fi
 }
@@ -384,7 +384,7 @@ _stopluks()
             # delete header from device
             wipefs -a "${_LUKS_REAL_DEV}" &>"${_NO_LOG}"
         done
-        _dialog --infobox "Removing luks encrypted device(s) done." 3 50
+        _dialog --no-mouse --infobox "Removing luks encrypted device(s) done." 3 50
         sleep 3
     fi
     _DISABLELUKS=""
@@ -399,7 +399,7 @@ _stopluks()
            # delete header from device
            wipefs -a "${dev}" &>"${_NO_LOG}"
         done
-        _dialog --infobox "Removing not running luks encrypted device(s) done." 3 60
+        _dialog --no-mouse --infobox "Removing not running luks encrypted device(s) done." 3 60
         sleep 3
     fi
     [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab
@@ -419,7 +419,7 @@ _createmd()
         : >/tmp/.raid-spare
         # check for devices
         # Remove all raid devices with children
-        _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
+        _dialog --no-mouse --infobox "Scanning blockdevices... This may need some time." 3 60
         _RAID_BLACKLIST="$(_raid_devices;_partitionable_raid_devices_partitions)"
         #shellcheck disable=SC2119
         _DEVS="$(_finddevices)"
@@ -504,10 +504,10 @@ _createmd()
     [[ -n "${_PARITY}" ]] && _RAIDOPTIONS="${_RAIDOPTIONS} --layout=${_PARITY}"
     #shellcheck disable=SC2086
     if mdadm --create ${_RAIDDEV} ${_RAIDOPTIONS} ${_DEVS} &>"${_LOG}"; then
-        _dialog --infobox "${_RAIDDEV} created successfully." 3 50
+        _dialog --no-mouse --infobox "${_RAIDDEV} created successfully." 3 50
         sleep 3
     else
-        _dialog --title " ERROR " --infobox "Creating ${_RAIDDEV} failed." 3 60
+        _dialog --title " ERROR " --no-mouse --infobox "Creating ${_RAIDDEV} failed." 3 60
         sleep 5
         return 1
     fi
@@ -537,7 +537,7 @@ _createpv()
     while [[ "${_PVFINISH}" != "DONE" ]]; do
         _activate_special_devices
         : >/tmp/.pvs-create
-        _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
+        _dialog --no-mouse --infobox "Scanning blockdevices... This may need some time." 3 60
         # Remove all lvm devices with children
         _LVM_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do
                     echo "${dev}"
@@ -579,10 +579,10 @@ _createpv()
     _umountall
     #shellcheck disable=SC2086
     if pvcreate -y ${_DEV} &>"${_LOG}"; then
-        _dialog --infobox "Creating physical volume on ${_DEV} was successful." 3 75
+        _dialog --no-mouse --infobox "Creating physical volume on ${_DEV} was successful." 3 75
         sleep 3
     else
-        _dialog --title " ERROR " --infobox "Creating physical volume on ${_DEV} failed." 3 60
+        _dialog --title " ERROR " --no-mouse --infobox "Creating physical volume on ${_DEV} failed." 3 60
         sleep 5
         return 1
     fi
@@ -664,7 +664,7 @@ _createvg()
     _umountall
     #shellcheck disable=SC2086
     if vgcreate ${_VGDEV} ${_PV} &>"${_LOG}"; then
-        _dialog --infobox "Creating Volume Group ${_VGDEV} was successful." 3 60
+        _dialog --no-mouse --infobox "Creating Volume Group ${_VGDEV} was successful." 3 60
         sleep 3
     else
         _dialog --msgbox "Error while creating Volume Group ${_VGDEV} (see ${_LOG} for details)." 0 0
@@ -733,7 +733,7 @@ _createlv()
     if [[ -n "${_LV_ALL}" ]]; then
         #shellcheck disable=SC2086
         if lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
-            _dialog --infobox "Creating Logical Volume ${_LVDEV} was successful." 3 60
+            _dialog --no-mouse --infobox "Creating Logical Volume ${_LVDEV} was successful." 3 60
             sleep 3
         else
             _dialog --msgbox "Error while creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
@@ -742,7 +742,7 @@ _createlv()
     else
         #shellcheck disable=SC2086
         if lvcreate ${_LV_EXTRA} -L ${_LV_SIZE} ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
-            _dialog --infobox "Creating Logical Volume ${_LVDEV} was successful." 3 60
+            _dialog --no-mouse --infobox "Creating Logical Volume ${_LVDEV} was successful." 3 60
             sleep 3
         else
             _dialog --msgbox "Error while creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
@@ -775,19 +775,19 @@ _enter_luks_passphrase () {
             echo "${_LUKSPASSPHRASE}" > "/tmp/passphrase-${_LUKSDEV}"
             _LUKSPASSPHRASE="/tmp/passphrase-${_LUKSDEV}"
         else
-             _dialog --infobox "Passphrases didn't match or was empty, please enter again." 0 0
+             _dialog --no-mouse --infobox "Passphrases didn't match or was empty, please enter again." 0 0
              sleep 5
         fi
     done
 }
 
 _opening_luks() {
-    _dialog --infobox "Opening encrypted ${_DEV}..." 0 0
+    _dialog --no-mouse --infobox "Opening encrypted ${_DEV}..." 0 0
     _LUKSOPEN_SUCCESS=""
     while [[ -z "${_LUKSOPEN_SUCCESS}" ]]; do
         cryptsetup luksOpen "${_DEV}" "${_LUKSDEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}" && _LUKSOPEN_SUCCESS=1
         if [[ -z "${_LUKSOPEN_SUCCESS}" ]]; then
-            _dialog --infobox "Error: Passphrase didn't match, please enter again." 0 0
+            _dialog --no-mouse --infobox "Error: Passphrase didn't match, please enter again." 0 0
             sleep 5
             _enter_luks_passphrase || return 1
         fi
@@ -807,7 +807,7 @@ _createluks()
     _LUKSFINISH=""
     while [[ "${_LUKSFINISH}" != "DONE" ]]; do
         _activate_special_devices
-        _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
+        _dialog --no-mouse --infobox "Scanning blockdevices... This may need some time." 3 60
         # Remove all crypt devices with children
         _LUKS_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1 | sort -u); do
                     echo "${dev}"
@@ -837,7 +837,7 @@ _createluks()
     done
     _enter_luks_passphrase || return 1
     _umountall
-    _dialog --infobox "Encrypting ${_DEV}..." 0 0
+    _dialog --no-mouse --infobox "Encrypting ${_DEV}..." 0 0
     cryptsetup -q luksFormat "${_DEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}"
     _opening_luks
 }

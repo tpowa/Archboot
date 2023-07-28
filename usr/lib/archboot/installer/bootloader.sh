@@ -124,21 +124,21 @@ _check_bootpart() {
 _abort_uboot(){
         _FSTYPE="$(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}")"
         if ! [[ "${_FSTYPE}" == "ext2" || "${_FSTYPE}" == "ext3" || "${_FSTYPE}" == "ext4" || "${_FSTYPE}" == "vfat" ]]; then
-            _dialog --title " ERROR " --infobox "Your selected bootloader cannot boot from none ext2/3/4 or vfat /boot on it." 0 0
+            _dialog --title " ERROR " --no-mouse --infobox "Your selected bootloader cannot boot from none ext2/3/4 or vfat /boot on it." 0 0
             return 1
         fi
 }
 
 _abort_nilfs_bootpart() {
         if ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "nilfs2"; then
-            _dialog --title " ERROR " --infobox "Error:\nYour selected bootloader cannot boot from nilfs2 partition with /boot on it." 0 0
+            _dialog --title " ERROR " --no-mouse --infobox "Error:\nYour selected bootloader cannot boot from nilfs2 partition with /boot on it." 0 0
             return 1
         fi
 }
 
 _abort_f2fs_bootpart() {
         if  ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "f2fs"; then
-            _dialog --title " ERROR " --infobox "Your selected bootloader cannot boot from f2fs partition with /boot on it." 0 0
+            _dialog --title " ERROR " --no-mouse --infobox "Your selected bootloader cannot boot from f2fs partition with /boot on it." 0 0
             return 1
         fi
 }
@@ -230,10 +230,10 @@ _do_secureboot_keys() {
             _CN=$(cat "${_ANSWER}")
         done
         secureboot-keys.sh -name="${_CN}" "${_DESTDIR}/${_KEYDIR}" &>"${_LOG}" || return 1
-         _dialog --title " Setup Keys " --infobox "Common name(CN) ${_CN}\nused for your keys in ${_DESTDIR}/${_KEYDIR}" 5 60
+         _dialog --title " Setup Keys " --no-mouse --infobox "Common name(CN) ${_CN}\nused for your keys in ${_DESTDIR}/${_KEYDIR}" 5 60
          sleep 5
     else
-         _dialog --title " Setup Keys " --infobox "-Directory ${_DESTDIR}/${_KEYDIR} exists\n-assuming keys are already created\n-trying to use existing keys now" 5 50
+         _dialog --title " Setup Keys " --no-mouse --infobox "-Directory ${_DESTDIR}/${_KEYDIR} exists\n-assuming keys are already created\n-trying to use existing keys now" 5 50
          sleep 5
     fi
 }
@@ -255,13 +255,13 @@ _do_mok_sign () {
                 echo "${_MOK_PW}" >> /tmp/.password
                 _MOK_PW=/tmp/.password
             else
-                _dialog --title " ERROR " --infobox "Password didn't match or was empty, please enter again." 6 65
+                _dialog --title " ERROR " --no-mouse --infobox "Password didn't match or was empty, please enter again." 6 65
                 sleep 3
             fi
         done
         mokutil -i "${_DESTDIR}"/"${_KEYDIR}"/MOK/MOK.cer < ${_MOK_PW} >"${_LOG}"
         rm /tmp/.password
-        _dialog --infobox "MOK keys have been installed successfully." 3 50
+        _dialog --no-mouse --infobox "MOK keys have been installed successfully." 3 50
         sleep 3
     fi
     _SIGN_MOK=""
@@ -269,7 +269,7 @@ _do_mok_sign () {
     if [[ -n "${_SIGN_MOK}" ]]; then
         ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" &>"${_LOG}"
         ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
-        _dialog --infobox "/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nhave been signed successfully." 5 60
+        _dialog --no-mouse --infobox "/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nhave been signed successfully." 5 60
         sleep 3
     fi
 }
@@ -295,7 +295,7 @@ Depends = sbsigntools
 Depends = findutils
 Depends = grep
 EOF
-        _dialog --infobox "Pacman hook for automatic signing has been installed successfully:\n\n${_HOOKNAME}" 5 70
+        _dialog --no-mouse --infobox "Pacman hook for automatic signing has been installed successfully:\n\n${_HOOKNAME}" 5 70
         sleep 3
     fi
 }
@@ -323,7 +323,7 @@ _do_efistub_parameters() {
 _do_efistub_copy_to_efisys() {
     if ! [[ "${_UEFISYS_MP}" == "boot" ]]; then
         # clean and copy to efisys
-        _dialog --infobox "Copying kernel, ucode and initramfs\nto EFI SYSTEM PARTITION (ESP) now..." 4 65
+        _dialog --no-mouse --infobox "Copying kernel, ucode and initramfs\nto EFI SYSTEM PARTITION (ESP) now..." 4 65
         [[ -d "${_DESTDIR}/${_UEFISYS_MP}/${_UEFISYS_PATH}" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/${_UEFISYS_PATH}"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/${_KERNEL}"
         cp -f "${_DESTDIR}/boot/${_VMLINUZ}" "${_DESTDIR}/${_UEFISYS_MP}/${_KERNEL}"
@@ -334,7 +334,7 @@ _do_efistub_copy_to_efisys() {
             cp -f "${_DESTDIR}/boot/${_UCODE}" "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD_UCODE}"
         fi
         sleep 5
-        _dialog --infobox "Enable automatic copying of system files\nto EFI SYSTEM PARTITION (ESP) on installed system..." 4 65
+        _dialog --no-mouse --infobox "Enable automatic copying of system files\nto EFI SYSTEM PARTITION (ESP) on installed system..." 4 65
         cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/efistub_copy.path"
 [Unit]
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
@@ -391,7 +391,7 @@ _do_efistub_uefi() {
 }
 
 _do_systemd_boot_uefi() {
-    _dialog --infobox "Setting up SYSTEMD-BOOT now..." 3 40
+    _dialog --no-mouse --infobox "Setting up SYSTEMD-BOOT now..." 3 40
     # create directory structure, if it doesn't exist
     [[ -d "${_DESTDIR}/${_UEFISYS_MP}/loader/entries" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/loader/entries"
     echo "title    Arch Linux" > "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
@@ -423,7 +423,7 @@ GUMEOF
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"
         _do_efistub_copy_to_efisys
-        _dialog --infobox "SYSTEMD-BOOT has been setup successfully." 3 50
+        _dialog --no-mouse --infobox "SYSTEMD-BOOT has been setup successfully." 3 50
         sleep 3
         _S_BOOTLOADER=1
     else
@@ -436,7 +436,7 @@ _do_refind_uefi() {
         _PACKAGES="refind"
         _run_pacman
     fi
-    _dialog --infobox "Setting up rEFInd now. This needs some time..." 3 60
+    _dialog --no-mouse --infobox "Setting up rEFInd now. This needs some time..." 3 60
     [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
     cp -f "${_DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
     cp -r "${_DESTDIR}/usr/share/refind/icons" "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
@@ -472,7 +472,7 @@ CONFEOF
         "${_EDITOR}" "${_REFIND_CONFIG}"
         cp -f "${_REFIND_CONFIG}" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
         _do_efistub_copy_to_efisys
-        _dialog --infobox "rEFInd has been setup successfully." 3 50
+        _dialog --no-mouse --infobox "rEFInd has been setup successfully." 3 50
         sleep 3
         _S_BOOTLOADER=1
     else
@@ -504,11 +504,11 @@ CONFEOF
     "${_EDITOR}" "${_CMDLINE}"
     "${_EDITOR}" "${_UKIFY_CONFIG}"
 
-    _dialog --infobox "Setting up Unified Kernel Image ..." 3 60
+    _dialog --no-mouse --infobox "Setting up Unified Kernel Image ..." 3 60
     ${_NSPAWN} /usr/bin/bash -c "source /etc/ukify.conf" >>"${_LOG}"
     sleep 2
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
-        _dialog --infobox "Enable automatic UKI creation\non EFI SYSTEM PARTITION (ESP) on installed system..." 4 60
+        _dialog --no-mouse --infobox "Enable automatic UKI creation\non EFI SYSTEM PARTITION (ESP) on installed system..." 4 60
         cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.path"
 [Unit]
 Description=Run systemd ukify
@@ -534,11 +534,11 @@ CONFEOF
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        _dialog --infobox "Unified Kernel Image has been setup successfully." 3 60
+        _dialog --no-mouse --infobox "Unified Kernel Image has been setup successfully." 3 60
         sleep 3
         _S_BOOTLOADER=1
     else
-        _dialog --title " ERROR " --infobox "Setting up Unified Kernel Image failed!" 3 60
+        _dialog --title " ERROR " --no-mouse --infobox "Setting up Unified Kernel Image failed!" 3 60
         sleep 5
     fi
 }
@@ -750,7 +750,7 @@ _do_uboot() {
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _TITLE="ARM 64"
     [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _TITLE="RISC-V 64"
     # write extlinux.conf
-    _dialog --infobox "Installing UBOOT..." 0 0
+    _dialog --no-mouse --infobox "Installing UBOOT..." 0 0
     cat << EOF >> "${_DESTDIR}/boot/extlinux/extlinux.conf"
 menu title Welcome Arch Linux ${_TITLE}
 timeout 100
@@ -761,7 +761,7 @@ label linux
     initrd ${_SUBDIR}/${_INITRAMFS}
     append ${_KERNEL_PARAMS_COMMON_MOD}
 EOF
-    _dialog --infobox "UBOOT has been installed successfully." 3 55
+    _dialog --no-mouse --infobox "UBOOT has been installed successfully." 3 55
     sleep 3
 }
 
@@ -826,7 +826,7 @@ _do_grub_bios() {
         _dialog --msgbox "Error:\nGRUB(2) cannot boot from ${_BOOTDEV}, which contains /boot!\n\nPossible error sources:\n- encrypted devices are not supported" 0 0
         return 1
     fi
-    _dialog --infobox "Setting up GRUB(2) BIOS. This needs some time..." 3 55
+    _dialog --no-mouse --infobox "Setting up GRUB(2) BIOS. This needs some time..." 3 55
     # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
     _freeze_xfs
     _chroot_mount
@@ -843,7 +843,7 @@ _do_grub_bios() {
     if [[ -e "${_DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
         _GRUB_PREFIX_DIR="/boot/grub/"
         _do_grub_config || return 1
-        _dialog --infobox "GRUB(2) BIOS has been installed successfully." 3 55
+        _dialog --no-mouse --infobox "GRUB(2) BIOS has been installed successfully." 3 55
         sleep 3
         _S_BOOTLOADER=1
     else
@@ -858,7 +858,7 @@ _do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
     _do_grub_common_before
-    _dialog --infobox "Setting up GRUB(2) UEFI. This needs some time..." 3 55
+    _dialog --no-mouse --infobox "Setting up GRUB(2) UEFI. This needs some time..." 3 55
     _chroot_mount
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         # install fedora shim
@@ -893,7 +893,7 @@ _do_grub_uefi() {
         if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
             ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
         elif [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-            #_dialog --infobox "Pacman is running...\n\nInstalling grub-2:2.06.r533.g78bc9a9b2-1 to ${_DESTDIR}...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress..." 8 70
+            #_dialog --no-mouse --infobox "Pacman is running...\n\nInstalling grub-2:2.06.r533.g78bc9a9b2-1 to ${_DESTDIR}...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress..." 8 70
             # fix broken grub with last working version:
             # https://lists.gnu.org/archive/html/grub-devel/2023-06/msg00121.html
             #if [[ -e "${_LOCAL_DB}" ]]; then
@@ -906,7 +906,7 @@ _do_grub_uefi() {
             #${_NSPAWN} pacman -U --noconfirm /grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst >>"${_LOG}"
             #rm "${_DESTDIR}/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst"
             #rm "${_DESTDIR}/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig"
-            #_dialog --infobox "grub-2:2.06.r533.g78bc9a9b2-1 has been installed successfully.\nContinuing in 5 seconds..." 4 70
+            #_dialog --no-mouse --infobox "grub-2:2.06.r533.g78bc9a9b2-1 has been installed successfully.\nContinuing in 5 seconds..." 4 70
             #sleep 5
             ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
         fi
@@ -918,7 +918,7 @@ _do_grub_uefi() {
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        _dialog --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully." 3 60
+        _dialog --no-mouse --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully." 3 60
         sleep 3
         _S_BOOTLOADER=1
     elif [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && -n "${_UEFI_SECURE_BOOT}" ]]; then
@@ -929,7 +929,7 @@ _do_grub_uefi() {
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
         _BOOTMGR_LOADER_PATH="/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         _do_uefi_bootmgr_setup
-        _dialog --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully." 4 50
+        _dialog --no-mouse --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully." 4 50
         sleep 3
         _S_BOOTLOADER=1
     else

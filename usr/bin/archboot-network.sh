@@ -46,7 +46,7 @@ _wireless() {
     _CONTINUE=""
     while [[ -z "${_CONTINUE}" ]]; do
         # scan the area
-        _dialog --infobox "Scanning for SSIDs with interface ${_INTERFACE}..." 3 50
+        _dialog --no-mouse --infobox "Scanning for SSIDs with interface ${_INTERFACE}..." 3 50
         iwctl station "${_INTERFACE}" scan &>"${_NO_LOG}"
         sleep 5
         #shellcheck disable=SC2086,SC2046
@@ -80,7 +80,7 @@ _wireless() {
         _WLAN_KEY=$(cat "${_ANSWER}")
     fi
     # time to connect
-    _dialog --infobox "Connecting to SSID='${_WLAN_SSID}' with interface ${_INTERFACE}..." 3 70
+    _dialog --no-mouse --infobox "Connecting to SSID='${_WLAN_SSID}' with interface ${_INTERFACE}..." 3 70
     _printk off
     if [[ -z "${_WLAN_KEY}" ]]; then
         iwctl station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" &>"${_NO_LOG}" && _WLAN_AUTH=1
@@ -90,11 +90,11 @@ _wireless() {
     sleep 3
     _printk on
     if [[ -n "${_WLAN_AUTH}" ]]; then
-        _dialog --infobox "Authentification to SSID='${_WLAN_SSID}' was successful." 3 70
+        _dialog --no-mouse --infobox "Authentification to SSID='${_WLAN_SSID}' was successful." 3 70
         sleep 3
         return 0
     else
-        _dialog --title " ERROR " --infobox "Authentification to SSID='${_WLAN_SSID}' failed. Please configure again!" 3 70
+        _dialog --title " ERROR " --no-mouse --infobox "Authentification to SSID='${_WLAN_SSID}' failed. Please configure again!" 3 70
         sleep 5
         return 1
     fi
@@ -197,13 +197,13 @@ _network() {
     echo "Using setup's network profile ${_NETWORK_PROFILE} now..." >"${_LOG}"
     systemctl restart systemd-networkd
     systemctl restart systemd-resolved
-    _dialog --infobox "Waiting for network link to come up..." 3 50
+    _dialog --no-mouse --infobox "Waiting for network link to come up..." 3 50
     # add sleep here for systemd-resolve get correct values
     _COUNT=0
     while true; do
         sleep 1
         if getent hosts www.google.com &>"${_LOG}"; then
-            _dialog --infobox "Network configuration completed successfully." 3 50
+            _dialog --no-mouse --infobox "Network configuration completed successfully." 3 50
             sleep 2
             return 0
         fi
@@ -212,7 +212,7 @@ _network() {
         [[ "${_COUNT}" == 10 ]] && break
     done
     if ! getent hosts www.google.com &>"${_LOG}"; then
-        _dialog --title " ERROR " --infobox "Your network is not working correctly, please configure again!" 3 60
+        _dialog --title " ERROR " --no-mouse --infobox "Your network is not working correctly, please configure again!" 3 60
         sleep 3
         return 1
     fi

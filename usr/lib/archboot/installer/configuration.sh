@@ -4,13 +4,13 @@
 _check_root_password() {
     # check if empty password is set
     if chroot "${_DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q NP; then
-        _dialog --infobox "Setup detected no password set for root user,\nplease set new password now." 6 50
+        _dialog --no-mouse --infobox "Setup detected no password set for root user,\nplease set new password now." 6 50
         sleep 3
         _set_password || return 1
     fi
     # check if account is locked
     if chroot "${_DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q L; then
-        _dialog --infobox "Setup detected locked account for root user,\nplease set new password to unlock account now." 6 50
+        _dialog --no-mouse --infobox "Setup detected locked account for root user,\nplease set new password to unlock account now." 6 50
         _set_password || return 1
     fi
 }
@@ -23,7 +23,7 @@ _set_mkinitcpio() {
         [[ -e ${_DESTDIR}/usr/lib/initcpio/install/${i} ]] || _HOOK_ERROR=1
     done
     if [[ -n "${_HOOK_ERROR}" ]]; then
-        _dialog --title " ERROR " --infobox "Detected error in 'HOOKS=' line,\nplease correct HOOKS= in /etc/mkinitcpio.conf!" 6 70
+        _dialog --title " ERROR " --no-mouse --infobox "Detected error in 'HOOKS=' line,\nplease correct HOOKS= in /etc/mkinitcpio.conf!" 6 70
         sleep 5
     else
         _run_mkinitcpio
@@ -59,7 +59,7 @@ _set_password() {
             echo "${_PASSWORD}" >> /tmp/.password
             _PASSWORD=/tmp/.password
         else
-            _dialog --title " ERROR " --infobox "Password didn't match, please enter again." 5 50
+            _dialog --title " ERROR " --no-mouse --infobox "Password didn't match, please enter again." 5 50
             sleep 3
             _PASSWORD=""
             _PASS=""
@@ -71,7 +71,7 @@ _set_password() {
 }
 
 _run_mkinitcpio() {
-    _dialog --infobox "Rebuilding initramfs on installed system..." 3 70
+    _dialog --no-mouse --infobox "Rebuilding initramfs on installed system..." 3 70
     _chroot_mount
     echo "Initramfs progress..." > /tmp/mkinitcpio.log
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
@@ -98,7 +98,7 @@ _run_mkinitcpio() {
 }
 
 _run_locale_gen() {
-    _dialog --infobox "Rebuilding glibc locales on installed system..." 3 70
+    _dialog --no-mouse --infobox "Rebuilding glibc locales on installed system..." 3 70
     _locale_gen
     sleep 2
 }

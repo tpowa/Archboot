@@ -72,11 +72,11 @@ _autoprepare() {
                     _dialog --title " /boot In MiB" --no-cancel --inputbox "Minimum value is 260. Disk space left: ${_DISK_SIZE}M" 8 55 "512" 2>"${_ANSWER}" || return 1
                     _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
                     if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
-                        _dialog --title " ERROR " --infobox "You have entered a invalid size, please enter again." 3 60
+                        _dialog --title " ERROR " --no-mouse --infobox "You have entered a invalid size, please enter again." 3 60
                         sleep 5
                     else
                         if [[ "${_UEFISYSDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_UEFISYSDEV_SIZE}" -lt "260" || "${_UEFISYSDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
-                            _dialog --title " ERROR " --infobox "You have entered an invalid size, please enter again." 3 60
+                            _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
                             sleep 5
                         else
                             _BOOTDEV_SET=1
@@ -91,11 +91,11 @@ _autoprepare() {
                     _dialog --title " EFI SYSTEM PARTITION (ESP) In MiB " --no-cancel --inputbox "Minimum value is 260. Disk space left: ${_DISK_SIZE}M" 8 55 "1024" 2>"${_ANSWER}" || return 1
                     _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
                     if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
-                        _dialog --title " ERROR " --infobox "You have entered a invalid size, please enter again." 3 60
+                        _dialog --title " ERROR " --no-mouse --infobox "You have entered a invalid size, please enter again." 3 60
                         sleep 5
                     else
                         if [[ "${_UEFISYSDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_UEFISYSDEV_SIZE}" -lt "260" || "${_UEFISYSDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
-                            _dialog --title " ERROR " --infobox "You have entered an invalid size, please enter again." 3 60
+                            _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
                             sleep 5
                         else
                             _UEFISYSDEV_SET=1
@@ -110,11 +110,11 @@ _autoprepare() {
                 _dialog --title " /boot In MiB " --no-cancel --inputbox "Minimum value is 100. Disk space left: ${_DISK_SIZE}M" 8 55 "512" 2>"${_ANSWER}" || return 1
                 _BOOTDEV_SIZE="$(cat "${_ANSWER}")"
                 if [[ -z "${_BOOTDEV_SIZE}" ]]; then
-                    _dialog --title " ERROR " --infobox "You have entered a invalid size, please enter again." 3 60
+                    _dialog --title " ERROR " --no-mouse --infobox "You have entered a invalid size, please enter again." 3 60
                     sleep 5
                 else
                     if [[ "${_BOOTDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_BOOTDEV_SIZE}" -lt "100" || "${_BOOTDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
-                        _dialog --title " ERROR " --infobox "You have entered an invalid size, please enter again." 3 60
+                        _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
                     else
                         _BOOTDEV_SET=1
                         _BOOTDEV_NUM="$((_DEV_NUM+1))"
@@ -128,11 +128,11 @@ _autoprepare() {
                 _dialog --title " /boot In MiB "--no-cancel --inputbox "Minimum value is 100.\n\nDisk space left: ${_DISK_SIZE}M" 8 55 "512" 2>"${_ANSWER}" || return 1
                 _BOOTDEV_SIZE="$(cat "${_ANSWER}")"
                 if [[ -z "${_BOOTDEV_SIZE}" ]]; then
-                    _dialog --title " ERROR " --infobox "You have entered a invalid size, please enter again." 3 60
+                    _dialog --title " ERROR " --no-mouse --infobox "You have entered a invalid size, please enter again." 3 60
                     sleep 5
                 else
                     if [[ "${_BOOTDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_BOOTDEV_SIZE}" -lt "100" || "${_BOOTDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
-                        _dialog --title " ERROR " --infobox "You have entered an invalid size, please enter again." 3 60
+                        _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
                         sleep 5
                     else
                         _BOOTDEV_SET=1
@@ -149,11 +149,11 @@ _autoprepare() {
             _dialog --title " Swap In MiB " --no-cancel --inputbox "Minimum value is > 0. Disk space left: ${_DISK_SIZE}M" 8 55 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
             _SWAPDEV_SIZE=$(cat "${_ANSWER}")
             if [[ -z "${_SWAPDEV_SIZE}" || "${_SWAPDEV_SIZE}" == 0 ]]; then
-                _dialog --title " ERROR " --infobox "You have entered an invalid size, please enter again." 3 60
+                _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
                 sleep 5
             else
                 if [[ "${_SWAPDEV_SIZE}" -ge "${_DISK_SIZE}" ]]; then
-                    _dialog --title " ERROR " --infobox "You have entered a too large size, please enter again." 3 60
+                    _dialog --title " ERROR " --no-mouse --infobox "You have entered a too large size, please enter again." 3 60
                     sleep 5
                 else
                     _SWAPDEV_SET=1
@@ -177,11 +177,11 @@ _autoprepare() {
         _dialog --title " / in MiB " --inputbox "Minimum value is 2000. Disk space left: $((_DISK_SIZE-350))M" 8 55 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
         _ROOTDEV_SIZE=$(cat "${_ANSWER}")
             if [[ -z "${_ROOTDEV_SIZE}" || "${_ROOTDEV_SIZE}" == 0 || "${_ROOTDEV_SIZE}" -lt "2000" ]]; then
-                _dialog --title " ERROR " --infobox "You have entered an invalid size, please enter again." 3 60
+                _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
                 sleep 5
             else
                 if [[ "${_ROOTDEV_SIZE}" -ge "${_DISK_SIZE}" || "$((_DISK_SIZE-_ROOTDEV_SIZE))" -lt "350" ]]; then
-                    _dialog --title " ERROR " --infobox "You have entered a too large size, please enter again." 3 60
+                    _dialog --title " ERROR " --no-mouse --infobox "You have entered a too large size, please enter again." 3 60
                     sleep 5
                 else
                     _dialog --yesno "$((_DISK_SIZE-_ROOTDEV_SIZE))M will be used for your /home partition. Is this OK?" 0 0 && _ROOTDEV_SET=1
@@ -199,7 +199,7 @@ _autoprepare() {
     _umountall
     # disable swap and all mounted partitions, umount / last!
     _printk off
-    _dialog --infobox "Partitioning ${_DISK}..." 0 0
+    _dialog --no-mouse --infobox "Partitioning ${_DISK}..." 0 0
     _clean_disk "${_DISK}"
     # we assume a /dev/sdX,/dev/vdX or /dev/nvmeXnY format
     if [[ -n "${_GUIDPARAMETER}" ]]; then
@@ -294,7 +294,7 @@ _autoprepare() {
             btrfs subvolume set-default "${_DESTDIR}"/"${_MP}" || return 1
         fi
     done
-    _dialog --infobox "Quick Setup was successful." 3 40
+    _dialog --no-mouse --infobox "Quick Setup was successful." 3 40
     sleep 3
     _S_QUICK_SETUP=1
 }

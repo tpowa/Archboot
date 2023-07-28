@@ -44,7 +44,7 @@ _timezone () {
             _SET_ZONE=""
         fi
     done
-    _dialog --infobox "Setting Timezone to ${_ZONE}..." 3 50
+    _dialog --no-mouse --infobox "Setting Timezone to ${_ZONE}..." 3 50
     timedatectl set-timezone "${_ZONE}"
     sleep 2
 }
@@ -53,7 +53,7 @@ _timeset() {
     _hwclock
     # check internet connection
     if ping -c1 www.google.com &>/dev/null; then
-        _dialog --infobox "Syncing clock with NTP pool and enable timesyncd..." 3 65
+        _dialog --no-mouse --infobox "Syncing clock with NTP pool and enable timesyncd..." 3 65
         sleep 2
         # sync immediatly with standard pool
         if ! systemctl restart systemd-timesyncd; then
@@ -86,7 +86,7 @@ while [[ -z "${_SET_TIME}" ]]; do
     _timezone
     _timeset
 done
-_dialog --infobox "Clock configuration completed successfully." 3 50
+_dialog --no-mouse --infobox "Clock configuration completed successfully." 3 50
 sleep 2
 _cleanup
 # vim: set ts=4 sw=4 et:

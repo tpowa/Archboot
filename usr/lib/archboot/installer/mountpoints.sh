@@ -127,7 +127,7 @@ _create_filesystem() {
             "$(${_LSBLK} LABEL "${_DEV}" 2>"${_NO_LOG}")" 2>"${_ANSWER}" || return 1
             _LABEL_NAME=$(cat "${_ANSWER}")
             if grep ":${_LABEL_NAME}$" /tmp/.parts; then
-                _dialog --title " ERROR " --infobox "You have defined 2 identical LABEL names! Please enter another name." 3 60
+                _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical LABEL names! Please enter another name." 3 60
                 sleep 5
                 _LABEL_NAME=""
             fi
@@ -159,7 +159,7 @@ _mountpoints() {
             _set_device_name_scheme || return 1
         fi
         _DEV=""
-        _dialog --infobox "Scanning blockdevices... This may need some time." 3 60
+        _dialog --no-mouse --infobox "Scanning blockdevices... This may need some time." 3 60
         _DEVS=$(_finddevices)
         _SWAP_DONE=""
         _ROOT_DONE=""
@@ -223,7 +223,7 @@ _mountpoints() {
                         if [[ -z "${_SWAP_DONE}" ]]; then
                             if ! [[ "${_DEV}" == "NONE" ]]; then
                                 if ! [[ "${_FSTYPE}" == "swap" ]]; then
-                                    _dialog --title " ERROR " --infobox "SWAP PARTITION has not a swap filesystem." 3 60
+                                    _dialog --title " ERROR " --no-mouse --infobox "SWAP PARTITION has not a swap filesystem." 3 60
                                     sleep 5
                                     _MP_DONE=""
                                 else
@@ -234,11 +234,11 @@ _mountpoints() {
                             fi
                         elif [[ -z "${_ROOT_DONE}" ]]; then
                             if [[ "${_FSTYPE}" == "vfat" ]]; then
-                                _dialog --tile " ERROR " --infobox "ROOT DEVICE has a vfat filesystem." 3 60
+                                _dialog --tile " ERROR " --no-mouse --infobox "ROOT DEVICE has a vfat filesystem." 3 60
                                 sleep 5
                                 _MP_DONE=""
                             elif [[ "${_FSTYPE}" == "swap" ]]; then
-                                _dialog --title " ERROR " --infobox "ROOT DEVICE has a swap filesystem." 3 60
+                                _dialog --title " ERROR " --no-mouse --infobox "ROOT DEVICE has a swap filesystem." 3 60
                                 sleep 5
                                 _MP_DONE=""
                             else
@@ -246,7 +246,7 @@ _mountpoints() {
                             fi
                         elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
                             if ! [[ "${_FSTYPE}" == "vfat" ]]; then
-                                _dialog --title " ERROR " --infobox "EFI SYSTEM PARTITION has not a vfat filesystem." 3 60
+                                _dialog --title " ERROR " --no-mouse --infobox "EFI SYSTEM PARTITION has not a vfat filesystem." 3 60
                                 sleep 5
                                 _MP_DONE=""
                             else
@@ -329,7 +329,7 @@ _mountpoints() {
     done < /tmp/.parts
     _printk on
      _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
-    _dialog --infobox "Devices were mounted successfully." 3 50
+    _dialog --no-mouse --infobox "Devices were mounted successfully." 3 50
     sleep 3
     _NEXTITEM="5"
 }
@@ -340,15 +340,15 @@ _mountpoints() {
 _mkfs() {
     if [[ -n "${4}" ]]; then
         if [[ "${2}" == "swap" ]]; then
-            _dialog --infobox "Creating and activating\nswapspace on ${1}..." 0 0
+            _dialog --no-mouse --infobox "Creating and activating\nswapspace on ${1}..." 0 0
         else
-            _dialog --infobox "Creating ${2} on ${1},\nmounting to ${3}${5}..." 0 0
+            _dialog --no-mouse --infobox "Creating ${2} on ${1},\nmounting to ${3}${5}..." 0 0
         fi
     else
         if [[ "${2}" == "swap" ]]; then
-            _dialog --infobox "Activating swapspace \non ${1}..." 0 0
+            _dialog --no-mouse --infobox "Activating swapspace \non ${1}..." 0 0
         else
-            _dialog --infobox "Mounting ${2} \non ${1} \nto ${3}${5}..." 0 0
+            _dialog --no-mouse --infobox "Mounting ${2} \non ${1} \nto ${3}${5}..." 0 0
         fi
     fi
     # add btrfs raid level, if needed
@@ -361,7 +361,7 @@ _mkfs() {
             sleep 2
             #shellcheck disable=SC2181
             if [[ $? != 0 ]]; then
-                _dialog --title " ERROR " --infobox "Creating swap: mkswap ${1}" 0 0
+                _dialog --title " ERROR " --no-mouse --infobox "Creating swap: mkswap ${1}" 0 0
                 sleep 5
                 return 1
             fi
@@ -369,7 +369,7 @@ _mkfs() {
         swapon "${1}" &>"${_LOG}"
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
-            _dialog --title " ERROR " --infobox "Activating swap: swapon ${1}" 0 0
+            _dialog --title " ERROR " --no-mouse --infobox "Activating swap: swapon ${1}" 0 0
             sleep 5
             return 1
         fi
@@ -380,7 +380,7 @@ _mkfs() {
             [[ "${2}" == "${fs}" ]] && _KNOWNFS=1 && break
         done
         if [[ ${_KNOWNFS} -eq 0 ]]; then
-            _dialog --title " ERROR " --infobox "Unknown fstype ${2} for ${1}" 0 0
+            _dialog --title " ERROR " --no-mouse --infobox "Unknown fstype ${2} for ${1}" 0 0
             sleep 5
             return 1
         fi
@@ -402,7 +402,7 @@ _mkfs() {
                 # don't handle anything else here, we will error later
             esac
             if [[ ${ret} != 0 ]]; then
-                _dialog --title " ERROR " --infobox "Creating filesystem ${2} on ${1}" 0 0
+                _dialog --title " ERROR " --no-mouse --infobox "Creating filesystem ${2} on ${1}" 0 0
                 sleep 5
                 return 1
             fi
@@ -434,7 +434,7 @@ _mkfs() {
         mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" &>"${_LOG}"
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
-            _dialog --title " ERROR " --infobox "Mounting ${3}${5}" 0 0
+            _dialog --title " ERROR " --no-mouse --infobox "Mounting ${3}${5}" 0 0
             sleep 5
             return 1
         fi
@@ -447,14 +447,14 @@ _mkfs() {
         fi
         # check if /boot exists on ROOT DEVICE
         if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/" && ! -d "${3}${5}/boot" ]]; then
-            _dialog --title " ERROR " --infobox "ROOT DEVICE ${3}${5} does not contain /boot directory." 0 0
+            _dialog --title " ERROR " --no-mouse --infobox "ROOT DEVICE ${3}${5} does not contain /boot directory." 0 0
             sleep 5
             _umountall
             return 1
         fi
         # check on /EFI on /efi mountpoint
         if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/efi" && ! -d "${3}${5}/EFI" ]]; then
-            _dialog --title " ERROR " --infobox "EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory." 0 0
+            _dialog --title " ERROR " --no-mouse --infobox "EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory." 0 0
             sleep 5
             _umountall
             return 1
@@ -462,7 +462,7 @@ _mkfs() {
         # check on /EFI on /boot
         if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/boot" && -n "${_UEFI_BOOT}" && ! -d "${3}${5}/EFI" ]]; then
             if ! mountpoint -q "${3}/efi"; then
-                _dialog --title " ERROR " --infobox "EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory." 0 0
+                _dialog --title " ERROR " --no-mouse --infobox "EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory." 0 0
                 sleep 5
                 _umountall
                 return 1

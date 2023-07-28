@@ -65,7 +65,7 @@ _geteditor() {
                 if ! [[ -f "${_DESTDIR}/usr/bin/nano" ]]; then
                     _PACKAGES="nano"
                     _run_pacman
-                    _dialog --infobox "Enable nano's syntax highlighting on installed system..." 3 70
+                    _dialog --no-mouse --infobox "Enable nano's syntax highlighting on installed system..." 3 70
                     grep -q '^include' "${_DESTDIR}/etc/nanorc" || \
                         echo "include \"/usr/share/nano/*.nanorc\"" >> "${_DESTDIR}/etc/nanorc"
                     sleep 2
@@ -275,14 +275,14 @@ _mainmenu() {
                 fi
                 exit 0
             elif [[ "${_EXIT}" == "2" ]]; then
-                _dialog --infobox "Rebooting in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
+                _dialog --no-mouse --infobox "Rebooting in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
                 sleep 10
                 clear
                 wall -n "Rebooting the system..."
                 sleep 3
                 reboot
             elif [[ "${_EXIT}" == "3" ]]; then
-                _dialog --infobox "Powering off in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
+                _dialog --no-mouse --infobox "Powering off in 10 seconds...\nDon't forget to remove the boot medium!" 4 50
                 sleep 10
                 clear
                 wall -n "Powering off the system..."
