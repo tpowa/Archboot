@@ -22,7 +22,7 @@ if command -v nvim >/dev/null; then
     alias edit='nvim'
 fi
 # show MOTD on ttyd login
-if [[ -z "${TTY}" && -z "${SSH_TTY}" ]]; then
+if [[ -z "${TTY}" && -z "${SSH_TTY}" && -z "${TMUX}" ]]; then
     [[ "${SHLVL}" == "2" ]] && cat /etc/motd
 fi
 # run remote-login.sh on ssh connection
