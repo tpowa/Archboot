@@ -26,6 +26,7 @@ Environment Changes:
 - added shutdown / reboot wall messages
 - enabled MulticastDNS=yes mdns support
 - run GNU screen on all remote connections automatically
+- don't show MOTD on tmux startup
 localize:
 - removed font selection
 - fixed abort dialog
