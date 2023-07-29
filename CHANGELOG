@@ -25,6 +25,7 @@ Environment Changes:
 - silenced systemd messages
 - added shutdown / reboot wall messages
 - enabled MulticastDNS=yes mdns support
+- run GNU screen on all remote connections automatically
 localize:
 - removed font selection
 - fixed abort dialog
