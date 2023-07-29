@@ -24,7 +24,7 @@ Environment Changes:
 - added used kernel to image name
 - silenced systemd messages
 - added shutdown / reboot wall messages
-- enabled MulticastDNS=yes mdns support
+- enabled MulticastDNS=yes mdns support -> archboot.local
 - run GNU screen on all remote connections automatically
 - don't show MOTD on tmux startup
 localize:
