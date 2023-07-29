@@ -25,3 +25,8 @@ fi
 if [[ -z "${TTY}" && -z "${SSH_TTY}" ]]; then
     [[ "${SHLVL}" == "2" ]] && cat /etc/motd
 fi
+# run remote-login.sh on ssh connection
+if [[ -z "${STY}" && -n "${SSH_TTY}" ]]; then
+    /usr/bin/remote-login.sh
+    exit 0
+fi

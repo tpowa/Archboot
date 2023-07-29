@@ -33,7 +33,7 @@ build ()
     add_symlink /etc/systemd/system/multi-user.target.wants/sshd.service /usr/lib/systemd/system/sshd.service
     # start ttyd on startup
     add_file /usr/lib/libwebsockets-evlib_uv.so
-    add_file /usr/share/archboot/remote/usr/bin/ttyd.sh /usr/bin/ttyd.sh
+    add_file /usr/share/archboot/remote/usr/bin/remote-login.sh /usr/bin/remote-login.sh
     add_file /usr/share/archboot/remote/etc/systemd/system/ttyd.service /etc/systemd/system/ttyd.service
     add_symlink /etc/systemd/system/multi-user.target.wants/ttyd.service /etc/systemd/system/ttyd.service
     # fix licenses
