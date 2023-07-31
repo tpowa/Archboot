@@ -65,7 +65,6 @@ _show_coffee() {
 }
 
 _run_update_environment() {
-    _show_coffee
     if update | grep -q latest-install; then
         update -latest-install
     else
