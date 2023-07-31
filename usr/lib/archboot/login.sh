@@ -70,7 +70,7 @@ if [[ "${TTY}" = "tty1" ]]; then
     rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
     # systemd needs this for root_switch
     touch /etc/initrd-release
-    _progress "100" "Systemd initrd-switch-root will be launched in a second..."
+    _progress "100" "System is ready."
     read -r -t 2
     printf "\ec"
     # https://www.freedesktop.org/software/systemd/man/bootup.html
@@ -174,20 +174,19 @@ if ! [[ -e /.clean-pacman-db ]]; then
         rm -rf /var/lib/pacman/local/"${i}"-[0-9]* &>/dev/null
     done
 fi
-
-if ! mount | grep -q zram0; then
-    printf "\ec"
-    _TITLE="Archboot $(uname -m) | Basic Setup | Moving to ZRAM"
-    _switch_root_zram | _dialog --title "Initializing..." --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
-else
-    systemctl start systemd-networkd
-    systemctl start systemd-resolved
-    # initialize pacman keyring
-    if [[ -e /etc/systemd/system/pacman-init.service ]]; then
-        systemctl start pacman-init
+if [[ "${TTY}" = "/dev/tty1" ]] ; then
+    if ! mount | grep -q zram0; then
+        _TITLE="Archboot $(uname -m) | Basic Setup | Moving to ZRAM"
+        _switch_root_zram | _dialog --title "Initializing..." --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+    else
+        systemctl start systemd-networkd
+        systemctl start systemd-resolved
+        # initialize pacman keyring
+        if [[ -e /etc/systemd/system/pacman-init.service ]]; then
+            systemctl start pacman-init
+        fi
     fi
 fi
-
 if [[ -e /usr/bin/setup ]]; then
     _local_mode
     # wait on user interaction!
