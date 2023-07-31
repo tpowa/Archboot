@@ -40,6 +40,7 @@ echo -e "\e[1mInformation:\e[m Logging is done on \e[1m/dev/tty7\e[m..."
 # Generate new environment and launch it with kexec
 if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]]; then
     _TITLE="Archboot $(uname -m) | Basic Setup | Generating New Environment"
+    _KEEP="Logging is done on /dev/tty7."
     _new_environment | _dialog --title "Running..." --gauge "Waiting for gpg pacman keyring import to finish..." 6 75 0
 fi
 # Generate new images
