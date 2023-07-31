@@ -72,6 +72,7 @@ if [[ "${TTY}" = "tty1" ]]; then
     touch /etc/initrd-release
     _progress "100" "Systemd initrd-switch-root will be launched in a second..."
     read -r -t 2
+    printf "\ec"
     # https://www.freedesktop.org/software/systemd/man/bootup.html
     # enable systemd  initrd functionality
     touch /etc/initrd-release

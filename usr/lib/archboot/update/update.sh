@@ -468,6 +468,7 @@ _new_environment() {
     while true; do
         _clean_kernel_cache
         read -r -t 1
+        printf "\ec"
     done
 }
 
