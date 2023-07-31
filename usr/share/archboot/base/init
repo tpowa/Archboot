@@ -157,6 +157,7 @@ echo 0 > /proc/sys/kernel/sysrq
 echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
 echo | _dialog --title "Ready" --gauge "The boot medium can be safely removed now." 6 75 100
 read -r -t 1
+printf "\ec"
 exec switch_root /sysroot /usr/bin/init "$@"
 
 # vim: set ft=sh ts=4 sw=4 et:
