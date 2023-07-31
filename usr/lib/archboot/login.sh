@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
+[[ -z $TTY ]] && TTY=$(tty)
+TTY=${TTY#/dev/}
 
 _welcome () {
     [[ "$(uname -m)" == "x86_64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux X86_64\e[m"
@@ -41,8 +43,6 @@ EOF
 # fstrim <mountpoint> for manual action
 # it needs some seconds to get RAM free on delete!
 _switch_root_zram() {
-[[ -z $TTY ]] && TTY=$(tty)
-TTY=${TTY#/dev/}
 if [[ "${TTY}" = "tty1" ]]; then
     clear
     [[ -d /sysroot ]] || mkdir /sysroot
@@ -92,7 +92,6 @@ fi
 }
 
 _enter_shell() {
-    [[ -z $TTY ]] && TTY=$(tty)
     # dbus sources profiles again
     if ! echo "${TTY}" | grep -q pts; then
         echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mlogin\e[m routine."
@@ -115,8 +114,6 @@ _run_latest_install() {
 }
 
 _run_update_installer() {
-    [[ -z $TTY ]] && TTY=$(tty)
-    TTY=${TTY#/dev/}
     cd /
     echo -e "\e[1m\e[92mMemory checks run successfully:\e[m"
     echo -e "\e[93mGo and get a cup of coffee. Depending on your system setup,\e[m"
@@ -174,7 +171,8 @@ if ! [[ -e /.clean-pacman-db ]]; then
         rm -rf /var/lib/pacman/local/"${i}"-[0-9]* &>/dev/null
     done
 fi
-if [[ "${TTY}" = "/dev/tty1" ]] ; then
+
+if [[ "${TTY}" = "tty1" ]] ; then
     if ! mount | grep -q zram0; then
         _TITLE="Archboot $(uname -m) | Basic Setup | Moving to ZRAM"
         _switch_root_zram | _dialog --title "Initializing..." --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
