@@ -341,34 +341,38 @@ _prepare_graphic() {
     systemctl reload dbus-org.freedesktop.login1.service
 }
 
+_dialog() {
+    dialog --backtitle "${_TITLE}" "$@"
+    return $?
+}
+
+_progress() {
+cat <<EOF
+XXX
+${1}
+${2}
+XXX
+EOF
+}
+
 _new_environment() {
     _update_installer_check
     touch /.update
     _kill_w_dir
-    _STEPS="11"
-    _S_APPEND="0"
-    _S_EMPTY="  "
-    if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        _STEPS="7"
-        _S_APPEND=""
-        _S_EMPTY=""
-    fi
-    echo -e "\e[1mStep ${_S_APPEND}1/${_STEPS}:\e[m Waiting for gpg pacman keyring import to finish..."
     _gpg_check
-    echo -e "\e[1mStep ${_S_APPEND}2/${_STEPS}:\e[m Removing not necessary files from /..."
+    _progress "5" "Removing not necessary files from /..."
     _clean_archboot
     _clean_kernel_cache
-    echo -e "\e[1mStep ${_S_APPEND}3/${_STEPS}:\e[m Generating archboot container in ${_W_DIR}..."
-    echo "${_S_EMPTY}          This will need some time..."
+    _progress "10" "Generating archboot container in ${_W_DIR}..."
     _create_container || exit 1
     _clean_kernel_cache
     _ram_check
     mkdir ${_RAM}
     mount -t ramfs none ${_RAM}
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        echo -e "\e[1mStep ${_S_APPEND}4/${_STEPS}:\e[m Skipping copying of kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
+        _progress "20" "Skipping copying of kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
     else
-        echo -e "\e[1mStep ${_S_APPEND}4/${_STEPS}:\e[m Copying kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
+        _progress "20" "Copying kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
         # use ramfs to get immediate free space on file deletion
         mv "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
     fi
@@ -376,21 +380,22 @@ _new_environment() {
     [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
     # fallback if no detectable kernel is installed
     [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
-    echo -e "\e[1mStep ${_S_APPEND}5/${_STEPS}:\e[m Collecting rootfs files in ${_W_DIR}..."
-    echo "${_S_EMPTY}          This will need some time..."
+    _progress "30" "Collecting rootfs files in ${_W_DIR}..."
     # write initramfs to "${_W_DIR}"/tmp
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1 || exit 1
-    echo -e "\e[1mStep ${_S_APPEND}6/${_STEPS}:\e[m Cleanup ${_W_DIR}..."
+    _progress "50" "Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
     _ram_check
     # local switch, don't kexec on local image
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        echo -e "\e[1mStep ${_STEPS}/${_STEPS}:\e[m Switch root to ${_RAM}..."
+        _progress "60" "Move rootfs to ${_RAM}..."
         mv ${_W_DIR}/tmp/* /${_RAM}/
         # cleanup mkinitcpio directories and files
+        _progress "70" "Cleanup ${_RAM}..."
         rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot,mkinitcpio.*} &>"${_NO_LOG}"
         rm -f /sysroot/{VERSION,config,buildconfig,init} &>"${_NO_LOG}"
+        _progress "100" "Switching to rootfs ${_RAM}..."
         # https://www.freedesktop.org/software/systemd/man/bootup.html
         # enable systemd  initrd functionality
         touch /etc/initrd-release
@@ -404,7 +409,7 @@ _new_environment() {
         systemctl start initrd-switch-root.target
     fi
     _C_DIR="${_W_DIR}/tmp"
-    echo -e "\e[1mStep ${_S_APPEND}7/${_STEPS}:\e[m Preserving Basic Setup values..."
+    _progress "60" "Preserving Basic Setup values..."
     if [[ -e '/.localize' ]]; then
         cp /etc/{locale.gen,locale.conf} "${_C_DIR}"/etc
         cp /.localize "${_C_DIR}"/
@@ -434,15 +439,13 @@ _new_environment() {
         cp -ar /etc/pacman.d/gnupg "${_C_DIR}"/etc/pacman.d
         cp /.pacsetup "${_C_DIR}"/
     fi
-    echo -e "\e[1mStep ${_S_APPEND}8/${_STEPS}:\e[m Creating initramfs ${_RAM}/${_INITRD}..."
-    echo "            This will need some time..."
+    _progress "70" "Creating initramfs ${_RAM}/${_INITRD}..."
     _create_initramfs
-    echo -e "\e[1mStep ${_S_APPEND}9/${_STEPS}:\e[m Cleanup ${_W_DIR}..."
+    _progress "80" "Cleanup ${_W_DIR}..."
     cd /
     _kill_w_dir
     _clean_kernel_cache
-    echo -e "\e[1mStep 10/${_STEPS}:\e[m Waiting for kernel to free RAM..."
-    echo "            This will need some time..."
+    _progress "90" "Waiting for kernel to free RAM..."
     # wait until enough memory is available!
     while true; do
         [[ "$(($(stat -c %s ${_RAM}/${_INITRD})*200/100000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
@@ -453,8 +456,7 @@ _new_environment() {
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
             _MEM_MIN="--mem-min=0xA0000000"
     fi
-    echo -e "\e[1mStep ${_STEPS}/${_STEPS}:\e[m Running \e[1;92mkexec\e[m with \e[1mKEXEC_LOAD\e[m..."
-    echo "            This will need some time..."
+    _progress "100" "kexec\e[m with \e[1mKEXEC_LOAD\e[m..."
     kexec -c -f ${_MEM_MIN} ${_RAM}/"${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     sleep 0.1
     _clean_kernel_cache

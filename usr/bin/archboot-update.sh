@@ -39,7 +39,8 @@ _download_latest
 echo -e "\e[1mInformation:\e[m Logging is done on \e[1m/dev/tty7\e[m..."
 # Generate new environment and launch it with kexec
 if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]]; then
-    _new_environment
+    _TITLE="Archboot $(uname -m) | Basic Setup | Generating New Environment"
+    _new_environment | _dialog --title "Running..." --gauge "Waiting for gpg pacman keyring import to finish..." 6 75 0
 fi
 # Generate new images
 if [[ -n "${_G_RELEASE}" ]]; then
