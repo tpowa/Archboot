@@ -176,6 +176,7 @@ if ! [[ -e /.clean-pacman-db ]]; then
 fi
 
 if ! mount | grep -q zram0; then
+    printf "\ec"
     _TITLE="Archboot $(uname -m) | Basic Setup | Moving to ZRAM"
     _switch_root_zram | _dialog --title "Initializing..." --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 else
