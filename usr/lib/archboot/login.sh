@@ -22,6 +22,20 @@ _local_mode () {
     fi
 }
 
+_dialog() {
+    dialog --backtitle "${_TITLE}" "$@"
+    return $?
+}
+
+_progress() {
+cat <<EOF
+XXX
+${1}
+${2}
+XXX
+EOF
+}
+
 # use -o discard for RAM cleaning on delete
 # (online fstrimming the block device!)
 # fstrim <mountpoint> for manual action
@@ -31,25 +45,23 @@ _switch_root_zram() {
 TTY=${TTY#/dev/}
 if [[ "${TTY}" = "tty1" ]]; then
     clear
-    echo -e "\e[1mInitializing\e[m \e[96mArchboot\e[m \e[1m- Arch Linux Environment:\e[m"
-    echo -e "\e[1mStep 1/4:\e[m Creating /dev/zram0 with zstd compression..."
     [[ -d /sysroot ]] || mkdir /sysroot
     modprobe zram &>/dev/null
     modprobe zstd &>/dev/null
     echo "1" >/sys/block/zram0/reset
     echo "zstd" >/sys/block/zram0/comp_algorithm
     echo "4G" >/sys/block/zram0/disksize
-    echo -e "\e[1mStep 2/4:\e[m Creating btrfs on /dev/zram0..."
+    _progress "33" "Creating btrfs on /dev/zram0..."
     mkfs.btrfs /dev/zram0 &>/dev/null
     mount -o discard /dev/zram0 /sysroot &>/dev/null
-    echo -e "\e[1mStep 3/4:\e[m Removing firmware and modules..."
+    _progress "66" "Removing firmware and modules..."
     # cleanup firmware and modules
     mv /lib/firmware/regulatory* /tmp/
     rm -rf /lib/firmware/*
     mv /tmp/regulatory* /lib/firmware/
     rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,platform,net,scsi,soc,spi,usb,video}
     rm -rf /lib/modules/*/extramodules
-    echo -e "\e[1mStep 4/4:\e[m Copying archboot rootfs to /sysroot..."
+    _progress "75" "Copying archboot rootfs to /sysroot..."
     tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
         --exclude="./run/*" --exclude="./mnt/*" --exclude="./tmp/*" --exclude="./sysroot/*" \
         -clpf - . | tar -C /sysroot -xlspf - &>/dev/null
@@ -58,9 +70,8 @@ if [[ "${TTY}" = "tty1" ]]; then
     rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
     # systemd needs this for root_switch
     touch /etc/initrd-release
-    echo -e "\e[1;96mArchboot\e[m \e[1m- Arch Linux Environment finished.\e[m"
-    echo -e "\e[1mSystemd initrd-switch-root will be launched in a second...\e[m"
-    read -r -t 3
+    _progress "100" "Systemd initrd-switch-root will be launched in a second..."
+    read -r -t 2
     # https://www.freedesktop.org/software/systemd/man/bootup.html
     # enable systemd  initrd functionality
     touch /etc/initrd-release
@@ -164,7 +175,8 @@ if ! [[ -e /.clean-pacman-db ]]; then
 fi
 
 if ! mount | grep -q zram0; then
-    _switch_root_zram | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+    _TITLE="Archboot $(uname -m) | Basic Setup | Moving to ZRAM"
+    _switch_root_zram | _dialog --title "Initializing..." --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 else
     systemctl start systemd-networkd
     systemctl start systemd-resolved

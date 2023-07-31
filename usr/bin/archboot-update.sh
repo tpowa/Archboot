@@ -39,9 +39,9 @@ _download_latest
 echo -e "\e[1mInformation:\e[m Logging is done on \e[1m/dev/tty7\e[m..."
 # Generate new environment and launch it with kexec
 if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]]; then
-    _TITLE="Archboot $(uname -m) | Basic Setup | Generating New Environment"
-    _KEEP="Logging is done on ${_LOG}."
-    _new_environment | _dialog --title "Initializing..." --gauge "${_KEEP} Waiting for pacman..." 6 75 0
+    _TITLE="Archboot $(uname -m) | Basic Setup | New Environment"
+    _KEEP="Logging to ${_LOG}."
+    _new_environment | _dialog --title "Initializing..." --gauge "${_KEEP} Waiting for pacman..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 fi
 # Generate new images
 if [[ -n "${_G_RELEASE}" ]]; then
