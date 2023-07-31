@@ -16,7 +16,7 @@ build ()
             mkdir echo false sleep kmod pidof touch chmod find wc uname yes awk halt \
             shutdown reboot poweroff insmod modprobe sh dd sort zstd date tee mktemp \
             install pgrep mkfs.btrfs rmmod mountpoint gzip ldconfig nscd ln top df cut \
-            stat tr passwd od tar bsdtar
+            stat tr passwd od tar bsdtar dialog
 
     ### add nano
     add_binary nano
@@ -47,7 +47,7 @@ build ()
 
     ### adding config files of installation system
     map add_file "/etc/profile" "/etc/shells"
-    basic_config="hostname issue modprobe.d/modprobe.conf os-release tmpfiles.d/var.conf"
+    basic_config="dialogrc hostname issue modprobe.d/modprobe.conf os-release tmpfiles.d/var.conf"
     for i in $basic_config; do
         add_file "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done

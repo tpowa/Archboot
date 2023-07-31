@@ -1,0 +1,4 @@
+border_color = (BLACK,WHITE,ON)
+border2_color = (BLACK,WHITE,ON)
+menubox_border_color = (BLACK,WHITE,ON)
+menubox_border2_color = (BLACK,WHITE,ON)
