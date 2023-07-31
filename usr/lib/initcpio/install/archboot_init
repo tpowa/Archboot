@@ -7,7 +7,8 @@ build() {
     map add_module vfat? iso9660? nls_cp437? nls_ascii? cdrom? exfat?
     map add_binary bash sh blkid mount mountpoint switch_root bsdcpio mkfs.btrfs setfont \
         /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod insmod modprobe \
-        gzip uname cat cp dmesg grep ln ls mv rm umount lsblk rmmod cut sed find mkdir
+        gzip uname cat cp dmesg grep ln ls mv rm umount lsblk rmmod cut sed find mkdir dialog
+    add_file /usr/share/terminfo/l/linux
     add_file "/usr/share/kbd/consolefonts/ter-v16n.psf.gz" "/consolefont-16.psf.gz"
     add_file "/usr/share/kbd/consolefonts/ter-v32n.psf.gz" "/consolefont-32.psf.gz"
     rules_d=/usr/lib/udev/rules.d

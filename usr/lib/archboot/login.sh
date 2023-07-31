@@ -141,7 +141,7 @@ _run_update_installer() {
 
 if ! [[ -e /.vconsole-run ]]; then
     touch /.vconsole-run
-    FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
+    FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" 2>/dev/null | sed -e 's#.*:##g')"
     if [[ "${FB_SIZE}" -gt '1900' ]]; then
         SIZE="32"
     else
