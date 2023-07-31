@@ -72,7 +72,8 @@ if [[ "${TTY}" = "tty1" ]]; then
     touch /etc/initrd-release
     _progress "100" "System is ready."
     read -r -t 2
-    printf "\ec"
+    # fix clear screen on all terminals
+    printf "\ec" | | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
     # https://www.freedesktop.org/software/systemd/man/bootup.html
     # enable systemd  initrd functionality
     touch /etc/initrd-release
