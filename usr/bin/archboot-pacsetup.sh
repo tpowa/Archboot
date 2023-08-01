@@ -88,6 +88,7 @@ _update_environment() {
     _UPDATE_ENVIRONMENT=""
     _LOCAL_KERNEL=""
     _ONLINE_KERNEL=""
+    sleep 2
     pacman -Sy &>"${_LOG}"
     _progress "50" "Checking on new online kernel version..."
     #shellcheck disable=SC2086
