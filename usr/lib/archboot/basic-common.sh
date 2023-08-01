@@ -21,6 +21,15 @@ _dialog() {
     return $?
 }
 
+_progress() {
+cat <<EOF
+XXX
+${1}
+${2}
+XXX
+EOF
+}
+
 _show_login() {
     [[ -e "/.${_ANSWER}-running" ]] && rm "/.${_ANSWER}-running"
     clear

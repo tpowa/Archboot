@@ -61,6 +61,15 @@ _vconsole() {
     systemctl restart systemd-vconsole-setup
 }
 
+_finish() {
+    _progress "33" "Setting locale to ${_LOCALE}.UTF-8..."
+    sleep 1
+    _progress "66" "Setting keymap to ${_KEYMAP}..."
+    sleep 1
+    _progress "100" "Localization completed successfully."
+    sleep 1
+}
+
 _localize() {
     echo "LANG=${_LOCALE}.UTF-8" > /etc/locale.conf
     echo "LANG=${_LOCALE}.UTF-8" > /.localize
@@ -68,11 +77,8 @@ _localize() {
     localectl set-locale "${_LOCALE}.UTF-8" &>/dev/null
     sed -i -e "s:^[a-z]:#&:g" /etc/locale.gen
     sed -i -e "s:^#${_LOCALE}.UTF-8:${_LOCALE}.UTF-8:g" /etc/locale.gen
-    sleep 1 | _dialog --no-mouse --gauge "Setting locale to ${_LOCALE}.UTF-8..." 6 50 0
     locale-gen &>/dev/null
-    sleep 1 | _dialog --no-mouse --gauge "Setting vconsole font to ${_FONT}..." 6 50 33
-    sleep 1 | _dialog --no-mouse --gauge "Setting keymap to ${_KEYMAP}..." 6 50 66
-    sleep 1 | _dialog --no-mouse --gauge "Localization completed successfully." 6 50 100
+    _finish | _dialog --no-mouse --gauge "Setting locale to ${_LOCALE}.UTF-8..." 6 50 0
 }
 
 _check
