@@ -550,6 +550,7 @@ _new_image() {
     rm -r "${_W_DIR}"
     _progress "100" "New isofiles are located in /archboot."
     sleep 2
+    clear
 }
 
 _install_graphic () {
