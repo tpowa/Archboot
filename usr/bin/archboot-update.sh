@@ -45,7 +45,7 @@ if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]]; then
 fi
 # Generate new images
 if [[ -n "${_G_RELEASE}" ]]; then
-    _new_image
+    _new_image | _dialog --title "Initializing..." --gauge "${_KEEP} Removing not necessary files from /..." 6 75 0
 fi
 # install custom xorg or wayland
 if [[ -n "${_CUSTOM_X}" || -n "${_CUSTOM_WAYLAND}" ]]; then
