@@ -156,7 +156,7 @@ EOF
         break
     else
         _dialog --title " ERROR " --no-mouse --infobox "Please reconfigure pacman." 3 40
-        sleep 5
+        sleep 3
     fi
 done
 if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
