@@ -24,20 +24,6 @@ _local_mode () {
     fi
 }
 
-_dialog() {
-    dialog --backtitle "${_TITLE}" "$@"
-    return $?
-}
-
-_progress() {
-cat <<EOF
-XXX
-${1}
-${2}
-XXX
-EOF
-}
-
 # use -o discard for RAM cleaning on delete
 # (online fstrimming the block device!)
 # fstrim <mountpoint> for manual action

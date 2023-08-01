@@ -61,6 +61,20 @@ _riscv64_check() {
     fi
 }
 
+_dialog() {
+    dialog --backtitle "${_TITLE}" "$@"
+    return $?
+}
+
+_progress() {
+cat <<EOF
+XXX
+${1}
+${2}
+XXX
+EOF
+}
+
 _kver() {
     # this is intentionally very loose. only ensure that we're
     # dealing with some sort of string that starts with something
