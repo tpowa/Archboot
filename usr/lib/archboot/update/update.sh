@@ -481,7 +481,7 @@ _full_system() {
     _progress "1" "${_KEEP} Reinstalling all packages..."
     _PACKAGES="$(pacman -Qqn)"
     _COUNT=0
-    _PACKAGE_COUNT="$(echo ${_PACKAGES} | wc -l)"
+    _PACKAGE_COUNT="$(pacman -Qqn | wc -l)"
     for i in ${_PACKAGES}; do
         pacman -S --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
         if [[ "$((${_COUNT}*100/${_PACKAGE_COUNT}-4))" -gt 1 ]]; then
