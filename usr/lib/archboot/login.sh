@@ -50,7 +50,7 @@ if [[ "${TTY}" = "tty1" ]]; then
     modprobe zstd &>/dev/null
     echo "1" >/sys/block/zram0/reset
     echo "zstd" >/sys/block/zram0/comp_algorithm
-    echo "4G" >/sys/block/zram0/disksize
+    echo "5G" >/sys/block/zram0/disksize
     _progress "33" "Creating btrfs on /dev/zram0..."
     mkfs.btrfs /dev/zram0 &>/dev/null
     mount -o discard /dev/zram0 /sysroot &>/dev/null

@@ -523,13 +523,11 @@ _new_image() {
     _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg > "${_LOG}"
     # riscv64 does not support kexec at the moment
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-        # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
         # removing not working lvm2 from latest image
         _progress "35" "${_KEEP} Removing lvm2 from container..."
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>"${_NO_LOG}"
-        # generate latest tarball in container
         _progress "40" "${_KEEP} Generating local ISO..."
-        # generate local iso in container
+        # generate local iso in container, umount tmp it's a tmpfs and weird things could happen then
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
         -i=${_ISONAME}-local-${_RUNNING_ARCH}" > "${_LOG}" || exit 1
         rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*

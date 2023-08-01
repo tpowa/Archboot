@@ -79,7 +79,7 @@ _second_stage() {
     rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,platform,net,scsi,soc,spi,usb,video} /lib/modules/*/extramodules
     _progress "66" "${_KEEP} Creating /dev/zram0 with zstd compression..."
     echo "zstd" >/sys/block/zram0/comp_algorithm
-    echo "4G" >/sys/block/zram0/disksize
+    echo "5G" >/sys/block/zram0/disksize
     _progress "67" "${_KEEP} Creating btrfs on /dev/zram0..."
     mkfs.btrfs /dev/zram0 &>/dev/null
     # use discard to get free RAM on delete!
