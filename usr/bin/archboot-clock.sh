@@ -67,16 +67,15 @@ _timeset() {
 _auto_clock() {
     timedatectl set-timezone "${_ZONE}"
     _hwclock
-    sleep 1
+    sleep 2
     _progress "50" "Syncing clock with NTP pool and enable timesyncd..."
-    sleep 1
+    sleep 2
     # sync immediatly with standard pool
     systemctl restart systemd-timesyncd
     # enable background syncing
     timedatectl set-ntp 1
-    _SET_TIME="1"
     _progress "100" "Clock configuration completed successfully."
-    sleep 1
+    sleep 2
 }
 
 _check
@@ -85,6 +84,7 @@ _SET_TIME=""
 if ping -c1 www.google.com &>/dev/null; then
     _ZONE="$(curl -s "http://ip-api.com/csv/?fields=timezone")"
     _auto_clock |  _dialog --no-mouse --gauge "Setting Timezone to ${_ZONE}..." 6 60 0
+    _SET_TIME="1"
 fi
 while [[ -z "${_SET_TIME}" ]]; do
     _timezone
