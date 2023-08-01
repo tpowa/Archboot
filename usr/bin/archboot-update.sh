@@ -61,5 +61,7 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
 fi
 # Switch to full Arch Linux system
 if [[ -n "${_FULL_SYSTEM}" ]]; then
-    _full_system
+    _TITLE="Archboot $(uname -m) | Basic Setup | Full System"
+    _KEEP="Logging to ${_LOG}."
+    _full_system | _dialog --title "Initializing..." --gauge "${_KEEP} Syncing package db..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 fi

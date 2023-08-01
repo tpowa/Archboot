@@ -472,35 +472,37 @@ _new_environment() {
     done
 }
 
-_kernel_check() {
-    _PATH="/usr/bin"
-    _INSTALLED_KERNEL="$(${_PATH}/pacman -Qi linux | ${_PATH}/grep Version | ${_PATH}/cut -d ':' -f 2 | ${_PATH}/sed -e 's# ##g' -e 's#\.arch#-arch#g')"
-    _RUNNING_KERNEL="$(${_PATH}/uname -r)"
-    if ! [[ "${_INSTALLED_KERNEL}" == "${_RUNNING_KERNEL}" ]]; then
-        echo -e "\e[93mWarning:\e[m"
-        echo -e "Installed kernel does \e[1mnot\e[m match running kernel!"
-        echo -e "Kernel module loading will \e[1mnot\e[m work."
-        echo -e "Use \e[1m--latest\e[m options to get a matching kernel first."
-    fi
-}
-
 _full_system() {
     if [[ -e "/.full_system" ]]; then
         echo -e "\e[1mFull Arch Linux system already setup.\e[m"
         exit 0
     fi
-    echo -e "\e[1mInitializing full Arch Linux system...\e[m"
-    echo -e "\e[1mStep 1/3:\e[m Reinstalling packages and adding info/man-pages..."
-    echo "          This will need some time..."
     pacman -Sy >"${_LOG}" 2>&1 || exit 1
-    pacman -Qqn | pacman -S --noconfirm man-db man-pages texinfo - >"${_LOG}" 2>&1 || exit 1
-    echo -e "\e[1mStep 2/3:\e[m Checking kernel version..."
-    _kernel_check
-    echo -e "\e[1mStep 3/3:\e[m Trigger kernel module loading..."
-    udevadm trigger --action=add --type=subsystems
-    udevadm trigger --action=add --type=devices
-    udevadm settle
-    echo -e "\e[1mFull Arch Linux system is ready now.\e[m"
+    _progress "1" "${_KEEP} Reinstalling all packages..."
+    _PACKAGES="$(pacman -Qqn)"
+    _COUNT=0
+    _PACKAGE_COUNT="$(echo ${_PACKAGES} | wc -l)"
+    for i in ${_PACKAGES}; do
+        pacman -S --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
+        if [[ "$((${_COUNT}*100/${_PACKAGE_COUNT}-4))" -gt 1 ]]; then
+            progress "$((${_COUNT}*100/${_PACKAGE_COUNT}-4))" "${_KEEP} Reinstalling all packages..."
+        fi
+        _COUNT="$((${_COUNT}+1))"
+    done
+    _progress "97" "${_KEEP} Adding info/man-pages..."
+    pacman -S --noconfirm man-db man-pages texinfo >"${_LOG}" 2>&1 || exit 1
+    _progress "98" "${_KEEP} Checking kernel version..."
+    _INSTALLED_KERNEL="$(pacman -Qi linux | grep Version | cut -d ':' -f 2 | sed -e 's# ##g' -e 's#\.arch#-arch#g')"
+    if ! [[ "${_INSTALLED_KERNEL}" == "$(uname -r)" ]]; then
+        _progress "99" "${_KEEP} Skipping kernel module loading..."
+    else
+        _progress "99" "${_KEEP} Trigger kernel module loading..."
+        udevadm trigger --action=add --type=subsystems
+        udevadm trigger --action=add --type=devices
+        udevadm settle
+    fi
+    _progress "100" "${_KEEP} Full Arch Linux system is ready now."
+    sleep 2
     touch /.full_system
 }
 
