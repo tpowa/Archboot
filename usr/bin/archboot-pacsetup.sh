@@ -151,7 +151,7 @@ EOF
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _enable_testing
     fi
-    _select_mirror || exit 1
+    _select_mirror
     if _prepare_pacman; then
         break
     else
