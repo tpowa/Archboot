@@ -501,8 +501,10 @@ _full_system() {
         udevadm trigger --action=add --type=devices
         udevadm settle
     fi
+    sleep 2
     _progress "100" "${_KEEP} Full Arch Linux system is ready now."
     sleep 2
+    clear
     touch /.full_system
 }
 
