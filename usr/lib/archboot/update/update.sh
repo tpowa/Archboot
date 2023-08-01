@@ -518,34 +518,34 @@ _new_image() {
     cd /archboot || exit 1
     _W_DIR="$(mktemp -u archboot-release.XXX)"
     # create container
-    _progress "15" "Creating archboot container..."
+    _progress "5" "${_KEEP} Creating archboot container..."
     archboot-"${_RUNNING_ARCH}"-create-container.sh "${_W_DIR}" -cc > "${_LOG}" || exit 1
     _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg > "${_LOG}"
     # riscv64 does not support kexec at the moment
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         # generate tarball in container, umount tmp it's a tmpfs and weird things could happen then
         # removing not working lvm2 from latest image
-        _progress "35" "Removing lvm2 from container..."
+        _progress "35" "${_KEEP} Removing lvm2 from container..."
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>"${_NO_LOG}"
         # generate latest tarball in container
-        _progress "40" "Generating local ISO..."
+        _progress "40" "${_KEEP} Generating local ISO..."
         # generate local iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
         -i=${_ISONAME}-local-${_RUNNING_ARCH}" > "${_LOG}" || exit 1
         rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
         _ram_check
-        _progress "65" "Generating latest ISO..."
+        _progress "65" "${_KEEP} Generating latest ISO..."
         # generate latest iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
         -i=${_ISONAME}-latest-${_RUNNING_ARCH}" > "${_LOG}" || exit 1
-        _progress "72" "Installing lvm2 to container..."
+        _progress "72" "${_KEEP} Installing lvm2 to container..."
         ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>"${_NO_LOG}"
     fi
-    _progress "75" "Generating normal ISO..."
+    _progress "75" "${_KEEP} Generating normal ISO..."
     # generate iso in container
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_RUNNING_ARCH}-iso.sh -g \
     -i=${_ISONAME}-${_RUNNING_ARCH}" > "${_LOG}" || exit 1
-    _progress "98" "Cleanup container..."
+    _progress "98" "${_KEEP} Cleanup container..."
     # move iso out of container
     mv "${_W_DIR}"/*.iso ./ &>"${_NO_LOG}"
     mv "${_W_DIR}"/*.img ./ &>"${_NO_LOG}"
