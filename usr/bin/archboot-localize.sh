@@ -72,6 +72,7 @@ _run() {
     _progress "33" "Setting locale to ${_LOCALE}.UTF-8..."
     sleep 1
     _progress "66" "Setting keymap to ${_KEYMAP}..."
+    _vconsole
     sleep 1
     _progress "100" "Localization completed successfully."
     sleep 1
@@ -86,7 +87,6 @@ while [[ -z "${_LOCALE}" ]]; do
     _locale_menu
     _vconsole_keymap
 done
-_vconsole
 _localize
 _cleanup
 # vim: set ts=4 sw=4 et:
