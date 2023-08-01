@@ -161,7 +161,7 @@ fi
 
 if [[ "${TTY}" = "tty1" ]] ; then
     if ! mount | grep -q zram0; then
-        _TITLE="Archboot $(uname -m) | Basic Setup | Moving to ZRAM"
+        _TITLE="Archboot $(uname -m) | Basic Setup | ZRAM Setup"
         _switch_root_zram | _dialog --title "Initializing..." --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
     else
         systemctl start systemd-networkd
