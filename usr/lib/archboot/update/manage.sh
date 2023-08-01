@@ -186,10 +186,10 @@ _new_environment() {
         # use ramfs to get immediate free space on file deletion
         mv "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
     fi
-    _kver "${_RAM}/${_VMLINUZ}"
+    _KVER=$(_kver "${_RAM}/${_VMLINUZ}")
     _progress "55" "${_KEEP} Collecting rootfs files in ${_W_DIR}..."
     # write initramfs to "${_W_DIR}"/tmp
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${kver} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1 || exit 1
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_KVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1 || exit 1
     _progress "70" "${_KEEP} Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
