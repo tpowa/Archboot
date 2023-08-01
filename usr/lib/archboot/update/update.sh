@@ -21,6 +21,7 @@ _LOG="/dev/tty7"
 _NO_LOG="/dev/null"
 [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="vmlinuz-linux"
 [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="Image"
+_MENU_TITLE="Logging to ${_LOG}"
 
 _graphic_options() {
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
