@@ -70,12 +70,12 @@ _run() {
     sed -i -e "s:^#${_LOCALE}.UTF-8:${_LOCALE}.UTF-8:g" /etc/locale.gen
     locale-gen &>/dev/null
     _progress "33" "Setting locale to ${_LOCALE}.UTF-8..."
-    sleep 1
+    sleep 2
     _progress "66" "Setting keymap to ${_KEYMAP}..."
     _vconsole
-    sleep 1
+    sleep 2
     _progress "100" "Localization completed successfully."
-    sleep 1
+    sleep 2
 }
 
 _localize() {
