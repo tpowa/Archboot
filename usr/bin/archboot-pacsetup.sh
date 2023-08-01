@@ -61,6 +61,7 @@ _enable_testing() {
 }
 
 _prepare_pacman() {
+    sleep 2
     # pacman-key process itself
     while pgrep -x pacman-key &>"${_NO_LOG}"; do
         sleep 1
