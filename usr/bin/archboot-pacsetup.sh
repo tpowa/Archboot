@@ -157,7 +157,7 @@ EOF
 done
 if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-        _update_environment | _dialog --title "Logging to ${_LOG}" --no-mouse --gauge "Refreshing package database..." 6 50 0
+        _update_environment | _dialog --title "Logging to ${_LOG}" --no-mouse --gauge "Refreshing package database..." 6 60 0
     fi
 fi
 _dialog --no-mouse --infobox "Pacman configuration completed successfully." 3 60
