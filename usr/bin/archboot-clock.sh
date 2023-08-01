@@ -14,10 +14,6 @@ _hwclock() {
 
 _timezone () {
     _SET_ZONE=""
-    if ping -c1 www.google.com &>/dev/null; then
-        _ZONE="$(curl -s "http://ip-api.com/csv/?fields=timezone")"
-        _SET_ZONE=1
-    fi
     while [[ -z "${_SET_ZONE}" ]]; do
         _CONTINUE=""
         while [[ -z "${_CONTINUE}" ]]; do
@@ -51,20 +47,6 @@ _timezone () {
 
 _timeset() {
     _hwclock
-    # check internet connection
-    if ping -c1 www.google.com &>/dev/null; then
-        _dialog --no-mouse --infobox "Syncing clock with NTP pool and enable timesyncd..." 3 65
-        sleep 2
-        # sync immediatly with standard pool
-        if ! systemctl restart systemd-timesyncd; then
-            _dialog --msgbox "An error has occured, time was not changed!" 0 0
-            _SET_TIME=""
-        else
-            # enable background syncing
-            timedatectl set-ntp 1
-            _SET_TIME="1"
-        fi
-    fi
     if [[ -z "${_SET_TIME}" ]]; then
         timedatectl set-ntp 0
         # display and ask to set date/time
@@ -78,15 +60,35 @@ _timeset() {
         timedatectl set-time "${_DATETIME}"
         _SET_TIME="1"
     fi
+    _dialog --no-mouse --infobox "Clock configuration completed successfully." 3 50
+    sleep 2
+}
+
+_auto_clock() {
+    timedatectl set-timezone "${_ZONE}"
+    _hwclock
+    sleep 1
+    _progress "50" "Syncing clock with NTP pool and enable timesyncd..."
+    sleep 1
+    # sync immediatly with standard pool
+    systemctl restart systemd-timesyncd
+    # enable background syncing
+    timedatectl set-ntp 1
+    _SET_TIME="1"
+    _progress "100" "Clock configuration completed successfully."
+    sleep 1
 }
 
 _check
 _SET_TIME=""
+# automatic setup
+if ping -c1 www.google.com &>/dev/null; then
+    _ZONE="$(curl -s "http://ip-api.com/csv/?fields=timezone")"
+    _auto_clock |  _dialog --no-mouse --gauge "Setting Timezone to ${_ZONE}..." 6 60 0
+fi
 while [[ -z "${_SET_TIME}" ]]; do
     _timezone
     _timeset
 done
-_dialog --no-mouse --infobox "Clock configuration completed successfully." 3 50
-sleep 2
 _cleanup
 # vim: set ts=4 sw=4 et:
