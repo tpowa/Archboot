@@ -145,11 +145,12 @@ EOF
         pacman -Sy >>"${_LOG}"
         sleep 2
         break
+    else
+        if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
+            _enable_testing
+        fi
+        _select_mirror
     fi
-    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-        _enable_testing
-    fi
-    _select_mirror
     if _prepare_pacman | _dialog --no-mouse --gauge "Waiting for Arch Linux keyring initialization..." 6 70 0; then
         break
     else
