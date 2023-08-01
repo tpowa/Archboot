@@ -197,20 +197,20 @@ _network() {
     echo "Using setup's network profile ${_NETWORK_PROFILE} now..." >"${_LOG}"
     systemctl restart systemd-networkd
     systemctl restart systemd-resolved
-    _dialog --no-mouse --infobox "Waiting for network link to come up..." 3 50
     # add sleep here for systemd-resolve get correct values
     _COUNT=0
     while true; do
         sleep 1
         if getent hosts www.google.com &>"${_LOG}"; then
-            _dialog --no-mouse --infobox "Network configuration completed successfully." 3 50
+            _progress "100" "Network configuration completed successfully."
             sleep 2
             return 0
         fi
         _COUNT=$((_COUNT+1))
         # abort after 10 seconds
+        _progress "$((${_COUNT}*10))" "Waiting $((10-${_COUNT})) seconds for network link to come up..."
         [[ "${_COUNT}" == 10 ]] && break
-    done
+    done | _dialog --no-mouse --gauge "Waiting 10 seconds for network link to come up..." 6 60 0
     if ! getent hosts www.google.com &>"${_LOG}"; then
         _dialog --title " ERROR " --no-mouse --infobox "Your network is not working correctly, please configure again!" 3 60
         sleep 3
