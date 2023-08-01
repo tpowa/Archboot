@@ -16,7 +16,6 @@ _ram_check() {
     done
 }
 
-
 _kill_w_dir() {
     if [[ -d "${_W_DIR}" ]]; then
         rm -r "${_W_DIR}"
@@ -43,25 +42,6 @@ _create_container() {
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
             "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >"${_LOG}" 2>&1 || exit 1
         fi
-    fi
-}
-
-_kver_x86() {
-    # get kernel version from installed kernel
-    if [[ -f "${_RAM}/${_VMLINUZ}" ]]; then
-        offset="$(od -An -j0x20E -dN2 "${_RAM}/${_VMLINUZ}")"
-        read -r _HWKVER _ < <(dd if="${_RAM}/${_VMLINUZ}" bs=1 count=127 skip=$((offset + 0x200)) 2>"${_NO_LOG}")
-    fi
-}
-
-_kver_generic() {
-    # get kernel version from installed kernel
-    if [[ -f "${_RAM}/${_VMLINUZ}" ]]; then
-        reader="cat"
-        # try if the image is gzip compressed
-        bytes="$(od -An -t x2 -N2 "${_RAM}/${_VMLINUZ}" | tr -dc '[:alnum:]')"
-        [[ $bytes == '8b1f' ]] && reader="zcat"
-        read -r _ _ _HWKVER _ < <($reader "${_RAM}/${_VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
     fi
 }
 
@@ -206,13 +186,10 @@ _new_environment() {
         # use ramfs to get immediate free space on file deletion
         mv "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
     fi
-    [[ ${_RUNNING_ARCH} == "x86_64" ]] && _kver_x86
-    [[ ${_RUNNING_ARCH} == "aarch64" || ${_RUNNING_ARCH} == "riscv64" ]] && _kver_generic
-    # fallback if no detectable kernel is installed
-    [[ -z "${_HWKVER}" ]] && _HWKVER="$(uname -r)"
+    _kver ${_RAM}/${_VMLINUZ}
     _progress "55" "${_KEEP} Collecting rootfs files in ${_W_DIR}..."
     # write initramfs to "${_W_DIR}"/tmp
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_HWKVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1 || exit 1
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${kver} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1 || exit 1
     _progress "70" "${_KEEP} Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
