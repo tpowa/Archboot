@@ -55,6 +55,8 @@ _enable_testing() {
             sed -i -e '/^#\[extra-testing\]/ { n ; s/^#// }' /etc/pacman.conf
             sed -i -e 's:^#\[core-testing\]:\[core-testing\]:g' -e  's:^#\[extra-testing\]:\[extra-testing\]:g' /etc/pacman.conf
         fi
+    else
+        _DOTESTING=1
     fi
 }
 
