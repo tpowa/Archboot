@@ -68,15 +68,15 @@ _localize() {
     localectl set-locale "${_LOCALE}.UTF-8" &>/dev/null
     sed -i -e "s:^[a-z]:#&:g" /etc/locale.gen
     sed -i -e "s:^#${_LOCALE}.UTF-8:${_LOCALE}.UTF-8:g" /etc/locale.gen
-    _dialog --no-mouse --infobox "Setting locale to ${_LOCALE}.UTF-8..." 3 50
+    _dialog --no-mouse --gauge "Setting locale to ${_LOCALE}.UTF-8..." 3 50 0
     locale-gen &>/dev/null
-    sleep 2
-    _dialog --no-mouse --infobox "Setting vconsole font to ${_FONT}..." 3 50
-    sleep 2
-    _dialog --no-mouse --infobox "Setting keymap to ${_KEYMAP}..." 3 50
-    sleep 2
-    _dialog --no-mouse --infobox "Localization completed successfully." 3 40
-    sleep 2
+    sleep 1
+    _dialog --no-mouse --gauge "Setting vconsole font to ${_FONT}..." 3 50 33
+    sleep 1
+    _dialog --no-mouse --gauge "Setting keymap to ${_KEYMAP}..." 3 50 66
+    sleep 1
+    _dialog --no-mouse --gauge "Localization completed successfully." 3 50 100
+    sleep 1
 }
 
 _check
