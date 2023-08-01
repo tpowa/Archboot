@@ -61,7 +61,6 @@ _enable_testing() {
 }
 
 _prepare_pacman() {
-    _dialog --no-mouse --infobox "Waiting for Arch Linux keyring initialization..." 3 40
     # pacman-key process itself
     while pgrep -x pacman-key &>"${_NO_LOG}"; do
         sleep 1
@@ -71,7 +70,7 @@ _prepare_pacman() {
         sleep 1
     done
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
-    _dialog --no-mouse --infobox "Update Arch Linux keyring..." 3 50
+    __progress "50" "Update Arch Linux keyring..."
     _KEYRING="archlinux-keyring"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
@@ -79,6 +78,9 @@ _prepare_pacman() {
         _dialog --title " ERROR " --no-mouse --infobox "Keyring update failed! Check ${_LOG} for errors." 3 60
         sleep 5
         return 1
+    else
+        _progress "100" "Pacman is ready."
+        sleep 2
     fi
 }
 
@@ -146,7 +148,7 @@ EOF
         _enable_testing
     fi
     _select_mirror
-    if _prepare_pacman; then
+    if _prepare_pacman | _dialog --no-mouse --gauge "Waiting for Arch Linux keyring initialization..." 6 70 0; then
         break
     else
         _dialog --title " ERROR " --no-mouse --infobox "Please reconfigure pacman." 3 40
