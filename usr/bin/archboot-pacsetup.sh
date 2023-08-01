@@ -86,38 +86,35 @@ _update_environment() {
     _UPDATE_ENVIRONMENT=""
     _LOCAL_KERNEL=""
     _ONLINE_KERNEL=""
-    if update | grep -q '\-latest'; then
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]]; then
-            pacman -Sy &>"${_LOG}"
-            _progress "50" "Checking on new online kernel version..."
+    pacman -Sy &>"${_LOG}"
+    _progress "50" "Checking on new online kernel version..."
+    #shellcheck disable=SC2086
+    _LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+    if  [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+        #shellcheck disable=SC2086
+        _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+    else
+        if [[ -n "${_DOTESTING}" ]]; then
             #shellcheck disable=SC2086
-            _LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
-            if  [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-                #shellcheck disable=SC2086
-                _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
-            else
-                if [[ -n "${_DOTESTING}" ]]; then
-                    #shellcheck disable=SC2086
-                    _ONLINE_KERNEL="$(pacman -Si core-testing/${_KERNELPKG} 2>${_NO_LOG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
-                fi
-                if [[ -z "${_ONLINE_KERNEL}" ]]; then
-                    #shellcheck disable=SC2086
-                    _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
-                fi
-            fi
-            echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
-            sleep 2
-            if [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
-                _progress "100" "No new kernel online available. Skipping update environment."
-                sleep 2
-            else
-                _dialog --title " New Kernel Available " --defaultno --yesno "Do you want to update the Archboot Environment to ${_ONLINE_KERNEL}?\n\nATTENTION:\nThis will reboot the system using kexec!" 9 60 && _UPDATE_ENVIRONMENT=1
-                if [[ -n "${_UPDATE_ENVIRONMENT}" ]]; then
-                    _run_update_environment
-                fi
-            fi
+            _ONLINE_KERNEL="$(pacman -Si core-testing/${_KERNELPKG} 2>${_NO_LOG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+        fi
+        if [[ -z "${_ONLINE_KERNEL}" ]]; then
+            #shellcheck disable=SC2086
+            _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
         fi
     fi
+    echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
+    if [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
+        _progress "98" "No new kernel online available. Skipping update environment."
+        sleep 2
+    else
+        _dialog --title " New Kernel Available " --defaultno --yesno "Do you want to update the Archboot Environment to ${_ONLINE_KERNEL}?\n\nATTENTION:\nThis will reboot the system using kexec!" 9 60 && _UPDATE_ENVIRONMENT=1
+        if [[ -n "${_UPDATE_ENVIRONMENT}" ]]; then
+            _run_update_environment
+        fi
+    fi
+    _progress "100" "Pacman configuration completed successfully."
+    sleep 2
 }
 
 _check
@@ -155,10 +152,12 @@ EOF
         sleep 3
     fi
 done
-if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
-    if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
+if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]] &&\
+    update | grep -q '\-latest' &&\
+    [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]] &&\
+    ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         _update_environment | _dialog --title "Logging to ${_LOG}" --no-mouse --gauge "Refreshing package database..." 6 70 0
-    fi
+        _cleanup
 fi
 _dialog --no-mouse --infobox "Pacman configuration completed successfully." 3 60
 sleep 2
