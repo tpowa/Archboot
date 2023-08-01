@@ -103,6 +103,7 @@ _update_environment() {
             _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
         fi
     fi
+    sleep 2
     echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
     if [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
         _progress "98" "No new kernel online available. Skipping update environment."
