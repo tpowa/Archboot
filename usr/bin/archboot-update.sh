@@ -6,6 +6,8 @@
 . /usr/lib/archboot/container.sh
 #shellcheck disable=SC1094
 . /usr/lib/archboot/update/update.sh
+. /usr/lib/archboot/update/manage.sh
+. /usr/lib/archboot/update/desktop.sh
 . /usr/lib/archboot/update/xfce.sh
 . /usr/lib/archboot/update/gnome.sh
 . /usr/lib/archboot/update/gnome-wayland.sh
