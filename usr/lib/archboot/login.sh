@@ -102,7 +102,7 @@ _run_update_installer() {
             # abort after 10 seconds
             _progress "$((${_COUNT}*10))" "Waiting $((10-${_COUNT})) seconds to stop the process with CTRL-C..."
             [[ "${_COUNT}" == 10 ]] && break
-        done | _dialog --title "Stop Processing?" --no-mouse --gauge "Waiting 10 seconds to stop the process with CTRL-C..." 6 60 0
+        done | _dialog --title " Stop Processing? " --no-mouse --gauge "Waiting 10 seconds to stop the process with CTRL-C..." 6 60 0
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 ]]; then
             _run_latest
         else
@@ -148,7 +148,7 @@ fi
 if [[ "${TTY}" = "tty1" ]] ; then
     if ! mount | grep -q zram0; then
         _TITLE="Archboot $(uname -m) | Basic Setup | ZRAM Setup"
-        _switch_root_zram | _dialog --title "Initializing..." --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+        _switch_root_zram | _dialog --title " Initializing... " --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
     else
         if ! [[ -e "${_CACHEDIR}/archboot.db" ]]; then
             systemctl start systemd-networkd

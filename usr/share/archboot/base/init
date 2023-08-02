@@ -141,7 +141,7 @@ echo "Initialize Console..."
 printf "\ec"
 # it needs one echo before, in order to reset the consolefont!
 setfont consolefont-16.psf.gz -C /dev/console
-_first_stage | _dialog --title  "Initializing..." --gauge "${_KEEP} Searching for archboot rootfs..." 6 75 0
+_first_stage | _dialog --title  " Initializing... " --gauge "${_KEEP} Searching for archboot rootfs..." 6 75 0
 FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
 if [[ "${FB_SIZE}" -gt '1900' ]]; then
     SIZE="32"
@@ -152,7 +152,7 @@ fi
 echo "Initialize Console..."
 printf "\ec"
 setfont consolefont-${SIZE}.psf.gz -C /dev/console
-_second_stage | _dialog --title "Initializing..." --gauge "${_KEEP} Removing firmware..." 6 75 60
+_second_stage | _dialog --title " Initializing... " --gauge "${_KEEP} Removing firmware..." 6 75 60
 echo 0 > /proc/sys/kernel/sysrq
 # set font size in vconsole.conf
 echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
