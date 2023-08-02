@@ -173,35 +173,35 @@ _new_environment() {
     touch /.update
     _kill_w_dir
     _gpg_check
-    _progress "5" "${_KEEP} Removing files from /..."
+    _progress "5" "Removing files from /..."
     _clean_archboot
     _clean_kernel_cache
-    _progress "10" "${_KEEP} Generating container in ${_W_DIR}..."
+    _progress "10" "Generating container in ${_W_DIR}..."
     _create_container || exit 1
     _clean_kernel_cache
     _ram_check
     mkdir ${_RAM}
     mount -t ramfs none ${_RAM}
-    _progress "50" "${_KEEP} Moving kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
+    _progress "50" "Moving kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
     # use ramfs to get immediate free space on file deletion
     mv "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
     _KVER=$(_kver "${_RAM}/${_VMLINUZ}")
-    _progress "55" "${_KEEP} Collecting rootfs files in ${_W_DIR}..."
+    _progress "55" "Collecting rootfs files in ${_W_DIR}..."
     # write initramfs to "${_W_DIR}"/tmp
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_KVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1 || exit 1
-    _progress "70" "${_KEEP} Cleanup ${_W_DIR}..."
+    _progress "70" "Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
     _ram_check
     # local switch, don't kexec on local image
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        _progress "75" "${_KEEP} Moving rootfs to ${_RAM}..."
+        _progress "75" "Moving rootfs to ${_RAM}..."
         mv ${_W_DIR}/tmp/* /${_RAM}/
         # cleanup mkinitcpio directories and files
-        _progress "95" "${_KEEP} Cleanup ${_RAM}..."
+        _progress "95" "Cleanup ${_RAM}..."
         rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot,mkinitcpio.*} &>"${_NO_LOG}"
         rm -f /sysroot/{VERSION,config,buildconfig,init} &>"${_NO_LOG}"
-        _progress "100" "${_KEEP} Switching to rootfs ${_RAM}..."
+        _progress "100" "Switching to rootfs ${_RAM}..."
         # https://www.freedesktop.org/software/systemd/man/bootup.html
         # enable systemd  initrd functionality
         touch /etc/initrd-release
@@ -216,7 +216,7 @@ _new_environment() {
     fi
 
     _C_DIR="${_W_DIR}/tmp"
-    _progress "75" "${_KEEP} Preserving Basic Setup values..."
+    _progress "75" "Preserving Basic Setup values..."
     if [[ -e '/.localize' ]]; then
         cp /etc/{locale.gen,locale.conf} "${_C_DIR}"/etc
         cp /.localize "${_C_DIR}"/
@@ -246,13 +246,13 @@ _new_environment() {
         cp -ar /etc/pacman.d/gnupg "${_C_DIR}"/etc/pacman.d
         cp /.pacsetup "${_C_DIR}"/
     fi
-    _progress "80" "${_KEEP} Creating initramfs ${_RAM}/${_INITRD}..."
+    _progress "80" "Creating initramfs ${_RAM}/${_INITRD}..."
     _create_initramfs
-    _progress "95" "${_KEEP} Cleanup ${_W_DIR}..."
+    _progress "95" "Cleanup ${_W_DIR}..."
     cd /
     _kill_w_dir
     _clean_kernel_cache
-    _progress "97" "${_KEEP} Waiting for kernel to free RAM..."
+    _progress "97" "Waiting for kernel to free RAM..."
     # wait until enough memory is available!
     while true; do
         [[ "$(($(stat -c %s ${_RAM}/${_INITRD})*200/100000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
@@ -263,7 +263,7 @@ _new_environment() {
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
             _MEM_MIN="--mem-min=0xA0000000"
     fi
-    _progress "100" "${_KEEP} Restarting with KEXEC_LOAD..."
+    _progress "100" "Restarting with KEXEC_LOAD..."
     kexec -c -f ${_MEM_MIN} ${_RAM}/"${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     sleep 0.1
     _clean_kernel_cache
@@ -287,31 +287,31 @@ _full_system() {
         echo -e "\e[1mFull Arch Linux system already setup.\e[m"
         exit 1
     fi
-    _progress "1" "${_KEEP} Refreshing pacman package database..."
+    _progress "1" "Refreshing pacman package database..."
     pacman -Sy >"${_LOG}" 2>&1 || exit 1
     _PACKAGES="$(pacman -Qqn)"
     _COUNT=0
     _PACKAGE_COUNT="$(pacman -Qqn | wc -l)"
     for i in ${_PACKAGES}; do
         if [[ "$((${_COUNT}*100/${_PACKAGE_COUNT}-4))" -gt 1 ]]; then
-            _progress "$((${_COUNT}*100/${_PACKAGE_COUNT}-4))" "${_KEEP} Reinstalling all packages, installing ${i} now..."
+            _progress "$((${_COUNT}*100/${_PACKAGE_COUNT}-4))" "Reinstalling all packages, installing ${i} now..."
         fi
         pacman -S --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
         _COUNT="$((${_COUNT}+1))"
     done
-    _progress "97" "${_KEEP} Adding info/man-pages now..."
+    _progress "97" "Adding info/man-pages now..."
     pacman -S --noconfirm man-db man-pages texinfo >"${_LOG}" 2>&1 || exit 1
-    _progress "98" "${_KEEP} Checking kernel version..."
+    _progress "98" "Checking kernel version..."
     _INSTALLED_KERNEL="$(pacman -Qi linux | grep Version | cut -d ':' -f 2 | sed -e 's# ##g' -e 's#\.arch#-arch#g')"
     if ! [[ "${_INSTALLED_KERNEL}" == "$(uname -r)" ]]; then
-        _progress "99" "${_KEEP} Skipping kernel module loading..."
+        _progress "99" "Skipping kernel module loading..."
     else
-        _progress "99" "${_KEEP} Trigger kernel module loading..."
+        _progress "99" "Trigger kernel module loading..."
         udevadm trigger --action=add --type=subsystems
         udevadm trigger --action=add --type=devices
         udevadm settle
     fi
-    _progress "100" "${_KEEP} Full Arch Linux system is ready now."
+    _progress "100" "Full Arch Linux system is ready now."
     sleep 2
     touch /.full_system
 }
@@ -328,32 +328,32 @@ _new_image() {
     cd /archboot || exit 1
     _W_DIR="$(mktemp -u archboot-release.XXX)"
     # create container
-    _progress "5" "${_KEEP} Creating archboot container..."
+    _progress "5" "Creating archboot container..."
     archboot-"${_RUNNING_ARCH}"-create-container.sh "${_W_DIR}" -cc > "${_LOG}" || exit 1
     _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg > "${_LOG}"
     # riscv64 does not support kexec at the moment
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         # removing not working lvm2 from latest image
-        _progress "35" "${_KEEP} Removing lvm2 from container..."
+        _progress "35" "Removing lvm2 from container..."
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>"${_NO_LOG}"
-        _progress "40" "${_KEEP} Generating local ISO..."
+        _progress "40" "Generating local ISO..."
         # generate local iso in container, umount tmp it's a tmpfs and weird things could happen then
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
         -i=${_ISONAME}-local-${_RUNNING_ARCH}" > "${_LOG}" || exit 1
         rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
         _ram_check
-        _progress "65" "${_KEEP} Generating latest ISO..."
+        _progress "65" "Generating latest ISO..."
         # generate latest iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
         -i=${_ISONAME}-latest-${_RUNNING_ARCH}" > "${_LOG}" || exit 1
-        _progress "72" "${_KEEP} Installing lvm2 to container..."
+        _progress "72" "Installing lvm2 to container..."
         ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>"${_NO_LOG}"
     fi
-    _progress "75" "${_KEEP} Generating normal ISO..."
+    _progress "75" "Generating normal ISO..."
     # generate iso in container
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_RUNNING_ARCH}-iso.sh -g \
     -i=${_ISONAME}-${_RUNNING_ARCH}" > "${_LOG}" || exit 1
-    _progress "98" "${_KEEP} Cleanup container..."
+    _progress "98" "Cleanup container..."
     # move iso out of container
     mv "${_W_DIR}"/*.iso ./ &>"${_NO_LOG}"
     mv "${_W_DIR}"/*.img ./ &>"${_NO_LOG}"
