@@ -1,6 +1,6 @@
 On the road to 2023.08:
 Environment Changes:
-- implemented a progressbar in early userspace
+- implemented progressbars
 2023.07 Highlights:
 - kernel 6.4.x
 - grub 2.12rc1-1
