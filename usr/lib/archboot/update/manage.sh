@@ -48,6 +48,7 @@ _create_container() {
 _network_check() {
     if ! getent hosts www.google.com &>"${_NO_LOG}"; then
         _dialog --title " ERROR " --infobox "Network not yet ready. Please configure your network first." 3 70
+        clear
         sleep 3
         exit 1
     fi
@@ -56,6 +57,7 @@ _network_check() {
 _update_installer_check() {
     if [[ -f /.update ]]; then
         _dialog  --title " ERROR " --infobox "update is already running on other tty...\nYou need to remove /.update first!" 4 70
+        clear
         sleep 3
         exit 1
     fi
@@ -67,6 +69,7 @@ _update_installer_check() {
 _full_system_check() {
     if [[ -e "/.full_system" ]]; then
         _dialog  --title " SUCCESS " --infobox "Full Arch Linux system already setup." 3 7ß
+        clear
         sleep 3
         exit 0
     fi
@@ -172,8 +175,6 @@ _download_latest() {
 }
 
 _new_environment() {
-    _update_installer_check
-    touch /.update
     _kill_w_dir
     _gpg_check
     _progress "5" "Removing files from /..."
@@ -284,9 +285,6 @@ _new_environment() {
 }
 
 _full_system() {
-    _full_system_check
-    _update_installer_check
-    touch /.update
     _progress "1" "Refreshing pacman package database..."
     pacman -Sy >"${_LOG}" 2>&1 || exit 1
     _PACKAGES="$(pacman -Qqn)"
