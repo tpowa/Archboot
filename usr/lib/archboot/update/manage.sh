@@ -124,55 +124,53 @@ _create_initramfs() {
 
 _download_latest() {
     # Download latest setup and quickinst script from git repository
-    if [[ -n "${_D_SCRIPTS}" ]]; then
-        _update_installer_check
-        touch /.update
-        echo -e "\e[1mStart:\e[m Downloading latest archboot from GIT master tree..."
-        [[ -d "${_INST}" ]] || mkdir "${_INST}"
-        # config
-        echo -e "\e[1mStep 1/4:\e[m Downloading latest config..."
-        wget -q "${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
-        # helper binaries
-        echo -e "\e[1mStep 2/4:\e[m Downloading latest scripts..."
-        # main binaries
-        BINS="quickinst setup clock launcher localize network pacsetup update copy-mountpoint rsync-backup restore-usbstick"
-        for i in ${BINS}; do
-            [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
-        done
-        BINS="binary-check.sh not-installed.sh secureboot-keys.sh mkkeys.sh hwsim.sh cpio,sh"
-        for i in ${BINS}; do
-            [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/${i}"
-            [[ -e "${_BIN}/archboot-${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/archboot-${i}"
-        done
-        HELP="guid-partition.txt guid.txt luks.txt lvm2.txt mbr-partition.txt md.txt"
-        for i in ${HELP}; do
-            [[ -e "${_HELP}/${i}" ]] && wget -q "${_SOURCE}${_HELP}/${i}?inline=false" -O "${_HELP}/${i}"
-        done
-        # main libs
-        echo -e "\e[1mStep 3/4:\e[m Downloading latest script libs..."
-        LIBS="basic-common.sh common.sh container.sh release.sh iso.sh login.sh cpio.sh"
-        for i in ${LIBS}; do
-            wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
-        done
-        # update libs
-        LIBS="update.sh manage.sh desktop.sh xfce.sh gnome.sh gnome-wayland.sh plasma.sh plasma-wayland.sh sway.sh"
-        for i in ${LIBS}; do
-            wget -q "${_SOURCE}${_UPDATE}/${i}?inline=false" -O "${_UPDATE}/${i}"
-        done
-        # run libs
-        LIBS="container.sh release.sh"
-        for i in ${LIBS}; do
-            wget -q "${_SOURCE}${_RUN}/${i}?inline=false" -O "${_RUN}/${i}"
-        done
-        # setup libs
-        echo -e "\e[1mStep 4/4:\e[m Downloading latest setup libs..."
-        LIBS="autoconfiguration.sh quicksetup.sh base.sh blockdevices.sh bootloader.sh btrfs.sh common.sh \
-                configuration.sh mountpoints.sh network.sh pacman.sh partition.sh storage.sh"
-        for i in ${LIBS}; do
-            wget -q "${_SOURCE}${_INST}/${i}?inline=false" -O "${_INST}/${i}"
-        done
-        echo -e "\e[1mFinished:\e[m Downloading scripts done."
-    fi
+    _update_installer_check
+    touch /.update
+    echo -e "\e[1mStart:\e[m Downloading latest archboot from GIT master tree..."
+    [[ -d "${_INST}" ]] || mkdir "${_INST}"
+    # config
+    echo -e "\e[1mStep 1/4:\e[m Downloading latest config..."
+    wget -q "${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
+    # helper binaries
+    echo -e "\e[1mStep 2/4:\e[m Downloading latest scripts..."
+    # main binaries
+    BINS="quickinst setup clock launcher localize network pacsetup update copy-mountpoint rsync-backup restore-usbstick"
+    for i in ${BINS}; do
+        [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
+    done
+    BINS="binary-check.sh not-installed.sh secureboot-keys.sh mkkeys.sh hwsim.sh cpio,sh"
+    for i in ${BINS}; do
+        [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/${i}"
+        [[ -e "${_BIN}/archboot-${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/archboot-${i}"
+    done
+    HELP="guid-partition.txt guid.txt luks.txt lvm2.txt mbr-partition.txt md.txt"
+    for i in ${HELP}; do
+        [[ -e "${_HELP}/${i}" ]] && wget -q "${_SOURCE}${_HELP}/${i}?inline=false" -O "${_HELP}/${i}"
+    done
+    # main libs
+    echo -e "\e[1mStep 3/4:\e[m Downloading latest script libs..."
+    LIBS="basic-common.sh common.sh container.sh release.sh iso.sh login.sh cpio.sh"
+    for i in ${LIBS}; do
+        wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
+    done
+    # update libs
+    LIBS="update.sh manage.sh desktop.sh xfce.sh gnome.sh gnome-wayland.sh plasma.sh plasma-wayland.sh sway.sh"
+    for i in ${LIBS}; do
+        wget -q "${_SOURCE}${_UPDATE}/${i}?inline=false" -O "${_UPDATE}/${i}"
+    done
+    # run libs
+    LIBS="container.sh release.sh"
+    for i in ${LIBS}; do
+        wget -q "${_SOURCE}${_RUN}/${i}?inline=false" -O "${_RUN}/${i}"
+    done
+    # setup libs
+    echo -e "\e[1mStep 4/4:\e[m Downloading latest setup libs..."
+    LIBS="autoconfiguration.sh quicksetup.sh base.sh blockdevices.sh bootloader.sh btrfs.sh common.sh \
+            configuration.sh mountpoints.sh network.sh pacman.sh partition.sh storage.sh"
+    for i in ${LIBS}; do
+        wget -q "${_SOURCE}${_INST}/${i}?inline=false" -O "${_INST}/${i}"
+    done
+    echo -e "\e[1mFinished:\e[m Downloading scripts done."
 }
 
 _new_environment() {
