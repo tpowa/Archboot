@@ -37,7 +37,9 @@ while [ $# -gt 0 ]; do
     shift
 done
 _archboot_check
-_download_latest
+if [[ -n "${_D_SCRIPTS}" ]]; then
+    _download_latest
+fi
 # Generate new environment and launch it with kexec
 if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]]; then
     _update_installer_check
@@ -75,3 +77,4 @@ if [[ -n "${_FULL_SYSTEM}" ]]; then
     _full_system | _dialog --title "${_MENU_TITLE}" --gauge "Refreshing pacman package database..." 6 75 0
     clear
 fi
+rm /.update
