@@ -170,7 +170,7 @@ if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]] &&\
     update | grep -q '\-latest' &&\
     [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]] &&\
     ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-        _update_environment | _dialog --no-mouse --gauge "Refreshing package database..." 6 70 0
+        _update_environment | _dialog --no-mouse --gauge "Refreshing pacman package database..." 6 70 0
         _cleanup
 fi
 _dialog --no-mouse --infobox "Pacman configuration completed successfully." 3 60
