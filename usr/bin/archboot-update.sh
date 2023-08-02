@@ -69,7 +69,7 @@ if [[ -n "${_FULL_SYSTEM}" ]]; then
     _TITLE="Archboot $(uname -m) | Basic Setup | Full System"
     _full_system | _dialog --title "${_MENU_TITLE}" --gauge "Refreshing pacman package database..." 6 75 0
     clear
-    _update_installer_check
     _full_system_check
+    _update_installer_check
 fi
 rm /.update
