@@ -64,6 +64,6 @@ fi
 # Switch to full Arch Linux system
 if [[ -n "${_FULL_SYSTEM}" ]]; then
     _TITLE="Archboot $(uname -m) | Basic Setup | Full System"
-    _full_system | _dialog --title "${_MENU_TITLE}" --gauge "Syncing package db..." 6 75 0 && clear
+    _full_system | _dialog --title "${_MENU_TITLE}" --gauge "Refreshing pacman package database..." 6 75 0 && clear
 fi
 rm /.update
