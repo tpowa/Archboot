@@ -47,7 +47,8 @@ _create_container() {
 
 _network_check() {
     if ! getent hosts www.google.com &>"${_NO_LOG}"; then
-        _dialog --title " ERROR " --infobox "Network not yet ready. Please configure your network first." 3 70
+        _TITLE="Archboot $(uname -m) | Basic Setup | Network Not Ready"
+        _dialog --title " ERROR " --no-mouse --infobox "Network not yet ready. Please configure your network first." 3 70
         sleep 3
         clear
         exit 1
@@ -56,7 +57,8 @@ _network_check() {
 
 _update_installer_check() {
     if [[ -f /.update ]]; then
-        _dialog  --title " ERROR " --infobox "update is already running on other tty...\nYou need to remove /.update first!" 4 70
+        _TITLE="Archboot $(uname -m) | Basic Setup | Update Is Running"
+        _dialog  --title " ERROR " --no-mouse --infobox "update is already running on other tty...\nYou need to remove /.update first!" 4 70
         sleep 3
         clear
         exit 1
@@ -68,7 +70,8 @@ _update_installer_check() {
 
 _full_system_check() {
     if [[ -e "/.full_system" ]]; then
-        _dialog  --title " SUCCESS " --infobox "Full Arch Linux system already setup." 3 7ß
+        _TITLE="Archboot $(uname -m) | Basic Setup | Full System Ready"
+        _dialog  --title " SUCCESS " --no-mouse --infobox "Full Arch Linux system already setup." 3 7ß
         sleep 3
         clear
         exit 0
