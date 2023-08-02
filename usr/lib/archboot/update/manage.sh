@@ -179,23 +179,10 @@ _new_environment() {
     _ram_check
     mkdir ${_RAM}
     mount -t ramfs none ${_RAM}
-    if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
-        _progress "50" "${_KEEP} Skipping copying of kernel..."
-    else
-        _progress "50" "${_KEEP} Copying kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
-        # use ramfs to get immediate free space on file deletion
-        mv "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
-    fi
-    _KVER=$(_kver "${_RAM}/${_VMLINUZ}")
-    _progress "55" "${_KEEP} Collecting rootfs files in ${_W_DIR}..."
-    # write initramfs to "${_W_DIR}"/tmp
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_KVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1 || exit 1
-    _progress "70" "${_KEEP} Cleanup ${_W_DIR}..."
-    find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
-    _clean_kernel_cache
-    _ram_check
     # local switch, don't kexec on local image
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+        _progress "50" "${_KEEP} Skipping copying of kernel..."
+        sleep 1
         _progress "75" "${_KEEP} Move rootfs to ${_RAM}..."
         mv ${_W_DIR}/tmp/* /${_RAM}/
         # cleanup mkinitcpio directories and files
@@ -215,6 +202,17 @@ _new_environment() {
         systemctl start initrd-cleanup.service
         systemctl start initrd-switch-root.target
     fi
+    _progress "50" "${_KEEP} Copying kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
+    # use ramfs to get immediate free space on file deletion
+    mv "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
+    _KVER=$(_kver "${_RAM}/${_VMLINUZ}")
+    _progress "55" "${_KEEP} Collecting rootfs files in ${_W_DIR}..."
+    # write initramfs to "${_W_DIR}"/tmp
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_KVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1 || exit 1
+    _progress "70" "${_KEEP} Cleanup ${_W_DIR}..."
+    find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
+    _clean_kernel_cache
+    _ram_check
     _C_DIR="${_W_DIR}/tmp"
     _progress "75" "${_KEEP} Preserving Basic Setup values..."
     if [[ -e '/.localize' ]]; then
