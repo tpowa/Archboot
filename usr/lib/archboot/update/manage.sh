@@ -47,7 +47,7 @@ _create_container() {
 
 _network_check() {
     if ! getent hosts www.google.com &>"${_NO_LOG}"; then
-        _dialog --title " ERROR " "Network not yet ready. Please configure your network first." 3 70
+        _dialog --title " ERROR " --infobox "Network not yet ready. Please configure your network first." 3 70
         sleep 3
         exit 1
     fi
@@ -55,7 +55,7 @@ _network_check() {
 
 _update_installer_check() {
     if [[ -f /.update ]]; then
-        _dialog  --title " ERROR " "update is already running on other tty...\nYou need to remove /.update first!" 5 70
+        _dialog  --title " ERROR " --infobox "update is already running on other tty...\nYou need to remove /.update first!" 5 70
         sleep 3
         exit 1
     fi
@@ -66,7 +66,7 @@ _update_installer_check() {
 
 _full_system_check() {
     if [[ -e "/.full_system" ]]; then
-        _dialog  --title " SUCCESS " "Full Arch Linux system already setup." 3 7ß
+        _dialog  --title " SUCCESS " --infobox "Full Arch Linux system already setup." 3 7ß
         sleep 3
         exit 0
     fi
