@@ -72,15 +72,6 @@ _full_system_check() {
     fi
 }
 
-_end_check() {
-    if [[ -e /.update ]]; then
-        clear
-    else
-        clear
-        exit 1
-    fi
-}
-
 _gpg_check() {
     # pacman-key process itself
     while pgrep -x pacman-key &>"${_NO_LOG}"; do
@@ -322,6 +313,7 @@ _full_system() {
     fi
     _progress "100" "Full Arch Linux system is ready now."
     sleep 2
+    rm /.update
     touch /.full_system
 }
 
@@ -369,5 +361,6 @@ _new_image() {
     rm -r "${_W_DIR}"
     _progress "100" "New isofiles are located in /archboot."
     sleep 2
+    rm /.update
 }
 # vim: set ft=sh ts=4 sw=4 et:
