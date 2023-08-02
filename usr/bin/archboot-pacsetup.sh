@@ -18,7 +18,7 @@ _select_mirror() {
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _COUNTRY="$(curl -s "http://ip-api.com/csv/?fields=countryCode")"
         _DOWNLOAD="Downloading latest mirrorlist for Region ${_COUNTRY}..."
-        _download_mirror | _dialog --title "Logging to ${_LOG}" --no-mouse --gauge "${_DOWNLOAD}" 6 70 0
+        _download_mirror | _dialog --no-mouse --gauge "${_DOWNLOAD}" 6 70 0
         if grep -q '#Server = https:' /tmp/pacman_mirrorlist.txt; then
             mv "${_MIRRORLIST}" "${_MIRRORLIST}.bak"
             cp /tmp/pacman_mirrorlist.txt "${_MIRRORLIST}"
@@ -170,7 +170,7 @@ if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]] &&\
     update | grep -q '\-latest' &&\
     [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]] &&\
     ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-        _update_environment | _dialog --title "Logging to ${_LOG}" --no-mouse --gauge "Refreshing package database..." 6 70 0
+        _update_environment | _dialog --no-mouse --gauge "Refreshing package database..." 6 70 0
         _cleanup
 fi
 _dialog --no-mouse --infobox "Pacman configuration completed successfully." 3 60
