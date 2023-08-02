@@ -115,6 +115,8 @@ _second_stage() {
     # remove mkinitcpio files and directories
     rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
     rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
+    _progress "100" "The boot medium can be safely removed now."
+   read -r -t 2
 }
 # mount kernel filesystems
 mount -t proc proc /proc -o nosuid,noexec,nodev
@@ -155,8 +157,6 @@ _second_stage | _dialog --title "Initializing..." --gauge "${_KEEP} Removing fir
 echo 0 > /proc/sys/kernel/sysrq
 # set font size in vconsole.conf
 echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
-echo | _dialog --title "Ready" --gauge "The boot medium can be safely removed now." 6 75 100
-read -r -t 2
 printf "\ec"
 exec switch_root /sysroot /usr/bin/init "$@"
 

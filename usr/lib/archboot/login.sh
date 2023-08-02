@@ -95,7 +95,7 @@ _run_update_installer() {
     cd /
     if [[ "${TTY}" == "tty1" ]]; then
         _COUNT=0
-        _TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Countdown"
+        _TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | New Environment"
         while true; do
             sleep 1
             _COUNT=$((_COUNT+1))
