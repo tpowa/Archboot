@@ -287,18 +287,18 @@ _full_system() {
     _PACKAGES="$(pacman -Qqn)"
     _COUNT=0
     _PACKAGE_COUNT="$(pacman -Qqn | wc -l)"
-    # avoid running mkinitcpio
-    _SKIP="btrfs-progs cryptsetup device-mapper lvm2 mdadm mkinitcpio"
     for i in ${_PACKAGES}; do
-        if [[ "$((${_COUNT}*100/${_PACKAGE_COUNT}-4))" -gt 1 ]]; then
-            _progress "$((${_COUNT}*100/${_PACKAGE_COUNT}-4))" "Reinstalling all packages, installing ${i} now..."
+        if [[ "$((_COUNT*100/_PACKAGE_COUNT-4))" -gt 1 ]]; then
+            _progress "$((_COUNT*100/_PACKAGE_COUNT-4))" "Reinstalling all packages, installing ${i} now..."
         fi
-        if echo "${_SKIP}" | grep -q "${i}"; then
-            pacman -S --noscriptlet --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
+        if echo "${i}" | grep -q "mkinitcpio"; then
+            pacman -S --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
+            # avoid running mkinitcpio
+            rm /usr/share/libalpm/{scripts/mkinitcpio,hooks/*mkinitcpio*}
         else
             pacman -S --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
         fi
-        _COUNT="$((${_COUNT}+1))"
+        _COUNT="$((_COUNT+1))"
     done
     _progress "97" "Adding info/man-pages now..."
     pacman -S --noconfirm man-db man-pages texinfo >"${_LOG}" 2>&1 || exit 1
