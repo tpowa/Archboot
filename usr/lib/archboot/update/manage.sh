@@ -66,6 +66,7 @@ _update_installer_check() {
     if ! [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         _network_check
     fi
+    exit 1
 }
 
 _gpg_check() {
@@ -286,7 +287,7 @@ _full_system() {
     if [[ -e "/.full_system" ]]; then
         clear
         echo -e "\e[1mFull Arch Linux system already setup.\e[m"
-        exit 0
+        exit 1
     fi
     _progress "1" "${_KEEP} Refreshing pacman package database..."
     pacman -Sy >"${_LOG}" 2>&1 || exit 1
