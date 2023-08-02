@@ -68,4 +68,3 @@ if [[ -n "${_FULL_SYSTEM}" ]]; then
     _full_system | _dialog --title "${_MENU_TITLE}" --gauge "Refreshing pacman package database..." 6 75 0
     clear
 fi
-rm /.update
