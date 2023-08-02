@@ -47,6 +47,7 @@ _create_container() {
 
 _network_check() {
     if ! getent hosts www.google.com &>"${_NO_LOG}"; then
+        clear
         echo -e "\e[91mAborting:\e[m"
         echo -e "Network not yet ready."
         echo -e "Please configure your network first."
@@ -56,6 +57,7 @@ _network_check() {
 
 _update_installer_check() {
     if [[ -f /.update ]]; then
+        clear
         echo -e "\e[91mAborting:\e[m"
         echo "update is already running on other tty..."
         echo "If you are absolutly sure it's not running, you need to remove /.update"
@@ -113,6 +115,8 @@ _create_initramfs() {
 }
 
 _download_latest() {
+    _update_installer_check
+    touch /.update
     # Download latest setup and quickinst script from git repository
     if [[ -n "${_D_SCRIPTS}" ]]; then
         _network_check
@@ -277,12 +281,15 @@ _new_environment() {
 }
 
 _full_system() {
+    _update_installer_check
+    touch /.update
     if [[ -e "/.full_system" ]]; then
+        clear
         echo -e "\e[1mFull Arch Linux system already setup.\e[m"
         exit 0
     fi
+    _progress "1" "${_KEEP} Refreshing pacman package database..."
     pacman -Sy >"${_LOG}" 2>&1 || exit 1
-    _progress "1" "${_KEEP} Reinstalling all packages..."
     _PACKAGES="$(pacman -Qqn)"
     _COUNT=0
     _PACKAGE_COUNT="$(pacman -Qqn | wc -l)"
@@ -293,7 +300,7 @@ _full_system() {
         pacman -S --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
         _COUNT="$((${_COUNT}+1))"
     done
-    _progress "97" "${_KEEP} Adding info/man-pages..."
+    _progress "97" "${_KEEP} Adding info/man-pages now..."
     pacman -S --noconfirm man-db man-pages texinfo >"${_LOG}" 2>&1 || exit 1
     _progress "98" "${_KEEP} Checking kernel version..."
     _INSTALLED_KERNEL="$(pacman -Qi linux | grep Version | cut -d ':' -f 2 | sed -e 's# ##g' -e 's#\.arch#-arch#g')"
@@ -311,6 +318,8 @@ _full_system() {
 }
 
 _new_image() {
+    _update_installer_check
+    touch /.update
     _PRESET_LATEST="${_RUNNING_ARCH}-latest"
     _PRESET_LOCAL="${_RUNNING_ARCH}-local"
     _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)"
