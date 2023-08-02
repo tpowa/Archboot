@@ -16,11 +16,6 @@ _welcome () {
 _local_mode () {
     if [[ -e "${_CACHEDIR}/archboot.db" ]]; then
         echo -e "You are running in \e[92m\e[1mOffline Mode\e[m, with \e[1mlocal package repository\e[m enabled.\e[m"
-        if [[ -e /usr/bin/setup ]] ; then
-            # bring down network
-            systemctl stop systemd-networkd 2>/dev/null
-            systemctl stop systemd-resolved 2>/dev/null
-        fi
     fi
 }
 
@@ -100,6 +95,7 @@ _run_update_installer() {
     cd /
     if [[ "${TTY}" == "tty1" ]]; then
         _COUNT=0
+        _TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Countdown"
         while true; do
             sleep 1
             _COUNT=$((_COUNT+1))
@@ -154,8 +150,10 @@ if [[ "${TTY}" = "tty1" ]] ; then
         _TITLE="Archboot $(uname -m) | Basic Setup | ZRAM Setup"
         _switch_root_zram | _dialog --title "Initializing..." --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
     else
-        systemctl start systemd-networkd
-        systemctl start systemd-resolved
+        if ! [[ -e "${_CACHEDIR}/archboot.db" ]]; then
+            systemctl start systemd-networkd
+            systemctl start systemd-resolved
+        fi
         # initialize pacman keyring
         if [[ -e /etc/systemd/system/pacman-init.service ]]; then
             systemctl start pacman-init
