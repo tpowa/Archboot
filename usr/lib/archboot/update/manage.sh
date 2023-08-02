@@ -124,8 +124,6 @@ _create_initramfs() {
 
 _download_latest() {
     # Download latest setup and quickinst script from git repository
-    _update_installer_check
-    touch /.update
     echo -e "\e[1mStart:\e[m Downloading latest archboot from GIT master tree..."
     [[ -d "${_INST}" ]] || mkdir "${_INST}"
     # config

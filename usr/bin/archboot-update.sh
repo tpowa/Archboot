@@ -38,6 +38,9 @@ while [ $# -gt 0 ]; do
 done
 _archboot_check
 if [[ -n "${_D_SCRIPTS}" ]]; then
+    _update_installer_check
+    _network_check
+    touch /.update
     _download_latest
 fi
 # Generate new environment and launch it with kexec
