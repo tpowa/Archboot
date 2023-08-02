@@ -71,7 +71,7 @@ _update_installer_check() {
 _full_system_check() {
     if [[ -e "/.full_system" ]]; then
         _TITLE="Archboot $(uname -m) | Basic Setup | Full System Ready"
-        _dialog  --title " SUCCESS " --no-mouse --infobox "Full Arch Linux system already setup." 3 7ß
+        _dialog  --title " SUCCESS " --no-mouse --infobox "Full Arch Linux system already setup." 3 70
         sleep 3
         clear
         exit 0
