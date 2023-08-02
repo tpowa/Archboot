@@ -66,7 +66,6 @@ _update_installer_check() {
     if ! [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         _network_check
     fi
-    exit 1
 }
 
 _gpg_check() {
