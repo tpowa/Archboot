@@ -288,7 +288,7 @@ _full_system() {
     _PACKAGE_COUNT="$(pacman -Qqn | wc -l)"
     for i in ${_PACKAGES}; do
         if [[ "$((${_COUNT}*100/${_PACKAGE_COUNT}-4))" -gt 1 ]]; then
-            _progress "$((${_COUNT}*100/${_PACKAGE_COUNT}-4))" "${_KEEP} Reinstalling all packages, processing ${i} now..."
+            _progress "$((${_COUNT}*100/${_PACKAGE_COUNT}-4))" "${_KEEP} Reinstalling all packages, installing ${i} now..."
         fi
         pacman -S --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
         _COUNT="$((${_COUNT}+1))"
