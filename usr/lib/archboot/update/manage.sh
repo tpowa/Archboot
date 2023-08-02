@@ -287,10 +287,10 @@ _full_system() {
     _COUNT=0
     _PACKAGE_COUNT="$(pacman -Qqn | wc -l)"
     for i in ${_PACKAGES}; do
-        pacman -S --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
         if [[ "$((${_COUNT}*100/${_PACKAGE_COUNT}-4))" -gt 1 ]]; then
             _progress "$((${_COUNT}*100/${_PACKAGE_COUNT}-4))" "${_KEEP} Reinstalling all packages, processing ${i} now..."
         fi
+        pacman -S --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
         _COUNT="$((${_COUNT}+1))"
     done
     _progress "97" "${_KEEP} Adding info/man-pages..."
