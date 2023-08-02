@@ -89,27 +89,24 @@ _enter_shell() {
 }
 
 _run_latest() {
-    echo -e "\e[1mStarting\e[m assembling of archboot environment \e[1mwithout\e[m package cache..."
-    echo -e "\e[1mRunning now: \e[92mupdate -latest\e[m"
     update -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 }
 
 _run_latest_install() {
-    echo -e "\e[1mStarting\e[m assembling of archboot environment \e[1mwith\e[m package cache..."
-    echo -e "\e[1mRunning now: \e[92mupdate -latest-install\e[m"
     update -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
 }
 
 _run_update_installer() {
     cd /
-    echo -e "\e[1m\e[92mMemory checks run successfully:\e[m"
-    echo -e "\e[93mGo and get a cup of coffee. Depending on your system setup,\e[m"
-    echo -e "\e[93myou can \e[1mstart\e[m\e[93m with your tasks in about \e[1m5\e[m\e[93m minutes...\e[m"
-    echo ""
     if [[ "${TTY}" == "tty1" ]]; then
-        echo -e "\e[1m\e[91m10 seconds\e[0;25m time to hit \e[1m\e[92mCTRL-C\e[m to \e[1m\e[91mstop\e[m the process \e[1m\e[1mnow...\e[m"
-        sleep 10
-        echo ""
+        _COUNT=0
+        while true; do
+            sleep 1
+            _COUNT=$((_COUNT+1))
+            # abort after 10 seconds
+            _progress "$((${_COUNT}*10))" "Waiting $((10-${_COUNT})) seconds to stop the process with CTRL-C..."
+            [[ "${_COUNT}" == 10 ]] && break
+        done | _dialog --title "Stop Processing?" --no-mouse --gauge "Waiting 10 seconds to stop the process with CTRL-C..." 6 60 0
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 ]]; then
             _run_latest
         else
@@ -125,13 +122,6 @@ _run_update_installer() {
                 fi
             fi
         fi
-    elif [[ "${TTY}" == "ttyS0" || "${TTY}" == "ttyAMA0" || "${TTY}" == "ttyUSB0" || "${TTY}" == "pts/0" ]]; then
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 ]]; then
-            echo -e "Running \e[1m\e[92mupdate -latest-install\e[m on \e[1mtty1\e[m, please wait...\e[m"
-        else
-            echo -e "\e[1mRunning now: \e[92mupdate -latest\e[m"
-        fi
-        echo -e "\e[1mProgress is shown here...\e[m"
     fi
 }
 
