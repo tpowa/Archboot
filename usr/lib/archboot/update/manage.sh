@@ -308,10 +308,8 @@ _full_system() {
         udevadm trigger --action=add --type=devices
         udevadm settle
     fi
-    sleep 2
     _progress "100" "${_KEEP} Full Arch Linux system is ready now."
     sleep 2
-    clear
     touch /.full_system
 }
 
@@ -357,6 +355,5 @@ _new_image() {
     rm -r "${_W_DIR}"
     _progress "100" "New isofiles are located in /archboot."
     sleep 2
-    clear
 }
 # vim: set ft=sh ts=4 sw=4 et:
