@@ -47,7 +47,6 @@ _create_container() {
 
 _network_check() {
     if ! getent hosts www.google.com &>"${_NO_LOG}"; then
-        clear
         echo -e "\e[91mAborting:\e[m"
         echo -e "Network not yet ready."
         echo -e "Please configure your network first."
@@ -57,7 +56,6 @@ _network_check() {
 
 _update_installer_check() {
     if [[ -f /.update ]]; then
-        clear
         echo -e "\e[91mAborting:\e[m"
         echo "update is already running on other tty..."
         echo "If you are absolutly sure it's not running, you need to remove /.update"
@@ -70,7 +68,6 @@ _update_installer_check() {
 
 _full_system_check() {
     if [[ -e "/.full_system" ]]; then
-        clear
         echo -e "\e[1mFull Arch Linux system already setup.\e[m"
         exit 1
     fi
