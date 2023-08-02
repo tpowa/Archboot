@@ -6,7 +6,6 @@ _TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Pacman Configuration"
 
 _download_mirror() {
     _COUNTRY="$(curl -s "http://ip-api.com/csv/?fields=countryCode")"
-    _DOWNLOAD="Downloading latest mirrorlist for Region ${_COUNTRY}..."
     sleep 1
     _progress "50" "${_DOWNLOAD}"
     ${_DLPROG} "https://www.archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
@@ -18,6 +17,7 @@ _download_mirror() {
 _select_mirror() {
     # Download updated mirrorlist, if possible (only on x86_64)
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
+        _DOWNLOAD="Downloading latest mirrorlist for Region ${_COUNTRY}..."
         _download_mirror | _dialog --title "Logging to ${_LOG}" --no-mouse --gauge "${_DOWNLOAD}" 6 70 0
         if grep -q '#Server = https:' /tmp/pacman_mirrorlist.txt; then
             mv "${_MIRRORLIST}" "${_MIRRORLIST}.bak"
