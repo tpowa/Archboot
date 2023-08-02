@@ -295,7 +295,7 @@ _full_system() {
         if [[ "$((${_COUNT}*100/${_PACKAGE_COUNT}-4))" -gt 1 ]]; then
             _progress "$((${_COUNT}*100/${_PACKAGE_COUNT}-4))" "Reinstalling all packages, installing ${i} now..."
         fi
-        if echo "${_SKIP}" | grep -q ${i}; then
+        if echo "${_SKIP}" | grep -q "${i}"; then
             pacman -S --noscriptlet --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
         else
             pacman -S --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
