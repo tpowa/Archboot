@@ -47,20 +47,20 @@ _create_container() {
 
 _network_check() {
     if ! getent hosts www.google.com &>"${_NO_LOG}"; then
-        _TITLE="Archboot $(uname -m) | Basic Setup | Network Not Ready"
-        _dialog --title " ERROR " --no-mouse --infobox "Network not yet ready. Please configure your network first." 3 70
-        sleep 3
         clear
+        echo -e "\e[91mAborting:\e[m"
+        echo -e "Network not yet ready."
+        echo -e "Please configure your network first."
         exit 1
     fi
 }
 
 _update_installer_check() {
     if [[ -f /.update ]]; then
-        _TITLE="Archboot $(uname -m) | Basic Setup | Update Is Running"
-        _dialog  --title " ERROR " --no-mouse --infobox "update is already running on other tty...\nYou need to remove /.update first!" 4 70
-        sleep 3
         clear
+        echo -e "\e[91mAborting:\e[m"
+        echo "update is already running on other tty..."
+        echo "If you are absolutly sure it's not running, you need to remove /.update"
         exit 1
     fi
     if ! [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
@@ -70,10 +70,8 @@ _update_installer_check() {
 
 _full_system_check() {
     if [[ -e "/.full_system" ]]; then
-        _TITLE="Archboot $(uname -m) | Basic Setup | Full System Ready"
-        _dialog  --title " SUCCESS " --no-mouse --infobox "Full Arch Linux system already setup." 3 70
-        sleep 3
         clear
+        echo -e "\e[1mFull Arch Linux system already setup.\e[m"
         exit 0
     fi
 }
@@ -314,13 +312,10 @@ _full_system() {
     fi
     _progress "100" "Full Arch Linux system is ready now."
     sleep 2
-    rm /.update
     touch /.full_system
 }
 
 _new_image() {
-    _update_installer_check
-    touch /.update
     _PRESET_LATEST="${_RUNNING_ARCH}-latest"
     _PRESET_LOCAL="${_RUNNING_ARCH}-local"
     _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)"
@@ -362,6 +357,5 @@ _new_image() {
     rm -r "${_W_DIR}"
     _progress "100" "New isofiles are located in /archboot."
     sleep 2
-    rm /.update
 }
 # vim: set ft=sh ts=4 sw=4 et:
