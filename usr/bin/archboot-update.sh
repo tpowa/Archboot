@@ -42,13 +42,11 @@ _download_latest
 if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]]; then
     _TITLE="Archboot $(uname -m) | Basic Setup | New Environment"
     _new_environment | _dialog --title "${_MENU_TITLE}" --gauge "Waiting for pacman keyring..." 6 75 0
-    clear
 fi
 # Generate new images
 if [[ -n "${_G_RELEASE}" ]]; then
     _TITLE="Archboot $(uname -m) | Basic Setup | New Images"
     _new_image | _dialog --title "${_MENU_TITLE}" --gauge "Removing not necessary files from /..." 6 75 0
-    clear
 fi
 # install custom xorg or wayland
 if [[ -n "${_CUSTOM_X}" || -n "${_CUSTOM_WAYLAND}" ]]; then
@@ -66,6 +64,5 @@ fi
 if [[ -n "${_FULL_SYSTEM}" ]]; then
     _TITLE="Archboot $(uname -m) | Basic Setup | Full System"
     _full_system | _dialog --title "${_MENU_TITLE}" --gauge "Refreshing pacman package database..." 6 75 0
-    clear
 fi
 rm /.update
