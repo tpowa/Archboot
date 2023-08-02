@@ -287,9 +287,9 @@ _new_environment() {
 }
 
 _full_system() {
+    _full_system_check
     _update_installer_check
     touch /.update
-    _full_system_check
     _progress "1" "Refreshing pacman package database..."
     pacman -Sy >"${_LOG}" 2>&1 || exit 1
     _PACKAGES="$(pacman -Qqn)"
