@@ -55,7 +55,7 @@ _network_check() {
 
 _update_installer_check() {
     if [[ -f /.update ]]; then
-        _dialog  --title " ERROR " --infobox "update is already running on other tty...\nYou need to remove /.update first!" 5 70
+        _dialog  --title " ERROR " --infobox "update is already running on other tty...\nYou need to remove /.update first!" 4 70
         sleep 3
         exit 1
     fi
