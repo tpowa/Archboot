@@ -47,18 +47,16 @@ _create_container() {
 
 _network_check() {
     if ! getent hosts www.google.com &>"${_NO_LOG}"; then
-        echo -e "\e[91mAborting:\e[m"
-        echo -e "Network not yet ready."
-        echo -e "Please configure your network first."
+        _progress "100" "Network not yet ready. Please configure your network first."
+        sleep 3
         exit 1
     fi
 }
 
 _update_installer_check() {
     if [[ -f /.update ]]; then
-        echo -e "\e[91mAborting:\e[m"
-        echo "update is already running on other tty..."
-        echo "If you are absolutly sure it's not running, you need to remove /.update"
+        _progress "100" "update is already running on other tty... You need to remove /.update first!"
+        sleep 3
         exit 1
     fi
     if ! [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
@@ -68,8 +66,9 @@ _update_installer_check() {
 
 _full_system_check() {
     if [[ -e "/.full_system" ]]; then
-        echo -e "\e[1mFull Arch Linux system already setup.\e[m"
-        exit 1
+        _progress "100" "Full Arch Linux system already setup."
+        sleep 3
+        exit 0
     fi
 }
 
@@ -206,7 +205,7 @@ _new_environment() {
         rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot,mkinitcpio.*} &>"${_NO_LOG}"
         rm -f /sysroot/{VERSION,config,buildconfig,init} &>"${_NO_LOG}"
         _progress "100" "Switching to rootfs ${_RAM}..."
-        read -r -t 2
+        sleep 2
         # https://www.freedesktop.org/software/systemd/man/bootup.html
         # enable systemd  initrd functionality
         touch /etc/initrd-release
@@ -279,7 +278,7 @@ _new_environment() {
     rm -rf /usr/* &>"${_NO_LOG}"
     while true; do
         _clean_kernel_cache
-        read -r -t 1
+        sleep 1
         printf "\ec"
     done
 }
