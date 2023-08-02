@@ -84,11 +84,11 @@ _second_stage() {
     mkfs.btrfs /dev/zram0 &>/dev/null
     # use discard to get free RAM on delete!
     mount -o discard /dev/zram0 /sysroot &>/dev/null
-    _progress "72" "${_KEEP} Copying modules to /sysroot..."
+    _progress "72" "${_KEEP} Moving modules to /sysroot..."
     mkdir -p /sysroot/usr/lib
-    _progress "73" "${_KEEP} Copying modules to /sysroot..."
+    _progress "73" "${_KEEP} Moving modules to /sysroot..."
     mv /lib/modules /sysroot/usr/lib
-    _progress "76" "${_KEEP} Copying firmware to /sysroot..."
+    _progress "76" "${_KEEP} Moving firmware to /sysroot..."
     mv /lib/firmware /sysroot/usr/lib
     _progress "80" "${_KEEP} Copying rootfs to /sysroot..."
     cd /sysroot || _emergency_shell

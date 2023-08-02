@@ -206,6 +206,7 @@ _new_environment() {
         rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot,mkinitcpio.*} &>"${_NO_LOG}"
         rm -f /sysroot/{VERSION,config,buildconfig,init} &>"${_NO_LOG}"
         _progress "100" "Switching to rootfs ${_RAM}..."
+        read -r -t 2
         # https://www.freedesktop.org/software/systemd/man/bootup.html
         # enable systemd  initrd functionality
         touch /etc/initrd-release
