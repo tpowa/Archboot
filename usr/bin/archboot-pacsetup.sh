@@ -11,9 +11,9 @@ _select_mirror() {
         _DOWNLOAD="Downloading latest mirrorlist for Region ${_COUNTRY}..."
         ${_DLPROG} "https://www.archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
         (sleep 1
-         progress "50" "${_DOWNLOAD}"
+         _progress "50" "${_DOWNLOAD}"
          sleep 1
-         progress "100" "${_DOWNLOAD}"
+         _progress "100" "${_DOWNLOAD}"
          sleep 2) | _dialog --title "Logging to ${_LOG}" --no-mouse --gauge "${_DOWNLOAD}" 6 70 0
         if grep -q '#Server = https:' /tmp/pacman_mirrorlist.txt; then
             mv "${_MIRRORLIST}" "${_MIRRORLIST}.bak"
