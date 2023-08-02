@@ -88,7 +88,7 @@ _prepare_pacman() {
         sleep 5
         return 1
     else
-        _progress "100" "Pacman is ready."
+        _progress "100" "Arch Linux keyring is ready."
         sleep 2
     fi
 }
