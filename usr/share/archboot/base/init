@@ -111,7 +111,7 @@ _second_stage() {
         umount -q -A UUID=1234-ABCD 2>/dev/null && break
         read -r -t 1
     done
-    _progress "98" "Cleanup /sysroot..."
+    _progress "98" "${_KEEP} Cleanup /sysroot..."
     # remove mkinitcpio files and directories
     rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
     rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
