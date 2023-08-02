@@ -68,6 +68,14 @@ _update_installer_check() {
     fi
 }
 
+_full_system_check() {
+    if [[ -e "/.full_system" ]]; then
+        clear
+        echo -e "\e[1mFull Arch Linux system already setup.\e[m"
+        exit 1
+    fi
+}
+
 _gpg_check() {
     # pacman-key process itself
     while pgrep -x pacman-key &>"${_NO_LOG}"; do
@@ -119,7 +127,6 @@ _download_latest() {
     if [[ -n "${_D_SCRIPTS}" ]]; then
         _update_installer_check
         touch /.update
-        _network_check
         echo -e "\e[1mStart:\e[m Downloading latest archboot from GIT master tree..."
         [[ -d "${_INST}" ]] || mkdir "${_INST}"
         # config
@@ -282,11 +289,7 @@ _new_environment() {
 _full_system() {
     _update_installer_check
     touch /.update
-    if [[ -e "/.full_system" ]]; then
-        clear
-        echo -e "\e[1mFull Arch Linux system already setup.\e[m"
-        exit 1
-    fi
+    _full_system_check
     _progress "1" "Refreshing pacman package database..."
     pacman -Sy >"${_LOG}" 2>&1 || exit 1
     _PACKAGES="$(pacman -Qqn)"
