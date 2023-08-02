@@ -165,7 +165,6 @@ _download_latest() {
             wget -q "${_SOURCE}${_INST}/${i}?inline=false" -O "${_INST}/${i}"
         done
         echo -e "\e[1mFinished:\e[m Downloading scripts done."
-        exit 0
     fi
 }
 
