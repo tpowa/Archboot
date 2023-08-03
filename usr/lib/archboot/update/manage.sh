@@ -276,10 +276,9 @@ _new_environment() {
         cp -ar /etc/pacman.d/gnupg "${_C_DIR}"/etc/pacman.d
         cp /.pacsetup "${_C_DIR}"/
     fi
-    _progress "87" "Creating initramfs ${_RAM}/${_INITRD}..."
     touch "${_W_DIR}"/.archboot
     _create_initramfs &
-    _progress_wait "81" "94" "Creating initramfs ${_RAM}/${_INITRD}..." "1"
+    _progress_wait "87" "94" "Creating initramfs ${_RAM}/${_INITRD}..." "1"
     _progress "95" "Cleanup ${_W_DIR}..."
     cd /
     _kill_w_dir
