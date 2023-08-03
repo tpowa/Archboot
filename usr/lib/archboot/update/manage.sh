@@ -207,7 +207,23 @@ _new_environment() {
     _KVER=$(_kver "${_RAM}/${_VMLINUZ}")
     _progress "55" "Collecting rootfs files in ${_W_DIR}..."
     # write initramfs to "${_W_DIR}"/tmp
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_KVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1 || exit 1
+    touch "${_W_DIR}"/.archboot
+    (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_KVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1;\
+    rm "${_W_DIR}"/.archboot &)
+    while [[ -e "${_W_DIR}/tmp/.archboot" ]]; do
+        if [[ "${_COUNT}" -gt 55 && "${_COUNT}" -lt 69 ]]; then
+            _progress "$((_COUNT))"  "Collecting rootfs files in ${_W_DIR}..."
+        fi
+        if [[ "${_COUNT}" -gt 69 ]]; then
+            _progress "69"  "Collecting rootfs files in ${_W_DIR}..."
+        fi
+        # abort after 15 minutes
+        if [[ "${_COUNT}" -gt 150 ]]; then
+            exit 1
+        fi
+        _COUNT="$((_COUNT+1))"
+        sleep 5
+    done
     _progress "70" "Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
