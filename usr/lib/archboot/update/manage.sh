@@ -280,7 +280,7 @@ _new_environment() {
     _progress "80" "Creating initramfs ${_RAM}/${_INITRD}..."
     touch "${_W_DIR}"/.archboot
     _create_initramfs &
-    _progress_wait "81" "94" "Creating initramfs ${_RAM}/${_INITRD}..." "0.3"
+    _progress_wait "81" "94" "Creating initramfs ${_RAM}/${_INITRD}..." "0.4"
     _progress "95" "Cleanup ${_W_DIR}..."
     cd /
     _kill_w_dir
