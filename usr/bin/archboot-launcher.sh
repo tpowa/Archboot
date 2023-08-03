@@ -56,12 +56,10 @@ _manage() {
     [[ -e /.launcher-running ]] && rm /.launcher-running
     _EXIT="$(cat ${_ANSWER})"
     if [[ "${_EXIT}" == "FULL" ]]; then
-        _show_coffee
         update -full-system
     elif [[ "${_EXIT}" == "UPDATE" ]]; then
         _run_update_environment
     elif [[ "${_EXIT}" == "IMAGE" ]]; then
-        _show_coffee
         update -latest-image
     fi
     exit 0

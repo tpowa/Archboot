@@ -74,9 +74,9 @@ usage () {
                 echo -e "                  package cache (using kexec)."
             fi
         fi
-    fi
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3216000 ]]; then
-        echo -e " \e[1m-latest-image\e[m    Generate latest image files in /archboot directory."
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 3216000 ]]; then
+            echo -e " \e[1m-latest-image\e[m    Generate latest image files in /archboot directory."
+        fi
     fi
     exit 0
 }

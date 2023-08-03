@@ -346,37 +346,44 @@ _new_image() {
     _PRESET_LATEST="${_RUNNING_ARCH}-latest"
     _PRESET_LOCAL="${_RUNNING_ARCH}-local"
     _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)"
+    _progress "1" "Removing files from /..."
     _clean_archboot
+    _clean_kernel_cache
     [[ -d var/cache/pacman/pkg ]] && rm -f /var/cache/pacman/pkg/*
     mkdir /archboot
     cd /archboot || exit 1
     _W_DIR="$(mktemp -u archboot-release.XXX)"
     # create container
-    _progress "5" "Creating archboot container..."
-    archboot-"${_RUNNING_ARCH}"-create-container.sh "${_W_DIR}" -cc > "${_LOG}" || exit 1
+    [[ -d "${_W_DIR}" ]] || mkdir -p "${_W_DIR}"
+    touch "${_W_DIR}"/.archboot
+    _create_container &
+    _progress_wait "2" "33" "Generating container in ${_W_DIR}..." "5"
+    _progress "34" "Create archboot.db in ${_W_DIR}..."
     _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg > "${_LOG}"
     # riscv64 does not support kexec at the moment
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         # removing not working lvm2 from latest image
         _progress "35" "Removing lvm2 from container..."
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>"${_NO_LOG}"
-        _progress "40" "Generating local ISO..."
+        _progress_wait "36" "64" "Generating local ISO..." "5"
         # generate local iso in container, umount tmp it's a tmpfs and weird things could happen then
-        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
-        -i=${_ISONAME}-local-${_RUNNING_ARCH}" > "${_LOG}" || exit 1
-        rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*
+        touch "${_W_DIR}"/.archboot
+        (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
+        -i=${_ISONAME}-local-${_RUNNING_ARCH}" > "${_LOG}"; rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*; rm "${_W_DIR}"/.archboot) &
         _ram_check
-        _progress "65" "Generating latest ISO..."
+        _progress_wait "65" "71" "Generating latest ISO..." "5"
         # generate latest iso in container
-        ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
-        -i=${_ISONAME}-latest-${_RUNNING_ARCH}" > "${_LOG}" || exit 1
+        touch "${_W_DIR}"/.archboot
+        (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
+        -i=${_ISONAME}-latest-${_RUNNING_ARCH}" > "${_LOG}"; rm "${_W_DIR}"/.archboot) &
         _progress "72" "Installing lvm2 to container..."
         ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>"${_NO_LOG}"
     fi
-    _progress "75" "Generating normal ISO..."
+    _progress_wait "73" "97" "Generating normal ISO..." "5"
+    touch "${_W_DIR}"/.archboot
     # generate iso in container
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_RUNNING_ARCH}-iso.sh -g \
-    -i=${_ISONAME}-${_RUNNING_ARCH}" > "${_LOG}" || exit 1
+    (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_RUNNING_ARCH}-iso.sh -g \
+    -i=${_ISONAME}-${_RUNNING_ARCH}" > "${_LOG}"; rm "${_W_DIR}"/.archboot) &
     _progress "98" "Cleanup container..."
     # move iso out of container
     mv "${_W_DIR}"/*.iso ./ &>"${_NO_LOG}"

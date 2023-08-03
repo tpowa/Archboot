@@ -21,7 +21,8 @@ while [ $# -gt 0 ]; do
         -u|--u|-update|--update) _D_SCRIPTS="1" ;;
         -latest|--latest) _L_COMPLETE="1" ;;
         -latest-install|--latest-install) _L_INSTALL_COMPLETE="1";;
-        -latest-image|--latest-image) _G_RELEASE="1" ;;
+        -latest-image|--latest-image) _G_RELEASE="1"
+                                      _L_INSTALL_COMPLETE="1";;
         -xfce|--xfce) _L_XFCE="1" ;;
         -sway|--sway) _L_SWAY="1" ;;
         -gnome|--gnome) _L_GNOME="1";;
@@ -44,7 +45,7 @@ if [[ -n "${_D_SCRIPTS}" ]]; then
     _download_latest
 fi
 # Generate new environment and launch it with kexec
-if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]]; then
+if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]] && [[ -z "${_G_RELEASE}" ]] ; then
     _update_installer_check
     touch /.update
     _TITLE="Archboot $(uname -m) | Basic Setup | New Environment"
