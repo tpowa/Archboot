@@ -206,7 +206,7 @@ _new_environment() {
     [[ -d "${_W_DIR}" ]] || mkdir -p "${_W_DIR}"
     touch "${_W_DIR}"/.archboot
     _create_container &
-    _progress_wait "2" "49" "Generating container in ${_W_DIR}..." "5"
+    _progress_wait "2" "49" "Generating container in ${_W_DIR}..." "4"
     _clean_kernel_cache
     _ram_check
     mkdir ${_RAM}
