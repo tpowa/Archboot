@@ -23,6 +23,8 @@ _kill_w_dir() {
 }
 
 _create_container() {
+    [[ -d "${_W_DIR}" ]] || mkdir -p "${_W_DIR}"
+    touch "${_W_DIR}"/.archboot
     # create container without package cache
     if [[ -n "${_L_COMPLETE}" ]]; then
         "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp >"${_LOG}" 2>&1 || exit 1
@@ -43,6 +45,7 @@ _create_container() {
             "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >"${_LOG}" 2>&1 || exit 1
         fi
     fi
+    rm "${_W_DIR}"/.archboot
 }
 
 _network_check() {
@@ -178,12 +181,17 @@ _new_environment() {
     _clean_archboot
     _clean_kernel_cache
     _COUNT=10
-    while _create_container; do
-        if [[ "$((_COUNT))" -gt 10 ]]; then
+    (_create_container &)
+    while [[ -e "${_W_DIR}/.archboot" ]]; do
+        if [[ "${_COUNT}" -gt 10 ]]; then
             _progress "$((_COUNT))"  "Generating container in ${_W_DIR}..."
         fi
-        if [[ "$((_COUNT))" -gt 49 ]]; then
+        if [[ "${_COUNT}" -gt 49 ]]; then
             _progress "49"  "Generating container in ${_W_DIR}..."
+        fi
+        # abort after 10 minutes
+        if [[ "${_COUNT}" -gt 300 ]]; then
+            exit 1
         fi
         _COUNT="$((_COUNT+1))"
         sleep 2
