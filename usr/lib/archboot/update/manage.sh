@@ -182,6 +182,7 @@ _new_environment() {
     _clean_kernel_cache
     _COUNT=10
     (_create_container &)
+    sleep 1
     while [[ -e "${_W_DIR}/.archboot" ]]; do
         if [[ "${_COUNT}" -gt 10 ]]; then
             _progress "$((_COUNT))"  "Generating container in ${_W_DIR}..."
