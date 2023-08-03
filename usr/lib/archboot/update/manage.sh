@@ -217,7 +217,7 @@ _new_environment() {
     # write initramfs to "${_W_DIR}"/tmp
     touch "${_W_DIR}"/.archboot
     _collect_files &
-    _progress_wait "51" "78" "Collecting rootfs files in ${_W_DIR}..." "1"
+    _progress_wait "51" "84" "Collecting rootfs files in ${_W_DIR}..." "1"
     _progress "85" "Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
