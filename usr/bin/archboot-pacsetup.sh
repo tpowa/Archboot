@@ -120,13 +120,13 @@ _update_environment() {
     if [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
         _progress "98" "No new kernel online available. Skipping update environment."
         sleep 2
+        _progress "100" "Pacman configuration completed successfully."
+        sleep 2
     else
-        _progress "98" "New kernel online available."
+        _progress "100" "New kernel online available. Asking for update..."
         echo ${_ONLINE_KERNEL} > /.new_kernel
         sleep 2
     fi
-    _progress "100" "Pacman configuration completed successfully."
-    sleep 2
 }
 
 _check
