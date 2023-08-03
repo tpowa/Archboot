@@ -122,7 +122,8 @@ _update_environment() {
         sleep 2
     else
         _progress "98" "New kernel online available."
-        touch /.new_kernel
+        echo ${_ONLINE_KERNEL} > /.new_kernel
+        sleep 2
     fi
     _progress "100" "Pacman configuration completed successfully."
     sleep 2
@@ -170,7 +171,7 @@ if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]] &&\
     ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         _update_environment | _dialog --no-mouse --gauge "Refreshing pacman package database..." 6 70 0
         if [[ -e /.new_kernel ]]; then
-            _dialog --title " New Kernel Available " --defaultno --yesno "Do you want to update the Archboot Environment to ${_ONLINE_KERNEL}?\n\nATTENTION:\nThis will reboot the system using kexec!" 9 60 && _UPDATE_ENVIRONMENT=1
+            _dialog --title " New Kernel Available " --defaultno --yesno "Do you want to update the Archboot Environment to $(cat /.new_kernel)?\n\nATTENTION:\nThis will reboot the system using kexec!" 9 60 && _UPDATE_ENVIRONMENT=1
             if [[ -n "${_UPDATE_ENVIRONMENT}" ]]; then
                 _run_update_environment
             fi
