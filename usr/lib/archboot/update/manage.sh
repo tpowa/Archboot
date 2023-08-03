@@ -386,8 +386,8 @@ _new_image() {
     _progress_wait "71" "97" "Generating normal ISO..." "10"
     _progress "98" "Cleanup container..."
     # move iso out of container
-    mv "${_W_DIR}"/*.iso ./ &>"${_NO_LOG}"
-    mv "${_W_DIR}"/*.img ./ &>"${_NO_LOG}"
+    mv "${_W_DIR}"/archboot*.iso ./ &>"${_NO_LOG}"
+    mv "${_W_DIR}"/archboot*.img ./ &>"${_NO_LOG}"
     rm -r "${_W_DIR}"
     _progress "100" "New isofiles are located in /archboot."
     sleep 2
