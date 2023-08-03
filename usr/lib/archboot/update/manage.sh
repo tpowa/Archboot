@@ -177,8 +177,17 @@ _new_environment() {
     _progress "5" "Removing files from /..."
     _clean_archboot
     _clean_kernel_cache
-    _progress "10" "Generating container in ${_W_DIR}..."
-    _create_container || exit 1
+    _COUNT=10
+    while _create_container || exit 1; do
+        if [[ "$((_COUNT))" -gt 10 ]]; then
+            _progress "$((_COUNT))"  "Generating container in ${_W_DIR}..."
+        fi
+        if [[ "$((_COUNT))" -gt 49 ]]; then
+            _progress "49"  "Generating container in ${_W_DIR}..."
+        fi
+        _COUNT="$((_COUNT+1))"
+        sleep 2
+    done
     _clean_kernel_cache
     _ram_check
     mkdir ${_RAM}
@@ -296,7 +305,7 @@ _full_system() {
         rm -f /usr/share/libalpm/{scripts/mkinitcpio,hooks/*mkinitcpio*}
         _COUNT="$((_COUNT+1))"
     done
-    _progress "97" "Adding info/man-pages now..."
+    _progress "97" "Adding texinfo and man-pages..."
     pacman -S --noconfirm man-db man-pages texinfo >"${_LOG}" 2>&1 || exit 1
     _progress "98" "Checking kernel version..."
     _INSTALLED_KERNEL="$(pacman -Qi linux | grep Version | cut -d ':' -f 2 | sed -e 's# ##g' -e 's#\.arch#-arch#g')"
