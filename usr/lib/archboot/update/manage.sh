@@ -187,7 +187,7 @@ _new_environment() {
     _clean_kernel_cache
     [[ -d "${_W_DIR}" ]] || mkdir -p "${_W_DIR}"
     touch "${_W_DIR}"/.archboot
-    (_create_container &)
+    _create_container &
     _COUNT=2
     while [[ -e "${_W_DIR}/.archboot" ]]; do
         if [[ "${_COUNT}" -lt 49 ]]; then
@@ -213,7 +213,7 @@ _new_environment() {
     _progress "51" "Collecting rootfs files in ${_W_DIR}..."
     # write initramfs to "${_W_DIR}"/tmp
     touch "${_W_DIR}"/.archboot
-    (_collect_files &)
+    _collect_files &
     _COUNT=52
     while [[ -e "${_W_DIR}/.archboot" ]]; do
         if [[ "${_COUNT}" -lt 69 ]]; then
@@ -289,7 +289,7 @@ _new_environment() {
     fi
     _progress "80" "Creating initramfs ${_RAM}/${_INITRD}..."
     touch "${_W_DIR}"/.archboot
-    (_create_initramfs &)
+    _create_initramfs &
     _COUNT=81
     while [[ -e "${_W_DIR}/.archboot" ]]; do
         if [[ "${_COUNT}" -lt 94 ]]; then
