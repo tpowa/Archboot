@@ -144,7 +144,7 @@ _progress_wait() {
             exit 1
         fi
         _COUNT="$((_COUNT+1))"
-        sleep 5
+        sleep "${4}"
     done
 }
 
@@ -206,7 +206,7 @@ _new_environment() {
     [[ -d "${_W_DIR}" ]] || mkdir -p "${_W_DIR}"
     touch "${_W_DIR}"/.archboot
     _create_container &
-    _progress_wait "2" "49" "Generating container in ${_W_DIR}..."
+    _progress_wait "2" "49" "Generating container in ${_W_DIR}..." "5"
     _clean_kernel_cache
     _ram_check
     mkdir ${_RAM}
@@ -218,7 +218,7 @@ _new_environment() {
     # write initramfs to "${_W_DIR}"/tmp
     touch "${_W_DIR}"/.archboot
     _collect_files &
-    _progress_wait "52" "69" "Collecting rootfs files in ${_W_DIR}..."
+    _progress_wait "52" "69" "Collecting rootfs files in ${_W_DIR}..." "4"
     _progress "70" "Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
@@ -280,7 +280,7 @@ _new_environment() {
     _progress "80" "Creating initramfs ${_RAM}/${_INITRD}..."
     touch "${_W_DIR}"/.archboot
     _create_initramfs &
-    _progress_wait "81" "94" "Creating initramfs ${_RAM}/${_INITRD}..."
+    _progress_wait "81" "94" "Creating initramfs ${_RAM}/${_INITRD}..." "3"
     _progress "95" "Cleanup ${_W_DIR}..."
     cd /
     _kill_w_dir
