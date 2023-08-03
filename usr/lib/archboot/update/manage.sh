@@ -184,7 +184,7 @@ _new_environment() {
     (_create_container &)
     sleep 1
     while [[ -e "${_W_DIR}/.archboot" ]]; do
-        if [[ "${_COUNT}" -gt 2 && "${_COUNT}" -lt 49 ]]; then
+        if [[ "${_COUNT}" -lt 49 ]]; then
             _progress "$((_COUNT))"  "Generating container in ${_W_DIR}..."
         fi
         if [[ "${_COUNT}" -gt 49 ]]; then
@@ -212,7 +212,7 @@ _new_environment() {
     rm "${_W_DIR}"/.archboot &)
     _COUNT=52
     while [[ -e "${_W_DIR}/.archboot" ]]; do
-        if [[ "${_COUNT}" -gt 52 && "${_COUNT}" -lt 69 ]]; then
+        if [[ "${_COUNT}" -lt 69 ]]; then
             _progress "$((_COUNT))"  "Collecting rootfs files in ${_W_DIR}..."
         fi
         if [[ "${_COUNT}" -gt 69 ]]; then
