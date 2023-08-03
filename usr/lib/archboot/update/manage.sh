@@ -184,18 +184,18 @@ _new_environment() {
     (_create_container &)
     sleep 1
     while [[ -e "${_W_DIR}/.archboot" ]]; do
-        if [[ "${_COUNT}" -gt 10 ]]; then
+        if [[ "${_COUNT}" -gt 10 && "${_COUNT}" -lt 49 ]]; then
             _progress "$((_COUNT))"  "Generating container in ${_W_DIR}..."
         fi
         if [[ "${_COUNT}" -gt 49 ]]; then
             _progress "49"  "Generating container in ${_W_DIR}..."
         fi
-        # abort after 10 minutes
-        if [[ "${_COUNT}" -gt 300 ]]; then
+        # abort after 15 minutes
+        if [[ "${_COUNT}" -gt 150 ]]; then
             exit 1
         fi
         _COUNT="$((_COUNT+1))"
-        sleep 2
+        sleep 5
     done
     _clean_kernel_cache
     _ram_check
@@ -294,7 +294,7 @@ _new_environment() {
     rm -rf /usr/* &>"${_NO_LOG}"
     while true; do
         _clean_kernel_cache
-        sleep 1
+        read -r -t 1
         printf "\ec"
     done
 }
