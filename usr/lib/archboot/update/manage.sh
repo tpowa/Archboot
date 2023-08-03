@@ -291,13 +291,9 @@ _full_system() {
         if [[ "$((_COUNT*100/_PACKAGE_COUNT-4))" -gt 1 ]]; then
             _progress "$((_COUNT*100/_PACKAGE_COUNT-4))" "Reinstalling all packages, installing ${i} now..."
         fi
-        if echo "${i}" | grep -qw "mkinitcpio"; then
-            pacman -S --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
-            # avoid running mkinitcpio
-            rm -f /usr/share/libalpm/{scripts/mkinitcpio,hooks/*mkinitcpio*}
-        else
-            pacman -S --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
-        fi
+        pacman -S --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
+        # avoid running mkinitcpio
+        rm -f /usr/share/libalpm/{scripts/mkinitcpio,hooks/*mkinitcpio*}
         _COUNT="$((_COUNT+1))"
     done
     _progress "97" "Adding info/man-pages now..."
