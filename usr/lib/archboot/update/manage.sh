@@ -178,7 +178,7 @@ _new_environment() {
     _clean_archboot
     _clean_kernel_cache
     _COUNT=10
-    while _create_container || exit 1; do
+    while _create_container; do
         if [[ "$((_COUNT))" -gt 10 ]]; then
             _progress "$((_COUNT))"  "Generating container in ${_W_DIR}..."
         fi
