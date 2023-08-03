@@ -3,10 +3,9 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _install_xfce() {
     if ! [[ -e /usr/bin/startxfce4 ]]; then
-        echo -e "\e[1mStep 1/3:\e[m Installing XFCE desktop now..."
-        echo "          This will need some time..."
+        _progress "1" "Installing XFCE desktop now..."
         _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES}" >/dev/tty7 2>&1
-        echo -e "\e[1mStep 2/3:\e[m Configuring XFCE desktop..."
+        _progress "50" "Configuring XFCE desktop..."
         _configure_xfce >/dev/tty7 2>&1
     else
         echo -e "\e[1mStep 1/3:\e[m Installing XFCE desktop already done..."
@@ -15,7 +14,7 @@ _install_xfce() {
 }
 
 _configure_xfce() {
-    echo "Configuring xfce panel..."
+    _progress "60" "Configuring xfce panel..."
     cat << EOF >/etc/xdg/xfce4/panel/default.xml
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -127,10 +126,10 @@ _configure_xfce() {
   </property>
 </channel>
 EOF
-    echo "Setting breeze as default icons..."
+    _progress "70" "Setting breeze as default icons..."
     sed -i -e 's#<property name="IconThemeName" type="string" value="Adwaita"/>#<property name="IconThemeName" type="string" value="breeze"/>#g' \
     /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
-    echo "Setting archboot background image..."
+    _progress "80" "Setting archboot background image..."
     cat << EOF >/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -167,13 +166,13 @@ EOF
   </property>
 </channel>
 EOF
-    echo "Replacing appfinder launcher with gparted..."
+    _prgress "85" "Replacing appfinder launcher with gparted..."
     sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
-    echo "Replacing directory menu launcher with setup..."
+    _progress "86" "Replacing directory menu launcher with setup..."
     sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
-    echo "Setting ${_STANDARD_BROWSER} as default browser..."
+    _progress "87" "Setting ${_STANDARD_BROWSER} as default browser..."
     sed -i -e "s#firefox#${_STANDARD_BROWSER}#g" /etc/xdg/xfce4/helpers.rc
-    echo "Replacing menu structure..."
+    _progress "88" "Replacing menu structure..."
     cat << EOF >/etc/xdg/menus/xfce-applications.menu
 <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
   "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
@@ -230,14 +229,14 @@ EOF
 
 </Menu>
 EOF
-    echo "Adding gparted to xfce top level menu..."
+    _progress "89" "Adding gparted to xfce top level menu..."
     sed -i -e 's#Categories=.*#Categories=X-Xfce-Toplevel;#g' /usr/share/applications/gparted.desktop
     _HIDE_MENU="xfce4-mail-reader xfce4-about"
-    echo "Hiding ${_HIDE_MENU} menu entries..."
+    _progress "90" "Hiding ${_HIDE_MENU} menu entries..."
     for i in ${_HIDE_MENU}; do
         echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
     done
-    echo "Autostarting setup..."
+    _progress "91" "Autostarting setup..."
     cat << EOF > /etc/xdg/autostart/archboot.desktop
 [Desktop Entry]
 Type=Application
@@ -251,7 +250,7 @@ EOF
 }
 
 _start_xfce() {
-    echo -e "Launching \e[1mXFCE\e[m now, logging is done on \e[1m/dev/tty8\e[m..."
+    _progress "100" "Launching XFCE now, logging is done on /dev/tty8..."
     startxfce4 >/dev/tty8 2>&1
     echo -e "To relaunch \e[1mXFCE\e[m desktop use: \e[92mstartxfce4\e[m"
 }

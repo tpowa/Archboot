@@ -19,12 +19,12 @@ _cleanup_cache() {
 _prepare_graphic() {
     _GRAPHIC="${1}"
     if [[ ! -e "/.full_system" ]]; then
-        echo "Removing firmware files..."
+        _progress "2" "Removing firmware files..."
         rm -rf /usr/lib/firmware
         # fix libs first, then install packages from defaults
         _GRAPHIC="${_FIX_PACKAGES} ${1}"
     fi
-    echo "Updating environment to latest packages (ignoring packages: ${_GRAPHIC_IGNORE})..."
+     _progress 3 "Updating environment to latest packages (ignoring packages: ${_GRAPHIC_IGNORE})..."
     _IGNORE=""
     if [[ -n "${_GRAPHIC_IGNORE}" ]]; then
         for i in ${_GRAPHIC_IGNORE}; do
@@ -36,7 +36,7 @@ _prepare_graphic() {
     [[ ! -e "/.full_system" ]] && _cleanup_install
     # check for qxl module
     grep -q qxl /proc/modules && grep -q xorg "${_GRAPHIC}" && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
-    echo "Running pacman to install packages: ${_GRAPHIC}..."
+    progress "4" "Running pacman to install packages: ${_GRAPHIC}..."
     for i in ${_GRAPHIC}; do
         #shellcheck disable=SC2086
         pacman -S ${i} --noconfirm &>"${_NO_LOG}" || exit 1
@@ -46,6 +46,7 @@ _prepare_graphic() {
     done
     # install firefox langpacks
     if [[ "${_STANDARD_BROWSER}" == "firefox" ]]; then
+        _progress "10" "Installing firefox langpack..."
         _LANG="be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr uk"
         for i in ${_LANG}; do
             if grep -q "${i}" /etc/locale.conf; then
@@ -63,9 +64,9 @@ _prepare_graphic() {
         fi
     fi
     if [[ ! -e "/.full_system" ]]; then
-        echo "Removing not used icons..."
+        _progress "20" "Removing not used icons..."
         rm -rf /usr/share/icons/breeze-dark
-        echo "Cleanup locale and i18n..."
+        _progress "30" "Cleanup locale and i18n..."
         find /usr/share/locale/ -mindepth 2 ! -path '*/be/*' ! -path '*/bg/*' ! -path '*/cs/*' \
         ! -path '*/da/*' ! -path '*/de/*' ! -path '*/en/*' ! -path '*/el/*' ! -path '*/es/*' \
         ! -path '*/fi/*' ! -path '*/fr/*' ! -path '*/hu/*' ! -path '*/it/*' ! -path '*/lt/*' \
@@ -74,6 +75,7 @@ _prepare_graphic() {
         ! -path '*/sv/*' ! -path '*/uk/*' -delete &>"${_NO_LOG}"
         find /usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>"${_NO_LOG}"
     fi
+    _progress "40" "Restart dbus..."
     systemd-sysusers >"${_LOG}" 2>&1
     systemd-tmpfiles --create >"${_LOG}" 2>&1
     # fixing dbus requirements
@@ -83,7 +85,6 @@ _prepare_graphic() {
 
 _install_graphic () {
     [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
-    echo -e "\e[1mInitializing desktop environment...\e[m"
     [[ -n "${_L_XFCE}" ]] && _install_xfce
     [[ -n "${_L_GNOME}" ]] && _install_gnome
     [[ -n "${_L_GNOME_WAYLAND}" ]] && _install_gnome_wayland
@@ -91,7 +92,7 @@ _install_graphic () {
     [[ -n "${_L_PLASMA_WAYLAND}" ]] && _install_plasma_wayland
     [[ -n "${_L_SWAY}" ]] && _install_sway
     # only start vnc on xorg environment
-    echo -e "\e[1mStep 3/3:\e[m Setting up VNC and browser...\e[m"
+    _progress "93" "Setting up VNC and browser..."
     [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]] && _autostart_vnc
     command -v firefox &>"${_NO_LOG}"  && _firefox_flags
     command -v chromium &>"${_NO_LOG}" && _chromium_flags
