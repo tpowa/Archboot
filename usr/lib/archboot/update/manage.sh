@@ -109,7 +109,15 @@ _clean_archboot() {
     done
 }
 
+_collect_files() {
+    touch "${_W_DIR}"/.archboot
+    _KVER=$(_kver "${_RAM}/${_VMLINUZ}")
+    {_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_KVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1
+    rm "${_W_DIR}"/.archboot
+}
+
 _create_initramfs() {
+    touch "${_W_DIR}"/.archboot
     # https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt
     # compress image with zstd
     cd  "${_W_DIR}"/tmp || exit 1
@@ -123,6 +131,7 @@ _create_initramfs() {
         _clean_kernel_cache
         sleep 1
     done
+    rm "${_W_DIR}"/.archboot
 }
 
 _download_latest() {
@@ -172,13 +181,6 @@ _download_latest() {
         wget -q "${_SOURCE}${_INST}/${i}?inline=false" -O "${_INST}/${i}"
     done
     echo -e "\e[1mFinished:\e[m Downloading scripts done."
-}
-
-_collect_files() {
-    touch "${_W_DIR}"/.archboot
-    _KVER=$(_kver "${_RAM}/${_VMLINUZ}")
-    {_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_KVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1
-    rm "${_W_DIR}"/.archboot
 }
 
 _new_environment() {
@@ -289,7 +291,23 @@ _new_environment() {
         cp /.pacsetup "${_C_DIR}"/
     fi
     _progress "80" "Creating initramfs ${_RAM}/${_INITRD}..."
-    _create_initramfs
+    (_create_initramfs &)
+    sleep 1
+    _COUNT=81
+    while [[ -e "${_W_DIR}/.archboot" ]]; do
+        if [[ "${_COUNT}" -lt 94 ]]; then
+            _progress "${_COUNT}"  "Creating initramfs ${_RAM}/${_INITRD}..."
+        fi
+        if [[ "${_COUNT}" -gt 94 ]]; then
+            _progress "94"  "Creating initramfs ${_RAM}/${_INITRD}..."
+        fi
+        # abort after 15 minutes
+        if [[ "${_COUNT}" -gt 150 ]]; then
+            exit 1
+        fi
+        _COUNT="$((_COUNT+1))"
+        sleep 5
+    done
     _progress "95" "Cleanup ${_W_DIR}..."
     cd /
     _kill_w_dir
