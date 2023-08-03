@@ -365,25 +365,25 @@ _new_image() {
         # removing not working lvm2 from latest image
         _progress "35" "Removing lvm2 from container..."
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>"${_NO_LOG}"
-        _progress_wait "36" "64" "Generating local ISO..." "5"
         # generate local iso in container, umount tmp it's a tmpfs and weird things could happen then
         touch "${_W_DIR}"/.archboot
         (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LOCAL} \
         -i=${_ISONAME}-local-${_RUNNING_ARCH}" > "${_LOG}"; rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*; rm "${_W_DIR}"/.archboot) &
         _ram_check
-        _progress_wait "65" "71" "Generating latest ISO..." "5"
+        _progress_wait "36" "64" "Generating local ISO..." "5"
         # generate latest iso in container
         touch "${_W_DIR}"/.archboot
         (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_RUNNING_ARCH}-iso.sh -g -p=${_PRESET_LATEST} \
         -i=${_ISONAME}-latest-${_RUNNING_ARCH}" > "${_LOG}"; rm "${_W_DIR}"/.archboot) &
+        _progress_wait "65" "71" "Generating latest ISO..." "5"
         _progress "72" "Installing lvm2 to container..."
         ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>"${_NO_LOG}"
     fi
-    _progress_wait "73" "97" "Generating normal ISO..." "5"
     touch "${_W_DIR}"/.archboot
     # generate iso in container
     (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_RUNNING_ARCH}-iso.sh -g \
     -i=${_ISONAME}-${_RUNNING_ARCH}" > "${_LOG}"; rm "${_W_DIR}"/.archboot) &
+    _progress_wait "73" "97" "Generating normal ISO..." "5"
     _progress "98" "Cleanup container..."
     # move iso out of container
     mv "${_W_DIR}"/*.iso ./ &>"${_NO_LOG}"
