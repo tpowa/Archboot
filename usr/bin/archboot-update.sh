@@ -43,7 +43,7 @@ if [[ -n "${_D_SCRIPTS}" ]]; then
     _network_check
     touch /.update
     _TITLE="Archboot $(uname -m) | Basic Setup | Download GIT  Archboot Scripts"
-    _download_latest | _dialog --title " Downloading GIT " --gauge "Downloading latest config..." 6 75 0
+    _download_latest | _dialog --title " Archboot GIT Master " --gauge "Downloading latest config..." 6 75 0
     clear
 fi
 # Generate new environment and launch it with kexec
