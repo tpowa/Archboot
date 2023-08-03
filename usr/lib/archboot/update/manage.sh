@@ -211,7 +211,7 @@ _new_environment() {
     (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_KVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1;\
     rm "${_W_DIR}"/.archboot &)
     _COUNT=52
-    while [[ -e "${_W_DIR}/tmp/.archboot" ]]; do
+    while [[ -e "${_W_DIR}/.archboot" ]]; do
         if [[ "${_COUNT}" -gt 52 && "${_COUNT}" -lt 69 ]]; then
             _progress "$((_COUNT))"  "Collecting rootfs files in ${_W_DIR}..."
         fi
