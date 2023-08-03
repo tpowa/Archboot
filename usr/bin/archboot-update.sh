@@ -42,7 +42,7 @@ if [[ -n "${_D_SCRIPTS}" ]]; then
     _update_installer_check
     _network_check
     touch /.update
-    _TITLE="Archboot $(uname -m) | Basic Setup | GIT Master Archboot Scripts"
+    _TITLE="Archboot $(uname -m) | Basic Setup | GIT Master Scripts"
     _download_latest | _dialog --title " Archboot GIT Master " --gauge "Downloading latest config..." 6 75 0
     clear
 fi
