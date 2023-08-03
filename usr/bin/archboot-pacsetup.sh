@@ -18,7 +18,7 @@ _select_mirror() {
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _COUNTRY="$(curl -s "http://ip-api.com/csv/?fields=countryCode")"
         _DOWNLOAD="Downloading latest mirrorlist for Region ${_COUNTRY}..."
-        _download_mirror | _dialog --no-mouse --gauge "${_DOWNLOAD}" 6 70 0
+        _download_mirror | _dialog --title " Pacman Configuration " --no-mouse --gauge "${_DOWNLOAD}" 6 70 0
         if grep -q '#Server = https:' /tmp/pacman_mirrorlist.txt; then
             mv "${_MIRRORLIST}" "${_MIRRORLIST}.bak"
             cp /tmp/pacman_mirrorlist.txt "${_MIRRORLIST}"
@@ -139,7 +139,7 @@ if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
 fi
 while true; do
     if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
-        _dialog --no-mouse --infobox "Setting local mirror..." 3 40
+        _dialog --title " Pacman Configuration " --no-mouse --infobox "Setting local mirror..." 3 40
         _PACMAN_CONF="/etc/pacman.conf"
         cat << EOF > "${_PACMAN_CONF}"
 [options]
@@ -158,7 +158,7 @@ EOF
         fi
         _select_mirror
     fi
-    if _prepare_pacman | _dialog --no-mouse --gauge "Waiting for Arch Linux keyring initialization..." 6 70 0; then
+    if _prepare_pacman | _dialog --title " Pacman Configuration " --no-mouse --gauge "Waiting for Arch Linux keyring initialization..." 6 70 0; then
         break
     else
         _dialog --title " ERROR " --no-mouse --infobox "Please reconfigure pacman." 3 40
@@ -169,7 +169,7 @@ if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]] &&\
     update | grep -q '\-latest' &&\
     [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]] &&\
     ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-        _update_environment | _dialog --no-mouse --gauge "Refreshing pacman package database..." 6 70 0
+        _update_environment | _dialog --title " Pacman Configuration " --no-mouse --gauge "Refreshing pacman package database..." 6 70 0
         if [[ -e /.new_kernel ]]; then
             _dialog --title " New Kernel Available " --defaultno --yesno "Do you want to update the Archboot Environment to $(cat /.new_kernel)?\n\nATTENTION:\nThis will reboot the system using kexec!" 9 60 && _UPDATE_ENVIRONMENT=1
             if [[ -n "${_UPDATE_ENVIRONMENT}" ]]; then
@@ -179,7 +179,7 @@ if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]] &&\
         fi
         _cleanup
 fi
-_dialog --no-mouse --infobox "Pacman configuration completed successfully." 3 60
+_dialog --title " Pacman Configuration " --no-mouse --infobox "Pacman configuration completed successfully." 3 60
 sleep 2
 _cleanup
 # vim: set ft=sh ts=4 sw=4 et:
