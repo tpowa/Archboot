@@ -71,7 +71,9 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
     if [[ -e "/.graphic_installed" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]]; then
         _hint_graphic_installed
     else
-        _install_graphic
+        touch /.update
+        _TITLE="Archboot $(uname -m) | Basic Setup | New Images"
+        _install_graphic | _dialog --title "${_MENU_TITLE}" --gauge "Initializing desktop environment..." 6 75 0
     fi
 fi
 # Switch to full Arch Linux system
