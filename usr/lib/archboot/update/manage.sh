@@ -154,7 +154,7 @@ _download_latest() {
     # config
     wget -q "${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
     # helper binaries
-    _progress "33" "Downloading latest scripts..."
+    _progress "25" "Downloading latest scripts..."
     # main binaries
     BINS="quickinst setup clock launcher localize network pacsetup update copy-mountpoint rsync-backup restore-usbstick"
     for i in ${BINS}; do
@@ -170,7 +170,7 @@ _download_latest() {
         [[ -e "${_HELP}/${i}" ]] && wget -q "${_SOURCE}${_HELP}/${i}?inline=false" -O "${_HELP}/${i}"
     done
     # main libs
-    _progress "66" "Downloading latest script libs..."
+    _progress "50" "Downloading latest script libs..."
     LIBS="basic-common.sh common.sh container.sh release.sh iso.sh login.sh cpio.sh"
     for i in ${LIBS}; do
         wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
@@ -186,7 +186,7 @@ _download_latest() {
         wget -q "${_SOURCE}${_RUN}/${i}?inline=false" -O "${_RUN}/${i}"
     done
     # setup libs
-    _progress "90" "Downloading latest setup libs..."
+    _progress "75" "Downloading latest setup libs..."
     LIBS="autoconfiguration.sh quicksetup.sh base.sh blockdevices.sh bootloader.sh btrfs.sh common.sh \
             configuration.sh mountpoints.sh network.sh pacman.sh partition.sh storage.sh"
     for i in ${LIBS}; do
