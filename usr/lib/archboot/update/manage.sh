@@ -174,6 +174,13 @@ _download_latest() {
     echo -e "\e[1mFinished:\e[m Downloading scripts done."
 }
 
+_collect_files() {
+    touch "${_W_DIR}"/.archboot
+    _KVER=$(_kver "${_RAM}/${_VMLINUZ}")
+    {_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_KVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1
+    rm "${_W_DIR}"/.archboot
+}
+
 _new_environment() {
     _kill_w_dir
     _gpg_check
@@ -185,7 +192,7 @@ _new_environment() {
     sleep 1
     while [[ -e "${_W_DIR}/.archboot" ]]; do
         if [[ "${_COUNT}" -lt 49 ]]; then
-            _progress "$((_COUNT))"  "Generating container in ${_W_DIR}..."
+            _progress "${_COUNT}" "Generating container in ${_W_DIR}..."
         fi
         if [[ "${_COUNT}" -gt 49 ]]; then
             _progress "49"  "Generating container in ${_W_DIR}..."
@@ -204,16 +211,14 @@ _new_environment() {
     _progress "50" "Moving kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
     # use ramfs to get immediate free space on file deletion
     mv "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
-    _KVER=$(_kver "${_RAM}/${_VMLINUZ}")
     _progress "51" "Collecting rootfs files in ${_W_DIR}..."
     # write initramfs to "${_W_DIR}"/tmp
-    touch "${_W_DIR}"/.archboot
-    (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_KVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1;\
-    rm "${_W_DIR}"/.archboot &)
+    (_collect_files &)
+    sleep 1
     _COUNT=52
     while [[ -e "${_W_DIR}/.archboot" ]]; do
         if [[ "${_COUNT}" -lt 69 ]]; then
-            _progress "$((_COUNT))"  "Collecting rootfs files in ${_W_DIR}..."
+            _progress "${_COUNT}"  "Collecting rootfs files in ${_W_DIR}..."
         fi
         if [[ "${_COUNT}" -gt 69 ]]; then
             _progress "69"  "Collecting rootfs files in ${_W_DIR}..."
