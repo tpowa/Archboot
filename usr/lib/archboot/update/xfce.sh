@@ -166,7 +166,7 @@ EOF
   </property>
 </channel>
 EOF
-    _prgress "85" "Replacing appfinder launcher with gparted..."
+    _progress "85" "Replacing appfinder launcher with gparted..."
     sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
     _progress "86" "Replacing directory menu launcher with setup..."
     sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
