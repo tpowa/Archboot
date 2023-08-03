@@ -40,7 +40,7 @@ _timezone () {
             _SET_ZONE=""
         fi
     done
-    _dialog --no-mouse --infobox "Setting Timezone to ${_ZONE}..." 3 50
+    _dialog --title " Clock Configuration " --no-mouse --infobox "Setting Timezone to ${_ZONE}..." 3 50
     timedatectl set-timezone "${_ZONE}"
     sleep 2
 }
@@ -60,7 +60,7 @@ _timeset() {
         timedatectl set-time "${_DATETIME}"
         _SET_TIME="1"
     fi
-    _dialog --no-mouse --infobox "Clock configuration completed successfully." 3 50
+    _dialog --title " Clock Configuration " --no-mouse --infobox "Clock configuration completed successfully." 3 50
     sleep 2
 }
 
@@ -83,7 +83,7 @@ _SET_TIME=""
 # automatic setup
 if ping -c1 www.google.com &>/dev/null; then
     _ZONE="$(curl -s "http://ip-api.com/csv/?fields=timezone")"
-    _auto_clock |  _dialog --no-mouse --gauge "Setting Timezone to ${_ZONE}..." 6 60 0
+    _auto_clock |  _dialog --title " Clock Configuration " --no-mouse --gauge "Setting Timezone to ${_ZONE}..." 6 60 0
     _SET_TIME="1"
 fi
 while [[ -z "${_SET_TIME}" ]]; do
