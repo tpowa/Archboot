@@ -120,14 +120,9 @@ _update_environment() {
     if [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
         _progress "98" "No new kernel online available. Skipping update environment."
         sleep 2
-    else
-        _dialog --title " New Kernel Available " --defaultno --yesno "Do you want to update the Archboot Environment to ${_ONLINE_KERNEL}?\n\nATTENTION:\nThis will reboot the system using kexec!" 9 60 && _UPDATE_ENVIRONMENT=1
-        if [[ -n "${_UPDATE_ENVIRONMENT}" ]]; then
-            _run_update_environment
-        fi
+        _progress "100" "Pacman configuration completed successfully."
+        sleep 2
     fi
-    _progress "100" "Pacman configuration completed successfully."
-    sleep 2
 }
 
 _check
@@ -171,6 +166,10 @@ if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]] &&\
     [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]] &&\
     ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         _update_environment | _dialog --no-mouse --gauge "Refreshing pacman package database..." 6 70 0
+        _dialog --title " New Kernel Available " --defaultno --yesno "Do you want to update the Archboot Environment to ${_ONLINE_KERNEL}?\n\nATTENTION:\nThis will reboot the system using kexec!" 9 60 && _UPDATE_ENVIRONMENT=1
+        if [[ -n "${_UPDATE_ENVIRONMENT}" ]]; then
+            _run_update_environment
+        fi
         _cleanup
 fi
 _dialog --no-mouse --infobox "Pacman configuration completed successfully." 3 60

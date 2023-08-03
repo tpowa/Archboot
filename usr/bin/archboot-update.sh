@@ -45,7 +45,7 @@ if [[ -n "${_D_SCRIPTS}" ]]; then
     _download_latest
 fi
 # Generate new environment and launch it with kexec
-if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]] && [[ -z "${_G_RELEASE}" ]] ; then
+if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]] && [[ -z "${_G_RELEASE}" ]]; then
     _update_installer_check
     touch /.update
     _TITLE="Archboot $(uname -m) | Basic Setup | New Environment"
