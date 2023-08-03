@@ -46,7 +46,7 @@ _wireless() {
     _CONTINUE=""
     while [[ -z "${_CONTINUE}" ]]; do
         # scan the area
-        _dialog --no-mouse --infobox "Scanning for SSIDs with interface ${_INTERFACE}..." 3 50
+        _dialog --title " Network Configuration " --no-mouse --infobox "Scanning for SSIDs with interface ${_INTERFACE}..." 3 50
         iwctl station "${_INTERFACE}" scan &>"${_NO_LOG}"
         sleep 5
         #shellcheck disable=SC2086,SC2046
@@ -80,7 +80,7 @@ _wireless() {
         _WLAN_KEY=$(cat "${_ANSWER}")
     fi
     # time to connect
-    _dialog --no-mouse --infobox "Connecting to SSID='${_WLAN_SSID}' with interface ${_INTERFACE}..." 3 70
+    _dialog --title " Network Configuration " --no-mouse --infobox "Connecting to SSID='${_WLAN_SSID}' with interface ${_INTERFACE}..." 3 70
     _printk off
     if [[ -z "${_WLAN_KEY}" ]]; then
         iwctl station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" &>"${_NO_LOG}" && _WLAN_AUTH=1
@@ -90,8 +90,8 @@ _wireless() {
     sleep 3
     _printk on
     if [[ -n "${_WLAN_AUTH}" ]]; then
-        _dialog --no-mouse --infobox "Authentification to SSID='${_WLAN_SSID}' was successful." 3 70
-        sleep 3
+        _dialog --title " Network Configuration " --no-mouse --infobox "Authentification to SSID='${_WLAN_SSID}' was successful." 3 70
+        sleep 2
         return 0
     else
         _dialog --title " ERROR " --no-mouse --infobox "Authentification to SSID='${_WLAN_SSID}' failed. Please configure again!" 3 70
@@ -139,14 +139,14 @@ _network() {
         done
         # dhcp switch
         _IP=""
-        if _dialog --yesno "Do you want to use DHCP?" 5 40; then
+        if _dialog --title " Network Configuration " --yesno "Do you want to use DHCP?" 5 40; then
             _IP="dhcp"
             _IPADDR=""
             _GW=""
             _DNS=""
         else
             _IP="static"
-            _dialog --no-cancel --title " IP Address And Netmask " --inputbox "" 7 40 "192.168.1.23/24" 2>"${_ANSWER}"
+            _dialog  --no-cancel --title " IP Address And Netmask " --inputbox "" 7 40 "192.168.1.23/24" 2>"${_ANSWER}"
             _IPADDR=$(cat "${_ANSWER}")
             _dialog --no-cancel --title " Gateway " --inputbox "" 7 40 "192.168.1.1" 2>"${_ANSWER}"
             _GW=$(cat "${_ANSWER}")
@@ -210,7 +210,7 @@ _network() {
         # abort after 10 seconds
         _progress "$((${_COUNT}*10))" "Waiting $((10-${_COUNT})) seconds for network link to come up..."
         [[ "${_COUNT}" == 10 ]] && break
-    done | _dialog --no-mouse --gauge "Waiting 10 seconds for network link to come up..." 6 60 0
+    done | _dialog --title " Network Configuration " --no-mouse --gauge "Waiting 10 seconds for network link to come up..." 6 60 0
     if ! getent hosts www.google.com &>"${_LOG}"; then
         _dialog --title " ERROR " --no-mouse --infobox "Your network is not working correctly, please configure again!" 3 60
         sleep 3
