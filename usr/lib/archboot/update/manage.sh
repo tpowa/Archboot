@@ -130,6 +130,24 @@ _create_initramfs() {
     rm "${_W_DIR}"/.archboot
 }
 
+_progress_wait() {
+    _COUNT=${1}
+    while [[ -e "${_W_DIR}/.archboot" ]]; do
+        if [[ "${_COUNT}" -lt "${2}" ]]; then
+            _progress "${_COUNT}" "${3}"
+        fi
+        if [[ "${_COUNT}" -gt "${2}" ]]; then
+            _progress "${2}"  "${3}"
+        fi
+        # abort after 15 minutes
+        if [[ "${_COUNT}" -gt 150 ]]; then
+            exit 1
+        fi
+        _COUNT="$((_COUNT+1))"
+        sleep 5
+    done
+}
+
 _download_latest() {
     # Download latest setup and quickinst script from git repository
     echo -e "\e[1mStart:\e[m Downloading latest archboot from GIT master tree..."
@@ -188,21 +206,7 @@ _new_environment() {
     [[ -d "${_W_DIR}" ]] || mkdir -p "${_W_DIR}"
     touch "${_W_DIR}"/.archboot
     _create_container &
-    _COUNT=2
-    while [[ -e "${_W_DIR}/.archboot" ]]; do
-        if [[ "${_COUNT}" -lt 49 ]]; then
-            _progress "${_COUNT}" "Generating container in ${_W_DIR}..."
-        fi
-        if [[ "${_COUNT}" -gt 49 ]]; then
-            _progress "49"  "Generating container in ${_W_DIR}..."
-        fi
-        # abort after 15 minutes
-        if [[ "${_COUNT}" -gt 150 ]]; then
-            exit 1
-        fi
-        _COUNT="$((_COUNT+1))"
-        sleep 5
-    done
+    _progress_wait "2" "49" "Generating container in ${_W_DIR}..."
     _clean_kernel_cache
     _ram_check
     mkdir ${_RAM}
@@ -214,21 +218,7 @@ _new_environment() {
     # write initramfs to "${_W_DIR}"/tmp
     touch "${_W_DIR}"/.archboot
     _collect_files &
-    _COUNT=52
-    while [[ -e "${_W_DIR}/.archboot" ]]; do
-        if [[ "${_COUNT}" -lt 69 ]]; then
-            _progress "${_COUNT}"  "Collecting rootfs files in ${_W_DIR}..."
-        fi
-        if [[ "${_COUNT}" -gt 69 ]]; then
-            _progress "69"  "Collecting rootfs files in ${_W_DIR}..."
-        fi
-        # abort after 15 minutes
-        if [[ "${_COUNT}" -gt 150 ]]; then
-            exit 1
-        fi
-        _COUNT="$((_COUNT+1))"
-        sleep 5
-    done
+    _progress_wait "52" "69" "Collecting rootfs files in ${_W_DIR}..."
     _progress "70" "Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
@@ -290,21 +280,7 @@ _new_environment() {
     _progress "80" "Creating initramfs ${_RAM}/${_INITRD}..."
     touch "${_W_DIR}"/.archboot
     _create_initramfs &
-    _COUNT=81
-    while [[ -e "${_W_DIR}/.archboot" ]]; do
-        if [[ "${_COUNT}" -lt 94 ]]; then
-            _progress "${_COUNT}"  "Creating initramfs ${_RAM}/${_INITRD}..."
-        fi
-        if [[ "${_COUNT}" -gt 94 ]]; then
-            _progress "94"  "Creating initramfs ${_RAM}/${_INITRD}..."
-        fi
-        # abort after 15 minutes
-        if [[ "${_COUNT}" -gt 150 ]]; then
-            exit 1
-        fi
-        _COUNT="$((_COUNT+1))"
-        sleep 5
-    done
+    _progress_wait "81" "94" "Creating initramfs ${_RAM}/${_INITRD}..."
     _progress "95" "Cleanup ${_W_DIR}..."
     cd /
     _kill_w_dir
