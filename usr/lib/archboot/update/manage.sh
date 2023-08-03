@@ -23,8 +23,6 @@ _kill_w_dir() {
 }
 
 _create_container() {
-    [[ -d "${_W_DIR}" ]] || mkdir -p "${_W_DIR}"
-    touch "${_W_DIR}"/.archboot
     # create container without package cache
     if [[ -n "${_L_COMPLETE}" ]]; then
         "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp >"${_LOG}" 2>&1 || exit 1
@@ -110,14 +108,12 @@ _clean_archboot() {
 }
 
 _collect_files() {
-    touch "${_W_DIR}"/.archboot
     _KVER=$(_kver "${_RAM}/${_VMLINUZ}")
     {_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_KVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1
     rm "${_W_DIR}"/.archboot
 }
 
 _create_initramfs() {
-    touch "${_W_DIR}"/.archboot
     # https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt
     # compress image with zstd
     cd  "${_W_DIR}"/tmp || exit 1
@@ -189,9 +185,10 @@ _new_environment() {
     _progress "1" "Removing files from /..."
     _clean_archboot
     _clean_kernel_cache
-    _COUNT=2
+    [[ -d "${_W_DIR}" ]] || mkdir -p "${_W_DIR}"
+    touch "${_W_DIR}"/.archboot
     (_create_container &)
-    sleep 1
+    _COUNT=2
     while [[ -e "${_W_DIR}/.archboot" ]]; do
         if [[ "${_COUNT}" -lt 49 ]]; then
             _progress "${_COUNT}" "Generating container in ${_W_DIR}..."
@@ -215,8 +212,8 @@ _new_environment() {
     mv "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
     _progress "51" "Collecting rootfs files in ${_W_DIR}..."
     # write initramfs to "${_W_DIR}"/tmp
+    touch "${_W_DIR}"/.archboot
     (_collect_files &)
-    sleep 1
     _COUNT=52
     while [[ -e "${_W_DIR}/.archboot" ]]; do
         if [[ "${_COUNT}" -lt 69 ]]; then
@@ -291,8 +288,8 @@ _new_environment() {
         cp /.pacsetup "${_C_DIR}"/
     fi
     _progress "80" "Creating initramfs ${_RAM}/${_INITRD}..."
+    touch "${_W_DIR}"/.archboot
     (_create_initramfs &)
-    sleep 1
     _COUNT=81
     while [[ -e "${_W_DIR}/.archboot" ]]; do
         if [[ "${_COUNT}" -lt 94 ]]; then
