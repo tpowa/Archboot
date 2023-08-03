@@ -79,7 +79,7 @@ _run() {
 }
 
 _localize() {
-    _run | _dialog --no-mouse --gauge "Setting locale to ${_LOCALE}.UTF-8..." 6 50 0
+    _run | _dialog --title " Localization " --no-mouse --gauge "Setting locale to ${_LOCALE}.UTF-8..." 6 50 0
 }
 
 _check
