@@ -35,7 +35,9 @@ _prepare_graphic() {
     pacman -Syu ${_IGNORE} --noconfirm &>"${_NO_LOG}" || exit 1
     [[ ! -e "/.full_system" ]] && _cleanup_install
     # check for qxl module
-    grep -q qxl /proc/modules && grep -q xorg "${_GRAPHIC}" && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
+    if grep -q qxl /proc/modules; then
+        echo ${_GRAPHIC} | grep -q xorg && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
+    fi
     _progress "4" "Running pacman to install packages: ${_GRAPHIC}..."
     for i in ${_GRAPHIC}; do
         #shellcheck disable=SC2086
@@ -81,27 +83,6 @@ _prepare_graphic() {
     # fixing dbus requirements
     systemctl reload dbus
     systemctl reload dbus-org.freedesktop.login1.service
-}
-
-_install_graphic () {
-    [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
-    [[ -n "${_L_XFCE}" ]] && _install_xfce
-    [[ -n "${_L_GNOME}" ]] && _install_gnome
-    [[ -n "${_L_GNOME_WAYLAND}" ]] && _install_gnome_wayland
-    [[ -n "${_L_PLASMA}" ]] && _install_plasma
-    [[ -n "${_L_PLASMA_WAYLAND}" ]] && _install_plasma_wayland
-    [[ -n "${_L_SWAY}" ]] && _install_sway
-    # only start vnc on xorg environment
-    _progress "93" "Setting up VNC and browser..."
-    [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]] && _autostart_vnc
-    command -v firefox &>"${_NO_LOG}"  && _firefox_flags
-    command -v chromium &>"${_NO_LOG}" && _chromium_flags
-    [[ -n "${_L_XFCE}" ]] && _start_xfce
-    [[ -n "${_L_GNOME}" ]] && _start_gnome
-    [[ -n "${_L_GNOME_WAYLAND}" ]] && _start_gnome_wayland
-    [[ -n "${_L_PLASMA}" ]] && _start_plasma
-    [[ -n "${_L_PLASMA_WAYLAND}" ]] && _start_plasma_wayland
-    [[ -n "${_L_SWAY}" ]] && _start_sway
 }
 
 _hint_graphic_installed () {
