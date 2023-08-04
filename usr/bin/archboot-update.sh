@@ -74,7 +74,10 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
         touch /.update
         _TITLE="Archboot $(uname -m) | Basic Setup | Desktop Environment"
         [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
-        [[ -n "${_L_XFCE}" ]] && _install_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Initializing Xfce..." 6 75 0
+        if [[ -n "${_L_XFCE}" ]]; then
+            _ENVIRONMENT="Xfce"
+            _install_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Initializing Xfce..." 6 75 0
+        fi
         [[ -n "${_L_GNOME}" ]] && _install_gnome
         [[ -n "${_L_GNOME_WAYLAND}" ]] && _install_gnome_wayland
         [[ -n "${_L_PLASMA}" ]] && _install_plasma
