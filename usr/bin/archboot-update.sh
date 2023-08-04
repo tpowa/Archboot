@@ -10,9 +10,7 @@
 . /usr/lib/archboot/update/desktop.sh
 . /usr/lib/archboot/update/xfce.sh
 . /usr/lib/archboot/update/gnome.sh
-. /usr/lib/archboot/update/gnome-wayland.sh
 . /usr/lib/archboot/update/plasma.sh
-. /usr/lib/archboot/update/plasma-wayland.sh
 . /usr/lib/archboot/update/sway.sh
 
 [[ -z "${1}" ]] && usage
