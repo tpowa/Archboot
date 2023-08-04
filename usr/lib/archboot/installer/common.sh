@@ -27,6 +27,39 @@ fi
 _PACMAN="pacman --root ${_DESTDIR} --cachedir=${_DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
 _MIRRORLIST="/etc/pacman.d/mirrorlist"
 
+# $1: percentage
+# $2: message
+_progress() {
+cat <<EOF
+XXX
+${1}
+${2}
+XXX
+EOF
+}
+
+# $1: start percentage
+# $2: end percentage
+# $3: message
+# $4: sleep time
+_progress_wait() {
+    _COUNT=${1}
+    while [[ -e "${_W_DIR}/.archboot" || -e /.archboot ]]; do
+        if [[ "${_COUNT}" -lt "${2}" ]]; then
+            _progress "${_COUNT}" "${3}"
+        fi
+        if [[ "${_COUNT}" -gt "${2}" ]]; then
+            _progress "${2}"  "${3}"
+        fi
+        # abort after 15 minutes
+        if [[ "${_COUNT}" -gt 150 ]]; then
+            exit 1
+        fi
+        _COUNT="$((_COUNT+1))"
+        sleep "${4}"
+    done
+}
+
 _linux_firmware() {
     _PACKAGES="${_PACKAGES//\ linux-firmware\ / }"
     #shellcheck disable=SC2013
