@@ -100,7 +100,7 @@ _run_update_installer() {
             sleep 1
             _COUNT=$((_COUNT+1))
             # abort after 10 seconds
-            _progress "$((${_COUNT}*10))" "Waiting $((10-${_COUNT})) seconds to stop the process with CTRL-C..."
+            _progress "$((_COUNT*10))" "Waiting $((10-_COUNT)) seconds to stop the process with CTRL-C..."
             [[ "${_COUNT}" == 10 ]] && break
         done | _dialog --title " Stop Processing? " --no-mouse --gauge "Waiting 10 seconds to stop the process with CTRL-C..." 6 60 0
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 ]]; then

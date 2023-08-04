@@ -42,7 +42,8 @@ _config() {
     _PRESET="${_PRESET_DIR}/${_PRESET}"
     #shellcheck disable=SC1090
     source "${_PRESET}"
-    [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver ${ALL_kver})-${_ARCH}"
+    #shellcheck disable=SC2154
+    [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver "${ALL_kver}")-${_ARCH}"
 }
 
 ### EFI status of RISCV64:

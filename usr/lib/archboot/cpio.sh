@@ -144,7 +144,7 @@ add_firmware() {
     local -i r=1
     fwpath=/lib/firmware
     for fw; do
-        # shellcheck disable=SC2154
+        # shellcheck disable=SC2154,SC2153
         if ! compgen -G "${BUILDROOT}${fwpath}/${fw}?(.*)" &>/dev/null; then
             if read -r fwfile < <(compgen -G "${fwpath}/${fw}?(.*)"); then
                 map add_file "${fwfile[@]}"
@@ -303,7 +303,7 @@ add_binary() {
 initialize_buildroot() {
     # creates a temporary directory for the buildroot and initialize it with a
     # basic set of necessary directories and symlinks
-    local workdir='' kernver="$1" arch buildroot osreleasefile
+    local workdir='' kernver="$1" arch buildroot
     arch="$(uname -m)"
     if ! workdir="$(mktemp -d --tmpdir mkinitcpio.XXXXXX)"; then
         error 'Failed to create temporary working directory in %s' "${TMPDIR:-/tmp}"

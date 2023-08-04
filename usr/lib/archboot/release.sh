@@ -34,9 +34,8 @@ _create_iso() {
     # create container
     archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
     _create_archboot_db "${_W_DIR}${_CACHEDIR}"
-    _KERNEL_VERSION="$(${_NSPAWN} ${_W_DIR} /bin/bash -c ". /usr/lib/archboot/common.sh; _kver $(grep 'kver' ${_W_DIR}/etc/archboot/presets/${_ARCH} | cut -d '=' -f2)")"
+    _KERNEL_VERSION="$(${_NSPAWN} "${_W_DIR}" /bin/bash -c ". /usr/lib/archboot/common.sh; _kver $(grep 'kver' "${_W_DIR}/etc/archboot/presets/${_ARCH}" | cut -d '=' -f2)")"
     _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_KERNEL_VERSION}"
-    echo $_KERNEL_VERSION $_ISONAME
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
         # generate tarball in container, umount tmp container tmpfs, else weird things could happen
