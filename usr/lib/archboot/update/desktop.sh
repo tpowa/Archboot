@@ -112,9 +112,6 @@ _prepare_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
         _prepare_graphic "${_PACKAGES}"
         _configure_gnome >"${_LOG}" 2>&1
-    else
-        echo -e "\e[1mStep 1/3:\e[m Installing GNOME desktop already done..."
-        echo -e "\e[1mStep 2/3:\e[m Configuring GNOME desktop already done..."
     fi
 }
 
@@ -122,9 +119,6 @@ _prepare_plasma() {
     if ! [[ -e /usr/bin/startplasma-x11 ]]; then
         _prepare_graphic "${_PACKAGES}"
         _configure_plasma >"${_LOG}" 2>&1
-    else
-        echo -e "\e[1mStep 1/3:\e[m Installing KDE/Plasma desktop already done..."
-        echo -e "\e[1mStep 2/3:\e[m Configuring KDE/Plasma desktop already done..."
     fi
 }
 
@@ -132,9 +126,6 @@ _prepare_sway() {
     if ! [[ -e /usr/bin/sway ]]; then
         _prepare_graphic "${_PACKAGES}"
         _configure_sway >"${_LOG}" 2>&1
-    else
-        echo -e "\e[1mStep 1/3:\e[m Installing Sway desktop already done..."
-        echo -e "\e[1mStep 2/3:\e[m Configuring Sway desktop already done..."
     fi
 }
 
