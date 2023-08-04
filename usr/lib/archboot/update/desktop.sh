@@ -22,7 +22,7 @@ _prepare_graphic() {
         _progress "2" "Removing firmware files..."
         rm -rf /usr/lib/firmware
         # fix libs first, then install packages from defaults
-        _GRAPHIC="${_FIX_PACKAGES} ${1}"
+        _GRAPHIC="${1}"
     fi
     touch /.archboot
     (_IGNORE=""
@@ -40,6 +40,14 @@ _prepare_graphic() {
     if grep -q qxl /proc/modules; then
         echo "${_GRAPHIC}" | grep -q xorg && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
     fi
+    for i in ${_FIX_PACKAGES}; do
+        #shellcheck disable=SC2086
+        _progress "11" "Installing ${i} ..."
+        pacman -S ${i} --noconfirm &>"${_LOG}"
+        [[ ! -e "/.full_system" ]] && _cleanup_install
+        [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
+        rm -f /var/log/pacman.log
+    done
     touch /.archboot
     (for i in ${_GRAPHIC}; do
         #shellcheck disable=SC2086
