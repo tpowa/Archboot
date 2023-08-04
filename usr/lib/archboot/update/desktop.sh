@@ -24,9 +24,7 @@ _prepare_graphic() {
         # fix libs first, then install packages from defaults
         _GRAPHIC="${_FIX_PACKAGES} ${1}"
     fi
-    touch /.archboot
-     _progress_wait "3" "10" "Updating environment to latest packages..." "5"
-    _IGNORE=""
+    (_IGNORE=""
     if [[ -n "${_GRAPHIC_IGNORE}" ]]; then
         for i in ${_GRAPHIC_IGNORE}; do
             _IGNORE="${_IGNORE} --ignore ${i}"
@@ -35,14 +33,14 @@ _prepare_graphic() {
     #shellcheck disable=SC2086
     pacman -Syu ${_IGNORE} --noconfirm &>"${_LOG}"
     [[ ! -e "/.full_system" ]] && _cleanup_install
-    rm /.archboot
+    rm /.archboot) &
+    touch /.archboot
+    _progress_wait "3" "10" "Updating environment to latest packages..." "5"
     # check for qxl module
     if grep -q qxl /proc/modules; then
         echo "${_GRAPHIC}" | grep -q xorg && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
     fi
-    touch /.archboot
-    _progress_wait "11" "59" "Running pacman to install packages: ${_GRAPHIC}..." "0.5"
-    for i in ${_GRAPHIC}; do
+    (for i in ${_GRAPHIC}; do
         #shellcheck disable=SC2086
         pacman -S ${i} --noconfirm &>"${_LOG}"
         [[ ! -e "/.full_system" ]] && _cleanup_install
@@ -67,7 +65,10 @@ _prepare_graphic() {
         elif grep -q sv_SE /etc/locale.conf; then
             pacman -S firefox-i18n-sv-se --noconfirm &>"${_LOG}"
         fi
-    fi
+    fi) &
+    touch /.archboot
+    _progress_wait "11" "59" "Running pacman to install packages: ${_GRAPHIC}..." "0.5"
+
     rm /.archboot
     if [[ ! -e "/.full_system" ]]; then
         _progress "70" "Removing not used icons..."
