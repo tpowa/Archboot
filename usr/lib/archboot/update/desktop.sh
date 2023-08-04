@@ -24,7 +24,8 @@ _prepare_graphic() {
         # fix libs first, then install packages from defaults
         _GRAPHIC="${_FIX_PACKAGES} ${1}"
     fi
-     _progress 3 "Updating environment to latest packages (ignoring packages: ${_GRAPHIC_IGNORE})..."
+    touch /.archboot
+     _progress_wait "3" "10" "Updating environment to latest packages..." "5"
     _IGNORE=""
     if [[ -n "${_GRAPHIC_IGNORE}" ]]; then
         for i in ${_GRAPHIC_IGNORE}; do
@@ -34,12 +35,13 @@ _prepare_graphic() {
     #shellcheck disable=SC2086
     pacman -Syu ${_IGNORE} --noconfirm &>"${_NO_LOG}" || exit 1
     [[ ! -e "/.full_system" ]] && _cleanup_install
+    rm /.archboot
     # check for qxl module
     if grep -q qxl /proc/modules; then
         echo ${_GRAPHIC} | grep -q xorg && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
     fi
     touch /.archboot
-    _progress_wait "4" "50" "Running pacman to install packages: ${_GRAPHIC}..." "0.5"
+    _progress_wait "11" "59" "Running pacman to install packages: ${_GRAPHIC}..." "0.5"
     for i in ${_GRAPHIC}; do
         #shellcheck disable=SC2086
         pacman -S ${i} --noconfirm &>"${_NO_LOG}" || exit 1
@@ -49,7 +51,7 @@ _prepare_graphic() {
     done
     # install firefox langpacks
     if [[ "${_STANDARD_BROWSER}" == "firefox" ]]; then
-        _progress "60" "Installing firefox langpack..."
+        _progress_wait "60" "69" "Installing firefox langpack..." "0.5"
         _LANG="be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr uk"
         for i in ${_LANG}; do
             if grep -q "${i}" /etc/locale.conf; then
