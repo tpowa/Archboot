@@ -33,7 +33,7 @@ _prepare_graphic() {
         done
     fi
     #shellcheck disable=SC2086
-    pacman -Syu ${_IGNORE} --noconfirm &>"${_NO_LOG}" || exit 1
+    pacman -Syu ${_IGNORE} --noconfirm &>"${_LOG}"
     [[ ! -e "/.full_system" ]] && _cleanup_install
     rm /.archboot
     # check for qxl module
