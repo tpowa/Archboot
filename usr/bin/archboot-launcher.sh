@@ -20,9 +20,9 @@ _check_manage() {
 }
 
 _desktop () {
-    _dialog --cancel-label "Back" --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>${_ANSWER} || return 1
+    _dialog --cancel-label "Back" --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>"${_ANSWER}" || return 1
     [[ -e /.launcher-running ]] && rm /.launcher-running
-    _EXIT="$(cat ${_ANSWER})"
+    _EXIT=$(cat "${_ANSWER}")
     source /etc/locale.conf
     if [[ "${_EXIT}" == "GNOME" ]]; then
         if _dialog --defaultno --yesno "Gnome Desktop:\nDo you want to use the Wayland Backend?" 6 45; then
@@ -51,10 +51,10 @@ _desktop () {
 }
 
 _manage() {
-    _dialog --cancel-label "Back" --title " Manage Archboot Menu " --menu "" 9 50 5 "${_MANAGE[@]}" 2>${_ANSWER} || return 1
+    _dialog --cancel-label "Back" --title " Manage Archboot Menu " --menu "" 9 50 5 "${_MANAGE[@]}" 2>"${_ANSWER}" || return 1
     clear
     [[ -e /.launcher-running ]] && rm /.launcher-running
-    _EXIT="$(cat ${_ANSWER})"
+    _EXIT=$(cat "${_ANSWER}")
     if [[ "${_EXIT}" == "FULL" ]]; then
         update -full-system
     elif [[ "${_EXIT}" == "UPDATE" ]]; then
@@ -71,7 +71,7 @@ _exit() {
     "1" "Exit Program" \
     "2" "Reboot System" \
     "3" "Poweroff System" 2>${_ANSWER} || return 1
-        _EXIT="$(cat ${_ANSWER})"
+        _EXIT=$(cat "${_ANSWER}")
     if [[ "${_EXIT}" == "1" ]]; then
         [[ -e /.launcher-running ]] && rm /.launcher-running
         _show_login
@@ -95,15 +95,15 @@ _exit() {
 
 _launcher() {
     _MENU=()
-    if [[ -n "${_DESKTOP[@]}" ]]; then
+    if [[ -n "${_DESKTOP[*]}" ]]; then
         _MENU+=( "2" "Launch Desktop Environment" )
     fi
-    if [[ -n "${_MANAGE[@]}" ]]; then
+    if [[ -n "${_MANAGE[*]}" ]]; then
         _MENU+=( "3" "Manage Archboot Environment" )
     fi
     _dialog  --default-item "${_DEFAULTITEM}" --cancel-label "Exit" --title " Main Menu " --menu "" 9 40 5 \
-    "1" "Launch Archboot Setup" "${_MENU[@]}" 2>${_ANSWER}
-    case $(cat ${_ANSWER}) in
+    "1" "Launch Archboot Setup" "${_MENU[@]}" 2>"${_ANSWER}"
+    case $(cat "${_ANSWER}") in
         "1")
             [[ -e /.launcher-running ]] && rm /.launcher-running
             setup
