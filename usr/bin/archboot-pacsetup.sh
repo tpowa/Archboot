@@ -124,7 +124,7 @@ _update_environment() {
         sleep 2
     else
         _progress "100" "New kernel online available. Asking for update..."
-        echo ${_ONLINE_KERNEL} > /.new_kernel
+        echo "${_ONLINE_KERNEL}" > /.new_kernel
         sleep 2
     fi
 }

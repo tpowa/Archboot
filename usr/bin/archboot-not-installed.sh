@@ -9,7 +9,7 @@ rm -r /usr/share/licenses
 pacman -Sy
 pacman -Q | cut -d ' ' -f1 >packages.txt
 for i in $(cat packages.txt); do
-    rm -r /var/lib/pacman/local/${i}*
+    rm -r /var/lib/pacman/local/"${i}"*
 	#shellcheck disable=SC2086
     if pacman -S ${i} --noconfirm &>>log.txt; then
         echo "${i}" >> uninstalled.orig.txt
