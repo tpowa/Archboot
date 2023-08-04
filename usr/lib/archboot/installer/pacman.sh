@@ -8,9 +8,9 @@ _run_pacman(){
     [[ ! -d "${_DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${_DESTDIR}/var/cache/pacman/pkg"
     [[ ! -d "${_DESTDIR}/var/lib/pacman" ]] && mkdir -p "${_DESTDIR}/var/lib/pacman"
     echo "Installing Packages..." >/tmp/pacman.log
+    touch /.archboot
     #shellcheck disable=SC2086,SC2069
-    (touch /.archboot
-    ${_PACMAN} -Sy ${_PACKAGES} |& tee -a "${_LOG}" /tmp/pacman.log &>"${_NO_LOG}"
+    (${_PACMAN} -Sy ${_PACKAGES} |& tee -a "${_LOG}" /tmp/pacman.log &>"${_NO_LOG}"
     echo $? > /tmp/.pacman-retcode
     if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
         echo -e "\nPackage Installation FAILED." >>/tmp/pacman.log
