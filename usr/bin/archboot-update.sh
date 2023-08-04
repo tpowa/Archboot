@@ -71,6 +71,7 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
     if [[ -e "/.graphic_installed" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]]; then
         _hint_graphic_installed
     else
+        touch /.update
         _TITLE="Archboot $(uname -m) | Basic Setup | Desktop Environment"
         [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
         [[ -n "${_L_XFCE}" ]] && _install_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Initializing Xfce..." 6 75 0
@@ -80,7 +81,7 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
         [[ -n "${_L_PLASMA_WAYLAND}" ]] && _install_plasma_wayland
         [[ -n "${_L_SWAY}" ]] && _install_sway
         # only start vnc on xorg environment
-        _progress "93" "Setting up VNC and browser..."
+        echo "Setting up VNC and browser..." >"${_LOG}"
         [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]] && _autostart_vnc
         command -v firefox &>"${_NO_LOG}"  && _firefox_flags
         command -v chromium &>"${_NO_LOG}" && _chromium_flags
@@ -89,12 +90,12 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
             clear
             echo -e "To relaunch \e[1mXFCE\e[m desktop use: \e[92mstartxfce4\e[m"
         fi
+        rm /.update
         [[ -n "${_L_GNOME}" ]] && _start_gnome
         [[ -n "${_L_GNOME_WAYLAND}" ]] && _start_gnome_wayland
         [[ -n "${_L_PLASMA}" ]] && _start_plasma
         [[ -n "${_L_PLASMA_WAYLAND}" ]] && _start_plasma_wayland
         [[ -n "${_L_SWAY}" ]] && _start_sway
-        touch /.update
     fi
 fi
 # Switch to full Arch Linux system
