@@ -130,24 +130,6 @@ _create_initramfs() {
     rm "${_W_DIR}"/.archboot
 }
 
-_progress_wait() {
-    _COUNT=${1}
-    while [[ -e "${_W_DIR}/.archboot" ]]; do
-        if [[ "${_COUNT}" -lt "${2}" ]]; then
-            _progress "${_COUNT}" "${3}"
-        fi
-        if [[ "${_COUNT}" -gt "${2}" ]]; then
-            _progress "${2}"  "${3}"
-        fi
-        # abort after 15 minutes
-        if [[ "${_COUNT}" -gt 150 ]]; then
-            exit 1
-        fi
-        _COUNT="$((_COUNT+1))"
-        sleep "${4}"
-    done
-}
-
 _download_latest() {
     # Download latest setup and quickinst script from git repository
     [[ -d "${_INST}" ]] || mkdir "${_INST}"
