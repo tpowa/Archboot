@@ -10,6 +10,7 @@ _run_pacman(){
     _dialog --title " Pacman " --no-mouse --infobox "Installing package(s) to ${_DESTDIR}:\n${_PACKAGES}...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress..." 8 70
     echo "Installing Packages..." >/tmp/pacman.log
     #shellcheck disable=SC2086,SC2069
+    (
     (touch /.archboot
     ${_PACMAN} -Sy ${_PACKAGES} |& tee -a "${_LOG}" /tmp/pacman.log &>"${_NO_LOG}"
     echo $? > /tmp/.pacman-retcode
@@ -18,10 +19,10 @@ _run_pacman(){
     else
         echo -e "\nPackage Installation Complete." >>/tmp/pacman.log
     fi
-    rm /.archboot) | _dialog --title " Logging to ${_LOG} " --gauge "Installing package:\n${_PACKAGES}..." 8 75 0 &
+    rm /.archboot) &
     while ! [[ -e /tmp/.pacman-retcode ]]; do
         _progress_wait "0" "100" "Installing package: ${_PACKAGES}..." "2"
-    done
+    done) | _dialog --title " Logging to ${_LOG} " --gauge "Installing package:\n${_PACKAGES}..." 8 75 0
     # pacman finished, display scrollable output
     local _RESULT=''
     if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
