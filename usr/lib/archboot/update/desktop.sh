@@ -38,7 +38,8 @@ _prepare_graphic() {
     if grep -q qxl /proc/modules; then
         echo ${_GRAPHIC} | grep -q xorg && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
     fi
-    _progress "4" "Running pacman to install packages: ${_GRAPHIC}..."
+    touch /.archboot
+    _progress_wait "4" "50" "Running pacman to install packages: ${_GRAPHIC}..." "0.5"
     for i in ${_GRAPHIC}; do
         #shellcheck disable=SC2086
         pacman -S ${i} --noconfirm &>"${_NO_LOG}" || exit 1
@@ -48,7 +49,7 @@ _prepare_graphic() {
     done
     # install firefox langpacks
     if [[ "${_STANDARD_BROWSER}" == "firefox" ]]; then
-        _progress "10" "Installing firefox langpack..."
+        _progress "60" "Installing firefox langpack..."
         _LANG="be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr uk"
         for i in ${_LANG}; do
             if grep -q "${i}" /etc/locale.conf; then
@@ -66,9 +67,9 @@ _prepare_graphic() {
         fi
     fi
     if [[ ! -e "/.full_system" ]]; then
-        _progress "20" "Removing not used icons..."
+        _progress "70" "Removing not used icons..."
         rm -rf /usr/share/icons/breeze-dark
-        _progress "30" "Cleanup locale and i18n..."
+        _progress "80" "Cleanup locale and i18n..."
         find /usr/share/locale/ -mindepth 2 ! -path '*/be/*' ! -path '*/bg/*' ! -path '*/cs/*' \
         ! -path '*/da/*' ! -path '*/de/*' ! -path '*/en/*' ! -path '*/el/*' ! -path '*/es/*' \
         ! -path '*/fi/*' ! -path '*/fr/*' ! -path '*/hu/*' ! -path '*/it/*' ! -path '*/lt/*' \
@@ -77,7 +78,7 @@ _prepare_graphic() {
         ! -path '*/sv/*' ! -path '*/uk/*' -delete &>"${_NO_LOG}"
         find /usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>"${_NO_LOG}"
     fi
-    _progress "40" "Restart dbus..."
+    _progress "90" "Restart dbus..."
     systemd-sysusers >"${_LOG}" 2>&1
     systemd-tmpfiles --create >"${_LOG}" 2>&1
     # fixing dbus requirements
