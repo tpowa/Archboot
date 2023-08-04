@@ -176,6 +176,7 @@ _auto_set_locale() {
 _auto_bash(){
     if [[ ! -f ${_DESTDIR}/etc/profile.d/custom-bash-prompt.sh ]]; then
         _progress "99" "Setup bash with custom options on installed system..."
+         cp "${_DESTDIR}"/etc/skel/.bash* "${_DESTDIR}"/root/
         ! grep -qw 'custom-bash-options.sh' "${_DESTDIR}/etc/skel/.bashrc" &&\
             echo ". /etc/profile.d/custom-bash-options.sh" >> "${_DESTDIR}/etc/skel/.bashrc"
         ! grep -qw 'custom-bash-options.sh' "${_DESTDIR}/root/.bashrc" &&\
