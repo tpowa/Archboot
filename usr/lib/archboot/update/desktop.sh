@@ -87,7 +87,7 @@ _prepare_graphic() {
     done
     touch /.archboot
     _install_graphic &
-    _progress_wait "${_COUNT}" "97" "Installing ${_ENVIRONMENT}..." "1"
+    _progress_wait "${_COUNT}" "97" "Installing ${_ENVIRONMENT}..." "2"
     if [[ ! -e "/.full_system" ]]; then
         echo "Removing not used icons..."  >"${_LOG}"
         rm -rf /usr/share/icons/breeze-dark
