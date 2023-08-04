@@ -121,7 +121,7 @@ _create_initramfs() {
             sort -z |
             LANG=C bsdtar --null -cnf - -T - |
             LANG=C bsdtar --null -cf - --format=newc @- |
-            zstd --rm -T0> ${_RAM}/${_INITRD} &
+            zstd --rm -T0> "${_RAM}/${_INITRD}" &
     sleep 2
     while pgrep -x zstd &>"${_NO_LOG}"; do
         _clean_kernel_cache
@@ -138,17 +138,17 @@ _download_latest() {
     # helper binaries
     _progress "25" "Downloading latest scripts..."
     # main binaries
-    BINS="quickinst setup clock launcher localize network pacsetup update copy-mountpoint rsync-backup restore-usbstick"
-    for i in ${BINS}; do
+    _SCRIPTS="quickinst setup clock launcher localize network pacsetup update copy-mountpoint rsync-backup restore-usbstick"
+    for i in ${_SCRIPTS}; do
         [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
     done
-    BINS="binary-check.sh not-installed.sh secureboot-keys.sh mkkeys.sh hwsim.sh cpio,sh"
-    for i in ${BINS}; do
+    _SCRIPTS="binary-check.sh not-installed.sh secureboot-keys.sh mkkeys.sh hwsim.sh cpio,sh"
+    for i in ${_SCRIPTS}; do
         [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/${i}"
         [[ -e "${_BIN}/archboot-${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/archboot-${i}"
     done
-    HELP="guid-partition.txt guid.txt luks.txt lvm2.txt mbr-partition.txt md.txt"
-    for i in ${HELP}; do
+    _TXT="guid-partition.txt guid.txt luks.txt lvm2.txt mbr-partition.txt md.txt"
+    for i in ${_TXT}; do
         [[ -e "${_HELP}/${i}" ]] && wget -q "${_SOURCE}${_HELP}/${i}?inline=false" -O "${_HELP}/${i}"
     done
     # main libs
@@ -190,11 +190,11 @@ _new_environment() {
     _progress_wait "2" "49" "Generating container in ${_W_DIR}..." "3"
     _clean_kernel_cache
     _ram_check
-    mkdir ${_RAM}
-    mount -t ramfs none ${_RAM}
+    mkdir "${_RAM}"
+    mount -t ramfs none "${_RAM}"
     _progress "50" "Moving kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
     # use ramfs to get immediate free space on file deletion
-    mv "${_W_DIR}/boot/${_VMLINUZ}" ${_RAM}/ || exit 1
+    mv "${_W_DIR}/boot/${_VMLINUZ}" "${_RAM}/"
     # write initramfs to "${_W_DIR}"/tmp
     touch "${_W_DIR}"/.archboot
     _collect_files &
@@ -206,7 +206,7 @@ _new_environment() {
     # local switch, don't kexec on local image
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         _progress "86" "Moving rootfs to ${_RAM}..."
-        mv ${_W_DIR}/tmp/* /${_RAM}/
+        mv "${_W_DIR}"/tmp/* "/${_RAM}/"
         # cleanup mkinitcpio directories and files
         _progress "95" "Cleanup ${_RAM}..."
         rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot,mkinitcpio.*} &>"${_NO_LOG}"
@@ -267,7 +267,7 @@ _new_environment() {
     _progress "97" "Waiting for kernel to free RAM..."
     # wait until enough memory is available!
     while true; do
-        [[ "$(($(stat -c %s ${_RAM}/${_INITRD})*200/100000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
+        [[ "$(($(stat -c %s "${_RAM}/${_INITRD}")*200/100000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
         sleep 1
     done
     _MEM_MIN=""
@@ -276,12 +276,12 @@ _new_environment() {
             _MEM_MIN="--mem-min=0xA0000000"
     fi
     _progress "100" "Restarting with KEXEC_LOAD..."
-    kexec -c -f ${_MEM_MIN} ${_RAM}/"${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
+    kexec -c -f ${_MEM_MIN} "${_RAM}/${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     sleep 0.1
     _clean_kernel_cache
-    rm ${_RAM}/{"${_VMLINUZ}","${_INITRD}"}
-    umount ${_RAM} &>"${_NO_LOG}"
-    rm -r ${_RAM} &>"${_NO_LOG}"
+    rm "${_RAM}"/{"${_VMLINUZ}","${_INITRD}"}
+    umount "${_RAM}" &>"${_NO_LOG}"
+    rm -r "${_RAM}" &>"${_NO_LOG}"
     #shellcheck disable=SC2115
     rm -rf /usr/* &>"${_NO_LOG}"
     while true; do
@@ -301,6 +301,7 @@ _full_system() {
         if [[ "$((_COUNT*100/_PACKAGE_COUNT-4))" -gt 1 ]]; then
             _progress "$((_COUNT*100/_PACKAGE_COUNT-4))" "Reinstalling all packages, installing ${i} now..."
         fi
+        #shellcheck disable=SC2086
         pacman -S --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
         # avoid running mkinitcpio
         rm -f /usr/share/libalpm/{scripts/mkinitcpio,hooks/*mkinitcpio*}
