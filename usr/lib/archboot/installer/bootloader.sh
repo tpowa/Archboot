@@ -949,7 +949,7 @@ _install_bootloader_uefi() {
     # aarch64 is broken for UKI and systemd-boot
     # https://github.com/systemd/systemd/issues/27837
     # https://sourceforge.net/p/gnu-efi/bugs/37/
-    if [[ -n "${_UEFI_SECURE_BOOT}" || "${_RUNNING_ARCH}" == "aarch64" ]]; then
+    if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         _do_grub_uefi
     else
         _dialog --title " ${_UEFI_ARCH} UEFI Bootloader " --menu "" 8 40 2 \
