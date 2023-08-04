@@ -35,7 +35,6 @@ _prepare_graphic() {
     pacman -Syu ${_IGNORE} --noconfirm &>"${_LOG}"
     [[ ! -e "/.full_system" ]] && _cleanup_install
     rm /.archboot) &
-    touch /.archboot
     _progress_wait "3" "10" "Updating environment to latest packages..." "5"
     # check for qxl module
     if grep -q qxl /proc/modules; then
