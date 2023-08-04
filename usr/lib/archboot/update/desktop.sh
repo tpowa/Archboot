@@ -68,6 +68,7 @@ _prepare_graphic() {
             pacman -S firefox-i18n-sv-se --noconfirm &>"${_NO_LOG}" || exit 1
         fi
     fi
+    rm /.archboot
     if [[ ! -e "/.full_system" ]]; then
         _progress "70" "Removing not used icons..."
         rm -rf /usr/share/icons/breeze-dark
