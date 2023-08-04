@@ -68,62 +68,58 @@ if [[ -n "${_CUSTOM_X}" || -n "${_CUSTOM_WAYLAND}" ]]; then
 fi
 # Gnome, KDE/PLASMA or XFCE launch
 if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" || -n "${_L_GNOME_WAYLAND}" || -n "${_L_PLASMA_WAYLAND}" ]]; then
-    if [[ -e "/.graphic_installed" && "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]]; then
-        _hint_graphic_installed
-    else
-        touch /.update
-        _TITLE="Archboot $(uname -m) | Basic Setup | Desktop Environment"
-        [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
-        if [[ -n "${_L_XFCE}" ]]; then
-            _ENVIRONMENT="XFCE"
-            _install_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
-        elif [[ -n "${_L_GNOME}" ]]; then
-            _ENVIRONMENT="GNOME"
-            _install_gnome | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
-        elif [[ -n "${_L_GNOME_WAYLAND}" ]]; then
-            _ENVIRONMENT="GNOME Wayland"
-            _install_gnome_wayland | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
-        elif [[ -n "${_L_PLASMA}" ]];then
-            _ENVIRONMENT="Plasma/KDE"
-            _install_plasma | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
-        elif [[ -n "${_L_PLASMA_WAYLAND}" ]]; then
-            _ENVIRONMENT="Plasma/KDE Wayland"
-            _install_plasma_wayland | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
-        elif [[ -n "${_L_SWAY}" ]]; then
-            _ENVIRONMENT="Sway"
-            _install_sway | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
-        fi
-        # only start vnc on xorg environment
-        echo "Setting up VNC and browser..." >"${_LOG}"
-        [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]] && _autostart_vnc
-        command -v firefox &>"${_NO_LOG}"  && _firefox_flags
-        command -v chromium &>"${_NO_LOG}" && _chromium_flags
-        if [[ -n "${_L_XFCE}" ]]; then
-            _start_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
-            clear
-            echo -e "To relaunch \e[1mXFCE\e[m desktop use: \e[92mstartxfce4\e[m"
-        elif [[ -n "${_L_GNOME}" ]]; then
-            _start_gnome | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
-            clear
-            echo -e "To relaunch \e[1mGNOME\e[m desktop use: \e[92mstartx\e[m"
-        elif [[ -n "${_L_GNOME_WAYLAND}" ]]; then
-            _start_gnome_wayland | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
-            clear
-            echo -e "To relaunch \e[1mGNOME Wayland\e[m use: \e[92mgnome-wayland\e[m"
-        elif [[ -n "${_L_PLASMA}" ]]; then
-            _start_plasma | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
-            clear
-            echo -e "To relaunch \e[1mKDE/Plasma\e[m desktop use: \e[92mstartx\e[m"
-        elif [[ -n "${_L_PLASMA_WAYLAND}" ]]; then
-            _start_plasma_wayland | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
-            clear
-            echo -e "To relaunch \e[1mKDE/Plasma Wayland\e[m use: \e[92mplasma-wayland\e[m"
-        elif [[ -n "${_L_SWAY}" ]]; then
-            _start_sway | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
-            clear
-            echo -e "To relaunch \e[1mSway\e[m use: \e[92msway-wayland\e[m"
-        fi
-        rm /.update
+    touch /.update
+    _TITLE="Archboot $(uname -m) | Basic Setup | Desktop Environment"
+    [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
+    if [[ -n "${_L_XFCE}" ]]; then
+        _ENVIRONMENT="XFCE"
+        _install_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
+    elif [[ -n "${_L_GNOME}" ]]; then
+        _ENVIRONMENT="GNOME"
+        _install_gnome | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
+    elif [[ -n "${_L_GNOME_WAYLAND}" ]]; then
+        _ENVIRONMENT="GNOME Wayland"
+        _install_gnome_wayland | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
+    elif [[ -n "${_L_PLASMA}" ]];then
+        _ENVIRONMENT="Plasma/KDE"
+        _install_plasma | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
+    elif [[ -n "${_L_PLASMA_WAYLAND}" ]]; then
+        _ENVIRONMENT="Plasma/KDE Wayland"
+        _install_plasma_wayland | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
+    elif [[ -n "${_L_SWAY}" ]]; then
+        _ENVIRONMENT="Sway"
+        _install_sway | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
+    fi
+    rm /.update
+    # only start vnc on xorg environment
+    echo "Setting up VNC and browser..." >"${_LOG}"
+    [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]] && _autostart_vnc
+    command -v firefox &>"${_NO_LOG}"  && _firefox_flags
+    command -v chromium &>"${_NO_LOG}" && _chromium_flags
+    if [[ -n "${_L_XFCE}" ]]; then
+        _start_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        clear
+        echo -e "To relaunch \e[1mXFCE\e[m desktop use: \e[92mstartxfce4\e[m"
+    elif [[ -n "${_L_GNOME}" ]]; then
+        _start_gnome | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        clear
+        echo -e "To relaunch \e[1mGNOME\e[m desktop use: \e[92mstartx\e[m"
+    elif [[ -n "${_L_GNOME_WAYLAND}" ]]; then
+        _start_gnome_wayland | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        clear
+        echo -e "To relaunch \e[1mGNOME Wayland\e[m use: \e[92mgnome-wayland\e[m"
+    elif [[ -n "${_L_PLASMA}" ]]; then
+        _start_plasma | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        clear
+        echo -e "To relaunch \e[1mKDE/Plasma\e[m desktop use: \e[92mstartx\e[m"
+    elif [[ -n "${_L_PLASMA_WAYLAND}" ]]; then
+        _start_plasma_wayland | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        clear
+        echo -e "To relaunch \e[1mKDE/Plasma Wayland\e[m use: \e[92mplasma-wayland\e[m"
+    elif [[ -n "${_L_SWAY}" ]]; then
+        _start_sway | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        clear
+        echo -e "To relaunch \e[1mSway\e[m use: \e[92msway-wayland\e[m"
     fi
 fi
 # Switch to full Arch Linux system
