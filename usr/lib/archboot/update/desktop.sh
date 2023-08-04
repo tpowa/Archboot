@@ -24,6 +24,7 @@ _prepare_graphic() {
         # fix libs first, then install packages from defaults
         _GRAPHIC="${_FIX_PACKAGES} ${1}"
     fi
+    touch /.archboot
     (_IGNORE=""
     if [[ -n "${_GRAPHIC_IGNORE}" ]]; then
         for i in ${_GRAPHIC_IGNORE}; do
@@ -68,7 +69,6 @@ _prepare_graphic() {
         fi
     fi
     rm /.archboot ) &
-    touch /.archboot
     _progress_wait "11" "59" "Running pacman..." "0.5"
     if [[ ! -e "/.full_system" ]]; then
         _progress "70" "Removing not used icons..."
