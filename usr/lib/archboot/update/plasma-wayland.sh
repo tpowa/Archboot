@@ -7,8 +7,8 @@ _install_plasma_wayland() {
 }
 
 _start_plasma_wayland() {
-    echo -e "Launching \e[1mKDE/Plasma Wayland\e[m now, logging is done on \e[1m/dev/tty7\e[m..."
-	echo -e "To relaunch \e[1mKDE/Plasma Wayland\e[m use: \e[92mplasma-wayland\e[m"
+    _progress "100" "Launching Plasma/KDE Wayland now, logging is done on /dev/tty8..."
+    sleep 2
     echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session startplasma-wayland >/dev/tty7 2>&1" > /usr/bin/plasma-wayland
     chmod 755 /usr/bin/plasma-wayland
     plasma-wayland

@@ -7,12 +7,12 @@ _install_gnome() {
 }
 
 _start_gnome() {
-    echo -e "Launching \e[1mGNOME\e[m now, logging is done on \e[1m/dev/tty8\e[m..."
+    _progress "100" "Launching GNOME now, logging is done on /dev/tty8..."
+    sleep 2
     echo "export XDG_SESSION_TYPE=x11" > /root/.xinitrc
     #shellcheck disable=SC2129
     echo "export GDK_BACKEND=x11" >> /root/.xinitrc
     echo "exec dbus-launch gnome-session" >> /root/.xinitrc
     startx >/dev/tty8 2>&1
-    echo -e "To relaunch \e[1mGNOME\e[m desktop use: \e[92mstartx\e[m"
 }
 # vim: set ft=sh ts=4 sw=4 et:

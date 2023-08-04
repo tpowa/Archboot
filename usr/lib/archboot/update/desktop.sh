@@ -87,7 +87,7 @@ _prepare_graphic() {
     done
     touch /.archboot
     _install_graphic &
-    _progress_wait "${_COUNT}" "98" "Installing ${_ENVIRONMENT}..." "1"
+    _progress_wait "${_COUNT}" "97" "Installing ${_ENVIRONMENT}..." "1"
     if [[ ! -e "/.full_system" ]]; then
         echo "Removing not used icons..."  >"${_LOG}"
         rm -rf /usr/share/icons/breeze-dark
@@ -100,7 +100,7 @@ _prepare_graphic() {
         ! -path '*/sv/*' ! -path '*/uk/*' -delete &>"${_NO_LOG}"
         find /usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>"${_NO_LOG}"
     fi
-    _progress "99" "Restart dbus..."
+    _progress "98" "Restart dbus..."
     systemd-sysusers >"${_LOG}" 2>&1
     systemd-tmpfiles --create >"${_LOG}" 2>&1
     # fixing dbus requirements
@@ -116,10 +116,7 @@ _hint_graphic_installed () {
 
 _prepare_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
-        echo -e "\e[1mStep 1/3:\e[m Installing GNOME desktop now..."
-        echo "          This will need some time..."
-        _prepare_graphic "${_PACKAGES}" >"${_LOG}" 2>&1
-        echo -e "\e[1mStep 2/3:\e[m Configuring GNOME desktop..."
+        _prepare_graphic "${_PACKAGES}"
         _configure_gnome >"${_LOG}" 2>&1
     else
         echo -e "\e[1mStep 1/3:\e[m Installing GNOME desktop already done..."
@@ -129,10 +126,7 @@ _prepare_gnome() {
 
 _prepare_plasma() {
     if ! [[ -e /usr/bin/startplasma-x11 ]]; then
-        echo -e "\e[1mStep 1/3:\e[m Installing KDE/Plasma desktop now..."
-        echo "          This will need some time..."
-        _prepare_graphic "${_PACKAGES}" >"${_LOG}" 2>&1
-        echo -e "\e[1mStep 2/3:\e[m Configuring KDE/Plasma desktop..."
+        _prepare_graphic "${_PACKAGES}"
         _configure_plasma >"${_LOG}" 2>&1
     else
         echo -e "\e[1mStep 1/3:\e[m Installing KDE/Plasma desktop already done..."
@@ -142,10 +136,7 @@ _prepare_plasma() {
 
 _prepare_sway() {
     if ! [[ -e /usr/bin/sway ]]; then
-        echo -e "\e[1mStep 1/3:\e[m Installing Sway desktop now..."
-        echo "          This will need some time..."
         _prepare_graphic "${_PACKAGES}" >"${_LOG}" 2>&1
-        echo -e "\e[1mStep 2/3:\e[m Configuring Sway desktop..."
         _configure_sway >"${_LOG}" 2>&1
     else
         echo -e "\e[1mStep 1/3:\e[m Installing Sway desktop already done..."

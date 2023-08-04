@@ -73,26 +73,25 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
     else
         touch /.update
         _TITLE="Archboot $(uname -m) | Basic Setup | Desktop Environment"
-        _PROGRESSBAR="_dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0"
         [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
         if [[ -n "${_L_XFCE}" ]]; then
-            _ENVIRONMENT="Xfce"
-            _install_xfce | ${_PROGRESSBAR}
+            _ENVIRONMENT="XFCE"
+            _install_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
         elif [[ -n "${_L_GNOME}" ]]; then
-            _ENVIRONMENT="Gnome"
-            _install_gnome | ${_PROGRESSBAR}
+            _ENVIRONMENT="GNOME"
+            _install_gnome | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
         elif [[ -n "${_L_GNOME_WAYLAND}" ]]; then
-            _ENVIRONMENT="Gnome Wayland"
-            _install_gnome_wayland | ${_PROGRESSBAR}
+            _ENVIRONMENT="GNOME Wayland"
+            _install_gnome_wayland | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
         elif [[ -n "${_L_PLASMA}" ]];then
             _ENVIRONMENT="Plasma/KDE"
-            _install_plasma | ${_PROGRESSBAR}
+            _install_plasma | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
         elif [[ -n "${_L_PLASMA_WAYLAND}" ]]; then
             _ENVIRONMENT="Plasma/KDE Wayland"
-            _install_plasma_wayland | ${_PROGRESSBAR}
+            _install_plasma_wayland | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
         elif [[ -n "${_L_SWAY}" ]]; then
             _ENVIRONMENT="Sway"
-            _install_sway | ${_PROGRESSBAR}
+            _install_sway | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
         fi
         # only start vnc on xorg environment
         echo "Setting up VNC and browser..." >"${_LOG}"
@@ -100,16 +99,30 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
         command -v firefox &>"${_NO_LOG}"  && _firefox_flags
         command -v chromium &>"${_NO_LOG}" && _chromium_flags
         if [[ -n "${_L_XFCE}" ]]; then
-            _start_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Starting Xfce..." 6 75 94
+            _start_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
             clear
             echo -e "To relaunch \e[1mXFCE\e[m desktop use: \e[92mstartxfce4\e[m"
+        elif [[ -n "${_L_GNOME}" ]]; then
+            _start_gnome
+            clear
+            echo -e "To relaunch \e[1mGNOME\e[m desktop use: \e[92mstartx\e[m"
+        elif [[ -n "${_L_GNOME_WAYLAND}" ]]; then
+            _start_gnome_wayland
+            clear
+            echo -e "To relaunch \e[1mGNOME Wayland\e[m use: \e[92mgnome-wayland\e[m"
+        elif [[ -n "${_L_PLASMA}" ]]; then
+            _start_plasma
+            clear
+        elif [[ -n "${_L_PLASMA_WAYLAND}" ]]; then
+            _start_plasma_wayland
+            clear
+            echo -e "To relaunch \e[1mKDE/Plasma Wayland\e[m use: \e[92mplasma-wayland\e[m"
+        elif [[ -n "${_L_SWAY}" ]]; then
+            _start_sway
+            clear
+            echo -e "To relaunch \e[1mSway\e[m use: \e[92msway-wayland\e[m"
         fi
         rm /.update
-        [[ -n "${_L_GNOME}" ]] && _start_gnome
-        [[ -n "${_L_GNOME_WAYLAND}" ]] && _start_gnome_wayland
-        [[ -n "${_L_PLASMA}" ]] && _start_plasma
-        [[ -n "${_L_PLASMA_WAYLAND}" ]] && _start_plasma_wayland
-        [[ -n "${_L_SWAY}" ]] && _start_sway
     fi
 fi
 # Switch to full Arch Linux system

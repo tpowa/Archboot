@@ -3,9 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _install_xfce() {
     if ! [[ -e /usr/bin/startxfce4 ]]; then
-        echo "Installing XFCE desktop now..." >"${_LOG}"
         _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES}"
-        echo "Configuring XFCE desktop..."  >"${_LOG}"
         _configure_xfce  >"${_LOG}" 2>&1
     else
         echo -e "\e[1mStep 1/3:\e[m Installing XFCE desktop already done..."

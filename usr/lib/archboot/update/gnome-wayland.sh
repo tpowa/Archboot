@@ -7,9 +7,8 @@ _install_gnome_wayland() {
 }
 
 _start_gnome_wayland() {
-    echo -e "Launching \e[1mGNOME Wayland\e[m now, logging is done on \e[1m/dev/tty7\e[m..."
-    echo -e "To relaunch \e[1mGNOME Wayland\e[m use: \e[92mgnome-wayland\e[m"
-
+    _progress "100" "Launching GNOME Wayland now, logging is done on /dev/tty8..."
+    sleep 2
     echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session gnome-session >/dev/tty7 2>&1" > /usr/bin/gnome-wayland
     chmod 755 /usr/bin/gnome-wayland
     gnome-wayland
