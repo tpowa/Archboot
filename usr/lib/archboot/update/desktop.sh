@@ -78,7 +78,7 @@ _prepare_graphic() {
     _COUNT=11
     for i in ${_FIX_PACKAGES}; do
         #shellcheck disable=SC2086
-        _progress "${_COUNT}" "Installing basic packages ${i}..."
+        _progress "${_COUNT}" "Installing basic packages: ${i}..."
         pacman -S ${i} --noconfirm &>"${_LOG}"
         [[ ! -e "/.full_system" ]] && _cleanup_install
         [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
