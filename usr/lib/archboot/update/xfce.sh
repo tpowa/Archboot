@@ -5,9 +5,6 @@ _install_xfce() {
     if ! [[ -e /usr/bin/startxfce4 ]]; then
         _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES}"
         _configure_xfce  >"${_LOG}" 2>&1
-    else
-        echo -e "\e[1mStep 1/3:\e[m Installing XFCE desktop already done..."
-        echo -e "\e[1mStep 2/3:\e[m Configuring XFCE desktop already done..."
     fi
 }
 
