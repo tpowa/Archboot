@@ -68,7 +68,7 @@ _prepare_graphic() {
     fi
     rm /.archboot ) &
     touch /.archboot
-    _progress_wait "11" "59" "Running pacman to install packages: ${_GRAPHIC}..." "0.5"
+    _progress_wait "11" "59" "Running pacman..." "0.5"
     if [[ ! -e "/.full_system" ]]; then
         _progress "70" "Removing not used icons..."
         rm -rf /usr/share/icons/breeze-dark
