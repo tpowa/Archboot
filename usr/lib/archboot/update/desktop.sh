@@ -75,17 +75,19 @@ _prepare_graphic() {
     if grep -q qxl /proc/modules; then
         echo "${_GRAPHIC}" | grep -q xorg && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
     fi
+    _COUNT=11
     for i in ${_FIX_PACKAGES}; do
         #shellcheck disable=SC2086
-        _progress "11" "Installing ${i} ..."
+        _progress "${_COUNT}" "Installing package ${i}..."
         pacman -S ${i} --noconfirm &>"${_LOG}"
         [[ ! -e "/.full_system" ]] && _cleanup_install
         [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
         rm -f /var/log/pacman.log
+        _COUNT="$((_COUNT+1))"
     done
     touch /.archboot
     _install_graphic &
-    _progress_wait "11" "89" "Installing Desktop Environment..." "1"
+    _progress_wait "${_COUNT}" "89" "Installing Desktop Environment..." "1"
     if [[ ! -e "/.full_system" ]]; then
         echo "Removing not used icons..."  >"${_LOG}"
         rm -rf /usr/share/icons/breeze-dark

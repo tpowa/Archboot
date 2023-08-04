@@ -129,7 +129,7 @@ EOF
     echo "Setting breeze as default icons..."
     sed -i -e 's#<property name="IconThemeName" type="string" value="Adwaita"/>#<property name="IconThemeName" type="string" value="breeze"/>#g' \
     /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
-    _progress "80" "Setting archboot background image..."
+    echo "Setting archboot background image..."
     cat << EOF >/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -253,7 +253,5 @@ _start_xfce() {
     _progress "100" "Launching XFCE now, logging is done on /dev/tty8..."
     sleep 2
     startxfce4 >/dev/tty8 2>&1
-    clear
-    echo -e "To relaunch \e[1mXFCE\e[m desktop use: \e[92mstartxfce4\e[m"
 }
 # vim: set ft=sh ts=4 sw=4 et:
