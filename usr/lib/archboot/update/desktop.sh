@@ -65,11 +65,10 @@ _prepare_graphic() {
         elif grep -q sv_SE /etc/locale.conf; then
             pacman -S firefox-i18n-sv-se --noconfirm &>"${_LOG}"
         fi
-    fi) &
+    fi
+    rm /.archboot ) &
     touch /.archboot
     _progress_wait "11" "59" "Running pacman to install packages: ${_GRAPHIC}..." "0.5"
-
-    rm /.archboot
     if [[ ! -e "/.full_system" ]]; then
         _progress "70" "Removing not used icons..."
         rm -rf /usr/share/icons/breeze-dark
