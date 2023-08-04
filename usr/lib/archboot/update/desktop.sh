@@ -38,13 +38,13 @@ _prepare_graphic() {
     rm /.archboot
     # check for qxl module
     if grep -q qxl /proc/modules; then
-        echo ${_GRAPHIC} | grep -q xorg && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
+        echo "${_GRAPHIC}" | grep -q xorg && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
     fi
     touch /.archboot
     _progress_wait "11" "59" "Running pacman to install packages: ${_GRAPHIC}..." "0.5"
     for i in ${_GRAPHIC}; do
         #shellcheck disable=SC2086
-        pacman -S ${i} --noconfirm &>"${_NO_LOG}" || exit 1
+        pacman -S ${i} --noconfirm &>"${_LOG}"
         [[ ! -e "/.full_system" ]] && _cleanup_install
         [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
         rm -f /var/log/pacman.log
@@ -55,17 +55,17 @@ _prepare_graphic() {
         _LANG="be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr uk"
         for i in ${_LANG}; do
             if grep -q "${i}" /etc/locale.conf; then
-                pacman -S firefox-i18n-"${i}" --noconfirm &>"${_NO_LOG}" || exit 1
+                pacman -S firefox-i18n-"${i}" --noconfirm &>"${_LOG}"
             fi
         done
         if grep -q en_US /etc/locale.conf; then
-            pacman -S firefox-i18n-en-us --noconfirm &>"${_NO_LOG}" || exit 1
+            pacman -S firefox-i18n-en-us --noconfirm &>"${_LOG}"
         elif grep -q es_ES /etc/locale.conf; then
-            pacman -S firefox-i18n-es-es --noconfirm &>"${_NO_LOG}" || exit 1
+            pacman -S firefox-i18n-es-es --noconfirm &>"${_LOG}"
         elif grep -q pt_PT /etc/locale.conf; then
-            pacman -S firefox-i18n-pt-pt --noconfirm &>"${_NO_LOG}" || exit 1
+            pacman -S firefox-i18n-pt-pt --noconfirm &>"${_LOG}"
         elif grep -q sv_SE /etc/locale.conf; then
-            pacman -S firefox-i18n-sv-se --noconfirm &>"${_NO_LOG}" || exit 1
+            pacman -S firefox-i18n-sv-se --noconfirm &>"${_LOG}"
         fi
     fi
     rm /.archboot
