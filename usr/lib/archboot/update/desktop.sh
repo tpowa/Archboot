@@ -30,6 +30,10 @@ _IGNORE=""
 }
 
 _install_graphic() {
+    # check for qxl module
+    if grep -q qxl /proc/modules; then
+        _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
+    fi
     for i in ${_GRAPHIC}; do
         #shellcheck disable=SC2086
         pacman -S ${i} --noconfirm &>"${_LOG}"
@@ -71,10 +75,6 @@ _prepare_graphic() {
     touch /.archboot
     _update_packages &
     _progress_wait "2" "10" "Updating environment to latest packages..." "5"
-    # check for qxl module
-    if grep -q qxl /proc/modules; then
-        echo "${_GRAPHIC}" | grep -q xorg && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
-    fi
     _COUNT=11
     for i in ${_FIX_PACKAGES}; do
         #shellcheck disable=SC2086
