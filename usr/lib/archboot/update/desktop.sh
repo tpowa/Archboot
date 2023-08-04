@@ -57,6 +57,8 @@ _prepare_graphic() {
         done
         if grep -q en_US /etc/locale.conf; then
             pacman -S firefox-i18n-en-us --noconfirm &>"${_LOG}"
+        elif grep -q 'C.UTF-8' /etc/locale.conf; then
+            pacman -S firefox-i18n-en-us --noconfirm &>"${_LOG}"
         elif grep -q es_ES /etc/locale.conf; then
             pacman -S firefox-i18n-es-es --noconfirm &>"${_LOG}"
         elif grep -q pt_PT /etc/locale.conf; then
