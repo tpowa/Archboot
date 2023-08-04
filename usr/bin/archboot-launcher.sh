@@ -81,7 +81,7 @@ _exit() {
             sleep 1
             _COUNT=$((_COUNT+1))
             # abort after 10 seconds
-            _progress "$((_COUNT*10))" "Rebooting in $((10-_COUNT)) seconds. Don't forget to remove the boot medium!"
+            _progress "$((_COUNT*10))" "Rebooting in $((10-_COUNT)) second(s). Don't forget to remove the boot medium!"
             [[ "${_COUNT}" == 10 ]] && break
         done | _dialog --title " System Reboot " --no-mouse --gauge "Rebooting in 10 seconds. Don't forget to remove the boot medium!" 6 75 0
         reboot
@@ -90,7 +90,7 @@ _exit() {
             sleep 1
             _COUNT=$((_COUNT+1))
             # abort after 10 seconds
-            _progress "$((_COUNT*10))" "Powering off in $((10-_COUNT)) seconds. Don't forget to remove the boot medium!"
+            _progress "$((_COUNT*10))" "Powering off in $((10-_COUNT)) second(s). Don't forget to remove the boot medium!"
             [[ "${_COUNT}" == 10 ]] && break
         done | _dialog --title " System Shutdown " --no-mouse --gauge "Powering off in 10 seconds. Don't forget to remove the boot medium!" 6 75 0
         poweroff
