@@ -10,7 +10,6 @@ _run_pacman(){
     _dialog --title " Pacman " --no-mouse --infobox "Installing package(s) to ${_DESTDIR}:\n${_PACKAGES}...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress..." 8 70
     echo "Installing Packages..." >/tmp/pacman.log
     #shellcheck disable=SC2086,SC2069
-    (
     (touch /.archboot
     ${_PACMAN} -Sy ${_PACKAGES} |& tee -a "${_LOG}" /tmp/pacman.log &>"${_NO_LOG}"
     echo $? > /tmp/.pacman-retcode
@@ -21,7 +20,6 @@ _run_pacman(){
     fi
     rm /.archboot) &
     _progress_wait "0" "100" "Installing package:\n${_PACKAGES}..." "2"
-     )| _dialog --title " Logging to ${_LOG} " --gauge "Installing package:\n${_PACKAGES}..." 8 75 0
     # pacman finished, display scrollable output
     local _RESULT=''
     if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
@@ -29,8 +27,8 @@ _run_pacman(){
         _dialog --title "${_RESULT}" --exit-label "Continue" \
         --textbox "/tmp/pacman.log" 18 70 || return 1
     else
-        _dialog --no-mouse --infobox "Package installation complete." 3 40
-        sleep 3
+        _progress "100" "Package installation complete." 6 75
+        sleep 2
     fi
     rm /tmp/.pacman-retcode
     # ensure the disk is synced
@@ -49,7 +47,7 @@ _install_packages() {
     # fix double spaces
     _PACKAGES="${_PACKAGES//  / }"
     _dialog --title " Summary " --yesno "Next step will install the following packages for a minimal system:\n${_PACKAGES}\n\nYou can watch the progress on your ${_VC} console." 9 75 || return 1
-    _run_pacman
+    _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package:\n${_PACKAGES}..." 8 75 0
     _NEXTITEM="3"
     _chroot_mount
     # automagic time!
