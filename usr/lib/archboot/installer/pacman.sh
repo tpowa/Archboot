@@ -20,9 +20,8 @@ _run_pacman(){
         echo -e "\nPackage Installation Complete." >>/tmp/pacman.log
     fi
     rm /.archboot) &
-    while true; do
-        _progress_wait "0" "100" "Installing package: ${_PACKAGES}..." "2"
-    done) | _dialog --title " Logging to ${_LOG} " --gauge "Installing package:\n${_PACKAGES}..." 8 75 0
+    _progress_wait "0" "100" "Installing package:\n${_PACKAGES}..." "2"
+     )| _dialog --title " Logging to ${_LOG} " --gauge "Installing package:\n${_PACKAGES}..." 8 75 0
     # pacman finished, display scrollable output
     local _RESULT=''
     if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
