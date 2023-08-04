@@ -103,22 +103,23 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
             clear
             echo -e "To relaunch \e[1mXFCE\e[m desktop use: \e[92mstartxfce4\e[m"
         elif [[ -n "${_L_GNOME}" ]]; then
-            _start_gnome
+            _start_gnome | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
             clear
             echo -e "To relaunch \e[1mGNOME\e[m desktop use: \e[92mstartx\e[m"
         elif [[ -n "${_L_GNOME_WAYLAND}" ]]; then
-            _start_gnome_wayland
+            _start_gnome_wayland | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
             clear
             echo -e "To relaunch \e[1mGNOME Wayland\e[m use: \e[92mgnome-wayland\e[m"
         elif [[ -n "${_L_PLASMA}" ]]; then
-            _start_plasma
+            _start_plasma | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
             clear
+            echo -e "To relaunch \e[1mKDE/Plasma\e[m desktop use: \e[92mstartx\e[m"
         elif [[ -n "${_L_PLASMA_WAYLAND}" ]]; then
-            _start_plasma_wayland
+            _start_plasma_wayland | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
             clear
             echo -e "To relaunch \e[1mKDE/Plasma Wayland\e[m use: \e[92mplasma-wayland\e[m"
         elif [[ -n "${_L_SWAY}" ]]; then
-            _start_sway
+            _start_sway | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
             clear
             echo -e "To relaunch \e[1mSway\e[m use: \e[92msway-wayland\e[m"
         fi
