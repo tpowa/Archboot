@@ -7,7 +7,6 @@ _run_pacman(){
     # Set up the necessary directories for pacman use
     [[ ! -d "${_DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${_DESTDIR}/var/cache/pacman/pkg"
     [[ ! -d "${_DESTDIR}/var/lib/pacman" ]] && mkdir -p "${_DESTDIR}/var/lib/pacman"
-    _dialog --title " Pacman " --no-mouse --infobox "Installing package(s) to ${_DESTDIR}:\n${_PACKAGES}...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress..." 8 70
     echo "Installing Packages..." >/tmp/pacman.log
     #shellcheck disable=SC2086,SC2069
     (touch /.archboot
