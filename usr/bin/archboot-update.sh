@@ -84,7 +84,11 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
         [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]] && _autostart_vnc
         command -v firefox &>"${_NO_LOG}"  && _firefox_flags
         command -v chromium &>"${_NO_LOG}" && _chromium_flags
-        [[ -n "${_L_XFCE}" ]] && _start_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Starting Xfce..." 6 75 94
+        if [[ -n "${_L_XFCE}" ]]; then
+            _start_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Starting Xfce..." 6 75 94
+            clear
+            echo -e "To relaunch \e[1mXFCE\e[m desktop use: \e[92mstartxfce4\e[m"
+        fi
         [[ -n "${_L_GNOME}" ]] && _start_gnome
         [[ -n "${_L_GNOME_WAYLAND}" ]] && _start_gnome_wayland
         [[ -n "${_L_PLASMA}" ]] && _start_plasma

@@ -85,11 +85,11 @@ _prepare_graphic() {
     done
     touch /.archboot
     _install_graphic &
-    _progress_wait "11" "69" "Running pacman..." "5"
+    _progress_wait "11" "89" "Installing Desktop Environment..." "1"
     if [[ ! -e "/.full_system" ]]; then
-        _progress "70" "Removing not used icons..."
+        echo "Removing not used icons..."  >"${_LOG}"
         rm -rf /usr/share/icons/breeze-dark
-        _progress "80" "Cleanup locale and i18n..."
+        echo "Cleanup locale and i18n..."  >"${_LOG}"
         find /usr/share/locale/ -mindepth 2 ! -path '*/be/*' ! -path '*/bg/*' ! -path '*/cs/*' \
         ! -path '*/da/*' ! -path '*/de/*' ! -path '*/en/*' ! -path '*/el/*' ! -path '*/es/*' \
         ! -path '*/fi/*' ! -path '*/fr/*' ! -path '*/hu/*' ! -path '*/it/*' ! -path '*/lt/*' \
