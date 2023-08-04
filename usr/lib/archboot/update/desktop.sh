@@ -16,16 +16,8 @@ _cleanup_cache() {
     done
 }
 
-_prepare_graphic() {
-    _GRAPHIC="${1}"
-    if [[ ! -e "/.full_system" ]]; then
-        _progress "2" "Removing firmware files..."
-        rm -rf /usr/lib/firmware
-        # fix libs first, then install packages from defaults
-        _GRAPHIC="${1}"
-    fi
-    touch /.archboot
-    (_IGNORE=""
+_update_packages() {
+_IGNORE=""
     if [[ -n "${_GRAPHIC_IGNORE}" ]]; then
         for i in ${_GRAPHIC_IGNORE}; do
             _IGNORE="${_IGNORE} --ignore ${i}"
@@ -34,22 +26,11 @@ _prepare_graphic() {
     #shellcheck disable=SC2086
     pacman -Syu ${_IGNORE} --noconfirm &>"${_LOG}"
     [[ ! -e "/.full_system" ]] && _cleanup_install
-    rm /.archboot) &
-    _progress_wait "3" "10" "Updating environment to latest packages..." "5"
-    # check for qxl module
-    if grep -q qxl /proc/modules; then
-        echo "${_GRAPHIC}" | grep -q xorg && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
-    fi
-    for i in ${_FIX_PACKAGES}; do
-        #shellcheck disable=SC2086
-        _progress "11" "Installing ${i} ..."
-        pacman -S ${i} --noconfirm &>"${_LOG}"
-        [[ ! -e "/.full_system" ]] && _cleanup_install
-        [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
-        rm -f /var/log/pacman.log
-    done
-    touch /.archboot
-    (for i in ${_GRAPHIC}; do
+    rm /.archboot
+}
+
+_install_graphic() {
+    for i in ${_GRAPHIC}; do
         #shellcheck disable=SC2086
         pacman -S ${i} --noconfirm &>"${_LOG}"
         [[ ! -e "/.full_system" ]] && _cleanup_install
@@ -76,8 +57,35 @@ _prepare_graphic() {
             pacman -S firefox-i18n-sv-se --noconfirm &>"${_LOG}"
         fi
     fi
-    rm /.archboot ) &
-    _progress_wait "11" "59" "Running pacman..." "0.5"
+    rm /.archboot
+}
+
+_prepare_graphic() {
+    _GRAPHIC="${1}"
+    if [[ ! -e "/.full_system" ]]; then
+        _progress "2" "Removing firmware files..."
+        rm -rf /usr/lib/firmware
+        # fix libs first, then install packages from defaults
+        _GRAPHIC="${1}"
+    fi
+    touch /.archboot
+    _update_packages &
+    _progress_wait "3" "10" "Updating environment to latest packages..." "5"
+    # check for qxl module
+    if grep -q qxl /proc/modules; then
+        echo "${_GRAPHIC}" | grep -q xorg && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
+    fi
+    for i in ${_FIX_PACKAGES}; do
+        #shellcheck disable=SC2086
+        _progress "11" "Installing ${i} ..."
+        pacman -S ${i} --noconfirm &>"${_LOG}"
+        [[ ! -e "/.full_system" ]] && _cleanup_install
+        [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
+        rm -f /var/log/pacman.log
+    done
+    touch /.archboot
+    _install_graphic &
+    _progress_wait "11" "69" "Running pacman..." "5"
     if [[ ! -e "/.full_system" ]]; then
         _progress "70" "Removing not used icons..."
         rm -rf /usr/share/icons/breeze-dark
