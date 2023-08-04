@@ -108,12 +108,6 @@ _prepare_graphic() {
     systemctl reload dbus-org.freedesktop.login1.service
 }
 
-_hint_graphic_installed () {
-    echo -e "\e[1;91mError: Graphical environment already installed...\e[m"
-    echo -e "You are running in \e[1mOffline Mode\e[m with less than \e[1m4500 MB RAM\e[m, which only can launch \e[1mone\e[m environment."
-    echo -e "Please relaunch your already used graphical environment from commandline."
-}
-
 _prepare_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
         _prepare_graphic "${_PACKAGES}"
@@ -136,7 +130,7 @@ _prepare_plasma() {
 
 _prepare_sway() {
     if ! [[ -e /usr/bin/sway ]]; then
-        _prepare_graphic "${_PACKAGES}" >"${_LOG}" 2>&1
+        _prepare_graphic "${_PACKAGES}"
         _configure_sway >"${_LOG}" 2>&1
     else
         echo -e "\e[1mStep 1/3:\e[m Installing Sway desktop already done..."
