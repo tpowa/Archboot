@@ -40,6 +40,7 @@ _prepare_graphic() {
     if grep -q qxl /proc/modules; then
         echo "${_GRAPHIC}" | grep -q xorg && _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
     fi
+    touch /.archboot
     (for i in ${_GRAPHIC}; do
         #shellcheck disable=SC2086
         pacman -S ${i} --noconfirm &>"${_LOG}"
