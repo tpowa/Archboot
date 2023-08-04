@@ -50,8 +50,7 @@ _install_packages() {
     _chroot_mount
     # automagic time!
     # any automatic configuration should go here
-    _dialog --no-mouse --infobox "Writing base configuration..." 6 40
-    _auto_timesetting
+    (_auto_timesetting
     _auto_network
     _auto_fstab
     _auto_scheduler
@@ -65,7 +64,7 @@ _install_packages() {
     _auto_hostname
     _auto_locale
     _auto_set_locale
-    _auto_bash
+    _auto_bash) | _dialog --title " Autoconfiguration " --no-mouse --gauge "Writing base configuration..." 6 75 0
     # tear down the chroot environment
     _chroot_umount
     _run_locale_gen
