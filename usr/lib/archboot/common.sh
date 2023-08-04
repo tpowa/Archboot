@@ -83,7 +83,7 @@ EOF
 # $4: sleep time
 _progress_wait() {
     _COUNT=${1}
-    while [[ -e "${_W_DIR}/.archboot" ]]; do
+    while [[ -e "${_W_DIR}/.archboot" || -e /.archboot ]]; do
         if [[ "${_COUNT}" -lt "${2}" ]]; then
             _progress "${_COUNT}" "${3}"
         fi
