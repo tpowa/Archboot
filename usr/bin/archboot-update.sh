@@ -73,16 +73,27 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
     else
         touch /.update
         _TITLE="Archboot $(uname -m) | Basic Setup | Desktop Environment"
+        _PROGRESSBAR="_dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0"
         [[ -e /var/cache/pacman/pkg/archboot.db ]] && touch /.graphic_installed
         if [[ -n "${_L_XFCE}" ]]; then
             _ENVIRONMENT="Xfce"
-            _install_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Initializing Xfce..." 6 75 0
+            _install_xfce | ${_PROGRESSBAR}
+        elif [[ -n "${_L_GNOME}" ]]; then
+            _ENVIRONMENT="Gnome"
+            _install_gnome | ${_PROGRESSBAR}
+        elif [[ -n "${_L_GNOME_WAYLAND}" ]]; then
+            _ENVIRONMENT="Gnome Wayland"
+            _install_gnome_wayland | ${_PROGRESSBAR}
+        elif [[ -n "${_L_PLASMA}" ]];then
+            _ENVIRONMENT="Plasma/KDE"
+            _install_plasma | ${_PROGRESSBAR}
+        elif [[ -n "${_L_PLASMA_WAYLAND}" ]]; then
+            _ENVIRONMENT="Plasma/KDE Wayland"
+            _install_plasma_wayland | ${_PROGRESSBAR}
+        elif [[ -n "${_L_SWAY}" ]]; then
+            _ENVIRONMENT="Sway"
+            _install_sway | ${_PROGRESSBAR}
         fi
-        [[ -n "${_L_GNOME}" ]] && _install_gnome
-        [[ -n "${_L_GNOME_WAYLAND}" ]] && _install_gnome_wayland
-        [[ -n "${_L_PLASMA}" ]] && _install_plasma
-        [[ -n "${_L_PLASMA_WAYLAND}" ]] && _install_plasma_wayland
-        [[ -n "${_L_SWAY}" ]] && _install_sway
         # only start vnc on xorg environment
         echo "Setting up VNC and browser..." >"${_LOG}"
         [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]] && _autostart_vnc
