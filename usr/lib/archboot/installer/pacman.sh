@@ -18,7 +18,7 @@ _run_pacman(){
         echo -e "\nPackage Installation Complete." >>/tmp/pacman.log
     fi
     rm /.archboot) &
-    _progress_wait "0" "99" "Installing package:\n${_PACKAGES}..." "2"
+    _progress_wait "0" "99" "Installing package(s):\n${_PACKAGES}..." "2"
     # pacman finished, display scrollable output
     local _RESULT=''
     if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
@@ -53,7 +53,7 @@ _install_packages() {
     # fix double spaces
     _PACKAGES="${_PACKAGES//  / }"
     _dialog --title " Summary " --yesno "Next step will install the following packages for a minimal system:\n${_PACKAGES}\n\nYou can watch the progress on your ${_VC} console." 9 75 || return 1
-    _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package:\n${_PACKAGES}..." 8 75 0
+    _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 8 75 0
     _pacman_error
     _NEXTITEM="3"
     _chroot_mount
