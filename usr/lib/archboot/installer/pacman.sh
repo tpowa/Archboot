@@ -40,7 +40,6 @@ _pacman_error() {
         --textbox "/tmp/pacman.log" 18 70 || return 1
     fi
     rm /tmp/.pacman-retcode
-fi
 }
 
 _install_packages() {
