@@ -41,6 +41,7 @@ _pacman_error() {
     fi
     rm /tmp/.pacman-retcode
 fi
+}
 
 _install_packages() {
     _destdir_mounts || return 1
