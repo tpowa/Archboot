@@ -176,5 +176,6 @@ _auto_packages() {
 # enable at least C.UTF-8 if nothing was changed, else weird things happen on reboot!
 _locale_gen() {
     ${_NSPAWN} locale-gen &>"${_NO_LOG}"
+    [[ -e /.archboot ]] && rm /.archboot
 }
 # vim: set ft=sh ts=4 sw=4 et:

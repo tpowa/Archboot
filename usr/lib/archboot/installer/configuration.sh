@@ -98,8 +98,10 @@ _run_mkinitcpio() {
 }
 
 _run_locale_gen() {
-    _dialog --no-mouse --infobox "Rebuilding glibc locales on installed system..." 3 70
-    _locale_gen
+    touch /.archboot
+    _locale_gen &
+    _progress_wait "0" "99" "Rebuilding glibc locales on installed system..." "0.1"
+    _progress "100" "Rebuilding glibc locales on installed system complete." 6 75
     sleep 2
 }
 # vim: set ft=sh ts=4 sw=4 et:
