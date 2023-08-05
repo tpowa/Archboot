@@ -4,7 +4,7 @@
 
 
 _pacman() {
-    shellcheck disable=SC2086,SC2069
+    #shellcheck disable=SC2086,SC2069
     ${_PACMAN} -Sy ${_PACKAGES} |& tee -a "${_LOG}" /tmp/pacman.log &>"${_NO_LOG}"
     echo $? > /tmp/.pacman-retcode
     if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
