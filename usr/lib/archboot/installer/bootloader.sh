@@ -471,10 +471,43 @@ CONFEOF
     fi
 }
 
+_uki_uefi() {
+    sleep 2
+    progress "50" "Enable automatic UKI creation\non EFI SYSTEM PARTITION (ESP) on installed system..."
+    cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.path"
+[Unit]
+Description=Run systemd ukify
+[Path]
+PathChanged=/boot/${_INITRAMFS}
+PathChanged=/boot/${_UCODE}
+Unit=run_ukify.service
+[Install]
+WantedBy=multi-user.target
+CONFEOF
+        cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.service"
+[Unit]
+Description=Run systemd ukify
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash -c "source /etc/ukify.conf"
+CONFEOF
+    ${_NSPAWN} systemctl enable run_ukify.path &>"${_NO_LOG}"
+    _BOOTMGR_LABEL="Arch Linux - Unified Kernel Image"
+    _BOOTMGR_LOADER_PATH="/EFI/Linux/archlinux-linux.efi"
+    _do_uefi_bootmgr_setup
+    mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
+    rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+    cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+    sleep 2
+    progress "100" "Unified Kernel Image has been setup successfully."
+    sleep 2
+    _S_BOOTLOADER=1
+}
+
 _do_uki_uefi() {
     if [[ ! -f "${_DESTDIR}/usr/lib/systemd/ukify" ]]; then
         _PACKAGES="systemd-ukify"
-        _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 8 75 0
+        _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
         _pacman_error
     fi
     _UKIFY_CONFIG="${_DESTDIR}/etc/ukify.conf"
@@ -495,43 +528,12 @@ CONFEOF
     _geteditor || return 1
     "${_EDITOR}" "${_CMDLINE}"
     "${_EDITOR}" "${_UKIFY_CONFIG}"
-
-    _dialog --no-mouse --infobox "Setting up Unified Kernel Image ..." 3 60
     ${_NSPAWN} /usr/bin/bash -c "source /etc/ukify.conf" >>"${_LOG}"
-    sleep 2
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
-        _dialog --no-mouse --infobox "Enable automatic UKI creation\non EFI SYSTEM PARTITION (ESP) on installed system..." 4 60
-        cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.path"
-[Unit]
-Description=Run systemd ukify
-[Path]
-PathChanged=/boot/${_INITRAMFS}
-PathChanged=/boot/${_UCODE}
-Unit=run_ukify.service
-[Install]
-WantedBy=multi-user.target
-CONFEOF
-        cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.service"
-[Unit]
-Description=Run systemd ukify
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/bash -c "source /etc/ukify.conf"
-CONFEOF
-        ${_NSPAWN} systemctl enable run_ukify.path &>"${_NO_LOG}"
-        sleep 3
-        _BOOTMGR_LABEL="Arch Linux - Unified Kernel Image"
-        _BOOTMGR_LOADER_PATH="/EFI/Linux/archlinux-linux.efi"
-        _do_uefi_bootmgr_setup
-        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
-        rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        _dialog --no-mouse --infobox "Unified Kernel Image has been setup successfully." 3 60
-        sleep 3
-        _S_BOOTLOADER=1
+        _uki_uefi | _dialog --title " Logging to ${_LOG} " --gauge "Setting up Unified Kernel Image..." 6 75 0
     else
         _dialog --title " ERROR " --no-mouse --infobox "Setting up Unified Kernel Image failed!" 3 60
-        sleep 5
+        sleep 3
     fi
 }
 
