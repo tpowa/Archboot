@@ -33,7 +33,6 @@ _auto_partition() {
         sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":"${_GUID_TYPE}" --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
         _progress "85" "Creating Home partition..."
         sgdisk --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCH_LINUX_HOME "${_DISK}" >"${_LOG}"
-        _progress "100" "Partitions created successfully."
         sgdisk --print "${_DISK}" >"${_LOG}"
     else
         # start at sector 1 for 4k drive compatibility and correct alignment
@@ -46,11 +45,13 @@ _auto_partition() {
         parted -a optimal -s "${_DISK}" unit MiB set 1 boot on >"${_LOG}"
         _progress "60" "Creating SWAP partition..."
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) >"${_LOG}"
-        _progress "85" "Creating Root partition..."
+        _progress "70" "Creating Root partition..."
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) >"${_LOG}"
-        _progress "100" "Creating Home partition..."
+        _progress "85" "Creating Home partition..."
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
     fi
+    _progress "100" "Partitions created successfully."
+    sleep 2
 }
 
 _autoprepare() {
