@@ -156,7 +156,7 @@ _do_uefi_common() {
         [[ -f "${_DESTDIR}/usr/bin/sbsign" ]] || _PACKAGES="${_PACKAGES} sbsigntools"
     fi
     if [[ -n "${_PACKAGES}" ]]; then
-        _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+        _run_pacman | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
         _pacman_error
     fi
     # automounted /boot and ESP needs to be mounted first, trigger mount with ls
@@ -414,7 +414,7 @@ GUMEOF
         _geteditor || return 1
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"
-        _do_efistub_copy_to_efisys | _dialog --title " Logging to ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
+        _do_efistub_copy_to_efisys | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
         _dialog --title " Success " --no-mouse --infobox "SYSTEMD-BOOT has been setup successfully." 3 50
         sleep 3
         _S_BOOTLOADER=1
@@ -426,7 +426,7 @@ GUMEOF
 _do_refind_uefi() {
     if [[ ! -f "${_DESTDIR}/usr/bin/refind-install" ]]; then
         _PACKAGES="refind"
-        _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+        _run_pacman | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
         _pacman_error
     fi
     _dialog --no-mouse --infobox "Setting up rEFInd now..." 3 60
@@ -465,7 +465,7 @@ CONFEOF
         _geteditor || return 1
         "${_EDITOR}" "${_REFIND_CONFIG}"
         cp -f "${_REFIND_CONFIG}" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
-        _do_efistub_copy_to_efisys | _dialog --title " Logging to ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
+        _do_efistub_copy_to_efisys | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
         _dialog --title " Success " --no-mouse --infobox "rEFInd has been setup successfully." 3 50
         sleep 3
         _S_BOOTLOADER=1
@@ -510,7 +510,7 @@ CONFEOF
 _do_uki_uefi() {
     if [[ ! -f "${_DESTDIR}/usr/lib/systemd/ukify" ]]; then
         _PACKAGES="systemd-ukify"
-        _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+        _run_pacman | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
         _pacman_error
     fi
     _UKIFY_CONFIG="${_DESTDIR}/etc/ukify.conf"
@@ -533,7 +533,7 @@ CONFEOF
     "${_EDITOR}" "${_UKIFY_CONFIG}"
     ${_NSPAWN} /usr/bin/bash -c "source /etc/ukify.conf" >>"${_LOG}"
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
-        _uki_uefi | _dialog --title " Logging to ${_LOG} " --gauge "Setting up Unified Kernel Image..." 6 75 0
+        _uki_uefi | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Setting up Unified Kernel Image..." 6 75 0
     else
         _dialog --title " ERROR " --no-mouse --infobox "Setting up Unified Kernel Image failed!" 3 60
         sleep 3
@@ -551,12 +551,12 @@ _do_grub_common_before() {
     _abort_f2fs_bootpart || return 1
     if [[ ! -d "${_DESTDIR}/usr/lib/grub" ]]; then
         _PACKAGES="grub"
-        _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+        _run_pacman | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
         _pacman_error
     fi
     if [[ ! -f "${_DESTDIR}/usr/share/grub/ter-u16n.pf2" ]]; then
         _PACKAGES=terminus-font
-        _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+        _run_pacman | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
         _pacman_error
     fi
 }
@@ -849,7 +849,7 @@ _do_grub_bios() {
         _dialog --msgbox "Error:\nGRUB(2) cannot boot from ${_BOOTDEV}, which contains /boot!\n\nPossible error sources:\n- encrypted devices are not supported" 0 0
         return 1
     fi
-    _grub_bios | _dialog --title " Logging to ${_LOG} " --gauge "Setting up GRUB(2) BIOS..." 6 75 0
+    _grub_bios | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Setting up GRUB(2) BIOS..." 6 75 0
     mkdir -p "${_DESTDIR}/boot/grub/locale"
     cp -f "${_DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${_DESTDIR}/boot/grub/locale/en.mo"
     if [[ -e "${_DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
@@ -955,9 +955,9 @@ _do_grub_uefi() {
         _GRUB_PREFIX_DIR="/boot/grub/"
     fi
     _do_grub_common_before
-    _setup_grub_uefi | _dialog --title " Logging to ${_LOG} " --gauge "Setting up GRUB(2) UEFI..." 6 75 0
+    _setup_grub_uefi | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Setting up GRUB(2) UEFI..." 6 75 0
     _do_grub_config || return 1
-    _setup_grub_uefi_sb | _dialog --title " Logging to ${_LOG} " --gauge "Setting up GRUB(2) UEFI Secure Boot..." 6 75 0
+    _setup_grub_uefi_sb | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Setting up GRUB(2) UEFI Secure Boot..." 6 75 0
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" && -z "${_UEFI_SECURE_BOOT}" && -e "${_DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="GRUB"
         _BOOTMGR_LOADER_PATH="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
@@ -1022,7 +1022,7 @@ _install_bootloader() {
     if [[ -n "${_UCODE}" ]]; then
         if ! [[ -f "${_DESTDIR}/boot/${_UCODE}" ]]; then
             _PACKAGES="${_UCODE_PKG}"
-            _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+            _run_pacman | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
             _pacman_error
         fi
     fi

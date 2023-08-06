@@ -61,7 +61,7 @@ _set_mkinitcpio() {
         _dialog --title " ERROR " --no-mouse --infobox "Detected error in 'HOOKS=' line,\nplease correct HOOKS= in /etc/mkinitcpio.conf!" 6 70
         sleep 5
     else
-        _run_mkinitcpio | _dialog --title " Logging to ${_LOG} " --gauge "Rebuilding initramfs on installed system..." 6 75 0
+        _run_mkinitcpio | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Rebuilding initramfs on installed system..." 6 75 0
         _mkinitcpio_error
     fi
 }

@@ -64,7 +64,7 @@ _geteditor() {
             "NANO") _EDITOR="nano"
                 if ! [[ -f "${_DESTDIR}/usr/bin/nano" ]]; then
                     _PACKAGES="nano"
-                    _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+                    _run_pacman | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
                     _pacman_error
                     _dialog --no-mouse --infobox "Enable nano's syntax highlighting on installed system..." 3 70
                     grep -q '^include' "${_DESTDIR}/etc/nanorc" || \
@@ -75,7 +75,7 @@ _geteditor() {
             "NEOVIM") _EDITOR="nvim"
                 if ! [[ -f "${_DESTDIR}/usr/bin/nvim" ]]; then
                     _PACKAGES="nvim"
-                    _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+                    _run_pacman | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
                     _pacman_error
                 fi
                 ;;
