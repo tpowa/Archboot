@@ -243,45 +243,35 @@ _do_mok_sign () {
     _UEFI_BOOTLOADER_DIR="${_UEFISYS_MP}/EFI/BOOT"
     _INSTALL_MOK=""
     _MOK_PW=""
-    _dialog --yesno "Do you want to install the MOK certificate to the UEFI keys?" 5 65 && _INSTALL_MOK=1
-    if [[ -n "${_INSTALL_MOK}" ]]; then
-        while [[ -z "${_MOK_PW}" ]]; do
-            _dialog --title " MOK Password " --insecure --passwordbox "" 7 65 2>"${_ANSWER}" || return 1
-            _PASS=$(cat "${_ANSWER}")
-            _dialog --title " Retype MOK Passwork " --insecure --passwordbox "" 7 65 2>"${_ANSWER}" || return 1
-            _PASS2=$(cat "${_ANSWER}")
-            if [[ "${_PASS}" == "${_PASS2}" && -n "${_PASS}" ]]; then
-                _MOK_PW=${_PASS}
-                echo "${_MOK_PW}" > /tmp/.password
-                echo "${_MOK_PW}" >> /tmp/.password
-                _MOK_PW=/tmp/.password
-            else
-                _dialog --title " ERROR " --no-mouse --infobox "Password didn't match or was empty, please enter again." 6 65
-                sleep 3
-            fi
-        done
-        mokutil -i "${_DESTDIR}"/"${_KEYDIR}"/MOK/MOK.cer < ${_MOK_PW} >"${_LOG}"
-        rm /tmp/.password
-        _dialog --no-mouse --infobox "MOK keys have been installed successfully." 3 50
-        sleep 3
-    fi
-    _SIGN_MOK=""
-    _dialog --yesno "Do you want to sign with the MOK certificate?\n\n/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" 7 55 && _SIGN_MOK=1
-    if [[ -n "${_SIGN_MOK}" ]]; then
-        ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" &>"${_LOG}"
-        ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
-        _dialog --no-mouse --infobox "/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nhave been signed successfully." 5 60
-        sleep 3
-    fi
+    while [[ -z "${_MOK_PW}" ]]; do
+        _dialog --title " MOK Password " --insecure --passwordbox "" 7 65 2>"${_ANSWER}" || return 1
+        _PASS=$(cat "${_ANSWER}")
+        _dialog --title " Retype MOK Passwork " --insecure --passwordbox "" 7 65 2>"${_ANSWER}" || return 1
+        _PASS2=$(cat "${_ANSWER}")
+        if [[ "${_PASS}" == "${_PASS2}" && -n "${_PASS}" ]]; then
+            _MOK_PW=${_PASS}
+            echo "${_MOK_PW}" > /tmp/.password
+            echo "${_MOK_PW}" >> /tmp/.password
+            _MOK_PW=/tmp/.password
+        else
+            _dialog --title " ERROR " --no-mouse --infobox "Password didn't match or was empty, please enter again." 6 65
+            sleep 3
+        fi
+    done
+    mokutil -i "${_DESTDIR}"/"${_KEYDIR}"/MOK/MOK.cer < ${_MOK_PW} >"${_LOG}"
+    rm /tmp/.password
+    _dialog --no-mouse --infobox "MOK keys have been installed successfully." 3 50
+    sleep 3
+    ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" &>"${_LOG}"
+    ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
+    _dialog --no-mouse --infobox "/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nhave been signed successfully." 5 60
+    sleep 3
 }
 
 _do_pacman_sign() {
-    _SIGN_KERNEL=""
-    _dialog --yesno "Do you want to install a pacman hook\nfor automatic signing /boot/${_VMLINUZ} on updates?" 6 60 && _SIGN_KERNEL=1
-    if [[ -n "${_SIGN_KERNEL}" ]]; then
-        [[ -d "${_DESTDIR}/etc/pacman.d/hooks" ]] || mkdir -p  "${_DESTDIR}"/etc/pacman.d/hooks
-        _HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-sign_kernel_for_secureboot.hook"
-        cat << EOF > "${_HOOKNAME}"
+    [[ -d "${_DESTDIR}/etc/pacman.d/hooks" ]] || mkdir -p  "${_DESTDIR}"/etc/pacman.d/hooks
+    _HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-sign_kernel_for_secureboot.hook"
+    cat << EOF > "${_HOOKNAME}"
 [Trigger]
 Operation = Install
 Operation = Upgrade
@@ -296,9 +286,8 @@ Depends = sbsigntools
 Depends = findutils
 Depends = grep
 EOF
-        _dialog --no-mouse --infobox "Pacman hook for automatic signing has been installed successfully:\n\n${_HOOKNAME}" 5 70
-        sleep 3
-    fi
+    _dialog --no-mouse --infobox "Pacman hook for automatic signing has been installed successfully:\n\n${_HOOKNAME}" 5 70
+    sleep 3
 }
 
 _do_efistub_parameters() {
