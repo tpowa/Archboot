@@ -460,6 +460,7 @@ CONFEOF
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        sleep 2
         _dialog --msgbox "You will now be put into the editor to edit:\nrefind.conf\n\nAfter you save your changes, exit the editor." 8 50
         _geteditor || return 1
         "${_EDITOR}" "${_REFIND_CONFIG}"
