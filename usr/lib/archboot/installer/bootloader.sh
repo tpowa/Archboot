@@ -465,7 +465,7 @@ CONFEOF
         "${_EDITOR}" "${_REFIND_CONFIG}"
         cp -f "${_REFIND_CONFIG}" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
         _do_efistub_copy_to_efisys
-        _dialog --no-mouse --infobox "rEFInd has been setup successfully." 3 50
+        _dialog --title " Success " --no-mouse --infobox "rEFInd has been setup successfully." 3 50
         sleep 3
         _S_BOOTLOADER=1
     else
