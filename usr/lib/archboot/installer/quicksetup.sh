@@ -275,7 +275,7 @@ _autoprepare() {
     else
         _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_BOOTDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
     fi
-    _MAX_COUNT=$$(echo ${_FSSPECS} | wc -w)
+    _MAX_COUNT=$(echo ${_FSSPECS} | wc -w)
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     _COUNT=0
     ## make and mount filesystems
