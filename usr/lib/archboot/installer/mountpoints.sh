@@ -339,8 +339,6 @@ _mountpoints() {
     _run_mkfs | _dialog --title " Mountpoints " --no-mouse --gauge "Mountpoints..." 6 75 0
     _printk on
      _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
-    _dialog --no-mouse --infobox "Devices were mounted successfully." 3 50
-    sleep 3
     _NEXTITEM="5"
 }
 
