@@ -323,7 +323,7 @@ _do_efistub_copy_to_efisys() {
             cp -f "${_DESTDIR}/boot/${_UCODE}" "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD_UCODE}"
         fi
         sleep 2
-        _progress "50" "Enable automatic copying of system files\nto EFI SYSTEM PARTITION on installed system..."
+        _progress "50" "Enable automatic copying of system files to EFI SYSTEM PARTITION on installed system..."
         cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/efistub_copy.path"
 [Unit]
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
