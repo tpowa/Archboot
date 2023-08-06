@@ -789,7 +789,7 @@ _grub_install_bios() {
 _grub_bios() {
     touch /.archboot
     _grub_install_bios &
-    _progress_wait "11" "99" "Setting up GRUB(2) BIOS..." "0.1"
+    _progress_wait "11" "99" "Setting up GRUB(2) BIOS..." "0.15"
     _progress "100" "Setting up GRUB(2) BIOS completed."
     sleep 2
 }
