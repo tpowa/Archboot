@@ -88,7 +88,7 @@ _auto_create_filesystems() {
         fi
         _COUNT=$((_COUNT+_PROGRESS_COUNT))
     done
-    progress "100" "Filesystems created successfully."
+    _progress "100" "Filesystems created successfully."
     sleep 2
 }
 _autoprepare() {
