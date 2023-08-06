@@ -232,7 +232,8 @@ _auto_mkinitcpio() {
         [[ -e "${_DESTDIR}/boot/initramfs-linux-fallback.img" ]] && rm -f "${_DESTDIR}/boot/initramfs-linux-fallback.img"
         sleep 2
         _AUTO_MKINITCPIO=1
-        _run_mkinitcpio
+        _run_mkinitcpio | _dialog --title " Logging to ${_LOG} " --gauge "Rebuilding initramfs on installed system..." 8 75 0
+        _error_mkinitcpio
         _printk on
     fi
 }

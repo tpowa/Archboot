@@ -25,7 +25,6 @@ _run_pacman(){
     _pacman &
     _progress_wait "0" "99" "Installing package(s):\n${_PACKAGES}..." "2"
     # pacman finished, display scrollable output
-    local _RESULT=''
     if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
         _progress "100" "Package installation failed." 6 75
         sleep 2
