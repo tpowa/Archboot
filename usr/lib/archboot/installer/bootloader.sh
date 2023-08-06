@@ -917,7 +917,6 @@ _setup_grub_uefi() {
         sleep 2
     else
         ## Install GRUB
-        _GRUB_PREFIX_DIR="/boot/grub/"
         _progress "10" "Setting up GRUB(2) UEFI..."
         _chroot_mount
         touch /.archboot
@@ -932,7 +931,6 @@ _setup_grub_uefi() {
 
 _setup_grub_uefi_sb() {
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
-        _GRUB_PREFIX_DIR="${_UEFISYS_MP}/EFI/BOOT/"
         _progress "10" "Setting up GRUB(2) UEFI Secure Boot..."
         # generate GRUB with config embeded
         #remove existing, else weird things are happening
@@ -951,6 +949,11 @@ _do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "X64" ]] && _GRUB_ARCH="x86_64"
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
+    if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
+        _GRUB_PREFIX_DIR="${_UEFISYS_MP}/EFI/BOOT/"
+    else
+        _GRUB_PREFIX_DIR="/boot/grub/"
+    fi
     _do_grub_common_before
     _setup_grub_uefi | _dialog --title " Logging to ${_LOG} " --gauge "Setting up GRUB(2) UEFI..." 6 75 0
     _do_grub_config || return 1
