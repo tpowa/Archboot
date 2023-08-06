@@ -863,15 +863,16 @@ _do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
     _do_grub_common_before
-    _dialog --no-mouse --infobox "Setting up GRUB(2) UEFI. This needs some time..." 3 55
     _chroot_mount
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
+        progress "10" "Setting up GRUB(2) UEFI..."
         # install fedora shim
         [[ -d  ${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT ]] || mkdir -p "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT
         cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".EFI
         cp -f /usr/share/archboot/bootloader/mm"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/
         _GRUB_PREFIX_DIR="${_UEFISYS_MP}/EFI/BOOT/"
     else
+        progress "50" "Setting up GRUB(2) UEFI..."
         ## Install GRUB
         chroot "${_DESTDIR}" grub-install \
             --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
@@ -890,6 +891,7 @@ _do_grub_uefi() {
     _do_grub_config || return 1
     _GRUB_UEFI=""
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
+        progress "50" "Setting up GRUB(2) UEFI..."
         # generate GRUB with config embeded
         #remove existing, else weird things are happening
         [[ -f "${_DESTDIR}/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]] && rm "${_DESTDIR}"/"${_GRUB_PREFIX_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi
@@ -916,6 +918,7 @@ _do_grub_uefi() {
             ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
         fi
     fi
+        progress "98" "Setting up GRUB(2) UEFI..."
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" && -z "${_UEFI_SECURE_BOOT}" && -e "${_DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="GRUB"
         _BOOTMGR_LOADER_PATH="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
@@ -923,7 +926,7 @@ _do_grub_uefi() {
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        _dialog --no-mouse --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully." 3 60
+        _progress "100" "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully."
         sleep 3
         _S_BOOTLOADER=1
     elif [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && -n "${_UEFI_SECURE_BOOT}" ]]; then
@@ -934,7 +937,7 @@ _do_grub_uefi() {
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
         _BOOTMGR_LOADER_PATH="/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         _do_uefi_bootmgr_setup
-        _dialog --no-mouse --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully." 4 50
+        _progress "100" "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully."
         sleep 3
         _S_BOOTLOADER=1
     else
@@ -955,7 +958,7 @@ _install_bootloader_uefi() {
     # https://github.com/systemd/systemd/issues/27837
     # https://sourceforge.net/p/gnu-efi/bugs/37/
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
-        _do_grub_uefi
+        _do_grub_uefi | _dialog --title " Logging to ${_LOG} " --gauge "Setting up GRUB(2) UEFI. This needs some time..." 6 75 0
     else
         _dialog --title " ${_UEFI_ARCH} UEFI Bootloader " --menu "" 8 40 2 \
             "${_EFISTUB_MENU_LABEL}" "${_EFISTUB_MENU_TEXT}" \
@@ -964,7 +967,7 @@ _install_bootloader_uefi() {
             "EFISTUB")
                         _do_efistub_uefi ;;
             "GRUB_UEFI")
-                        _do_grub_uefi ;;
+                        _do_grub_uefi _dialog --title " Logging to ${_LOG} " --gauge "Setting up GRUB(2) UEFI. This needs some time..." 6 75 0 ;;
         esac
     fi
 }
