@@ -409,12 +409,13 @@ GUMEOF
         _BOOTMGR_LABEL="SYSTEMD-BOOT"
         _BOOTMGR_LOADER_PATH="/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi"
         _do_uefi_bootmgr_setup
+        sleep 2
         _dialog --msgbox "You will now be put into the editor to edit:\nloader.conf and menu entry files\n\nAfter you save your changes, exit the editor." 8 50
         _geteditor || return 1
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"
         _do_efistub_copy_to_efisys | _dialog --title " Logging to ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
-        _dialog --no-mouse --infobox "SYSTEMD-BOOT has been setup successfully." 3 50
+        _dialog --title " Success " --no-mouse --infobox "SYSTEMD-BOOT has been setup successfully." 3 50
         sleep 3
         _S_BOOTLOADER=1
     else
