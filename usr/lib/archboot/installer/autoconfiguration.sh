@@ -232,14 +232,14 @@ _auto_mkinitcpio() {
             _dialog --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && _HWPARAMETER="${_HWPARAMETER} --nfs"
         fi
         _dialog --no-mouse --infobox "" 3 70
-        _auto_hwdetect | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Preconfiguring mkinitcpio settings on installed system..." 6 75 0
+        _auto_hwdetect | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Preconfiguring mkinitcpio settings on installed system..." 6 75 0
         # disable fallpack preset
         sed -i -e "s# 'fallback'##g" "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
         # remove fallback initramfs
         [[ -e "${_DESTDIR}/boot/initramfs-linux-fallback.img" ]] && rm -f "${_DESTDIR}/boot/initramfs-linux-fallback.img"
         sleep 2
         _AUTO_MKINITCPIO=1
-        _run_mkinitcpio | _dialog --title " Logging to ${VC} | ${_LOG} " --gauge "Rebuilding initramfs on installed system..." 6 75 0
+        _run_mkinitcpio | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Rebuilding initramfs on installed system..." 6 75 0
         _mkinitcpio_error
         _printk on
     fi
