@@ -473,7 +473,7 @@ CONFEOF
 
 _uki_uefi() {
     sleep 2
-    _progress "50" "Enable automatic UKI creation\non EFI SYSTEM PARTITION (ESP) on installed system..."
+    _progress "50" "Enable automatic UKI creation on EFI SYSTEM PARTITION (ESP) on installed system..."
     cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.path"
 [Unit]
 Description=Run systemd ukify
