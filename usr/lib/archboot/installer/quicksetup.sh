@@ -17,13 +17,9 @@ _auto_partition() {
             _progress "25" "Creating EFI_SYSTEM partition..."
             sgdisk --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":EFI_SYSTEM "${_DISK}" >"${_LOG}"
         fi
-        if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
-            # set the legacy BIOS boot 2bit attribute
-            _progress "40" "Setting BIOS_boot attribute..."
-            sgdisk --attributes="${_UEFISYSDEV_NUM}":set:2 "${_DISK}" >"${_LOG}"
-        else
+        if [[ -z "${_UEFISYS_BOOTDEV}" ]]; then
             _progress "40" "Creating Extended_BOOT partition..."
-            sgdisk --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":EA00 --attributes="${_BOOTDEV_NUM}":set:2 --change-name="${_BOOTDEV_NUM}":ARCH_LINUX_XBOOT "${_DISK}" >"${_LOG}"
+            sgdisk --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":EA00 --change-name="${_BOOTDEV_NUM}":ARCH_LINUX_XBOOT "${_DISK}" >"${_LOG}"
         fi
         _progress "55" "Creating Swap partition..."
         sgdisk --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCH_LINUX_SWAP "${_DISK}" >"${_LOG}"
