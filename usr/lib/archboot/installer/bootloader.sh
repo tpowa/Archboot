@@ -774,7 +774,6 @@ _grub_install_bios() {
     # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
     _freeze_xfs
     _chroot_mount
-    sleep 2
     chroot "${_DESTDIR}" grub-install \
         --directory="/usr/lib/grub/i386-pc" \
         --target="i386-pc" \
@@ -788,7 +787,7 @@ _grub_install_bios() {
 }
 
 _grub_bios() {
-    touch ./archboot
+    touch /.archboot
     _grub_install_bios &
     _progress_wait "11" "99" "Setting up GRUB(2) BIOS..." "0.1"
     _progress "100" "Setting up GRUB(2) BIOS completed."
