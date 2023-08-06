@@ -17,7 +17,6 @@ _mkinitcpio() {
 }
 
 _run_mkinitcpio() {
-    _dialog --no-mouse --infobox "" 3 70
     _chroot_mount
     echo "Initramfs progress..." > /tmp/mkinitcpio.log
     touch /.archboot
