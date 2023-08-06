@@ -857,6 +857,20 @@ _do_grub_bios() {
     fi
 }
 
+_grub_install() {
+    chroot "${_DESTDIR}" grub-install \
+        --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
+        --target="${_GRUB_ARCH}-efi" \
+        --efi-directory="/${_UEFISYS_MP}" \
+        --bootloader-id="grub" \
+        --boot-directory="/boot" \
+        --no-nvram \
+        --recheck \
+        --debug &> "/tmp/grub_uefi_${_UEFI_ARCH}_install.log"
+    cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >>"${_LOG}"
+    rm /.archboot
+}
+
 _setup_grub_uefi() {
     _do_uefi_common || return 1
     [[ "${_UEFI_ARCH}" == "X64" ]] && _GRUB_ARCH="x86_64"
@@ -873,18 +887,10 @@ _setup_grub_uefi() {
         cp -f /usr/share/archboot/bootloader/mm"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/
         _GRUB_PREFIX_DIR="${_UEFISYS_MP}/EFI/BOOT/"
     else
-        _progress "50" "Setting up GRUB(2) UEFI..."
         ## Install GRUB
-        chroot "${_DESTDIR}" grub-install \
-            --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
-            --target="${_GRUB_ARCH}-efi" \
-            --efi-directory="/${_UEFISYS_MP}" \
-            --bootloader-id="grub" \
-            --boot-directory="/boot" \
-            --no-nvram \
-            --recheck \
-            --debug &> "/tmp/grub_uefi_${_UEFI_ARCH}_install.log"
-        cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >>"${_LOG}"
+        touch /.archboot
+        _grub_install &
+        _progress_wait "50" "99" "Setting up GRUB(2) UEFI..." "0.1"
         _GRUB_PREFIX_DIR="/boot/grub/"
     fi
     _chroot_umount
