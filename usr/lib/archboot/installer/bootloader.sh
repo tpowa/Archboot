@@ -929,6 +929,7 @@ _setup_grub_uefi_sb() {
 }
 
 _do_grub_uefi() {
+    _GRUB_UEFI=""
     _do_uefi_common || return 1
     [[ "${_UEFI_ARCH}" == "X64" ]] && _GRUB_ARCH="x86_64"
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
@@ -936,7 +937,6 @@ _do_grub_uefi() {
     _do_grub_common_before
     _setup_grub_uefi | _dialog --title " Logging to ${_LOG} " --gauge "Setting up GRUB(2) UEFI..." 6 75 0
     _do_grub_config || return 1
-    _GRUB_UEFI=""
     _setup_grub_uefi_sb | _dialog --title " Logging to ${_LOG} " --gauge "Setting up GRUB(2) UEFI Secure Boot..." 6 75 0
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" && -z "${_UEFI_SECURE_BOOT}" && -e "${_DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
         _BOOTMGR_LABEL="GRUB"
