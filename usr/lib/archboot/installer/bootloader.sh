@@ -940,14 +940,12 @@ _setup_grub_uefi() {
 _setup_grub_uefi_sb() {
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         _progress "10" "Setting up GRUB(2) UEFI Secure Boot..."
-        _chroot_mount
         # generate GRUB with config embeded
         #remove existing, else weird things are happening
         [[ -f "${_DESTDIR}/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]] && rm "${_DESTDIR}"/"${_GRUB_PREFIX_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi
         touch /.archboot
         _grub_install_uefi_sb &
         _progress_wait "11" "99" "Setting up GRUB(2) UEFI Secure Boot..." "0.1"
-        _chroot_umount
         _progress "100" "Setting up GRUB(2) UEFI Secure Boot completed."
         sleep 2
     fi
