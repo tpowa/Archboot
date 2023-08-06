@@ -872,13 +872,8 @@ _grub_install() {
 }
 
 _setup_grub_uefi() {
-    _do_uefi_common || return 1
-    [[ "${_UEFI_ARCH}" == "X64" ]] && _GRUB_ARCH="x86_64"
-    [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
-    [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
-    _do_grub_common_before
     _chroot_mount
-    _progress "25" "Setting up GRUB(2) UEFI..."
+    _progress "10" "Setting up GRUB(2) UEFI..."
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         _progress "50" "Setting up GRUB(2) UEFI..."
         # install fedora shim
@@ -890,7 +885,7 @@ _setup_grub_uefi() {
         ## Install GRUB
         touch /.archboot
         _grub_install &
-        _progress_wait "50" "99" "Setting up GRUB(2) UEFI..." "0.1"
+        _progress_wait "11" "99" "Setting up GRUB(2) UEFI..." "0.1"
         _GRUB_PREFIX_DIR="/boot/grub/"
     fi
     _chroot_umount
@@ -934,6 +929,11 @@ _setup_grub_uefi_sb() {
 }
 
 _do_grub_uefi() {
+    _do_uefi_common || return 1
+    [[ "${_UEFI_ARCH}" == "X64" ]] && _GRUB_ARCH="x86_64"
+    [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
+    [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
+    _do_grub_common_before
     _setup_grub_uefi | _dialog --title " Logging to ${_LOG} " --gauge "Setting up GRUB(2) UEFI..." 6 75 0
     _do_grub_config || return 1
     _GRUB_UEFI=""
