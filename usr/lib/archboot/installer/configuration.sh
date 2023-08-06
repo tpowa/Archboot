@@ -63,7 +63,7 @@ _set_mkinitcpio() {
         sleep 5
     else
         _run_mkinitcpio | _dialog --title " Logging to ${_LOG} " --gauge "Rebuilding initramfs on installed system..." 6 75 0
-        _error_mkinitcpio
+        _mkinitcpio_error
     fi
 }
 
