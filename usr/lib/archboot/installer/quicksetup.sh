@@ -1,6 +1,58 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
+_auto_partition() {
+    sleep 2
+    _progress "10" "Cleaning ${_DISK}..."
+    _clean_disk "${_DISK}"
+    # we assume a /dev/sdX,/dev/vdX or /dev/nvmeXnY format
+    if [[ -n "${_GUIDPARAMETER}" ]]; then
+        # GPT (GUID) is supported only by 'parted' or 'sgdisk'
+        # create fresh GPT
+        sgdisk --clear "${_DISK}" &>"${_NO_LOG}"
+        # create actual partitions
+        _progress "20" "Creating partitions ..."
+        sgdisk --new="${_GPT_BIOS_GRUB_DEV_NUM}":0:+"${_GPT_BIOS_GRUB_DEV_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEV_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEV_NUM}":BIOS_GRUB "${_DISK}" >"${_LOG}"
+        if [[ -n "${_UEFI_BOOT}" ]]; then
+            _progress "25" "Creating partitions ..."
+            sgdisk --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":EFI_SYSTEM "${_DISK}" >"${_LOG}"
+        fi
+        if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
+            # set the legacy BIOS boot 2bit attribute
+            _progress "40" "Creating partitions ..."
+            sgdisk --attributes="${_UEFISYSDEV_NUM}":set:2 "${_DISK}" >"${_LOG}"
+        else
+            _progress "40" "Creating partitions ..."
+            sgdisk --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":EA00 --attributes="${_BOOTDEV_NUM}":set:2 --change-name="${_BOOTDEV_NUM}":ARCH_LINUX_XBOOT "${_DISK}" >"${_LOG}"
+        fi
+        _progress "55" "Creating partitions ..."
+        sgdisk --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCH_LINUX_SWAP "${_DISK}" >"${_LOG}"
+        [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _GUID_TYPE=8305
+        [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _GUID_TYPE=8304
+        _progress "70" "Creating partitions ..."
+        sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":"${_GUID_TYPE}" --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
+        _progress "85" "Creating partitions ..."
+        sgdisk --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCH_LINUX_HOME "${_DISK}" >"${_LOG}"
+        _progress "100" "Creating partitions ..."
+        sgdisk --print "${_DISK}" >"${_LOG}"
+    else
+        # start at sector 1 for 4k drive compatibility and correct alignment
+        # create DOS MBR with parted
+        _progress "20" "Creating partitions ..."
+        parted -a optimal -s "${_DISK}" unit MiB mktable msdos &>"${_NO_LOG}"
+        _progress "35" "Creating partitions ..."
+        parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_BOOTDEV_SIZE)) >"${_LOG}"
+        _progress "50" "Creating partitions ..."
+        parted -a optimal -s "${_DISK}" unit MiB set 1 boot on >"${_LOG}"
+        _progress "60" "Creating partitions ..."
+        parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) >"${_LOG}"
+        _progress "85" "Creating partitions ..."
+        parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) >"${_LOG}"
+        _progress "100" "Creating partitions ..."
+        parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
+    fi
+}
+
 _autoprepare() {
     # check on special devices and stop them, else weird things can happen during partitioning!
     _stopluks
@@ -199,46 +251,7 @@ _autoprepare() {
     _umountall
     # disable swap and all mounted partitions, umount / last!
     _printk off
-    _dialog --no-mouse --infobox "Partitioning ${_DISK}..." 0 0
-    _clean_disk "${_DISK}"
-    # we assume a /dev/sdX,/dev/vdX or /dev/nvmeXnY format
-    if [[ -n "${_GUIDPARAMETER}" ]]; then
-        # GPT (GUID) is supported only by 'parted' or 'sgdisk'
-        # create fresh GPT
-        sgdisk --clear "${_DISK}" &>"${_NO_LOG}"
-        # create actual partitions
-        sgdisk --new="${_GPT_BIOS_GRUB_DEV_NUM}":0:+"${_GPT_BIOS_GRUB_DEV_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEV_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEV_NUM}":BIOS_GRUB "${_DISK}" >"${_LOG}"
-        if [[ -n "${_UEFI_BOOT}" ]]; then
-            sgdisk --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":EFI_SYSTEM "${_DISK}" >"${_LOG}"
-        fi
-        if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
-            # set the legacy BIOS boot 2bit attribute
-            sgdisk --attributes="${_UEFISYSDEV_NUM}":set:2 "${_DISK}" >"${_LOG}"
-        else
-            sgdisk --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":EA00 --attributes="${_BOOTDEV_NUM}":set:2 --change-name="${_BOOTDEV_NUM}":ARCH_LINUX_XBOOT "${_DISK}" >"${_LOG}"
-        fi
-        sgdisk --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCH_LINUX_SWAP "${_DISK}" >"${_LOG}"
-        [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _GUID_TYPE=8305
-        [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _GUID_TYPE=8304
-        sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":"${_GUID_TYPE}" --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
-        sgdisk --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCH_LINUX_HOME "${_DISK}" >"${_LOG}"
-        sgdisk --print "${_DISK}" >"${_LOG}"
-    else
-        # start at sector 1 for 4k drive compatibility and correct alignment
-        # create DOS MBR with parted
-        parted -a optimal -s "${_DISK}" unit MiB mktable msdos &>"${_NO_LOG}"
-        parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_BOOTDEV_SIZE)) >"${_LOG}"
-        parted -a optimal -s "${_DISK}" unit MiB set 1 boot on >"${_LOG}"
-        parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) >"${_LOG}"
-        parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) >"${_LOG}"
-        parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
-    fi
-    #shellcheck disable=SC2181
-    if [[ $? -gt 0 ]]; then
-        _dialog --msgbox "Error: Partitioning ${_DISK} (see ${_LOG} for details)." 0 0
-        _printk on
-        return 1
-    fi
+    _auto_partition | _dialog --title " Partitioning " --no-mouse --gauge "Partitioning ${_DISK}..." 6 75 0
     # reread partitiontable for kernel
     partprobe "${_DISK}"
     _printk on
