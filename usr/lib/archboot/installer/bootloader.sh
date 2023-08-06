@@ -473,7 +473,7 @@ CONFEOF
 
 _uki_uefi() {
     sleep 2
-    progress "50" "Enable automatic UKI creation\non EFI SYSTEM PARTITION (ESP) on installed system..."
+    _progress "50" "Enable automatic UKI creation\non EFI SYSTEM PARTITION (ESP) on installed system..."
     cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.path"
 [Unit]
 Description=Run systemd ukify
@@ -499,7 +499,7 @@ CONFEOF
     rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
     cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
     sleep 2
-    progress "100" "Unified Kernel Image has been setup successfully."
+    _progress "100" "Unified Kernel Image has been setup successfully."
     sleep 2
     _S_BOOTLOADER=1
 }
