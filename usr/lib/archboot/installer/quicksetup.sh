@@ -275,6 +275,9 @@ _autoprepare() {
     else
         _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_BOOTDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
     fi
+    _MAX_COUNT=$(($(echo ${_FSSPECS} | wc -w)+1))
+    _PROGRESS_COUNT=$((100/_MAX_COUNT))
+    _COUNT=0
     ## make and mount filesystems
     for fsspec in ${_FSSPECS}; do
         _DEV="${_DISK}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
@@ -306,8 +309,9 @@ _autoprepare() {
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             btrfs subvolume set-default "${_DESTDIR}"/"${_MP}" || return 1
         fi
-    done
-    _dialog --no-mouse --infobox "Quick Setup was successful." 3 40
+        _COUNT=$((_COUNT+_PROGRESS_COUNT))
+    done | _dialog --title " Filesystems " --no-mouse --gauge "Creating Filesystems on ${_DISK}..." 6 75 0
+    _dialog --title " Success " --no-mouse --infobox "Quick Setup was successful." 3 40
     sleep 3
     _S_QUICK_SETUP=1
 }
