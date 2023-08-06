@@ -845,7 +845,7 @@ _do_grub_bios() {
     if [[ "$(${_BLKID} -p -i -o value -s PTTYPE "${_BOOTDEV}")" == "gpt" ]]; then
         _CHECK_BIOS_BOOT_GRUB=1
         _RUN_CFDISK=""
-        _DEV="${_BOOTDEV}"
+        _DISK="${_BOOTDEV}"
         _check_gpt
     else
         if [[ -z "${_FAIL_COMPLEX}" ]]; then
