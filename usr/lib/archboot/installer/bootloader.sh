@@ -770,6 +770,28 @@ EOF
     sleep 3
 }
 
+_grub_install_bios() {
+    # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
+    _freeze_xfs
+    _chroot_mount
+    chroot "${_DESTDIR}" grub-install \
+        --directory="/usr/lib/grub/i386-pc" \
+        --target="i386-pc" \
+        --boot-directory="/boot" \
+        --recheck \
+        --debug \
+        "${_BOOTDEV}" &>"/tmp/grub_bios_install.log"
+    cat "/tmp/grub_bios_install.log" >>"${_LOG}"
+    _chroot_umount
+    rm /.archboot
+}
+
+_grub_bios() {
+    _grub_install_bios &
+    _progress_wait "11" "99" "Setting up GRUB(2) BIOS..." "0.1"
+     _progress "100" "Setting up GRUB(2) BIOS completed."
+}
+
 _do_grub_bios() {
     _do_grub_common_before
     # try to auto-configure GRUB(2)...
@@ -831,18 +853,8 @@ _do_grub_bios() {
         _dialog --msgbox "Error:\nGRUB(2) cannot boot from ${_BOOTDEV}, which contains /boot!\n\nPossible error sources:\n- encrypted devices are not supported" 0 0
         return 1
     fi
-    _dialog --no-mouse --infobox "Setting up GRUB(2) BIOS. This needs some time..." 3 55
-    # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
-    _freeze_xfs
-    _chroot_mount
-    chroot "${_DESTDIR}" grub-install \
-        --directory="/usr/lib/grub/i386-pc" \
-        --target="i386-pc" \
-        --boot-directory="/boot" \
-        --recheck \
-        --debug \
-        "${_BOOTDEV}" &>"/tmp/grub_bios_install.log"
-    _chroot_umount
+    touch ./archboot
+    _grub_bios | _dialog --title " Logging to ${_LOG} " --gauge "Setting up GRUB(2) BIOS..." 6 75 0
     mkdir -p "${_DESTDIR}/boot/grub/locale"
     cp -f "${_DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${_DESTDIR}/boot/grub/locale/en.mo"
     if [[ -e "${_DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
@@ -857,7 +869,7 @@ _do_grub_bios() {
     fi
 }
 
-_grub_install() {
+_grub_install_uefi() {
     chroot "${_DESTDIR}" grub-install \
         --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
         --target="${_GRUB_ARCH}-efi" \
@@ -871,7 +883,7 @@ _grub_install() {
     rm /.archboot
 }
 
-_grub_install_sb() {
+_grub_install_uefi_sb() {
     ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
     # add -v for verbose
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
@@ -914,7 +926,7 @@ _setup_grub_uefi() {
         _progress "10" "Setting up GRUB(2) UEFI..."
         _chroot_mount
         touch /.archboot
-        _grub_install &
+        _grub_install_uefi &
         _progress_wait "11" "99" "Setting up GRUB(2) UEFI..." "0.1"
         _GRUB_PREFIX_DIR="/boot/grub/"
         _GRUB_UEFI=1
@@ -932,7 +944,7 @@ _setup_grub_uefi_sb() {
         #remove existing, else weird things are happening
         [[ -f "${_DESTDIR}/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]] && rm "${_DESTDIR}"/"${_GRUB_PREFIX_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi
         touch ./archboot
-        _grub_install_sb &
+        _grub_install_uefi_sb &
         _progress_wait "11" "99" "Setting up GRUB(2) UEFI Secure Boot..." "0.1"
         _GRUB_UEFI=1
         _chroot_umount
