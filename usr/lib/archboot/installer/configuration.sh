@@ -24,7 +24,7 @@ _run_mkinitcpio() {
     _mkinitcpio &
     _progress_wait "0" "99" "Rebuilding initramfs on installed system..." "0.1"
     if [[ $(cat /tmp/.mkinitcpio-retcode) -ne 0 ]]; then
-        progress "100" "Rebuilding initramfs failed." 6 75
+        _progress "100" "Rebuilding initramfs failed." 6 75
         sleep 2
     else
         _progress "100" "Rebuilding initramfs complete." 6 75
