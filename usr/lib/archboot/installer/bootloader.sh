@@ -861,7 +861,7 @@ _do_grub_bios() {
     if [[ -e "${_DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
         _GRUB_PREFIX_DIR="/boot/grub/"
         _do_grub_config || return 1
-        _dialog --no-mouse --infobox "GRUB(2) BIOS has been installed successfully." 3 55
+        _dialog --title " Success " --no-mouse --infobox "GRUB(2) BIOS has been installed successfully." 3 55
         sleep 3
         _S_BOOTLOADER=1
     else
@@ -944,7 +944,7 @@ _setup_grub_uefi_sb() {
         # generate GRUB with config embeded
         #remove existing, else weird things are happening
         [[ -f "${_DESTDIR}/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]] && rm "${_DESTDIR}"/"${_GRUB_PREFIX_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi
-        touch ./archboot
+        touch /.archboot
         _grub_install_uefi_sb &
         _progress_wait "11" "99" "Setting up GRUB(2) UEFI Secure Boot..." "0.1"
         _GRUB_UEFI=1
