@@ -967,7 +967,7 @@ _install_bootloader_uefi() {
             "EFISTUB")
                         _do_efistub_uefi ;;
             "GRUB_UEFI")
-                        _do_grub_uefi _dialog --title " Logging to ${_LOG} " --gauge "Setting up GRUB(2) UEFI. This needs some time..." 6 75 0 ;;
+                        _do_grub_uefi | _dialog --title " Logging to ${_LOG} " --gauge "Setting up GRUB(2) UEFI. This needs some time..." 6 75 0 ;;
         esac
     fi
 }
