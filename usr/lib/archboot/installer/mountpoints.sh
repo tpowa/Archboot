@@ -113,6 +113,33 @@ _check_mkfs_values() {
     [[ -z "${_LABEL_NAME}" ]] && _LABEL_NAME="NONE"
 }
 
+_run_mkfs() {
+    while read -r line; do
+        _DEV=$(echo "${line}" | cut -d: -f 1)
+        _FSTYPE=$(echo "${line}" | cut -d: -f 2)
+        _MP=$(echo "${line}" | cut -d: -f 3)
+        _DOMKFS=$(echo "${line}" | cut -d: -f 4)
+        _LABEL_NAME=$(echo "${line}" | cut -d: -f 5)
+        _FS_OPTIONS=$(echo "${line}" | cut -d: -f 6)
+        [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
+        _BTRFS_DEVS=$(echo "${line}" | cut -d: -f 7)
+        # remove # from array
+        _BTRFS_DEVS="${_BTRFS_DEVS//#/\ }"
+        _BTRFS_LEVEL=$(echo "${line}" | cut -d: -f 8)
+        [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _BTRFS_LEVEL="${_FS_OPTIONS} -m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
+        _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d: -f 9)
+        [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _BTRFS_SUBVOLUME=""
+        _BTRFS_COMPRESS=$(echo "${line}" | cut -d: -f 10)
+        [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
+        _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
+              "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+        sleep 1
+        _COUNT=$((_COUNT+_PROGRESS_COUNT))
+    done < /tmp/.parts
+    _progress "100" "Mountpoints finished successfully."
+    sleep 2
+}
+
 _create_filesystem() {
     _LABEL_NAME=""
     _FS_OPTIONS=""
@@ -306,27 +333,10 @@ _mountpoints() {
     # disable swap and all mounted devices
     _umountall
     _printk off
-    while read -r line; do
-        _DEV=$(echo "${line}" | cut -d: -f 1)
-        _FSTYPE=$(echo "${line}" | cut -d: -f 2)
-        _MP=$(echo "${line}" | cut -d: -f 3)
-        _DOMKFS=$(echo "${line}" | cut -d: -f 4)
-        _LABEL_NAME=$(echo "${line}" | cut -d: -f 5)
-        _FS_OPTIONS=$(echo "${line}" | cut -d: -f 6)
-        [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
-        _BTRFS_DEVS=$(echo "${line}" | cut -d: -f 7)
-        # remove # from array
-        _BTRFS_DEVS="${_BTRFS_DEVS//#/\ }"
-        _BTRFS_LEVEL=$(echo "${line}" | cut -d: -f 8)
-        [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _BTRFS_LEVEL="${_FS_OPTIONS} -m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
-        _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d: -f 9)
-        [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _BTRFS_SUBVOLUME=""
-        _BTRFS_COMPRESS=$(echo "${line}" | cut -d: -f 10)
-        [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
-        _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-              "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
-        sleep 1
-    done < /tmp/.parts
+    _MAX_COUNT=$(wc -l /tmp/.parts)
+    _PROGRESS_COUNT=$((100/_MAX_COUNT))
+    _COUNT=0
+    _run_mkfs | _dialog --title " Mountpoints " --no-mouse --gauge "Mountpoints..." 6 75 0
     _printk on
      _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
     _dialog --no-mouse --infobox "Devices were mounted successfully." 3 50
@@ -348,7 +358,7 @@ _mkfs() {
         if [[ "${2}" == "swap" ]]; then
             _progress "${_COUNT}" "Activating swapspace on ${1}..."
         else
-            _progress "${_COUNT}" "Mounting ${2} \non ${1} to ${3}${5}..." 0 0
+            _progress "${_COUNT}" "Mounting ${2} on ${1} to ${3}${5}..." 0 0
         fi
     fi
     # add btrfs raid level, if needed
