@@ -930,11 +930,11 @@ _setup_grub_uefi() {
         _grub_install_uefi &
         _progress_wait "11" "99" "Setting up GRUB(2) UEFI..." "0.1"
         _GRUB_PREFIX_DIR="/boot/grub/"
-        _GRUB_UEFI=1
         _chroot_umount
         _progress "100" "Setting up GRUB(2) UEFI completed."
         sleep 2
     fi
+    _GRUB_UEFI=1
 }
 
 _setup_grub_uefi_sb() {
@@ -947,7 +947,6 @@ _setup_grub_uefi_sb() {
         touch /.archboot
         _grub_install_uefi_sb &
         _progress_wait "11" "99" "Setting up GRUB(2) UEFI Secure Boot..." "0.1"
-        _GRUB_UEFI=1
         _chroot_umount
         _progress "100" "Setting up GRUB(2) UEFI Secure Boot completed."
         sleep 2
