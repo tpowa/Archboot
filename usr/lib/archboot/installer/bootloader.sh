@@ -872,6 +872,8 @@ _grub_install() {
 }
 
 _grub_install_sb() {
+    ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
+    # add -v for verbose
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
     elif [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
@@ -897,41 +899,43 @@ _grub_install_sb() {
 }
 
 _setup_grub_uefi() {
-    _chroot_mount
-    _progress "10" "Setting up GRUB(2) UEFI..."
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
-        _progress "50" "Setting up GRUB(2) UEFI..."
+        _progress "50" "Copying fedora's shim and mokmanager..."
+        sleep 2
         # install fedora shim
         [[ -d  ${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT ]] || mkdir -p "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT
         cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".EFI
         cp -f /usr/share/archboot/bootloader/mm"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/
         _GRUB_PREFIX_DIR="${_UEFISYS_MP}/EFI/BOOT/"
+        _progress "100" "Copying fedora's shim and mokmanager completed."
+        sleep 2
     else
         ## Install GRUB
+        _progress "10" "Setting up GRUB(2) UEFI..."
+        _chroot_mount
         touch /.archboot
         _grub_install &
         _progress_wait "11" "99" "Setting up GRUB(2) UEFI..." "0.1"
         _GRUB_PREFIX_DIR="/boot/grub/"
+        _GRUB_UEFI=1
+        _chroot_umount
+        _progress "100" "Setting up GRUB(2) UEFI completed."
+        sleep 2
     fi
-    _chroot_umount
-    _GRUB_UEFI=1
-    _progress "100" "Setting up GRUB(2) UEFI completed."
-    sleep 2
 }
 
 _setup_grub_uefi_sb() {
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
-        _progress "25" "Setting GRUB(2) UEFI Secure Boot..."
+        _progress "10" "Setting up GRUB(2) UEFI Secure Boot..."
+        _chroot_mount
         # generate GRUB with config embeded
         #remove existing, else weird things are happening
         [[ -f "${_DESTDIR}/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]] && rm "${_DESTDIR}"/"${_GRUB_PREFIX_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi
         touch ./archboot
         _grub_install_sb &
-
-        ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
-        # add -v for verbose
-        _progress "50" "Setting GRUB(2) UEFI Secure Boot..."
-
+        _progress_wait "11" "99" "Setting up GRUB(2) UEFI Secure Boot..." "0.1"
+        _GRUB_UEFI=1
+        _chroot_umount
         _progress "100" "Setting up GRUB(2) UEFI Secure Boot completed."
         sleep 2
     fi
