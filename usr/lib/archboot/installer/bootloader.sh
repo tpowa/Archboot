@@ -429,7 +429,7 @@ _do_refind_uefi() {
         _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
         _pacman_error
     fi
-    _dialog --no-mouse --infobox "Setting up rEFInd now. This needs some time..." 3 60
+    _dialog --no-mouse --infobox "Setting up rEFInd now..." 3 60
     [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
     cp -f "${_DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
     cp -r "${_DESTDIR}/usr/share/refind/icons" "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
