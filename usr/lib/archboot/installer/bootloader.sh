@@ -313,7 +313,6 @@ _do_efistub_parameters() {
 _do_efistub_copy_to_efisys() {
     if ! [[ "${_UEFISYS_MP}" == "boot" ]]; then
         # clean and copy to efisys
-        _dialog --no-mouse --infobox "Copying kernel, ucode and initramfs\nto EFI SYSTEM PARTITION (ESP) now..." 4 65
         [[ -d "${_DESTDIR}/${_UEFISYS_MP}/${_UEFISYS_PATH}" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/${_UEFISYS_PATH}"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/${_KERNEL}"
         cp -f "${_DESTDIR}/boot/${_VMLINUZ}" "${_DESTDIR}/${_UEFISYS_MP}/${_KERNEL}"
@@ -323,8 +322,8 @@ _do_efistub_copy_to_efisys() {
             rm -f "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD_UCODE}"
             cp -f "${_DESTDIR}/boot/${_UCODE}" "${_DESTDIR}/${_UEFISYS_MP}/${_INITRD_UCODE}"
         fi
-        sleep 5
-        _dialog --no-mouse --infobox "Enable automatic copying of system files\nto EFI SYSTEM PARTITION (ESP) on installed system..." 4 65
+        sleep 2
+        _progress "50" "Enable automatic copying of system files\nto EFI SYSTEM PARTITION on installed system..."
         cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/efistub_copy.path"
 [Unit]
 Description=Copy EFISTUB Kernel and Initramfs files to EFI SYSTEM PARTITION
@@ -353,6 +352,8 @@ CONFEOF
             >> "${_DESTDIR}/etc/systemd/system/efistub_copy.service"
         fi
         ${_NSPAWN} systemctl enable efistub_copy.path &>"${_NO_LOG}"
+        sleep 2
+        _progress "100" "Automatic Syncing to EFI SYSTEM PARTITIOM completed."
         sleep 2
     fi
     # reset _VMLINUZ on aarch64
@@ -412,7 +413,7 @@ GUMEOF
         _geteditor || return 1
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"
-        _do_efistub_copy_to_efisys
+        _do_efistub_copy_to_efisys | _dialog --title " Logging to ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
         _dialog --no-mouse --infobox "SYSTEMD-BOOT has been setup successfully." 3 50
         sleep 3
         _S_BOOTLOADER=1
