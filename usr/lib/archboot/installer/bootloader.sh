@@ -528,7 +528,7 @@ EFI=/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi
 CONFEOF
     echo "/usr/lib/systemd/ukify \${KERNEL} \${UCODE} \${INITRD} --cmdline @\${CMDLINE} --splash \${SPLASH} --output \${EFI}" >> "${_UKIFY_CONFIG}"
     mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux"
-    _dialog --msgbox "You will now be put into the editor to edit:\n- kernel commandline config file\n-ukify.conf config file\n\nAfter you save your changes, exit the editor." 9 50
+    _dialog --msgbox "You will now be put into the editor to edit:\n- kernel commandline config file\n- ukify.conf config file\n\nAfter you save your changes, exit the editor." 9 50
     _geteditor || return 1
     "${_EDITOR}" "${_CMDLINE}"
     "${_EDITOR}" "${_UKIFY_CONFIG}"
