@@ -244,9 +244,9 @@ _do_mok_sign () {
     _INSTALL_MOK=""
     _MOK_PW=""
     while [[ -z "${_MOK_PW}" ]]; do
-        _dialog --title " MOK Password " --insecure --passwordbox "" 7 65 2>"${_ANSWER}" || return 1
+        _dialog --title " MOK Password " --insecure --passwordbox "On reboot you will be asked for this password by mokmanager:" 8 65 2>"${_ANSWER}" || return 1
         _PASS=$(cat "${_ANSWER}")
-        _dialog --title " Retype MOK Passwork " --insecure --passwordbox "" 7 65 2>"${_ANSWER}" || return 1
+        _dialog --title " Retype MOK Passwork " --insecure --passwordbox "On reboot you will be asked for this password by mokmanager:" 8 65 2>"${_ANSWER}" || return 1
         _PASS2=$(cat "${_ANSWER}")
         if [[ "${_PASS}" == "${_PASS2}" && -n "${_PASS}" ]]; then
             _MOK_PW=${_PASS}
