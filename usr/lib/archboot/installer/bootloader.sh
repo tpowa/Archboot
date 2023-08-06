@@ -156,7 +156,7 @@ _do_uefi_common() {
         [[ -f "${_DESTDIR}/usr/bin/sbsign" ]] || _PACKAGES="${_PACKAGES} sbsigntools"
     fi
     if [[ -n "${_PACKAGES}" ]]; then
-        _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 8 75 0
+        _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
         _pacman_error
     fi
     # automounted /boot and ESP needs to be mounted first, trigger mount with ls
@@ -426,7 +426,7 @@ GUMEOF
 _do_refind_uefi() {
     if [[ ! -f "${_DESTDIR}/usr/bin/refind-install" ]]; then
         _PACKAGES="refind"
-        _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 8 75 0
+        _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
         _pacman_error
     fi
     _dialog --no-mouse --infobox "Setting up rEFInd now. This needs some time..." 3 60
@@ -550,12 +550,12 @@ _do_grub_common_before() {
     _abort_f2fs_bootpart || return 1
     if [[ ! -d "${_DESTDIR}/usr/lib/grub" ]]; then
         _PACKAGES="grub"
-        _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 8 75 0
+        _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
         _pacman_error
     fi
     if [[ ! -f "${_DESTDIR}/usr/share/grub/ter-u16n.pf2" ]]; then
         _PACKAGES=terminus-font
-        _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 8 75 0
+        _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
         _pacman_error
     fi
 }
@@ -1018,7 +1018,7 @@ _install_bootloader() {
     if [[ -n "${_UCODE}" ]]; then
         if ! [[ -f "${_DESTDIR}/boot/${_UCODE}" ]]; then
             _PACKAGES="${_UCODE_PKG}"
-            _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 8 75 0
+            _run_pacman | _dialog --title " Logging to ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
             _pacman_error
         fi
     fi
