@@ -244,9 +244,9 @@ _do_mok_sign () {
     _INSTALL_MOK=""
     _MOK_PW=""
     while [[ -z "${_MOK_PW}" ]]; do
-        _dialog --title " MOK Password " --insecure --passwordbox "On reboot you will be asked for this password by mokmanager:" 8 65 2>"${_ANSWER}" || return 1
+        _dialog --title " Machine Owner Key Password " --insecure --passwordbox "On reboot you will be asked for this password by mokmanager:" 8 65 2>"${_ANSWER}" || return 1
         _PASS=$(cat "${_ANSWER}")
-        _dialog --title " Retype MOK Passwork " --insecure --passwordbox "On reboot you will be asked for this password by mokmanager:" 8 65 2>"${_ANSWER}" || return 1
+        _dialog --title " Retype Machine Owner Key Password " --insecure --passwordbox "On reboot you will be asked for this password by mokmanager:" 8 65 2>"${_ANSWER}" || return 1
         _PASS2=$(cat "${_ANSWER}")
         if [[ "${_PASS}" == "${_PASS2}" && -n "${_PASS}" ]]; then
             _MOK_PW=${_PASS}
@@ -260,11 +260,11 @@ _do_mok_sign () {
     done
     mokutil -i "${_DESTDIR}"/"${_KEYDIR}"/MOK/MOK.cer < ${_MOK_PW} >"${_LOG}"
     rm /tmp/.password
-    _dialog --title " MOK Key " --no-mouse --infobox "MOK keys have been installed successfully." 3 50
+    _dialog --title " Machine Owner Key " --no-mouse --infobox "MOK key has been installed successfully." 3 50
     sleep 3
     ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" &>"${_LOG}"
     ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
-    _dialog --title " File Signing " --no-mouse --infobox "/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nhave been signed successfully." 5 60
+    _dialog --title " Kernel And Bootloader Signing " --no-mouse --infobox "/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nhave been signed successfully." 5 60
     sleep 3
 }
 
