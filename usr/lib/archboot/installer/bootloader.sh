@@ -871,6 +871,7 @@ _do_grub_bios() {
 }
 
 _grub_install_uefi() {
+    _GRUB_PREFIX_DIR="/boot/grub/"
     chroot "${_DESTDIR}" grub-install \
         --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
         --target="${_GRUB_ARCH}-efi" \
@@ -887,6 +888,7 @@ _grub_install_uefi() {
 _grub_install_uefi_sb() {
     ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
     # add -v for verbose
+    _GRUB_PREFIX_DIR="${_UEFISYS_MP}/EFI/BOOT/"
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
     elif [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
@@ -919,7 +921,6 @@ _setup_grub_uefi() {
         [[ -d  ${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT ]] || mkdir -p "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT
         cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".EFI
         cp -f /usr/share/archboot/bootloader/mm"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/
-        _GRUB_PREFIX_DIR="${_UEFISYS_MP}/EFI/BOOT/"
         _progress "100" "Copying fedora's shim and mokmanager completed."
         sleep 2
     else
@@ -929,7 +930,6 @@ _setup_grub_uefi() {
         touch /.archboot
         _grub_install_uefi &
         _progress_wait "11" "99" "Setting up GRUB(2) UEFI..." "0.1"
-        _GRUB_PREFIX_DIR="/boot/grub/"
         _chroot_umount
         _progress "100" "Setting up GRUB(2) UEFI completed."
         sleep 2
