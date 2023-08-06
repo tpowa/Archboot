@@ -54,6 +54,43 @@ _auto_partition() {
     sleep 2
 }
 
+_auto_create_filesystems() {
+    ## make and mount filesystems
+    for fsspec in ${_FSSPECS}; do
+        _DEV="${_DISK}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
+        # Add check on nvme or mmc controller:
+        # NVME uses /dev/nvme0n1pX name scheme
+        # MMC uses /dev/mmcblk0pX
+        if echo "${_DISK}" | grep -q "nvme" || echo "${_DISK}" | grep -q "mmc"; then
+            _DEV="${_DISK}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
+        fi
+        _FSTYPE="$(echo "${fsspec}" | tr -d ' ' | cut -f2 -d:)"
+        _DOMKFS=1
+        _MP="$(echo "${fsspec}" | tr -d ' ' | cut -f3 -d:)"
+        _LABEL_NAME="$(echo "${fsspec}" | tr -d ' ' | cut -f4 -d:)"
+        _FS_OPTIONS=""
+        _BTRFS_DEVS=""
+        _BTRFS_LEVEL=""
+        _BTRFS_SUBVOLUME=""
+        _BTRFS_COMPRESS=""
+        if [[ "${_FSTYPE}" == "btrfs" ]]; then
+            _BTRFS_DEVS="${_DEV}"
+            [[ "${_MP}" == "/" ]] && _BTRFS_SUBVOLUME="root"
+            [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home"
+            _BTRFS_COMPRESS="compress=zstd"
+        fi
+        _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
+              "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+        sleep 1
+        # set default subvolume for systemd-gpt-autogenerator
+        if [[ "${_FSTYPE}" == "btrfs" ]]; then
+            btrfs subvolume set-default "${_DESTDIR}"/"${_MP}" || return 1
+        fi
+        _COUNT=$((_COUNT+_PROGRESS_COUNT))
+    done
+    progress "100" "Filesystems created successfully."
+    sleep 2
+}
 _autoprepare() {
     # check on special devices and stop them, else weird things can happen during partitioning!
     _stopluks
@@ -279,39 +316,7 @@ _autoprepare() {
     _MAX_COUNT=$(echo ${_FSSPECS} | wc -w)
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     _COUNT=0
-    ## make and mount filesystems
-    for fsspec in ${_FSSPECS}; do
-        _DEV="${_DISK}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
-        # Add check on nvme or mmc controller:
-        # NVME uses /dev/nvme0n1pX name scheme
-        # MMC uses /dev/mmcblk0pX
-        if echo "${_DISK}" | grep -q "nvme" || echo "${_DISK}" | grep -q "mmc"; then
-            _DEV="${_DISK}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
-        fi
-        _FSTYPE="$(echo "${fsspec}" | tr -d ' ' | cut -f2 -d:)"
-        _DOMKFS=1
-        _MP="$(echo "${fsspec}" | tr -d ' ' | cut -f3 -d:)"
-        _LABEL_NAME="$(echo "${fsspec}" | tr -d ' ' | cut -f4 -d:)"
-        _FS_OPTIONS=""
-        _BTRFS_DEVS=""
-        _BTRFS_LEVEL=""
-        _BTRFS_SUBVOLUME=""
-        _BTRFS_COMPRESS=""
-        if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            _BTRFS_DEVS="${_DEV}"
-            [[ "${_MP}" == "/" ]] && _BTRFS_SUBVOLUME="root"
-            [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home"
-            _BTRFS_COMPRESS="compress=zstd"
-        fi
-        _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-              "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
-        sleep 1
-        # set default subvolume for systemd-gpt-autogenerator
-        if [[ "${_FSTYPE}" == "btrfs" ]]; then
-            btrfs subvolume set-default "${_DESTDIR}"/"${_MP}" || return 1
-        fi
-        _COUNT=$((_COUNT+_PROGRESS_COUNT))
-    done | _dialog --title " Filesystems " --no-mouse --gauge "Creating Filesystems on ${_DISK}..." 6 75 0
+    _auto_create_filesystems | _dialog --title " Filesystems " --no-mouse --gauge "Creating Filesystems on ${_DISK}..." 6 75 0
     _dialog --title " Success " --no-mouse --infobox "Quick Setup was successful." 3 40
     sleep 3
     _S_QUICK_SETUP=1
