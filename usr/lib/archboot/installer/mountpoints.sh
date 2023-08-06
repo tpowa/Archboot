@@ -340,15 +340,15 @@ _mountpoints() {
 _mkfs() {
     if [[ -n "${4}" ]]; then
         if [[ "${2}" == "swap" ]]; then
-            _progress "${_COUNT}" "Creating and activating\nswapspace on ${1}..."
+            _progress "${_COUNT}" "Creating and activating swapspace on ${1}..."
         else
-            _progress "${_COUNT}" "Creating ${2} on ${1},\nmounting to ${3}${5}..."
+            _progress "${_COUNT}" "Creating ${2} on ${1}, mounting to ${3}${5}..."
         fi
     else
         if [[ "${2}" == "swap" ]]; then
-            _progress "${_COUNT}" "Activating swapspace \non ${1}..."
+            _progress "${_COUNT}" "Activating swapspace on ${1}..."
         else
-            _progress "${_COUNT}" "Mounting ${2} \non ${1} \nto ${3}${5}..." 0 0
+            _progress "${_COUNT}" "Mounting ${2} \non ${1} to ${3}${5}..." 0 0
         fi
     fi
     # add btrfs raid level, if needed
