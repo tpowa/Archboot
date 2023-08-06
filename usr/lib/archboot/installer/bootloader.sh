@@ -902,13 +902,13 @@ _grub_install_uefi_sb() {
 
 _setup_grub_uefi() {
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
-        _progress "50" "Copying fedora's shim and mokmanager..."
+        _progress "50" "Installing fedora's shim and mokmanager..."
         sleep 2
         # install fedora shim
         [[ -d  ${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT ]] || mkdir -p "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT
         cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".EFI
         cp -f /usr/share/archboot/bootloader/mm"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/
-        _progress "100" "Copying fedora's shim and mokmanager completed."
+        _progress "100" "Installing fedora's shim and mokmanager completed."
         sleep 2
     else
         ## Install GRUB
@@ -968,7 +968,7 @@ _do_grub_uefi() {
         _BOOTMGR_LABEL="SHIM with GRUB Secure Boot"
         _BOOTMGR_LOADER_PATH="/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         _do_uefi_bootmgr_setup
-        _dialog --title " Success " --no-mouse --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI\nhas been installed successfully." 4 60
+        _dialog --title " Success " --no-mouse --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} UEFI has been installed successfully." 4 75
         sleep 3
         _S_BOOTLOADER=1
     else
