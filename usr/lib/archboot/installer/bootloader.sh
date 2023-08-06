@@ -464,7 +464,7 @@ CONFEOF
         _geteditor || return 1
         "${_EDITOR}" "${_REFIND_CONFIG}"
         cp -f "${_REFIND_CONFIG}" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
-        _do_efistub_copy_to_efisys
+        _do_efistub_copy_to_efisys | _dialog --title " Logging to ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
         _dialog --title " Success " --no-mouse --infobox "rEFInd has been setup successfully." 3 50
         sleep 3
         _S_BOOTLOADER=1
