@@ -227,7 +227,7 @@ _do_secureboot_keys() {
     done
     if [[ ! -d "${_DESTDIR}/${_KEYDIR}" ]]; then
         while [[ -z "${_CN}" ]]; do
-            _dialog --title " Setup Keys " --no-cancel --inputbox "Enter a common name(CN) for your keys, eg. Your Name" 7 65 "" 2>"${_ANSWER}" || return 1
+            _dialog --title " Setup Keys " --no-cancel --inputbox "Enter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>"${_ANSWER}" || return 1
             _CN=$(cat "${_ANSWER}")
         done
         secureboot-keys.sh -name="${_CN}" "${_DESTDIR}/${_KEYDIR}" &>"${_LOG}" || return 1
@@ -260,7 +260,7 @@ _do_mok_sign () {
     done
     mokutil -i "${_DESTDIR}"/"${_KEYDIR}"/MOK/MOK.cer < ${_MOK_PW} >"${_LOG}"
     rm /tmp/.password
-    _dialog --title " Machine Owner Key " --no-mouse --infobox "MOK key has been installed successfully." 3 50
+    _dialog --title " Machine Owner Key " --no-mouse --infobox "Machine Owner Key has been installed successfully." 3 50
     sleep 3
     ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" &>"${_LOG}"
     ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
