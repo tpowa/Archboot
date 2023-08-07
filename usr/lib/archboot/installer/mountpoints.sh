@@ -521,8 +521,9 @@ _mkfs() {
     # / root is not needed in fstab, it's mounted automatically
     # https://www.freedesktop.org/software/systemd/man/systemd-gpt-auto-generator.html
     # systemd supports detection on GPT disks:
-    # GRUB and rEFInd don't support /efi automount!
-    # GRUB does not support /boot automount!
+    # 07/08/2023:
+    # UKI, rEFInd and systemd don't support XBOOT automount!
+    # GRUB does not support /boot and /efi automount!
     ### TODO: recheck if it works later, at the moment safety first and no experiments with /boot and /efi!
     # disabled for now this check: "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${5}" == "/efi"
     # "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${5}" == "/boot"
