@@ -11,23 +11,23 @@ _auto_partition() {
         # create fresh GPT
         sgdisk --clear "${_DISK}" &>"${_NO_LOG}"
         # create actual partitions
-        _progress "20" "Creating bios_grub partition..."
+        _progress "20" "Creating BIOS_GRUB partition..."
         sgdisk --new="${_GPT_BIOS_GRUB_DEV_NUM}":0:+"${_GPT_BIOS_GRUB_DEV_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEV_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEV_NUM}":BIOS_GRUB "${_DISK}" >"${_LOG}"
         if [[ -n "${_UEFI_BOOT}" ]]; then
-            _progress "25" "Creating EFI_SYSTEM partition..."
+            _progress "25" "Creating EFI SYSTEM partition..."
             sgdisk --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":EFI_SYSTEM "${_DISK}" >"${_LOG}"
         fi
         if [[ -z "${_UEFISYS_BOOTDEV}" ]]; then
-            _progress "40" "Creating Extended_BOOT partition..."
+            _progress "40" "Creating XBOOT partition..."
             sgdisk --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":EA00 --change-name="${_BOOTDEV_NUM}":ARCH_LINUX_XBOOT "${_DISK}" >"${_LOG}"
         fi
-        _progress "55" "Creating Swap partition..."
+        _progress "55" "Creating SWAP partition..."
         sgdisk --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCH_LINUX_SWAP "${_DISK}" >"${_LOG}"
         [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _GUID_TYPE=8305
         [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _GUID_TYPE=8304
-        _progress "70" "Creating Root partition..."
+        _progress "70" "Creating ROOT partition..."
         sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":"${_GUID_TYPE}" --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
-        _progress "85" "Creating Home partition..."
+        _progress "85" "Creating HOME partition..."
         sgdisk --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCH_LINUX_HOME "${_DISK}" >"${_LOG}"
         sgdisk --print "${_DISK}" >"${_LOG}"
     else
@@ -35,15 +35,15 @@ _auto_partition() {
         # create DOS MBR with parted
         _progress "20" "Creating BIOS MBR..."
         parted -a optimal -s "${_DISK}" unit MiB mktable msdos &>"${_NO_LOG}"
-        _progress "35" "Creating Boot partition ..."
+        _progress "35" "Creating BOOT partition ..."
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_BOOTDEV_SIZE)) >"${_LOG}"
         _progress "50" "Setting bootable flag..."
         parted -a optimal -s "${_DISK}" unit MiB set 1 boot on >"${_LOG}"
         _progress "60" "Creating SWAP partition..."
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) >"${_LOG}"
-        _progress "70" "Creating Root partition..."
+        _progress "70" "Creating ROOT partition..."
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) >"${_LOG}"
-        _progress "85" "Creating Home partition..."
+        _progress "85" "Creating HOME partition..."
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
     fi
     _progress "100" "Partitions created successfully."
