@@ -433,7 +433,7 @@ _do_limine_uefi() {
     fi
     _dialog --no-mouse --infobox "Setting up Limine now..." 3 60
     [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
-    cp -f "${_DESTDIR}/usr/share/limine/BOOT${_SPEC_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine_${_SPEC_UEFI_ARCH}.efi"
+    cp -f "${_DESTDIR}/usr/share/limine/BOOT${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine_${_UEFI_ARCH}.efi"
     _LIMINE_CONFIG="${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine.cfg"
     cat << CONFEOF > "${_LIMINE_CONFIG}"
     TIMEOUT=5
@@ -447,13 +447,13 @@ CONFEOF
         echo "MODULE_PATH=boot:///${_INITRD_UCODE}" >> "${_LIMINE_CONFIG}"
     fi
     echo "MODULE_PATH=boot:///${_INITRD}" >> "${_LIMINE_CONFIG}"
-    if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine_${_SPEC_UEFI_ARCH}.efi" ]]; then
+    if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine_${_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="Limine"
         _BOOTMGR_LOADER_PATH="/EFI/BOOT/limine_${_SPEC_UEFI_ARCH}.efi"
         _do_uefi_bootmgr_setup
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine_${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine_${_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         sleep 2
         _dialog --msgbox "You will now be put into the editor to edit:\nrefind.conf\n\nAfter you save your changes, exit the editor." 8 50
         _geteditor || return 1
