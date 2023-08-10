@@ -372,10 +372,12 @@ _do_efistub_uefi() {
     fi
     _dialog --title " EFISTUB Menu " --menu "" 9 60 3 \
         "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
+        "LIMINE" "LIMINE for  ${_UEFI_ARCH} UEFI" \
         "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
         "${_ADDITIONAL_BOOTLOADER}" "${_ADDITIONAL_BOOTLOADER_DESC}" 2>"${_ANSWER}"
     case $(cat "${_ANSWER}") in
-        "FIRMWARE") _do_uki_uefi;;
+        "FIRMWARE") _do_uki_uefi ;;
+        "LIMINE") _do_limine_uefi ;;
         "SYSTEMD-BOOT") _do_systemd_boot_uefi ;;
         "rEFInd") _do_refind_uefi ;;
     esac
@@ -420,6 +422,49 @@ GUMEOF
         _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error installing SYSTEMD-BOOT." 0 0
+    fi
+}
+
+_do_limine_uefi() {
+    if [[ ! -f "${_DESTDIR}/usr/bin/limine" ]]; then
+        _PACKAGES="limine"
+        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+        _pacman_error
+    fi
+    _dialog --no-mouse --infobox "Setting up Limine now..." 3 60
+    [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
+    cp -f "${_DESTDIR}/usr/share/limine/BOOT${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine_${_SPEC_UEFI_ARCH}.efi"
+    _LIMINE_CONFIG="${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine.cfg"
+    cat << CONFEOF > "${_LIMINE_CONFIG}"
+    TIMEOUT=5
+
+:Arch Linux
+    PROTOCOL=linux
+    KERNEL_PATH=boot:///${_KERNEL}
+    CMDLINE=${_KERNEL_PARAMS_MOD}
+CONFEOF
+    if [[ -n "${_INITRD_UCODE}" ]]; then
+        echo "MODULE_PATH=boot:///${_INITRD_UCODE}" >> "${_LIMINE_CONFIG}"
+    fi
+    echo "MODULE_PATH=boot:///${_INITRD}"  "${_LIMINE_CONFIG}"
+    if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine_${_SPEC_UEFI_ARCH}.efi" ]]; then
+        _BOOTMGR_LABEL="Limine"
+        _BOOTMGR_LOADER_PATH="/EFI/BOOT/limine_${_SPEC_UEFI_ARCH}.efi"
+        _do_uefi_bootmgr_setup
+        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
+        rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine_${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        sleep 2
+        _dialog --msgbox "You will now be put into the editor to edit:\nrefind.conf\n\nAfter you save your changes, exit the editor." 8 50
+        _geteditor || return 1
+        "${_EDITOR}" "${_LIMINE_CONFIG}"
+        _do_efistub_copy_to_efisys | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
+        _dialog --title " Success " --no-mouse --infobox "Limine has been setup successfully." 3 50
+        sleep 3
+        _S_BOOTLOADER=1
+
+    else
+        _dialog --msgbox "Error setting up Limine." 3 40
     fi
 }
 
