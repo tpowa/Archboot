@@ -370,7 +370,7 @@ _do_efistub_uefi() {
         _ADDITIONAL_BOOTLOADER="rEFInd"
         _ADDITIONAL_BOOTLOADER_DESC="rEFInd for ${_UEFI_ARCH} UEFI"
     fi
-    _dialog --title " EFISTUB Menu " --menu "" 9 60 3 \
+    _dialog --title " EFISTUB Menu " --menu "" 10 60 3 \
         "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
         "LIMINE" "LIMINE for  ${_UEFI_ARCH} UEFI" \
         "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
@@ -464,7 +464,7 @@ CONFEOF
         _S_BOOTLOADER=1
 
     else
-        _dialog --msgbox "Error setting up Limine." 4 40
+        _dialog --msgbox "Error setting up Limine." 5 40
     fi
 }
 
@@ -515,7 +515,7 @@ CONFEOF
         sleep 3
         _S_BOOTLOADER=1
     else
-        _dialog --msgbox "Error setting up rEFInd." 4 40
+        _dialog --msgbox "Error setting up rEFInd." 5 40
     fi
 }
 
