@@ -446,7 +446,7 @@ CONFEOF
     if [[ -n "${_INITRD_UCODE}" ]]; then
         echo "MODULE_PATH=boot:///${_INITRD_UCODE}" >> "${_LIMINE_CONFIG}"
     fi
-    echo "MODULE_PATH=boot:///${_INITRD}"  "${_LIMINE_CONFIG}"
+    echo "MODULE_PATH=boot:///${_INITRD}" >> "${_LIMINE_CONFIG}"
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine_${_SPEC_UEFI_ARCH}.efi" ]]; then
         _BOOTMGR_LABEL="Limine"
         _BOOTMGR_LOADER_PATH="/EFI/BOOT/limine_${_SPEC_UEFI_ARCH}.efi"
