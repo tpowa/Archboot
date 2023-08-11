@@ -1095,6 +1095,7 @@ _do_grub_uefi() {
         _BOOTMGR_LABEL="GRUB"
         _BOOTMGR_LOADER_PATH="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
         _do_uefi_bootmgr_setup
+        _do_grub_pacman_uefi
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
