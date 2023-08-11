@@ -432,9 +432,9 @@ _do_limine_uefi() {
         _pacman_error
     fi
     _dialog --no-mouse --infobox "Setting up LIMINE now..." 3 60
-    [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/limine" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/limine/"
-    cp -f "${_DESTDIR}/usr/share/limine/BOOT${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/limine/LIMINE${_UEFI_ARCH}.EFI"
-    _LIMINE_CONFIG="${_DESTDIR}/${_UEFISYS_MP}/EFI/limine/limine.cfg"
+    [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
+    cp -f "${_DESTDIR}/usr/share/limine/BOOT${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI"
+    _LIMINE_CONFIG="${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine.cfg"
     cat << CONFEOF > "${_LIMINE_CONFIG}"
     TIMEOUT=5
 
@@ -447,19 +447,17 @@ CONFEOF
         echo "MODULE_PATH=boot:///${_INITRD_UCODE}" >> "${_LIMINE_CONFIG}"
     fi
     echo "MODULE_PATH=boot:///${_INITRD}" >> "${_LIMINE_CONFIG}"
-    if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/limine/LIMINE${_UEFI_ARCH}.EFI" ]]; then
-
+    if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI" ]]; then
         _BOOTMGR_LABEL="LIMINE"
         _BOOTMGR_LOADER_PATH="/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI"
         _do_uefi_bootmgr_setup
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/limine/LIMINE${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         sleep 2
         _dialog --msgbox "You will now be put into the editor to edit:\nlimine.cfg\n\nAfter you save your changes, exit the editor." 8 50
         _geteditor || return 1
         "${_EDITOR}" "${_LIMINE_CONFIG}"
-        cp -f "${_LIMINE_CONFIG}" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
         _do_efistub_copy_to_efisys | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
         _dialog --title " Success " --no-mouse --infobox "LIMINE has been setup successfully." 3 50
         sleep 3
