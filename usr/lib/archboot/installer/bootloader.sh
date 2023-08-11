@@ -509,10 +509,10 @@ _do_limine_bios() {
     fi
     _do_limine_config
     _geteditor
-    _PARENT_BOOTDEV="$(${_LSBLK} PKNAME ${_BOOTDEV})"
+    _PARENT_BOOTDEV="$(${_LSBLK} PKNAME "${_BOOTDEV}")"
     _chroot_mount
-    cp ${_DESTDIR}/usr/share/limine/limine-bios.sys ${_DESTDIR}/boot/
-    if chroot ${_DESTDIR} limine bios-install "${_PARENT_BOOTDEV}" &>"${_LOG}"; then
+    cp "${_DESTDIR}/usr/share/limine/limine-bios.sys" "${_DESTDIR}/boot/"
+    if chroot "${_DESTDIR}" limine bios-install "${_PARENT_BOOTDEV}" &>"${_LOG}"; then
         _do_limine_pacman_bios
         _dialog --title " Success " --no-mouse --infobox "LIMINE BIOS has been setup successfully." 3 50
         sleep 3
