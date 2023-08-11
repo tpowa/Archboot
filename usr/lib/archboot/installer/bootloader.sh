@@ -471,6 +471,26 @@ CONFEOF
     "${_EDITOR}" "${_LIMINE_CONFIG}"
 }
 
+_do_limine_pacman_bios() {
+    [[ -d "${_DESTDIR}/etc/pacman.d/hooks" ]] || mkdir -p  "${_DESTDIR}"/etc/pacman.d/hooks
+    _HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-limine-bios.hook"
+    cat << EOF > "${_HOOKNAME}"
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = limine
+
+[Action]
+Description = Update Limine after upgrade...
+When = PostTransaction
+Exec = /usr/bin/sh -c '/usr/bin/cp /usr/share/limine/limine-bios.sys /boot/;\
+/usr/bin/limine bios-install "${_PARENT_BOOTDEV} '
+EOF
+    _dialog --title " Automatic LIMINE BIOS Update " --no-mouse --infobox "Pacman hook for automatic LIMINE BIOS update has been installed successfully:\n\n${_HOOKNAME}" 5 70
+    sleep 3
+}
+
 _do_limine_bios() {
     _BOOTDEV=""
     _do_limine_common
@@ -505,7 +525,7 @@ _do_limine_bios() {
 
 _do_limine_pacman_uefi() {
     [[ -d "${_DESTDIR}/etc/pacman.d/hooks" ]] || mkdir -p  "${_DESTDIR}"/etc/pacman.d/hooks
-    _HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-limine.hook"
+    _HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-limine-uefi.hook"
     cat << EOF > "${_HOOKNAME}"
 [Trigger]
 Operation = Install
