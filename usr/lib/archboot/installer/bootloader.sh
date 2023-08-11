@@ -492,7 +492,14 @@ _do_limine_bios() {
     _PARENT_BOOTDEV="$(${_LSBLK} PKNAME ${_BOOTDEV})"
     _chroot_mount
     cp ${_DESTDIR}/usr/share/limine/limine-bios.sys ${_DESTDIR}/boot/
-    chroot ${_DESTDIR} limine bios-install "${_PARENT_BOOTDEV}" &>"${_LOG}"
+    if chroot ${_DESTDIR} limine bios-install "${_PARENT_BOOTDEV}" &>"${_LOG}"; then
+        _dialog --title " Success " --no-mouse --infobox "LIMINE BIOS has been setup successfully." 3 50
+        sleep 3
+        _S_BOOTLOADER=1
+
+    else
+        _dialog --title " ERROR " --msgbox "Setting up LIMINE BIOS failed." 5 40
+    fi
     _chroot_umount
 }
 
@@ -1226,7 +1233,7 @@ _install_bootloader() {
         if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "riscv64" ]]; then
             _do_uboot
         else
-            _dialog --title " BIOS Menu " --menu "" 10 60 3 \
+            _dialog --title " BIOS Menu " --menu "" 7 50 3 \
             "GRUB" "GRUB BIOS" \
             "LIMINE" "LIMINE BIOS" 2>"${_ANSWER}"
             case $(cat "${_ANSWER}") in
