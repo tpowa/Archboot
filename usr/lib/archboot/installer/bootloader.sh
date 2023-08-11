@@ -521,6 +521,7 @@ _do_limine_bios() {
         _dialog --title " ERROR " --msgbox "Setting up LIMINE BIOS failed." 5 40
     fi
     _chroot_umount
+    _do_limine_pacman_bios
 }
 
 _do_limine_pacman_uefi() {
