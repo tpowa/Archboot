@@ -465,6 +465,10 @@ CONFEOF
         echo "MODULE_PATH=boot:///${_INITRD_UCODE}" >> "${_LIMINE_CONFIG}"
     fi
     echo "MODULE_PATH=boot:///${_INITRD}" >> "${_LIMINE_CONFIG}"
+    ## Edit limine.cfg config file
+    _dialog --msgbox "You will now be put into the editor to edit:\nlimine.cfg\n\nAfter you save your changes, exit the editor." 8 50
+    _geteditor || return 1
+    "${_EDITOR}" "${_LIMINE_CONFIG}"
 }
 
 _do_limine_bios() {
@@ -484,10 +488,11 @@ _do_limine_bios() {
         _INITRD_UCODE="${_SUBDIR}/${_UCODE}"
     fi
     _do_limine_config
+    _geteditor
     _PARENT_BOOTDEV="$(${_LSBLK} PKNAME ${_BOOTDEV})"
     _chroot_mount
     cp ${_DESTDIR}/usr/share/limine/limine-bios.sys ${_DESTDIR}/boot/
-    chroot ${_DESTDIR} limine bios-install "${_PARENT_BOOTDEV}"
+    chroot ${_DESTDIR} limine bios-install "${_PARENT_BOOTDEV}" &>"${_LOG}"
     _chroot_umount
 }
 
@@ -526,9 +531,6 @@ _do_limine_uefi() {
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         sleep 2
-        _dialog --msgbox "You will now be put into the editor to edit:\nlimine.cfg\n\nAfter you save your changes, exit the editor." 8 50
-        _geteditor || return 1
-        "${_EDITOR}" "${_LIMINE_CONFIG}"
         _do_efistub_copy_to_efisys | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
         _do_limine_pacman_uefi
         _dialog --title " Success " --no-mouse --infobox "LIMINE has been setup successfully." 3 50
