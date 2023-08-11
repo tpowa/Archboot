@@ -478,6 +478,15 @@ _do_limine_bios() {
     fi
     _dialog --no-mouse --infobox "Setting up LIMINE BIOS now..." 3 60
     _LIMINE_CONFIG="${_DESTDIR}/boot/limine.cfg"
+    _SUBDIR=""
+    if [[ "${_ROOTDEV}" == "${_BOOTDEV}" ]]; then
+        _SUBDIR=/boot
+    fi
+    _KERNEL="${_SUBDIR}/${_VMLINUZ}"
+    _INITRD="${_SUBDIR}/${_INITRAMFS}"
+    if [[ -n "${_UCODE}" ]]; then
+        _INITRD_UCODE="${_SUBDIR}/${_UCODE}"
+    fi
     _do_limine_config
     _PARENT_BOOTDEV="$(${_LSBLK} PKNAME "${_BOOTDEV}")"
     _chroot_mount
