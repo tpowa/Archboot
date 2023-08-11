@@ -487,7 +487,7 @@ When = PostTransaction
 Exec = /usr/bin/sh -c '/usr/bin/cp /usr/share/limine/limine-bios.sys /boot/;\
 /usr/bin/limine bios-install "${_PARENT_BOOTDEV} '
 EOF
-    _dialog --title " Automatic LIMINE BIOS Update " --no-mouse --infobox "Pacman hook for automatic LIMINE BIOS update has been installed successfully:\n\n${_HOOKNAME}" 5 70
+    _dialog --title " Automatic LIMINE BIOS Update " --no-mouse --infobox "Pacman hook for automatic LIMINE BIOS update has been installed successfully:\n\n${_HOOKNAME}" 5 75
     sleep 3
 }
 
@@ -513,6 +513,7 @@ _do_limine_bios() {
     _chroot_mount
     cp ${_DESTDIR}/usr/share/limine/limine-bios.sys ${_DESTDIR}/boot/
     if chroot ${_DESTDIR} limine bios-install "${_PARENT_BOOTDEV}" &>"${_LOG}"; then
+        _do_limine_pacman_bios
         _dialog --title " Success " --no-mouse --infobox "LIMINE BIOS has been setup successfully." 3 50
         sleep 3
         _S_BOOTLOADER=1
@@ -521,7 +522,6 @@ _do_limine_bios() {
         _dialog --title " ERROR " --msgbox "Setting up LIMINE BIOS failed." 5 40
     fi
     _chroot_umount
-    _do_limine_pacman_bios
 }
 
 _do_limine_pacman_uefi() {
