@@ -372,7 +372,7 @@ _do_efistub_uefi() {
     fi
     _dialog --title " EFISTUB Menu " --menu "" 10 60 3 \
         "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
-        "LIMINE" "LIMINE for  ${_UEFI_ARCH} UEFI" \
+        "LIMINE" "LIMINE for ${_UEFI_ARCH} UEFI" \
         "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
         "${_ADDITIONAL_BOOTLOADER}" "${_ADDITIONAL_BOOTLOADER_DESC}" 2>"${_ANSWER}"
     case $(cat "${_ANSWER}") in
