@@ -1050,6 +1050,32 @@ _setup_grub_uefi_sb() {
     fi
 }
 
+_do_grub_pacman_uefi() {
+    [[ -d "${_DESTDIR}/etc/pacman.d/hooks" ]] || mkdir -p  "${_DESTDIR}"/etc/pacman.d/hooks
+    _HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-grub.hook"
+    cat << EOF > "${_HOOKNAME}"
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = grub
+
+[Action]
+Description = Update GRUB after upgrade...
+When = PostTransaction
+Exec = /usr/bin/sh -c 'grub-install \
+        --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
+        --target="${_GRUB_ARCH}-efi" \
+        --efi-directory="/${_UEFISYS_MP}" \
+        --bootloader-id="grub" \
+        --boot-directory="/boot" \
+        --no-nvram \
+        --recheck'
+EOF
+    _dialog --title " Automatic GRUB Update " --no-mouse --infobox "Pacman hook for automatic GRUB update has been installed successfully:\n\n${_HOOKNAME}" 5 70
+    sleep 3
+}
+
 _do_grub_uefi() {
     _GRUB_UEFI=""
     _do_uefi_common || return 1
