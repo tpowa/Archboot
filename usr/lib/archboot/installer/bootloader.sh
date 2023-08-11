@@ -485,7 +485,7 @@ Target = limine
 Description = Update Limine after upgrade...
 When = PostTransaction
 Exec = /usr/bin/sh -c '/usr/bin/cp /usr/share/limine/limine-bios.sys /boot/;\
-/usr/bin/limine bios-install "${_PARENT_BOOTDEV} '
+/usr/bin/limine bios-install "${_PARENT_BOOTDEV}"'
 EOF
     _dialog --title " Automatic LIMINE BIOS Update " --no-mouse --infobox "Automatic LIMINE BIOS update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
     sleep 3
