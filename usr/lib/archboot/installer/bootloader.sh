@@ -485,7 +485,7 @@ CONFEOF
         _S_BOOTLOADER=1
 
     else
-        _dialog --msgbox "Error setting up LIMINE." 5 40
+        _dialog --title " ERROR " --msgbox "Setting up LIMINE failed." 5 40
     fi
 }
 
@@ -557,7 +557,7 @@ CONFEOF
         sleep 3
         _S_BOOTLOADER=1
     else
-        _dialog --msgbox "Error setting up rEFInd." 5 40
+        _dialog --title " ERROR " --msgbox "Setting up rEFInd failed." 5 40
     fi
 }
 
