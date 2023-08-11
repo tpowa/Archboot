@@ -1052,7 +1052,7 @@ _setup_grub_uefi_sb() {
 
 _do_grub_pacman_uefi() {
     [[ -d "${_DESTDIR}/etc/pacman.d/hooks" ]] || mkdir -p  "${_DESTDIR}"/etc/pacman.d/hooks
-    _HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-grub.hook"
+    _HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-grub-uefi.hook"
     cat << EOF > "${_HOOKNAME}"
 [Trigger]
 Operation = Install
