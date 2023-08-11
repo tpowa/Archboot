@@ -425,6 +425,26 @@ GUMEOF
     fi
 }
 
+_do_limine_pacman_uefi() {
+    [[ -d "${_DESTDIR}/etc/pacman.d/hooks" ]] || mkdir -p  "${_DESTDIR}"/etc/pacman.d/hooks
+    _HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-limine.hook"
+    cat << EOF > "${_HOOKNAME}"
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = limine
+
+[Action]
+Description = Update Limine after upgrade...
+When = PostTransaction
+Exec = /usr/bin/sh -c '/usr/bin/cp /usr/share/limine/BOOT${_UEFI_ARCH}.EFI /${_UEFISYS_MP}/EFI/BOOT/;\
+/usr/bin/cp /usr/share/limine/BOOT${_UEFI_ARCH}.EFI /${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI'
+EOF
+    _dialog --title " Automatic LIMINE Update " --no-mouse --infobox "Pacman hook for automatic LIMINE update has been installed successfully:\n\n${_HOOKNAME}" 5 70
+    sleep 3
+}
+
 _do_limine_uefi() {
     if [[ ! -f "${_DESTDIR}/usr/bin/limine" ]]; then
         _PACKAGES="limine"
@@ -459,6 +479,7 @@ CONFEOF
         _geteditor || return 1
         "${_EDITOR}" "${_LIMINE_CONFIG}"
         _do_efistub_copy_to_efisys | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
+        _do_limine_pacman_uefi
         _dialog --title " Success " --no-mouse --infobox "LIMINE has been setup successfully." 3 50
         sleep 3
         _S_BOOTLOADER=1
@@ -466,6 +487,26 @@ CONFEOF
     else
         _dialog --msgbox "Error setting up LIMINE." 5 40
     fi
+}
+
+_do_refind_pacman_uefi() {
+    [[ -d "${_DESTDIR}/etc/pacman.d/hooks" ]] || mkdir -p  "${_DESTDIR}"/etc/pacman.d/hooks
+    _HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-refind.hook"
+    cat << EOF > "${_HOOKNAME}"
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = refind
+
+[Action]
+Description = Update rEFInd after upgrade...
+When = PostTransaction
+Exec = /usr/bin/sh -c '/usr/bin/cp /usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi /${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI;\
+cp /usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi ${_UEFISYS_MP}/EFI/refind/'
+EOF
+    _dialog --title " Automatic rEFInd Update " --no-mouse --infobox "Pacman hook for automatic rEFInd update has been installed successfully:\n\n${_HOOKNAME}" 5 70
+    sleep 3
 }
 
 _do_refind_uefi() {
@@ -511,6 +552,7 @@ CONFEOF
         "${_EDITOR}" "${_REFIND_CONFIG}"
         cp -f "${_REFIND_CONFIG}" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
         _do_efistub_copy_to_efisys | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
+        _do_refind_pacman_uefi
         _dialog --title " Success " --no-mouse --infobox "rEFInd has been setup successfully." 3 50
         sleep 3
         _S_BOOTLOADER=1
