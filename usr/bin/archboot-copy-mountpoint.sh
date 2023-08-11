@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: GPL-2.0-only
+# SPDX-License-Identifier: GPL-3.0-or-later
 # 
 #    copy-mointpoint.sh - copy recursivly a mountpoint using tar
 #    by Tobias Powalowski <tpowa@archlinux.org>
