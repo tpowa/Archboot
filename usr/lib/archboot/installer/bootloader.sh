@@ -444,6 +444,48 @@ GUMEOF
     fi
 }
 
+_do_limine_common() {
+    if [[ ! -f "${_DESTDIR}/usr/bin/limine" ]]; then
+        _PACKAGES="limine"
+        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+        _pacman_error
+    fi
+}
+
+_do_limine_config() {
+    cat << CONFEOF > "${_LIMINE_CONFIG}"
+    TIMEOUT=5
+
+:Arch Linux
+    PROTOCOL=linux
+    KERNEL_PATH=boot:///${_KERNEL}
+    CMDLINE=${_KERNEL_PARAMS_MOD}
+CONFEOF
+    if [[ -n "${_INITRD_UCODE}" ]]; then
+        echo "MODULE_PATH=boot:///${_INITRD_UCODE}" >> "${_LIMINE_CONFIG}"
+    fi
+    echo "MODULE_PATH=boot:///${_INITRD}" >> "${_LIMINE_CONFIG}"
+}
+
+_do_limine_bios() {
+    _BOOTDEV=""
+    _do_limine_common
+    _common_bootloader_checks
+    _check_bootpart
+    if ! ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "ext"; then
+        _dialog --title " ERROR " --no-mouse --infobox "LIMINE BIOS can only boot from ext2/3/4 partition with /boot on it." 3 70
+        return 1
+    fi
+    _dialog --no-mouse --infobox "Setting up LIMINE BIOS now..." 3 60
+    _LIMINE_CONFIG="${_DESTDIR}/boot/limine.cfg"
+    _do_limine_config
+    _PARENT_BOOTDEV="$(${_LSBLK} PKNAME "${_BOOTDEV}")"
+    _chroot_mount
+    cp ${_DESTDIR}/usr/share/limine/limine-bios.sys ${_DESTDIR}/boot/
+    chroot limine bios-install "${_PARENT_BOOTDEV}"
+    _chroot_umount
+}
+
 _do_limine_pacman_uefi() {
     [[ -d "${_DESTDIR}/etc/pacman.d/hooks" ]] || mkdir -p  "${_DESTDIR}"/etc/pacman.d/hooks
     _HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-limine.hook"
@@ -465,27 +507,12 @@ EOF
 }
 
 _do_limine_uefi() {
-    if [[ ! -f "${_DESTDIR}/usr/bin/limine" ]]; then
-        _PACKAGES="limine"
-        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
-        _pacman_error
-    fi
+    _do_limine_common
     _dialog --no-mouse --infobox "Setting up LIMINE now..." 3 60
     [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
     cp -f "${_DESTDIR}/usr/share/limine/BOOT${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI"
     _LIMINE_CONFIG="${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine.cfg"
-    cat << CONFEOF > "${_LIMINE_CONFIG}"
-    TIMEOUT=5
-
-:Arch Linux
-    PROTOCOL=linux
-    KERNEL_PATH=boot:///${_KERNEL}
-    CMDLINE=${_KERNEL_PARAMS_MOD}
-CONFEOF
-    if [[ -n "${_INITRD_UCODE}" ]]; then
-        echo "MODULE_PATH=boot:///${_INITRD_UCODE}" >> "${_LIMINE_CONFIG}"
-    fi
-    echo "MODULE_PATH=boot:///${_INITRD}" >> "${_LIMINE_CONFIG}"
+    _do_limine_config
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI" ]]; then
         _BOOTMGR_LABEL="LIMINE"
         _BOOTMGR_LOADER_PATH="/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI"
@@ -1192,7 +1219,13 @@ _install_bootloader() {
         if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "riscv64" ]]; then
             _do_uboot
         else
-            _do_grub_bios
+            _dialog --title " BIOS Menu " --menu "" 10 60 3 \
+            "GRUB" "GRUB BIOS" \
+            "LIMINE" "LIMINE BIOS" 2>"${_ANSWER}"
+            case $(cat "${_ANSWER}") in
+                "GRUB") _do_grub_bios ;;
+                "LIMINE") _do_limine_bios ;;
+            esac
         fi
     fi
     if [[ -z "${_S_BOOTLOADER}" ]]; then
