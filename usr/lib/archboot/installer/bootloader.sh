@@ -286,7 +286,7 @@ Depends = sbsigntools
 Depends = findutils
 Depends = grep
 EOF
-    _dialog --title " Automatic Signing " --no-mouse --infobox "Pacman hook for automatic signing has been installed successfully:\n\n${_HOOKNAME}" 5 70
+    _dialog --title " Automatic Signing " --no-mouse --infobox "Automatic signing has been enabled successfully:\n\n${_HOOKNAME}" 5 70
     sleep 3
 }
 
@@ -397,7 +397,7 @@ Description = Gracefully upgrading systemd-boot...
 When = PostTransaction
 Exec = /usr/bin/systemctl restart systemd-boot-update.service
 EOF
-    _dialog --title " Automatic SYSTEMD-BOOT Update " --no-mouse --infobox "Pacman hook for automatic SYSTEMD-BOOT update has been installed successfully:\n\n${_HOOKNAME}" 5 70
+    _dialog --title " Automatic SYSTEMD-BOOT Update " --no-mouse --infobox "Automatic SYSTEMD-BOOT update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
     sleep 3
 }
 
@@ -487,7 +487,7 @@ When = PostTransaction
 Exec = /usr/bin/sh -c '/usr/bin/cp /usr/share/limine/limine-bios.sys /boot/;\
 /usr/bin/limine bios-install "${_PARENT_BOOTDEV} '
 EOF
-    _dialog --title " Automatic LIMINE BIOS Update " --no-mouse --infobox "Pacman hook for automatic LIMINE BIOS update has been installed successfully:\n\n${_HOOKNAME}" 5 75
+    _dialog --title " Automatic LIMINE BIOS Update " --no-mouse --infobox "Automatic LIMINE BIOS update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
     sleep 3
 }
 
@@ -540,7 +540,7 @@ When = PostTransaction
 Exec = /usr/bin/sh -c '/usr/bin/cp /usr/share/limine/BOOT${_UEFI_ARCH}.EFI /${_UEFISYS_MP}/EFI/BOOT/;\
 /usr/bin/cp /usr/share/limine/BOOT${_UEFI_ARCH}.EFI /${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI'
 EOF
-    _dialog --title " Automatic LIMINE Update " --no-mouse --infobox "Pacman hook for automatic LIMINE update has been installed successfully:\n\n${_HOOKNAME}" 5 70
+    _dialog --title " Automatic LIMINE Update " --no-mouse --infobox "Automatic LIMINE update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
     sleep 3
 }
 
@@ -586,7 +586,7 @@ When = PostTransaction
 Exec = /usr/bin/sh -c '/usr/bin/cp /usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi /${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI;\
 cp /usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi ${_UEFISYS_MP}/EFI/refind/'
 EOF
-    _dialog --title " Automatic rEFInd Update " --no-mouse --infobox "Pacman hook for automatic rEFInd update has been installed successfully:\n\n${_HOOKNAME}" 5 70
+    _dialog --title " Automatic rEFInd Update " --no-mouse --infobox "Automatic rEFInd update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
     sleep 3
 }
 
@@ -978,7 +978,7 @@ Exec = /usr/bin/sh -c 'grub-install \
         --debug \
         "${_BOOTDEV}"'
 EOF
-    _dialog --title " Automatic GRUB Update " --no-mouse --infobox "Pacman hook for automatic GRUB update has been installed successfully:\n\n${_HOOKNAME}" 5 70
+    _dialog --title " Automatic GRUB Update " --no-mouse --infobox "Automatic GRUB BIOS update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
     sleep 3
 }
 
@@ -1160,7 +1160,7 @@ Exec = /usr/bin/sh -c 'grub-install \
         --no-nvram \
         --recheck'
 EOF
-    _dialog --title " Automatic GRUB Update " --no-mouse --infobox "Pacman hook for automatic GRUB update has been installed successfully:\n\n${_HOOKNAME}" 5 70
+    _dialog --title " Automatic GRUB Update " --no-mouse --infobox "Automatic GRUB update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
     sleep 3
 }
 
