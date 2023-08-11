@@ -383,6 +383,24 @@ _do_efistub_uefi() {
     esac
 }
 
+_do_systemd_bootd_pacman_uefi() {
+    [[ -d "${_DESTDIR}/etc/pacman.d/hooks" ]] || mkdir -p  "${_DESTDIR}"/etc/pacman.d/hooks
+    _HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-systemd-bootd.hook"
+    cat << EOF > "${_HOOKNAME}"
+[Trigger]
+Type = Package
+Operation = Upgrade
+Target = systemd
+
+[Action]
+Description = Gracefully upgrading systemd-boot...
+When = PostTransaction
+Exec = /usr/bin/systemctl restart systemd-boot-update.service
+EOF
+    _dialog --title " Automatic SYSTEMD-BOOT Update " --no-mouse --infobox "Pacman hook for automatic SYSTEMD-BOOT update has been installed successfully:\n\n${_HOOKNAME}" 5 70
+    sleep 3
+}
+
 _do_systemd_boot_uefi() {
     _dialog --no-mouse --infobox "Setting up SYSTEMD-BOOT now..." 3 40
     # create directory structure, if it doesn't exist
@@ -417,6 +435,7 @@ GUMEOF
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"
         _do_efistub_copy_to_efisys | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
+        _do_systemd_bootd_pacman_uefi
         _dialog --title " Success " --no-mouse --infobox "SYSTEMD-BOOT has been setup successfully." 3 50
         sleep 3
         _S_BOOTLOADER=1
