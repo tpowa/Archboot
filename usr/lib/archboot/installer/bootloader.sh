@@ -895,6 +895,31 @@ _grub_bios() {
     sleep 2
 }
 
+_do_grub_pacman_bios() {
+    [[ -d "${_DESTDIR}/etc/pacman.d/hooks" ]] || mkdir -p  "${_DESTDIR}"/etc/pacman.d/hooks
+    _HOOKNAME="${_DESTDIR}/etc/pacman.d/hooks/999-grub-bios.hook"
+    cat << EOF > "${_HOOKNAME}"
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = grub
+
+[Action]
+Description = Update GRUB after upgrade...
+When = PostTransaction
+Exec = /usr/bin/sh -c 'grub-install \
+        --directory="/usr/lib/grub/i386-pc" \
+        --target="i386-pc" \
+        --boot-directory="/boot" \
+        --recheck \
+        --debug \
+        "${_BOOTDEV}"'
+EOF
+    _dialog --title " Automatic GRUB Update " --no-mouse --infobox "Pacman hook for automatic GRUB update has been installed successfully:\n\n${_HOOKNAME}" 5 70
+    sleep 3
+}
+
 _do_grub_bios() {
     _do_grub_common_before
     # try to auto-configure GRUB(2)...
@@ -962,6 +987,7 @@ _do_grub_bios() {
     if [[ -e "${_DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
         _GRUB_PREFIX_DIR="/boot/grub/"
         _do_grub_config || return 1
+        _do_grub_pacman_bios
         _dialog --title " Success " --no-mouse --infobox "GRUB(2) BIOS has been installed successfully." 3 55
         sleep 3
         _S_BOOTLOADER=1
