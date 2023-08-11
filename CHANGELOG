@@ -1,5 +1,6 @@
 On the road to 2023.08:
-- systemd 254
+- systemd 254.x
+- switch project license to GPL3 or later
 Environment Changes:
 - implemented dialog progressbars
 setup:
