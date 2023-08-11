@@ -487,7 +487,7 @@ _do_limine_bios() {
     _PARENT_BOOTDEV="$(${_LSBLK} PKNAME ${_BOOTDEV})"
     _chroot_mount
     cp ${_DESTDIR}/usr/share/limine/limine-bios.sys ${_DESTDIR}/boot/
-    chroot limine bios-install "${_PARENT_BOOTDEV}"
+    chroot ${_DESTDIR} limine bios-install "${_PARENT_BOOTDEV}"
     _chroot_umount
 }
 
