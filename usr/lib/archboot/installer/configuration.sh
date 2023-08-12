@@ -3,9 +3,9 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _mkinitcpio() {
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}"-"${_RUNNING_ARCH}" |& tee -a "${_LOG}" /tmp/mkinitcpio.log &>"${_LOG}"
+        chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}"-"${_RUNNING_ARCH}" |& tee -a "${_LOG}" /tmp/mkinitcpio.log
     else
-        chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}" |& tee -a "${_LOG}" /tmp/mkinitcpio.log &>"${_LOG}"
+        chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}" |& tee -a "${_LOG}" /tmp/mkinitcpio.log
     fi
     echo $? > /tmp/.mkinitcpio-retcode
     if [[ $(cat /tmp/.mkinitcpio-retcode) -ne 0 ]]; then
