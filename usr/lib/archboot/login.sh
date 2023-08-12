@@ -139,7 +139,7 @@ if ! [[ -e /.clean-pacman-db ]]; then
         libisoburn libburn libisofs mkinitcpio memtest linux-api-headers jansson libwbclient \
         libbsd libmd libpcap libnftnl libnfnetlink libnetfilter_conntrack libsasl libldap memtest86+ \
         memtest86+-efi mkinitcpio-busybox mtools libsysprof-capture libnsl libksba gdbm binutils \
-        cdrtools systemd-ukify python python-pefile"
+        cdrtools systemd-ukify python python-pefile limine"
     for i in ${_RM_PACMAN_DB}; do
         rm -rf /var/lib/pacman/local/"${i}"-[0-9]* &>/dev/null
     done
