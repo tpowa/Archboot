@@ -408,14 +408,14 @@ _do_systemd_boot_uefi() {
     if [[ -n "${_INITRD_UCODE}" ]]; then
         echo "initrd   /${_INITRD_UCODE}" >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     fi
-    cat << GUMEOF >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
+    cat << BOOTDEOF >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
 initrd   /${_INITRD}
 options  ${_KERNEL_PARAMS_MOD}
-GUMEOF
-    cat << GUMEOF > "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"
+BOOTDEOF
+    cat << BOOTDEOF > "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"
 timeout 5
 default archlinux-core-main
-GUMEOF
+BOOTDEOF
     _chroot_mount
     chroot "${_DESTDIR}" bootctl --path="/${_UEFISYS_MP}" install &>"${_LOG}"
     chroot "${_DESTDIR}" bootctl --path="/${_UEFISYS_MP}" update &>"${_LOG}"
