@@ -18,7 +18,7 @@ _auto_partition() {
             sgdisk --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":EFI_SYSTEM "${_DISK}" >"${_LOG}"
         fi
         if [[ -z "${_UEFISYS_BOOTDEV}" ]]; then
-            _progress "40" "Creating XBOOT partition..."
+            _progress "40" "Creating XBOOTLDR partition..."
             sgdisk --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":EA00 --change-name="${_BOOTDEV_NUM}":ARCH_LINUX_XBOOT "${_DISK}" >"${_LOG}"
         fi
         _progress "55" "Creating SWAP partition..."
