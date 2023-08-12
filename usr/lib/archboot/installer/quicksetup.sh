@@ -211,7 +211,7 @@ _autoprepare() {
             done
         else
             while [[ -z "${_BOOTDEV_SET}" ]]; do
-                _dialog --title " /boot In MiB "--no-cancel --inputbox "Minimum value is 100.\n\nDisk space left: ${_DISK_SIZE}M" 8 55 "512" 2>"${_ANSWER}" || return 1
+                _dialog --title " /boot In MiB "--no-cancel --inputbox "Minimum value is 100.\nDisk space left: ${_DISK_SIZE}M" 8 55 "512" 2>"${_ANSWER}" || return 1
                 _BOOTDEV_SIZE="$(cat "${_ANSWER}")"
                 if [[ -z "${_BOOTDEV_SIZE}" ]]; then
                     _dialog --title " ERROR " --no-mouse --infobox "You have entered a invalid size, please enter again." 3 60
