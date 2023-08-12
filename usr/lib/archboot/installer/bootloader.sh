@@ -368,7 +368,7 @@ _do_efistub_uefi() {
         _ADDITIONAL_BOOTLOADER="rEFInd"
         _ADDITIONAL_BOOTLOADER_DESC="rEFInd for ${_UEFI_ARCH} UEFI"
     fi
-    _dialog --title " EFISTUB Menu " --menu "" 10 60 3 \
+    _dialog --title " EFISTUB " --menu "" 10 60 3 \
         "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
         "LIMINE" "LIMINE for ${_UEFI_ARCH} UEFI" \
         "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" \
