@@ -287,6 +287,8 @@ _set_device_name_scheme() {
 _clean_disk() {
     # clear all magic strings/signatures - mdadm, lvm, partition tables etc
     wipefs -a -f "${1}" &>"${_NO_LOG}"
+    # really clear everything MBR/GPT at the beginning!
+    dd if=/dev/zero of=${1} bs=1M count=10 &>"${_NO_LOG}"
     partprobe "${1}" &>"${_NO_LOG}"
 }
 
