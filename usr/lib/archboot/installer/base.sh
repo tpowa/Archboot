@@ -180,7 +180,6 @@ _configure_system() {
     _check_root_password || return 1
     _geteditor || return 1
     ## PREPROCESSING ##
-    _set_locale || return 1
     _auto_mkinitcpio
     ## END PREPROCESS ##
     _FILE=""
