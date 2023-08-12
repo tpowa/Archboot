@@ -1252,7 +1252,7 @@ _install_bootloader() {
         if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "riscv64" ]]; then
             _do_uboot
         else
-            _dialog --title " BIOS Menu " --menu "" 8 40 3 \
+            _dialog --title " BOOTLOADER " --menu "" 8 40 3 \
             "GRUB" "GRUB BIOS" \
             "LIMINE" "LIMINE BIOS" 2>"${_ANSWER}"
             case $(cat "${_ANSWER}") in
