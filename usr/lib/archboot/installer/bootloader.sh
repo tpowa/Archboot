@@ -92,10 +92,8 @@ _freeze_xfs() {
 
 ## Setup kernel cmdline parameters to be added to bootloader configs
 _bootloader_kernel_parameters() {
-    if [[ -n "${_UEFI_BOOT}" ]]; then
-        [[ "${_NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && _getrootpartuuid
-        [[ "${_NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && _getrootpartlabel
-    fi
+    [[ "${_NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] && _getrootpartuuid
+    [[ "${_NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && _getrootpartlabel
     [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && _getrootfsuuid
     [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && _getrootfslabel
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTDEV} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_LUKSSETUP}"
