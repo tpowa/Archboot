@@ -502,21 +502,18 @@ _mkfs() {
         if [[ -n "${_FSLABEL}" ]]; then
             _DEV="LABEL=${_FSLABEL}"
         fi
-    else
-        if [[ -n "${_UEFI_BOOT}" ]]; then
-           if [[ "${_NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
-               if [[ -n "${_PARTUUID}" ]]; then
-                   _DEV="PARTUUID=${_PARTUUID}"
-               fi
-           elif [[ "${_NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]]; then
-               if [[ -n "${_PARTLABEL}" ]]; then
-                    _DEV="PARTLABEL=${_PARTLABEL}"
-               fi
-           fi
-        else
-            # fallback to device name
-            _DEV="${1}"
+    elif [[ "${_NAME_SCHEME_PARAMETER}" == "PARTUUID" ]]; then
+            if [[ -n "${_PARTUUID}" ]]; then
+                _DEV="PARTUUID=${_PARTUUID}"
+            fi
+    elif [[ "${_NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]]; then
+        if [[ -n "${_PARTLABEL}" ]]; then
+            _DEV="PARTLABEL=${_PARTLABEL}"
         fi
+    fi
+    if [[ -z "${_DEV}" ]]; then
+        # fallback to device name
+        _DEV="${1}"
     fi
     # / root is not needed in fstab, it's mounted automatically
     # https://www.freedesktop.org/software/systemd/man/systemd-gpt-auto-generator.html
