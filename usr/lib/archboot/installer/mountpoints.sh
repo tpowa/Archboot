@@ -484,15 +484,11 @@ _mkfs() {
     _FSUUID="$(_getfsuuid "${1}")"
     #shellcheck disable=SC2155
     _FSLABEL="$(_getfslabel "${1}")"
-    if [[ -n "${_UEFI_BOOT}" ]]; then
-        #shellcheck disable=SC2155
-        _PARTUUID="$(_getpartuuid "${1}")"
-        #shellcheck disable=SC2155
-        _PARTLABEL="$(_getpartlabel "${1}")"
-        echo "# DEVICE DETAILS: ${1} PARTUUID=${_PARTUUID} PARTLABEL=${_PARTLABEL} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
-    else
-        echo "# DEVICE DETAILS: ${1} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
-    fi
+    #shellcheck disable=SC2155
+    _PARTUUID="$(_getpartuuid "${1}")"
+    #shellcheck disable=SC2155
+    _PARTLABEL="$(_getpartlabel "${1}")"
+    echo "# DEVICE DETAILS: ${1} PARTUUID=${_PARTUUID} PARTLABEL=${_PARTLABEL} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
     # add to temp fstab
     if [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
         if [[ -n "${_FSUUID}" ]]; then
