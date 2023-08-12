@@ -66,16 +66,6 @@ _set_mkinitcpio() {
     fi
 }
 
-_set_locale() {
-    if [[ -z "${_S_LOCALE}" && ! -e "/.localize" ]]  && grep -qw '^archboot' /etc/hostname ; then
-        localize
-        _auto_locale
-        _auto_set_locale
-        _run_locale_gen
-    fi
-    _S_LOCALE=1
-}
-
 _check_root_password() {
     # check if empty password is set
     if chroot "${_DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q NP; then
