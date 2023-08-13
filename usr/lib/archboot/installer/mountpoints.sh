@@ -261,7 +261,7 @@ _mountpoints() {
                             fi
                         elif [[ -z "${_ROOT_DONE}" ]]; then
                             if [[ "${_FSTYPE}" == "vfat" ]]; then
-                                _dialog --tile " ERROR " --no-mouse --infobox "ROOT DEVICE has a vfat filesystem." 3 60
+                                _dialog --title " ERROR " --no-mouse --infobox "ROOT DEVICE has a vfat filesystem." 3 60
                                 sleep 5
                                 _MP_DONE=""
                             elif [[ "${_FSTYPE}" == "swap" ]]; then
