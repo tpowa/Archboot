@@ -482,8 +482,7 @@ Target = limine
 [Action]
 Description = Update Limine after upgrade...
 When = PostTransaction
-Exec = /usr/bin/sh -c '/usr/bin/cp /usr/share/limine/limine-bios.sys /boot/;\
-/usr/bin/limine bios-install "${_PARENT_BOOTDEV}"'
+Exec = /usr/bin/sh -c '/usr/bin/cp /usr/share/limine/limine-bios.sys /boot/; /usr/bin/limine bios-install "${_PARENT_BOOTDEV}"'
 EOF
     _dialog --title " Automatic LIMINE BIOS Update " --no-mouse --infobox "Automatic LIMINE BIOS update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
     sleep 3
@@ -586,8 +585,7 @@ Target = refind
 [Action]
 Description = Update rEFInd after upgrade...
 When = PostTransaction
-Exec = /usr/bin/sh -c '/usr/bin/cp /usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi /${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI;\
-cp /usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi ${_UEFISYS_MP}/EFI/refind/'
+Exec = /usr/bin/sh -c '/usr/bin/cp /usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi /${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI;cp /usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi /${_UEFISYS_MP}/EFI/refind/'
 EOF
     _dialog --title " Automatic rEFInd Update " --no-mouse --infobox "Automatic rEFInd update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
     sleep 3
@@ -973,13 +971,7 @@ Target = grub
 [Action]
 Description = Update GRUB after upgrade...
 When = PostTransaction
-Exec = /usr/bin/sh -c 'grub-install \
-        --directory="/usr/lib/grub/i386-pc" \
-        --target="i386-pc" \
-        --boot-directory="/boot" \
-        --recheck \
-        --debug \
-        "${_BOOTDEV}"'
+Exec = /usr/bin/sh -c 'grub-install --directory="/usr/lib/grub/i386-pc" --target="i386-pc" --boot-directory="/boot" --recheck "${_BOOTDEV}"'
 EOF
     _dialog --title " Automatic GRUB Update " --no-mouse --infobox "Automatic GRUB BIOS update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
     sleep 3
@@ -1182,14 +1174,7 @@ Target = grub
 [Action]
 Description = Update GRUB after upgrade...
 When = PostTransaction
-Exec = /usr/bin/sh -c 'grub-install \
-        --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
-        --target="${_GRUB_ARCH}-efi" \
-        --efi-directory="/${_UEFISYS_MP}" \
-        --bootloader-id="grub" \
-        --boot-directory="/boot" \
-        --no-nvram \
-        --recheck'
+Exec = /usr/bin/sh -c 'grub-install --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" --target="${_GRUB_ARCH}-efi" --efi-directory="/${_UEFISYS_MP}" --bootloader-id="grub" --boot-directory="/boot" --no-nvram --recheck'
 EOF
     _dialog --title " Automatic GRUB Update " --no-mouse --infobox "Automatic GRUB update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
     sleep 3
