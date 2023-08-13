@@ -258,7 +258,7 @@ _do_mok_sign () {
     done
     mokutil -i "${_DESTDIR}"/"${_KEYDIR}"/MOK/MOK.cer < ${_MOK_PW} >"${_LOG}"
     rm /tmp/.password
-    _dialog --title " Machine Owner Key " --no-mouse --infobox "Machine Owner Key has been installed successfully." 3 50
+    _dialog --title " Machine Owner Key " --no-mouse --infobox "Machine Owner Key has been installed successfully." 3 70
     sleep 3
     ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" &>"${_LOG}"
     ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
