@@ -900,18 +900,17 @@ fi
 EOF
     fi
 fi
-if [[ -n "${_UEFI_BOOT}" ]]; then
     cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
-menuentry "UEFI Firmware Setup" {
-    fwsetup
-    }
-EOF
+if [ "\${grub_platform}" == "efi" ]; then
+    menuentry "UEFI Firmware Setup" {
+        fwsetup
+        }
 fi
+EOF
 cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
 menuentry "Reboot System" {
     reboot
 }
-
 menuentry "Poweroff System" {
     halt
 }
