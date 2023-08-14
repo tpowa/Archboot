@@ -900,6 +900,22 @@ fi
 EOF
     fi
 fi
+if [[ -n "${_UEFI_BOOT}" ]]; then
+    cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
+menuentry "UEFI Firmware Setup" {
+    fwsetup
+    }
+EOF
+fi
+cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
+menuentry "Reboot System" {
+    reboot
+}
+
+menuentry "Poweroff System" {
+    halt
+}
+EOF
     ## copy ter-u16n.pf2 font file
     [[ -d ${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts ]] || mkdir -p "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts"
     cp -f "${_DESTDIR}/usr/share/grub/ter-u16n.pf2" "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts/ter-u16n.pf2"
