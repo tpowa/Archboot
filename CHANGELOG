@@ -10,8 +10,9 @@ setup:
 - removed legacyBoot UEFI flag in Quick Setup
 - added message in UKI before editing config files
 - added Limine support
-- added bootloader automatic update hooks
+- added bootloader pacman update hooks
 - reallow GPT Nameschemes on BIOS systems
+- added firmware, reboot and shutdown to grub.cfg by default
 2023.07 Highlights:
 - kernel 6.4.x
 - grub 2.12rc1-1
