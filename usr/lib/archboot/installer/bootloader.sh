@@ -1042,7 +1042,7 @@ _do_grub_bios() {
     mkdir -p "${_DESTDIR}/boot/grub/locale"
     cp -f "${_DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${_DESTDIR}/boot/grub/locale/en.mo"
     if [[ -e "${_DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
-        _GRUB_PREFIX_DIR="/boot/grub/"
+        _GRUB_PREFIX_DIR="/boot/grub"
         _do_grub_config || return 1
         _do_grub_pacman_bios
         _dialog --title " Success " --no-mouse --infobox "GRUB(2) BIOS has been installed successfully." 3 55
@@ -1085,11 +1085,11 @@ When = PostTransaction
 EOF
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         cat << EOF >> "${_HOOKNAME}"
-Exec = /usr/bin/sh -c '/usr/bin/grub-mkstandalone -d "/usr/lib/grub/${_GRUB_ARCH}-efi" -O "${_GRUB_ARCH}-efi" --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "/${_GRUB_PREFIX_DIR}grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}${_GRUB_CFG}";/usr/bin/sbsign --key "/${_KEYDIR}/MOK/MOK.key" --cert "/${_KEYDIR}/MOK/MOK.crt" --output "/${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "/${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi"'
+Exec = /usr/bin/sh -c '/usr/bin/grub-mkstandalone -d "/usr/lib/grub/${_GRUB_ARCH}-efi" -O "${_GRUB_ARCH}-efi" --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd chain tpm" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "/${_GRUB_PREFIX_DIR}grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}";/usr/bin/sbsign --key "/${_KEYDIR}/MOK/MOK.key" --cert "/${_KEYDIR}/MOK/MOK.crt" --output "/${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "/${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi"'
 EOF
     elif [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         cat << EOF >> "${_HOOKNAME}"
-Exec = /usr/bin/sh -c '/usr/bin/grub-mkstandalone -d "/usr/lib/grub/${_GRUB_ARCH}-efi" -O "${_GRUB_ARCH}-efi" --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "/${_GRUB_PREFIX_DIR}grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}${_GRUB_CFG}";/usr/bin/sbsign --key "/${_KEYDIR}/MOK/MOK.key" --cert "/${_KEYDIR}/MOK/MOK.crt" --output "/${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "/${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi"'
+Exec = /usr/bin/sh -c '/usr/bin/grub-mkstandalone -d "/usr/lib/grub/${_GRUB_ARCH}-efi" -O "${_GRUB_ARCH}-efi" --sbat=/usr/share/grub/sbat.csv --modules="all_video boot btrfs cat configfile cryptodisk echo efi_gop efi_uga efifwsetup efinet ext2 f2fs fat font gcry_rijndael gcry_rsa gcry_serpent gcry_sha256 gcry_twofish gcry_whirlpool gfxmenu gfxterm gzio halt hfsplus http iso9660 loadenv loopback linux lvm lsefi lsefimmap luks luks2 mdraid09 mdraid1x minicmd net normal part_apple part_msdos part_gpt password_pbkdf2 pgp png reboot regexp search search_fs_uuid search_fs_file search_label serial sleep syslinuxcfg test tftp video xfs zstd backtrace chain tpm usb usbserial_common usbserial_pl2303 usbserial_ftdi usbserial_usbdebug keylayouts at_keyboard" --fonts="ter-u16n" --locales="en@quot" --themes="" -o "/${_GRUB_PREFIX_DIR}grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}";/usr/bin/sbsign --key "/${_KEYDIR}/MOK/MOK.key" --cert "/${_KEYDIR}/MOK/MOK.crt" --output "/${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "/${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi"'
 EOF
     fi
     _dialog --title " Automatic GRUB UEFI SB Update " --no-mouse --infobox "Automatic GRUB UEFI SB update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
@@ -1187,9 +1187,9 @@ _do_grub_uefi() {
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
-        _GRUB_PREFIX_DIR="${_UEFISYS_MP}/EFI/BOOT/"
+        _GRUB_PREFIX_DIR="${_UEFISYS_MP}/EFI/BOOT"
     else
-        _GRUB_PREFIX_DIR="boot/grub/"
+        _GRUB_PREFIX_DIR="boot/grub"
     fi
     _do_grub_common_before
     _setup_grub_uefi | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Setting up GRUB(2) UEFI..." 6 75 0
