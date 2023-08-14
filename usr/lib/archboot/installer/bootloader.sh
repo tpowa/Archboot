@@ -906,7 +906,7 @@ fi
     ## Edit grub.cfg config file
     _dialog --msgbox "You must now review the GRUB(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 8 55
     _geteditor || return 1
-    "${_EDITOR}" "${_DESTDIR}${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
+    "${_EDITOR}" "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
 }
 
 _do_uboot() {
