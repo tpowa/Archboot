@@ -365,16 +365,16 @@ _do_efistub_uefi() {
     _do_efistub_parameters
     _common_bootloader_checks
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-        _ADDITIONAL_REFIND="rEFInd"
-        _ADDITIONAL_REFIND_DESC="rEFInd for ${_UEFI_ARCH} UEFI"
-        _ADDITIONAL_LIMINE="LIMINE"
-        _ADDITIONAL_LIMINE_DESC="LIMINE for ${_UEFI_ARCH} UEFI"
+        _dialog --title " EFISTUB " --menu "" 10 60 3 \
+            "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
+             "LIMINE" "LIMINE for ${_UEFI_ARCH} UEFI" \
+             "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" \
+            "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
+    else
+        _dialog --title " EFISTUB " --menu "" 8 60 3 \
+            "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
+            "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
     fi
-    _dialog --title " EFISTUB " --menu "" 10 60 3 \
-        "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
-        "${_ADDITIONAL_LIMINE}" "${_ADDITIONAL_LIMINE_DESC}" \
-        "${_ADDITIONAL_REFIND}" "${_ADDITIONAL_REFIND_DESC}" \
-        "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
     case $(cat "${_ANSWER}") in
         "FIRMWARE") _do_uki_uefi ;;
         "LIMINE") _do_limine_uefi ;;
