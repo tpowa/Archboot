@@ -367,8 +367,8 @@ _do_efistub_uefi() {
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _dialog --title " EFISTUB " --menu "" 10 60 3 \
             "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
-             "LIMINE" "LIMINE for ${_UEFI_ARCH} UEFI" \
-             "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" \
+            "LIMINE" "LIMINE for ${_UEFI_ARCH} UEFI" \
+            "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" \
             "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
     else
         _dialog --title " EFISTUB " --menu "" 8 60 3 \
