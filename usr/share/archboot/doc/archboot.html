@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 13.08.2023 09:39</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 15.08.2023 09:47</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -682,18 +682,6 @@ The AARCH64 <strong>kernel </strong> does not seem to support this feature. This
 <ul>
 <li><strong>dmraid</strong>/<a href="https://wiki.archlinux.org/title/Fakeraid" title="Fakeraid"><strong>fakeraid</strong></a>/<strong>biosraid</strong> might not work on some boards.<br>
 <strong>mdadm</strong> only supports some <strong>isw</strong> and <strong>ddf</strong> fakeraid chipsets.
-</li>
-</ul>
-<ul>
-<li><a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a> cannot detect correct <strong>BIOS</strong> boot order:<br>
-It may happen that hd(x,x) entries are not correct, thus first reboot may not work.<br>
-<strong>Fix</strong>: Either change <strong>BIOS</strong> boot order or change <strong>grub.cfg</strong> to correct entries after successful boot.<br>This cannot be fixed it is a restriction in grub!
-</li>
-</ul>
-<ul>
-<li><a href="https://wiki.archlinux.org/title/Efibootmgr" title="Efibootmgr"><strong>efibootmgr</strong></a> setup entries are not working:<br>
-It may happen that <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> boot entries are not correct. Thus first reboot may not work.<br>
-<strong>Fix</strong>: Add manual entries and delete wrong entries from your <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> implementation.
 </li>
 </ul>
 <ul>
