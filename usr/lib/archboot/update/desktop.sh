@@ -132,6 +132,7 @@ _chromium_flags() {
 --incognito
 archboot.com
 wiki.archlinux.org
+wiki.archlinux.org/title/Installation_guide
 EOF
 }
 
@@ -143,7 +144,7 @@ _firefox_flags() {
 pref("browser.aboutwelcome.enabled", false, locked);
 pref("browser.startup.homepage_override.once", false, locked);
 pref("datareporting.policy.firstRunURL", "https://wiki.archlinux.org", locked);
-pref("browser.startup.homepage", "https://archboot.com|https://wiki.archlinux.org", locked);
+pref("browser.startup.homepage", "https://archboot.com|https://wiki.archlinux.org|https://wiki.archlinux.org/title/Installation_guide", locked);
 pref("browser.startup.firstrunSkipsHomepage"; true, locked);
 pref("startup.homepage_welcome_url", "https://archboot.com", locked );
 EOF
