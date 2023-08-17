@@ -44,7 +44,7 @@ _ISO_HOME_ARCH="${_ISO_HOME}/${_ARCH}"
 _ISO_HOME_SOURCE="${_ISO_HOME}/${_ARCH}/sources"
 # external paths
 _SERVER="archboot.com"
-_SERVER_PUBLIC="/httpdocs"
+_SERVER_PUBLIC=""
 _SERVER_IMAGE_DIR="${_SERVER_PUBLIC}/iso"
 _SERVER_SOURCE_DIR="${_SERVER_PUBLIC}/src/iso"
 _PACMAN_AARCH64="pacman-aarch64-chroot"
