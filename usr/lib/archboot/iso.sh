@@ -125,12 +125,6 @@ _prepare_fedora_shim_bootloaders_aarch64 () {
     cp "/usr/share/archboot/bootloader/BOOTAA64.efi" "${_ISODIR}/EFI/BOOT/BOOTAA64.EFI"
 }
 
-_prepare_efitools_uefi () {
-    echo "Preparing efitools..."
-    cp  "/usr/share/efitools/efi/HashTool.efi" "${_ISODIR}/EFI/TOOLS/HASHTOOL.EFI"
-    cp  "/usr/share/efitools/efi/KeyTool.efi" "${_ISODIR}/EFI/TOOLS/KEYTOOL.EFI"
-}
-
 _prepare_uefi_shell_tianocore() {
     echo "Preparing UEFI shell..."
     ## Installing Tianocore UDK/EDK2 UEFI X64 "Full Shell"

@@ -137,7 +137,6 @@ _uefi_common() {
     [[ -f "${_DESTDIR}/usr/bin/efibootmgr" ]] || _PACKAGES="${_PACKAGES} efibootmgr"
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         [[ -f "${_DESTDIR}/usr/bin/mokutil" ]] || _PACKAGES="${_PACKAGES} mokutil"
-        [[ -f "${_DESTDIR}/usr/bin/efi-readvar" ]] || _PACKAGES="${_PACKAGES} efitools"
         [[ -f "${_DESTDIR}/usr/bin/sbsign" ]] || _PACKAGES="${_PACKAGES} sbsigntools"
     fi
     if [[ -n "${_PACKAGES}" ]]; then

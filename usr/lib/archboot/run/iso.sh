@@ -25,7 +25,6 @@ if echo "${_BASENAME}" | grep -qw aarch64 || echo "${_BASENAME}" | grep -qw x86_
         _prepare_uefi_IA32 || exit 1
         _prepare_memtest || exit 1
     fi
-    _prepare_efitools_uefi || exit 1
     _prepare_background || exit 1
     _reproducibility
     _prepare_uefi_image || exit 1
