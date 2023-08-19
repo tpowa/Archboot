@@ -6,9 +6,7 @@ build ()
 {
     # https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot
     _RUNNING_ARCH="$(uname -m)"
-    map add_binary openssl cert-to-efi-hash-list efi-readvar efi-updatevar efitool-mkusb flash-var \
-          hash-to-efi-sig-list sig-list-to-certs cert-to-efi-sig-list sign-efi-sig-list sbattach sbkeysync \
-          sbsiglist sbsign sbvarsign sbverify mokutil sbctl
+    map add_binary openssl sbattach sbkeysync sbsiglist sbsign sbvarsign sbverify mokutil sbctl
     map add_file "/etc/ssl/openssl.cnf" "/usr/share/licenses/sbctl/LICENSE"
     # add mkkeys.sh, 
     # curl -s -L -O https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh
