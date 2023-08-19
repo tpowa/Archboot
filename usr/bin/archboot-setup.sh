@@ -10,6 +10,15 @@ LANG=C
 . /usr/lib/archboot/installer/quicksetup.sh
 . /usr/lib/archboot/installer/blockdevices.sh
 . /usr/lib/archboot/installer/bootloader.sh
+. /usr/lib/archboot/installer/bootloader_grub.sh
+. /usr/lib/archboot/installer/bootloader_limine.sh
+. /usr/lib/archboot/installer/bootloader_sb.sh
+. /usr/lib/archboot/installer/bootloader_systemd_boot.sh
+. /usr/lib/archboot/installer/bootloader_refind.sh
+. /usr/lib/archboot/installer/bootloader_uboot.sh
+. /usr/lib/archboot/installer/bootloader_uki.sh
+. /usr/lib/archboot/installer/bootloader_pacman_hooks.sh
+. /usr/lib/archboot/installer/bootloader_systemd_services.sh
 . /usr/lib/archboot/installer/btrfs.sh
 . /usr/lib/archboot/installer/configuration.sh
 . /usr/lib/archboot/installer/mountpoints.sh

@@ -169,7 +169,10 @@ _download_latest() {
     done
     # setup libs
     _progress "75" "Downloading latest setup libs..."
-    LIBS="autoconfiguration.sh quicksetup.sh base.sh blockdevices.sh bootloader.sh btrfs.sh common.sh \
+    LIBS="autoconfiguration.sh quicksetup.sh base.sh blockdevices.sh bootloader.sh \
+            bootloader_sb.sh bootloader_grub.sh bootloader_uki.sh bootloader_systemd_bootd.sh \
+            bootloader_limine.sh bootloader_pacman_hooks.sh bootloader_refind.sh \
+            bootloader_systemd_services.sh bootloader_uboot.sh btrfs.sh common.sh \
             configuration.sh mountpoints.sh network.sh pacman.sh partition.sh storage.sh"
     for i in ${LIBS}; do
         wget -q "${_SOURCE}${_INST}/${i}?inline=false" -O "${_INST}/${i}"
