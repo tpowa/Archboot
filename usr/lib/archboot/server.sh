@@ -65,7 +65,7 @@ echo "Moving ./${_ARCH}/${_DIR} to .${1}/${_ARCH}..."
 mv "./${_ARCH}/${_DIR}" ".${1}"/"${_ARCH}"
 echo "Removing ./${_ARCH} directory..."
 rm -r "./${_ARCH}"
-cd "./${1}"/"${_ARCH}"
+cd ".${1}"/"${_ARCH}"
 echo "Creating new latest symlink in .${1}/${_ARCH}..."
 rm latest
 ln -s "${_DIR}" latest
