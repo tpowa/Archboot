@@ -57,16 +57,16 @@ _server_upload() {
     sudo -u "${_USER}" scp -q -r "${_DIR}" "${_SERVER}":"${_ARCH}" || exit 1
     # move files on server, create symlink and removing ${_PURGE_DATE} old release
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
-echo "Removing old ./${1}/${_ARCH}/${_DIR} directory..."
-rm -r "./${1}"/"${_ARCH}"/"${_DIR}"
-echo "Removing old purge date reached ${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory..."
-rm -r "./${1}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>/dev/null
+echo "Removing old .${1}/${_ARCH}/${_DIR} directory..."
+rm -r ".${1}"/"${_ARCH}"/"${_DIR}"
+echo "Removing old purge date reached .${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory..."
+rm -r ".${1}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>/dev/null
 echo "Moving ./${_ARCH}/${_DIR} to ./${1}/${_ARCH}..."
 mv "./${_ARCH}/${_DIR}" "./${1}"/"${_ARCH}"
 echo "Removing ./${_ARCH} directory..."
 rm -r "./${_ARCH}"
 cd "./${1}"/"${_ARCH}"
-echo "Creating new latest symlink in ./${1}/${_ARCH}..."
+echo "Creating new latest symlink in .${1}/${_ARCH}..."
 rm latest
 ln -s "${_DIR}" latest
 EOF
