@@ -13,7 +13,7 @@ LANG=C
 . /usr/lib/archboot/installer/bootloader_grub.sh
 . /usr/lib/archboot/installer/bootloader_limine.sh
 . /usr/lib/archboot/installer/bootloader_sb.sh
-. /usr/lib/archboot/installer/bootloader_systemd_boot.sh
+. /usr/lib/archboot/installer/bootloader_systemd_bootd.sh
 . /usr/lib/archboot/installer/bootloader_refind.sh
 . /usr/lib/archboot/installer/bootloader_uboot.sh
 . /usr/lib/archboot/installer/bootloader_uki.sh
