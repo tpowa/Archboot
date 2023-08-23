@@ -76,6 +76,7 @@ _prepare_kernel_initrd_files() {
         # save init ramdisk for further images
         if [[ -n "${_SAVE_INIT}" ]]; then
             cp "${_ISODIR}/boot/init-${_ARCH}.img" ./
+            chmod 644 "./init-${_ARCH}.img"
         fi
     fi
     echo "Running archboot-cpio.sh for initrd-${_ARCH}.img..."
