@@ -3,6 +3,8 @@ On the road to 2023.08:
 - switch project license to GPL3 or later
 Environment Changes:
 - implemented dialog progressbars
+- open Installation Guide on firefox and chromium startup
+- removed efitools
 setup:
 - implemented progressbars
 - reactivated firmware and systemd-boot on aarch64
@@ -15,6 +17,8 @@ setup:
 - added message in UKI mode before editing the config files
 - readded dd cleaning the disk at the beginning too,
   wipefs is still not enough!
+- removed efitools
+- splitted each bootloader into its own file
 2023.07 Highlights:
 - kernel 6.4.x
 - grub 2.12rc1-1
