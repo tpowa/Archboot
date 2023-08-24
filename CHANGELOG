@@ -1,4 +1,6 @@
-On the road to 2023.08:
+On the road to 2023.09:
+---
+2023.08 Highlights:
 - systemd 254.x
 - switched hosting of project for better reliability
 - reenabled 3 month archive for ISOs
@@ -21,6 +23,7 @@ setup:
   wipefs is still not enough!
 - removed efitools
 - splitted each bootloader into its own file
+---
 2023.07 Highlights:
 - kernel 6.4.x
 - grub 2.12rc1-1
