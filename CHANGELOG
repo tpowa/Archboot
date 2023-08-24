@@ -1,6 +1,8 @@
 On the road to 2023.08:
 - systemd 254.x
-- switch project license to GPL3 or later
+- switched hosting of project for better reliability
+- reenabled 3 month archive for ISOs
+- switched project license to GPL3 or later
 Environment Changes:
 - implemented dialog progressbars
 - open Installation Guide on firefox and chromium startup
@@ -13,7 +15,7 @@ setup:
 - added Limine support for x86_64
 - added firmware, reboot and shutdown to grub.cfg by default
 - added bootloader pacman update hooks
-- reallow GPT Nameschemes on BIOS systems
+- reallow GPT nameschemes on BIOS systems
 - added message in UKI mode before editing the config files
 - readded dd cleaning the disk at the beginning too,
   wipefs is still not enough!
