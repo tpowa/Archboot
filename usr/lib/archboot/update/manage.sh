@@ -119,8 +119,8 @@ _create_initramfs() {
     cd "${_ROOTFS_DIR}" || exit 1
     find . -mindepth 1 -printf '%P\0' |
             sort -z |
-            LANG=C bsdtar --null -cnf - -T - |
-            LANG=C bsdtar --null -cf - --format=newc @- |
+            bsdtar --null -cnf - -T - |
+            bsdtar --null -cf - --format=newc @- |
             zstd --rm -T0> "${_RAM}/${_INITRD}" &
     sleep 2
     while pgrep -x zstd &>"${_NO_LOG}"; do
