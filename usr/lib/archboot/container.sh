@@ -150,8 +150,12 @@ _umount_special() {
 _install_base_packages() {
     if [[ "${2}" == "use_binfmt" ]]; then
         echo "Downloading ${_PACKAGES} ${_KEYRING} to ${1}..."
-        #shellcheck disable=SC2086
-        ${_PACMAN} -Syw ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
+        if grep -q 'archboot' /etc/hostname; then
+            ${_PACMAN} -Syw ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_LOG}" || exit 1
+        else
+            #shellcheck disable=SC2086
+            ${_PACMAN} -Syw ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
+        fi
     fi
     echo "Installing ${_PACKAGES} ${_KEYRING} to ${1}..."
     #shellcheck disable=SC2086
@@ -165,8 +169,13 @@ _install_archboot() {
         _pacman_key_system
     fi
     echo "Installing ${_ARCHBOOT} ${_MAN_INFO_PACKAGES} to ${1}..."
-    #shellcheck disable=SC2086
-    ${_PACMAN} -Sy ${_ARCHBOOT} ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
+    if grep -q 'archboot' /etc/hostname; then
+        #shellcheck disable=SC2086
+        ${_PACMAN} -Sy ${_ARCHBOOT} ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
+    else
+        #shellcheck disable=SC2086
+        ${_PACMAN} -Sy ${_ARCHBOOT} ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
+    fi
     # cleanup
     if ! [[ "${2}"  == "use_binfmt" ]]; then
         rm -r "${1}"/blankdb
