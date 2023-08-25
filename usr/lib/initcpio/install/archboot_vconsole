@@ -12,8 +12,6 @@ build ()
     # add fbset
     add_binary fbset
     add_file /etc/fb.modes
-    # add terminus-font
-    map add_full_dir /usr/share/fonts /usr/share/fontconfig
     add_file /usr/share/licenses/terminus-font/LICENSE
 }
 
