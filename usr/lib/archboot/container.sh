@@ -158,8 +158,13 @@ _install_base_packages() {
         fi
     fi
     echo "Installing ${_PACKAGES} ${_KEYRING} to ${1}..."
-    #shellcheck disable=SC2086
-    ${_PACMAN} -Sy ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
+    if grep -q 'archboot' /etc/hostname; then
+        #shellcheck disable=SC2086
+        ${_PACMAN} -Sy ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
+    else
+        #shellcheck disable=SC2086
+        ${_PACMAN} -Sy ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
+    fi
 }
 
 _install_archboot() {
