@@ -122,7 +122,7 @@ all_modules() {
         mod="${mod##*/}"
         mod="${mod%.ko*}"
         printf '%s\n' "${mod//-/_}"
-    done < <(find "$_d_kmoduledir" -name '*.ko*' -print0 2>/dev/null | grep -EZz "$@")
+    done < <(find "$_d_kmoduledir" -name '*.ko*' -print0 2>"${_NO_LOG}" | grep -EZz "$@")
     (( count ))
 }
 
@@ -145,7 +145,7 @@ add_firmware() {
     fwpath=/lib/firmware
     for fw; do
         # shellcheck disable=SC2154,SC2153
-        if ! compgen -G "${BUILDROOT}${fwpath}/${fw}?(.*)" &>/dev/null; then
+        if ! compgen -G "${BUILDROOT}${fwpath}/${fw}?(.*)" &>"${_NO_LOG}"; then
             if read -r fwfile < <(compgen -G "${fwpath}/${fw}?(.*)"); then
                 map add_file "${fwfile[@]}"
                 break
@@ -194,7 +194,7 @@ add_module() {
                 done
                 ;;
         esac
-    done < <(modinfo -b "$_optmoduleroot" -k "$KERNELVERSION" -0 "$target" 2>/dev/null)
+    done < <(modinfo -b "$_optmoduleroot" -k "$KERNELVERSION" -0 "$target" 2>"${_NO_LOG}")
     if (( ${#firmware[*]} )); then
         add_firmware "${firmware[@]}"
     fi
@@ -284,7 +284,7 @@ add_binary() {
     dest="${2:-$binary}"
     add_file "$binary" "$dest"
     # non-binaries
-    if ! lddout="$(ldd "$binary" 2>/dev/null)"; then
+    if ! lddout="$(ldd "$binary" 2>"${_NO_LOG}")"; then
         return 0
     fi
     # resolve sodeps
@@ -355,7 +355,7 @@ run_build_hook() {
         error 'Failed to read %s' "$script"
         return 1
     fi
-    if ! declare -f build >/dev/null; then
+    if ! declare -f build >"${_NO_LOG}"; then
         error "Hook '%s' has no build function" "${script}"
         return 1
     fi
@@ -370,11 +370,11 @@ run_build_hook() {
 
 try_enable_color() {
     local colors
-    if ! colors="$(tput colors 2>/dev/null)"; then
+    if ! colors="$(tput colors 2>"${_NO_LOG}")"; then
         warning "Failed to enable color. Check your TERM environment variable"
         return
     fi
-    if (( colors > 0 )) && tput setaf 0 &>/dev/null; then
+    if (( colors > 0 )) && tput setaf 0 &>"${_NO_LOG}"; then
         _color_none="$(tput sgr0)"
         _color_bold="$(tput bold)"
         _color_blue="$_color_bold$(tput setaf 4)"

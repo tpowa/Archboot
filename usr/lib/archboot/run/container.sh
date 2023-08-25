@@ -48,7 +48,7 @@ else
         _install_base_packages "${1}" "use_binfmt" || exit 1
         _install_archboot "${1}" "use_binfmt" || exit 1
         _clean_mkinitcpio "${1}"
-        _clean_container "${1}" 2>/dev/null
+        _clean_container "${1}" 2>"${_NO_LOG}"
     else
         echo "Error: binfmt usage is only supported on x86_64!"
         exit 1

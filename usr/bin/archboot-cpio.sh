@@ -96,7 +96,7 @@ build_image() {
         # this assumes that the new image is not more than 1¼ times the size of the old one
         (( $((curr_size + (curr_size/4))) < space_left_on_device )) && compressout="$out".tmp
     fi
-    pushd "$BUILDROOT" >/dev/null || return
+    pushd "$BUILDROOT" >"${_NO_LOG}" || return
     # Reproducibility: set all timestamps to 0
     find . -mindepth 1 -execdir touch -hcd "@0" "{}" +
     # If this pipeline changes, |pipeprogs| below needs to be updated as well.
@@ -107,7 +107,7 @@ build_image() {
             $compress "${COMPRESSION_OPTIONS[@]}" > "$compressout"
     pipestatus=("${PIPESTATUS[@]}")
     pipeprogs=('find' 'sort' 'bsdtar (step 1)' 'bsdtar (step 2)' "$compress")
-    popd >/dev/null || return
+    popd >"${_NO_LOG}" || return
     for (( i = 0; i < ${#pipestatus[*]}; ++i )); do
         if (( pipestatus[i] )); then
             errmsg="${pipeprogs[i]} reported an error"
@@ -215,7 +215,7 @@ fi
 _d_workdir="$(initialize_buildroot "$KERNELVERSION" "$_opttargetdir")" || exit 1
 BUILDROOT="${_opttargetdir:-$_d_workdir/root}"
 # shellcheck source=mkinitcpio.conf
-! . "$_f_config" 2>/dev/null && die "Failed to read configuration '%s'" "$_f_config"
+! . "$_f_config" 2>"${_NO_LOG}" && die "Failed to read configuration '%s'" "$_f_config"
 _hooks=("${HOOKS[@]}")
 if (( ${#_hooks[*]} == 0 )); then
     die "Invalid config: No hooks found"
@@ -239,7 +239,7 @@ preload_builtin_modules
 map run_build_hook "${_hooks[@]}" || (( ++_builderrors ))
 install_modules "${!_modpaths[@]}"
 # this is simply a nice-to-have -- it doesn't matter if it fails.
-ldconfig -r "$BUILDROOT" &>/dev/null
+ldconfig -r "$BUILDROOT" &>"${_NO_LOG}"
 # remove /var/cache/ldconfig/aux-cache for reproducability
 rm -f -- "$BUILDROOT/var/cache/ldconfig/aux-cache"
 # Set umask to create initramfs images as 600

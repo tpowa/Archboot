@@ -41,7 +41,7 @@ _create_iso() {
         # generate tarball in container, umount tmp container tmpfs, else weird things could happen
         # removing not working lvm2 from latest and local image first
         echo "Removing lvm2 from container ${_W_DIR}..."
-        ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>/dev/null
+        ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>"${_NO_LOG}"
         echo "Generating local ISO..."
         # generate local iso in container
         #if [[ "${_ARCH}" == "x86_64" ]]; then
@@ -56,15 +56,15 @@ _create_iso() {
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g \
             -p=${_PRESET_LATEST} -i=${_ISONAME}-latest-${_ARCH}" || exit 1
         echo "Installing lvm2 to container ${_W_DIR}..."
-        ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>/dev/null
+        ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>"${_NO_LOG}"
     fi
     echo "Generating normal ISO..."
     # generate iso in container
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g -s \
         -i=${_ISONAME}-${_ARCH}"  || exit 1
     # move iso out of container
-    mv "${_W_DIR}"/*.iso ./ &>/dev/null
-    mv "${_W_DIR}"/*.img ./ &>/dev/null
+    mv "${_W_DIR}"/*.iso ./ &>"${_NO_LOG}"
+    mv "${_W_DIR}"/*.img ./ &>"${_NO_LOG}"
     # create boot directory with ramdisks
     echo "Creating boot directory..."
     mkdir -p boot/
@@ -83,16 +83,16 @@ _create_iso() {
     else
         for i in *.iso; do
             if  echo "${i}" | grep -v local | grep -vq latest; then
-                isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > efi.img
+                isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
                 mcopy -m -i efi.img ::/"${_AMD_UCODE}" ./"${_AMD_UCODE}"
                 [[ "${_ARCH}" == "aarch64" ]] || mcopy -m -i efi.img ::/"${_INTEL_UCODE}" ./"${_INTEL_UCODE}"
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD}"
                 mcopy -m -i efi.img ::/"${_KERNEL}" ./"${_KERNEL_ARCHBOOT}"
             elif echo "${i}" | grep -q latest; then
-                isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > efi.img
+                isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD_LATEST}"
             elif echo "${i}" | grep -q local; then
-                isoinfo -R -i "${i}" -x /efi.img 2>/dev/null > efi.img
+                isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD_LOCAL}"
             fi
             rm efi.img
@@ -131,7 +131,7 @@ _create_iso() {
             #shellcheck disable=SC2086
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify ${_KERNEL_ARCHBOOT} \
                 ${_UCODE} ${initrd} --cmdline @${_CMDLINE} --splash ${_SPLASH} \
-                --os-release @${_OSREL} --stub ${_EFISTUB} --output ${_UKI} &>/dev/null || exit 1
+                --os-release @${_OSREL} --stub ${_EFISTUB} --output ${_UKI} &>"${_NO_LOG}" || exit 1
         done
         # fix permission and timestamp
         mv "${_W_DIR}"/boot ./

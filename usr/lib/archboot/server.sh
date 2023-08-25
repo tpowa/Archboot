@@ -21,21 +21,21 @@ _update_pacman_chroot() {
     cd "${_ISO_HOME}" || exit 1
     [[ -d "${_ARCH_DIR}" ]] || mkdir "${_ARCH_DIR}"
     echo "Downloading pacman ${_ARCH} chroot..."
-    [[ -f pacman-${_ARCH}-chroot-latest.tar.zst ]] && rm pacman-"${_ARCH}"-chroot-latest.tar.zst{,.sig} 2>/dev/null
-    wget "${_ARCH_CHROOT_PUBLIC}"/"${_PACMAN_CHROOT}"{,.sig} &>/dev/null
+    [[ -f pacman-${_ARCH}-chroot-latest.tar.zst ]] && rm pacman-"${_ARCH}"-chroot-latest.tar.zst{,.sig} 2>"${_NO_LOG}"
+    wget "${_ARCH_CHROOT_PUBLIC}"/"${_PACMAN_CHROOT}"{,.sig} &>"${_NO_LOG}"
     # verify download
-    sudo -u "${_USER}" gpg --verify "${_PACMAN_CHROOT}.sig" &>/dev/null || exit 1
-    bsdtar -C "${_ARCH_DIR}" -xf "${_PACMAN_CHROOT}" &>/dev/null
+    sudo -u "${_USER}" gpg --verify "${_PACMAN_CHROOT}.sig" &>"${_NO_LOG}" || exit 1
+    bsdtar -C "${_ARCH_DIR}" -xf "${_PACMAN_CHROOT}" &>"${_NO_LOG}"
     echo "Removing installation tarball..."
-    rm "${_PACMAN_CHROOT}"{,.sig} &>/dev/null
+    rm "${_PACMAN_CHROOT}"{,.sig} &>"${_NO_LOG}"
     # update container to latest packages
     echo "Updating container to latest packages..."
     # fix mirrorlist
     [[ "${_ARCH}" == "riscv64" ]] && sed -i -e 's|^#Server = https://riscv|Server = https://riscv|g' "${_ARCH_DIR}"/etc/pacman.d/mirrorlist
-    ${_NSPAWN} "${_ARCH_DIR}" pacman -Syu --noconfirm &>/dev/null || exit 1
+    ${_NSPAWN} "${_ARCH_DIR}" pacman -Syu --noconfirm &>"${_NO_LOG}" || exit 1
     _fix_network "${_ARCH_DIR}"
-    _CLEANUP_CONTAINER="1" _clean_container "${_ARCH_DIR}" &>/dev/null
-    _CLEANUP_CACHE="1" _clean_cache "${_ARCH_DIR}" &>/dev/null
+    _CLEANUP_CONTAINER="1" _clean_container "${_ARCH_DIR}" &>"${_NO_LOG}"
+    _CLEANUP_CACHE="1" _clean_cache "${_ARCH_DIR}" &>"${_NO_LOG}"
     echo "Generating tarball..."
     tar -acf "${_PACMAN_CHROOT}" -C "${_ARCH_DIR}" .
     echo "Removing ${_ARCH_DIR}..."
@@ -60,7 +60,7 @@ _server_upload() {
 echo "Removing old .${1}/${_ARCH}/${_DIR} directory..."
 rm -r ".${1}"/"${_ARCH}"/"${_DIR}"
 echo "Removing old purge date reached .${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory..."
-rm -r ".${1}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>/dev/null
+rm -r ".${1}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>"${_NO_LOG}"
 echo "Moving ./${_ARCH}/${_DIR} to .${1}/${_ARCH}..."
 mv "./${_ARCH}/${_DIR}" ".${1}"/"${_ARCH}"
 echo "Removing ./${_ARCH} directory..."

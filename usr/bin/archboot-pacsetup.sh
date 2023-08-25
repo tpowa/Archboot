@@ -131,7 +131,7 @@ _update_environment() {
 
 _check
 if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
-    if ! ping -c1 www.google.com &>/dev/null; then
+    if ! ping -c1 www.google.com &>"${_NO_LOG}"; then
         _dialog --title " ERROR " --no-mouse --infobox "Your network is not working. Please reconfigure it." 3 60
         sleep 5
         _abort

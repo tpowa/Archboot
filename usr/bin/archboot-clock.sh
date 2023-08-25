@@ -81,7 +81,7 @@ _auto_clock() {
 _check
 _SET_TIME=""
 # automatic setup
-if ping -c1 www.google.com &>/dev/null; then
+if ping -c1 www.google.com &>"${_NO_LOG}"; then
     _ZONE="$(curl -s "http://ip-api.com/csv/?fields=timezone")"
     _auto_clock |  _dialog --title " Clock Configuration " --no-mouse --gauge "Setting Timezone to ${_ZONE}..." 6 60 0
     _SET_TIME="1"

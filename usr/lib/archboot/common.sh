@@ -4,6 +4,8 @@
 . /etc/archboot/defaults
 _BASENAME=${0##*/}
 _RUNNING_ARCH="$(uname -m)"
+_LOG="/dev/tty7"
+_NO_LOG="/dev/null"
 _KEYRING="archlinux-keyring"
 if echo "${_BASENAME}" | grep -qw aarch64; then
     _ARCHBOOT="archboot-arm"
@@ -111,7 +113,7 @@ _kver() {
         local -i offset
         offset="$(od -An -j0x20E -dN2 "$1")" || return
         read -r kver _ < \
-            <(dd if="$1" bs=1 count=127 skip=$((offset + 0x200)) 2>/dev/null)
+            <(dd if="$1" bs=1 count=127 skip=$((offset + 0x200)) 2>"${_NO_LOG}")
     else
         reader='cat'
         bytes="$(od -An -t x2 -N2 "$1" | tr -dc '[:alnum:]')"
@@ -151,10 +153,10 @@ _generate_keyring() {
     if ! grep -qw archboot /etc/hostname; then
         # generate pacman keyring
         echo "Generating pacman keyring in container..."
-        ${_NSPAWN} "${1}" pacman-key --init &>/dev/null
-        ${_NSPAWN} "${1}" pacman-key --populate &>/dev/null
+        ${_NSPAWN} "${1}" pacman-key --init &>"${_NO_LOG}"
+        ${_NSPAWN} "${1}" pacman-key --populate &>"${_NO_LOG}"
     else
-        cp -ar /etc/pacman.d/gnupg "${1}"/etc/pacman.d &>/dev/null
+        cp -ar /etc/pacman.d/gnupg "${1}"/etc/pacman.d &>"${_NO_LOG}"
     fi
 }
 
@@ -230,16 +232,16 @@ _pacman_key() {
     [[ -d "${1}"/usr/share/archboot/gpg ]] || mkdir -p "${1}"/usr/share/archboot/gpg
     cp "${_GPG_KEY}" "${1}"/"${_GPG_KEY}"
     echo "Adding ${_GPG_KEY_ID} to container trusted keys..."
-    ${_NSPAWN} "${1}" pacman-key --add "${_GPG_KEY}" &>/dev/null
-    ${_NSPAWN} "${1}" pacman-key --lsign-key "${_GPG_KEY_ID}" &>/dev/null
+    ${_NSPAWN} "${1}" pacman-key --add "${_GPG_KEY}" &>"${_NO_LOG}"
+    ${_NSPAWN} "${1}" pacman-key --lsign-key "${_GPG_KEY_ID}" &>"${_NO_LOG}"
     echo "Removing ${_GPG_KEY} from container..."
     rm "${1}/${_GPG_KEY}"
 }
 
 _pacman_key_system() {
     echo "Adding ${_GPG_KEY_ID} to trusted keys..."
-    pacman-key --add "${_GPG_KEY}" &>/dev/null
-    pacman-key --lsign-key "${_GPG_KEY_ID}" &>/dev/null
+    pacman-key --add "${_GPG_KEY}" &>"${_NO_LOG}"
+    pacman-key --lsign-key "${_GPG_KEY_ID}" &>"${_NO_LOG}"
 }
 
 _cachedir_check() {

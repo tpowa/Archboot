@@ -43,19 +43,19 @@ _clean_cache() {
 _pacman_chroot() {
     if ! [[ -f ${3} && -f ${3}.sig ]]; then
         echo "Downloading ${3}..."
-        wget "${2}"/"${3}"{,.sig} &>/dev/null
+        wget "${2}"/"${3}"{,.sig} &>"${_NO_LOG}"
     else
         echo "Using local ${3}..."
     fi
     echo "Verifying ${3}..."
-    gpg --verify "${3}.sig" &>/dev/null || exit 1
+    gpg --verify "${3}.sig" &>"${_NO_LOG}" || exit 1
     bsdtar -C "${1}" -xf "${3}"
     if [[ -f "${3}" && -f "${3}".sig ]]; then
         echo "Removing installation tarball ${3}..."
         rm "${3}"{,.sig}
     fi
     echo "Updating container to latest packages..."
-    ${_NSPAWN} "${1}" pacman -Syu --noconfirm &>/dev/null
+    ${_NSPAWN} "${1}" pacman -Syu --noconfirm &>"${_NO_LOG}"
 }
 
 # clean container from not needed files
@@ -69,8 +69,8 @@ _clean_container() {
         find "${1}"/usr/share/locale/ -mindepth 2 ! -path '*/be/*' ! -path '*/bg/*' ! -path '*/cs/*' ! -path '*/da/*' ! -path '*/de/*' \
         ! -path '*/en/*' ! -path '*/el/*' ! -path '*/es/*' ! -path '*/fi/*' ! -path '*/fr/*' ! -path '*/hu/*' ! -path '*/it/*' \
         ! -path '*/lt/*' ! -path '*/lv/*' ! -path '*/mk/*' ! -path '*/nl/*' ! -path '*/nn/*' ! -path '*/pl/*' ! -path '*/pt/*' \
-        ! -path '*/ro/*' ! -path '*/ru/*' ! -path '*/sk/*' ! -path '*/sr/*' ! -path '*/sv/*' ! -path '*/uk/*' -delete &>/dev/null
-        find "${1}"/usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>/dev/null
+        ! -path '*/ro/*' ! -path '*/ru/*' ! -path '*/sk/*' ! -path '*/sr/*' ! -path '*/sv/*' ! -path '*/uk/*' -delete &>"${_NO_LOG}"
+        find "${1}"/usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>"${_NO_LOG}"
     fi
 }
 
@@ -102,7 +102,7 @@ _prepare_pacman() {
     rm -f /var/lib/pacman/sync/archboot.db
     echo "Updating Arch Linux keyring..."
     #shellcheck disable=SC2086
-    pacman -Sy --config ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} &>/dev/null
+    pacman -Sy --config ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} &>"${_NO_LOG}"
 }
 
 #shellcheck disable=SC2120
@@ -151,11 +151,11 @@ _install_base_packages() {
     if [[ "${2}" == "use_binfmt" ]]; then
         echo "Downloading ${_PACKAGES} ${_KEYRING} to ${1}..."
         #shellcheck disable=SC2086
-        ${_PACMAN} -Syw ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>/dev/null || exit 1
+        ${_PACMAN} -Syw ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
     fi
     echo "Installing ${_PACKAGES} ${_KEYRING} to ${1}..."
     #shellcheck disable=SC2086
-    ${_PACMAN} -Sy ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} &>/dev/null || exit 1
+    ${_PACMAN} -Sy ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
 }
 
 _install_archboot() {
@@ -166,7 +166,7 @@ _install_archboot() {
     fi
     echo "Installing ${_ARCHBOOT} ${_MAN_INFO_PACKAGES} to ${1}..."
     #shellcheck disable=SC2086
-    ${_PACMAN} -Sy ${_ARCHBOOT} ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} &>/dev/null || exit 1
+    ${_PACMAN} -Sy ${_ARCHBOOT} ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
     # cleanup
     if ! [[ "${2}"  == "use_binfmt" ]]; then
         rm -r "${1}"/blankdb

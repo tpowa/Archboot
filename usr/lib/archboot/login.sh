@@ -27,14 +27,14 @@ _switch_root_zram() {
 if [[ "${TTY}" = "tty1" ]]; then
     clear
     [[ -d /sysroot ]] || mkdir /sysroot
-    modprobe zram &>/dev/null
-    modprobe zstd &>/dev/null
+    modprobe zram &>"${_NO_LOG}"
+    modprobe zstd &>"${_NO_LOG}"
     echo "1" >/sys/block/zram0/reset
     echo "zstd" >/sys/block/zram0/comp_algorithm
     echo "5G" >/sys/block/zram0/disksize
     _progress "33" "Creating btrfs on /dev/zram0..."
-    mkfs.btrfs /dev/zram0 &>/dev/null
-    mount -o discard /dev/zram0 /sysroot &>/dev/null
+    mkfs.btrfs /dev/zram0 &>"${_NO_LOG}"
+    mount -o discard /dev/zram0 /sysroot &>"${_NO_LOG}"
     _progress "66" "Removing firmware and modules..."
     # cleanup firmware and modules
     mv /lib/firmware/regulatory* /tmp/
@@ -45,16 +45,16 @@ if [[ "${TTY}" = "tty1" ]]; then
     _progress "75" "Copying archboot rootfs to /sysroot..."
     tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
         --exclude="./run/*" --exclude="./mnt/*" --exclude="./tmp/*" --exclude="./sysroot/*" \
-        -clpf - . | tar -C /sysroot -xlspf - &>/dev/null
+        -clpf - . | tar -C /sysroot -xlspf - &>"${_NO_LOG}"
     # cleanup mkinitcpio directories and files
-    rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
-    rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
+    rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>"${_NO_LOG}"
+    rm -f /sysroot/{VERSION,config,buildconfig,init} &>"${_NO_LOG}"
     # systemd needs this for root_switch
     touch /etc/initrd-release
     _progress "100" "System is ready."
     read -r -t 2
     # fix clear screen on all terminals
-    printf "\ec" | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+    printf "\ec" | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
     # https://www.freedesktop.org/software/systemd/man/bootup.html
     # enable systemd  initrd functionality
     touch /etc/initrd-release
@@ -84,11 +84,11 @@ _enter_shell() {
 }
 
 _run_latest() {
-    update -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+    update -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
 }
 
 _run_latest_install() {
-    update -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+    update -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
 }
 
 _run_update_installer() {
@@ -123,7 +123,7 @@ _run_update_installer() {
 
 if ! [[ -e /.vconsole-run ]]; then
     touch /.vconsole-run
-    FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" 2>/dev/null | sed -e 's#.*:##g')"
+    FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" 2>"${_NO_LOG}" | sed -e 's#.*:##g')"
     if [[ "${FB_SIZE}" -gt '1900' ]]; then
         SIZE="32"
     else
@@ -141,14 +141,14 @@ if ! [[ -e /.clean-pacman-db ]]; then
         memtest86+-efi mkinitcpio-busybox mtools libsysprof-capture libnsl libksba gdbm binutils \
         cdrtools systemd-ukify python python-pefile limine man-pages libev libpipeline groff db db5.3"
     for i in ${_RM_PACMAN_DB}; do
-        rm -rf /var/lib/pacman/local/"${i}"-[0-9]* &>/dev/null
+        rm -rf /var/lib/pacman/local/"${i}"-[0-9]* &>"${_NO_LOG}"
     done
 fi
 
 if [[ "${TTY}" = "tty1" ]] ; then
     if ! mount | grep -q zram0; then
         _TITLE="Archboot $(uname -m) | Basic Setup | ZRAM"
-        _switch_root_zram | _dialog --title " Initializing System... " --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>/dev/null
+        _switch_root_zram | _dialog --title " Initializing System... " --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
     else
         if ! [[ -e "${_CACHEDIR}/archboot.db" ]]; then
             systemctl start systemd-networkd

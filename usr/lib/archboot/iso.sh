@@ -176,7 +176,7 @@ _prepare_uefi_image() {
     IMGSZ=$((BOOTSIZE/1024 + 2048)) # image size in KB
     VFAT_IMAGE="${_ISODIR}/efi.img"
     ## Creating efi.img
-    mkfs.vfat --invariant -C "${VFAT_IMAGE}" "${IMGSZ}" >/dev/null
+    mkfs.vfat --invariant -C "${VFAT_IMAGE}" "${IMGSZ}" >"${_NO_LOG}"
     ## Copying all files to UEFI vfat image
     mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI "${_ISODIR}"/boot ::/
     # leave EFI/ and /boot/kernel for virtualbox and other restricted VM emulators :(
@@ -217,14 +217,14 @@ _uboot() {
     IMGSZ=$((BOOTSIZE/1024 + 2048)) # image size in KB
     VFAT_IMAGE="${_ISODIR}/extlinux.img"
     dd if=/dev/zero of="${VFAT_IMAGE}" bs="${IMGSZ}" count=1024 status=none
-    sfdisk "${VFAT_IMAGE}" &>/dev/null <<EOF
+    sfdisk "${VFAT_IMAGE}" &>"${_NO_LOG}" <<EOF
 label: dos
 label-id: 0x12345678
 device: "${VFAT_IMAGE}"
 unit: sectors
 "${VFAT_IMAGE}"1 : start=        2048, type=83, bootable
 EOF
-    mkfs.vfat --offset=2048 --invariant "${VFAT_IMAGE}" >/dev/null
+    mkfs.vfat --offset=2048 --invariant "${VFAT_IMAGE}" >"${_NO_LOG}"
     ## Copying all files to UEFI vfat image
     mcopy -m -i "${VFAT_IMAGE}"@@1048576  -s "${_ISODIR}"/boot ::/
     mv "${VFAT_IMAGE}" "${_IMAGENAME}.img"
@@ -247,11 +247,11 @@ _grub_mkrescue() {
 
 _reproducibility_iso() {
     echo "Creating reproducible UUIDs on ${_IMAGENAME}.iso GPT..."
-    sgdisk -u 1:1 "${_IMAGENAME}.iso" &>/dev/null
-    sgdisk -u 2:2 "${_IMAGENAME}.iso" &>/dev/null
-    sgdisk -u 3:3 "${_IMAGENAME}.iso" &>/dev/null
-    sgdisk -u 4:4 "${_IMAGENAME}.iso" &>/dev/null
-    sgdisk -U 1 "${_IMAGENAME}.iso" &>/dev/null
+    sgdisk -u 1:1 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
+    sgdisk -u 2:2 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
+    sgdisk -u 3:3 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
+    sgdisk -u 4:4 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
+    sgdisk -U 1 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
 }
 
 _create_cksum() {
