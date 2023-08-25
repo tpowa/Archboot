@@ -209,11 +209,11 @@ _new_environment() {
     # local switch, don't kexec on local image
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         _progress "86" "Moving rootfs to ${_RAM}..."
-        mv "${_W_DIR}"/tmp/* "/${_RAM}/"
+        mv "${_W_DIR}"/tmp/* "${_RAM}/"
         # cleanup mkinitcpio directories and files
         _progress "95" "Cleanup ${_RAM}..."
-        rm -rf /${_RAM}/{hooks,install,kernel,new_root,sysroot,mkinitcpio.*} &>"${_NO_LOG}"
-        rm -f /${_RAM}/{VERSION,config,buildconfig,init,${_VMLINUZ}} &>"${_NO_LOG}"
+        rm -rf ${_RAM}/{hooks,install,kernel,new_root,sysroot,mkinitcpio.*} &>"${_NO_LOG}"
+        rm -f ${_RAM}/{VERSION,config,buildconfig,init,${_VMLINUZ}} &>"${_NO_LOG}"
         _progress "100" "Switching to rootfs ${_RAM}..."
         sleep 2
         # https://www.freedesktop.org/software/systemd/man/bootup.html
