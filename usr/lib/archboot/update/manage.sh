@@ -116,7 +116,7 @@ _collect_files() {
 _create_initramfs() {
     # https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt
     # compress image with zstd
-    cd  "${_W_DIR}"/tmp || exit 1
+    cd "${_ROOTFS_DIR}" || exit 1
     find . -mindepth 1 -printf '%P\0' |
             sort -z |
             LANG=C bsdtar --null -cnf - -T - |
@@ -198,7 +198,7 @@ _new_environment() {
     _progress "50" "Moving kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
     # use ramfs to get immediate free space on file deletion
     mv "${_W_DIR}/boot/${_VMLINUZ}" "${_RAM}/"
-    # write initramfs to "${_W_DIR}"/tmp
+    # write initramfs to "${_ROOTFS_DIR}
     touch "${_W_DIR}"/.archboot
     _collect_files &
     _progress_wait "51" "84" "Collecting rootfs files in ${_W_DIR}..." "1"
@@ -209,7 +209,7 @@ _new_environment() {
     # local switch, don't kexec on local image
     if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
         _progress "86" "Moving rootfs to ${_RAM}..."
-        mv "${_W_DIR}"/tmp/* "${_RAM}/"
+        mv "${_ROOTFS_DIR}"/* "${_RAM}/"
         # cleanup mkinitcpio directories and files
         _progress "95" "Cleanup ${_RAM}..."
         rm -rf ${_RAM}/{hooks,install,kernel,new_root,sysroot,mkinitcpio.*} &>"${_NO_LOG}"
@@ -228,37 +228,35 @@ _new_environment() {
         systemctl start initrd-cleanup.service
         systemctl start initrd-switch-root.target
     fi
-
-    _C_DIR="${_W_DIR}/tmp"
     _progress "86" "Preserving Basic Setup values..."
     if [[ -e '/.localize' ]]; then
-        cp /etc/{locale.gen,locale.conf} "${_C_DIR}"/etc
-        cp /.localize "${_C_DIR}"/
-        ${_NSPAWN} "${_C_DIR}" /bin/bash -c "locale-gen" &>"${_NO_LOG}"
-        cp /etc/vconsole.conf "${_C_DIR}"/etc
-        : >"${_C_DIR}"/.vconsole-run
+        cp /etc/{locale.gen,locale.conf} "${_ROOTFS_DIR}"/etc
+        cp /.localize "${_ROOTFS_DIR}"/
+        ${_NSPAWN} "${_ROOTFS_DIR}" /bin/bash -c "locale-gen" &>"${_NO_LOG}"
+        cp /etc/vconsole.conf "${_ROOTFS_DIR}"/etc
+        : >"${_ROOTFS_DIR}"/.vconsole-run
     fi
     if [[ -e '/.clock' ]]; then
-        cp -a /etc/{adjtime,localtime} "${_C_DIR}"/etc
-        ${_NSPAWN} "${_C_DIR}" /bin/bash -c "systemctl enable systemd-timesyncd.service" &>"${_NO_LOG}"
-        cp /.clock "${_C_DIR}"/
+        cp -a /etc/{adjtime,localtime} "${_ROOTFS_DIR}"/etc
+        ${_NSPAWN} "${_ROOTFS_DIR}" /bin/bash -c "systemctl enable systemd-timesyncd.service" &>"${_NO_LOG}"
+        cp /.clock "${_ROOTFS_DIR}"/
     fi
     if [[ -e '/.network' ]]; then
-        cp -r /var/lib/iwd "${_C_DIR}"/var/lib
-        ${_NSPAWN} "${_C_DIR}" /bin/bash -c "systemctl enable iwd" &>"${_NO_LOG}"
-        cp /etc/systemd/network/* "${_C_DIR}"/etc/systemd/network/
-        ${_NSPAWN} "${_C_DIR}" /bin/bash -c "systemctl enable systemd-networkd" &>"${_NO_LOG}"
-        ${_NSPAWN} "${_C_DIR}" /bin/bash -c "systemctl enable systemd-resolved" &>"${_NO_LOG}"
-        rm "${_C_DIR}"/etc/systemd/network/10-wired-auto-dhcp.network
-        [[ -e '/etc/profile.d/proxy.sh' ]] && cp /etc/profile.d/proxy.sh "${_C_DIR}"/etc/profile.d/proxy.sh
-        cp /.network "${_C_DIR}"/
-        cp /.network-interface "${_C_DIR}"/
+        cp -r /var/lib/iwd "${_ROOTFS_DIR}"/var/lib
+        ${_NSPAWN} "${_ROOTFS_DIR}" /bin/bash -c "systemctl enable iwd" &>"${_NO_LOG}"
+        cp /etc/systemd/network/* "${_ROOTFS_DIR}"/etc/systemd/network/
+        ${_NSPAWN} "${_ROOTFS_DIR}" /bin/bash -c "systemctl enable systemd-networkd" &>"${_NO_LOG}"
+        ${_NSPAWN} "${_ROOTFS_DIR}" /bin/bash -c "systemctl enable systemd-resolved" &>"${_NO_LOG}"
+        rm "${_ROOTFS_DIR}"/etc/systemd/network/10-wired-auto-dhcp.network
+        [[ -e '/etc/profile.d/proxy.sh' ]] && cp /etc/profile.d/proxy.sh "${_ROOTFS_DIR}"/etc/profile.d/proxy.sh
+        cp /.network "${_ROOTFS_DIR}"/
+        cp /.network-interface "${_ROOTFS_DIR}"/
     fi
     if [[ -e '/.pacsetup' ]]; then
-        cp /etc/pacman.conf "${_C_DIR}"/etc
-        cp /etc/pacman.d/mirrorlist "${_C_DIR}"/etc/pacman.d/
-        cp -ar /etc/pacman.d/gnupg "${_C_DIR}"/etc/pacman.d
-        cp /.pacsetup "${_C_DIR}"/
+        cp /etc/pacman.conf "${_ROOTFS_DIR}"/etc
+        cp /etc/pacman.d/mirrorlist "${_ROOTFS_DIR}"/etc/pacman.d/
+        cp -ar /etc/pacman.d/gnupg "${_ROOTFS_DIR}"/etc/pacman.d
+        cp /.pacsetup "${_ROOTFS_DIR}"/
     fi
     touch "${_W_DIR}"/.archboot
     _create_initramfs &
