@@ -57,7 +57,7 @@ build ()
         /usr/lib/gconv /usr/share/readline
 
     ### add locale support on archboot container
-    if grep -q 'archboot' /etc/hostname; then
+    if grep -qw 'archboot' /etc/hostname; then
         map add_binary locale-gen localedef
         add_file /etc/locale.gen
         _LANG="be bg cs da de en el es fi fr hu it lt lv mk nl nn pl pt ro ru sk sr sv uk"

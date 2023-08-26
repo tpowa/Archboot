@@ -166,7 +166,7 @@ if [[ -e /usr/bin/setup ]]; then
     _enter_shell
     # Basic Setup on archboot:
     # localization, network, clock, pacman
-    if grep -q 'archboot' /etc/hostname; then
+    if grep -qw 'archboot' /etc/hostname; then
         if ! [[ -e /.localize ]]; then
             localize
             source /etc/locale.conf
