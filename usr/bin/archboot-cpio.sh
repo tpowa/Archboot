@@ -119,16 +119,15 @@ preload_builtin_modules() {
     local modname field value
     local -a path
     # Prime the _addedmodules list with the builtins for this kernel.
-    if [[ -r $_d_kmoduledir/modules.builtin.modinfo ]]; then
-        while IFS=.= read -rd '' modname field value; do
-            _addedmodules[${modname//-/_}]=2
-            case "$field" in
-                alias)
-                    _addedmodules["${value//-/_}"]=2
-                    ;;
-            esac
-        done <"$_d_kmoduledir/modules.builtin.modinfo"
-    fi
+    # kmod>=27 and kernel >=5.2 required!
+    while IFS=.= read -rd '' modname field value; do
+        _addedmodules[${modname//-/_}]=2
+        case "$field" in
+            alias)
+                _addedmodules["${value//-/_}"]=2
+                ;;
+        esac
+    done <"$_d_kmoduledir/modules.builtin.modinfo"
 }
 
 if [[ -z "$1" ]]; then
@@ -187,10 +186,11 @@ fi
 [[ -e /dev/fd ]] || die "/dev must be mounted!"
 if [[ -z "${_KERNEL}" ]]; then
     msg "Autodetecting kernel from: /etc/archboot/presets/${_RUNNING_ARCH}"
-    if [[ ! -f "$(grep 'kver' "/etc/archboot/presets/${_RUNNING_ARCH}" | cut -d '=' -f2 | sed -e 's#"##g')" ]]; then
+    . /etc/archboot/presets/${_RUNNING_ARCH}
+    if [[ ! -f "${ALL_kver}" ]]; then
         die "specified kernel image does not exist!"
     fi
-    _KERNELVERSION="$(_kver "$(grep 'kver' "/etc/archboot/presets/${_RUNNING_ARCH}" | cut -d '=' -f2 | sed -e 's#"##g')")"
+    _KERNELVERSION="$(_kver ${ALL_kver})"
 else
     msg "Using specified kernel: ${_KERNEL}"
     if [[ ! -f "${_KERNEL}" ]]; then

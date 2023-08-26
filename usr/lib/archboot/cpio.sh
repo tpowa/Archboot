@@ -389,6 +389,7 @@ install_modules() {
     msg "Generating module dependencies"
     map add_file "$_d_kmoduledir"/modules.{builtin,builtin.modinfo,order}
     depmod -b "$BUILDROOT" "${_KERNELVERSION}"
-    # remove all non-binary module.* files (except devname for on-demand module loading)
-    rm "${BUILDROOT}${_d_kmoduledir}"/modules.!(*.bin|devname|softdep)
+    # remove all non-binary module.* files (except devname for on-demand module loading
+    # and builtin.modinfo for checking on builtin modules)
+    rm "${BUILDROOT}${_d_kmoduledir}"/modules.!(*.bin|*.modinfo|devname|softdep)
 }
