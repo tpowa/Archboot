@@ -66,13 +66,13 @@ build ()
         done
         add_file /usr/share/locale/locale.alias
         add_full_dir /usr/share/i18n/locales
+        # only support UTF-8
+        add_file /usr/share/i18n/charmaps/UTF-8.gz
+        # remove conflicting files from not installed packages: binutils, grub and gdbm
+        find ${BUILDROOT}/usr/share/locale/ -type f \( -name 'grub*' -o -name 'binutils*' -o -name 'gdbm*' -o -name 'bfd*' \
+            -o -name 'gettext*' -o -name 'gas*' -o -name 'gold*' -o -name 'gprof*' -o -name 'ld*' \
+            -o -name 'opcodes*' \) -delete
     fi
-    # only support UTF-8
-    add_file /usr/share/i18n/charmaps/UTF-8.gz
-    # remove conflicting files from not installed packages: binutils, grub and gdbm
-    find ${BUILDROOT}/usr/share/locale/ -type f \( -name 'grub*' -o -name 'binutils*' -o -name 'gdbm*' -o -name 'bfd*' \
-        -o -name 'gettext*' -o -name 'gas*' -o -name 'gold*' -o -name 'gprof*' -o -name 'ld*' \
-        -o -name 'opcodes*' \) -delete
 
     ### add bash configuration
     # add bash-completion
