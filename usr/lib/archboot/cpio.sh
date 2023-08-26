@@ -99,7 +99,7 @@ map() {
 modprobe() {
     # _optmoduleroot is assigned in mkinitcpio
     # shellcheck disable=SC2154
-    command modprobe -d "$_optmoduleroot" -S "$KERNELVERSION" "$@"
+    command modprobe -d "$_optmoduleroot" -S "${_KERNELVERSION}" "$@"
 }
 
 all_modules() {
@@ -194,7 +194,7 @@ add_module() {
                 done
                 ;;
         esac
-    done < <(modinfo -b "$_optmoduleroot" -k "$KERNELVERSION" -0 "$target" 2>"${_NO_LOG}")
+    done < <(modinfo -b "$_optmoduleroot" -k "${_KERNELVERSION}" -0 "$target" 2>"${_NO_LOG}")
     if (( ${#firmware[*]} )); then
         add_firmware "${firmware[@]}"
     fi
@@ -388,7 +388,7 @@ install_modules() {
     command tar --hard-dereference -C / -cpf - "$@" | tar -C "${BUILDROOT}" -xpf -
     msg "Generating module dependencies"
     map add_file "$_d_kmoduledir"/modules.{builtin,builtin.modinfo,order}
-    depmod -b "$BUILDROOT" "$KERNELVERSION"
+    depmod -b "$BUILDROOT" "${_KERNELVERSION}"
     # remove all non-binary module.* files (except devname for on-demand module loading)
     rm "${BUILDROOT}${_d_kmoduledir}"/modules.!(*.bin|devname|softdep)
 }

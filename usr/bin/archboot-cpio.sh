@@ -53,21 +53,6 @@ cleanup() {
     exit "$err"
 }
 
-resolve_kernver() {
-    local kernel="$1"
-    if [[ "${kernel:0:1}" != / ]]; then
-        echo "$kernel"
-        return 0
-    fi
-    if [[ ! -e "$kernel" ]]; then
-        error "specified kernel image does not exist: '%s'" "$kernel"
-        return 1
-    fi
-    _kver "$kernel" && return
-    error "invalid kernel specified: '%s'" "$1"
-    return 1
-}
-
 build_image() {
     local out="$1" compressout="$1" compress="$2" errmsg pipestatus
     case "$compress" in
@@ -175,7 +160,7 @@ while :; do
             ;;
         -k|--kernel)
             shift
-            KERNELVERSION="$1"
+            _KERNEL="$1"
             ;;
         -d|--generatedir)
             shift
@@ -207,12 +192,22 @@ fi
 # use in mkinitcpio. Avoids issues like FS#26344.
 [[ -e /proc/self/mountinfo ]] || die "/proc must be mounted!"
 [[ -e /dev/fd ]] || die "/dev must be mounted!"
-if [[ "$KERNELVERSION" != 'none' ]]; then
-    KERNELVERSION="$(resolve_kernver "$KERNELVERSION")" || exit 1
-    _d_kmoduledir="/lib/modules/$KERNELVERSION"
-    [[ -d "$_d_kmoduledir" ]] || die "'$_d_kmoduledir' is not a valid kernel module directory"
+if [[ -z "${_KERNEL}" ]]; then
+    msg "Autodetecting kernel from: /etc/archboot/presets/${_RUNNING_ARCH}"
+    if [[ ! -f "$(grep 'kver' "/etc/archboot/presets/${_RUNNING_ARCH}" | cut -d '=' -f2 | sed -e 's#"##g')" ]]; then
+        die "specified kernel image does not exist!"
+    fi
+    _KERNELVERSION="$(_kver "$(grep 'kver' "/etc/archboot/presets/${_RUNNING_ARCH}" | cut -d '=' -f2 | sed -e 's#"##g')")"
+else
+    msg "Using specified kernel: ${_KERNEL}"
+    if [[ ! -f "${_KERNEL}" ]]; then
+        die "specified kernel image does not exist!"
+    fi
+    _KERNELVERSION="$(_kver ${_KERNEL})"
 fi
-_d_workdir="$(initialize_buildroot "$KERNELVERSION" "$_opttargetdir")" || exit 1
+_d_kmoduledir="/lib/modules/${_KERNELVERSION}"
+[[ -d "$_d_kmoduledir" ]] || die "'$_d_kmoduledir' is not a valid kernel module directory"
+_d_workdir="$(initialize_buildroot "${_KERNELVERSION}" "$_opttargetdir")" || exit 1
 BUILDROOT="${_opttargetdir:-$_d_workdir/root}"
 # shellcheck source=mkinitcpio.conf
 ! . "$_f_config" 2>"${_NO_LOG}" && die "Failed to read configuration '%s'" "$_f_config"
@@ -227,11 +222,11 @@ if [[ -n "$_optgenimg" ]]; then
             ( ! -d ${_optgenimg%/*} || ! -w ${_optgenimg%/*} ) ]]; then
         die "Unable to write to '%s'" "$_optgenimg"
     fi
-    msg "Starting build: '%s'" "$KERNELVERSION"
+    msg "Starting build: '%s'" "${_KERNELVERSION}"
 elif [[ -n "$_opttargetdir" ]]; then
-    msg "Starting build: '%s'" "$KERNELVERSION"
+    msg "Starting build: '%s'" "${_KERNELVERSION}"
 else
-    msg "Starting dry run: '%s'" "$KERNELVERSION"
+    msg "Starting dry run: '%s'" "${_KERNELVERSION}"
 fi
 # set functrace and trap to catch errors in add_* functions
 declare -i _builderrors=0
