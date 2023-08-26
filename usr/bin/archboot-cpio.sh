@@ -118,9 +118,7 @@ build_image() {
 preload_builtin_modules() {
     local modname field value
     local -a path
-    # Prime the _addedmodules list with the builtins for this kernel. We prefer
-    # the modinfo file if it exists, but this requires a recent enough kernel
-    # and kmod>=27.
+    # Prime the _addedmodules list with the builtins for this kernel.
     if [[ -r $_d_kmoduledir/modules.builtin.modinfo ]]; then
         while IFS=.= read -rd '' modname field value; do
             _addedmodules[${modname//-/_}]=2
@@ -130,11 +128,6 @@ preload_builtin_modules() {
                     ;;
             esac
         done <"$_d_kmoduledir/modules.builtin.modinfo"
-    elif [[ -r "$_d_kmoduledir/modules.builtin" ]]; then
-        while IFS=/ read -ra path; do
-            modname="${path[-1]%.ko}"
-            _addedmodules["${modname//-/_}"]=2
-        done <"$_d_kmoduledir/modules.builtin"
     fi
 }
 
