@@ -56,15 +56,17 @@ build ()
     map add_full_dir /usr/lib/coreutils /usr/lib/cryptsetup \
         /usr/lib/gconv /usr/share/readline
 
-    ### add locale support
-    map add_binary locale-gen localedef
-    add_file /etc/locale.gen
-    _LANG="be bg cs da de en el es fi fr hu it lt lv mk nl nn pl pt ro ru sk sr sv uk"
-    for i in ${_LANG}; do
-        add_full_dir /usr/share/locale/${i}
-    done
-    add_file /usr/share/locale/locale.alias
-    add_full_dir /usr/share/i18n/locales
+    ### add locale support on archboot container
+    if grep -q 'archboot' /etc/hostname; then
+        map add_binary locale-gen localedef
+        add_file /etc/locale.gen
+        _LANG="be bg cs da de en el es fi fr hu it lt lv mk nl nn pl pt ro ru sk sr sv uk"
+        for i in ${_LANG}; do
+            add_full_dir /usr/share/locale/${i}
+        done
+        add_file /usr/share/locale/locale.alias
+        add_full_dir /usr/share/i18n/locales
+    fi
     # only support UTF-8
     add_file /usr/share/i18n/charmaps/UTF-8.gz
     # remove conflicting files from not installed packages: binutils, grub and gdbm

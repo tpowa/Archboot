@@ -164,23 +164,25 @@ if [[ -e /usr/bin/setup ]]; then
     _local_mode
     # wait on user interaction!
     _enter_shell
-    # Basic Setup:
+    # Basic Setup on archboot:
     # localization, network, clock, pacman
-    if ! [[ -e /.localize ]]; then
-        localize
-        source /etc/locale.conf
-    fi
-    if [[ ! -e /.network ]]; then
-        network
-    fi
-    if ! [[ -e /.clock ]]; then
-        clock
-    fi
-    if [[ ! -e /.pacsetup ]]; then
-        pacsetup
-    fi
-    if [[ ! -e /.launcher ]]; then
-        launcher
+    if grep -q 'archboot' /etc/hostname; then
+        if ! [[ -e /.localize ]]; then
+            localize
+            source /etc/locale.conf
+        fi
+        if [[ ! -e /.network ]]; then
+            network
+        fi
+        if ! [[ -e /.clock ]]; then
+            clock
+        fi
+        if [[ ! -e /.pacsetup ]]; then
+            pacsetup
+        fi
+        if [[ ! -e /.launcher ]]; then
+            launcher
+        fi
     fi
 # latest image, fail if less than 2GB RAM available
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 1970000 ]]; then
