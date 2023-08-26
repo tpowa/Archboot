@@ -25,7 +25,8 @@ build ()
     for i in rpcbind.service rpcbind.socket rpcbind.target nfs-server.service; do
         add_symlink "/etc/systemd/system/${i}" "/dev/null"
     done
-    map add_full_dir /etc/gss /etc/gssproxy /var/lib/gssproxy
+    map add_full_dir /etc/gss /etc/gssproxy
+    map add_dir /var/lib/gssproxy/{clients,rcache} /var/log/gssproxy
     add_dir /var/lib/openldap
     chmod 700 "${BUILDROOT}/var/lib/openldap"
     chown 439:439 "${BUILDROOT}/var/lib/openldap"
