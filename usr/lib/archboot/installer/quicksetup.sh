@@ -270,7 +270,7 @@ _autoprepare() {
             #shellcheck disable=SC2086
             _dialog --title " Filesystem / and /home " --no-cancel --menu "" 14 45 8 ${_FSOPTS} 2>"${_ANSWER}" || return 1
             _FSTYPE=$(cat "${_ANSWER}")
-            _dialog --title " Filesystem / and /home " --yesno "${_FSTYPE} will be used for / and /home?" 6 55 && _CHOSENFS=1
+            _dialog --title " Confirmation " --yesno " Filesystem ${_FSTYPE} will be used for / and /home?" 5 55 && _CHOSENFS=1
         done
         _DISK_SIZE="$((_DISK_SIZE-_SWAPDEV_SIZE))"
         _ROOT_SIZE="7500"
@@ -284,7 +284,7 @@ _autoprepare() {
         _dialog --title " / in MiB " --inputbox "Disk space left: $((_DISK_SIZE-350))M | Minimum value is 2000\nValue 0 skips /home and uses the left ${_DISK_SIZE}M for /" 9 60 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
         _ROOTDEV_SIZE=$(cat "${_ANSWER}")
         if [[ "${_ROOTDEV_SIZE}" == 0 ]]; then
-            if _dialog --title " / partition " --yesno "${_DISK_SIZE}M will be used for your / partition?" 6 55; then
+            if _dialog --title " Confirmation " --yesno "${_DISK_SIZE}M will be used for your /?" 5 55; then
                 _ROOTDEV_SET=1
                 _SKIP_HOME=1
             fi
@@ -297,7 +297,7 @@ _autoprepare() {
                     _dialog --title " ERROR " --no-mouse --infobox "You have entered a too large size, please enter again." 3 60
                     sleep 5
                 else
-                    if _dialog --title " /home partition " --yesno "$((_DISK_SIZE-_ROOTDEV_SIZE))M will be used for your /home?" 6 55; then
+                    if _dialog --title " Confirmation " --yesno "$((_DISK_SIZE-_ROOTDEV_SIZE))M will be used for your /home?" 5 55; then
                         _ROOTDEV_SET=1
                         _HOMEDEV_NUM="$((_DEV_NUM+1))"
                         _DEV_NUM="${_HOMEDEV_NUM}"
