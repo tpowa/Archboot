@@ -30,8 +30,10 @@ _auto_partition() {
         [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GUID_TYPE=FFFF
         [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _GUID_TYPE=8304
         sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":"${_GUID_TYPE}" --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
-        _progress "85" "Creating HOME partition..."
-        sgdisk --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCH_LINUX_HOME "${_DISK}" >"${_LOG}"
+        if [[ -z "${_SKIP_HOME}" ]]; then
+            _progress "85" "Creating HOME partition..."
+            sgdisk --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCH_LINUX_HOME "${_DISK}" >"${_LOG}"
+        fi
         sgdisk --print "${_DISK}" >"${_LOG}"
     else
         # start at sector 1 for 4k drive compatibility and correct alignment
