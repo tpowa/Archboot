@@ -277,7 +277,7 @@ _autoprepare() {
         # xfs minimum size is around 300M
         # btrfs minimum size is around 120M
         [[ "${_DISK_SIZE}" -lt "7500" ]] && _ROOT_SIZE="$((_DISK_SIZE-350))"
-        [[ "${_DISK_SIZE}" -lt "2000" ]] && _ROOT_SIZE=0
+        [[ "$((_DISK_SIZE-350))" -lt "2000" ]] && _ROOT_SIZE=0
         _ROOTDEV_NUM="$((_DEV_NUM+1))"
         _DEV_NUM="${_ROOTDEV_NUM}"
         while [[ -z "${_ROOTDEV_SET}" ]]; do
