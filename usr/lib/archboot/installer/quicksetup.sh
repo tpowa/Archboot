@@ -29,10 +29,12 @@ _auto_partition() {
         [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _GUID_TYPE=8305
         [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GUID_TYPE=FFFF
         [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _GUID_TYPE=8304
-        sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":"${_GUID_TYPE}" --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
         if [[ -z "${_SKIP_HOME}" ]]; then
+            sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":"${_GUID_TYPE}" --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
             _progress "85" "Creating HOME partition..."
             sgdisk --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCH_LINUX_HOME "${_DISK}" >"${_LOG}"
+        else
+            sgdisk --new="${_ROOTDEV_NUM}":0:0 --typecode="${_ROOTDEV_NUM}":"${_GUID_TYPE}" --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
         fi
         sgdisk --print "${_DISK}" >"${_LOG}"
     else
@@ -49,9 +51,13 @@ _auto_partition() {
             parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) >"${_LOG}"
         fi
         _progress "70" "Creating ROOT partition..."
-        parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) >"${_LOG}"
-        _progress "85" "Creating HOME partition..."
-        parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
+        if [[ -z "${_SKIP_HOME}" ]]; then
+            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) >"${_LOG}"
+            _progress "85" "Creating HOME partition..."
+            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
+        else
+            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
+        fi
     fi
     _progress "100" "Partitions created successfully."
     sleep 2
@@ -274,9 +280,9 @@ _autoprepare() {
         _ROOTDEV_NUM="$((_DEV_NUM+1))"
         _DEV_NUM="${_ROOTDEV_NUM}"
         while [[ -z "${_ROOTDEV_SET}" ]]; do
-        _dialog --title " / in MiB " --inputbox "${_DISK_SIZE}=Skip /home partition | Minimum value is 2000 | Disk space left: $((_DISK_SIZE-350))M" 8 55 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
+        _dialog --title " / in MiB " --inputbox "Minimum value is 2000 | Disk space left: $((_DISK_SIZE-350))M | 0=Skip /home partition. Use ${_DISK_SIZE} for /" 8 55 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
         _ROOTDEV_SIZE=$(cat "${_ANSWER}")
-        if [[ "$((_DISK_SIZE-_ROOTDEV_SIZE))" == 0 ]]; then
+        if [[ "${_ROOTDEV_SIZE}" == 0 ]]; then
             _ROOTDEV_SET=1
             _SKIP_HOME=1
         else
