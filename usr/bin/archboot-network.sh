@@ -39,6 +39,8 @@ _wireless() {
     _WLAN_SSID=""
     _WLAN_KEY=""
     _WLAN_AUTH=""
+    # unblock all interfaces!
+    rfkill unblock all
     # disconnect the interface first!
     iwctl station "${_INTERFACE}" disconnect &>"${_NO_LOG}"
     # clean old keys first!
