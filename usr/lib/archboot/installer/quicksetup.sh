@@ -21,7 +21,7 @@ _auto_partition() {
             _progress "40" "Creating XBOOTLDR partition..."
             sgdisk --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":EA00 --change-name="${_BOOTDEV_NUM}":ARCH_LINUX_XBOOT "${_DISK}" >"${_LOG}"
         fi
-        if [[ -z "${_NO_SWAP}" ]]; then
+        if [[ -z "${_SKIP_SWAP}" ]]; then
             _progress "55" "Creating SWAP partition..."
             sgdisk --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCH_LINUX_SWAP "${_DISK}" >"${_LOG}"
         fi
@@ -42,7 +42,7 @@ _auto_partition() {
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_BOOTDEV_SIZE)) >"${_LOG}"
         _progress "50" "Setting bootable flag..."
         parted -a optimal -s "${_DISK}" unit MiB set 1 boot on >"${_LOG}"
-        if [[ -z "${_NO_SWAP}" ]]; then
+        if [[ -z "${_SKIP_SWAP}" ]]; then
             _progress "60" "Creating SWAP partition..."
             parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) >"${_LOG}"
         fi
@@ -124,7 +124,8 @@ _autoprepare() {
     _ROOTDEV_SET=""
     _BOOTDEV_SIZE=""
     _UEFISYSDEV_SIZE=""
-    _NO_SWAP=""
+    _SKIP_SWAP=""
+    _SKIP_HOME=""
     # get just the disk size in M/MiB 1024*1024
     _DISK_SIZE="$(($(${_LSBLK} SIZE -d -b "${_DISK}" 2>"${_NO_LOG}")/1048576))"
     if [[ -z "${_DISK_SIZE}" ]]; then
@@ -238,7 +239,7 @@ _autoprepare() {
         _SWAP_SIZE="256"
         [[ "${_DISK_SIZE}" -lt "256" ]] && _SWAP_SIZE="${_DISK_SIZE}"
         while [[ -z "${_SWAPDEV_SET}" ]]; do
-            _dialog --title " Swap In MiB " --no-cancel --inputbox "0=Skip Swap partition. Disk space left: ${_DISK_SIZE}M" 8 55 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
+            _dialog --title " Swap In MiB " --no-cancel --inputbox "0=Skip Swap partition | Disk space left: ${_DISK_SIZE}M" 8 55 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
             _SWAPDEV_SIZE=$(cat "${_ANSWER}")
             if [[ -z "${_SWAPDEV_SIZE}" ]]; then
                 _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
@@ -249,7 +250,7 @@ _autoprepare() {
                     sleep 5
                 elif [[ "${_SWAPDEV_SIZE}" == "0" ]]; then
                     _SWAPDEV_SET=1
-                    _NO_SWAP=1
+                    _SKIP_SWAP=1
                 else
                     _SWAPDEV_SET=1
                     _SWAPDEV_NUM="$((_DEV_NUM+1))"
@@ -268,9 +269,15 @@ _autoprepare() {
         # xfs minimum size is around 300M
         # btrfs minimum size is around 120M
         [[ "${_DISK_SIZE}" -lt "7500" ]] && _ROOT_SIZE="$((_DISK_SIZE-350))"
+        _ROOTDEV_NUM="$((_DEV_NUM+1))"
+        _DEV_NUM="${_ROOTDEV_NUM}"
         while [[ -z "${_ROOTDEV_SET}" ]]; do
-        _dialog --title " / in MiB " --inputbox "Minimum value is 2000. Disk space left: $((_DISK_SIZE-350))M" 8 55 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
+        _dialog --title " / in MiB " --inputbox "${_DISK_SIZE}=Skip /home partition | Minimum value is 2000 | Disk space left: $((_DISK_SIZE-350))M" 8 55 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
         _ROOTDEV_SIZE=$(cat "${_ANSWER}")
+        if [[ "$((_DISK_SIZE-_ROOTDEV_SIZE))" == 0 ]]; then
+            _ROOTDEV_SET=1
+            _SKIP_HOME=1
+        else
             if [[ -z "${_ROOTDEV_SIZE}" || "${_ROOTDEV_SIZE}" == 0 || "${_ROOTDEV_SIZE}" -lt "2000" ]]; then
                 _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
                 sleep 5
@@ -279,14 +286,13 @@ _autoprepare() {
                     _dialog --title " ERROR " --no-mouse --infobox "You have entered a too large size, please enter again." 3 60
                     sleep 5
                 else
-                    _dialog --yesno "$((_DISK_SIZE-_ROOTDEV_SIZE))M will be used for your /home partition. Is this OK?" 0 0 && _ROOTDEV_SET=1
+                    if _dialog --yesno "$((_DISK_SIZE-_ROOTDEV_SIZE))M will be used for your /home partition. Is this OK?" 0 0; then
+                    _ROOTDEV_SET=1
+                    _HOMEDEV_NUM="$((_DEV_NUM+1))"
+                    _DEV_NUM="${_HOMEDEV_NUM}"
                 fi
             fi
         done
-         _ROOTDEV_NUM="$((_DEV_NUM+1))"
-        _DEV_NUM="${_ROOTDEV_NUM}"
-        _HOMEDEV_NUM="$((_DEV_NUM+1))"
-        _DEV_NUM="${_HOMEDEV_NUM}"
         _DEFAULTFS=1
     done
     _dialog --defaultno --yesno "${_DISK} will be COMPLETELY ERASED!\nALL DATA ON ${_DISK} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 || return 1
@@ -304,10 +310,10 @@ _autoprepare() {
     ## <partnum>:<fstype>:<mountpoint>:<labelname>
     ## The partitions in FSSPECS list should be listed in the "mountpoint" order.
     ## Make sure the "root" partition is defined first in the FSSPECS list
-    _FSSPEC_SWAPDEV="${_SWAPDEV_NUM}:swap:swap:ARCH_SWAP"
+    [[ -z "${_SKIP_SWAP}" ]] && _FSSPEC_SWAPDEV="${_SWAPDEV_NUM}:swap:swap:ARCH_SWAP"
     _FSSPEC_ROOTDEV="${_ROOTDEV_NUM}:${_FSTYPE}:/:ARCH_ROOT"
     _FSSPEC_BOOTDEV="${_BOOTDEV_NUM}:ext2:/boot:ARCH_BOOT"
-    _FSSPEC_HOMEDEV="${_HOMEDEV_NUM}:${_FSTYPE}:/home:ARCH_HOME"
+    [[ -z "${_SKIP_HOME}" ]] &&_FSSPEC_HOMEDEV="${_HOMEDEV_NUM}:${_FSTYPE}:/home:ARCH_HOME"
     _FSSPEC_UEFISYSDEV="${_UEFISYSDEV_NUM}:vfat:${_UEFISYS_MP}:ESP"
     if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
         if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
