@@ -24,10 +24,11 @@ _auto_partition() {
         if [[ -z "${_NO_SWAP}" ]]; then
             _progress "55" "Creating SWAP partition..."
             sgdisk --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCH_LINUX_SWAP "${_DISK}" >"${_LOG}"
-            [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _GUID_TYPE=8305
-            [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _GUID_TYPE=8304
         fi
         _progress "70" "Creating ROOT partition..."
+        [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _GUID_TYPE=8305
+        [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GUID_TYPE=FFFF
+        [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _GUID_TYPE=8304
         sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":"${_GUID_TYPE}" --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
         _progress "85" "Creating HOME partition..."
         sgdisk --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCH_LINUX_HOME "${_DISK}" >"${_LOG}"
