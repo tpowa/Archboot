@@ -9,6 +9,8 @@ Environment Changes:
 - implemented dialog progressbars
 - open Installation Guide on firefox and chromium startup
 - removed efitools
+network:
+- unblock all wireless devices
 setup:
 - implemented progressbars
 - reactivated firmware and systemd-boot on aarch64
