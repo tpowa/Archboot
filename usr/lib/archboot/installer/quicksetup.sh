@@ -287,9 +287,10 @@ _autoprepare() {
                     sleep 5
                 else
                     if _dialog --yesno "$((_DISK_SIZE-_ROOTDEV_SIZE))M will be used for your /home partition. Is this OK?" 0 0; then
-                    _ROOTDEV_SET=1
-                    _HOMEDEV_NUM="$((_DEV_NUM+1))"
-                    _DEV_NUM="${_HOMEDEV_NUM}"
+                        _ROOTDEV_SET=1
+                        _HOMEDEV_NUM="$((_DEV_NUM+1))"
+                        _DEV_NUM="${_HOMEDEV_NUM}"
+                    fi
                 fi
             fi
         done
