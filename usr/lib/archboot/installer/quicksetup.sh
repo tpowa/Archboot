@@ -293,6 +293,7 @@ _autoprepare() {
                     fi
                 fi
             fi
+        fi
         done
         _DEFAULTFS=1
     done
