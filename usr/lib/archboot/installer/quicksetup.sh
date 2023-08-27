@@ -281,7 +281,7 @@ _autoprepare() {
         _ROOTDEV_NUM="$((_DEV_NUM+1))"
         _DEV_NUM="${_ROOTDEV_NUM}"
         while [[ -z "${_ROOTDEV_SET}" ]]; do
-        _dialog --title " / in MiB " --inputbox "Disk space left: $((_DISK_SIZE-350))M | Minimum value is 2000\nValue 0 skips /home and uses the left ${_DISK_SIZE}M for /" 9 70 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
+        _dialog --title " / in MiB " --inputbox "Disk space left: $((_DISK_SIZE-350))M | Minimum value is 2000\nValue 0 skips /home and uses the left ${_DISK_SIZE}M for /" 9 55 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
         _ROOTDEV_SIZE=$(cat "${_ANSWER}")
         if [[ "${_ROOTDEV_SIZE}" == 0 ]]; then
             if _dialog --yesno "${_DISK_SIZE}M will be used for your / partition. Is this OK?" 0 0; then
