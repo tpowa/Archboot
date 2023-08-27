@@ -280,7 +280,7 @@ _autoprepare() {
         _ROOTDEV_NUM="$((_DEV_NUM+1))"
         _DEV_NUM="${_ROOTDEV_NUM}"
         while [[ -z "${_ROOTDEV_SET}" ]]; do
-        _dialog --title " / in MiB " --inputbox "Minimum value is 2000 | Disk space left: $((_DISK_SIZE-350))M | 0=Skip /home partition. Use ${_DISK_SIZE} for /" 8 55 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
+        _dialog --title " / in MiB " --inputbox "Minimum value is 2000 | Disk space left: $((_DISK_SIZE-350))M\n0=Skip /home partition and use ${_DISK_SIZE} for /" 8 55 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
         _ROOTDEV_SIZE=$(cat "${_ANSWER}")
         if [[ "${_ROOTDEV_SIZE}" == 0 ]]; then
             _ROOTDEV_SET=1
