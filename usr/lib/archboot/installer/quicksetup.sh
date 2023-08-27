@@ -21,10 +21,12 @@ _auto_partition() {
             _progress "40" "Creating XBOOTLDR partition..."
             sgdisk --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":EA00 --change-name="${_BOOTDEV_NUM}":ARCH_LINUX_XBOOT "${_DISK}" >"${_LOG}"
         fi
-        _progress "55" "Creating SWAP partition..."
-        sgdisk --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCH_LINUX_SWAP "${_DISK}" >"${_LOG}"
-        [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _GUID_TYPE=8305
-        [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _GUID_TYPE=8304
+        if [[ -z "${_NO_SWAP}" ]]; then
+            _progress "55" "Creating SWAP partition..."
+            sgdisk --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCH_LINUX_SWAP "${_DISK}" >"${_LOG}"
+            [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _GUID_TYPE=8305
+            [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _GUID_TYPE=8304
+        fi
         _progress "70" "Creating ROOT partition..."
         sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":"${_GUID_TYPE}" --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
         _progress "85" "Creating HOME partition..."
@@ -39,8 +41,10 @@ _auto_partition() {
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_BOOTDEV_SIZE)) >"${_LOG}"
         _progress "50" "Setting bootable flag..."
         parted -a optimal -s "${_DISK}" unit MiB set 1 boot on >"${_LOG}"
-        _progress "60" "Creating SWAP partition..."
-        parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) >"${_LOG}"
+        if [[ -z "${_NO_SWAP}" ]]; then
+            _progress "60" "Creating SWAP partition..."
+            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) >"${_LOG}"
+        fi
         _progress "70" "Creating ROOT partition..."
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) >"${_LOG}"
         _progress "85" "Creating HOME partition..."
@@ -119,6 +123,7 @@ _autoprepare() {
     _ROOTDEV_SET=""
     _BOOTDEV_SIZE=""
     _UEFISYSDEV_SIZE=""
+    _NO_SWAP=""
     # get just the disk size in M/MiB 1024*1024
     _DISK_SIZE="$(($(${_LSBLK} SIZE -d -b "${_DISK}" 2>"${_NO_LOG}")/1048576))"
     if [[ -z "${_DISK_SIZE}" ]]; then
