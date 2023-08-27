@@ -237,7 +237,7 @@ _autoprepare() {
         _SWAP_SIZE="256"
         [[ "${_DISK_SIZE}" -lt "256" ]] && _SWAP_SIZE="${_DISK_SIZE}"
         while [[ -z "${_SWAPDEV_SET}" ]]; do
-            _dialog --title " Swap In MiB " --no-cancel --inputbox "0=Create no swap partition. Disk space left: ${_DISK_SIZE}M" 8 55 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
+            _dialog --title " Swap In MiB " --no-cancel --inputbox "0=Skip Swap partition. Disk space left: ${_DISK_SIZE}M" 8 55 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
             _SWAPDEV_SIZE=$(cat "${_ANSWER}")
             if [[ -z "${_SWAPDEV_SIZE}" ]]; then
                 _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
@@ -246,7 +246,7 @@ _autoprepare() {
                 if [[ "${_SWAPDEV_SIZE}" -ge "${_DISK_SIZE}" ]]; then
                     _dialog --title " ERROR " --no-mouse --infobox "You have entered a too large size, please enter again." 3 60
                     sleep 5
-                elif [[ "${_SWAPDEV_SIZE}" -ge "${_DISK_SIZE}" ]]; then
+                elif [[ "${_SWAPDEV_SIZE}" == "0" ]]; then
                     _SWAPDEV_SET=1
                     _NO_SWAP=1
                 else
