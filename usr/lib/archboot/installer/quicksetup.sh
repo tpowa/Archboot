@@ -248,6 +248,7 @@ _autoprepare() {
                     sleep 5
                 elif [[ "${_SWAPDEV_SIZE}" -ge "${_DISK_SIZE}" ]]; then
                     _SWAPDEV_SET=1
+                    _NO_SWAP=1
                 else
                     _SWAPDEV_SET=1
                     _SWAPDEV_NUM="$((_DEV_NUM+1))"
