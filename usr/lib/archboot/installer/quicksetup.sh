@@ -247,7 +247,7 @@ _autoprepare() {
         _SWAP_SIZE="256"
         [[ "${_DISK_SIZE}" -lt "256" ]] && _SWAP_SIZE="${_DISK_SIZE}"
         while [[ -z "${_SWAPDEV_SET}" ]]; do
-            _dialog --title " Swap In MiB " --no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | 0=Skip Swap partition" 8 55 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
+            _dialog --title " Swap In MiB " --no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | Value=0 will skip Swap partition creation" 8 65 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
             _SWAPDEV_SIZE=$(cat "${_ANSWER}")
             if [[ -z "${_SWAPDEV_SIZE}" ]]; then
                 _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
@@ -280,7 +280,7 @@ _autoprepare() {
         _ROOTDEV_NUM="$((_DEV_NUM+1))"
         _DEV_NUM="${_ROOTDEV_NUM}"
         while [[ -z "${_ROOTDEV_SET}" ]]; do
-        _dialog --title " / in MiB " --inputbox "Disk space left: $((_DISK_SIZE-350))M | Minimum value is 2000\n0=Skip /home partition and use rest ${_DISK_SIZE}M for /" 9 55 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
+        _dialog --title " / in MiB " --inputbox "Disk space left: $((_DISK_SIZE-350))M | Minimum value is 2000\nValue=0 will skip /home partition creation and use rest ${_DISK_SIZE}M for /" 9 65 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
         _ROOTDEV_SIZE=$(cat "${_ANSWER}")
         if [[ "${_ROOTDEV_SIZE}" == 0 ]]; then
             if _dialog --yesno "${_DISK_SIZE}M will be used for your / partition. Is this OK?" 0 0; then
