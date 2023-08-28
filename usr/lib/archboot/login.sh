@@ -164,25 +164,25 @@ if [[ -e /usr/bin/setup ]]; then
     _local_mode
     # wait on user interaction!
     _enter_shell
+    # enable super keys console support
+    loadkeys windowkeys
     # Basic Setup on archboot:
     # localization, network, clock, pacman
-    if grep -qw 'archboot' /etc/hostname; then
-        if ! [[ -e /.localize ]]; then
-            localize
-            source /etc/locale.conf
-        fi
-        if [[ ! -e /.network ]]; then
-            network
-        fi
-        if ! [[ -e /.clock ]]; then
-            clock
-        fi
-        if [[ ! -e /.pacsetup ]]; then
-            pacsetup
-        fi
-        if [[ ! -e /.launcher ]]; then
-            launcher
-        fi
+    if ! [[ -e /.localize ]]; then
+        localize
+        source /etc/locale.conf
+    fi
+    if [[ ! -e /.network ]]; then
+        network
+    fi
+    if ! [[ -e /.clock ]]; then
+        clock
+    fi
+    if [[ ! -e /.pacsetup ]]; then
+        pacsetup
+    fi
+    if [[ ! -e /.launcher ]]; then
+        launcher
     fi
 # latest image, fail if less than 2GB RAM available
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 1970000 ]]; then
