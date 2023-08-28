@@ -10,7 +10,7 @@ Environment Changes:
 - open Installation Guide on firefox and chromium startup
 - removed efitools
 - enabled journal showing on Virtual Console 12
-- enabled windows super keys on console by default
+- enabled windows super keys on Virtual Consoles
 network:
 - unblock all wireless devices
 setup:
