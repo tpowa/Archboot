@@ -108,7 +108,7 @@ _clean_archboot() {
 }
 
 _collect_files() {
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k "${_RAM}/${_VMLINUZ}" -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1
     rm "${_W_DIR}"/.archboot
 }
 
@@ -192,16 +192,16 @@ _new_environment() {
     _progress_wait "2" "49" "Generating container in ${_W_DIR}..." "3"
     _clean_kernel_cache
     _ram_check
-    mkdir "${_RAM}"
-    mount -t ramfs none "${_RAM}"
-    _progress "50" "Moving kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
-    # use ramfs to get immediate free space on file deletion
-    mv "${_W_DIR}/boot/${_VMLINUZ}" "${_RAM}/"
     # write initramfs to "${_ROOTFS_DIR}
     touch "${_W_DIR}"/.archboot
     _collect_files &
-    _progress_wait "51" "84" "Collecting rootfs files in ${_W_DIR}..." "1"
-    _progress "85" "Cleanup ${_W_DIR}..."
+    _progress_wait "50" "83" "Collecting rootfs files in ${_W_DIR}..." "1"
+    _progress "84" "Cleanup ${_W_DIR}..."
+    mkdir "${_RAM}"
+    mount -t ramfs none "${_RAM}"
+    _progress "85" "Moving kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
+    # use ramfs to get immediate free space on file deletion
+    mv "${_W_DIR}/boot/${_VMLINUZ}" "${_RAM}/"
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
     _ram_check
