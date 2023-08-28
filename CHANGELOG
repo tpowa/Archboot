@@ -10,6 +10,7 @@ Environment Changes:
 - open Installation Guide on firefox and chromium startup
 - removed efitools
 - enabled journal logging to /dev/tty12 / VC12
+- enabled windows super keys on console by default
 network:
 - unblock all wireless devices
 setup:
