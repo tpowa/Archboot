@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
-LANG=C
 . /etc/archboot/defaults
 _BASENAME=${0##*/}
 _RUNNING_ARCH="$(uname -m)"
@@ -208,7 +207,7 @@ _fix_network() {
 _create_archboot_db() {
     echo "Creating archboot repository db..."
     #shellcheck disable=SC2046
-    repo-add -q "${1}"/archboot.db.tar.gz $(find "${1}"/ -type f ! -name '*.sig')
+    LANG=C repo-add -q "${1}"/archboot.db.tar.gz $(find "${1}"/ -type f ! -name '*.sig')
 }
 
 _pacman_parameters() {
