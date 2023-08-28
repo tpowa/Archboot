@@ -2,11 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _ANSWER="/tmp/.setup"
-if pgrep -x Xorg &>"${_NO_LOG}"; then
-    _LOG="/dev/tty8"
-else
-    _LOG="/dev/tty7"
-fi
+_LOG="/dev/tty11"
 _VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
 _VC="VC${_VC_NUM}"
 # install stages

@@ -44,20 +44,20 @@ _install_gnome() {
 }
 
 _start_gnome_wayland() {
-    _progress "100" "Launching GNOME Wayland now, logging is done on /dev/tty8..."
+    _progress "100" "Launching GNOME Wayland now, logging is done on /dev/tty11..."
     sleep 2
-    echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session gnome-session >/dev/tty7 2>&1" > /usr/bin/gnome-wayland
+    echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session gnome-session >/dev/tty11 2>&1" > /usr/bin/gnome-wayland
     chmod 755 /usr/bin/gnome-wayland
     gnome-wayland
 }
 
 _start_gnome() {
-    _progress "100" "Launching GNOME now, logging is done on /dev/tty8..."
+    _progress "100" "Launching GNOME now, logging is done on /dev/tty11..."
     sleep 2
     echo "export XDG_SESSION_TYPE=x11" > /root/.xinitrc
     #shellcheck disable=SC2129
     echo "export GDK_BACKEND=x11" >> /root/.xinitrc
     echo "exec dbus-launch gnome-session" >> /root/.xinitrc
-    startx >/dev/tty8 2>&1
+    startx >/dev/tty11 2>&1
 }
 # vim: set ft=sh ts=4 sw=4 et:

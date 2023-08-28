@@ -4,7 +4,7 @@
 . /etc/archboot/defaults
 _BASENAME=${0##*/}
 _RUNNING_ARCH="$(uname -m)"
-_LOG="/dev/tty7"
+_LOG="/dev/tty11"
 _NO_LOG="/dev/null"
 _KEYRING="archlinux-keyring"
 if echo "${_BASENAME}" | grep -qw aarch64; then

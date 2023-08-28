@@ -245,8 +245,8 @@ EOF
 }
 
 _start_xfce() {
-    _progress "100" "Launching XFCE now, logging is done on /dev/tty8..."
+    _progress "100" "Launching XFCE now, logging is done on /dev/tty11..."
     sleep 2
-    startxfce4 >/dev/tty8 2>&1
+    startxfce4 >/dev/tty11 2>&1
 }
 # vim: set ft=sh ts=4 sw=4 et:

@@ -4,7 +4,7 @@
 LANG=C
 _ANSWER="/.$(basename "${0}")"
 _RUNNING_ARCH="$(uname -m)"
-_LOG="/dev/tty7"
+_LOG="/dev/tty11"
 _NO_LOG="/dev/null"
 _LABEL="Exit"
 _DLPROG="wget -q"

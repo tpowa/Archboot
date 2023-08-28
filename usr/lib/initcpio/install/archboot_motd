@@ -12,7 +12,7 @@ build ()
     #shellcheck disable=SC2129
     echo -e "\e[1m----------------------------------------\e[m" >> "${MOTD}"
     echo -e "\e[1mVconsole:\e[m" >> "${MOTD}"
-    echo -e "  - Use the \e[1;92mALT + F1 - F7\e[m keys to change the virtual console." >> "${MOTD}"
+    echo -e "  - Use the \e[1;92mALT + F1 - F12\e[m keys to change the virtual console." >> "${MOTD}"
 if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
     #shellcheck disable=SC2129
     echo -e "\e[1mFor Additional Wi-Fi Authentification Or Online Help:\e[m" >> "${MOTD}"

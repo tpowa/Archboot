@@ -78,18 +78,18 @@ _install_plasma() {
 }
 
 _start_plasma_wayland() {
-    _progress "100" "Launching Plasma/KDE Wayland now, logging is done on /dev/tty8..."
+    _progress "100" "Launching Plasma/KDE Wayland now, logging is done on /dev/tty11..."
     sleep 2
-    echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session startplasma-wayland >/dev/tty7 2>&1" > /usr/bin/plasma-wayland
+    echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session startplasma-wayland >/dev/tty11 2>&1" > /usr/bin/plasma-wayland
     chmod 755 /usr/bin/plasma-wayland
     plasma-wayland
 }
 
 _start_plasma() {
-    _progress "100" "Launching Plasma/KDE now, logging is done on /dev/tty8..."
+    _progress "100" "Launching Plasma/KDE now, logging is done on /dev/tty11..."
     sleep 2
     echo "export DESKTOP_SESSION=plasma" > /root/.xinitrc
     echo "exec startplasma-x11" >> /root/.xinitrc
-    startx >/dev/tty8 2>&1
+    startx >/dev/tty11 2>&1
 }
 # vim: set ft=sh ts=4 sw=4 et:
