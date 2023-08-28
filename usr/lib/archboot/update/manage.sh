@@ -108,8 +108,7 @@ _clean_archboot() {
 }
 
 _collect_files() {
-    _KVER=$(_kver "${_RAM}/${_VMLINUZ}")
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k ${_KVER} -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -k "${_RAM}/${_VMLINUZ}" -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1
     rm "${_W_DIR}"/.archboot
 }
 
