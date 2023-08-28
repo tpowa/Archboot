@@ -9,6 +9,7 @@ Environment Changes:
 - implemented dialog progressbars
 - open Installation Guide on firefox and chromium startup
 - removed efitools
+- enabled journal logging to /dev/tty12 / VC12
 network:
 - unblock all wireless devices
 setup:
