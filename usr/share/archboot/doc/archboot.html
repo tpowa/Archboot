@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 29.08.2023 09:13</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 29.08.2023 09:38</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -30,8 +30,8 @@
 <li><a href="#archboot-in-a-nutshell" id="toc-archboot-in-a-nutshell"><strong><span class="toc-section-number">3.</span> Features In A Nutshell</strong></a></li>
 <li><ul>
 <li><a href="#secure-boot-support" id="toc-secure-boot-support"><span class="toc-section-number">3.1</span> Secure Boot - MOK / Machine Owner Key</a></li>
-<li><a href="#terminal-access" id="toc-terminal-access"><span class="toc-section-number">3.2</span> Terminal Access</a></li>
-<li><a href="#remote-terminal-access" id="toc-remote-terminal-access"><span class="toc-section-number">3.3</span> Remote Terminal Access</a></li>
+<li><a href="#terminal-access" id="toc-terminal-access"><span class="toc-section-number">3.2</span> Terminal Access - Virtual Consoles / Serial Console</a></li>
+<li><a href="#remote-terminal-access" id="toc-remote-terminal-access"><span class="toc-section-number">3.3</span> Remote Terminal Access - OpenSSH / TTYD</a></li>
 <li><a href="#interactive-basic-setup" id="toc-interactive-basic-setup"><span class="toc-section-number">3.4</span> Interactive Basic Setup</a></li>
 <li><a href="#interactive-launcher" id="toc-interactive-launcher"><span class="toc-section-number">3.5</span> Interactive Launcher</a></li>
 <li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">3.6</span> Interactive Setup</a></li>
@@ -429,7 +429,7 @@
 </ul>
 <h3 data-number="3.2" id="terminal-access"><span class="header-section-number">3.2</span> <strong>Terminal Access</strong></h3>
 <h4 data-number="3.2.1" id="vitual-console"><span class="header-section-number">3.2.1</span> <strong>Virtual Consoles - VCs</strong></h4>
-<p>Use <strong>SUPER<sup>*</sup></strong> key left/right or <strong>ALT</strong>+<strong>&larr;</strong> or <strong>ALT</strong>+<strong>&rarr;</strong> to toggle consoles.</p>
+<p>Use <strong>SUPER<sup>*</sup></strong> key left/right or <strong>ALT</strong>+<strong>&larr;</strong> or <strong>ALT</strong>+<strong>&rarr;</strong> to toggle <a href="https://wiki.archlinux.org/title/Linux_console" title="Linux_console"><strong>consoles</strong></a>.</p>
 <table>
 <thead>
 <tr class="header">
@@ -452,6 +452,7 @@
 <td>ALT+F11</td>
 <td>ALT+F12</td>
 </tr>
+<tr class="odd">
 <td><strong>Graphical Keys</strong></td>
 <td>CTRL+ALT+F1-F6</td>
 <td>CTRL+ALT+F11</td>
