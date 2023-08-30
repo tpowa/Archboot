@@ -49,15 +49,13 @@ if [[ "${TTY}" = "tty1" ]]; then
     # cleanup mkinitcpio directories and files
     rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>"${_NO_LOG}"
     rm -f /sysroot/{VERSION,config,buildconfig,init} &>"${_NO_LOG}"
-    # systemd needs this for root_switch
-    touch /etc/initrd-release
     _progress "100" "System is ready."
     read -r -t 2
     # fix clear screen on all terminals
     printf "\ec" | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
     # https://www.freedesktop.org/software/systemd/man/bootup.html
     # enable systemd  initrd functionality
-    touch /etc/initrd-release
+    : > /etc/initrd-release
     # fix /run/nouser issues
     systemctl stop systemd-user-sessions.service
     # avoid issues by taking down services in ordered way
@@ -122,7 +120,7 @@ _run_update_installer() {
 }
 
 if ! [[ -e /.vconsole-run ]]; then
-    touch /.vconsole-run
+    : > /.vconsole-run
     FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" 2>"${_NO_LOG}" | sed -e 's#.*:##g')"
     if [[ "${FB_SIZE}" -gt '1900' ]]; then
         SIZE="32"
@@ -134,7 +132,7 @@ if ! [[ -e /.vconsole-run ]]; then
     systemctl restart systemd-vconsole-setup
 fi
 if ! [[ -e /.clean-pacman-db ]]; then
-    touch /.clean-pacman-db
+    : > /.clean-pacman-db
     _RM_PACMAN_DB="base grub libxml2 icu gettext refind amd-ucode intel-ucode edk2-shell \
         libisoburn libburn libisofs mkinitcpio memtest linux-api-headers jansson libwbclient \
         libbsd libmd libpcap libnftnl libnfnetlink libnetfilter_conntrack libsasl libldap memtest86+ \

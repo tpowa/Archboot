@@ -18,7 +18,7 @@ cert-to-efi-sig-list -g "$GUID" PK.crt PK.esl
 cert-to-efi-sig-list -g "$GUID" KEK.crt KEK.esl
 cert-to-efi-sig-list -g "$GUID" DB.crt DB.esl
 rm -f noPK.esl
-touch noPK.esl
+: > noPK.esl
 sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \
                   -k PK.key -c PK.crt PK PK.esl PK.auth
 sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \

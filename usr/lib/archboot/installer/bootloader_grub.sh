@@ -247,7 +247,7 @@ _grub_install_bios() {
 }
 
 _grub_bios() {
-    touch /.archboot
+    : > /.archboot
     _grub_install_bios &
     _progress_wait "11" "99" "Setting up GRUB(2) BIOS..." "0.15"
     _progress "100" "Setting up GRUB(2) BIOS completed."
@@ -386,7 +386,7 @@ _setup_grub_uefi() {
         ## Install GRUB
         _progress "10" "Setting up GRUB(2) UEFI..."
         _chroot_mount
-        touch /.archboot
+        : > /.archboot
         _grub_install_uefi &
         _progress_wait "11" "99" "Setting up GRUB(2) UEFI..." "0.1"
         _chroot_umount
@@ -402,7 +402,7 @@ _setup_grub_uefi_sb() {
         # generate GRUB with config embeded
         #remove existing, else weird things are happening
         [[ -f "${_DESTDIR}/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]] && rm "${_DESTDIR}"/"${_GRUB_PREFIX_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi
-        touch /.archboot
+        : > /.archboot
         _grub_install_uefi_sb &
         _progress_wait "11" "99" "Setting up GRUB(2) UEFI Secure Boot..." "0.1"
         _progress "100" "Setting up GRUB(2) UEFI Secure Boot completed."

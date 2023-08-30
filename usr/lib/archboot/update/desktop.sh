@@ -72,7 +72,7 @@ _prepare_graphic() {
         # fix libs first, then install packages from defaults
         _GRAPHIC="${1}"
     fi
-    touch /.archboot
+    : > /.archboot
     _update_packages &
     _progress_wait "2" "10" "Updating environment to latest packages..." "5"
     _COUNT=11
@@ -85,7 +85,7 @@ _prepare_graphic() {
         rm -f /var/log/pacman.log
         _COUNT="$((_COUNT+1))"
     done
-    touch /.archboot
+    : > /.archboot
     _install_graphic &
     _progress_wait "${_COUNT}" "97" "Installing ${_ENVIRONMENT}..." "2"
     if [[ ! -e "/.full_system" ]]; then

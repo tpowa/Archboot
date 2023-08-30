@@ -19,7 +19,7 @@ _mkinitcpio() {
 _run_mkinitcpio() {
     _chroot_mount
     echo "Initramfs progress..." > /tmp/mkinitcpio.log
-    touch /.archboot
+    : > /.archboot
     _mkinitcpio &
     _progress_wait "0" "99" "Rebuilding initramfs on installed system..." "0.1"
     if [[ $(cat /tmp/.mkinitcpio-retcode) -ne 0 ]]; then
@@ -43,7 +43,7 @@ _mkinitcpio_error() {
 }
 
 _run_locale_gen() {
-    touch /.archboot
+    : > /.archboot
     _locale_gen &
     _progress_wait "0" "99" "Rebuilding glibc locales on installed system..." "0.05"
     _progress "100" "Rebuilding glibc locales on installed system complete." 6 75

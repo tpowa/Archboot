@@ -21,7 +21,7 @@ _run_pacman(){
     [[ ! -d "${_DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${_DESTDIR}/var/cache/pacman/pkg"
     [[ ! -d "${_DESTDIR}/var/lib/pacman" ]] && mkdir -p "${_DESTDIR}/var/lib/pacman"
     echo "Installing Packages..." >/tmp/pacman.log
-    touch /.archboot
+    : > /.archboot
     _pacman &
     _progress_wait "0" "99" "Installing package(s):\n${_PACKAGES}..." "2"
     # pacman finished, display scrollable output

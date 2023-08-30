@@ -187,13 +187,13 @@ _new_environment() {
     _clean_archboot
     _clean_kernel_cache
     [[ -d "${_W_DIR}" ]] || mkdir -p "${_W_DIR}"
-    touch "${_W_DIR}"/.archboot
+    : > "${_W_DIR}"/.archboot
     _create_container &
     _progress_wait "2" "49" "Generating container in ${_W_DIR}..." "3"
     _clean_kernel_cache
     _ram_check
     # write initramfs to "${_ROOTFS_DIR}
-    touch "${_W_DIR}"/.archboot
+    : > "${_W_DIR}"/.archboot
     _collect_files &
     _progress_wait "50" "83" "Collecting rootfs files in ${_W_DIR}..." "1"
     _progress "84" "Cleanup ${_W_DIR}..."
@@ -217,7 +217,7 @@ _new_environment() {
         sleep 2
         # https://www.freedesktop.org/software/systemd/man/bootup.html
         # enable systemd  initrd functionality
-        touch /etc/initrd-release
+        : > /etc/initrd-release
         # fix /run/nouser issues
         systemctl stop systemd-user-sessions.service
         # avoid issues by taking down services in ordered way
@@ -257,7 +257,7 @@ _new_environment() {
         cp -ar /etc/pacman.d/gnupg "${_ROOTFS_DIR}"/etc/pacman.d
         cp /.pacsetup "${_ROOTFS_DIR}"/
     fi
-    touch "${_W_DIR}"/.archboot
+    : > "${_W_DIR}"/.archboot
     _create_initramfs &
     _progress_wait "87" "94" "Creating initramfs ${_RAM}/${_INITRD}..." "1"
     _progress "95" "Cleanup ${_W_DIR}..."
@@ -321,7 +321,7 @@ _full_system() {
     fi
     _progress "100" "Full Arch Linux system is ready now."
     sleep 2
-    touch /.full_system
+    : > /.full_system
 }
 
 _new_image() {
@@ -337,7 +337,7 @@ _new_image() {
     _W_DIR="$(mktemp -u archboot-release.XXX)"
     # create container
     [[ -d "${_W_DIR}" ]] || mkdir -p "${_W_DIR}"
-    touch "${_W_DIR}"/.archboot
+    : > "${_W_DIR}"/.archboot
     _create_container &
     _progress_wait "2" "20" "Generating container in ${_W_DIR}..." "10"
     _progress "21" "Create archboot.db in ${_W_DIR}..."
@@ -348,20 +348,20 @@ _new_image() {
         _progress "22" "Removing lvm2 from container..."
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>"${_NO_LOG}"
         # generate local iso in container, umount tmp it's a tmpfs and weird things could happen then
-        touch "${_W_DIR}"/.archboot
+        : > "${_W_DIR}"/.archboot
         (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_RUNNING_ARCH}-iso.sh -g -s -p=${_PRESET_LOCAL} \
         -i=${_ISONAME}-local-${_RUNNING_ARCH}" > "${_LOG}"; rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*; rm "${_W_DIR}"/.archboot) &
         _ram_check
         _progress_wait "23" "55" "Generating local ISO..." "10"
         # generate latest iso in container
-        touch "${_W_DIR}"/.archboot
+        : > "${_W_DIR}"/.archboot
         (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_RUNNING_ARCH}-iso.sh -g -s -p=${_PRESET_LATEST} \
         -i=${_ISONAME}-latest-${_RUNNING_ARCH}" > "${_LOG}"; rm "${_W_DIR}"/.archboot) &
         _progress_wait "56" "69" "Generating latest ISO..." "10"
         _progress "70" "Installing lvm2 to container..."
         ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>"${_NO_LOG}"
     fi
-    touch "${_W_DIR}"/.archboot
+    : > "${_W_DIR}"/.archboot
     # generate iso in container
     (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_RUNNING_ARCH}-iso.sh -g \
     -i=${_ISONAME}-${_RUNNING_ARCH}" > "${_LOG}"; rm "${_W_DIR}"/.archboot) &
