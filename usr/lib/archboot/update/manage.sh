@@ -179,7 +179,7 @@ _download_latest() {
     [[ -d "${_INST}" ]] || mkdir "${_INST}"
     : > /.archboot
     _download_latest_task &
-    _progress_wait "0" "99" "Downloading latest GIT..." "0.01"
+    _progress_wait "0" "99" "Downloading latest GIT..." "0.1"
     _progress "100" "Downloading... done."
     sleep 2
 }
