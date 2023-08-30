@@ -81,7 +81,7 @@ _wireless() {
         _WLAN_KEY=$(cat "${_ANSWER}")
     fi
     # time to connect
-    _dialog --title " Network Configuration " --no-mouse --infobox "Connecting to '${_WLAN_SSID}' with interface ${_INTERFACE}..." 4 60
+    _dialog --title " Network Configuration " --no-mouse --infobox "Connecting to '${_WLAN_SSID}'\nwith interface ${_INTERFACE}..." 4 50
     _printk off
     if [[ -z "${_WLAN_KEY}" ]]; then
         iwctl station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" &>"${_NO_LOG}" && _WLAN_AUTH=1
