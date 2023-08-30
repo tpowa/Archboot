@@ -30,6 +30,22 @@ XXX
 EOF
 }
 
+# $1: start percentage $2: end percentage $3: message $4: sleep time
+_progress_wait() {
+    _COUNT=${1}
+    while true; do
+        if [[ "${_COUNT}" -lt "${2}" ]]; then
+            _progress "${_COUNT}" "${3}"
+        fi
+        if [[ "${_COUNT}" -gt "${2}" ]]; then
+            _progress "${2}" "${3}"
+        fi
+        _COUNT="$((_COUNT+1))"
+        read -r -t "${4}"
+        ! [[ -e /.archboot ]] && break
+    done
+}
+
 _show_login() {
     [[ -e "/.${_ANSWER}-running" ]] && rm "/.${_ANSWER}-running"
     clear

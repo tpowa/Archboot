@@ -59,9 +59,10 @@ _vconsole() {
     echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
     echo FONT="${_FONT}" >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
+    rm /.archboot
 }
 
-_run() {
+_locale() {
     echo "LANG=${_LOCALE}.UTF-8" > /etc/locale.conf
     echo "LANG=${_LOCALE}.UTF-8" > /.localize
     echo LC_COLLATE=C >> /etc/locale.conf
@@ -69,11 +70,16 @@ _run() {
     sed -i -e "s:^[a-z]:#&:g" /etc/locale.gen
     sed -i -e "s:^#${_LOCALE}.UTF-8:${_LOCALE}.UTF-8:g" /etc/locale.gen
     locale-gen &>"${_NO_LOG}"
-    _progress "33" "Setting locale to ${_LOCALE}.UTF-8..."
-    sleep 2
-    _progress "66" "Setting keymap to ${_KEYMAP}..."
-    _vconsole
-    sleep 2
+    rm /.archboot
+}
+
+_run() {
+    : >/.archboot
+    _locale &
+    _progress_wait "0" "66" "Setting locale to ${_LOCALE}.UTF-8..." "0.1"
+    : >/.archboot
+    _vconsole &
+    _progress_wait "67" "99" "Setting keymap to ${_KEYMAP}..." "0.1"
     _progress "100" "Localization completed successfully."
     sleep 2
 }
