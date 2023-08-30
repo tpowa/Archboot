@@ -49,7 +49,14 @@ _vconsole_keymap() {
     fi
 }
 
-_vconsole() {
+_task() {
+    echo "LANG=${_LOCALE}.UTF-8" > /etc/locale.conf
+    echo "LANG=${_LOCALE}.UTF-8" > /.localize
+    echo LC_COLLATE=C >> /etc/locale.conf
+    localectl set-locale "${_LOCALE}.UTF-8" &>"${_NO_LOG}"
+    sed -i -e "s:^[a-z]:#&:g" /etc/locale.gen
+    sed -i -e "s:^#${_LOCALE}.UTF-8:${_LOCALE}.UTF-8:g" /etc/locale.gen
+    locale-gen &>"${_NO_LOG}"
     # Terminus font size detection
     if grep -q '^FONT=.*32' /etc/vconsole.conf; then
         _FONT="ter-v32n"
@@ -62,30 +69,16 @@ _vconsole() {
     rm /.archboot
 }
 
-_locale() {
-    echo "LANG=${_LOCALE}.UTF-8" > /etc/locale.conf
-    echo "LANG=${_LOCALE}.UTF-8" > /.localize
-    echo LC_COLLATE=C >> /etc/locale.conf
-    localectl set-locale "${_LOCALE}.UTF-8" &>"${_NO_LOG}"
-    sed -i -e "s:^[a-z]:#&:g" /etc/locale.gen
-    sed -i -e "s:^#${_LOCALE}.UTF-8:${_LOCALE}.UTF-8:g" /etc/locale.gen
-    locale-gen &>"${_NO_LOG}"
-    rm /.archboot
-}
-
 _run() {
     : >/.archboot
-    _locale &
-    _progress_wait "0" "66" "Setting locale to ${_LOCALE}.UTF-8..." "0.05"
-    : >/.archboot
-    _vconsole &
-    _progress_wait "67" "99" "Setting keymap to ${_KEYMAP}..." "0.05"
+    _task &
+    _progress_wait "0" "99" "Using ${_LOCALE}.UTF-8 and ${_KEYMAP}..." "0.01"
     _progress "100" "Localization completed successfully."
     sleep 2
 }
 
 _localize() {
-    _run | _dialog --title " Localization " --no-mouse --gauge "Setting locale to ${_LOCALE}.UTF-8..." 6 50 0
+    _run | _dialog --title " Localization " --no-mouse --gauge "Using ${_LOCALE}.UTF-8 and ${_KEYMAP}..." 6 50 0
 }
 
 _check
