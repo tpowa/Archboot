@@ -76,10 +76,10 @@ _locale() {
 _run() {
     : >/.archboot
     _locale &
-    _progress_wait "0" "66" "Setting locale to ${_LOCALE}.UTF-8..." "0.1"
+    _progress_wait "0" "66" "Setting locale to ${_LOCALE}.UTF-8..." "0.05"
     : >/.archboot
     _vconsole &
-    _progress_wait "67" "99" "Setting keymap to ${_KEYMAP}..." "0.1"
+    _progress_wait "67" "99" "Setting keymap to ${_KEYMAP}..." "0.05"
     _progress "100" "Localization completed successfully."
     sleep 2
 }
