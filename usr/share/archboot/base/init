@@ -8,14 +8,6 @@ _dialog() {
     dialog --backtitle "${_TITLE}" "$@"
     return $?
 }
-_emergency_shell() {
-    echo -e "\e[1;91mArchboot Emergeny Shell:\e[m"
-    echo -e "\e[1mSeems something went wrong...\e[m"
-    echo -e "\e[1;93mType 'exit' or 'reboot' for reboot.\e[m"
-    echo -e "\e[1;93mType 'poweroff' for poweroff.\e[m"
-    /bin/bash
-    echo b >/proc/sysrq-trigger
-}
 _udev_trigger() {
     udevadm trigger --action=add --type=subsystems
     udevadm trigger --action=add --type=devices
@@ -29,89 +21,84 @@ ${2}
 XXX
 EOF
 }
-_first_stage() {
-    _COUNT=0
-    while true; do
-        # dd / rufus
-        mount UUID=1234-ABCD /mnt &>/dev/null && break
-        # ventoy
-        if mount LABEL=Ventoy /ventoy &>/dev/null; then
-            mount /ventoy/archboot-*-*-"$(uname -r)"-"$(uname -m)".iso /cdrom &>/dev/null && break
-            mount /ventoy/archboot-*-*-"$(uname -r)"-latest-"$(uname -m)".iso /cdrom &>/dev/null && break
-            mount /ventoy/archboot-*-*-"$(uname -r)"-local-"$(uname -m)".iso /cdrom &>/dev/null && break
-        fi
-        if [[ -b /dev/sr0 ]]; then
-            mount /dev/sr0 /cdrom &>/dev/null && break
-        fi
-        read -r -t 1
-        _COUNT=$((_COUNT+1))
-        [[ "${_COUNT}" == 10 ]] && break
-    done
-    if ! [[ -f "/mnt/boot/initrd-$(uname -m).img" ]] ; then
-        if ! mount /cdrom/efi.img /mnt &>/dev/null; then
-            echo -e "\e[1;91mError: Didn't find a device with archboot rootfs! \e[m"
-            echo -e "\e[1mThis needs further debugging. Please contact the archboot author.\e[m"
-            echo -e "\e[1mTobias Powalowski: tpowa@archlinux.org\e[m"
-            echo ""
-            _emergency_shell
-        fi
+_task() {
+    [[ "${1}" == kernel ]] && bsdcpio -u -i "*/lib/modules/"  "*/lib/firmware/" <"/mnt/boot/initrd-$(uname -m).img" &>/dev/null
+    if [[ "${1}" == udev ]]; then
+        udevadm control -R
+        _udev_trigger
+        # shutdown udevd
+        udevadm control --exit
+        udevadm info --cleanup-db
     fi
-    cd /
-    # move in modules from main initrd
-    _progress "5" "${_KEEP} Copying kernel modules..."
-    bsdcpio -u -i "*/lib/modules/"<"/mnt/boot/initrd-$(uname -m).img" &>/dev/null || _emergency_shell
-    _progress "35" "${_KEEP} Copying firmware..."
-    bsdcpio -u -i "*/lib/firmware/"<"/mnt/boot/initrd-$(uname -m).img" &>/dev/null || _emergency_shel
-    # reinitialize available modules
-    _progress "55" "${_KEEP} Loading kernel modules..."
-    udevadm control -R
-    _progress "56" "${_KEEP} Loading kernel modules..."
-    _udev_trigger
-    # shutdown udevd
-    _progress "57" "${_KEEP} Loading kernel modules..."
-    udevadm control --exit
-    _progress "58" "Loading kernel modules..."
-    udevadm info --cleanup-db
-}
-_second_stage() {
-    # keep ethernet NIC firmware
-    rm -rf /lib/firmware/{RTL8192E,advansys,amd*,ar3k,ath*,atmel,brcm,cavium,cirrus,cxgb*,cypress,dvb*,ene-ub6250,i915,imx,intel,iwlwifi-[8-9]*,iwlwifi-[a-z]*,iwlwifi-[A-Z]*,keyspan*,korg,libertas,matrox,mediatek,mrvl,mwl*,nvidia,nxp,qca,radeon,r128,rsi,rtlwifi,rtl_bt,rtw*,ti-connectivity,tehuti,wfx,yam,yamaha}
-    _progress "63" "${_KEEP} Removing kernel modules..."
-    rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,platform,net,scsi,soc,spi,usb,video} /lib/modules/*/extramodules
-    _progress "66" "${_KEEP} Creating /dev/zram0 with zstd compression..."
-    echo "zstd" >/sys/block/zram0/comp_algorithm
-    echo "5G" >/sys/block/zram0/disksize
-    _progress "67" "${_KEEP} Creating btrfs on /dev/zram0..."
-    mkfs.btrfs /dev/zram0 &>/dev/null
-    # use discard to get free RAM on delete!
-    mount -o discard /dev/zram0 /sysroot &>/dev/null
-    _progress "72" "${_KEEP} Moving modules to /sysroot..."
-    mkdir -p /sysroot/usr/lib
-    _progress "73" "${_KEEP} Moving modules to /sysroot..."
-    mv /lib/modules /sysroot/usr/lib
-    _progress "76" "${_KEEP} Moving firmware to /sysroot..."
-    mv /lib/firmware /sysroot/usr/lib
-    _progress "80" "${_KEEP} Copying rootfs to /sysroot..."
-    cd /sysroot || _emergency_shell
-    bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i <"/mnt/boot/initrd-$(uname -m).img" &>/dev/null || _emergency_shell
-    # unmount everything after copying
-    _progress "95" "${_KEEP} Unmounting archboot rootfs..."
-    while true; do
+    if [[ "${1}" == cleanup ]]; then
+        rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,platform,net,scsi,soc,spi,usb,video} /lib/modules/*/extramodules
+        # keep ethernet NIC firmware
+        rm -rf /lib/firmware/{RTL8192E,advansys,amd*,ar3k,ath*,atmel,brcm,cavium,cirrus,cxgb*,cypress,dvb*,ene-ub6250,i915,imx,intel,iwlwifi-[8-9]*,iwlwifi-[a-z]*,iwlwifi-[A-Z]*,keyspan*,korg,libertas,matrox,mediatek,mrvl,mwl*,nvidia,nxp,qca,radeon,r128,rsi,rtlwifi,rtl_bt,rtw*,ti-connectivity,tehuti,wfx,yam,yamaha}
+    fi
+    if [[ "${1}" == system ]]; then
+        echo "zstd" >/sys/block/zram0/comp_algorithm
+        echo "5G" >/sys/block/zram0/disksize
+        mkfs.btrfs /dev/zram0 &>/dev/null
+        # use discard to get free RAM on delete!
+        mount -o discard /dev/zram0 /sysroot &>/dev/null
+        mkdir -p /sysroot/usr/lib
+        mv /lib/modules /sysroot/usr/lib
+        mv /lib/firmware /sysroot/usr/lib
+        cd /sysroot
+        bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i<"/mnt/boot/initrd-$(uname -m).img" &>/dev/null
+    fi
+    if [[ "${1}" == unmount ]]; then
         if mountpoint /ventoy &>/dev/null; then
             for i in /mnt /cdrom /ventoy; do
                 umount -q -A "${i}" 2>/dev/null
             done
-            break
         fi
         if mountpoint /cdrom &>/dev/null; then
             for i in /mnt /cdrom; do
                 umount -q -A "${i}" 2>/dev/null
             done
-            break
         fi
-        umount -q -A UUID=1234-ABCD 2>/dev/null && break
-        read -r -t 1
+        umount -q -A UUID=1234-ABCD 2>/dev/null
+    fi
+    rm /.archboot
+}
+# $1: start percentage $2: end percentage $3: message $4: sleep time
+_progress_wait() {
+    _COUNT=${1}
+    while true; do
+        if [[ "${_COUNT}" -lt "${2}" ]]; then
+            _progress "${_COUNT}" "${3}"
+        fi
+        if [[ "${_COUNT}" -gt "${2}" ]]; then
+            _progress "${2}" "${3}"
+        fi
+        _COUNT="$((_COUNT+1))"
+        read -r -t "${4}"
+        ! [[ -e /.archboot ]] && break
     done
+}
+_first_stage() {
+    cd /
+    # move in modules from main initrd
+    : >/.archboot
+    _task kernel &
+    _progress_wait "0" "96" "${_KEEP} Copying files..." "0.33"
+    # reinitialize available modules
+    : >/.archboot
+    _task udev &
+    _progress_wait "97" "100" "${_KEEP} Loading kernel modules..." "0.33"
+}
+_second_stage() {
+    : >/.archboot
+    _task cleanup &
+    _progress_wait "0" "3" "${_KEEP} Removing files..." "0.125"
+    : >/.archboot
+    _task system &
+    _progress_wait "4" "97" "${_KEEP} Creating rootfs in /sysroot..." "0.125"
+    : >/.archboot
+    # unmount everything after copying
+    _task unmount &
+    _progress_wait "98" "99" "${_KEEP} Unmounting archboot rootfs..." "1"
     _progress "100" "The boot medium can be safely removed now."
     read -r -t 2
     # remove mkinitcpio files and directories
@@ -138,11 +125,42 @@ modprobe -q usb-storage
 modprobe -q zram
 modprobe -q zstd
 echo 1 > /proc/sys/kernel/sysrq
-echo "Initialize Console..."
+echo "Initializing Console..."
 printf "\ec"
 # it needs one echo before, in order to reset the consolefont!
 setfont consolefont-16.psf.gz -C /dev/console
-_first_stage | _dialog --title  " Initializing System... " --gauge "${_KEEP} Searching for archboot rootfs..." 6 75 0
+echo "Searching 10 seconds for archboot rootfs..."
+_COUNT=0
+while true; do
+    # dd / rufus
+    mount UUID=1234-ABCD /mnt &>/dev/null && break
+    # ventoy
+    if mount LABEL=Ventoy /ventoy &>/dev/null; then
+        mount /ventoy/archboot-*-*-"$(uname -r)"-"$(uname -m)".iso /cdrom &>/dev/null && break
+        mount /ventoy/archboot-*-*-"$(uname -r)"-latest-"$(uname -m)".iso /cdrom &>/dev/null && break
+        mount /ventoy/archboot-*-*-"$(uname -r)"-local-"$(uname -m)".iso /cdrom &>/dev/null && break
+    fi
+    if [[ -b /dev/sr0 ]]; then
+        mount /dev/sr0 /cdrom &>/dev/null && break
+    fi
+    read -r -t 1
+    _COUNT=$((_COUNT+1))
+    [[ "${_COUNT}" == 10 ]] && break
+done
+if ! [[ -f "/mnt/boot/initrd-$(uname -m).img" ]] ; then
+    if ! mount /cdrom/efi.img /mnt &>/dev/null; then
+        echo -e "\e[1;91mArchboot Emergeny Shell:\e[m"
+        echo -e "\e[1;91mError: Didn't find a device with archboot rootfs! \e[m"
+        echo -e "\e[1mThis needs further debugging. Please contact the archboot author.\e[m"
+        echo -e "\e[1mTobias Powalowski: tpowa@archlinux.org\e[m"
+        echo ""
+        echo -e "\e[1;93mType 'exit' or 'reboot' for reboot.\e[m"
+        echo -e "\e[1;93mType 'poweroff' for poweroff.\e[m"
+        /bin/bash
+        echo b >/proc/sysrq-trigger
+    fi
+fi
+_first_stage | _dialog --title  " Loading Kernel And Modules... " --gauge "${_KEEP} Copying files..." 6 75 0
 FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
 if [[ "${FB_SIZE}" -gt '1900' ]]; then
     SIZE="32"
@@ -150,10 +168,10 @@ else
     SIZE="16"
 fi
 # clear screen
-echo "Initialize Console..."
+echo "Initializing Console..."
 printf "\ec"
 setfont consolefont-${SIZE}.psf.gz -C /dev/console
-_second_stage | _dialog --title " Initializing System... " --gauge "${_KEEP} Removing firmware..." 6 75 60
+_second_stage | _dialog --title " Initializing System... " --gauge "${_KEEP} Removing files..." 6 75 60
 echo 0 > /proc/sys/kernel/sysrq
 # set font size in vconsole.conf
 echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
