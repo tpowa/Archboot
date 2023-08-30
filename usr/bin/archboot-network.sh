@@ -48,13 +48,12 @@ _wireless() {
     _CONTINUE=""
     while [[ -z "${_CONTINUE}" ]]; do
         # scan the area
-        _dialog --title " Network Configuration " --no-mouse --infobox "Scanning for SSIDs with interface ${_INTERFACE}..." 3 50
+        _dialog --title " Network Configuration " --no-mouse --infobox "Scanning for SSIDs with interface ${_INTERFACE}..." 3 60
         iwctl station "${_INTERFACE}" scan &>"${_NO_LOG}"
         sleep 5
         #shellcheck disable=SC2086,SC2046
         if _dialog --cancel-label "${_LABEL}" --title " SSID Scan Result " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
-        $(_essid_list _) \
-        "HIDDEN" "SSID" "RESCAN" "SSIDs" 2>"${_ANSWER}"; then
+            "RESCAN" "SSIDs" "HIDDEN" "SSID" $(_essid_list _) 2>"${_ANSWER}"; then
             _WLAN_SSID=$(cat "${_ANSWER}")
             _CONTINUE=1
             if grep -q 'RESCAN' "${_ANSWER}"; then
@@ -82,7 +81,7 @@ _wireless() {
         _WLAN_KEY=$(cat "${_ANSWER}")
     fi
     # time to connect
-    _dialog --title " Network Configuration " --no-mouse --infobox "Connecting to SSID='${_WLAN_SSID}' with interface ${_INTERFACE}..." 3 70
+    _dialog --title " Network Configuration " --no-mouse --infobox "Connecting to '${_WLAN_SSID}' with interface ${_INTERFACE}..." 4 60
     _printk off
     if [[ -z "${_WLAN_KEY}" ]]; then
         iwctl station "${_INTERFACE}" "${_WLAN_CONNECT}" "${_WLAN_SSID}" &>"${_NO_LOG}" && _WLAN_AUTH=1
@@ -92,11 +91,11 @@ _wireless() {
     sleep 3
     _printk on
     if [[ -n "${_WLAN_AUTH}" ]]; then
-        _dialog --title " Network Configuration " --no-mouse --infobox "Authentification to SSID='${_WLAN_SSID}' was successful." 3 70
+        _dialog --title " Network Configuration " --no-mouse --infobox "Authentification to '${_WLAN_SSID}' was successful." 3 70
         sleep 2
         return 0
     else
-        _dialog --title " ERROR " --no-mouse --infobox "Authentification to SSID='${_WLAN_SSID}' failed. Please configure again!" 3 70
+        _dialog --title " ERROR " --no-mouse --infobox "Authentification to ${_WLAN_SSID}' failed. Please configure again!" 3 70
         sleep 5
         return 1
     fi
