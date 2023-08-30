@@ -49,7 +49,7 @@ _vconsole_keymap() {
     fi
 }
 
-_task() {
+_localize_task() {
     echo "LANG=${_LOCALE}.UTF-8" > /etc/locale.conf
     echo "LANG=${_LOCALE}.UTF-8" > /.localize
     echo LC_COLLATE=C >> /etc/locale.conf
@@ -71,7 +71,7 @@ _task() {
 
 _run() {
     : >/.archboot
-    _task &
+    _localize_task &
     _progress_wait "0" "99" "Using ${_LOCALE}.UTF-8 and ${_KEYMAP}..." "0.01"
     _progress "100" "Localization completed successfully."
     sleep 2

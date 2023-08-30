@@ -129,13 +129,10 @@ _create_initramfs() {
     rm "${_W_DIR}"/.archboot
 }
 
-_download_latest() {
-    # Download latest setup and quickinst script from git repository
-    [[ -d "${_INST}" ]] || mkdir "${_INST}"
+_download_latest_task() {
     # config
     wget -q "${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
     # helper binaries
-    _progress "25" "Downloading latest scripts..."
     # main binaries
     _SCRIPTS="quickinst setup clock launcher localize network pacsetup update copy-mountpoint rsync-backup restore-usbstick"
     for i in ${_SCRIPTS}; do
@@ -151,7 +148,6 @@ _download_latest() {
         [[ -e "${_HELP}/${i}" ]] && wget -q "${_SOURCE}${_HELP}/${i}?inline=false" -O "${_HELP}/${i}"
     done
     # main libs
-    _progress "50" "Downloading latest script libs..."
     LIBS="basic-common.sh common.sh container.sh release.sh iso.sh login.sh cpio.sh"
     for i in ${LIBS}; do
         wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
@@ -167,7 +163,6 @@ _download_latest() {
         wget -q "${_SOURCE}${_RUN}/${i}?inline=false" -O "${_RUN}/${i}"
     done
     # setup libs
-    _progress "75" "Downloading latest setup libs..."
     LIBS="autoconfiguration.sh quicksetup.sh base.sh blockdevices.sh bootloader.sh \
             bootloader_sb.sh bootloader_grub.sh bootloader_uki.sh bootloader_systemd_bootd.sh \
             bootloader_limine.sh bootloader_pacman_hooks.sh bootloader_refind.sh \
@@ -176,7 +171,16 @@ _download_latest() {
     for i in ${LIBS}; do
         wget -q "${_SOURCE}${_INST}/${i}?inline=false" -O "${_INST}/${i}"
     done
-    _progress "100" "Downloading scripts done."
+    rm /.archboot
+}
+
+_download_latest() {
+    # Download latest setup and quickinst script from git repository
+    [[ -d "${_INST}" ]] || mkdir "${_INST}"
+    : > /.archboot
+    _download_latest_task &
+    _progress_wait "0" "99" "Downloading latest GIT..." "0.01"
+    _progress "100" "Downloading... done."
     sleep 2
 }
 
