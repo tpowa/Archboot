@@ -72,7 +72,7 @@ _enable_testing() {
     fi
 }
 
-_task_running_pacman_keyring() {
+_task_pacman_keyring_install() {
     # pacman-key process itself
     while pgrep -x pacman-key &>"${_NO_LOG}"; do
         sleep 1
@@ -82,10 +82,6 @@ _task_running_pacman_keyring() {
         sleep 1
     done
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
-    rm /.archboot
-}
-
-_task_pacman_keyring_install() {
     _KEYRING="archlinux-keyring"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
@@ -94,11 +90,9 @@ _task_pacman_keyring_install() {
 }
 _prepare_pacman() {
     : > /.archboot
-    _task_running_pacman_keyring &
-    _progress_wait "0" "49" "Waiting for Arch Linux keyring initialization..." "0.001"
-    : > /.archboot
     _task_pacman_keyring_install &
-    _progress_wait "50" "99" "Update Arch Linux keyring..." "0.1"
+    _progress_wait "0" "99" "Update Arch Linux keyring..." "0.001"
+    _task_pacman_keyring_install &
     _progress "100" "Arch Linux keyring is ready."
     sleep 2
 }
