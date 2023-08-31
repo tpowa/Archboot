@@ -31,7 +31,7 @@ _essid_scan() {
         sleep 1
         _COUNT=$((_COUNT+1))
         # abort after 5 seconds
-        _progress "$((_COUNT*5))" "Scanning $((5-_COUNT)) second(s) for SSIDs with interface ${_INTERFACE}..."
+        _progress "$((_COUNT*20))" "Scanning $((5-_COUNT)) second(s) for SSIDs with interface ${_INTERFACE}..."
         [[ "${_COUNT}" == 5 ]] && break
     done
 }
@@ -60,7 +60,7 @@ _wireless() {
     _CONTINUE=""
     while [[ -z "${_CONTINUE}" ]]; do
         # scan the area
-        _essid_scan | _dialog --title " Network Configuration " --no-mouse --gauge "Scanning 5 second(s) for SSIDs with interface ${_INTERFACE}..." 3 60
+        _essid_scan | _dialog --title " Network Configuration " --no-mouse --gauge "Scanning 5 second(s) for SSIDs with interface ${_INTERFACE}..." 5 60
         #shellcheck disable=SC2086,SC2046
         if _dialog --cancel-label "${_LABEL}" --title " SSID Scan Result " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
             "RESCAN" "SSIDs" "HIDDEN" "SSID" $(_essid_list _) 2>"${_ANSWER}"; then
