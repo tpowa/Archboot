@@ -4,11 +4,15 @@
 . /usr/lib/archboot/basic-common.sh
 _TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Pacman Configuration"
 
-_download_mirror() {
-    sleep 1
-    _progress "50" "${_DOWNLOAD}"
+_task_download_mirror() {
     ${_DLPROG} "https://www.archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
-    sleep 1
+    rm /.archboot
+}
+
+_download_mirror() {
+    : > /.archboot
+    _task_download_mirror &
+    _progress_wait "0" "99" "${_DOWNLOAD}" "0.01"
     _progress "100" "${_DOWNLOAD}"
     sleep 2
 }
