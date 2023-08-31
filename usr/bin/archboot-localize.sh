@@ -72,7 +72,7 @@ _localize_task() {
 _run() {
     : >/.archboot
     _localize_task &
-    _progress_wait "0" "99" "Using ${_LOCALE}.UTF-8 and ${_KEYMAP}..." "0.01"
+    _progress_wait "0" "99" "Using ${_LOCALE}.UTF-8 and ${_KEYMAP}..." "0.25"
     _progress "100" "Localization completed successfully."
     sleep 2
 }
