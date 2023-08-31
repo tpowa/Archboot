@@ -180,7 +180,7 @@ _download_latest() {
     : > /.archboot
     _download_latest_task &
     _progress_wait "0" "99" "Downloading latest GIT..." "0.2"
-    _progress "100" "Downloading... done."
+    _progress "100" "Download finished."
     sleep 2
 }
 
