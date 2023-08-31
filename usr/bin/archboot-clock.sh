@@ -78,7 +78,7 @@ _auto_clock() {
     : > /.archboot
     _task_clock &
     _progress_wait "0" "99" "Using ${_ZONE} and enable NTP timesyncd..." "0.001"
-    _progress "100" "Clock ${_ZONE} configuration completed successfully."
+    _progress "100" "Clock configuration completed successfully."
     sleep 2
 }
 
@@ -87,7 +87,7 @@ _SET_TIME=""
 # automatic setup
 if ping -c1 www.google.com &>"${_NO_LOG}"; then
     _ZONE="$(curl -s "http://ip-api.com/csv/?fields=timezone")"
-    _auto_clock |  _dialog --title " Clock Configuration " --no-mouse --gauge "Using ${_ZONE} and enable NTP timesyncd..." 6 60 0
+    _auto_clock |  _dialog --title " Clock Configuration " --no-mouse --gauge "Using ${_ZONE} and enable NTP timesyncd..." 6 70 0
     _SET_TIME="1"
 fi
 while [[ -z "${_SET_TIME}" ]]; do
