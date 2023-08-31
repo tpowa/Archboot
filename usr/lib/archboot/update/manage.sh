@@ -200,12 +200,12 @@ _new_environment() {
     : > "${_W_DIR}"/.archboot
     _collect_files &
     _progress_wait "50" "83" "Collecting rootfs files in ${_W_DIR}..." "1"
-    _progress "84" "Cleanup ${_W_DIR}..."
+    _progress "84" "Moving kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
+    # use ramfs to get immediate free space on file deletion
     mkdir "${_RAM}"
     mount -t ramfs none "${_RAM}"
-    _progress "85" "Moving kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
-    # use ramfs to get immediate free space on file deletion
     mv "${_W_DIR}/boot/${_VMLINUZ}" "${_RAM}/"
+    _progress "85" "Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
     _ram_check
