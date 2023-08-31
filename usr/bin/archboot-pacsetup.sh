@@ -100,7 +100,6 @@ _update_environment() {
     _UPDATE_ENVIRONMENT=""
     _LOCAL_KERNEL=""
     _ONLINE_KERNEL=""
-    sleep 2
     pacman -Sy &>"${_LOG}"
     _progress "50" "Checking on new online kernel version..."
     #shellcheck disable=SC2086
@@ -118,11 +117,11 @@ _update_environment() {
             _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
         fi
     fi
-    sleep 2
+    sleep 1
     echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
     if [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
         _progress "98" "No new kernel online available. Skipping update environment."
-        sleep 2
+        sleep 1
         _progress "100" "Pacman configuration completed successfully."
         sleep 2
     else
