@@ -103,12 +103,11 @@ _prepare_pacman() {
     sleep 2
 }
 
-_update_environment() {
+_task_update_environment() {
     _UPDATE_ENVIRONMENT=""
     _LOCAL_KERNEL=""
     _ONLINE_KERNEL=""
     pacman -Sy &>"${_LOG}"
-    _progress "50" "Checking on new online kernel version..."
     #shellcheck disable=SC2086
     _LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
     if  [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
@@ -124,7 +123,12 @@ _update_environment() {
             _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
         fi
     fi
-    sleep 1
+    rm /.archboot
+}
+_update_environment() {
+    : > /.archboot
+    _task_update_environment &
+    _progress_wait "0" " 97" "Checking on new online kernel version..." "0.01"
     echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
     if [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
         _progress "98" "No new kernel online available. Skipping update environment."
@@ -178,7 +182,7 @@ if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]] &&\
     update | grep -q '\-latest' &&\
     [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]] &&\
     ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-        _update_environment | _dialog --title " Pacman Configuration " --no-mouse --gauge "Refreshing pacman package database..." 6 70 0
+        _update_environment | _dialog --title " Pacman Configuration " --no-mouse --gauge "Checking on new online kernel version..." 6 70 0
         if [[ -e /.new_kernel ]]; then
             _dialog --title " New Kernel Available " --defaultno --yesno "Do you want to update the Archboot Environment to $(cat /.new_kernel)?\n\nATTENTION:\nThis will reboot the system using kexec!" 9 60 && _UPDATE_ENVIRONMENT=1
             if [[ -n "${_UPDATE_ENVIRONMENT}" ]]; then
