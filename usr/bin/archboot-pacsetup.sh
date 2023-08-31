@@ -165,7 +165,7 @@ EOF
         fi
         _select_mirror
     fi
-    if _prepare_pacman | _dialog --title " Pacman Configuration " --no-mouse --gauge "Waiting for Arch Linux keyring initialization..." 6 70 0; then
+    if _prepare_pacman | _dialog --title " Pacman Configuration " --no-mouse --gauge "Update Arch Linux keyring..." 6 70 0; then
         break
     else
         _dialog --title " ERROR " --no-mouse --infobox "Please reconfigure pacman." 3 40
