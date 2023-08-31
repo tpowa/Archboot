@@ -91,7 +91,7 @@ _task_pacman_keyring_install() {
 _prepare_pacman() {
     : > /.archboot
     _task_pacman_keyring_install &
-    _progress_wait "0" "99" "Update Arch Linux keyring..." "0.1"
+    _progress_wait "0" "99" "Update Arch Linux keyring..." "0.25"
     _progress "100" "Arch Linux keyring is ready."
     sleep 2
 }
@@ -121,7 +121,7 @@ _task_update_environment() {
 _update_environment() {
     : > /.archboot
     _task_update_environment &
-    _progress_wait "0" " 97" "Checking on new online kernel version..." "0.05"
+    _progress_wait "0" " 97" "Checking on new online kernel version..." "0.025"
     echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
     if [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
         _progress "98" "No new kernel online available. Skipping update environment."
