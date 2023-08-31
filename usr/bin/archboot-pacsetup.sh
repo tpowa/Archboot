@@ -95,10 +95,10 @@ _task_pacman_keyring_install() {
 _prepare_pacman() {
     : > /.archboot
     _task_running_pacman_keyring &
-    _progress_wait "0" "49" "Waiting for Arch Linux keyring initialization..." "0.01"
+    _progress_wait "0" "49" "Waiting for Arch Linux keyring initialization..." "0.001"
     : > /.archboot
     _task_pacman_keyring_install &
-    _progress_wait "50" "99" "Update Arch Linux keyring..." "0.01"
+    _progress_wait "50" "99" "Update Arch Linux keyring..." "0.05"
     _progress "100" "Arch Linux keyring is ready."
     sleep 2
 }
