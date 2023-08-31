@@ -72,7 +72,7 @@ _enable_testing() {
     fi
 }
 
-_prepare_pacman() {
+_task_running_pacman_keyring() {
     # pacman-key process itself
     while pgrep -x pacman-key &>"${_NO_LOG}"; do
         sleep 1
@@ -82,18 +82,25 @@ _prepare_pacman() {
         sleep 1
     done
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
-    _progress "50" "Update Arch Linux keyring..."
+    rm /.archboot
+}
+
+_task_pacman_keyring_install() {
     _KEYRING="archlinux-keyring"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
-    if ! pacman -Sy --noconfirm --noprogressbar ${_KEYRING} &>"${_LOG}"; then
-        _dialog --title " ERROR " --no-mouse --infobox "Keyring update failed! Check ${_LOG} for errors." 3 60
-        sleep 5
-        return 1
-    else
-        _progress "100" "Arch Linux keyring is ready."
-        sleep 2
-    fi
+    pacman -Sy --noconfirm --noprogressbar ${_KEYRING} &>"${_LOG}"
+    rm /.archboot
+}
+_prepare_pacman() {
+    : > /.archboot
+    _task_running_pacman_keyring &
+    _progress_wait "0" "49" "Waiting for Arch Linux keyring initialization..." "0.01"
+    : > /.archboot
+    _task_pacman_keyring_install &
+    _progress_wait "50" "99" "Update Arch Linux keyring..." "0.01"
+    _progress "100" "Arch Linux keyring is ready."
+    sleep 2
 }
 
 _update_environment() {
