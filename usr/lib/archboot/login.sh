@@ -131,17 +131,6 @@ if ! [[ -e /.vconsole-run ]]; then
     echo FONT=ter-v${SIZE}n >>/etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
 fi
-if ! [[ -e /.clean-pacman-db ]]; then
-    : > /.clean-pacman-db
-    _RM_PACMAN_DB="base grub libxml2 icu gettext refind amd-ucode intel-ucode edk2-shell \
-        libisoburn libburn libisofs mkinitcpio memtest linux-api-headers jansson libwbclient \
-        libbsd libmd libpcap libnftnl libnfnetlink libnetfilter_conntrack libsasl libldap memtest86+ \
-        memtest86+-efi mkinitcpio-busybox mtools libsysprof-capture libnsl libksba gdbm binutils \
-        cdrtools systemd-ukify python python-pefile limine man-pages libev libpipeline groff db db5.3"
-    for i in ${_RM_PACMAN_DB}; do
-        rm -rf /var/lib/pacman/local/"${i}"-[0-9]* &>"${_NO_LOG}"
-    done
-fi
 
 if [[ "${TTY}" = "tty1" ]] ; then
     if ! mount | grep -q zram0; then
