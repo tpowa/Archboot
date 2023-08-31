@@ -165,7 +165,7 @@ _network() {
             _DNS=$(cat "${_ANSWER}")
         fi
         # http/ftp proxy settings
-        _dialog --no-cancel --title " Proxy Server " --inputbox "\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 12 65 "" 2>"${_ANSWER}"
+        _dialog --no-cancel --title " Proxy Server " --inputbox "\nhttp://name:port\nhttp://ip:port\nhttp://username:password@ip:port\n\n Leave the field empty if no proxy is needed to install." 13 65 "" 2>"${_ANSWER}"
         _PROXY=$(cat "${_ANSWER}")
         _PROXIES="http_proxy https_proxy ftp_proxy rsync_proxy HTTP_PROXY HTTPS_PROXY FTP_PROXY RSYNC_PROXY"
         _dialog --title " Summary " --yesno "Interface:    ${_INTERFACE}\nConnection:   ${_CONNECTION}\nNetwork profile: ${_NETWORK_PROFILE}\nSSID:      ${_WLAN_SSID}\nHidden:     ${_WLAN_HIDDEN}\nKey:        ${_WLAN_KEY}\ndhcp or static: ${_IP}\nIP address: ${_IPADDR}\nGateway:    ${_GW}\nDNS server: ${_DNS}\nProxy setting: ${_PROXY}" 0 0 && _NETPARAMETERS=1
