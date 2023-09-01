@@ -143,10 +143,10 @@ _firefox_flags() {
             cat << EOF >> /usr/lib/firefox/browser/defaults/preferences/vendor.js
 pref("browser.aboutwelcome.enabled", false, locked);
 pref("browser.startup.homepage_override.once", false, locked);
-pref("datareporting.policy.firstRunURL", "https://wiki.archlinux.org", locked);
+pref("datareporting.policy.firstRunURL", "https://wiki.archlinux.org/title/Installation_guide", locked);
 pref("browser.startup.homepage", "https://archboot.com|https://wiki.archlinux.org|https://wiki.archlinux.org/title/Installation_guide", locked);
 pref("browser.startup.firstrunSkipsHomepage"; true, locked);
-pref("startup.homepage_welcome_url", "https://archboot.com", locked );
+pref("startup.homepage_welcome_url", "https://archboot.com|https://wiki.archlinux.org", locked );
 EOF
         fi
     fi
