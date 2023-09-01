@@ -40,6 +40,14 @@ _root_check() {
 }
 
 ### check for x86_64
+_archboot_check() {
+if ! grep -qw 'archboot' /etc/hostname; then
+    echo "This script should only be run in booted archboot environment. Aborting..."
+    exit 1
+fi
+}
+
+### check for x86_64
 _x86_64_check() {
     if ! [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         echo "ERROR: Pleae run on x86_64 hardware."

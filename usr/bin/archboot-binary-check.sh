@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
+. /usr/lib/archboot/common.sh
 _APPNAME=${0##*/}
 _usage () {
     echo "Check on missing binaries in archboot environment"
@@ -12,10 +13,7 @@ _usage () {
     exit 0
 }
 [[ -z "${1}" ]] && _usage
-if [[ ! "$(cat /etc/hostname)" == "archboot" ]]; then
-    echo "This script should only be run in booted archboot environment. Aborting..."
-    exit 1
-fi
+_archboot_check
 # update pacman db first
 pacman -Sy
 if [[ "${1}" == "base" ]]; then

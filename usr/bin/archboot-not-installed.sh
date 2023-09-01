@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
-if [[ ! "$(cat /etc/hostname)" == "archboot" ]]; then
-    echo "This script should only be run in booted archboot environment. Aborting..."
-    exit 1
-fi
+. /usr/lib/archboot/common.sh
+_archboot_check
 rm -r /usr/share/licenses
 pacman -Sy
 pacman -Q | cut -d ' ' -f1 >packages.txt
