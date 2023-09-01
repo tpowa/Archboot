@@ -2,6 +2,8 @@ On the road to 2023.09:
 Environment:
 config:
 - removed SERVER_PUBLIC usage
+login:
+- moved pacman db cleanup to base_common hook
 network:
 - fixed menu size in PROXY dialog
 ---
