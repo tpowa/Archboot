@@ -13,7 +13,8 @@ AddIcon (IMG,/db.png) .db .files .db.tar.gz .files.tar.gz
 AddIcon (IMG,/boot.png) .efi .img -x86_64 -aarch64 -riscv64 -aarch64.gz
 AddIcon (IMG,/iso.png) .iso
 AddIcon (IMG,/text.png) .txt LICENSE .amd-ucode
-AddIcon (DIR,/directory.png)    ^^DIRECTORY^^
+AddIcon (DIR,/directory.png) ^^DIRECTORY^^
+AddBlankIcon /blank.png ^^BLANKICON^^
 AddIcon /up.png ..
 HeaderName /header.html
 IndexStyleSheet "/styles.css"
