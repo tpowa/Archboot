@@ -196,7 +196,7 @@ build ()
     add_file "/usr/share/archboot/base/etc/systemd/system/pacman-init.service" "/etc/systemd/system/pacman-init.service"
     map add_full_dir "/usr/share/pacman/keyrings" "/usr/share/makepkg"
     # add local installed pacman database in container mode
-    if [[ "$(cat /etc/hostname )" == "archboot" ]]; then
+    if grep -qw 'archboot' /etc/hostname; then
         add_full_dir "/var/lib/pacman/local"
         _RM_PACMAN_DB="base grub libxml2 icu gettext refind amd-ucode intel-ucode edk2-shell \
             libisoburn libburn libisofs mkinitcpio memtest linux-api-headers jansson libwbclient \
