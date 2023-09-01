@@ -2,13 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
-_archboot_check() {
-    if ! grep -qw "archboot" /etc/hostname; then
-        echo "This script should only be run in booted archboot environment. Aborting..."
-        exit 1
-    fi
-}
-
 _ram_check() {
     while true; do
         # continue when 1 GB RAM is free
