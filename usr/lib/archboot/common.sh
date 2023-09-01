@@ -39,7 +39,7 @@ _root_check() {
     fi
 }
 
-### check for archboot
+### check for archboot environment
 _archboot_check() {
 if ! grep -qw 'archboot' /etc/hostname; then
     echo "This script should only be run in booted archboot environment. Aborting..."
