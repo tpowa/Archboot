@@ -1,4 +1,9 @@
 On the road to 2023.09:
+Environment:
+config:
+- removed SERVER_PUBLIC usage
+network:
+- fixed menu size in PROXY dialog
 ---
 2023.08 Highlights:
 - systemd 254.x
