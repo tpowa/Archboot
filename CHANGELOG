@@ -1,5 +1,6 @@
 On the road to 2023.09:
 Environment:
+- fixed mouse input devices
 config:
 - removed SERVER_PUBLIC usage
 login:
