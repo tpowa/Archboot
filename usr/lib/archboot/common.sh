@@ -141,7 +141,7 @@ _container_check() {
 
 ### check for tpowa's build server
 _buildserver_check() {
-    if [[ ! "$(cat /etc/hostname)" == "T-POWA-LX" ]]; then
+    if ! grep -qw 'T-POWA-LX' /etc/hostname; then
         echo "This script should only be run on tpowa's build server. Aborting..."
         exit 1
     fi
