@@ -173,7 +173,7 @@ fi
 echo "Initializing Console..."
 printf "\ec"
 setfont consolefont-${SIZE}.psf.gz -C /dev/console
-_second_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Removing files..." 6 75 60
+_second_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Removing files..." 6 75 0
 echo 0 > /proc/sys/kernel/sysrq
 # set font size in vconsole.conf
 echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
