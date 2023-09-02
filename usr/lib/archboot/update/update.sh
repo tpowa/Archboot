@@ -22,8 +22,9 @@ _LOG="/dev/tty11"
 _NO_LOG="/dev/null"
 _VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
 _VC="VC${_VC_NUM}"
-[[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="vmlinuz-linux"
-[[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="Image"
+if [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]]; then
+    _VMLINUZ="$(echo /usr/lib/modules/*/vmlinuz)"
+[[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="/boot/Image"
 _MENU_TITLE=" Logging to ${_VC} | ${_LOG} "
 
 _graphic_options() {
