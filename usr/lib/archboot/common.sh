@@ -100,10 +100,6 @@ _progress_wait() {
         if [[ "${_COUNT}" -gt "${2}" ]]; then
             _progress "${2}"  "${3}"
         fi
-        # abort after 15 minutes
-        if [[ "${_COUNT}" -gt 150 ]]; then
-            exit 1
-        fi
         _COUNT="$((_COUNT+1))"
         sleep "${4}"
     done
