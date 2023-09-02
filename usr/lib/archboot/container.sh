@@ -79,8 +79,11 @@ _clean_mkinitcpio() {
     echo "Cleaning mkinitcpio from ${1}..."
     [[ -e "${1}/usr/share/libalpm/hooks/60-mkinitcpio-remove.hook" ]] && rm "${1}/usr/share/libalpm/hooks/60-mkinitcpio-remove.hook"
     [[ -e "${1}/usr/share/libalpm/hooks/90-mkinitcpio-install.hook" ]] && rm "${1}/usr/share/libalpm/hooks/90-mkinitcpio-install.hook"
-    [[ -e "${1}/boot/initramfs-linux.img" ]] && rm "${1}/boot/initramfs-linux.img"
-    [[ -e "${1}/boot/initramfs-linux-fallback.img" ]] && rm "${1}/boot/initramfs-linux-fallback.img"
+    # aarch64 kernel installs hooks too!
+    if [[ -e "${1}/usr/bin/mkinitcpio" ]]; then
+        rm "${1}/usr/bin/mkinitcpio"
+        ln -s "/usr/bin/true" "${1}/usr/bin/mkinitcpio"
+    fi
 }
 
 _prepare_pacman() {
