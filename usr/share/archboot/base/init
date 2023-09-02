@@ -76,6 +76,7 @@ _first_stage() {
     : >/.archboot
     _task kernel &
     _progress_wait "0" "100" "${_KEEP} Loading files..." "0.33"
+    _progress "100" "${_KEEP}"
 }
 # avoid screen messup, don't run dialog on module loading!
 _udev_stage() {
