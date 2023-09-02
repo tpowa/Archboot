@@ -187,7 +187,7 @@ fi
 if [[ -z "${_KERNEL}" ]]; then
     msg "Autodetecting kernel from: /etc/archboot/presets/${_RUNNING_ARCH}"
     . /etc/archboot/presets/${_RUNNING_ARCH}
-    if [[ ! -f "${ALL_kver}" ]]; then
+    if [[ ! -f "$(echo "${ALL_kver}")" ]]; then
         die "specified kernel image does not exist!"
     fi
     _KERNELVERSION="$(_kver ${ALL_kver})"
