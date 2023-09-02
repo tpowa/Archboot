@@ -1,5 +1,6 @@
 On the road to 2023.09:
 Environment:
+- mount initrd outside of dialog progressbar
 - added mouse input devices
 - added systemd launch message
 - smooth early userspace console resetting
