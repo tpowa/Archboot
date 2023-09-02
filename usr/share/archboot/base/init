@@ -21,6 +21,21 @@ ${2}
 XXX
 EOF
 }
+# $1: start percentage $2: end percentage $3: message $4: sleep time
+_progress_wait() {
+    _COUNT=${1}
+    while true; do
+        if [[ "${_COUNT}" -lt "${2}" ]]; then
+            _progress "${_COUNT}" "${3}"
+        fi
+        if [[ "${_COUNT}" -gt "${2}" ]]; then
+            _progress "${2}" "${3}"
+        fi
+        _COUNT="$((_COUNT+1))"
+        read -r -t "${4}"
+        ! [[ -e /.archboot ]] && break
+    done
+}
 _task() {
     [[ "${1}" == kernel ]] && bsdcpio -u -i "*/lib/modules/"  "*/lib/firmware/" <"/mnt/boot/initrd-$(uname -m).img" &>/dev/null
     if [[ "${1}" == cleanup ]]; then
@@ -54,21 +69,6 @@ _task() {
         umount -q -A UUID=1234-ABCD 2>/dev/null
     fi
     rm /.archboot
-}
-# $1: start percentage $2: end percentage $3: message $4: sleep time
-_progress_wait() {
-    _COUNT=${1}
-    while true; do
-        if [[ "${_COUNT}" -lt "${2}" ]]; then
-            _progress "${_COUNT}" "${3}"
-        fi
-        if [[ "${_COUNT}" -gt "${2}" ]]; then
-            _progress "${2}" "${3}"
-        fi
-        _COUNT="$((_COUNT+1))"
-        read -r -t "${4}"
-        ! [[ -e /.archboot ]] && break
-    done
 }
 _first_stage() {
     cd /
