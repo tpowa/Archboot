@@ -40,6 +40,8 @@ _create_container() {
 }
 
 _network_check() {
+    # wait 10 seconds for dhcp
+    sleep 10
     if ! getent hosts www.google.com &>"${_NO_LOG}"; then
         clear
         echo -e "\e[91mAborting:\e[m"
