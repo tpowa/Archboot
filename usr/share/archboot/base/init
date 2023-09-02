@@ -75,7 +75,7 @@ _first_stage() {
     # move in modules from main initrd
     : >/.archboot
     _task kernel &
-    _progress_wait "0" "99" "${_KEEP} Loading files..." "0.33"
+    _progress_wait "0" "99" "${_KEEP} Loading files..." "0.5"
     _progress "100" "${_KEEP}"
 }
 _udev_stage() {
