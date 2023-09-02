@@ -1,14 +1,16 @@
 On the road to 2023.09:
 Environment:
-- fixed mouse input devices
+- added mouse input devices
+- added systemd launch message
+- smooth early userspace console resetting
 config:
 - removed SERVER_PUBLIC usage
 login:
-- moved pacman db cleanup to base_common hook
+- moved pacman db cleanup from login to base_common hook
 network:
 - fixed menu size in PROXY dialog
 firefox:
-- fixed 1st startup with homepage|wiki|Installation guide
+- fixed first startup with homepage|wiki|Installation guide
 ---
 2023.08 Highlights:
 - systemd 254.x
