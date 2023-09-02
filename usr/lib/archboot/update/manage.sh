@@ -202,13 +202,13 @@ _new_environment() {
     [[ -d "${_W_DIR}" ]] || mkdir -p "${_W_DIR}"
     : > "${_W_DIR}"/.archboot
     _create_container &
-    _progress_wait "2" "55" "Generating container in ${_W_DIR}..." "5"
+    _progress_wait "2" "62" "Generating container in ${_W_DIR}..." "5"
     _clean_kernel_cache
     _ram_check
     # write initramfs to "${_ROOTFS_DIR}
     : > "${_W_DIR}"/.archboot
     _collect_files &
-    _progress_wait "56" "83" "Collecting rootfs files in ${_W_DIR}..." "5"
+    _progress_wait "63" "83" "Collecting rootfs files in ${_W_DIR}..." "5"
     _progress "84" "Moving kernel ${_VMLINUZ} to ${_RAM}/${_VMLINUZ}..."
     # use ramfs to get immediate free space on file deletion
     mkdir "${_RAM}"
