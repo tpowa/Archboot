@@ -3,11 +3,11 @@ Environment:
 - added mouse input devices
 - added systemd launch message
 - smooth early userspace console resetting
-- removed progress waiting dialog on latest and local image
 config:
 - removed SERVER_PUBLIC usage
 login:
 - moved pacman db cleanup from login to base_common hook
+- removed progress waiting dialog on latest and local image
 network:
 - fixed menu size in PROXY dialog
 firefox:
