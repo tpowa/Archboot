@@ -94,6 +94,7 @@ _gpg_check() {
     if [[ -e /etc/systemd/system/pacman-init.service ]]; then
         systemctl stop pacman-init.service
     fi
+    rm /.archboot
 }
 
 _clean_kernel_cache () {
@@ -191,7 +192,10 @@ _download_latest() {
 
 _new_environment() {
     _kill_w_dir
-    _gpg_check
+    : > /.archboot
+    _gpg_check &
+    _progress_wait "0" "99" "Waiting for pacman keyring..." "0.75"
+    _progress "100" "Pacman keyring initialized."
     _progress "1" "Removing files from /..."
     _clean_archboot
     _clean_kernel_cache
