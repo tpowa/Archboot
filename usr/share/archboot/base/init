@@ -159,7 +159,7 @@ if ! [[ -f "/mnt/boot/initrd-$(uname -m).img" ]] ; then
         echo b >/proc/sysrq-trigger
     fi
 fi
-_first_stage | _dialog --title  " Loading Early Modules... " --gauge "${_KEEP} Loading files..." 6 75 0
+_first_stage | _dialog --title  " Loading Kernel Modules " --gauge "${_KEEP} Loading files..." 6 75 0
 _udev_stage
 FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
 if [[ "${FB_SIZE}" -gt '1900' ]]; then
@@ -171,7 +171,7 @@ fi
 echo "Initializing Console..."
 printf "\ec"
 setfont consolefont-${SIZE}.psf.gz -C /dev/console
-_second_stage | _dialog --title " Initializing System... " --gauge "${_KEEP} Removing files..." 6 75 60
+_second_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Removing files..." 6 75 60
 echo 0 > /proc/sys/kernel/sysrq
 # set font size in vconsole.conf
 echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
