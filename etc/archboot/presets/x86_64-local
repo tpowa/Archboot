@@ -4,5 +4,5 @@
 MKINITCPIO_CONFIG="/etc/archboot/x86_64-local.conf"
 
 # kernel version, defaulted to build for runtime kernel
-ALL_kver="/boot/vmlinuz-linux"
+ALL_kver="/usr/lib/modules/*/vmlinuz"
 # vim: set ft=sh ts=4 sw=4 et:
