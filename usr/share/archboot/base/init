@@ -23,13 +23,6 @@ EOF
 }
 _task() {
     [[ "${1}" == kernel ]] && bsdcpio -u -i "*/lib/modules/"  "*/lib/firmware/" <"/mnt/boot/initrd-$(uname -m).img" &>/dev/null
-    if [[ "${1}" == udev ]]; then
-        udevadm control -R
-        _udev_trigger
-        # shutdown udevd
-        udevadm control --exit
-        udevadm info --cleanup-db
-    fi
     if [[ "${1}" == cleanup ]]; then
         rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,platform,net,scsi,soc,spi,usb,video} /lib/modules/*/extramodules
         # keep ethernet NIC firmware
@@ -82,15 +75,21 @@ _first_stage() {
     # move in modules from main initrd
     : >/.archboot
     _task kernel &
-    _progress_wait "0" "96" "${_KEEP} Copying files..." "0.33"
+    _progress_wait "0" "100" "${_KEEP} Loading files..." "0.33"
     # reinitialize available modules
-    : >/.archboot
-    _task udev &
-    _progress_wait "97" "100" "${_KEEP} Loading kernel modules..." "0.33"
+}
+_udev_stage() {
+    printf "\ec"
+    udevadm control -R
+    _udev_trigger
+    # shutdown udevd
+    udevadm control --exit
+    udevadm info --cleanup-db
 }
 _second_stage() {
     : >/.archboot
     _task cleanup &
+    read -t 1
     _progress_wait "0" "3" "${_KEEP} Removing files..." "0.125"
     : >/.archboot
     _task system &
@@ -160,7 +159,8 @@ if ! [[ -f "/mnt/boot/initrd-$(uname -m).img" ]] ; then
         echo b >/proc/sysrq-trigger
     fi
 fi
-_first_stage | _dialog --title  " Loading Kernel And Modules... " --gauge "${_KEEP} Copying files..." 6 75 0
+_first_stage | _dialog --title  " Loading Early Modules... " --gauge "${_KEEP} Loading files..." 6 75 0
+_udev_stage
 FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
 if [[ "${FB_SIZE}" -gt '1900' ]]; then
     SIZE="32"
@@ -176,6 +176,7 @@ echo 0 > /proc/sys/kernel/sysrq
 # set font size in vconsole.conf
 echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
 printf "\ec"
+echo "Launching systemd..."
 exec switch_root /sysroot /usr/bin/init "$@"
 
 # vim: set ft=sh ts=4 sw=4 et:
