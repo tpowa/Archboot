@@ -92,24 +92,6 @@ _run_latest_install() {
 _run_update_installer() {
     cd /
     if [[ "${TTY}" == "tty1" ]]; then
-        _COUNT=0
-        _TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | New Environment"
-        : >/.archboot
-        while true; do
-            sleep 1
-            _COUNT=$((_COUNT+1))
-            # abort after 10 seconds
-            _progress "$((_COUNT*10))" "Waiting $((10-_COUNT)) second(s) to stop the process with CTRL-C..."
-            if [[ "${_COUNT}" == 10 ]]; then
-                rm /.archboot
-                break
-            fi
-        done | _dialog --title " Stop Processing? " --no-mouse --gauge "Waiting 10 seconds to stop the process with CTRL-C..." 6 60 0
-        if [[ -f /.archboot ]]; then
-            rm /.archboot
-            clear
-            exit 1
-        fi
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 ]]; then
             _run_latest
         else
