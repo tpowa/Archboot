@@ -78,9 +78,7 @@ _first_stage() {
     _progress_wait "0" "99" "${_KEEP} Loading files..." "0.33"
     _progress "100" "${_KEEP}"
 }
-# avoid screen messup, don't run dialog on module loading!
 _udev_stage() {
-    printf "\ec"
     udevadm control -R
     _udev_trigger
     # shutdown udevd
@@ -160,6 +158,8 @@ if ! [[ -f "/mnt/boot/initrd-$(uname -m).img" ]] ; then
     fi
 fi
 _first_stage | _dialog --title " Loading Kernel Modules " --gauge "${_KEEP} Loading files..." 6 75 0
+# avoid screen messup, don't run dialog on module loading!
+printf "\ec"
 # reinitialize available modules
 _udev_stage
 # autodetect screen size
