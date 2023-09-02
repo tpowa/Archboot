@@ -126,7 +126,7 @@ echo "Initializing Console..."
 printf "\ec"
 # it needs one echo before, in order to reset the consolefont!
 setfont consolefont-16.psf.gz -C /dev/console
-echo "Searching 10 seconds for archboot rootfs..."
+echo "Searching 10 seconds for Archboot $(uname -m) rootfs..."
 _COUNT=0
 while true; do
     # dd / rufus
