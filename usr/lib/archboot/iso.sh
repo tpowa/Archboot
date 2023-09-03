@@ -82,7 +82,7 @@ _prepare_kernel_initrd_files() {
     fi
     echo "Running archboot-cpio.sh for initrd-${_ARCH}.img..."
     #shellcheck disable=SC2154
-    archboot-cpio.sh -c "${MKINITCPIO_CONFIG}" -k "${KERNEL}" -g "${_ISODIR}/boot/initrd-${_ARCH}.img" || exit 1
+    archboot-cpio.sh -c "${_CONFIG}" -k "${KERNEL}" -g "${_ISODIR}/boot/initrd-${_ARCH}.img" || exit 1
     # delete cachedir on archboot environment
     if grep -qw 'archboot' /etc/hostname; then
         if [[ -d "${_CACHEDIR}" ]]; then
