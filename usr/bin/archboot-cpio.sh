@@ -186,15 +186,15 @@ fi
 [[ -e /dev/fd ]] || die "/dev must be mounted!"
 ! . "$_f_config" 2>"${_NO_LOG}" && die "Failed to read configuration '%s'" "$_f_config"
 if [[ -z "${KERNEL}" ]]; then
-    msg "Fallback to kernel from ${_RUNNING_ARCH}"
+    msg "Trying to autodetect ${_RUNNING_ARCH} kernel..."
     [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && KERNEL="/usr/lib/modules/*/vmlinuz"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && KERNEL="/boot/Image.gz"
 fi
 # allow * in config
 KERNEL="$(echo ${KERNEL})"
-msg "Using specified kernel: ${KERNEL}"
+msg "Using kernel: ${KERNEL}"
 if [[ ! -f "${KERNEL}" ]]; then
-    die "specified kernel image does not exist!"
+    die "kernel image does not exist!"
 fi
 _KERNELVERSION="$(_kver ${KERNEL})"
 _d_kmoduledir="/lib/modules/${_KERNELVERSION}"
