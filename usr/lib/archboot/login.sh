@@ -54,7 +54,6 @@ if [[ "${TTY}" = "tty1" ]]; then
     read -r -t 1
     # fix clear screen on all terminals
     printf "\ec" | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
-    echo "Launching systemd $(udevadm --version)..."
     # https://www.freedesktop.org/software/systemd/man/bootup.html
     # enable systemd  initrd functionality
     : > /etc/initrd-release
@@ -128,7 +127,7 @@ fi
 if [[ "${TTY}" = "tty1" ]] ; then
     if ! mount | grep -q zram0; then
         _TITLE="Archboot $(uname -m) | Basic Setup | ZRAM"
-        _switch_root_zram | _dialog --title " Initializing System... " --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
+        _switch_root_zram | _dialog --title " Initializing System " --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
     else
         if ! [[ -e "${_CACHEDIR}/archboot.db" ]]; then
             systemctl start systemd-networkd
