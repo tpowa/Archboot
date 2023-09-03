@@ -154,7 +154,7 @@ _download_latest_task() {
         [[ -e "${_HELP}/${i}" ]] && wget -q "${_SOURCE}${_HELP}/${i}?inline=false" -O "${_HELP}/${i}"
     done
     # main libs
-    LIBS="basic-common.sh common.sh container.sh release.sh iso.sh login.sh cpio.sh"
+    LIBS="common.sh container.sh release.sh iso.sh login.sh cpio.sh"
     for i in ${LIBS}; do
         wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
     done

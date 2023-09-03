@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
-. /usr/lib/archboot/basic-common.sh
+. /usr/lib/archboot/basic.sh
 _TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Pacman Configuration"
 
 _task_download_mirror() {

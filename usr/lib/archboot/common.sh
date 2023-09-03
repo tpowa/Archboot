@@ -6,6 +6,11 @@ _BASENAME=${0##*/}
 _RUNNING_ARCH="$(uname -m)"
 _LOG="/dev/tty11"
 _NO_LOG="/dev/null"
+_ANSWER="/.$(basename "${0}")"
+_LABEL="Exit"
+_DLPROG="wget -q"
+_MIRRORLIST="/etc/pacman.d/mirrorlist"
+_KERNELPKG="linux"
 _KEYRING="archlinux-keyring"
 if echo "${_BASENAME}" | grep -qw aarch64; then
     _ARCHBOOT="archboot-arm"
@@ -71,13 +76,13 @@ _riscv64_check() {
     fi
 }
 
+# returns: whatever dialog did
 _dialog() {
-    dialog --backtitle "${_TITLE}" "$@"
+    dialog --backtitle "${_TITLE}" --aspect 15 "$@"
     return $?
 }
 
-# $1: percentage
-# $2: message
+# $1: percentage $2: message
 _progress() {
 cat <<EOF
 XXX
@@ -87,10 +92,7 @@ XXX
 EOF
 }
 
-# $1: start percentage
-# $2: end percentage
-# $3: message
-# $4: sleep time
+# $1: start percentage $2: end percentage $3: message $4: sleep time
 _progress_wait() {
     _COUNT=${1}
     while [[ -e "${_W_DIR}/.archboot" || -e /.archboot ]]; do
@@ -103,6 +105,51 @@ _progress_wait() {
         _COUNT="$((_COUNT+1))"
         sleep "${4}"
     done
+}
+
+_show_login() {
+    [[ -e "/.${_ANSWER}-running" ]] && rm "/.${_ANSWER}-running"
+    clear
+    echo ""
+    agetty --show-issue
+    echo ""
+    cat /etc/motd
+}
+
+_abort() {
+    if _dialog --yesno "Abort$(echo "${_TITLE}" | cut -d '|' -f3) ?" 5 45; then
+        [[ -e "${_ANSWER}-running" ]] && rm "${_ANSWER}-running"
+        [[ -e "${_ANSWER}" ]] && rm "${_ANSWER}"
+        clear
+        exit 1
+    else
+        _CONTINUE=""
+    fi
+}
+
+_check() {
+    if [[ -e "${_ANSWER}-running" ]]; then
+        clear
+        echo "${0} already runs on a different console!"
+        echo "Please remove ${_ANSWER}-running first to launch ${0}!"
+        exit 1
+        fi
+    : >"${_ANSWER}"
+    : >"${_ANSWER}-running"
+}
+
+_cleanup() {
+    [[ -e "${_ANSWER}-running" ]] && rm "${_ANSWER}-running"
+    clear
+    exit 0
+}
+
+_run_update_environment() {
+    if update | grep -q latest-install; then
+        update -latest-install
+    else
+        update -latest
+    fi
 }
 
 _kver() {
