@@ -14,8 +14,8 @@ else
     _KERNEL="boot/vmlinuz-${_ARCH}"
     _KERNEL_ARCHBOOT="boot/vmlinuz-${_ARCH}"
 fi
-_PRESET_LATEST="${_ARCH}-latest"
-_PRESET_LOCAL="${_ARCH}-local"
+_PRESET_LATEST="${_ARCH}-latest.conf"
+_PRESET_LOCAL="${_ARCH}-local.conf"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 
 _usage () {
@@ -34,8 +34,8 @@ _create_iso() {
     # create container
     archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
     _create_archboot_db "${_W_DIR}${_CACHEDIR}"
-    . ${_W_DIR}/etc/archboot/presets/${_ARCH}
-    _KERNEL_VERSION="$(${_NSPAWN} "${_W_DIR}" /bin/bash -c "ALL_kver="$(echo ${ALL_kver})";. /usr/lib/archboot/common.sh; _kver ${ALL_kver}")"
+    . ${_W_DIR}/etc/archboot/${_ARCH}.conf
+    _KERNEL_VERSION="$(${_NSPAWN} "${_W_DIR}" /bin/bash -c "KERNEL="$(echo ${KERNEL})";. /usr/lib/archboot/common.sh; _kver ${KERNEL}")"
     _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_KERNEL_VERSION}"
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
@@ -51,18 +51,18 @@ _create_iso() {
         #    wget -q "https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig" -P "${_W_DIR}/var/cache/pacman/pkg"
         #fi
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -s \
-            -p=${_PRESET_LOCAL} -i=${_ISONAME}-local-${_ARCH}" || exit 1
+            -c=${_CONFIG_LOCAL} -i=${_ISONAME}-local-${_ARCH}" || exit 1
         echo "Generating latest ISO..."
         # generate latest iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g \
-            -p=${_PRESET_LATEST} -i=${_ISONAME}-latest-${_ARCH}" || exit 1
+            -c=${_CONFIG_LATEST} -i=${_ISONAME}-latest-${_ARCH}" || exit 1
         echo "Installing lvm2 to container ${_W_DIR}..."
         ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>"${_NO_LOG}"
     fi
     echo "Generating normal ISO..."
     # generate iso in container
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g -s \
-        -i=${_ISONAME}-${_ARCH}"  || exit 1
+        -i=${_ISONAME}-${_ARCH}" || exit 1
     # move iso out of container
     mv "${_W_DIR}"/*.iso ./ &>"${_NO_LOG}"
     mv "${_W_DIR}"/*.img ./ &>"${_NO_LOG}"

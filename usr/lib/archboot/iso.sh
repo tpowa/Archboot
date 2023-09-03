@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
-_PRESET_DIR="/etc/archboot/presets"
+_CONFIG_DIR="/etc/archboot"
 _ISODIR="$(mktemp -d ISODIR.XXX)"
 
 _usage () {
@@ -11,9 +11,9 @@ _usage () {
     echo "This will create an archboot iso image."
     echo ""
     echo " -g                  Starting generation of image."
-    echo " -p=PRESET           Which preset should be used."
-    echo "                     /etc/archboot/presets locates the presets"
-    echo "                     default=${_ARCH}"
+    echo " -c=CONFIG           Which CONFIG should be used."
+    echo "                     /etc/archboot/ locates the configs"
+    echo "                     default=${_ARCH}.conf"
     echo " -i=IMAGENAME        Your IMAGENAME."
     echo " -s                  Save init ramdisk to $(pwd)"
     echo " -h                  This message."
@@ -38,13 +38,13 @@ _parameters() {
 
 _config() {
     # set defaults, if nothing given
-    [[ -z "${_PRESET}" ]] && _PRESET="${_ARCH}"
-    _PRESET="${_PRESET_DIR}/${_PRESET}"
+    [[ -z "${_CONFIG}" ]] && _CONFIG="${_ARCH}.conf"
+    _CONFIG="${_CONFIG_DIR}/${_CONFIG}"
     #shellcheck disable=SC1090
-    source "${_PRESET}"
-    ALL_kver=$(echo ${ALL_kver})
+    . "${_CONFIG}"
+    KERNEL="$(echo ${KERNEL})"
     #shellcheck disable=SC2154
-    [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver "${ALL_kver}")-${_ARCH}"
+    [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver "${KERNEL}")-${_ARCH}"
 }
 
 ### EFI status of RISCV64:
@@ -63,17 +63,17 @@ _prepare_kernel_initrd_files() {
     # needed to hash the kernel for secureboot enabled systems
     echo "Preparing kernel..."
     if [[ "${_ARCH}" == "x86_64" || "${_ARCH}" == "riscv64" ]]; then
-        install -m644 "${ALL_kver}" "${_ISODIR}/boot/vmlinuz-${_ARCH}"
+        install -m644 "${KERNEL}" "${_ISODIR}/boot/vmlinuz-${_ARCH}"
     fi
     if [[ "${_ARCH}" == "aarch64" ]]; then
-        install -m644 "${ALL_kver}" "${_ISODIR}/boot/Image-${_ARCH}.gz"
+        install -m644 "${KERNEL}" "${_ISODIR}/boot/Image-${_ARCH}.gz"
     fi
     if [[ -f "./init-${_ARCH}.img" ]]; then
         echo "Using existing init-${_ARCH}.img..."
         cp "./init-${_ARCH}.img" "${_ISODIR}/boot/"
     else
         echo "Running archboot-cpio.sh for init-${_ARCH}.img..."
-        archboot-cpio.sh -c "/etc/archboot/${_ARCH}-init.conf" -k "${ALL_kver}" -g "${_ISODIR}/boot/init-${_ARCH}.img" || exit 1
+        archboot-cpio.sh -c "/etc/archboot/${_ARCH}-init.conf" -k "${KERNEL}" -g "${_ISODIR}/boot/init-${_ARCH}.img" || exit 1
         # save init ramdisk for further images
         if [[ -n "${_SAVE_INIT}" ]]; then
             cp "${_ISODIR}/boot/init-${_ARCH}.img" ./
@@ -82,7 +82,7 @@ _prepare_kernel_initrd_files() {
     fi
     echo "Running archboot-cpio.sh for initrd-${_ARCH}.img..."
     #shellcheck disable=SC2154
-    archboot-cpio.sh -c "${MKINITCPIO_CONFIG}" -k "${ALL_kver}" -g "${_ISODIR}/boot/initrd-${_ARCH}.img" || exit 1
+    archboot-cpio.sh -c "${MKINITCPIO_CONFIG}" -k "${KERNEL}" -g "${_ISODIR}/boot/initrd-${_ARCH}.img" || exit 1
     # delete cachedir on archboot environment
     if grep -qw 'archboot' /etc/hostname; then
         if [[ -d "${_CACHEDIR}" ]]; then

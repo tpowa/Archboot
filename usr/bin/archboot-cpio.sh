@@ -152,7 +152,7 @@ while :; do
             ;;
         -k|--kernel)
             shift
-            _KERNEL="$1"
+            KERNEL="$1"
             ;;
         -d|--generatedir)
             shift
@@ -184,28 +184,24 @@ fi
 # use in mkinitcpio. Avoids issues like FS#26344.
 [[ -e /proc/self/mountinfo ]] || die "/proc must be mounted!"
 [[ -e /dev/fd ]] || die "/dev must be mounted!"
-if [[ -z "${_KERNEL}" ]]; then
-    msg "Autodetecting kernel from: /etc/archboot/presets/${_RUNNING_ARCH}"
-    . /etc/archboot/presets/${_RUNNING_ARCH}
-    # allow * in config
-    ALL_kver="$(echo ${ALL_kver})"
-    if [[ ! -f "${ALL_kver}" ]]; then
-        die "specified kernel image does not exist!"
-    fi
-    _KERNELVERSION="$(_kver ${ALL_kver})"
+! . "$_f_config" 2>"${_NO_LOG}" && die "Failed to read configuration '%s'" "$_f_config"
+if [[ -z "${KERNEL}" ]]; then
+    msg "Autodetecting kernel from ${_RUNNING_ARCH}"
+    [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && KERNEL="/usr/lib/modules/*/vmlinuz"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && KERNEL="/boot/Image.gz"
+     # allow * in config
+    KERNEL="$(echo ${KERNEL})"
 else
-    msg "Using specified kernel: ${_KERNEL}"
-    if [[ ! -f "${_KERNEL}" ]]; then
-        die "specified kernel image does not exist!"
-    fi
-    _KERNELVERSION="$(_kver ${_KERNEL})"
+    msg "Using specified kernel: ${KERNEL}"
 fi
+if [[ ! -f "${KERNEL}" ]]; then
+    die "specified kernel image does not exist!"
+fi
+_KERNELVERSION="$(_kver ${KERNEL})"
 _d_kmoduledir="/lib/modules/${_KERNELVERSION}"
 [[ -d "$_d_kmoduledir" ]] || die "'$_d_kmoduledir' is not a valid kernel module directory"
 _d_workdir="$(initialize_buildroot "${_KERNELVERSION}" "$_opttargetdir")" || exit 1
 BUILDROOT="${_opttargetdir:-$_d_workdir/root}"
-# shellcheck source=mkinitcpio.conf
-! . "$_f_config" 2>"${_NO_LOG}" && die "Failed to read configuration '%s'" "$_f_config"
 _hooks=("${HOOKS[@]}")
 if (( ${#_hooks[*]} == 0 )); then
     die "Invalid config: No hooks found"
