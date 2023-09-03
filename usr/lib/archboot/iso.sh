@@ -27,7 +27,7 @@ _parameters() {
         case ${1} in
             -g|--g) export _GENERATE="1" ;;
             -s|--s) _SAVE_INIT="1" ;;
-            -p=*|--p=*) _PRESET="$(echo "${1}" | awk -F= '{print $2;}')" ;;
+            -c=*|--c=*) _CONFIG="$(echo "${1}" | awk -F= '{print $2;}')" ;;
             -i=*|--i=*) _IMAGENAME="$(echo "${1}" | awk -F= '{print $2;}')" ;;
             -h|--h|?) _usage ;;
             *) _usage ;;
