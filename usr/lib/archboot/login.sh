@@ -32,27 +32,29 @@ if [[ "${TTY}" = "tty1" ]]; then
     echo "1" >/sys/block/zram0/reset
     echo "zstd" >/sys/block/zram0/comp_algorithm
     echo "5G" >/sys/block/zram0/disksize
-    _progress "33" "Creating btrfs on /dev/zram0..."
+    _progress "1" "Creating btrfs on /dev/zram0..."
     mkfs.btrfs /dev/zram0 &>"${_NO_LOG}"
     mount -o discard /dev/zram0 /sysroot &>"${_NO_LOG}"
-    _progress "66" "Removing firmware and modules..."
+    _progress "3" "Removing firmware and modules..."
     # cleanup firmware and modules
     mv /lib/firmware/regulatory* /tmp/
     rm -rf /lib/firmware/*
     mv /tmp/regulatory* /lib/firmware/
     rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,platform,net,scsi,soc,spi,usb,video}
     rm -rf /lib/modules/*/extramodules
-    _progress "75" "Copying archboot rootfs to /sysroot..."
-    tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
+    : > /.archboot
+    (tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
         --exclude="./run/*" --exclude="./mnt/*" --exclude="./tmp/*" --exclude="./sysroot/*" \
-        -clpf - . | tar -C /sysroot -xlspf - &>"${_NO_LOG}"
+        -clpf - . | tar -C /sysroot -xlspf - &>"${_NO_LOG}"; rm /.archboot) &
+    _progress_wait "4" "99" "Copying archboot rootfs to /sysroot..." "0.125"
     # cleanup mkinitcpio directories and files
     rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>"${_NO_LOG}"
     rm -f /sysroot/{VERSION,config,buildconfig,init} &>"${_NO_LOG}"
     _progress "100" "System is ready."
-    read -r -t 2
+    read -r -t 1
     # fix clear screen on all terminals
     printf "\ec" | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
+    echo "Launching systemd $(udevadm --version)..."
     # https://www.freedesktop.org/software/systemd/man/bootup.html
     # enable systemd  initrd functionality
     : > /etc/initrd-release
