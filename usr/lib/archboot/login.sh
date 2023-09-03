@@ -149,7 +149,7 @@ if [[ -e /usr/bin/setup ]]; then
     # localization, network, clock, pacman
     if ! [[ -e /.localize ]]; then
         localize
-        source /etc/locale.conf
+        . /etc/locale.conf
     fi
     if [[ ! -e /.network ]]; then
         network
