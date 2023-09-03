@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="./logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="./donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 01.09.2023 13:38</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 03.09.2023 16:17</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -1075,14 +1075,13 @@ The calculated size to boot the image follows the formula:<br>
 There are the following configuration files for ISO creation:
 <ul>
 <li><strong>/etc/archboot/defaults</strong>: defaults for packages, bootloader config and server setup.</li>
-<li><strong>/etc/archboot/presets/&lt;profile&gt;</strong>: presets for the images, defines which kernel and mkinitcpio.conf is used.</li>
-<li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the HOOKS, which are used for the initrd.</li>
+<li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the KERNEL and the HOOKS, which are used for the initrd.</li>
 </ul>
 <h4 data-number="7.2.3.3" id="archboot-cpio.sh"><span class="header-section-number">7.2.3.3</span> <strong>archboot-cpio.sh</strong></h4>
 <p>The archboot initrd toolchain uses its own cpio generator, which is mkinitcpio compatible and <strong>only</strong> uses the following options:</p>
 <ul>
 <li>Options supported in <strong>config</strong> files:<br>
-<strong>HOOKS, COMPRESSION, COMPRESSION_OPTIONS, MODULES_DECOMPRESS</strong></li>
+<strong>KERNEL, HOOKS, COMPRESSION, COMPRESSION_OPTIONS, MODULES_DECOMPRESS</strong></li>
 <li>Functions supported in <strong>HOOK</strong> files:<br>
 <strong>add_dir, add_full_dir, add_binary, add_file, add_symlink, add_module, add_all_modules</strong></li>
 </ul>
