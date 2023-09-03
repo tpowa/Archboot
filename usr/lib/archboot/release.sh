@@ -12,8 +12,8 @@ if [[ "${_ARCH}" == "aarch64" ]]; then
 else
     _KERNEL_ARCHBOOT="boot/vmlinuz-${_ARCH}"
 fi
-_PRESET_LATEST="${_ARCH}-latest.conf"
-_PRESET_LOCAL="${_ARCH}-local.conf"
+_CONFIG_LATEST="${_ARCH}-latest.conf"
+_CONFIG_LOCAL="${_ARCH}-local.conf"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 
 _usage () {

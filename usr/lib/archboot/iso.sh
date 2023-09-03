@@ -12,7 +12,7 @@ _usage () {
     echo ""
     echo " -g                  Starting generation of image."
     echo " -c=CONFIG           Which CONFIG should be used."
-    echo "                     /etc/archboot/ locates the configs"
+    echo "                     ${_CONFIG_DIR} locates the configs"
     echo "                     default=${_ARCH}.conf"
     echo " -i=IMAGENAME        Your IMAGENAME."
     echo " -s                  Save init ramdisk to $(pwd)"
