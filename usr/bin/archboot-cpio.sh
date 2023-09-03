@@ -191,7 +191,9 @@ if [[ -z "${KERNEL}" ]]; then
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && KERNEL="/boot/Image.gz"
      # allow * in config
     KERNEL="$(echo ${KERNEL})"
+    msg "Using kernel: ${KERNEL}"
 else
+    KERNEL="$(echo ${KERNEL})"
     msg "Using specified kernel: ${KERNEL}"
 fi
 if [[ ! -f "${KERNEL}" ]]; then
