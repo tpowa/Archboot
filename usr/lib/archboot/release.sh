@@ -8,10 +8,8 @@ _INITRD="boot/initrd-${_ARCH}.img"
 _INITRD_LATEST="boot/initrd-latest-${_ARCH}.img"
 _INITRD_LOCAL="boot/initrd-local-${_ARCH}.img"
 if [[ "${_ARCH}" == "aarch64" ]]; then
-    _KERNEL="boot/Image-${_ARCH}.gz"
     _KERNEL_ARCHBOOT="boot/Image-${_ARCH}.gz"
 else
-    _KERNEL="boot/vmlinuz-${_ARCH}"
     _KERNEL_ARCHBOOT="boot/vmlinuz-${_ARCH}"
 fi
 _PRESET_LATEST="${_ARCH}-latest.conf"
@@ -73,7 +71,7 @@ _create_iso() {
     if [[ "${_ARCH}" == "riscv64" ]]; then
         for i in *.img; do
             if  echo "${i}" | grep -v local | grep -vq latest; then
-                mcopy -m -i "${i}"@@1048576 ::/"${_KERNEL}" ./"${_KERNEL_ARCHBOOT}"
+                mcopy -m -i "${i}"@@1048576 ::/"${_KERNEL_ARCHBOOT}" ./"${_KERNEL_ARCHBOOT}"
                 mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD}"
             elif echo "${i}" | grep -q latest; then
                 mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD_LATEST}"
@@ -88,7 +86,7 @@ _create_iso() {
                 mcopy -m -i efi.img ::/"${_AMD_UCODE}" ./"${_AMD_UCODE}"
                 [[ "${_ARCH}" == "aarch64" ]] || mcopy -m -i efi.img ::/"${_INTEL_UCODE}" ./"${_INTEL_UCODE}"
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD}"
-                mcopy -m -i efi.img ::/"${_KERNEL}" ./"${_KERNEL_ARCHBOOT}"
+                mcopy -m -i efi.img ::/"${_KERNEL_ARCHBOOT}" ./"${_KERNEL_ARCHBOOT}"
             elif echo "${i}" | grep -q latest; then
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD_LATEST}"
