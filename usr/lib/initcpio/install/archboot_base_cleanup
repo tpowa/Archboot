@@ -28,12 +28,15 @@ build ()
           lzmainfo xzcmp gzexe uncompress zcmp zdiff zegrep zfgrep zforce zmore znew \
           bzdiff bzgrep bzip2recover bzmore chacl getfacl setfacl attr getfattr \
           setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 \
-          gunzip zcat wipe file blkpr fadvise isosize pg pipesz tunelp waitpid"
+          gunzip zcat wipe file blkpr fadvise isosize pg pipesz tunelp"
     if [[ "$(uname -m)" == "x86_64" ]]; then
-        apps="i386 x86_64 peekfd $apps"
+        apps="i386 x86_64 peekfd waitpid $apps"
     fi
     if [[ "$(uname -m)" == "aarch64" ]]; then
         apps="peekfd $apps"
+    fi
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        apps="waitpid $apps"
     fi
     for i in $apps; do
         rm /usr/bin/"$i"

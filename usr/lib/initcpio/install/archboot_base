@@ -28,11 +28,11 @@ build ()
           lzmainfo xzcmp xzgrep xzegrep xzfgrep gzexe uncompress zcmp zdiff zegrep zfgrep zforce zmore znew \
           bunzip2 bzcat bzdiff bzgrep bzip2recover bzmore chacl getfacl setfacl attr getfattr \
           setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 gunzip zcat wipe \
-          capsh getcap getpcaps setcap file blkpr fadvise isosize pg pipesz tunelp waitpid
+          capsh getcap getpcaps setcap file blkpr fadvise isosize pg pipesz tunelp
 
-    [[ "$(uname -m)" == "x86_64" ]] && map add_binary i386 x86_64 peekfd
+    [[ "$(uname -m)" == "x86_64" ]] && map add_binary i386 x86_64 peekfd waitpid
     [[ "$(uname -m)" == "aarch64" ]] && add_binary peekfd
-    
+    [[ "$(uname -m)" == "riscv64" ]] && map add_binary waitpid
     ### add C.UTF-8 locale
     add_dir /usr/lib/locale
     add_full_dir /usr/lib/locale/C.UTF-8
