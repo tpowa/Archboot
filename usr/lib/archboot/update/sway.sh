@@ -108,7 +108,7 @@ _install_sway() {
 _start_sway() {
     echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland \
         XKB_DEFAULT_LAYOUT=$(grep 'KEYMAP' /etc/vconsole.conf | cut -d '=' -f2 | sed -e 's#-.*##g') \
-        exec dbus-run-session sway >/dev/tty11 2>&1" > /usr/bin/sway-wayland
+        exec dbus-run-session sway >${_LOG} 2>&1" > /usr/bin/sway-wayland
     chmod 755 /usr/bin/sway-wayland
     sway-wayland
 }
