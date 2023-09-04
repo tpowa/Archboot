@@ -42,7 +42,7 @@ _config() {
     _CONFIG="${_CONFIG_DIR}/${_CONFIG}"
     #shellcheck disable=SC1090
     . "${_CONFIG}"
-    #shellcheck disable=SC2116
+    #shellcheck disable=SC2116,2086
     KERNEL="$(echo ${KERNEL})"
     #shellcheck disable=SC2154
     [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver "${KERNEL}")-${_ARCH}"

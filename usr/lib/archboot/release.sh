@@ -34,7 +34,7 @@ _create_iso() {
     _create_archboot_db "${_W_DIR}${_CACHEDIR}"
     #shellcheck disable=SC1090
     . "${_W_DIR}/etc/archboot/${_ARCH}.conf"
-    #shellcheck disable=SC2116,SC2046,SC2027
+    #shellcheck disable=SC2116,SC2046,SC2027,2086
     _KERNEL_VERSION="$(${_NSPAWN} "${_W_DIR}" /bin/bash -c "KERNEL="$(echo ${KERNEL})";. /usr/lib/archboot/common.sh; _kver ${KERNEL}")"
     _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_KERNEL_VERSION}"
     # riscv64 does not support kexec at the moment
