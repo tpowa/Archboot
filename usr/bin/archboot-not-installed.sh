@@ -3,6 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 _archboot_check
+# consider only license or locale as uninstalled
 rm -r /usr/share/{licenses,locale}
 pacman -Sy
 pacman -Q | cut -d ' ' -f1 >packages.txt
