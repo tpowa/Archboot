@@ -359,8 +359,8 @@ _grub_install_uefi_sb() {
         #    cp "/var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst" "${_DESTDIR}"
         #    cp "/var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig" "${_DESTDIR}"
         #else
-        #    ${_DLPROG} "https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst" -O "${_DESTDIR}"
-        #    ${_DLPROG} "https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig" -O "${_DESTDIR}"
+        #    ${_DLPROG} -O --output-dir ${_DESTDIR}" "https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst"
+        #    ${_DLPROG} -O --output-dir "${_DESTDIR} "https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig"
         #fi
         #${_NSPAWN} pacman -U --noconfirm /grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst >>"${_LOG}"
         #rm "${_DESTDIR}/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst"
