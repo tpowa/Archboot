@@ -90,6 +90,6 @@ _start_plasma() {
     sleep 2
     echo "export DESKTOP_SESSION=plasma" > /root/.xinitrc
     echo "exec startplasma-x11" >> /root/.xinitrc
-    startx >${_LOG} 2>&1
+    startx >"${_LOG}" 2>&1
 }
 # vim: set ft=sh ts=4 sw=4 et:

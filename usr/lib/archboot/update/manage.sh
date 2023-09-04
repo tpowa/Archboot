@@ -213,10 +213,11 @@ _new_environment() {
     # use ramfs to get immediate free space on file deletion
     mkdir "${_RAM}"
     mount -t ramfs none "${_RAM}"
-    [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="$(echo ${_W_DIR}/usr/lib/modules/*/vmlinuz)"
+    #shellcheck disable=SC2116
+    [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="$(echo "${_W_DIR}/usr/lib/modules/*/vmlinuz")"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="${_W_DIR}/boot/Image"
     mv "${_VMLINUZ}" "${_RAM}/"
-    _VMLINUZ="$(basename ${_VMLINUZ})"
+    _VMLINUZ="$(basename "${_VMLINUZ}")"
     _progress "85" "Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
@@ -227,8 +228,8 @@ _new_environment() {
         mv "${_ROOTFS_DIR}"/* "${_RAM}/"
         # cleanup mkinitcpio directories and files
         _progress "95" "Cleanup ${_RAM}..."
-        rm -rf ${_RAM}/{hooks,install,kernel,new_root,sysroot,mkinitcpio.*} &>"${_NO_LOG}"
-        rm -f ${_RAM}/{VERSION,config,buildconfig,init,${_VMLINUZ}} &>"${_NO_LOG}"
+        rm -rf "${_RAM}"/{hooks,install,kernel,new_root,sysroot,mkinitcpio.*} &>"${_NO_LOG}"
+        rm -f "${_RAM}"/{VERSION,config,buildconfig,init,"${_VMLINUZ}"} &>"${_NO_LOG}"
         _progress "100" "Switching to rootfs ${_RAM}..."
         sleep 2
         # https://www.freedesktop.org/software/systemd/man/bootup.html

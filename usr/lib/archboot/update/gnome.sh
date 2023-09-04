@@ -58,6 +58,6 @@ _start_gnome() {
     #shellcheck disable=SC2129
     echo "export GDK_BACKEND=x11" >> /root/.xinitrc
     echo "exec dbus-launch gnome-session" >> /root/.xinitrc
-    startx >${_LOG} 2>&1
+    startx >"${_LOG}" 2>&1
 }
 # vim: set ft=sh ts=4 sw=4 et:

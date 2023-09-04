@@ -18,7 +18,7 @@ _INST="/${_LIB}/installer"
 _HELP="/${_LIB}/installer/help"
 _RUN="/${_LIB}/run"
 _UPDATE="/${_LIB}/update"
-_VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
+_VC_NUM="$(basename "${_LOG}" | sed -e 's#tty##g')"
 _VC="VC${_VC_NUM}"
 _MENU_TITLE=" Logging to ${_VC} | ${_LOG} "
 

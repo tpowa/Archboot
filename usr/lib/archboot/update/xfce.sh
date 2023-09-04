@@ -247,6 +247,6 @@ EOF
 _start_xfce() {
     _progress "100" "Launching XFCE now, logging is done on ${_LOG}..."
     sleep 2
-    startxfce4 >${_LOG} 2>&1
+    startxfce4 >"${_LOG}" 2>&1
 }
 # vim: set ft=sh ts=4 sw=4 et:
