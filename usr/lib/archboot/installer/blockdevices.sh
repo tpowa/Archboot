@@ -565,6 +565,7 @@ _createpv()
         while [[ "${_DEV}" != "DONE" ]]; do
             _DEVNUMBER="$((_DEVNUMBER + 1))"
             # clean loop from used partition and options
+            #shellcheck disable=SC2001
             _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")##g")"
             # add more devices
             #shellcheck disable=SC2086
@@ -651,6 +652,7 @@ _createvg()
         while [[ "${_PVS}" != "DONE" ]]; do
             _PVNUMBER=$((_PVNUMBER + 1))
             # clean loop from used partition and options
+            #shellcheck disable=SC2001
             _PVS="$(echo "${_PVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")##g")"
             # add more devices
             #shellcheck disable=SC2086

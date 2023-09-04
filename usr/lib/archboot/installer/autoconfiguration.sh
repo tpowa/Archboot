@@ -209,7 +209,7 @@ _auto_hwdetect() {
     fi
     _progress "66" "Preconfiguring mkinitcpio settings on installed system..."
     # arrange MODULES for mkinitcpio.conf
-    _HWDETECTMODULES="$(hwdetect --kernel_directory="${_DESTDIR}" --kernel_version="${_HWKVER}" --hostcontroller --filesystem ${_FBPARAMETER})"
+    _HWDETECTMODULES="$(hwdetect --kernel_directory="${_DESTDIR}" --kernel_version="${_HWKVER}" --hostcontroller --filesystem "${_FBPARAMETER}")"
     # arrange HOOKS for mkinitcpio.conf
     _HWDETECTHOOKS="$(hwdetect --kernel_directory="${_DESTDIR}" --kernel_version="${_HWKVER}" --rootdevice="${_ROOTDEV}" --hooks-dir="${_DESTDIR}"/usr/lib/initcpio/install "${_HWPARAMETER}" --hooks)"
     # change mkinitcpio.conf
