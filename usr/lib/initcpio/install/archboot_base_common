@@ -223,10 +223,13 @@ build ()
     add_file /usr/share/ca-certificates/trust-source/mozilla.trust.p11-kit
     add_file /usr/share/p11-kit/modules/p11-kit-trust.module
 
-    ### remove conflicting mkinitcpio files and grub
+    ### remove conflicting grub, man-db and mkinitcpio files
     rm "${BUILDROOT}/usr/lib/systemd/system/mkinitcpio-generate-shutdown-ramfs.service" \
         "${BUILDROOT}/usr/lib/systemd/system/shutdown.target.wants/mkinitcpio-generate-shutdown-ramfs.service" \
         "${BUILDROOT}/usr/lib/systemd/ukify" \
+        "${BUILDROOT}"/usr/lib/systemd/system/man-db* \
+        "${BUILDROOT}"/usr/lib/systemd/system/timers.target.wants/man-db* \
+        "${BUILDROOT}"/usr/lib/tmpfiles.d/man-db* \
         "${BUILDROOT}/usr/lib/tmpfiles.d/mkinitcpio.conf" \
         "${BUILDROOT}/usr/share/bash-completion/completions/lsinitcpio" \
         "${BUILDROOT}/usr/share/bash-completion/completions/mkinitcpio" \
