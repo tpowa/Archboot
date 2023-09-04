@@ -190,7 +190,7 @@ if [[ -z "${KERNEL}" ]]; then
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && KERNEL="/boot/Image.gz"
 fi
 # allow * in config
-#shellcheck disable=SC2116
+#shellcheck disable=SC2116,2086
 KERNEL="$(echo ${KERNEL})"
 msg "Using kernel: ${KERNEL}"
 if [[ ! -f "${KERNEL}" ]]; then
