@@ -35,7 +35,7 @@ build ()
     if [[ "$(uname -m)" == "aarch64" ]]; then
         apps="peekfd $apps"
     fi
-    if [[ "$(uname -m)" == "x86_64" ]]; then
+    if [[ "$(uname -m)" == "riscv64" ]]; then
         apps="waitpid $apps"
     fi
     for i in $apps; do
