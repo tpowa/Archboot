@@ -8,7 +8,6 @@
 
 shopt -s extglob
 
-# shellcheck source=functions
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/cpio.sh
 # needed files/directories
@@ -191,12 +190,13 @@ if [[ -z "${KERNEL}" ]]; then
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && KERNEL="/boot/Image.gz"
 fi
 # allow * in config
-KERNEL="$(echo ${KERNEL})"
+#shellcheck disable=SC2116
+KERNEL="$(echo "${KERNEL}")"
 msg "Using kernel: ${KERNEL}"
 if [[ ! -f "${KERNEL}" ]]; then
     die "kernel image does not exist!"
 fi
-_KERNELVERSION="$(_kver ${KERNEL})"
+_KERNELVERSION="$(_kver "${KERNEL}")"
 _d_kmoduledir="/lib/modules/${_KERNELVERSION}"
 [[ -d "$_d_kmoduledir" ]] || die "'$_d_kmoduledir' is not a valid kernel module directory"
 _d_workdir="$(initialize_buildroot "${_KERNELVERSION}" "$_opttargetdir")" || exit 1

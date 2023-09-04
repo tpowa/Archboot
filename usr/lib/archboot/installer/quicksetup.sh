@@ -64,6 +64,10 @@ _auto_partition() {
 }
 
 _auto_create_filesystems() {
+    #shellcheck disable=SC2086
+    _COUNT=0
+    _MAX_COUNT=$(echo ${_FSSPECS} | wc -w)
+    _PROGRESS_COUNT=$((100/_MAX_COUNT))
     ## make and mount filesystems
     for fsspec in ${_FSSPECS}; do
         _DEV="${_DISK}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
@@ -337,10 +341,6 @@ _autoprepare() {
     else
         _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_BOOTDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
     fi
-    #shellcheck disable=SC2086
-    _MAX_COUNT=$(echo ${_FSSPECS} | wc -w)
-    _PROGRESS_COUNT=$((100/_MAX_COUNT))
-    _COUNT=0
     _auto_create_filesystems | _dialog --title " Filesystems " --no-mouse --gauge "Creating Filesystems on ${_DISK}..." 6 75 0
     _dialog --title " Success " --no-mouse --infobox "Quick Setup was successful." 3 40
     sleep 3
