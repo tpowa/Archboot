@@ -43,7 +43,7 @@ _clean_cache() {
 _pacman_chroot() {
     if ! [[ -f ${3} && -f ${3}.sig ]]; then
         echo "Downloading ${3}..."
-        ${_DLPROG} "${2}"/"${3}"{,.sig} -O ./
+        ${_DLPROG} -O "${2}"/"${3}"{,.sig}
     else
         echo "Using local ${3}..."
     fi
