@@ -5,7 +5,7 @@
 _TITLE="Archboot ${_RUNNING_ARCH} | Basic Setup | Pacman Configuration"
 
 _task_download_mirror() {
-    ${_DLPROG} "https://www.archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" -O /tmp/pacman_mirrorlist.txt
+    ${_DLPROG} -o /tmp/pacman_mirrorlist.txt "https://www.archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on"
     rm /.archboot
 }
 
