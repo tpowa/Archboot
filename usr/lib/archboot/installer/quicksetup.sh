@@ -64,8 +64,8 @@ _auto_partition() {
 }
 
 _auto_create_filesystems() {
-    #shellcheck disable=SC2086
     _COUNT=0
+    #shellcheck disable=SC2086
     _MAX_COUNT=$(echo ${_FSSPECS} | wc -w)
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     ## make and mount filesystems

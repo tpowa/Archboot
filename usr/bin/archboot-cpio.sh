@@ -116,7 +116,6 @@ build_image() {
 
 preload_builtin_modules() {
     local modname field value
-    local -a path
     # Prime the _addedmodules list with the builtins for this kernel.
     # kmod>=27 and kernel >=5.2 required!
     while IFS=.= read -rd '' modname field value; do
@@ -183,6 +182,7 @@ fi
 # use in mkinitcpio. Avoids issues like FS#26344.
 [[ -e /proc/self/mountinfo ]] || die "/proc must be mounted!"
 [[ -e /dev/fd ]] || die "/dev must be mounted!"
+#shellcheck disable="SC1090"
 ! . "$_f_config" 2>"${_NO_LOG}" && die "Failed to read configuration '%s'" "$_f_config"
 if [[ -z "${KERNEL}" ]]; then
     msg "Trying to autodetect ${_RUNNING_ARCH} kernel..."

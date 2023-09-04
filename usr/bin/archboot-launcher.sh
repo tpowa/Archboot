@@ -77,7 +77,7 @@ _exit() {
         _show_login
         exit 0
     elif [[ "${_EXIT}" == "2" ]]; then
-        COUNT=0
+        _COUNT=0
         while true; do
             sleep 1
             _COUNT=$((_COUNT+1))
@@ -87,7 +87,7 @@ _exit() {
         done | _dialog --title " System Reboot " --no-mouse --gauge "Rebooting in 10 seconds. Don't forget to remove the boot medium!" 6 75 0
         reboot
     elif [[ "${_EXIT}" == "3" ]]; then
-        COUNT=0
+        _COUNT=0
         while true; do
             sleep 1
             _COUNT=$((_COUNT+1))
