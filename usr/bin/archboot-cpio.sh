@@ -191,7 +191,7 @@ if [[ -z "${KERNEL}" ]]; then
 fi
 # allow * in config
 #shellcheck disable=SC2116
-KERNEL="$(echo "${KERNEL}")"
+KERNEL="$(echo ${KERNEL})"
 msg "Using kernel: ${KERNEL}"
 if [[ ! -f "${KERNEL}" ]]; then
     die "kernel image does not exist!"
