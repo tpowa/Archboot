@@ -4,7 +4,8 @@ Environment:
 - added mouse input devices
 - added systemd launch message
 - smooth early userspace console resetting
-- removed presets/, KERNEL is now set in .conf
+- removed presets/, KERNEL is now set in /etc/archboot/*.conf
+- better progressbar timings
 config:
 - removed SERVER_PUBLIC usage
 login:
