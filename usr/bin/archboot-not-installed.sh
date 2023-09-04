@@ -14,7 +14,7 @@ for i in $(cat packages.txt); do
         echo "${i}" >> uninstalled.orig.txt
     else
 		#shellcheck disable=SC2086
-        pacman -S ${i} --noconfirm --overwrite '*'
+        pacman -Sdd ${i} --noconfirm --overwrite '*'
     fi
 done
 # remove false positives
