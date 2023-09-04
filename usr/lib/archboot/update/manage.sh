@@ -213,8 +213,8 @@ _new_environment() {
     # use ramfs to get immediate free space on file deletion
     mkdir "${_RAM}"
     mount -t ramfs none "${_RAM}"
-    #shellcheck disable=SC2116
-    [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="$(echo "${_W_DIR}/usr/lib/modules/*/vmlinuz")"
+    #shellcheck disable=SC2116,2086
+    [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="$(echo ${_W_DIR}/usr/lib/modules/*/vmlinuz)"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="${_W_DIR}/boot/Image"
     mv "${_VMLINUZ}" "${_RAM}/"
     _VMLINUZ="$(basename "${_VMLINUZ}")"
