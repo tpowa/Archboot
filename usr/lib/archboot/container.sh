@@ -43,7 +43,7 @@ _clean_cache() {
 _pacman_chroot() {
     if ! [[ -f ${3} && -f ${3}.sig ]]; then
         echo "Downloading ${3}..."
-        wget "${2}"/"${3}"{,.sig} &>"${_NO_LOG}"
+        "${_DLPROG} ""${2}"/"${3}"{,.sig} &>"${_NO_LOG}"
     else
         echo "Using local ${3}..."
     fi

@@ -48,8 +48,8 @@ if [[ -n "${_DIR}" ]]; then
 ${NAME} 
 EOF
     # download MS Certificates, else EFI might get broken!
-    curl -s -L -O https://www.microsoft.com/pkiops/certs/MicWinProPCA2011_2011-10-19.crt
-    curl -s -L -O https://www.microsoft.com/pkiops/certs/MicCorUEFCA2011_2011-06-27.crt
+    "${_DLPROG}" -L -O https://www.microsoft.com/pkiops/certs/MicWinProPCA2011_2011-10-19.crt
+    "${_DLPROG}" -L -O https://www.microsoft.com/pkiops/certs/MicCorUEFCA2011_2011-06-27.crt
     sbsiglist --owner 77fa9abd-0359-4d32-bd60-28f4e78f784b --type x509 --output MS_Win_db.esl MicWinProPCA2011_2011-10-19.crt
     sbsiglist --owner 77fa9abd-0359-4d32-bd60-28f4e78f784b --type x509 --output MS_UEFI_db.esl MicCorUEFCA2011_2011-06-27.crt
     cat MS_Win_db.esl MS_UEFI_db.esl > MS_db.esl

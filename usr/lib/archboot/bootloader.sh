@@ -15,9 +15,9 @@ _GRUB_ISO="/usr/share/archboot/grub/archboot-iso-grub.cfg"
 _prepare_shim_files () {
     # download packages from fedora server
     echo "Downloading fedora shim..."
-    curl -s --create-dirs -L -O --output-dir "${_SHIM}" ${_SHIM_URL}/${_SHIM_RPM} || exit 1
-    curl -s --create-dirs -L -O --output-dir "${_SHIM32}" ${_SHIM_URL}/${_SHIM32_RPM} || exit 1
-    curl -s --create-dirs -L -O --output-dir "${_SHIMAA64}" ${_SHIM_URL}/${_SHIM_AA64_RPM} || exit 1
+    "${_DLPROG}" --create-dirs -L -O --output-dir "${_SHIM}" ${_SHIM_URL}/${_SHIM_RPM} || exit 1
+    "${_DLPROG}" --create-dirs -L -O --output-dir "${_SHIM32}" ${_SHIM_URL}/${_SHIM32_RPM} || exit 1
+    "${_DLPROG}" --create-dirs -L -O --output-dir "${_SHIMAA64}" ${_SHIM_URL}/${_SHIM_AA64_RPM} || exit 1
     # unpack rpm
     echo "Unpacking rpms..."
     bsdtar -C "${_SHIM}" -xf "${_SHIM}"/*.rpm

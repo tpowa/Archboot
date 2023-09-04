@@ -137,36 +137,36 @@ _create_initramfs() {
 
 _download_latest_task() {
     # config
-    wget -q "${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
+    "${_DLPROG} ""${_SOURCE}${_ETC}/defaults?inline=false" -O "${_ETC}/defaults"
     # helper binaries
     # main binaries
     _SCRIPTS="quickinst setup clock launcher localize network pacsetup update copy-mountpoint rsync-backup restore-usbstick"
     for i in ${_SCRIPTS}; do
-        [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
+        [[ -e "${_BIN}/${i}" ]] && "${_DLPROG} ""${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false" -O "${_BIN}/${i}"
     done
     _SCRIPTS="binary-check.sh not-installed.sh secureboot-keys.sh mkkeys.sh hwsim.sh cpio,sh"
     for i in ${_SCRIPTS}; do
-        [[ -e "${_BIN}/${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/${i}"
-        [[ -e "${_BIN}/archboot-${i}" ]] && wget -q "${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/archboot-${i}"
+        [[ -e "${_BIN}/${i}" ]] && "${_DLPROG} ""${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/${i}"
+        [[ -e "${_BIN}/archboot-${i}" ]] && "${_DLPROG} ""${_SOURCE}${_BIN}/archboot-${i}?inline=false" -O "${_BIN}/archboot-${i}"
     done
     _TXT="guid-partition.txt guid.txt luks.txt lvm2.txt mbr-partition.txt md.txt"
     for i in ${_TXT}; do
-        [[ -e "${_HELP}/${i}" ]] && wget -q "${_SOURCE}${_HELP}/${i}?inline=false" -O "${_HELP}/${i}"
+        [[ -e "${_HELP}/${i}" ]] && "${_DLPROG} ""${_SOURCE}${_HELP}/${i}?inline=false" -O "${_HELP}/${i}"
     done
     # main libs
     LIBS="common.sh container.sh release.sh iso.sh login.sh cpio.sh"
     for i in ${LIBS}; do
-        wget -q "${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
+        "${_DLPROG} ""${_SOURCE}${_LIB}/${i}?inline=false" -O "${_LIB}/${i}"
     done
     # update libs
     LIBS="update.sh manage.sh desktop.sh xfce.sh gnome.sh plasma.sh sway.sh"
     for i in ${LIBS}; do
-        wget -q "${_SOURCE}${_UPDATE}/${i}?inline=false" -O "${_UPDATE}/${i}"
+        "${_DLPROG} ""${_SOURCE}${_UPDATE}/${i}?inline=false" -O "${_UPDATE}/${i}"
     done
     # run libs
     LIBS="container.sh release.sh"
     for i in ${LIBS}; do
-        wget -q "${_SOURCE}${_RUN}/${i}?inline=false" -O "${_RUN}/${i}"
+        "${_DLPROG} ""${_SOURCE}${_RUN}/${i}?inline=false" -O "${_RUN}/${i}"
     done
     # setup libs
     LIBS="autoconfiguration.sh quicksetup.sh base.sh blockdevices.sh bootloader.sh \
@@ -175,7 +175,7 @@ _download_latest_task() {
             bootloader_systemd_services.sh bootloader_uboot.sh btrfs.sh common.sh \
             configuration.sh mountpoints.sh network.sh pacman.sh partition.sh storage.sh"
     for i in ${LIBS}; do
-        wget -q "${_SOURCE}${_INST}/${i}?inline=false" -O "${_INST}/${i}"
+        "${_DLPROG} ""${_SOURCE}${_INST}/${i}?inline=false" -O "${_INST}/${i}"
     done
     rm /.archboot
 }
