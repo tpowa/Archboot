@@ -40,7 +40,7 @@ echo "Starting container creation..."
 echo "Creating directory ${1}..."
 mkdir -p "${1}"/"${_PACMAN_ARCH}"
 echo "Downloading archlinux ${_ARCH}..."
-! [[ -f ${_ARCH_VERSION} ]] && ${_DLPROG} "${_LATEST_ARCH}" -O ./
+! [[ -f ${_ARCH_VERSION} ]] && ${_DLPROG} -O "${_LATEST_ARCH}"
 bsdtar -xf "${_ARCH_VERSION}" -C "${1}"
 echo "Removing installation tarball..."
 rm "${_ARCH_VERSION}"
