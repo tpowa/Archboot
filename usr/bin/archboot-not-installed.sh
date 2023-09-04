@@ -3,7 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 _archboot_check
-rm -r /usr/share/{licenses,locale}
+rm -r /usr/share/licenses
 pacman -Sy
 pacman -Q | cut -d ' ' -f1 >packages.txt
 #shellcheck disable=SC2013
