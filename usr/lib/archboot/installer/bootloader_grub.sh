@@ -246,7 +246,7 @@ _grub_install_bios() {
     rm /.archboot
 }
 
-_grub_bios() {
+_setup_grub_bios() {
     : > /.archboot
     _grub_install_bios &
     _progress_wait "11" "99" "Setting up GRUB(2) BIOS..." "0.15"
@@ -315,7 +315,7 @@ _grub_bios() {
         _dialog --msgbox "Error:\nGRUB(2) cannot boot from ${_BOOTDEV}, which contains /boot!\n\nPossible error sources:\n- encrypted devices are not supported" 0 0
         return 1
     fi
-    _grub_bios | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Setting up GRUB(2) BIOS..." 6 75 0
+    _setup_grub_bios | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Setting up GRUB(2) BIOS..." 6 75 0
     mkdir -p "${_DESTDIR}/boot/grub/locale"
     cp -f "${_DESTDIR}/usr/share/locale/en@quot/LC_MESSAGES/grub.mo" "${_DESTDIR}/boot/grub/locale/en.mo"
     if [[ -e "${_DESTDIR}/boot/grub/i386-pc/core.img" ]]; then
