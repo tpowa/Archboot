@@ -32,6 +32,7 @@ _create_iso() {
     # create container
     archboot-"${_ARCH}"-create-container.sh "${_W_DIR}" -cc --install-source="${2}" || exit 1
     _create_archboot_db "${_W_DIR}${_CACHEDIR}"
+    #shellcheck disable=SC1090
     . "${_W_DIR}/etc/archboot/${_ARCH}.conf"
     #shellcheck disable=SC2116,SC2046,SC2027
     _KERNEL_VERSION="$(${_NSPAWN} "${_W_DIR}" /bin/bash -c "KERNEL="$(echo "${KERNEL}")";. /usr/lib/archboot/common.sh; _kver ${KERNEL}")"

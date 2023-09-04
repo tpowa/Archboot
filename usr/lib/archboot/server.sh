@@ -24,6 +24,7 @@ _update_pacman_chroot() {
     [[ -f pacman-${_ARCH}-chroot-latest.tar.zst ]] && rm pacman-"${_ARCH}"-chroot-latest.tar.zst{,.sig} 2>"${_NO_LOG}"
     wget "${_ARCH_CHROOT_PUBLIC}"/"${_PACMAN_CHROOT}"{,.sig} &>"${_NO_LOG}"
     # verify download
+    #shellcheck disable=SC2024
     sudo -u "${_USER}" gpg --verify "${_PACMAN_CHROOT}.sig" &>"${_NO_LOG}" || exit 1
     bsdtar -C "${_ARCH_DIR}" -xf "${_PACMAN_CHROOT}" &>"${_NO_LOG}"
     echo "Removing installation tarball..."
