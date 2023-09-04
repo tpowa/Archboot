@@ -3,12 +3,12 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 _archboot_check
-rm -r /usr/share/licenses
+rm -r /usr/share/{licenses,locale}
 pacman -Sy
 pacman -Q | cut -d ' ' -f1 >packages.txt
 #shellcheck disable=SC2013
 for i in $(cat packages.txt); do
-    rm -r /var/lib/pacman/local/"${i}"*
+    rm -r /var/lib/pacman/local/"${i}"-*-*
 	#shellcheck disable=SC2086
     if pacman -Sdd ${i} --noconfirm 2>&1 >>log.txt; then
         echo "${i}" >> uninstalled.orig.txt
