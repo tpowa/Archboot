@@ -203,7 +203,7 @@ build ()
             libbsd libmd libpcap libnftnl libnfnetlink libnetfilter_conntrack libsasl libldap memtest86+ \
             memtest86+-efi mkinitcpio-busybox mtools libsysprof-capture libnsl libksba gdbm binutils \
             cdrtools systemd-ukify python python-pefile limine man-pages libev libpipeline groff \
-            man-db texinfo db db5.3 gc ca-certificates"
+            man-db texinfo db db5.3 gc"
         for i in ${_RM_PACMAN_DB}; do
             rm -rf "${BUILDROOT}"/var/lib/pacman/local/"${i}"-[0-9]* &>"${_NO_LOG}"
         done
