@@ -15,7 +15,7 @@ _EDITOR=""
 _LSBLK="lsblk -rpno"
 _BLKID="blkid -c ${_NO_LOG}"
 _FINDMNT="findmnt -vno SOURCE"
-_DLPROG="wget -q"
+_DLPROG="curl -s"
 
 _set_title() {
     if [[ "${_DESTDIR}" == "/" ]]; then
