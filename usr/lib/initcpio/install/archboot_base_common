@@ -71,7 +71,7 @@ build ()
         # remove conflicting files from not installed packages: binutils, grub and gdbm
         find "${BUILDROOT}/usr/share/locale/" -type f \( -name 'grub*' -o -name 'binutils*' -o -name 'gdbm*' -o -name 'bfd*' \
             -o -name 'gettext*' -o -name 'gas*' -o -name 'gold*' -o -name 'gprof*' -o -name 'ld*' \
-            -o -name 'opcodes*' \) -delete
+            -o -name 'man-db*' -o -name 'opcodes*' -o -name 'texinfo*' \) -delete
     fi
 
     ### add bash configuration
@@ -202,7 +202,8 @@ build ()
             libisoburn libburn libisofs mkinitcpio memtest linux-api-headers jansson libwbclient \
             libbsd libmd libpcap libnftnl libnfnetlink libnetfilter_conntrack libsasl libldap memtest86+ \
             memtest86+-efi mkinitcpio-busybox mtools libsysprof-capture libnsl libksba gdbm binutils \
-            cdrtools systemd-ukify python python-pefile limine man-pages libev libpipeline groff db db5.3"
+            cdrtools systemd-ukify python python-pefile limine man-pages libev libpipeline groff \
+            man-db texinfo db db5.3"
         for i in ${_RM_PACMAN_DB}; do
             rm -rf "${BUILDROOT}"/var/lib/pacman/local/"${i}"-[0-9]* &>"${_NO_LOG}"
         done
