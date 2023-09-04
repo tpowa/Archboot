@@ -62,14 +62,14 @@ build ()
         add_file /etc/locale.gen
         _LANG="be bg cs da de en el es fi fr hu it lt lv mk nl nn pl pt ro ru sk sr sv uk"
         for i in ${_LANG}; do
-            add_full_dir /usr/share/locale/${i}
+            add_full_dir "/usr/share/locale/${i}"
         done
         add_file /usr/share/locale/locale.alias
         add_full_dir /usr/share/i18n/locales
         # only support UTF-8
         add_file /usr/share/i18n/charmaps/UTF-8.gz
         # remove conflicting files from not installed packages: binutils, grub and gdbm
-        find ${BUILDROOT}/usr/share/locale/ -type f \( -name 'grub*' -o -name 'binutils*' -o -name 'gdbm*' -o -name 'bfd*' \
+        find "${BUILDROOT}/usr/share/locale/" -type f \( -name 'grub*' -o -name 'binutils*' -o -name 'gdbm*' -o -name 'bfd*' \
             -o -name 'gettext*' -o -name 'gas*' -o -name 'gold*' -o -name 'gprof*' -o -name 'ld*' \
             -o -name 'opcodes*' \) -delete
     fi
@@ -161,7 +161,7 @@ build ()
     # proc-sys-fs-binfmt_misc.automount
     add_symlink "/etc/systemd/system/proc-sys-fs-binfmt_misc.automount" "/dev/null"
     # remove multi-user.target.wants
-    rm -rf ${BUILDROOT}/etc/systemd/system/multi-user.target.wants
+    rm -rf "${BUILDROOT}/etc/systemd/system/multi-user.target.wants"
     # disable lastlog
     add_symlink "/var/log/lastlog" "/dev/null"
     add_file "/usr/share/archboot/base/etc/tmpfiles.d/var.conf" "/etc/tmpfiles.d/var.conf"
@@ -172,7 +172,7 @@ build ()
     map add_file "/usr/lib/libnss_compat.so.2" "/usr/lib/libnsl.so.1"
     ## fix for systemd >=245 set default.target
     # remove initrd-release to allow normal systemd boot without initrd.target
-    rm -f ${BUILDROOT}/etc/initrd-release
+    rm -f "${BUILDROOT}/etc/initrd-release"
     # mask systemd-gpt-auto-generator, errors out on initramfs usage
     add_symlink "/etc/systemd/system-generators/systemd-gpt-auto-generator" "/dev/null"
     ### add udev
@@ -204,7 +204,7 @@ build ()
             memtest86+-efi mkinitcpio-busybox mtools libsysprof-capture libnsl libksba gdbm binutils \
             cdrtools systemd-ukify python python-pefile limine man-pages libev libpipeline groff db db5.3"
         for i in ${_RM_PACMAN_DB}; do
-            rm -rf ${BUILDROOT}/var/lib/pacman/local/"${i}"-[0-9]* &>"${_NO_LOG}"
+            rm -rf "${BUILDROOT}"/var/lib/pacman/local/"${i}"-[0-9]* &>"${_NO_LOG}"
         done
     fi
     ### add nss p11-kit and ca certificates
@@ -223,14 +223,14 @@ build ()
     add_file /usr/share/p11-kit/modules/p11-kit-trust.module
 
     ### remove conflicting mkinitcpio files and grub
-    rm ${BUILDROOT}/usr/lib/systemd/system/mkinitcpio-generate-shutdown-ramfs.service \
-        ${BUILDROOT}/usr/lib/systemd/system/shutdown.target.wants/mkinitcpio-generate-shutdown-ramfs.service \
-        ${BUILDROOT}/usr/lib/systemd/ukify \
-        ${BUILDROOT}/usr/lib/tmpfiles.d/mkinitcpio.conf \
-        ${BUILDROOT}/usr/share/bash-completion/completions/lsinitcpio \
-        ${BUILDROOT}/usr/share/bash-completion/completions/mkinitcpio \
-        ${BUILDROOT}/usr/share/bash-completion/completions/grub \
-        ${BUILDROOT}/usr/lib/modules-load.d/cdrecord.conf
+    rm "${BUILDROOT}/usr/lib/systemd/system/mkinitcpio-generate-shutdown-ramfs.service" \
+        "${BUILDROOT}/usr/lib/systemd/system/shutdown.target.wants/mkinitcpio-generate-shutdown-ramfs.service" \
+        "${BUILDROOT}/usr/lib/systemd/ukify" \
+        "${BUILDROOT}/usr/lib/tmpfiles.d/mkinitcpio.conf" \
+        "${BUILDROOT}/usr/share/bash-completion/completions/lsinitcpio" \
+        "${BUILDROOT}/usr/share/bash-completion/completions/mkinitcpio" \
+        "${BUILDROOT}/usr/share/bash-completion/completions/grub" \
+        "${BUILDROOT}/usr/lib/modules-load.d/cdrecord.conf"
 
     ### fix licenses
     map add_file /usr/share/licenses/shadow/COPYING /usr/share/licenses/iana-etc/LICENSE \

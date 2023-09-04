@@ -21,9 +21,9 @@ if  echo "${HOOKS[@]}" | grep -qw archboot_net; then
     echo -e "  - Use the \e[1;92m'weechat'\e[m IRC client." >> "${MOTD}"
 fi
 if  echo "${HOOKS[@]}" | grep -qw archboot_installer; then
+    #shellcheck disable=SC2129
     echo -e "\e[1mManage Archboot Environment:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92m'launcher'\e[m or the expert \e[1;92m'update'\e[m script." >> "${MOTD}"
-    #shellcheck disable=SC2129
     echo -e "\e[1mInstallation:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92m'setup'\e[m or the expert \e[1;92m'quickinst'\e[m script." >> "${MOTD}"
 fi

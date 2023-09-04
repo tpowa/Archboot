@@ -25,6 +25,7 @@ build() {
     done
     # add custom bash options
     echo ". /root/.bashrc" >> "${BUILDROOT}/etc/bash.bashrc"
+    #shellcheck disable=SC2129
     echo ". /etc/profile.d/custom-bash-options.sh" >> "${BUILDROOT}/root/.bashrc"
     echo "alias reboot='echo b >/proc/sysrq-trigger'" >> "${BUILDROOT}/root/.bashrc"
     echo "alias poweroff='echo o >/proc/sysrq-trigger'" >> "${BUILDROOT}/root/.bashrc"
