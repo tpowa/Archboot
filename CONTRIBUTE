@@ -1,0 +1,20 @@
+Coding style:
+- bash syntax
+- variables are named _BIG, only exception is /etc/archboot/*.conf 
+  mkinitcpio only understands HOOKS etc.
+- functions are named _small
+
+Use:
+- bash
+- curl for downloading files 
+- systemd
+- shellcheck
+
+Don't use:
+- fuse, perl, python
+
+Kernel Modules:
+- only modules that are needed to access filesystems, input, network
+  video and virtualization
+- only network modules for max. 1 Gigabit.
+
