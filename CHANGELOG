@@ -7,7 +7,7 @@ Environment:
 - code cleanup removed presets/*,
   KERNEL is now set in /etc/archboot/*.conf
 - better progressbar timings
-- removed wget
+- removed wget, traceroute
 - updated not installed packages
 config:
 - removed SERVER_PUBLIC usage
