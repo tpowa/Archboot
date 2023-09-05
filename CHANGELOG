@@ -8,6 +8,7 @@ Environment:
   KERNEL is now set in /etc/archboot/*.conf
 - better progressbar timings
 - removed wget
+- updated not installed packages
 config:
 - removed SERVER_PUBLIC usage
 login:
@@ -17,6 +18,8 @@ network:
 - fixed menu size in PROXY dialog
 firefox:
 - fixed first startup with homepage|wiki|Installation guide
+hwsim:
+- install kernel before setting up AP
 ---
 2023.08 Highlights:
 - systemd 254.x
