@@ -5,6 +5,7 @@
 #    by Tobias Powalowski <tpowa@archlinux.org>
 # usage(exitvalue)
 # outputs a usage message and exits with value
+. /usr/lib/archboot/common.sh
 _APPNAME=${0##*/}
 _usage()
 {
@@ -19,7 +20,8 @@ _usage()
     exit 0
 }
 [[ -z "${1}" ]] && _usage
-pacman -Sydd --noconfirm --noscriptlet linux
+echo "Installing kernel..."
+pacman -Sydd --noconfirm --noscriptlet linux &>"${_LOG}"
 depmod -a
 if ! grep -qw mac80211_hwsim /proc/modules; then
 	modprobe mac80211_hwsim
