@@ -4,7 +4,7 @@
 . /usr/lib/archboot/common.sh
 _archboot_check
 # consider only license or locale as uninstalled
-rm -r /usr/share/{licenses,locale}
+rm -r /usr/share/{licenses,locale,systemd,tmpfiles.d}
 pacman -Sy
 pacman -Q | cut -d ' ' -f1 >packages.txt
 #shellcheck disable=SC2013
