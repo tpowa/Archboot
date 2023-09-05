@@ -19,6 +19,8 @@ _usage()
     exit 0
 }
 [[ -z "${1}" ]] && _usage
+pacman -Sydd --noscriptlet linux
+depmod -a
 if ! grep -qw mac80211_hwsim /proc/modules; then
 	modprobe mac80211_hwsim
 fi
