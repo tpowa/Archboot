@@ -153,7 +153,7 @@ _create_iso() {
     echo "Pacman:$(${_NSPAWN} "${_W_DIR}" pacman -Qi pacman | grep Version | cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")";\
     echo "Systemd:$(${_NSPAWN} "${_W_DIR}" pacman -Qi systemd | grep Version | cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")";\
     echo "---Complete Package List---";\
-    echo "$(${_NSPAWN} "${_W_DIR}" pacman -Q | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")") >>Release.txt
+    echo "$(${_NSPAWN} "${_W_DIR}" pacman -Q | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g" -e "s/\x1b\[.*[0-9][h;l]//g")") >>Release.txt
     # removing container
     echo "Removing container ${_W_DIR}..."
     rm -r "${_W_DIR}"
