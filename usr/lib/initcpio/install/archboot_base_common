@@ -205,7 +205,7 @@ build ()
             cdrtools systemd-ukify python python-pefile limine man-pages libev libpipeline groff \
             man-db texinfo db db5.3 gc"
         for i in ${_RM_PACMAN_DB}; do
-            rm -rf "${BUILDROOT}"/var/lib/pacman/local/"${i}"-[0-9]* &>"${_NO_LOG}"
+            rm -rf "${BUILDROOT}"/var/lib/pacman/local/"${i}"-*-[0-9]* &>"${_NO_LOG}"
         done
     fi
     ### add nss p11-kit and ca certificates
