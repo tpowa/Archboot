@@ -4,7 +4,7 @@
 
 build ()
 {
-    map add_binary traceroute arping clockdiff tracepath ssh genl \
+    map add_binary arping clockdiff tracepath ssh genl \
       ifstat ctstat rtstat lnstat nstat rtacct rtmon ss tc bridge \
       dcb devlink rdma tipc vdpa ethtool elinks weechat brctl
     # add iproute 2, add openssl helper libraries
