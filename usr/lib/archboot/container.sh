@@ -90,7 +90,7 @@ _clean_mkinitcpio() {
 _prepare_pacman() {
     # prepare pacman dirs
     echo "Creating directories in ${1}..."
-    mkdir -p "${1}"${_PACMAN_LIB}""
+    mkdir -p "${1}${_PACMAN_LIB}"
     mkdir -p "${1}/${_CACHEDIR}"
     [[ -e "${1}/proc" ]] || mkdir -m 555 "${1}/proc"
     [[ -e "${1}/sys" ]] || mkdir -m 555 "${1}/sys"
