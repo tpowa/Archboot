@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # don't use _DESTDIR=/mnt because it's intended to mount other things there!
+
 # check first if bootet in archboot
 if grep -qw '^archboot' /etc/hostname; then
     _DESTDIR="/install"
