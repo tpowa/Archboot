@@ -5,7 +5,7 @@
 
 _pacman() {
     #shellcheck disable=SC2086,SC2069
-    ${_PACMAN} -Sy ${_PACKAGES} &>"${_LOG}" && : > /.pacman-success
+    ${_PACMAN} -Sy ${_PACKAGES} >"${_LOG}" && : > /.pacman-success
     rm /.archboot
 }
 
@@ -14,7 +14,6 @@ _run_pacman(){
     # Set up the necessary directories for pacman use
     [[ ! -d "${_DESTDIR}${_CACHEDIR}" ]] && mkdir -p "${_DESTDIR}${_CACHEDIR}"
     [[ ! -d "${_DESTDIR}${_PACMAN_LIB}" ]] && mkdir -p "${_DESTDIR}${_PACMAN_LIB}"
-    echo "Installing Packages..." >/tmp/pacman.log
     : > /.archboot
     _pacman &
     _progress_wait "0" "99" "Installing package(s):\n${_PACKAGES}..." "2"
