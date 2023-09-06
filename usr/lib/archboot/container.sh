@@ -90,7 +90,7 @@ _clean_mkinitcpio() {
 _prepare_pacman() {
     # prepare pacman dirs
     echo "Creating directories in ${1}..."
-    mkdir -p "${1}/var/lib/pacman"
+    mkdir -p "${1}"${_PACMAN_LIB}""
     mkdir -p "${1}/${_CACHEDIR}"
     [[ -e "${1}/proc" ]] || mkdir -m 555 "${1}/proc"
     [[ -e "${1}/sys" ]] || mkdir -m 555 "${1}/sys"
@@ -103,7 +103,7 @@ _prepare_pacman() {
     mount devpts "${1}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
     mount shm "${1}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
     echo "Removing archboot repository sync db..."
-    rm -f /var/lib/pacman/sync/archboot.db
+    rm -f "${_PACMAN_LIB}"/sync/archboot.db
     echo "Updating Arch Linux keyring..."
     #shellcheck disable=SC2086
     pacman -Sy --config ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} &>"${_NO_LOG}"
@@ -196,7 +196,7 @@ _install_archboot() {
     if ! [[ "${2}"  == "use_binfmt" ]]; then
         rm -r "${1}"/blankdb
         echo "Removing archboot repository sync db..."
-        rm /var/lib/pacman/sync/archboot.db
+        rm "${_PACMAN_LIB}"/sync/archboot.db
     fi
 }
 
@@ -224,7 +224,7 @@ _copy_archboot_defaults() {
 
 _reproducibility() {
     echo "Reproducibility changes..."
-    sed -i -e '/INSTALLDATE/{n;s/.*/0/}' "${1}"/var/lib/pacman/local/*/desc
+    sed -i -e '/INSTALLDATE/{n;s/.*/0/}' "${1}""${_PACMAN_LIB}"/local/*/desc
     rm "${1}"/var/cache/ldconfig/aux-cache
     rm "${1}"/etc/ssl/certs/java/cacerts
 }

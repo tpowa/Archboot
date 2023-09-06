@@ -12,7 +12,7 @@ pacman -Q | cut -d ' ' -f1 >packages.txt
 for i in $(cat packages.txt); do
     rm -r "${_PACMAN_LIB}"/local/"${i}"-*-[0-9]*
 	#shellcheck disable=SC2086
-    if pacman -Sdd ${i} --noconfirm 2>&1 >>log.txt; then
+    if pacman -Sdd ${i} --noconfirm >>log.txt; then
         echo "${i}" >> uninstalled.orig.txt
     else
 		#shellcheck disable=SC2086
