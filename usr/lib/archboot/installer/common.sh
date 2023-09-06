@@ -91,9 +91,9 @@ _local_pacman_conf() {
     echo "SigLevel    = Required DatabaseOptional" >> "${_PACMAN_CONF}"
     echo "LocalFileSigLevel = Optional" >> "${_PACMAN_CONF}"
     echo "[archboot]" >> "${_PACMAN_CONF}"
-    echo "Server = file:///var/cache/pacman/pkg" >> "${_PACMAN_CONF}"
+    echo "Server = file://${_CACHEDIR}" >> "${_PACMAN_CONF}"
     _PACMAN_CONF="--config ${_PACMAN_CONF}"
-    _PACMAN="pacman --root ${_DESTDIR} ${_PACMAN_CONF} --cachedir=${_DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
+    _PACMAN="pacman --root ${_DESTDIR} ${_PACMAN_CONF} --cachedir=${_DESTDIR}${_CACHEDIR} --noconfirm --noprogressbar"
 }
 
 _auto_packages() {

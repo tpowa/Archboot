@@ -18,7 +18,7 @@ _pacman() {
 _run_pacman(){
     _chroot_mount
     # Set up the necessary directories for pacman use
-    [[ ! -d "${_DESTDIR}/var/cache/pacman/pkg" ]] && mkdir -p "${_DESTDIR}/var/cache/pacman/pkg"
+    [[ ! -d "${_DESTDIR}${_CACHEDIR}" ]] && mkdir -p "${_DESTDIR}${_CACHEDIR}"
     [[ ! -d "${_DESTDIR}/var/lib/pacman" ]] && mkdir -p "${_DESTDIR}/var/lib/pacman"
     echo "Installing Packages..." >/tmp/pacman.log
     : > /.archboot

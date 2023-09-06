@@ -356,8 +356,8 @@ _grub_install_uefi_sb() {
         # fix broken grub with last working version:
         # https://lists.gnu.org/archive/html/grub-devel/2023-06/msg00121.html
         #if [[ -e "${_LOCAL_DB}" ]]; then
-        #    cp "/var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst" "${_DESTDIR}"
-        #    cp "/var/cache/pacman/pkg/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig" "${_DESTDIR}"
+        #    cp "${_CACHEDIR}/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst" "${_DESTDIR}"
+        #    cp "${_CACHEDIR}/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig" "${_DESTDIR}"
         #else
         #    ${_DLPROG} -O --output-dir ${_DESTDIR}" "https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst"
         #    ${_DLPROG} -O --output-dir "${_DESTDIR} "https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig"
