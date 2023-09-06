@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
-_VC="VC${_VC_NUM}"
 # install stages
 _S_QUICK_SETUP="" # guided fs/format
 # menu item tracker- autoselect the next item
