@@ -9,7 +9,6 @@ _NO_LOG="/dev/null"
 _ANSWER="/.${_BASENAME}"
 _LABEL="Exit"
 _DLPROG="curl -L -s"
-_MIRRORLIST="/etc/pacman.d/mirrorlist"
 _KERNELPKG="linux"
 _KEYRING="archlinux-keyring"
 if echo "${_BASENAME}" | grep -qw aarch64; then

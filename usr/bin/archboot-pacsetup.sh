@@ -24,13 +24,13 @@ _select_mirror() {
         _DOWNLOAD="Downloading latest mirrorlist for Region ${_COUNTRY}..."
         _download_mirror | _dialog --title " Pacman Configuration " --no-mouse --gauge "${_DOWNLOAD}" 6 70 0
         if grep -q '#Server = https:' /tmp/pacman_mirrorlist.txt; then
-            mv "${_MIRRORLIST}" "${_MIRRORLIST}.bak"
-            cp /tmp/pacman_mirrorlist.txt "${_MIRRORLIST}"
+            mv "${_PACMAN_MIRROR}" "${_PACMAN_MIRROR}.bak"
+            cp /tmp/pacman_mirrorlist.txt "${_PACMAN_MIRROR}"
         fi
     fi
     # This regex doesn't honor commenting
-    _MIRRORS=$(grep -E -o '(https)://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
-    [[ -z ${_MIRRORS} ]] && _MIRRORS=$(grep -E -o '(http)://[^/]*' "${_MIRRORLIST}" | sed 's|$| _|g')
+    _MIRRORS=$(grep -E -o '(https)://[^/]*' "${_PACMAN_MIRROR}" | sed 's|$| _|g')
+    [[ -z ${_MIRRORS} ]] && _MIRRORS=$(grep -E -o '(http)://[^/]*' "${_PACMAN_MIRROR}" | sed 's|$| _|g')
     _SYNC_URL=""
     while [[ -z "${_SYNC_URL}" ]]; do
         #shellcheck disable=SC2086
@@ -47,7 +47,7 @@ _select_mirror() {
             # our mirrorlist and pulling the full URL out. Substitute 'core' in
             # for the repository name, and ensure that if it was listed twice we
             # only return one line for the mirror.
-            _SYNC_URL=$(grep -E -o "${_SERVER}.*" "${_MIRRORLIST}" | head -n1)
+            _SYNC_URL=$(grep -E -o "${_SERVER}.*" "${_PACMAN_MIRROR}" | head -n1)
         fi
     done
     echo "Using mirror: ${_SYNC_URL}" >"${_LOG}"
