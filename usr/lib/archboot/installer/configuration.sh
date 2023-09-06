@@ -29,7 +29,7 @@ _run_mkinitcpio() {
 _mkinitcpio_error() {
     # mkinitcpio finished, display scrollable output on error
     if ! [[ -e "/tmp/.mkinitcpio-success" ]]; then
-        _dialog --title " ERROR " --msgbox "Mkinitcpio Failed (see errors ${_LOG} | ${_VC})" 3 70 || return 1
+        _dialog --title " ERROR " --msgbox "Mkinitcpio Failed (see errors ${_LOG} | ${_VC})" 5 70 || return 1
     fi
     rm /tmp/.mkinitcpio-success
 }
@@ -47,7 +47,7 @@ _set_mkinitcpio() {
     ${_EDITOR} "${_DESTDIR}""${_FILE}"
     #shellcheck disable=SC2013
     for i in $(grep ^HOOKS "${_DESTDIR}"/etc/mkinitcpio.conf | sed -e 's/"//g' -e 's/HOOKS=\(//g' -e 's/\)//g'); do
-        [[ -e ${_DESTDIR}/usr/lib/initcpio/install/${i} ]] || _HOOK_ERROR=1
+        ! [[ -e ${_DESTDIR}/usr/lib/initcpio/install/${i} ]] && _HOOK_ERROR=1
     done
     if [[ -n "${_HOOK_ERROR}" ]]; then
         _dialog --title " ERROR " --no-mouse --infobox "Detected error in 'HOOKS=' line,\nplease correct HOOKS= in /etc/mkinitcpio.conf!" 6 70
