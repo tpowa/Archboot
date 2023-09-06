@@ -5,7 +5,7 @@
 
 _pacman() {
     #shellcheck disable=SC2086,SC2069
-    ${_PACMAN} -Sy ${_PACKAGES} &>"${_LOG}" && : > /.pacman-success
+    ${_PACMAN} -Sy ${_PACKAGES} &>"${_LOG}" && : > /tmp/.pacman-success
     rm /.archboot
 }
 
@@ -18,7 +18,7 @@ _run_pacman(){
     _pacman &
     _progress_wait "0" "99" "Installing package(s):\n${_PACKAGES}..." "2"
     # pacman finished, display scrollable output
-    if [[ -e "/.pacman-success" ]]; then
+    if [[ -e "/tmp/.pacman-success" ]]; then
         _progress "100" "Package installation complete." 6 75
         sleep 2
     else
@@ -31,12 +31,12 @@ _run_pacman(){
 }
 
 _pacman_error() {
-    if ! [[ -e "/.pacman-success" ]]; then
+    if ! [[ -e "/tmp/.pacman-success" ]]; then
         _RESULT="Installation Failed (see errors below)"
         _dialog --title "${_RESULT}" --exit-label "Continue" \
         --textbox "${_DESTDIR}/var/log/pacman.log" 18 70 || return 1
     fi
-    rm /.pacman-success
+    rm /tmp/.pacman-success
 }
 
 # any automatic configuration should go here

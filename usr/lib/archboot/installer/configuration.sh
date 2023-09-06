@@ -3,15 +3,9 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _mkinitcpio() {
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}"-"${_RUNNING_ARCH}" |& tee -a "${_LOG}" /tmp/mkinitcpio.log &>"${_NO_LOG}"
+        chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}"-"${_RUNNING_ARCH}" &>"${_LOG}" && : > /tmp/.mkinitcpio-success
     else
-        chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}" |& tee -a "${_LOG}" /tmp/mkinitcpio.log &>"${_NO_LOG}"
-    fi
-    echo $? > /tmp/.mkinitcpio-retcode
-    if [[ $(cat /tmp/.mkinitcpio-retcode) -ne 0 ]]; then
-        echo -e "\nMkinitcpio FAILED." >>/tmp/mkinitcpio.log
-    else
-        echo -e "\nMkinitcpio Complete." >>/tmp/mkinitcpio.log
+        chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}" &>"${_LOG}" : > /tmp/.mkinitcpio-success
     fi
     rm /.archboot
 }
@@ -22,11 +16,11 @@ _run_mkinitcpio() {
     : > /.archboot
     _mkinitcpio &
     _progress_wait "0" "99" "Rebuilding initramfs on installed system..." "0.1"
-    if [[ $(cat /tmp/.mkinitcpio-retcode) -ne 0 ]]; then
-        _progress "100" "Rebuilding initramfs failed." 6 75
+    if [[ -e "/tmp/.mkinitcpio-success" ]]; then
+        _progress "100" "Rebuilding initramfs complete." 6 75
         sleep 2
     else
-        _progress "100" "Rebuilding initramfs complete." 6 75
+        _progress "100" "Rebuilding initramfs failed." 6 75
         sleep 2
     fi
     _chroot_umount
@@ -34,12 +28,10 @@ _run_mkinitcpio() {
 
 _mkinitcpio_error() {
     # mkinitcpio finished, display scrollable output on error
-    if [[ $(cat /tmp/.mkinitcpio-retcode) -ne 0 ]]; then
-        _RESULT="Mkinitcpio Failed (see errors below)"
-        _dialog --title "${_RESULT}" --exit-label "Continue" \
-        --textbox "/tmp/mkinitcpio.log" 18 70 || return 1
+    if ! [[ -e "/tmp/.mkinitcpio-success" ]]; then
+        _dialog --title " ERROR " --msgbox "Mkinitcpio Failed (see errors ${_LOG})" 18 70 || return 1
     fi
-    rm /tmp/.mkinitcpio-retcode
+    rm /tmp/.mkinitcpio-success
 }
 
 _run_locale_gen() {
