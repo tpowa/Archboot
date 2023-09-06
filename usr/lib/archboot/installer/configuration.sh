@@ -5,7 +5,7 @@ _mkinitcpio() {
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}"-"${_RUNNING_ARCH}" &>"${_LOG}" && : > /tmp/.mkinitcpio-success
     else
-        chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}" &>"${_LOG}" : > /tmp/.mkinitcpio-success
+        chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}" &>"${_LOG}" && : > /tmp/.mkinitcpio-success
     fi
     rm /.archboot
 }
