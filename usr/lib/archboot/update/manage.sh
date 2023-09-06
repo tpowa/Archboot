@@ -26,7 +26,7 @@ _create_container() {
         # add the db too on reboot
         install -D -m644 "${_LOCAL_DB}" "${_W_DIR}""${_LOCAL_DB}"
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
-            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file:///var/cache/pacman/pkg >"${_LOG}" 2>&1 || exit 1
+            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file://${_CACHEDIR} >"${_LOG}" 2>&1 || exit 1
         fi
         # needed for checks
         cp "${_W_DIR}""${_LOCAL_DB}" "${_LOCAL_DB}"
@@ -348,7 +348,7 @@ _new_image() {
     _progress "1" "Removing files from /..."
     _clean_archboot
     _clean_kernel_cache
-    [[ -d var/cache/pacman/pkg ]] && rm -f /var/cache/pacman/pkg/*
+    [[ -d "${_CACHEDIR}" ]] && rm -f "${_CACHEDIR}"/*
     mkdir /archboot
     cd /archboot || exit 1
     _W_DIR="$(mktemp -u archboot-release.XXX)"
@@ -358,7 +358,7 @@ _new_image() {
     _create_container &
     _progress_wait "2" "20" "Generating container in ${_W_DIR}..." "10"
     _progress "21" "Create archboot.db in ${_W_DIR}..."
-    _create_archboot_db "${_W_DIR}"/var/cache/pacman/pkg > "${_LOG}"
+    _create_archboot_db "${_W_DIR}${CACHEDIR}" > "${_LOG}"
     # riscv64 does not support kexec at the moment
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         # removing not working lvm2 from latest image
@@ -367,7 +367,7 @@ _new_image() {
         # generate local iso in container, umount tmp it's a tmpfs and weird things could happen then
         : > "${_W_DIR}"/.archboot
         (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_RUNNING_ARCH}-iso.sh -g -s -p=${_PRESET_LOCAL} \
-        -i=${_ISONAME}-local-${_RUNNING_ARCH}" > "${_LOG}"; rm -rf "${_W_DIR}"/var/cache/pacman/pkg/*; rm "${_W_DIR}"/.archboot) &
+        -i=${_ISONAME}-local-${_RUNNING_ARCH}" > "${_LOG}"; rm -rf "${_W_DIR}${_CACHEDIR}"/*; rm "${_W_DIR}"/.archboot) &
         _ram_check
         _progress_wait "23" "55" "Generating local ISO..." "10"
         # generate latest iso in container
