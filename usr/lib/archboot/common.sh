@@ -26,6 +26,7 @@ fi
 _PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
 _PACMAN_CONF="/etc/pacman.conf"
 _CACHEDIR="/var/cache/pacman/pkg"
+_LOCAL_DB="${_CACHEDIR}/archboot.db"
 _FIX_PACKAGES="libelf libevent talloc gcc-libs glibc glib2 pcre2 nss terminus-font"
 _XORG_PACKAGE="xorg"
 _VNC_PACKAGE="tigervnc"

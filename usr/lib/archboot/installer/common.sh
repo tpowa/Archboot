@@ -1,14 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_LOCAL_DB="/var/cache/pacman/pkg/archboot.db"
-_RUNNING_ARCH="$(uname -m)"
-_KERNELPKG="linux"
-_NO_LOG="/dev/null"
-# use the first VT not dedicated to a running console
 # don't use _DESTDIR=/mnt because it's intended to mount other things there!
 # check first if bootet in archboot
-# don't ask for source and network on booted system
 if grep -qw '^archboot' /etc/hostname; then
     _DESTDIR="/install"
     _NSPAWN="systemd-nspawn -q -D ${_DESTDIR}"
@@ -25,40 +19,6 @@ if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
 fi
 # abstract the common pacman args
 _PACMAN="pacman --root ${_DESTDIR} --cachedir=${_DESTDIR}/var/cache/pacman/pkg --noconfirm --noprogressbar"
-_MIRRORLIST="/etc/pacman.d/mirrorlist"
-
-# $1: percentage
-# $2: message
-_progress() {
-cat <<EOF
-XXX
-${1}
-${2}
-XXX
-EOF
-}
-
-# $1: start percentage
-# $2: end percentage
-# $3: message
-# $4: sleep time
-_progress_wait() {
-    _COUNT=${1}
-    while [[ -e "${_W_DIR}/.archboot" || -e /.archboot ]]; do
-        if [[ "${_COUNT}" -lt "${2}" ]]; then
-            _progress "${_COUNT}" "${3}"
-        fi
-        if [[ "${_COUNT}" -gt "${2}" ]]; then
-            _progress "${2}"  "${3}"
-        fi
-        # abort after 15 minutes
-        if [[ "${_COUNT}" -gt 150 ]]; then
-            exit 1
-        fi
-        _COUNT="$((_COUNT+1))"
-        sleep "${4}"
-    done
-}
 
 _linux_firmware() {
     _PACKAGES="${_PACKAGES//\ linux-firmware\ / }"

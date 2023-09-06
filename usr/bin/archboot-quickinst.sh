@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
+. /usr/lib/archboot/common.sh
 . /usr/lib/archboot/installer/common.sh
 _DESTDIR="${1}"
 

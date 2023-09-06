@@ -14,7 +14,7 @@ _welcome () {
 }
 
 _local_mode () {
-    if [[ -e "${_CACHEDIR}/archboot.db" ]]; then
+    if [[ -e "${_LOCAL_DB}" ]]; then
         echo -e "You are running in \e[92m\e[1mOffline Mode\e[m, with \e[1mlocal package repository\e[m enabled.\e[m"
     fi
 }
@@ -84,7 +84,7 @@ _run_update_installer() {
             _run_latest
         else
             # local image
-            if [[ -e "${_CACHEDIR}/archboot.db" ]]; then
+            if [[ -e "${_LOCAL_DB}" ]]; then
                 _run_latest_install
             else
                 # latest image
@@ -130,7 +130,7 @@ if [[ "${TTY}" = "tty1" ]] ; then
         systemctl start initrd-cleanup.service
         systemctl start initrd-switch-root.target
     else
-        if ! [[ -e "${_CACHEDIR}/archboot.db" ]]; then
+        if ! [[ -e "${_LOCAL_DB}" ]]; then
             systemctl start systemd-networkd
             systemctl start systemd-resolved
         fi
@@ -174,7 +174,7 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     _enter_shell
 # local image, fail if less than 3.3GB  RAM available
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 &&\
--e "${_CACHEDIR}/archboot.db" ]]; then
+-e "${_LOCAL_DB}" ]]; then
     _welcome
     echo -e "\e[1m\e[91mMemory check failed:\e[m"
     echo -e "\e[91m- Not engough memory detected! \e[m"

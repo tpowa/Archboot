@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_ANSWER="/tmp/.setup"
-_LOG="/dev/tty11"
 _VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
 _VC="VC${_VC_NUM}"
 # install stages
@@ -15,7 +13,6 @@ _EDITOR=""
 _LSBLK="lsblk -rpno"
 _BLKID="blkid -c ${_NO_LOG}"
 _FINDMNT="findmnt -vno SOURCE"
-_DLPROG="curl -s"
 
 _set_title() {
     if [[ "${_DESTDIR}" == "/" ]]; then

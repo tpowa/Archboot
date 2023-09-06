@@ -35,20 +35,20 @@ usage () {
     echo -e "\e[1mManage \e[36mArchboot\e[m\e[1m - Arch Linux Environment:\e[m"
     echo -e "\e[1m-----------------------------------------\e[m"
     echo -e " \e[1m-help\e[m            This message."
-    if [[ ! -e "/var/cache/pacman/pkg/archboot.db" || -e "/usr/bin/setup" ]]; then
+    if [[ ! -e ""${_LOCAL_DB}"" || -e "/usr/bin/setup" ]]; then
         echo -e " \e[1m-update\e[m          Update scripts: setup, quickinst, network, clock and helpers."
     fi
     # latest image
-    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2000000 && ! -e "/.full_system" && ! -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+    if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2000000 && ! -e "/.full_system" && ! -e ""${_LOCAL_DB}"" ]]; then
         echo -e " \e[1m-full-system\e[m     Switch to full Arch Linux system."
     # local image
-    elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 && ! -e "/.full_system" && -e "/var/cache/pacman/pkg/archboot.db" && -e "/usr/bin/setup" ]]; then
+    elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2571000 && ! -e "/.full_system" && -e ""${_LOCAL_DB}"" && -e "/usr/bin/setup" ]]; then
         echo -e " \e[1m-full-system\e[m     Switch to full Arch Linux system."
     fi
     echo -e ""
     if [[ -e "/usr/bin/setup" ]]; then
         # works only on latest image
-        if ! [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
+        if ! [[ -e ""${_LOCAL_DB}"" ]]; then
             if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2400000 ]] ; then
                 _graphic_options
             fi
@@ -61,7 +61,7 @@ usage () {
             fi
         fi
     fi
-    if ! [[ -e "/var/cache/pacman/pkg/archboot.db" ]] || [[ -e "/var/cache/pacman/pkg/archboot.db" && ! -e "/usr/bin/setup" ]]; then
+    if ! [[ -e ""${_LOCAL_DB}"" ]] || [[ -e ""${_LOCAL_DB}"" && ! -e "/usr/bin/setup" ]]; then
         if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1970000 ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
                 echo -e " \e[1m-latest\e[m          Launch latest archboot environment (using kexec)."

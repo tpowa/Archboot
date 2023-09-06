@@ -21,15 +21,15 @@ _create_container() {
         "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp >"${_LOG}" 2>&1 || exit 1
     fi
     # create container with package cache
-    if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+    if [[ -e "${_LOCAL_DB}" ]]; then
         # offline mode, for local image
         # add the db too on reboot
-        install -D -m644 /var/cache/pacman/pkg/archboot.db "${_W_DIR}"/var/cache/pacman/pkg/archboot.db
+        install -D -m644 "${_LOCAL_DB}" "${_W_DIR}""${_LOCAL_DB}"
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
             "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file:///var/cache/pacman/pkg >"${_LOG}" 2>&1 || exit 1
         fi
         # needed for checks
-        cp "${_W_DIR}"/var/cache/pacman/pkg/archboot.db /var/cache/pacman/pkg/archboot.db
+        cp "${_W_DIR}""${_LOCAL_DB}" "${_LOCAL_DB}"
     else
         # online mode
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
@@ -69,7 +69,7 @@ _update_installer_check() {
         echo "If you are absolutly sure it's not running, you need to remove /.update"
         exit 1
     fi
-    if ! [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+    if ! [[ -e "${_LOCAL_DB}" ]]; then
         _network_check
     fi
 }
@@ -223,7 +223,7 @@ _new_environment() {
     _clean_kernel_cache
     _ram_check
     # local switch, don't kexec on local image
-    if [[ -e /var/cache/pacman/pkg/archboot.db ]]; then
+    if [[ -e "${_LOCAL_DB}" ]]; then
         _progress "86" "Moving rootfs to ${_RAM}..."
         mv "${_ROOTFS_DIR}"/* "${_RAM}/"
         # cleanup mkinitcpio directories and files
