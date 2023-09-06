@@ -229,7 +229,7 @@ _mainmenu() {
     fi
     #shellcheck disable=SC2086
     _dialog --no-cancel ${_DEFAULT} --title " MAIN MENU " \
-    --menu "" 11 58 7 \
+    --menu "" 11 45 7 \
     "1" "Prepare Storage Device" \
     "2" "Install Packages" \
     "3" "Configure System" \
