@@ -5,7 +5,7 @@
 
 _pacman() {
     #shellcheck disable=SC2086,SC2069
-    ${_PACMAN} -Sy ${_PACKAGES} >"${_LOG}" && : > /.pacman-success
+    ${_PACMAN} -Sy ${_PACKAGES} &>"${_LOG}" && : > /.pacman-success
     rm /.archboot
 }
 
