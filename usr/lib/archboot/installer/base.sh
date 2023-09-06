@@ -26,16 +26,6 @@ _set_title() {
     fi
 }
 
-# _dialog()
-# an el-cheapo dialog wrapper
-#
-# parameters: see dialog(1)
-# returns: whatever dialog did
-_dialog() {
-    dialog --cancel-label "Back" --backtitle "${_TITLE}" --aspect 15 "$@"
-    return $?
-}
-
 _printk()
 {
     case ${1} in

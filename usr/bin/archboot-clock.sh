@@ -32,7 +32,7 @@ _timezone () {
             _ZONES="${_ZONES} ${i} -"
         done
         #shellcheck disable=SC2086
-        if _dialog --cancel-label "Back" --title " Timezone " --menu "" 21 30 16 ${_ZONES} 2>${_ANSWER}; then
+        if _dialog  --title " Timezone " --menu "" 21 30 16 ${_ZONES} 2>${_ANSWER}; then
             _SET_ZONE="1"
             _ZONE=$(cat ${_ANSWER})
             [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"

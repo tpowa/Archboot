@@ -20,7 +20,7 @@ _check_manage() {
 }
 
 _desktop () {
-    _dialog --cancel-label "Back" --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>"${_ANSWER}" || return 1
+    _dialog  --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>"${_ANSWER}" || return 1
     [[ -e /.launcher-running ]] && rm /.launcher-running
     _EXIT=$(cat "${_ANSWER}")
     source /etc/locale.conf
@@ -51,7 +51,7 @@ _desktop () {
 }
 
 _manage() {
-    _dialog --cancel-label "Back" --title " Manage Archboot Menu " --menu "" 9 50 5 "${_MANAGE[@]}" 2>"${_ANSWER}" || return 1
+    _dialog  --title " Manage Archboot Menu " --menu "" 9 50 5 "${_MANAGE[@]}" 2>"${_ANSWER}" || return 1
     clear
     [[ -e /.launcher-running ]] && rm /.launcher-running
     _EXIT=$(cat "${_ANSWER}")
@@ -67,7 +67,7 @@ _manage() {
 
 _exit() {
     #shellcheck disable=SC2086
-    _dialog --cancel-label "Back" --title " Exit Menu " --menu "" 9 30 5 \
+    _dialog  --title " Exit Menu " --menu "" 9 30 5 \
     "1" "Exit Program" \
     "2" "Reboot System" \
     "3" "Poweroff System" 2>${_ANSWER} || return 1

@@ -79,7 +79,7 @@ _riscv64_check() {
 
 # returns: whatever dialog did
 _dialog() {
-    dialog --backtitle "${_TITLE}" --aspect 15 "$@"
+    dialog --cancel-label "Back" --backtitle "${_TITLE}" --aspect 15 "$@"
     return $?
 }
 

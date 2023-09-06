@@ -39,7 +39,7 @@ _select_mirror() {
         #shellcheck disable=SC2155
         local _SERVER=$(cat "${_ANSWER}")
         if [[ "${_SERVER}" == "Custom Mirror" ]]; then
-            _dialog --cancel-label "Back" --inputbox "Enter the full URL to repositories." 8 65 \
+            _dialog  --inputbox "Enter the full URL to repositories." 8 65 \
                 "" 2>"${_ANSWER}" || _SYNC_URL=""
                 _SYNC_URL=$(cat "${_ANSWER}")
         else

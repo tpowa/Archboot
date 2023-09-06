@@ -16,7 +16,7 @@ _locale_menu() {
         _LOCALE=$(cat "${_ANSWER}")
         if [[ "${_LOCALE}" == "OTHER" ]]; then
             #shellcheck disable=SC2086
-            if _dialog --cancel-label "Back" --title " Other Locale " --menu "" 17 35 11 ${_OTHER_LOCALES} 2>${_ANSWER}; then
+            if _dialog  --title " Other Locale " --menu "" 17 35 11 ${_OTHER_LOCALES} 2>${_ANSWER}; then
                 _LOCALE=$(cat ${_ANSWER})
             else
                 _LOCALE=""
@@ -41,7 +41,7 @@ _vconsole_keymap() {
         _KEYMAPS="${_KEYMAPS} ${i} -"
     done
     #shellcheck disable=SC2086
-    if _dialog --cancel-label "Back" --title " Keymap Layout " --menu "" 13 40 7 ${_KEYMAPS} 2>${_ANSWER}; then
+    if _dialog  --title " Keymap Layout " --menu "" 13 40 7 ${_KEYMAPS} 2>${_ANSWER}; then
         #shellcheck disable=SC2086
         _KEYMAP=$(cat ${_ANSWER})
     else
