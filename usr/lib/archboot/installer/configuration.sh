@@ -29,7 +29,7 @@ _run_mkinitcpio() {
 _mkinitcpio_error() {
     # mkinitcpio finished, display scrollable output on error
     if ! [[ -e "/tmp/.mkinitcpio-success" ]]; then
-        _dialog --title " ERROR " --msgbox "Mkinitcpio Failed (see errors ${_LOG})" 18 70 || return 1
+        _dialog --title " ERROR " --msgbox "Mkinitcpio Failed (see errors ${_LOG} | ${_VC})" 3 70 || return 1
     fi
     rm /tmp/.mkinitcpio-success
 }
