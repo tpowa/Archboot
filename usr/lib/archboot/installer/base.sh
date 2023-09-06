@@ -29,8 +29,8 @@ _geteditor() {
     if ! [[ "${_EDITOR}" ]]; then
         _dialog --title " Text Editor " --no-cancel --menu "" 8 45 2 \
         "NANO" "Easier for newbies" \
-        "NEOVIM" "VIM variant for experts" 2>${_ANSWER} || return 1
-        case $(cat ${_ANSWER}) in
+        "NEOVIM" "VIM variant for experts" 2>"${_ANSWER}" || return 1
+        case $(cat "${_ANSWER}") in
             "NANO") _EDITOR="nano"
                 if ! [[ -f "${_DESTDIR}/usr/bin/nano" ]]; then
                     _PACKAGES="nano"
@@ -117,10 +117,10 @@ _prepare_storagedrive() {
             "2" "Partition Storage Device" \
             "3" "Manage Software Raid, LVM2 And LUKS Encryption" \
             "4" "Set Filesystem Mountpoints" \
-            "5" "Return To Main Menu" 2>${_ANSWER} || _CANCEL=1
-        _NEXTITEM="$(cat ${_ANSWER})"
+            "5" "Return To Main Menu" 2>"${_ANSWER}" || _CANCEL=1
+        _NEXTITEM="$(cat "${_ANSWER}")"
         [[ "${_S_QUICK_SETUP}" = "1" ]] && _DONE=1
-        case $(cat ${_ANSWER}) in
+        case $(cat "${_ANSWER}") in
             "1")
                 _CREATE_MOUNTPOINTS=1
                 _autoprepare
@@ -175,8 +175,8 @@ _configure_system() {
             "/etc/pacman.d/mirrorlist"      "Pacman Mirrors" \
             "/etc/pacman.conf"              "Pacman Config" \
             "Root-Password"                 "Set Root Password" \
-            "Return"                        "Return To Main Menu" 2>${_ANSWER} || break
-        _FILE="$(cat ${_ANSWER})"
+            "Return"                        "Return To Main Menu" 2>"${_ANSWER}" || break
+        _FILE="$(cat "${_ANSWER}")"
         if [[ "${_FILE}" = "Return" || -z "${_FILE}" ]]; then
             _S_CONFIG=1
             break
@@ -208,9 +208,9 @@ _mainmenu() {
     "2" "Install Packages" \
     "3" "Configure System" \
     "4" "Install Bootloader" \
-    "5" "Exit" 2>${_ANSWER}
-    _NEXTITEM="$(cat ${_ANSWER})"
-    case $(cat ${_ANSWER}) in
+    "5" "Exit" 2>"${_ANSWER}"
+    _NEXTITEM="$(cat "${_ANSWER}")"
+    case $(cat "${_ANSWER}") in
         "1")
             if [[ "${_DESTDIR}" == "/" ]]; then
                 _abort_running_system
@@ -232,8 +232,8 @@ _mainmenu() {
             _dialog --title " Exit Menu " --menu "" 9 30 5 \
             "1" "Exit Program" \
             "2" "Reboot System" \
-            "3" "Poweroff System" 2>${_ANSWER}
-            _EXIT="$(cat ${_ANSWER})"
+            "3" "Poweroff System" 2>"${_ANSWER}"
+            _EXIT="$(cat "${_ANSWER}")"
             if [[ "${_EXIT}" == "1" ]]; then
                 [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
                 clear
