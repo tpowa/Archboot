@@ -26,7 +26,7 @@ _create_container() {
         # add the db too on reboot
         install -D -m644 "${_LOCAL_DB}" "${_W_DIR}""${_LOCAL_DB}"
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
-            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file://${_CACHEDIR} >"${_LOG}" 2>&1 || exit 1
+            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file://"${_CACHEDIR}" >"${_LOG}" 2>&1 || exit 1
         fi
         # needed for checks
         cp "${_W_DIR}""${_LOCAL_DB}" "${_LOCAL_DB}"
