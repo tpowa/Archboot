@@ -5,13 +5,7 @@
 
 _pacman() {
     #shellcheck disable=SC2086,SC2069
-    ${_PACMAN} -Sy ${_PACKAGES} |& tee -a "${_LOG}" /tmp/pacman.log &>"${_NO_LOG}"
-    echo $? > /tmp/.pacman-retcode
-    if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
-        echo -e "\nPackage Installation FAILED." >>/tmp/pacman.log
-    else
-        echo -e "\nPackage Installation Complete." >>/tmp/pacman.log
-    fi
+    ${_PACMAN} -Sy ${_PACKAGES} &>"${_LOG}" && : > /.pacman-success
     rm /.archboot
 }
 
@@ -25,11 +19,11 @@ _run_pacman(){
     _pacman &
     _progress_wait "0" "99" "Installing package(s):\n${_PACKAGES}..." "2"
     # pacman finished, display scrollable output
-    if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
-        _progress "100" "Package installation failed." 6 75
+    if [[ -e "/.pacman-success" ]]; then
+        _progress "100" "Package installation complete." 6 75
         sleep 2
     else
-        _progress "100" "Package installation complete." 6 75
+        _progress "100" "Package installation failed." 6 75
         sleep 2
     fi
     # ensure the disk is synced
@@ -38,12 +32,12 @@ _run_pacman(){
 }
 
 _pacman_error() {
-    if [[ $(cat /tmp/.pacman-retcode) -ne 0 ]]; then
+    if ! [[ -e "/.pacman-success" ]]; then
         _RESULT="Installation Failed (see errors below)"
         _dialog --title "${_RESULT}" --exit-label "Continue" \
-        --textbox "/tmp/pacman.log" 18 70 || return 1
+        --textbox "${_DESTDIR}/var/log/pacman.log" 18 70 || return 1
     fi
-    rm /tmp/.pacman-retcode
+    rm /tmp/.pacman-success
 }
 
 # any automatic configuration should go here
