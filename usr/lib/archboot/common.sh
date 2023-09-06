@@ -26,6 +26,7 @@ else
 fi
 _PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
 _PACMAN_CONF="/etc/pacman.conf"
+_PACMAN_LIB="/var/lib/pacman"
 _CACHEDIR="/var/cache/pacman/pkg"
 _LOCAL_DB="${_CACHEDIR}/archboot.db"
 _FIX_PACKAGES="libelf libevent talloc gcc-libs glibc glib2 pcre2 nss terminus-font"

@@ -33,11 +33,11 @@ _usage() {
 # returns: 1 on error
 _prepare_pacman() {
     # Set up the necessary directories for pacman use
-    if [[ ! -d "${_DESTDIR}/var/cache/pacman/pkg" ]]; then
-        mkdir -p "${_DESTDIR}/var/cache/pacman/pkg"
+    if [[ ! -d "${_DESTDIR}${_CACHEDIR}" ]]; then
+        mkdir -p "${_DESTDIR}${_CACHEDIR}"
     fi
-    if [[ ! -d "${_DESTDIR}/var/lib/pacman" ]]; then
-        mkdir -p "${_DESTDIR}/var/lib/pacman"
+    if [[ ! -d "${_DESTDIR}${_PACMAN_LIB}" ]]; then
+        mkdir -p "${_DESTDIR}${_PACMAN_LIB}"
     fi
     # pacman-key process itself
     while pgrep -x pacman-key &>"${_NO_LOG}"; do
