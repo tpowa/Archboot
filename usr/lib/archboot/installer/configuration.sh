@@ -47,7 +47,7 @@ _set_mkinitcpio() {
     ${_EDITOR} "${_DESTDIR}""${_FILE}"
     #shellcheck disable=SC2013
     for i in $(grep ^HOOKS "${_DESTDIR}"/etc/mkinitcpio.conf | sed -e 's/"//g' -e 's/HOOKS=\(//g' -e 's/\)//g'); do
-        if ! [[ -e ${_DESTDIR}/usr/lib/initcpio/install/${i} ]];
+        if ! [[ -e "${_DESTDIR}/usr/lib/initcpio/install/${i}" ]]; then
             _HOOK_ERROR=1
         fi
     done
