@@ -43,21 +43,9 @@ _run_locale_gen() {
 }
 
 _set_mkinitcpio() {
-    _HOOK_ERROR=""
     ${_EDITOR} "${_DESTDIR}""${_FILE}"
-    #shellcheck disable=SC2013
-    for i in $(grep ^HOOKS "${_DESTDIR}"/etc/mkinitcpio.conf | sed -e 's/"//g' -e 's/HOOKS=\(//g' -e 's/\)//g'); do
-        if ! [[ -e "${_DESTDIR}/usr/lib/initcpio/install/${i}" ]]; then
-            _HOOK_ERROR=1
-        fi
-    done
-    if [[ -n "${_HOOK_ERROR}" ]]; then
-        _dialog --title " ERROR " --no-mouse --infobox "Detected error in 'HOOKS=' line,\nplease correct HOOKS= in /etc/mkinitcpio.conf!" 6 70
-        sleep 5
-    else
-        _run_mkinitcpio | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Rebuilding initramfs on installed system..." 6 75 0
-        _mkinitcpio_error
-    fi
+    _run_mkinitcpio | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Rebuilding initramfs on installed system..." 6 75 0
+    _mkinitcpio_error
 }
 
 _check_root_password() {
