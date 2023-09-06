@@ -1,4 +1,5 @@
 On the road to 2023.09:
+- kernel 6.5.x
 Environment:
 - mount initrd outside of dialog progressbar
 - added mouse input devices
@@ -20,7 +21,7 @@ network:
 firefox:
 - fixed first startup with homepage|wiki|Installation guide
 hwsim:
-- install kernel before setting up AP
+- install kernel modules before setting up AP
 ---
 2023.08 Highlights:
 - systemd 254.x
