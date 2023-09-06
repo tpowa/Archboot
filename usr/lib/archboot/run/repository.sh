@@ -4,7 +4,7 @@
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/container.sh
 . /usr/lib/archboot/repository.sh
-_CACHEDIR="${_REPODIR}/var/cache/pacman/pkg"
+_CACHEDIR="${_REPODIR}${_CACHEDIR}"
 [[ -z "${1}" ]] && _usage
 _root_check
 [[ -d "${1}" ]] || (echo "Creating directory ${1}..."; mkdir "${1}")
