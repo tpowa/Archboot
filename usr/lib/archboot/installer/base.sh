@@ -1,19 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"
-_VC="VC${_VC_NUM}"
-# install stages
-_S_QUICK_SETUP="" # guided fs/format
-# menu item tracker- autoselect the next item
-_NEXTITEM=""
-# To allow choice in script set EDITOR=""
-_EDITOR=""
-# programs
-_LSBLK="lsblk -rpno"
-_BLKID="blkid -c ${_NO_LOG}"
-_FINDMNT="findmnt -vno SOURCE"
-
 _set_title() {
     if [[ "${_DESTDIR}" == "/" ]]; then
         _TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup (System Mode) | https://archboot.com"
