@@ -36,7 +36,7 @@ _pacman_error() {
         _dialog --title "${_RESULT}" --exit-label "Continue" \
         --textbox "${_DESTDIR}/var/log/pacman.log" 18 70 || return 1
     fi
-    rm /tmp/.pacman-success
+    rm /.pacman-success
 }
 
 # any automatic configuration should go here
