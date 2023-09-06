@@ -47,7 +47,9 @@ _set_mkinitcpio() {
     ${_EDITOR} "${_DESTDIR}""${_FILE}"
     #shellcheck disable=SC2013
     for i in $(grep ^HOOKS "${_DESTDIR}"/etc/mkinitcpio.conf | sed -e 's/"//g' -e 's/HOOKS=\(//g' -e 's/\)//g'); do
-        ! [[ -e ${_DESTDIR}/usr/lib/initcpio/install/${i} ]] && _HOOK_ERROR=1
+        if ! [[ -e ${_DESTDIR}/usr/lib/initcpio/install/${i} ]];
+            _HOOK_ERROR=1
+        fi
     done
     if [[ -n "${_HOOK_ERROR}" ]]; then
         _dialog --title " ERROR " --no-mouse --infobox "Detected error in 'HOOKS=' line,\nplease correct HOOKS= in /etc/mkinitcpio.conf!" 6 70
