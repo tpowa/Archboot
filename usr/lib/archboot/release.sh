@@ -115,6 +115,7 @@ _create_iso() {
             echo "console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto" > ${_CMDLINE}
             _AMD_UCODE="${_AMD_UCODE}"
             _INTEL_UCODE="${_INTEL_UCODE}"
+        fi
         if [[ "${_ARCH}" == "aarch64" ]]; then
             echo "nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto" > ${_CMDLINE}
             _EFISTUB="/usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
