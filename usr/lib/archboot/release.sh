@@ -135,7 +135,7 @@ _create_iso() {
             [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="boot/archboot-local-${_ARCH}.efi"
             #shellcheck disable=SC2086
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux=${_KERNEL_ARCHBOOT} \
-                ${_INTEL_UCODE} ${_AMD_UCODE} --initrd=${initrd} --uname=${_KERNEL_VERSION} --cmdline=@${_CMDLINE} \
+                ${_INTEL_UCODE} ${_AMD_UCODE} --initrd=${initrd} --cmdline=@${_CMDLINE} \
                 --splash=${_SPLASH} --os-release=@${_OSREL} --output=${_UKI} &>"${_NO_LOG}" || exit 1
         done
         # fix permission and timestamp
