@@ -113,16 +113,19 @@ _create_iso() {
             cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
             _EFISTUB="/usr/lib/systemd/boot/efi/linuxx64.efi.stub"
             echo "console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto" > ${_CMDLINE}
-            _UCODE="${_INTEL_UCODE} ${_AMD_UCODE}"
-        fi
+            _AMD_UCODE="${_AMD_UCODE}"
+            _INTEL_UCODE="${_INTEL_UCODE}"
         if [[ "${_ARCH}" == "aarch64" ]]; then
             echo "nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto" > ${_CMDLINE}
             _EFISTUB="/usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
-            _UCODE="${_AMD_UCODE}"
+            _AMD_UCODE="${_AMD_UCODE}"
+            _INTEL_UCODE=""
             # replace aarch64 Image.gz with Image kernel for UKI, compressed image is not working at the moment
             cp "${_W_DIR}/boot/Image" "boot/Image-archboot-${_ARCH}"
             _KERNEL_ARCHBOOT="boot/Image-archboot-${_ARCH}"
         fi
+        [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=${_INTEL_UCODE}"
+        [[ -n "${_AMD_UCODE}" ]] && _AMD_UCODE="--initrd=${_AMD_UCODE}"
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
         for initrd in ${_INITRD} ${_INITRD_LATEST} ${_INITRD_LOCAL}; do
@@ -130,9 +133,9 @@ _create_iso() {
             [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="boot/archboot-latest-${_ARCH}.efi"
             [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="boot/archboot-local-${_ARCH}.efi"
             #shellcheck disable=SC2086
-            ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify ${_KERNEL_ARCHBOOT} \
-                ${_UCODE} ${initrd} --cmdline @${_CMDLINE} --splash ${_SPLASH} \
-                --os-release @${_OSREL} --stub ${_EFISTUB} --output ${_UKI} &>"${_NO_LOG}" || exit 1
+            ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux=${_KERNEL_ARCHBOOT} \
+                ${_INTEL_UCODE} ${_AMD_UCODE} --initrd=${initrd} --uname=${_KERNEL_VERSION} --cmdline=@${_CMDLINE} \
+                --splash=${_SPLASH} --os-release=@${_OSREL} --output=${_UKI} &>"${_NO_LOG}" || exit 1
         done
         # fix permission and timestamp
         mv "${_W_DIR}"/boot ./
