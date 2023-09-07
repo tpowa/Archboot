@@ -22,6 +22,8 @@ firefox:
 - fixed first startup with homepage|wiki|Installation guide
 hwsim:
 - install kernel modules before setting up AP
+setup:
+- update UKI routine to use new ukify syntax with ukify.conf
 ---
 2023.08 Highlights:
 - systemd 254.x
