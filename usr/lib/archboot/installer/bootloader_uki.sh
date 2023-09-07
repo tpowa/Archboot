@@ -8,10 +8,11 @@ _uki_config() {
     echo "[UKI]" > "${_UKIFY_CONFIG}"
     echo "Linux=/boot/${_VMLINUZ}" >> "${_UKIFY_CONFIG}"
     if [[ -n ${_UCODE} ]]; then
-        _UCODE="/boot/${_UCODE}"
+        echo "Initrd=/boot/${_UCODE} /boot/${_INITRAMFS}" >> "${_UKIFY_CONFIG}"
+    else
+        echo "Initrd=/boot/${_INITRAMFS}" >> "${_UKIFY_CONFIG}"
     fi
     cat << CONFEOF >> "${_UKIFY_CONFIG}"
-Initrd=${_UCODE} /boot/${_INITRAMFS}
 Cmdline=@/etc/kernel/cmdline
 OSRelease=@/etc/os-release
 Splash=/usr/share/systemd/bootctl/splash-arch.bmp

@@ -71,7 +71,7 @@ CONFEOF
 Description=Run systemd ukify
 [Service]
 Type=oneshot
-ExecStart="/usr/lib/systemd/ukify -c /etc/ukify.conf --output ${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi"
+ExecStart="/usr/lib/systemd/ukify build --config=/etc/ukify.conf --output ${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi"
 CONFEOF
     ${_NSPAWN} systemctl enable run_ukify.path &>"${_NO_LOG}"
 }
