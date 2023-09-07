@@ -5,17 +5,17 @@ _uki_config() {
     _UKIFY_CONFIG="${_DESTDIR}/etc/ukify.conf"
     _CMDLINE="${_DESTDIR}/etc/kernel/cmdline"
     echo "${_KERNEL_PARAMS_MOD}" > "${_CMDLINE}"
-    echo "KERNEL=/boot/${_VMLINUZ}" > "${_UKIFY_CONFIG}"
+    echo "[UKI]" > "${_UKIFY_CONFIG}"
+    echo "Linux=/boot/${_VMLINUZ}" >> "${_UKIFY_CONFIG}"
     if [[ -n ${_UCODE} ]]; then
-        echo "UCODE=/boot/${_UCODE}" >> "${_UKIFY_CONFIG}"
+        echo "Initrd=/boot/${_UCODE}" >> "${_UKIFY_CONFIG}"
     fi
     cat << CONFEOF >> "${_UKIFY_CONFIG}"
-INITRD=/boot/${_INITRAMFS}
-CMDLINE=/etc/kernel/cmdline
-SPLASH=/usr/share/systemd/bootctl/splash-arch.bmp
-EFI=/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi
+Initrd=/boot/${_INITRAMFS}
+Cmdline=@/etc/kernel/cmdline
+OSRelease=@/etc/os-release
+Splash=/usr/share/systemd/bootctl/splash-arch.bmp
 CONFEOF
-    echo "/usr/lib/systemd/ukify \${KERNEL} \${UCODE} \${INITRD} --cmdline @\${CMDLINE} --splash \${SPLASH} --output \${EFI}" >> "${_UKIFY_CONFIG}"
     mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux"
     _dialog --msgbox "You will now be put into the editor to edit:\n- kernel commandline config file\n- ukify.conf config file\n\nAfter you save your changes, exit the editor." 9 50
 }
@@ -44,7 +44,7 @@ _uki_uefi() {
     _geteditor || return 1
     "${_EDITOR}" "${_CMDLINE}"
     "${_EDITOR}" "${_UKIFY_CONFIG}"
-    ${_NSPAWN} /usr/bin/bash -c "source /etc/ukify.conf" >>"${_LOG}"
+    ${_NSPAWN} /usr/lib/systemd/ukify -c /etc/ukify.conf --output ${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi >>"${_LOG}"
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
         _uki_install | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Setting up Unified Kernel Image..." 6 75 0
     else
