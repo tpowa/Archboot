@@ -119,8 +119,8 @@ _create_iso() {
             _EFISTUB="/usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
             _INTEL_UCODE=""
             # replace aarch64 Image.gz with Image kernel for UKI, compressed image is not working at the moment
-            cp "${_W_DIR}/boot/Image" "boot/Image-archboot-${_ARCH}"
-            _KERNEL_ARCHBOOT="boot/Image-archboot-${_ARCH}"
+            cp "${_W_DIR}/boot/Image" "boot/Image-${_ARCH}"
+            _KERNEL_ARCHBOOT="boot/Image-${_ARCH}"
         fi
         [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=${_INTEL_UCODE}"
         [[ -n "${_AMD_UCODE}" ]] && _AMD_UCODE="--initrd=${_AMD_UCODE}"
