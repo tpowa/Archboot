@@ -72,6 +72,8 @@ echo "Creating new latest symlink in .${1}/${_ARCH}..."
 rm latest
 ln -s "${_DIR}" latest
 EOF
+    # sync to U.S. server
+    sudo -u "${_USER}" ssh "${_SERVER}" ./sync.sh
 }
 
 _create_archive() {
