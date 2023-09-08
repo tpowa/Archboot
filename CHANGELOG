@@ -1,6 +1,6 @@
 On the road to 2023.09:
 - kernel 6.5.x
-- added archboot.org as U.S. server mirror
+- added new U.S. mirror: https://archboot.org
 Environment:
 - mount initrd outside of dialog progressbar
 - added mouse input devices
@@ -24,7 +24,7 @@ firefox:
 hwsim:
 - install kernel modules before setting up AP
 setup:
-- update UKI routine to use new ukify syntax with ukify.conf
+- updated UKI routine to use new ukify syntax with ukify.conf
 ---
 2023.08 Highlights:
 - systemd 254.x
@@ -51,7 +51,6 @@ setup:
 - added message in UKI mode before editing the config files
 - readded dd cleaning the disk at the beginning too,
   wipefs is still not enough!
-- removed efitools
 - splitted each bootloader into its own file
 - allow to skip swap and /home in Quick Setup
 ---
