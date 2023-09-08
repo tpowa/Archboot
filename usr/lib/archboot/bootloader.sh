@@ -82,7 +82,8 @@ _upload_efi_files() {
             sudo -u "${_USER}" gpg ${_GPG} "${i}" || exit 1
         fi
     done
-    sudo -u "${_USER}" "${_RSYNC}" ./* "${_SERVER}:.${_ARCH_SERVERDIR}/" || exit 1
+    #shellcheck disable=SC2086
+    sudo -u "${_USER}" ${_RSYNC} ./* "${_SERVER}:.${_ARCH_SERVERDIR}/" || exit 1
     cd ..
 }
 
