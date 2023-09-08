@@ -48,7 +48,7 @@ _update_pacman_chroot() {
     sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_CHROOT}" || exit 1
     chown "${_USER}:${_GROUP}" "${_PACMAN_CHROOT}"{,.sig} || exit 1
     echo "Syncing files to ${_SERVER}:${_SERVER_PACMAN}..."
-    sudo -u "${_USER}" rsync -a --delete --delete-after "${_PACMAN_CHROOT}"{,.sig} "${_SERVER}:${_SERVER_PACMAN}/" || exit 1
+    sudo -u "${_USER}" rsync -a --delete --delete-after "${_PACMAN_CHROOT}"{,.sig} "${_SERVER}:.${_SERVER_PACMAN}/" || exit 1
 }
 
 _server_upload() {
