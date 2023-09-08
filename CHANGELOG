@@ -1,5 +1,6 @@
 On the road to 2023.09:
 - kernel 6.5.x
+- added archboot.org as U.S. server mirror
 Environment:
 - mount initrd outside of dialog progressbar
 - added mouse input devices
