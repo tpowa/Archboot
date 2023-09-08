@@ -47,14 +47,14 @@ _update_pacman_chroot() {
     #shellcheck disable=SC2086
     sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_CHROOT}" || exit 1
     chown "${_USER}:${_GROUP}" "${_PACMAN_CHROOT}"{,.sig} || exit 1
-    echo "Syncing files to ${_SERVER}:${_SERVER_PACMAN}..."
+    echo "Syncing files to ${_SERVER}:.${_SERVER_PACMAN}..."
     #shellcheck disable=SC2086
     sudo -u "${_USER}" ${_RSYNC} "${_PACMAN_CHROOT}"{,.sig} "${_SERVER}:.${_SERVER_PACMAN}/" || exit 1
 }
 
 _server_upload() {
     # copy files to server
-    echo "Syncing files to ${_SERVER}:${1}/${_ARCH}..."
+    echo "Syncing files to ${_SERVER}:.${1}/${_ARCH}..."
     #shellcheck disable=SC2086
     sudo -u "${_USER}" ssh "${_SERVER}" [[ -d "./${1}/${_ARCH}" ]] || mkdir -p ".${1}/${_ARCH}"
     #shellcheck disable=SC2086
