@@ -82,7 +82,7 @@ _upload_efi_files() {
             sudo -u "${_USER}" gpg ${_GPG} "${i}" || exit 1
         fi
     done
-    sudo -u "${_USER}" rsync --delete --delete-after -a ./* "${_SERVER}:.${_ARCH_SERVERDIR}/" || exit 1
+    sudo -u "${_USER}" "${_RSYNC}" ./* "${_SERVER}:.${_ARCH_SERVERDIR}/" || exit 1
     cd ..
 }
 

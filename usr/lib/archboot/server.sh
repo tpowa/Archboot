@@ -48,7 +48,7 @@ _update_pacman_chroot() {
     sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_CHROOT}" || exit 1
     chown "${_USER}:${_GROUP}" "${_PACMAN_CHROOT}"{,.sig} || exit 1
     echo "Syncing files to ${_SERVER}:${_SERVER_PACMAN}..."
-    sudo -u "${_USER}" rsync -a --delete --delete-after "${_PACMAN_CHROOT}"{,.sig} "${_SERVER}:.${_SERVER_PACMAN}/" || exit 1
+    sudo -u "${_USER}" "${_RSYNC}" "${_PACMAN_CHROOT}"{,.sig} "${_SERVER}:.${_SERVER_PACMAN}/" || exit 1
 }
 
 _server_upload() {
@@ -56,7 +56,7 @@ _server_upload() {
     echo "Syncing files to ${_SERVER}:${1}/${_ARCH}..."
     #shellcheck disable=SC2086
     sudo -u "${_USER}" ssh "${_SERVER}" [[ -d "./${1}/${_ARCH}" ]] || mkdir -p ".${1}/${_ARCH}"
-    sudo -u "${_USER}" rsync --delete --delete-after -a "${_DIR}" "${_SERVER}":".${1}/${_ARCH}/" || exit 1
+    sudo -u "${_USER}" "${_RSYNC}" "${_DIR}" "${_SERVER}":".${1}/${_ARCH}/" || exit 1
     # move files on server, create symlink and removing ${_PURGE_DATE} old release
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
 echo "Removing old purge date reached .${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory..."
