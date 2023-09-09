@@ -223,7 +223,7 @@ build ()
     add_file /usr/share/ca-certificates/trust-source/mozilla.trust.p11-kit
     add_file /usr/share/p11-kit/modules/p11-kit-trust.module
 
-    ### remove conflicting grub, man-db and mkinitcpio files
+    ### remove conflicting grub, man-db, mkinitcpio and rpcbind files
     rm "${BUILDROOT}/usr/lib/systemd/system/mkinitcpio-generate-shutdown-ramfs.service" \
         "${BUILDROOT}/usr/lib/systemd/system/shutdown.target.wants/mkinitcpio-generate-shutdown-ramfs.service" \
         "${BUILDROOT}/usr/lib/systemd/ukify" \
@@ -234,6 +234,9 @@ build ()
         "${BUILDROOT}/usr/share/bash-completion/completions/lsinitcpio" \
         "${BUILDROOT}/usr/share/bash-completion/completions/mkinitcpio" \
         "${BUILDROOT}/usr/share/bash-completion/completions/grub" \
+        "${BUILDROOT}"/usr/lib/systemd/system/rpcbind* \
+        "${BUILDROOT}"/usr/lib/tmpfiles.d/rpcbind* \
+        "${BUILDROOT}"/usr/lib/sysusers.d/rpcbind* \
         "${BUILDROOT}/usr/lib/modules-load.d/cdrecord.conf"
 
     ### fix licenses
