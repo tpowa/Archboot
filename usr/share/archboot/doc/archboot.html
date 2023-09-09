@@ -14,7 +14,7 @@
 <body>
 <p><span><img src="./logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="./donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 09.09.2023 08:04</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong><br>Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a><br>Last update: 09.09.2023 09:03</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -77,11 +77,11 @@
 <li><strong>Supported Glibc Locales</strong>: be, bg, cs, da, de, en, el, es, fi, fr, hu, it, lt, lv, mk, nl, nn, pl, pt, ro, ru, sk, sr, sv, uk</li>
 </ul>
 <h3 data-number="2.1" id="iso"><span class="header-section-number">2.1</span> <strong>ISOs - USB / CD / Virtual Machine</strong></h3>
-<a href="https://archlinuxarm.org/"><strong>Arch Linux ARM - aarch64</strong></a>
 <table>
 <thead>
 <tr class="header">
-<th>Release information</th>
+<th>Arch Linux Distribution</th>
+<th>Information</th>
 <th>Download</th>
 <th>B2SUM</th>
 <th>Forum</th>
@@ -89,49 +89,31 @@
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="/iso/aarch64/latest/Release.txt"><strong>Latest</strong></a></td>
+<td><a href="https://archlinuxarm.org/"><strong>ARM - aarch64</strong></a><sup>1</sup></td>
+<td><a href="/iso/aarch64/latest/Release.txt"><strong>Release</strong></a></td>
 <td><a href="https://bit.ly/archboot-aarch64-eu"><strong>EU</strong></a> | <a href="https://bit.ly/archboot-aarch64-us"><strong>U.S.</strong></a></td>
 <td><a href="/iso/aarch64/latest/b2sum.txt"><strong>Check</strong></a></td>
 <td><a href="https://archlinuxarm.org/forum/viewtopic.php?f=8&amp;t=15777"><strong>Check</strong></a></td>
-</tbody>
-</table>
-<p>The ISO supports <strong>aarch64, Apple Mac M1 and higher</strong> for virtual machines eg. <a href="https://wiki.archlinux.org/title/Parallels_Desktop" title="Parallels Desktop"><strong>Parallels Desktop</strong></a>, <a href="https://mac.getutm.app/" title="UTM MacOS"><strong>UTM</strong></a> and <a href="https://wiki.archlinux.org/title/VMware" title="VMware"><strong>VMware</strong></a></p>
-<a href="https://archriscv.felixc.at/"><strong>Arch Linux RISC-V - riscv64</strong></a>
-<table>
-<thead>
-<tr class="header">
-<th>Release information</th>
-<th>Download</th>
-<th>B2SUM</th>
 </tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="/iso/riscv64/latest/Release.txt"><strong>Latest</strong></a></td>
+<tr class="even">
+<td><a href="https://archriscv.felixc.at/"><strong>RISC-V - riscv64</strong></a><sup>2</sup></td>
+<td><a href="/iso/riscv64/latest/Release.txt"><strong>Release</strong></a></td>
 <td><a href="https://bit.ly/archboot-riscv64-eu"><strong>EU</strong></a> | <a href="https://bit.ly/archboot-riscv64-us"><strong>U.S.</strong></a></td>
 <td><a href="/iso/riscv64/latest/b2sum.txt"><strong>Check</strong></a></td>
-</tbody>
-</table>
-<p>The ISO supports <strong>riscv64</strong> and needs <a href="https://www.denx.de/wiki/U-Boot" title="U-Boot"><strong>U-Boot</strong></a> to launch. Recommended <strong>only</strong> for testing in a virtual machine.</p>
-<a href="https://archlinux.org/"><strong>Arch Linux X64 - x86_64</strong></a>
-<table>
-<thead>
-<tr class="header">
-<th>Release information</th>
-<th>Download</th>
-<th>B2SUM</th>
-<th>Forum</th>
+<td></td>
 </tr>
-</thead>
-<tbody>
 <tr class="odd">
-<td><a href="/iso/x86_64/latest/Release.txt"><strong>Latest</strong></a></td>
+<td><a href="https://archlinux.org/"><strong>X64 - x86_64</strong></a></a><sup>3</sup></td>
+<td><a href="/iso/x86_64/latest/Release.txt"><strong>Release</strong></a></td>
 <td><a href="https://bit.ly/archboot-x86_64-eu"><strong>EU</strong></a> | <a href="https://bit.ly/archboot-x86_64-us"><strong>U.S.</strong></a></td>
 <td><a href="/iso/x86_64/latest/b2sum.txt"><strong>Check</strong></a></td>
 <td><a href="https://bbs.archlinux.org/viewtopic.php?id=182439"><strong>Check</strong></a></td>
+</tr>
 </tbody>
 </table>
-<p>The ISO supports <strong>x86_64</strong>. Use it for <strong>real</strong> machines <strong>and/or</strong> virtual machines.</p>
+<p><sup>1</sup> The ISO supports <strong>aarch64, Apple Mac M1 and higher</strong> for virtual machines eg. <a href="https://wiki.archlinux.org/title/Parallels_Desktop" title="Parallels Desktop"><strong>Parallels Desktop</strong></a>, <a href="https://mac.getutm.app/" title="UTM MacOS"><strong>UTM</strong></a> and <a href="https://wiki.archlinux.org/title/VMware" title="VMware"><strong>VMware</strong></a><br>
+<sup>2</sup> The ISO supports <strong>riscv64</strong> and needs <a href="https://www.denx.de/wiki/U-Boot" title="U-Boot"><strong>U-Boot</strong></a> to launch. Recommended <strong>only</strong> for testing in a virtual machine.<br>
+<sup>3</sup> The ISO supports <strong>x86_64</strong>. Use it for <strong>real</strong> machines <strong>and/or</strong> virtual machines.</p>
 <h3 data-number="2.2" id="unified-kernel-image"><span class="header-section-number">2.2 </span> UKIs - <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Images</strong></a></h3>
 <table>
 <thead>
