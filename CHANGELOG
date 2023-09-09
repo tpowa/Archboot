@@ -9,7 +9,7 @@ Environment:
 - code cleanup removed presets/*,
   KERNEL is now set in /etc/archboot/*.conf
 - better progressbar timings
-- removed wget, traceroute
+- removed rpcbind, traceroute, wget
 - updated not installed packages
 - added complete package list to Release.txt
 config:
