@@ -1,7 +1,8 @@
 On the road to 2023.09:
 - kernel 6.5.x
-- added new US mirror: https://archboot.org
-- added new SG mirror: https://archboot.net
+- Infrastructure Upgrade:
+  United States - US mirror: https://archboot.org
+  Singapore - SG mirror: https://archboot.net
 Environment:
 - mount initrd outside of dialog progressbar
 - added mouse input devices
