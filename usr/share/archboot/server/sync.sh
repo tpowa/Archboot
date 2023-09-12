@@ -8,8 +8,13 @@ for i in ${_SYNC_SERVER}; do
         exit 1
     else
         : > .rsync-running
-        echo "Syncing files to mirror: ${i}..."
-        rsync -a -q --delete --delete-delay pkg src iso ${i}:public_html/
+        echo "Syncing files to: ${i}..."
+        if curl -s --connect-timeout 5 "${i}" > /dev/null; then
+            rsync -a -q --delete --delete-delay pkg src iso ${i}:public_html/
+            ssh "${i}" "[[ -e ./header-footer.sh ]] && ./header-footer.sh"
+        else
+            echo "Error: Connection blocked :("
+        fi
         rm .rsync-running
     fi
 done
