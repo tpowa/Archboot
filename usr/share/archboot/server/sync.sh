@@ -11,7 +11,7 @@ for i in ${_SYNC_SERVER}; do
         echo "Syncing files to: ${i}..."
         if curl -s --connect-timeout 5 "${i}" > /dev/null; then
             rsync -a -q --delete --delete-delay pkg src iso ${i}:public_html/
-            ssh "${i}" "[[ -e ./header-footer.sh ]] && ./header-footer.sh"
+            ssh "${i}" "[[ -e ./lsws-autoindex.sh ]] && ./lsws-autoindex.sh"
         else
             echo "Error: Connection blocked :("
         fi
