@@ -9,7 +9,7 @@ for i in ${_SYNC_SERVER}; do
     else
         : > .rsync-running
         echo "Syncing files to: ${i}..."
-        if curl -s --connect-timeout 5 "${i}" > /dev/null; then
+        if ssh "${i}" exit > /dev/null; then
             rsync -a -q --delete --delete-delay pkg src iso ${i}:public_html/
             ssh "${i}" "[[ -e ./lsws-autoindex.sh ]] && ./lsws-autoindex.sh"
         else
