@@ -22,11 +22,11 @@ if command -v nvim >/dev/null; then
     alias edit='nvim'
 fi
 # show MOTD on ttyd login
-if [[ -z "${TTY}" && -z "${SSH_TTY}" && -z "${TMUX}" ]]; then
+if [[ -z "${TTY}" && -z "${SSH_TTY}" && -z "${TMUX}" && "$(grep -w 'archboot' /etc/hostname)" ]]; then
     [[ "${SHLVL}" == "2" ]] && cat /etc/motd
 fi
 # run remote-login.sh on ssh connection
-if [[ -z "${STY}" && -n "${SSH_TTY}" ]]; then
-    command -v remote-login.sh >/dev/null && /usr/bin/remote-login.sh
+if [[ -z "${STY}" && -n "${SSH_TTY}" && "$(grep -w 'archboot' /etc/hostname)" ]]; then
+    /usr/bin/remote-login.sh
     exit 0
 fi
