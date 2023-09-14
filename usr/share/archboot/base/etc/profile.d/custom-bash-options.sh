@@ -27,6 +27,6 @@ if [[ -z "${TTY}" && -z "${SSH_TTY}" && -z "${TMUX}" ]]; then
 fi
 # run remote-login.sh on ssh connection
 if [[ -z "${STY}" && -n "${SSH_TTY}" ]]; then
-    command -v remote-login.sh && /usr/bin/remote-login.sh
+    command -v remote-login.sh >/dev/null && /usr/bin/remote-login.sh
     exit 0
 fi
