@@ -27,6 +27,8 @@ hwsim:
 - install kernel modules before setting up AP
 setup:
 - updated UKI routine to use new ukify syntax with ukify.conf
+custom-bash-options.sh: 
+- only run remote-login.sh on archboot
 ---
 2023.08 Highlights:
 - systemd 254.x
