@@ -15,7 +15,7 @@ fi
 export GROFF_NO_SGR=1
 # keep history clean from dups and spaces
 HISTCONTROL="erasedups:ignorespace"
-# if installed set  neovim as default editor
+# if installed set neovim as default editor
 if command -v nvim >/dev/null; then
     alias vi='nvim'
     alias vim='nvim'
@@ -26,7 +26,7 @@ if [[ -z "${TTY}" && -z "${SSH_TTY}" && -z "${TMUX}" ]]; then
     [[ "${SHLVL}" == "2" ]] && cat /etc/motd
 fi
 # run remote-login.sh on ssh connection
-if [[ -z "${STY}" && -n "${SSH_TTY}" && -e "/usr/bin/remote-login.sh" ]]; then
-    /usr/bin/remote-login.sh
+if [[ -z "${STY}" && -n "${SSH_TTY}" ]]; then
+    command -v remote-login.sh && /usr/bin/remote-login.sh
     exit 0
 fi
