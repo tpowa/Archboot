@@ -7,6 +7,5 @@
 # readme is placed in plain text on bottom
 for i in $(find public_html/*/ -type d); do
 	cp lsws-header.html ${i}/HEADER.html
-	cp lsws-readme.html ${i}/README.html
 done
 # vim: set ft=sh ts=4 sw=4 et:
