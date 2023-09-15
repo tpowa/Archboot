@@ -118,7 +118,6 @@ _create_pacman_conf() {
             echo "Adding archboot repository to ${_PACMAN_CONF}..."
             echo "[archboot]" >> "${_PACMAN_CONF}"
             echo "Server = https://archboot.com/pkg" >> "${_PACMAN_CONF}"
-            echo "Server = https://archboot.org/pkg" >> "${_PACMAN_CONF}"
             echo "Server = https://archboot.net/pkg" >> "${_PACMAN_CONF}"
         fi
         #shellcheck disable=SC2001
