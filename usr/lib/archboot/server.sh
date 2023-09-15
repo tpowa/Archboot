@@ -47,29 +47,29 @@ _update_pacman_chroot() {
     #shellcheck disable=SC2086
     sudo -u "${_USER}" gpg ${_GPG} "${_PACMAN_CHROOT}" || exit 1
     chown "${_USER}:${_GROUP}" "${_PACMAN_CHROOT}"{,.sig} || exit 1
-    echo "Syncing files to ${_SERVER}:.${_SERVER_PACMAN}..."
+    echo "Syncing files to ${_SERVER}:${_PUB}/.${_SERVER_PACMAN}..."
     #shellcheck disable=SC2086
-    sudo -u "${_USER}" ${_RSYNC} "${_PACMAN_CHROOT}"{,.sig} "${_SERVER}:.${_SERVER_PACMAN}/" || exit 1
+    sudo -u "${_USER}" ${_RSYNC} "${_PACMAN_CHROOT}"{,.sig} "${_SERVER}:${_PUB}/.${_SERVER_PACMAN}/" || exit 1
 }
 
 _server_upload() {
     # copy files to server
-    echo "Syncing files to ${_SERVER}:.${1}/${_ARCH}..."
+    echo "Syncing files to ${_SERVER}:${_PUB}/.${1}/${_ARCH}..."
     #shellcheck disable=SC2086
-    sudo -u "${_USER}" ssh "${_SERVER}" [[ -d "./${1}/${_ARCH}" ]] || mkdir -p ".${1}/${_ARCH}"
+    sudo -u "${_USER}" ssh "${_SERVER}" [[ -d "${_PUB}/.${1}/${_ARCH}" ]] || mkdir -p "${_PUB}/.${1}/${_ARCH}"
     #shellcheck disable=SC2086
-    sudo -u "${_USER}" ${_RSYNC} "${_DIR}" "${_SERVER}":".${1}/${_ARCH}/" || exit 1
+    sudo -u "${_USER}" ${_RSYNC} "${_DIR}" "${_SERVER}":"${_PUB}/.${1}/${_ARCH}/" || exit 1
     # move files on server, create symlink and removing ${_PURGE_DATE} old release
     sudo -u "${_USER}" ssh "${_SERVER}" <<EOF
-echo "Removing old purge date reached .${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory..."
-rm -r ".${1}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>"${_NO_LOG}"
-cd ".${1}"/"${_ARCH}"
-echo "Creating new latest symlink in .${1}/${_ARCH}..."
+echo "Removing old purge date reached ${_PUB}/.${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory..."
+rm -r ${_PUB}/".${1}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>"${_NO_LOG}"
+cd ${_PUB}/".${1}"/"${_ARCH}"
+echo "Creating new latest symlink in ${_PUB}/.${1}/${_ARCH}..."
 rm latest
 ln -s "${_DIR}" latest
 EOF
-    # sync to U.S. server
-    sudo -u "${_USER}" ssh "${_SERVER}" ./sync.sh
+    # create autoindex HEADER.html
+    sudo -u "${_USER}" ssh "${_SERVER}" "[[ -e "lsws-autoindex.sh" ]] && ./lsws-autoindex.sh"
 }
 
 _create_archive() {
