@@ -1,3 +1,6 @@
+# https://github.com/ethanholz/nvim-lastplace
+# https://github.com/neovim/neovim/issues/16339
+# modified to run as plugin
 local fn = vim.fn
 local lastplace = {}
 
