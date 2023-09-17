@@ -1,6 +1,6 @@
 On the road to 2023.09:
 - kernel 6.5.x
-- GeoIP Mirror: https://archboot.net
+- GeoIP Hosting: https://archboot.net
 - upgraded to 6 month archive of old ISOs
 Environment:
 - mount initrd outside of dialog progressbar
