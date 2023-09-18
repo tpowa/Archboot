@@ -14,6 +14,7 @@ Environment:
 - updated not installed packages
 - added complete package list to Release.txt
 - load windowkeys as systemd service
+- update nvim lastplace plugin
 config:
 - removed SERVER_PUBLIC usage
 login:
