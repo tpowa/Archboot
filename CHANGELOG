@@ -15,6 +15,7 @@ Environment:
 - added complete package list to Release.txt
 - load windowkeys as systemd service
 - updated nvim lastplace plugin
+- removed custom systemd-sysusers.service
 config:
 - removed SERVER_PUBLIC usage
 login:
