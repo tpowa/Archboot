@@ -13,6 +13,7 @@ Environment:
 - removed rpcbind, traceroute, wget
 - updated not installed packages
 - added complete package list to Release.txt
+- load windowkeys as systemd service
 config:
 - removed SERVER_PUBLIC usage
 login:
