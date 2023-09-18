@@ -174,10 +174,10 @@ _auto_set_locale() {
 }
 
 _auto_windowkeys() {
-    if ! [[ -e ${_DESTDIR}/etc/systemd/system/windowskeys.service ]]; then
+    if ! [[ -e "${_DESTDIR}/etc/systemd/system/windowskeys.service" ]]; then
     # enable windowskeys on console
     _progress "98" "Enable windowkeys on installed system..."
-        cp /etc/systemd/system/windowskeys.service ${_DESTDIR}/etc/systemd/system/windowskeys.service
+        cp "/etc/systemd/system/windowskeys.service" "${_DESTDIR}/etc/systemd/system/windowskeys.service"
         chroot "${_DESTDIR}" systemctl enable windowkeys &>"${_NO_LOG}"
     fi
 }
