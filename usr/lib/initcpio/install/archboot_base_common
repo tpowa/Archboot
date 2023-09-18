@@ -139,7 +139,6 @@ build ()
     add_file "/usr/share/archboot/base/etc/vconsole.conf" "/etc/vconsole.conf"
     add_file "/usr/share/archboot/base/etc/systemd/system/getty@.service" "/etc/systemd/system/getty@.service"
     add_file "/usr/share/archboot/base/etc/systemd/system/serial-getty@.service" "/etc/systemd/system/serial-getty@.service"
-    add_file "/usr/share/archboot/base/etc/systemd/system/systemd-sysusers.service" "/etc/systemd/system/systemd-sysusers.service"
     add_file "/usr/share/archboot/base/etc/systemd/system/windowkeys.service" "/etc/systemd/system/windowkeys.service"
     add_file "/usr/share/archboot/base/etc/systemd/journald.conf.d/fw-tty12.conf" "/etc/systemd/journald.conf.d/fw-tty12.conf"
     ### disable systemd mounts:
