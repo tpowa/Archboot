@@ -135,9 +135,9 @@ if [[ "${TTY}" = "tty1" ]] ; then
             systemctl start systemd-resolved
         fi
         # initialize pacman keyring
-        if [[ -e /etc/systemd/system/pacman-init.service ]]; then
-            systemctl start pacman-init
-        fi
+        [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl start pacman-init
+        # enable super keys on console
+        [[ -e /etc/systemd/system/windowkeys.service ]] && systemctl start windowkeys
     fi
 fi
 if [[ -e /usr/bin/setup ]]; then
