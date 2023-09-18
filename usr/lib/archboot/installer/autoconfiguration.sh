@@ -173,6 +173,15 @@ _auto_set_locale() {
     sleep 2
 }
 
+_auto_windowkeys() {
+    if ! [[ -e ${_DESTDIR}/etc/systemd/system/windowskeys.service ]]; then
+    # enable windowskeys on console
+    _progress "98" "Enable windowkeys on installed system..."
+        cp /etc/systemd/system/windowskeys.service ${_DESTDIR}/etc/systemd/system/windowskeys.service
+        chroot "${_DESTDIR}" systemctl enable windowkeys &>"${_NO_LOG}"
+    fi
+}
+
 _auto_bash(){
     if [[ ! -f ${_DESTDIR}/etc/profile.d/custom-bash-prompt.sh ]]; then
         _progress "99" "Setup bash with custom options on installed system..."
