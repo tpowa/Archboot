@@ -141,6 +141,7 @@ build ()
     add_file "/usr/share/archboot/base/etc/systemd/system/serial-getty@.service" "/etc/systemd/system/serial-getty@.service"
     add_file "/usr/share/archboot/base/etc/systemd/system/windowkeys.service" "/etc/systemd/system/windowkeys.service"
     add_file "/usr/share/archboot/base/etc/systemd/journald.conf.d/fw-tty12.conf" "/etc/systemd/journald.conf.d/fw-tty12.conf"
+    add_symlink "/etc/systemd/system/multi-user.target.wants/windowkeys.service" "/etc/systemd/system/windowkeys.service"
     ### disable systemd mounts:
     # disable configfs, debugfs, fuse, hugepages, mqueue and tracefs
     for i in dev-mqueue dev-hugepages sys-kernel-debug sys-kernel-tracing sys-kernel-config sys-fs-fuse-connections tmp; do
@@ -160,8 +161,8 @@ build ()
     ### disable autonount:
     # proc-sys-fs-binfmt_misc.automount
     add_symlink "/etc/systemd/system/proc-sys-fs-binfmt_misc.automount" "/dev/null"
-    # remove multi-user.target.wants
-    rm -rf "${BUILDROOT}/etc/systemd/system/multi-user.target.wants"
+    # remove remote-fs.target from multi-user.target.wants
+    rm -f "${BUILDROOT}/etc/systemd/system/multi-user.target.wants/remote-fs.target"
     # disable lastlog
     add_symlink "/var/log/lastlog" "/dev/null"
     add_file "/usr/share/archboot/base/etc/tmpfiles.d/var.conf" "/etc/tmpfiles.d/var.conf"
