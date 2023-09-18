@@ -140,8 +140,6 @@ if [[ "${TTY}" = "tty1" ]] ; then
         fi
     fi
 fi
-# enable super keys console support
-loadkeys windowkeys
 if [[ -e /usr/bin/setup ]]; then
     _local_mode
     # wait on user interaction!

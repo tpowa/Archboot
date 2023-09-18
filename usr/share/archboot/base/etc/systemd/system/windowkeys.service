@@ -1,0 +1,10 @@
+[Unit]
+Description=Load windowkeys on console
+
+[Service]
+Type=simple
+RemainAfterExit=No
+ExecStart=loadkeys windowkeys
+
+[Install]
+WantedBy=multi-user.target
