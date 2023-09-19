@@ -16,7 +16,7 @@ Environment:
 - load windowkeys as systemd service
 - updated nvim lastplace plugin
 - removed custom systemd-sysusers.service
-- use noto-fonts as default ttf-font
+- use noto-fonts as default ttf-font in Xorg and Wayland
 defaults:
 - removed SERVER_PUBLIC usage
 login:
