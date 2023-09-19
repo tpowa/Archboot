@@ -31,7 +31,7 @@ setup:
 - updated UKI routine to use new ukify syntax with ukify.conf
 - enabled windowkeys in autoconfiguration
 custom-bash-options.sh: 
-- only run remote-login.sh on archboot
+- only run remote-login.sh on archboot environment
 ---
 2023.08 Highlights:
 - systemd 254.x

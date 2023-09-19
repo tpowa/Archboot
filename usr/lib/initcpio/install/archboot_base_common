@@ -102,7 +102,7 @@ build ()
 
     ### add pam
     map add_binary mkhomedir_helper pam_timestamp_check unix_chkpwd unix_update
-    map add_full_dir "/etc/security" "/etc/default" "/etc/pam.d" "/usr/lib/security"
+    map add_full_dir /etc/security /etc/default /etc/pam.d /usr/lib/security /usr/lib/pam.d
     add_file "/etc/environment"
 
     ### add shadow
