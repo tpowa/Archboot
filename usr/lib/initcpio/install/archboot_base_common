@@ -231,6 +231,7 @@ build ()
         "${BUILDROOT}"/usr/lib/systemd/system/avahi* \
         "${BUILDROOT}"/usr/lib/sysusers.d/avahi* \
         "${BUILDROOT}"/usr/share/dbus-1/system.d/avahi* \
+        "${BUILDROOT}"/usr/share/dbus-1/interfaces/org.freedesktop.Avahi* \
         "${BUILDROOT}"/usr/lib/systemd/system/man-db* \
         "${BUILDROOT}"/usr/lib/systemd/system/timers.target.wants/man-db* \
         "${BUILDROOT}"/usr/lib/tmpfiles.d/man-db* \
