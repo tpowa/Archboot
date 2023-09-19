@@ -230,7 +230,7 @@ build ()
         "${BUILDROOT}/usr/lib/systemd/ukify" \
         "${BUILDROOT}"/usr/lib/systemd/system/avahi* \
         "${BUILDROOT}"/usr/lib/sysusers.d/avahi* \
-        "${BUILDROOT}"/usr/share/systemd/dbus-1/system.d/avahi* \
+        "${BUILDROOT}"/usr/share/dbus-1/system.d/avahi* \
         "${BUILDROOT}"/usr/lib/systemd/system/man-db* \
         "${BUILDROOT}"/usr/lib/systemd/system/timers.target.wants/man-db* \
         "${BUILDROOT}"/usr/lib/tmpfiles.d/man-db* \
