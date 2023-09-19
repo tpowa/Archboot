@@ -35,7 +35,7 @@ _FIX_PACKAGES="libelf libevent talloc gcc-libs glibc glib2 pcre2 nss terminus-fo
 _XORG_PACKAGE="xorg"
 _VNC_PACKAGE="tigervnc"
 _WAYLAND_PACKAGE="egl-wayland"
-_STANDARD_PACKAGES="gparted xorg-xhost mtools nss-mdns noto-fonts"
+_STANDARD_PACKAGES="gparted xorg-xhost mtools noto-fonts"
 # chromium is now working on riscv64
 [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _STANDARD_BROWSER="firefox"
 _NSPAWN="systemd-nspawn -q -D"
