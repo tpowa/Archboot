@@ -69,7 +69,7 @@ build ()
         # only support UTF-8
         add_file /usr/share/i18n/charmaps/UTF-8.gz
         # remove conflicting files from not installed packages: binutils, grub and gdbm
-        find "${BUILDROOT}/usr/share/locale/" -type f \( -name 'grub*' -o -name 'avahi*' -o -name 'binutils*' -o -name 'gdbm*' -o -name 'bfd*' \
+        find "${BUILDROOT}/usr/share/locale/" -type f \( -name 'grub*' -o -name 'binutils*' -o -name 'gdbm*' -o -name 'bfd*' \
             -o -name 'gettext*' -o -name 'gas*' -o -name 'gold*' -o -name 'gprof*' -o -name 'ld*' \
             -o -name 'man-db*' -o -name 'opcodes*' -o -name 'texinfo*' \) -delete
     fi
@@ -204,7 +204,7 @@ build ()
             libbsd libmd libpcap libnftnl libnfnetlink libnetfilter_conntrack libsasl libldap memtest86+ \
             memtest86+-efi mkinitcpio-busybox mtools libsysprof-capture libnsl libksba gdbm binutils \
             cdrtools systemd-ukify python python-pefile limine man-pages libev libpipeline groff \
-            man-db texinfo db db5.3 gc rpcbind avahi nss-mdns"
+            man-db texinfo db db5.3 gc rpcbind"
         for i in ${_RM_PACMAN_DB}; do
             rm -rf "${BUILDROOT}"/var/lib/pacman/local/"${i}"-*-[0-9]* &>"${_NO_LOG}"
         done
@@ -224,15 +224,10 @@ build ()
     add_file /usr/share/ca-certificates/trust-source/mozilla.trust.p11-kit
     add_file /usr/share/p11-kit/modules/p11-kit-trust.module
 
-    ### remove conflicting avahi, grub, man-db, mkinitcpio and rpcbind files
+    ### remove conflicting grub, man-db, mkinitcpio and rpcbind files
     rm "${BUILDROOT}/usr/lib/systemd/system/mkinitcpio-generate-shutdown-ramfs.service" \
         "${BUILDROOT}/usr/lib/systemd/system/shutdown.target.wants/mkinitcpio-generate-shutdown-ramfs.service" \
         "${BUILDROOT}/usr/lib/systemd/ukify" \
-        "${BUILDROOT}"/usr/lib/systemd/system/avahi* \
-        "${BUILDROOT}"/usr/lib/sysusers.d/avahi* \
-        "${BUILDROOT}"/usr/share/dbus-1/system.d/avahi* \
-        "${BUILDROOT}"/usr/share/dbus-1/interfaces/org.freedesktop.Avahi* \
-        "${BUILDROOT}"/usr/share/dbus-1/system-services/org.freedesktop.Avahi* \
         "${BUILDROOT}"/usr/lib/systemd/system/man-db* \
         "${BUILDROOT}"/usr/lib/systemd/system/timers.target.wants/man-db* \
         "${BUILDROOT}"/usr/lib/tmpfiles.d/man-db* \
