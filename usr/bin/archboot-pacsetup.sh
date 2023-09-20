@@ -181,13 +181,13 @@ if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]] &&\
             if [[ -n "${_UPDATE_ENVIRONMENT}" ]]; then
                 _run_update_environment
             fi
-            _dialog --title " Pacman Configuration " --no-mouse --infobox "Pacman configuration completed successfully." 3 60
+            _dialog --title " Success " --no-mouse --infobox "Pacman configuration completed successfully." 3 60
             sleep 2
             rm /.new_kernel
         fi
         _cleanup
 fi
-_dialog --title " Pacman Configuration " --no-mouse --infobox "Pacman configuration completed successfully." 3 60
+_dialog --title " Success " --no-mouse --infobox "Pacman configuration completed successfully." 3 60
 sleep 2
 _cleanup
 # vim: set ft=sh ts=4 sw=4 et:

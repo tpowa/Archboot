@@ -101,7 +101,7 @@ _wireless() {
     sleep 3
     _printk on
     if [[ -n "${_WLAN_AUTH}" ]]; then
-        _dialog --title " Network Configuration " --no-mouse --infobox "Authentification to '${_WLAN_SSID}' was successful." 3 70
+        _dialog --title " Success " --no-mouse --infobox "Authentification to '${_WLAN_SSID}' was successful." 3 70
         sleep 2
         return 0
     else
