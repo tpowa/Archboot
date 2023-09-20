@@ -66,7 +66,7 @@ echo "Signing tarball..."
 #shellcheck disable=SC2086
 sudo -u "${_USER}" gpg ${_GPG} ${_PACMAN_ARCH_CHROOT} || exit 1
 chown "${_USER}":"${_GROUP}" "${_PACMAN_ARCH_CHROOT}"{,.sig} || exit 1
-echo "Uploading tarball to ${_SERVER}:${_SERVER_PACMAN_ARCH}..."
-sudo -u "${_USER}" scp "${_PACMAN_ARCH_CHROOT}"{,.sig} "${_SERVER}:${_SERVER_PACMAN_ARCH}" || exit 1
+echo "Syncing tarball to ${_SERVER}:${_PUB}./${_SERVER_PACMAN_ARCH}..."
+sudo -u "${_USER}" ${_RSYNC} "${_PACMAN_ARCH_CHROOT}"{,.sig} "${_SERVER}:${_PUB}./${_SERVER_PACMAN_ARCH}" || exit 1
 echo "Finished."
 # vim: set ft=sh ts=4 sw=4 et:
