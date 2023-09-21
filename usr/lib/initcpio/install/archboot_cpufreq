@@ -5,8 +5,8 @@
 build ()
 {
     add_all_modules 'arch/x86/kernel/cpu/cpufreq|drivers/cpufreq'
-    map add_binary "cpupower" "cpufreq-bench_plot.sh"
-    add_file "/etc/cpufreq-bench.conf"
+    map add_binary cpupower cpufreq-bench_plot.sh
+    add_file /etc/cpufreq-bench.conf
 }
 
 help ()

@@ -37,7 +37,7 @@ build ()
     add_dir /usr/lib/locale
     add_full_dir /usr/lib/locale/C.UTF-8
     ### add custom locale
-    [[ -e "/usr/lib/locale/locale-archive" ]] && add_file "/usr/lib/locale/locale-archive"
+    [[ -e "/usr/lib/locale/locale-archive" ]] && add_file /usr/lib/locale/locale-archive
     
     ### add shadow
     map add_binary groups chage chfn chsh expiry faillog gpasswd lastlog \
@@ -45,9 +45,9 @@ build ()
           newusers pwck pwconv pwunconv useradd userdel usermod sg getsubids
 
     ### fix licenses
-    map add_file "/usr/share/licenses/file/COPYING" "/usr/share/licenses/bzip2/LICENSE" \
-                 "/usr/share/licenses/hdparm/LICENSE.TXT" "/usr/share/licenses/ncurses/COPYING" \
-                 "/usr/share/licenses/sdparm/LICENSE" "/usr/share/licenses/zlib/LICENSE"
+    map add_file /usr/share/licenses/file/COPYING /usr/share/licenses/bzip2/LICENSE \
+                 /usr/share/licenses/hdparm/LICENSE.TXT /usr/share/licenses/ncurses/COPYING \
+                 /usr/share/licenses/sdparm/LICENSE /usr/share/licenses/zlib/LICENSE
 }
 
 help ()

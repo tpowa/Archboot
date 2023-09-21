@@ -5,7 +5,7 @@
 build ()
 {
     # save RAM with deleting already copied content
-    rm -rf "/var/cache/pacman/pkg"
+    rm -rf /var/cache/pacman/pkg
 }
 
 help ()

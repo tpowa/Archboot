@@ -22,14 +22,14 @@ build ()
 	  nilfs-resize nilfs-tune xfs_growfs xfs_quota \
 	  xfs_spaceman compile_et mk_cmds fsck.xfs xfs_admin xfs_bmap xfs_freeze \
 	  xfs_info xfs_metadump xfs_mkfile xfs_ncheck gpart
-    add_file "/etc/nilfs_cleanerd.conf"
+    add_file /etc/nilfs_cleanerd.conf
     map add_full_dir /etc/cifs-utils /etc/request-key.d /etc/nvme
     # fix libinih for plasma wallpaper
     for i in /usr/lib/libINI*; do
 		add_file "${i}"
 	done
     # fix licenses
-    add_file "/usr/share/licenses/e2fsprogs/MIT-LICENSE"
+    add_file /usr/share/licenses/e2fsprogs/MIT-LICENSE
 }
 
 help ()

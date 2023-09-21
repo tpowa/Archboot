@@ -6,7 +6,7 @@ build ()
 {
     map add_binary hwclock tzselect zic zdump
     map add_full_dir /usr/share/zoneinfo /usr/share/zoneinfo-leaps
-    add_file "/usr/bin/archboot-clock.sh" "/usr/bin/clock"
+    add_file /usr/bin/archboot-clock.sh /usr/bin/clock
 }
 
 help ()

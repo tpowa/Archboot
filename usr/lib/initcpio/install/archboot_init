@@ -9,13 +9,13 @@ build() {
         /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod insmod modprobe \
         gzip uname cat cp dmesg grep ln ls mv rm umount lsblk rmmod cut sed find mkdir dialog
     add_file /usr/share/terminfo/l/linux
-    add_file "/usr/share/kbd/consolefonts/ter-v16n.psf.gz" "/consolefont-16.psf.gz"
-    add_file "/usr/share/kbd/consolefonts/ter-v32n.psf.gz" "/consolefont-32.psf.gz"
+    add_file /usr/share/kbd/consolefonts/ter-v16n.psf.gz /consolefont-16.psf.gz
+    add_file /usr/share/kbd/consolefonts/ter-v32n.psf.gz /consolefont-32.psf.gz
     rules_d=/usr/lib/udev/rules.d
     map add_file ${rules_d}/50-udev-default.rules ${rules_d}/60-persistent-storage.rules \
         ${rules_d}/64-btrfs.rules ${rules_d}/80-drivers.rules /usr/lib/udev/ata_id \
         /usr/lib/udev/scsi_id
-    add_file "/usr/share/archboot/base/init" "/init"
+    add_file /usr/share/archboot/base/init /init
     map add_dir /mnt /cdrom /sysroot /ventoy
     map add_file /etc/bash.bash_logout /etc/bash.bashrc /etc/profile /etc/shells
     add_file /usr/share/archboot/base/etc/dialogrc /etc/dialogrc
@@ -33,8 +33,8 @@ build() {
     echo "root:x:0:0:/root:/bin/bash" > "${BUILDROOT}/etc/passwd"
     add_file "/usr/share/archboot/base/etc/profile.d/custom-bash-options.sh" \
              "/etc/profile.d/custom-bash-options.sh"
-    basic_config="os-release modprobe.d/modprobe.conf"
-    for i in $basic_config; do
+    _BASIC_CONFIG="os-release modprobe.d/modprobe.conf"
+    for i in ${_BASIC_CONFIG}; do
         add_file "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done
 }

@@ -21,7 +21,7 @@ build ()
         /var/lib/nfs/rpc_pipefs /var/log/gssproxy
     # mask nfs3 systemd
     for i in rpcbind.service rpcbind.socket rpcbind.target nfs-server.service; do
-        add_symlink "/etc/systemd/system/${i}" "/dev/null"
+        add_symlink "/etc/systemd/system/${i}" /dev/null
     done
     map add_full_dir /etc/gss /etc/gssproxy
     map add_dir /var/lib/gssproxy/{clients,rcache} /var/log/gssproxy

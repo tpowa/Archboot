@@ -7,22 +7,22 @@ build ()
     add_all_modules -f '_cs|b43' '/net/wireless/|/net/ieee80211/|/net/mac80211/'
     if [[ "$(uname -m)" == "x86_64" ]]; then
         # add broadcom wl support
-        add_module 'wl.ko'
-        map add_file "/usr/lib/modprobe.d/broadcom-wl.conf" \
-                     "/usr/share/licenses/broadcom-wl/LICENSE"
+        add_module wl.ko
+        map add_file /usr/lib/modprobe.d/broadcom-wl.conf \
+                     /usr/share/licenses/broadcom-wl/LICENSE
     fi
     # start iwd service
-    add_symlink "/etc/systemd/system/multi-user.target.wants/iwd.service" "/usr/lib/systemd/system/iwd.service"
+    add_symlink /etc/systemd/system/multi-user.target.wants/iwd.service /usr/lib/systemd/system/iwd.service
     map add_binary iw set-wireless-regdom rfkill hwsim iwctl iwmon set-wireless-regdom
     # add iwd and ead daemon
-    map add_binary "/usr/lib/iwd/iwd" "/usr/lib/iwd/ead"
+    map add_binary /usr/lib/iwd/iwd /usr/lib/iwd/ead
     # add hwsim helper script
     add_binary archboot-hwsim.sh
     # crda support
-    map add_file "/etc/conf.d/wireless-regdom" "/usr/lib/crda/regulatory.bin" \
-                 "/usr/lib/crda/pubkeys/sforshee.key.pub.pem"
+    map add_file /etc/conf.d/wireless-regdom /usr/lib/crda/regulatory.bin \
+                 /usr/lib/crda/pubkeys/sforshee.key.pub.pem
     # fixing licenses
-    map add_file "/usr/share/licenses/expat/COPYING" "/usr/share/licenses/wireless-regdb/LICENSE"
+    map add_file /usr/share/licenses/expat/COPYING /usr/share/licenses/wireless-regdb/LICENSE
 }
 
 help ()

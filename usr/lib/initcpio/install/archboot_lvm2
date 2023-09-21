@@ -6,9 +6,9 @@ build ()
 {
     local symlink
     ### from thin-provisioning-tools
-    add_binary 'pdata_tools'
+    add_binary pdata_tools
     for symlink in cache_{check,dump,metadata_size,repair,restore} thin_{check,delta,dump,ls,metadata_size,repair,restore,rmap,trim}; do
-        add_symlink "/usr/bin/${symlink}" 'pdata_tools'
+        add_symlink "/usr/bin/${symlink}" pdata_tools
     done
     map add_binary lvmdump lvmconfig vgimportclone fsadm vgcfgbackup vgcfgrestore vgchange \
           vgck vgconvert vgcreate vgdisplay vgexport vgextend vgimport vgmerge vgmknodes \
@@ -16,9 +16,9 @@ build ()
           pvmove pvremove pvresize pvs pvscan lvchange lvconvert lvcreate lvdisplay \
           lvextend lvmdiskscan lvmsadc lvmsar lvreduce lvremove lvrename lvresize lvs \
           lvscan lvm_import_vdo lvmdevices lvmpolld vgimportdevices
-    map add_dir "/etc/lvm/backup/" "/etc/lvm/archive/"
+    map add_dir /etc/lvm/backup /etc/lvm/archive
     for i in /usr/lib/liblvm*; do
-        add_file "$i"
+        add_file "${i}"
     done
     add_file /etc/lvm/lvm.conf
 }

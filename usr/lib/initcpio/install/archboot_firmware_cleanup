@@ -4,7 +4,7 @@
 
 build ()
 {
-    rm -r "/lib/firmware"
+    rm -r /lib/firmware
 }
 
 help ()

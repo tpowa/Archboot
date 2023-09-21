@@ -5,13 +5,13 @@
 build ()
 {
     ### add pcspkr
-    add_module "pcspkr"
+    add_module pcspkr
     ### add init modules
     map add_module zram? btrfs? zstd? libcrc32c?
     ### keyboard modules
     add_all_modules -f '_cs|ssb-hcd' '/usb/host'
     add_all_modules '/hid/hid-(alps|apple|asus|belkin|cherry|chicony|corsair|elan|hyperv|kensignton|lenovo|logitech|magicmouse|microsoft|razer|redragon|roccat|samsung|sony|speedlink|steelseries)'
-    add_module 'usbhid'
+    add_module usbhid
     add_all_modules -f 'parkbd' '/input/serio|mouse|keyboard/(applespi|atkbd)'
     add_all_modules -f '9pnet|bluetooth|fs' 'virtio'
 }

@@ -4,7 +4,7 @@
 
 build ()
 {
-    apps="head id cksum tail test uptime w who whoami xargs \
+    _APPS="head id cksum tail test uptime w who whoami xargs \
           swapon uniq seq fdisk sfdisk cfdisk parted free less \
           chgrp dmesg egrep fgrep stty hdparm sync bsdcpio\
           dirname chroot expr bunzip2 bzcat bzip2 su sdparm tput \
@@ -30,16 +30,16 @@ build ()
           setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 \
           gunzip zcat wipe file blkpr fadvise isosize pg pipesz tunelp"
     if [[ "$(uname -m)" == "x86_64" ]]; then
-        apps="i386 x86_64 peekfd waitpid $apps"
+        _APPS="i386 x86_64 peekfd waitpid ${_APPS}"
     fi
     if [[ "$(uname -m)" == "aarch64" ]]; then
-        apps="peekfd $apps"
+        _APPS="peekfd ${_APPS}"
     fi
     if [[ "$(uname -m)" == "riscv64" ]]; then
-        apps="waitpid $apps"
+        _APPS="waitpid ${_APPS}"
     fi
-    for i in $apps; do
-        rm /usr/bin/"$i"
+    for i in ${_APPS}; do
+        rm /usr/bin/"${i}"
     done
 }
 

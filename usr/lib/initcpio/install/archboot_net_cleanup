@@ -4,11 +4,11 @@
 
 build ()
 {
-    apps="arping clockdiff tracepath ssh arpd \
+    _APPS="arping clockdiff tracepath ssh arpd \
       genl ifstat ctstat rtstat lnstat nstat rtacct rtmon ss tc \
       bridge dcb devlink rdma tipc vdpa ethtool elinks brctl"
-    for i in $apps; do
-        rm /usr/bin/"$i"
+    for i in ${_APPS}; do
+        rm /usr/bin/"${i}"
     done
 }
 

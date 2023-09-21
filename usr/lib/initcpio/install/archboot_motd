@@ -28,7 +28,7 @@ if  echo "${HOOKS[@]}" | grep -qw archboot_installer; then
     echo -e "  - Use the \e[1;92m'setup'\e[m or the expert \e[1;92m'quickinst'\e[m script." >> "${MOTD}"
 fi
     chmod 644 "${MOTD}"
-    add_file "${MOTD}" "/etc/motd"
+    add_file "${MOTD}" /etc/motd
 }
 
 help ()

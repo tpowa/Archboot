@@ -6,11 +6,11 @@ build ()
 {
     ### adding default font and keymap
     add_binary loadkeys
-    add_file "/usr/share/kbd/consolefonts/ter-v16n.psf.gz"
-    add_file "/usr/share/kbd/consolefonts/ter-v32n.psf.gz"
-    add_file "/usr/share/kbd/keymaps/i386/qwerty/us.map.gz"
-    add_full_dir "/usr/share/kbd/keymaps/i386/include"
-    add_full_dir "/usr/share/kbd/keymaps/include"
+    add_file /usr/share/kbd/consolefonts/ter-v16n.psf.gz
+    add_file /usr/share/kbd/consolefonts/ter-v32n.psf.gz
+    add_file /usr/share/kbd/keymaps/i386/qwerty/us.map.gz
+    add_full_dir /usr/share/kbd/keymaps/i386/include
+    add_full_dir /usr/share/kbd/keymaps/include
 }
 
 help ()
