@@ -41,6 +41,12 @@ _auto_network()
     if [[ -e "/etc/profile.d/proxy.sh" ]]; then
         cp /etc/profile.d/proxy.sh "${_DESTDIR}"/etc/profile.d/proxy.sh
     fi
+    # enable ipv6 privacy extensions
+    if ! [[ -d ${_DESTDIR}/etc/systemd/network.conf.d ]]; then
+        mkdir -p "${_DESTDIR}/etc/systemd/network.conf.d"
+        cp /etc/systemd/network.conf.d/ipv6-privacy-extensions.conf \
+           "${_DESTDIR}"/etc/systemd/network.conf.d/ipv6-privacy-extensions.conf
+    fi
     sleep 2
 }
 
