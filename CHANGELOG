@@ -17,7 +17,7 @@ Environment:
 - updated nvim lastplace plugin
 - removed custom systemd-sysusers.service
 - use noto-fonts as default ttf-font in Xorg and Wayland
-- enabled ipv6 privacy extensions globally
+- enabled ipv6 privacy extensions on all network devices
 defaults:
 - removed SERVER_PUBLIC usage
 login:
@@ -33,7 +33,7 @@ setup:
 - updated UKI routine to use new ukify syntax with ukify.conf
 - enabled windowkeys in autoconfiguration
 - fixed neovim installation
-- enabled ipv6-privacy-extensions in autoconfiguration
+- enabled ipv6 privacy extensions in network autoconfiguration
 custom-bash-options.sh: 
 - only run remote-login.sh on archboot environment
 ---
