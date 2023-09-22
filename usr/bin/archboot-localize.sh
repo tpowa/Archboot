@@ -35,15 +35,12 @@ _vconsole_keymap() {
         [[ -n ${_KEYMAP} ]] && break
     done
     _KEYMAPS=""
-    if $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "nodeadkeys"); then
-        _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "nodeadkeys")"
-        return
+    if $(${_LIST_MAPS} | grep "^${_KEYMAP}$"); then
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAP}$")"
     elif $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "latin1$"); then
         _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "latin1$")"
-        return
-    elif $(${_LIST_MAPS} | grep "^${_KEYMAP}$"); then
-        _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAP}$")"
-        return
+    elif $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "nodeadkeys"); then
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "nodeadkeys")"
     fi
 }
 
