@@ -31,15 +31,15 @@ _vconsole_keymap() {
     _LOW_LOCALE="$(echo "${_LOCALE}" | tr "[:upper:]" "[:lower:]")"
     _KEYMAP=""
     for i in ${_KEYMAPS}; do
-        echo "${_LOW_LOCALE}" | grep -q "${i}" && _KEYMAP="${i}"
+        echo "${_LOW_LOCALE}" | grep -q "${i}" && _KEYMAPS="${i}"
         [[ -n ${_KEYMAP} ]] && break
     done
-    if $(${_LIST_MAPS} | grep "^${_KEYMAP}$"); then
-        _KEYMAPS="$(${_LIST_MAPS} | grep "^${_KEYMAP}$")"
+    if $(${_LIST_MAPS} | grep "^${_KEYMAPS}$"); then
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAPS}$")"
     elif $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "latin1$"); then
-        _KEYMAPS="$(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "latin1$")"
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAPS}" | grep "latin1$")"
     elif $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "nodeadkeys"); then
-        _KEYMAPS="$(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "nodeadkeys")"
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAPS}" | grep "nodeadkeys")"
     fi
 }
 
