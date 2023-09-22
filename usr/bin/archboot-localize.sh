@@ -32,7 +32,7 @@ _vconsole_keymap() {
     _KEYMAP=""
     for i in ${_KEYMAPS}; do
         echo "${_LOW_LOCALE}" | grep -q "${i}" && _KEYMAPS="${i}"
-        [[ -n ${_KEYMAP} ]] && break
+        [[ -n ${_KEYMAPS} ]] && break
     done
     if $(${_LIST_MAPS} | grep "^${_KEYMAPS}$"); then
         _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAPS}$")"
