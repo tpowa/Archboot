@@ -34,10 +34,25 @@ _vconsole_keymap() {
         [[ -n ${_DETECTED_KEYMAP} ]] && break
     done
     _KEYMAP=""
+    # Germany and Estonian
     if ${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep -q "nodeadkeys"; then
         _KEYMAP="$(${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep "nodeadkeys")"
+    # Europe
     elif ${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep -q "^${_DETECTED_KEYMAP}-latin1$"; then
         _KEYMAP="$(${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep "^${_DETECTED_KEYMAP}-latin1$")"
+    # Bulgarian
+    elif ${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep -q "^${_DETECTED_KEYMAP}_pho-utf8$"; then
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep "^${_DETECTED_KEYMAP}_pho-utf8$")"
+    # Czech and Slovak
+    elif ${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep -q "^${_DETECTED_KEYMAP}-qwertz"; then
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep "^${_DETECTED_KEYMAP}-qwertz$")"
+    # Serbian
+    elif ${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep -q "^${_DETECTED_KEYMAP}-latin"; then
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep "^${_DETECTED_KEYMAP}-latin$")"
+    # Ukrainian
+    elif ${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep -q "^${_DETECTED_KEYMAP}-utf"; then
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep "^${_DETECTED_KEYMAP}-utf$")"
+    # Fallback
     elif ${_LIST_MAPS} | grep -q "^${_DETECTED_KEYMAP}$"; then
         _KEYMAP="$(${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}$")"
     fi
