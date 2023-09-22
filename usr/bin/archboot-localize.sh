@@ -35,17 +35,15 @@ _vconsole_keymap() {
         [[ -n ${_KEYMAP} ]] && break
     done
     _KEYMAPS=""
-    for i in $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep -v 'olpc' | grep -v 'mobii' | grep -v 'alt' |\
-                               grep -v '^carpalx' | grep -v 'defkey' | grep -v 'mac' | grep -v 'amiga' |\
-                               grep -v 'sun' | grep -v 'atari'); do
-        _KEYMAPS="${_KEYMAPS} ${i} -"
-    done
-    #shellcheck disable=SC2086
-    if _dialog  --title " Keymap Layout " --menu "" 13 40 7 ${_KEYMAPS} 2>${_ANSWER}; then
-        #shellcheck disable=SC2086
-        _KEYMAP=$(cat ${_ANSWER})
-    else
-        _LOCALE=""
+    if $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "nodeadkeys"); then
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "nodeadkeys")"
+        break
+    elif $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "latin1$"); then
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "latin1$")"
+        break
+    elif $(${_LIST_MAPS} | grep "^${_KEYMAP}$"); then
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAP}$")"
+        break
     fi
 }
 
