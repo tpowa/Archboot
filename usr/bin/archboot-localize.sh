@@ -37,13 +37,13 @@ _vconsole_keymap() {
     _KEYMAPS=""
     if $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "nodeadkeys"); then
         _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "nodeadkeys")"
-        return 0
+        return
     elif $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "latin1$"); then
         _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "latin1$")"
-        return 0
+        return
     elif $(${_LIST_MAPS} | grep "^${_KEYMAP}$"); then
         _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAP}$")"
-        return 0
+        return
     fi
 }
 
