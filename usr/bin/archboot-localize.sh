@@ -31,15 +31,15 @@ _vconsole_keymap() {
     _LOW_LOCALE="$(echo "${_LOCALE}" | tr "[:upper:]" "[:lower:]")"
     _KEYMAP=""
     for i in ${_KEYMAPS}; do
-        echo "${_LOW_LOCALE}" | grep -q "${i}" && _KEYMAPS="${i}"
-        [[ -n ${_KEYMAPS} ]] && break
+        echo "${_LOW_LOCALE}" | grep -q "${i}" && _DETECTED_KEYMAP="${i}"
+        [[ -n ${_DETECTED_KEYMAP} ]] && break
     done
-    if ${_LIST_MAPS} | grep "^${_KEYMAPS}$"; then
-        _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAPS}$")"
-    elif ${_LIST_MAPS} | grep "^${_KEYMAPS}" | grep "latin1$"; then
-        _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAPS}" | grep "latin1$")"
-    elif ${_LIST_MAPS} | grep "^${_KEYMAPS}" | grep "nodeadkeys"; then
-        _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAPS}" | grep "nodeadkeys")"
+    if ${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}$"; then
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}$")"
+    elif ${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep "latin1$"; then
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep "latin1$")"
+    elif ${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep "nodeadkeys"; then
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep "nodeadkeys")"
     fi
 }
 
