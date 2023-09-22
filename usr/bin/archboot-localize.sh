@@ -34,11 +34,11 @@ _vconsole_keymap() {
         echo "${_LOW_LOCALE}" | grep -q "${i}" && _KEYMAPS="${i}"
         [[ -n ${_KEYMAPS} ]] && break
     done
-    if $(${_LIST_MAPS} | grep "^${_KEYMAPS}$"); then
+    if ${_LIST_MAPS} | grep "^${_KEYMAPS}$"; then
         _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAPS}$")"
-    elif $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "latin1$"); then
+    elif ${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "latin1$"; then
         _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAPS}" | grep "latin1$")"
-    elif $(${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "nodeadkeys"); then
+    elif ${_LIST_MAPS} | grep "^${_KEYMAP}" | grep "nodeadkeys"; then
         _KEYMAP="$(${_LIST_MAPS} | grep "^${_KEYMAPS}" | grep "nodeadkeys")"
     fi
 }
