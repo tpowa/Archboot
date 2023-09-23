@@ -15,7 +15,7 @@
 <body>
 <p><span><img src="/web/logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="/web/donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br><strong>Last update: 16.09.2023 21:00</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br><strong>Last update: 23.09.2023 10:05</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -982,6 +982,21 @@ The calculated size to boot the image follows the formula:<br>
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <strong>qemu-user-static</strong> package for building <strong>aarch64</strong> or <strong>riscv64</strong> images on <strong>x86_64</strong> hardware.</li>
 </ul>
 <p>If you want to build <strong>aarch64</strong> or <strong>riscv64</strong> images replace <strong>x86_64</strong> with the architecture of your choice in the commands and files below.</p>
+<table>
+<thead>
+<tr class="header">
+<th class="MyNo">Caveat:</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="MyOpt"><ul><li><strong>Qemu 8.1.1-1</strong> packages don't work with <strong>binfmt</strong> and <strong>segfaults</strong> on <strong>aarch64</strong>!</li>
+<li>Use <a href="https://archboot.net/src/qemu" title="Qemu"><strong>Qemu 8.1.0-2 packages</strong></a> until it gets fixed upstream.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <h2 data-number="7.1" id="create-rescue-system"><span class="header-section-number">7.1</span> <strong>Create Rescue System Out Of The Running System</strong></h2>
 <table>
 <thead>
