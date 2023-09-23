@@ -52,7 +52,7 @@ _vconsole_keymap() {
     # Ukrainian
     elif ${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep -q "^${_DETECTED_KEYMAP}-utf"; then
         _KEYMAP="$(${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep "^${_DETECTED_KEYMAP}-utf$")"
-    # Fallback
+    # fallback to plain  ${_KEYMAP}
     elif ${_LIST_MAPS} | grep -q "^${_DETECTED_KEYMAP}$"; then
         _KEYMAP="$(${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}$")"
     fi
