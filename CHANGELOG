@@ -20,6 +20,8 @@ Environment:
 - enabled ipv6 privacy extensions on all network devices
 defaults:
 - removed SERVER_PUBLIC usage
+localize:
+- use most common keymap based on locale selection
 login:
 - moved pacman db cleanup from login to base_common hook
 - removed progress waiting dialog on latest and local image
