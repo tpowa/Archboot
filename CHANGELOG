@@ -18,6 +18,7 @@ Environment:
 - removed custom systemd-sysusers.service
 - use noto-fonts as default ttf-font in Xorg and Wayland
 - enabled ipv6 privacy extensions on all network devices
+- enabled tr turkish glibc locale
 defaults:
 - removed SERVER_PUBLIC usage
 localize:
