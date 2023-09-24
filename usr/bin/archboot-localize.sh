@@ -9,7 +9,7 @@ _locale_menu() {
     while [[ -z "${_LOCALE}" ]]; do
         _LOCALE=""
         _LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese OTHER Other"
-        _OTHER_LOCALES="be_BY Belarusian bg_BG Bulgarian cs_CZ Czech da_DK Dansk fi_FI Finnish el_GR Greek hu_HU Hungarian it_IT Italian lt_LT Lithuanian lv_LV Latvian mk_MK Macedonian nl_NL Dutch nn_NO Norwegian pl_PL Polish ro_RO Romanian  ru_RU Russian sk_SK Slovak sr_RS Serbian sv_SE Swedish uk_UA Ukrainian"
+        _OTHER_LOCALES="be_BY Belarusian bg_BG Bulgarian cs_CZ Czech da_DK Dansk fi_FI Finnish el_GR Greek hu_HU Hungarian it_IT Italian lt_LT Lithuanian lv_LV Latvian mk_MK Macedonian nl_NL Dutch nn_NO Norwegian pl_PL Polish ro_RO Romanian ru_RU Russian sk_SK Slovak sr_RS Serbian sv_SE Swedish tr_TR Turkish uk_UA Ukrainian"
         _CANCEL=""
         #shellcheck disable=SC2086
         _dialog --cancel-label "${_LABEL}" --title " Locale " --menu "" 12 35 5 ${_LOCALES} 2>${_ANSWER} || _abort
@@ -27,7 +27,7 @@ _locale_menu() {
 
 _vconsole_keymap() {
     _LIST_MAPS="localectl list-keymaps --no-pager"
-    _KEYMAPS="us de es fr pt be bg br ca cz dk et fi gr hu it lt lv mk nl no pl ro ru sk sr sv ua"
+    _KEYMAPS="us de es fr pt be bg br ca cz dk et fi gr hu it lt lv mk nl no pl ro ru sk sr sv tr ua"
     _LOW_LOCALE="$(echo "${_LOCALE}" | tr "[:upper:]" "[:lower:]")"
     for i in ${_KEYMAPS}; do
         echo "${_LOW_LOCALE}" | grep -q "${i}" && _DETECTED_KEYMAP="${i}"
@@ -49,6 +49,9 @@ _vconsole_keymap() {
     # Serbian
     elif ${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep -q "^${_DETECTED_KEYMAP}-latin"; then
         _KEYMAP="$(${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep "^${_DETECTED_KEYMAP}-latin$")"
+    # Turkish
+    elif ${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep -q "^${_DETECTED_KEYMAP}q$"; then
+        _KEYMAP="$(${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep "^${_DETECTED_KEYMAP}q$")"
     # Ukrainian
     elif ${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep -q "^${_DETECTED_KEYMAP}-utf"; then
         _KEYMAP="$(${_LIST_MAPS} | grep "^${_DETECTED_KEYMAP}" | grep "^${_DETECTED_KEYMAP}-utf$")"

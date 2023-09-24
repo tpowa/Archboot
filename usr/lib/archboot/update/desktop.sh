@@ -43,7 +43,7 @@ _install_graphic() {
     done
     # install firefox langpacks
     if [[ "${_STANDARD_BROWSER}" == "firefox" ]]; then
-        _LANG="be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr uk"
+        _LANG="be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr tr uk"
         for i in ${_LANG}; do
             if grep -q "${i}" /etc/locale.conf; then
                 pacman -S firefox-i18n-"${i}" --noconfirm &>"${_LOG}"
@@ -97,7 +97,7 @@ _prepare_graphic() {
         ! -path '*/fi/*' ! -path '*/fr/*' ! -path '*/hu/*' ! -path '*/it/*' ! -path '*/lt/*' \
         ! -path '*/lv/*' ! -path '*/mk/*' ! -path '*/nl/*' ! -path '*/nn/*' ! -path '*/pl/*' \
         ! -path '*/pt/*' ! -path '*/ro/*' ! -path '*/ru/*' ! -path '*/sk/*' ! -path '*/sr/*' \
-        ! -path '*/sv/*' ! -path '*/uk/*' -delete &>"${_NO_LOG}"
+        ! -path '*/sv/*' ! -path '*/tr/*' ! -path '*/uk/*' -delete &>"${_NO_LOG}"
         find /usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>"${_NO_LOG}"
     fi
     _progress "98" "Restart dbus..."

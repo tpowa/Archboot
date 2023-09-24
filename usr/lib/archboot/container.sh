@@ -70,7 +70,7 @@ _clean_container() {
         find "${1}"/usr/share/locale/ -mindepth 2 ! -path '*/be/*' ! -path '*/bg/*' ! -path '*/cs/*' ! -path '*/da/*' ! -path '*/de/*' \
         ! -path '*/en/*' ! -path '*/el/*' ! -path '*/es/*' ! -path '*/fi/*' ! -path '*/fr/*' ! -path '*/hu/*' ! -path '*/it/*' \
         ! -path '*/lt/*' ! -path '*/lv/*' ! -path '*/mk/*' ! -path '*/nl/*' ! -path '*/nn/*' ! -path '*/pl/*' ! -path '*/pt/*' \
-        ! -path '*/ro/*' ! -path '*/ru/*' ! -path '*/sk/*' ! -path '*/sr/*' ! -path '*/sv/*' ! -path '*/uk/*' -delete &>"${_NO_LOG}"
+        ! -path '*/ro/*' ! -path '*/ru/*' ! -path '*/sk/*' ! -path '*/sr/*' ! -path '*/sv/*' ! -path '*/tr/*' ! -path '*/uk/*' -delete &>"${_NO_LOG}"
         find "${1}"/usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>"${_NO_LOG}"
     fi
 }
