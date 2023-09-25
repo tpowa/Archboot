@@ -14,7 +14,7 @@ build ()
             partprobe cp dir du ls mv rm sed grep kill killall more ps pwd rmdir true cat \
             mkdir echo false sleep kmod pidof touch chmod find wc uname yes awk halt \
             shutdown reboot poweroff insmod modprobe sh dd sort zstd date tee mktemp \
-            install pgrep mkfs.btrfs rmmod mountpoint gzip ldconfig nscd ln top df cut \
+            install pgrep mkfs.btrfs rmmod mountpoint gzip ldconfig ln top df cut \
             stat tr passwd od tar bsdtar dialog
 
     ### add nano
@@ -37,7 +37,7 @@ build ()
     map add_full_dir /etc/profile.d /usr/share/terminfo
     add_symlink /usr/lib/terminfo ../share/terminfo
     _SYSTEMFILES="bash.bash_logout bash.bashrc crypttab fstab host.conf hosts \
-                 inputrc mke2fs.conf nscd.conf nsswitch.conf protocols \
+                 inputrc mke2fs.conf nsswitch.conf protocols \
                  request-key.conf securetty services"
     for i in ${_SYSTEMFILES}; do
         add_file "/etc/${i}"
