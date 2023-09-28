@@ -1,6 +1,8 @@
-On the road to 2023.09:
+On the road to 2023.10:
+---
+2023.09 Highlights:
 - kernel 6.5.x
-- GeoIP Hosting: https://archboot.net
+- GeoIP - CDN Hosting: https://archboot.net
 - upgraded to 6 months archive of old ISOs
 Environment:
 - mount initrd outside of dialog progressbar
