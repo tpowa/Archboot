@@ -769,18 +769,27 @@ _enter_luks_name() {
 
 _enter_luks_passphrase () {
     _LUKSPASSPHRASE=""
+    _LUKSPASS=""
+    _LUKSPASS2=""
     while [[ -z "${_LUKSPASSPHRASE}" ]]; do
-        _dialog --no-cancel --insecure --passwordbox "Enter passphrase for luks encrypted device ${_LUKSDEV}:" 7 60 2>"${_ANSWER}" || return 1
-        _LUKSPASS=$(cat "${_ANSWER}")
-        _dialog --no-cancel --insecure --passwordbox "Retype passphrase for luks encrypted device ${_LUKSDEV}:" 7 60 2>"${_ANSWER}" || return 1
-        _LUKSPASS2=$(cat "${_ANSWER}")
-        if [[ -n "${_LUKSPASS}" && -n "${_LUKSPASS2}" && "${_LUKSPASS}" == "${_LUKSPASS2}" ]]; then
+        while [[ -z "${_LUKSPASS}" ]]; do
+            _dialog --no-cancel --insecure --passwordbox "Enter passphrase for luks encrypted device ${_LUKSDEV}:" 8 70 2>"${_ANSWER}" || return 1
+            _LUKSPASS=$(cat "${_ANSWER}")
+        done
+        while [[ -z "${_LUKSPASS2}" ]]; do
+            _dialog --no-cancel --insecure --passwordbox "Retype passphrase for luks encrypted device ${_LUKSDEV}:" 8 70 2>"${_ANSWER}" || return 1
+            _LUKSPASS2=$(cat "${_ANSWER}")
+        done
+        if [[ "${_LUKSPASS}" == "${_LUKSPASS2}" ]]; then
             _LUKSPASSPHRASE=${_LUKSPASS}
             echo "${_LUKSPASSPHRASE}" > "/tmp/passphrase-${_LUKSDEV}"
             _LUKSPASSPHRASE="/tmp/passphrase-${_LUKSDEV}"
         else
-             _dialog --no-mouse --infobox "Passphrases didn't match or was empty, please enter again." 0 0
-             sleep 5
+             _dialog --no-mouse --infobox "Passphrases didn't match, please enter again." 0 0
+             sleep 3
+            _LUKSPASSPHRASE=""
+            _LUKSPASS=""
+            _LUKSPASS2=""
         fi
     done
 }
