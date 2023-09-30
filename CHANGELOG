@@ -1,4 +1,7 @@
 On the road to 2023.10:
+setup:
+- removed ext2/3 from quicksetup
+- don't allow empty luks passphrase
 ---
 2023.09 Highlights:
 - kernel 6.5.x
