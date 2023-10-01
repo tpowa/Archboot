@@ -72,7 +72,7 @@ _prepare_uefi_RISCV64() {
     _GRUB_ARCH="riscv64-efi"
     _GRUB_EFI="grubriscv64.efi"
     ${_NSPAWN} "${1}" ${_GRUB_MKSTANDALONE}
-    mv "${1}"/grubriscv64.efi.efi grub-efi/
+    mv "${1}"/grubriscv64.efi grub-efi/
 }
 
 _upload_efi_files() {
