@@ -11,6 +11,7 @@ _SHIM32_RPM="x86_64/shim-ia32-${_SHIM_VERSION}-${_SHIM_RELEASE}.x86_64.rpm"
 _SHIM_AA64_RPM="aarch64/shim-aa64-${_SHIM_VERSION}-${_SHIM_RELEASE}.aarch64.rpm"
 _ARCH_SERVERDIR="/${_PUB}/src/bootloader"
 _GRUB_ISO="/usr/share/archboot/grub/archboot-iso-grub.cfg"
+_GRUB_MKSTANDALONE="grub-mkstandalone -d /usr/lib/grub/x86_64-efi -O "${_GRUB_ARCH}" --sbat=/usr/share/grub/sbat.csv --fonts="ter-u16n" --locales="" --themes="" -o "grub-efi/${_GRUB_EFI}" "boot/grub/grub.cfg=${_GRUB_ISO}""
 
 _prepare_shim_files () {
     # download packages from fedora server
@@ -42,31 +43,36 @@ _prepare_shim_files () {
 ### RISC64: https://fedoraproject.org/wiki/Architectures/RISC-V/GRUB2
 _prepare_uefi_X64() {
     echo "Preparing X64 Grub..."
-    grub-mkstandalone -d /usr/lib/grub/x86_64-efi -O x86_64-efi --sbat=/usr/share/grub/sbat.csv --fonts="ter-u16n" --locales="" --themes="" -o grub-efi/grubx64.efi "boot/grub/grub.cfg=${_GRUB_ISO}"
+    _GRUB_ARCH="x86_64-efi"
+    _GRUB_EFI="grubx64.efi"
+    ${_GRUB_MKSTANDALONE}
 }
 
 _prepare_uefi_IA32() {
     echo "Preparing IA32 Grub..."
-    grub-mkstandalone -d /usr/lib/grub/i386-efi -O i386-efi --sbat=/usr/share/grub/sbat.csv --fonts="ter-u16n" --locales="" --themes="" -o grub-efi/grubia32.efi "boot/grub/grub.cfg=${_GRUB_ISO}"
+    _GRUB_ARCH="i386-efi"
+    _GRUB_EFI="grubia32.efi"
+    ${_GRUB_MKSTANDALONE}
 }
 
 _prepare_uefi_AA64() {
     echo "Installing grub package..."
     ${_NSPAWN} "${1}" pacman -Sy grub --noconfirm
-    cp ${_GRUB_ISO} "${1}"/archboot-iso-grub.cfg
     echo "Preparing AA64 Grub..."
-    ${_NSPAWN} "${1}" grub-mkstandalone -d /usr/lib/grub/arm64-efi -O arm64-efi --sbat=/usr/share/grub/sbat.csv --fonts="ter-u16n" --locales="" --themes="" -o /grubaa64.efi "boot/grub/grub.cfg=/archboot-iso-grub.cfg"
+    _GRUB_ARCH="arm64-efi"
+    _GRUB_EFI="grubaa64.efi"
+    ${_NSPAWN} "${1}" ${_GRUB_MKSTANDALONE}
     mv "${1}"/grubaa64.efi grub-efi/
 }
 
 _prepare_uefi_RISCV64() {
     echo "Installing grub package..."
-   ${_NSPAWN} "${1}" pacman -Sy grub --noconfirm
-    cp ${_GRUB_ISO} "${1}"/archboot-iso-grub.cfg
+    ${_NSPAWN} "${1}" pacman -Sy grub --noconfirm
     echo "Preparing RISCV64 Grub..."
-   ${_NSPAWN} "${1}" grub-mkstandalone -d /usr/lib/grub/riscv64-efi -O riscv64-efi --sbat=/usr/share/grub/sbat.csv --fonts="ter-u16n" --locales="" --themes="" -o /BOOTRISCV64.efi "boot/grub/grub.cfg=/archboot-iso-grub.cfg"
-    mv "${1}"/BOOTRISCV64.efi grub-efi/
-    cp grub-efi/BOOTRISCV64.efi grub-efi/grubriscv64.efi
+    _GRUB_ARCH="riscv64-efi"
+    _GRUB_EFI="grubriscv64.efi"
+    ${_NSPAWN} "${1}" ${_GRUB_MKSTANDALONE}
+    mv "${1}"/grubriscv64.efi.efi grub-efi/
 }
 
 _upload_efi_files() {
