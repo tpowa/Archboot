@@ -11,7 +11,7 @@ _SHIM32_RPM="x86_64/shim-ia32-${_SHIM_VERSION}-${_SHIM_RELEASE}.x86_64.rpm"
 _SHIM_AA64_RPM="aarch64/shim-aa64-${_SHIM_VERSION}-${_SHIM_RELEASE}.aarch64.rpm"
 _ARCH_SERVERDIR="/${_PUB}/src/bootloader"
 _GRUB_ISO="/usr/share/archboot/grub/archboot-iso-grub.cfg"
-_GRUB_MKSTANDALONE="grub-mkstandalone -d /usr/lib/grub/x86_64-efi -O "${_GRUB_ARCH}" --sbat=/usr/share/grub/sbat.csv --fonts="ter-u16n" --locales="" --themes="" -o "grub-efi/${_GRUB_EFI}" "boot/grub/grub.cfg=${_GRUB_ISO}""
+_GRUB_MKSTANDALONE="grub-mkstandalone -d /usr/lib/grub/x86_64-efi -O ${_GRUB_ARCH} --sbat=/usr/share/grub/sbat.csv --fonts=ter-u16n --locales= --themes= -o grub-efi/${_GRUB_EFI} boot/grub/grub.cfg=${_GRUB_ISO}"
 
 _prepare_shim_files () {
     # download packages from fedora server
@@ -61,6 +61,7 @@ _prepare_uefi_AA64() {
     echo "Preparing AA64 Grub..."
     _GRUB_ARCH="arm64-efi"
     _GRUB_EFI="grubaa64.efi"
+    #shellcheck disable=SC2086
     ${_NSPAWN} "${1}" ${_GRUB_MKSTANDALONE}
     mv "${1}"/grubaa64.efi grub-efi/
 }
@@ -71,6 +72,7 @@ _prepare_uefi_RISCV64() {
     echo "Preparing RISCV64 Grub..."
     _GRUB_ARCH="riscv64-efi"
     _GRUB_EFI="grubriscv64.efi"
+    #shellcheck disable=SC2086
     ${_NSPAWN} "${1}" ${_GRUB_MKSTANDALONE}
     mv "${1}"/grubriscv64.efi grub-efi/
 }
