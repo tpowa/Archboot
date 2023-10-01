@@ -13,6 +13,7 @@ _ARCH_SERVERDIR="/${_PUB}/src/bootloader"
 _GRUB_ISO="/usr/share/archboot/grub/archboot-iso-grub.cfg"
 
 _grub_mkstandalone() {
+    #shellcheck disable=SC2086
     ${1} ${2} grub-mkstandalone -d "/usr/lib/grub/${_GRUB_ARCH}" -O "${_GRUB_ARCH}" --sbat=/usr/share/grub/sbat.csv --fonts=ter-u16n --locales="" --themes="" -o "grub-efi/${_GRUB_EFI}" "boot/grub/grub.cfg=${_GRUB_ISO}"
 }
 
@@ -67,7 +68,7 @@ _prepare_uefi_AA64() {
     mkdir "${1}"/grub-efi
     #shellcheck disable=SC2086
     _grub_mkstandalone "${_NSPAWN}" "${1}"
-    mv "${1}"/grub-efi/grubaa64.efi grub-efi/
+    mv "${1}/grub-efi/${_GRUB_EFI}" grub-efi/
 }
 
 _prepare_uefi_RISCV64() {
@@ -79,7 +80,7 @@ _prepare_uefi_RISCV64() {
     mkdir "${1}"/grub-efi
     #shellcheck disable=SC2086
     _grub_mkstandalone "${_NSPAWN}" "${1}"
-    mv "${1}"/grub-efi/grubriscv64.efi grub-efi/
+    mv "${1}/grub-efi/${_GRUB_EFI}" grub-efi/
 }
 
 _upload_efi_files() {
