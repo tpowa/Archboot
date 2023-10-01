@@ -3,7 +3,7 @@ Environment:
 - simplified grub-mkstandalone calls
 - added grub bli module loading on EFI systems
 setup:
-- removed ext2/3 from quicksetup
+- removed ext2/3 from Quick Setup
 - don't allow empty luks passphrase
 - added grub bli module in grub.cfg
 ---
