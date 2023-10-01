@@ -105,21 +105,20 @@ EOF
     [[ -n "${_RAID_ON_LVM}" ]] && echo "insmod lvm" >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
     #shellcheck disable=SC2129
     cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
-if [ -e "\${prefix}/\${grub_cpu}-\${grub_platform}/all_video.mod" ]; then
+if [ "\${grub_platform}" == "efi" ]; then
     insmod all_video
-else
-    if [ "\${grub_platform}" == "efi" ]; then
+    insmod efi_gop
+    if [ "\${grub_cpu}" == "x86_64" ] || [ "\${grub_cpu}" == "i386" ]; then
         insmod bli
-        insmod efi_gop
         insmod efi_uga
     fi
-    if [ "\${grub_platform}" == "pc" ]; then
-        insmod vbe
-        insmod vga
-    fi
-    insmod video_bochs
-    insmod video_cirrus
+elif [ "\${grub_platform}" == "pc" ]; then
+    insmod vbe
+    insmod vga
+    insmod png
 fi
+insmod video_bochs
+insmod video_cirrus
 insmod font
 search --fs-uuid --no-floppy --set=usr_part ${_USRDEV_HINTS_STRING} ${_USRDEV_FS_UUID}
 search --fs-uuid --no-floppy --set=root_part ${_ROOTDEV_HINTS_STRING} ${_ROOTDEV_FS_UUID}
