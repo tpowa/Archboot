@@ -348,26 +348,7 @@ _grub_install_uefi() {
 
 _grub_install_uefi_sb() {
     ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
-    # add -v for verbose
-    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --fonts="ter-u16n" --locales="en@quot" --themes="" -o "/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
-    elif [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-        ### In case grub will be broken!
-        #_dialog --no-mouse --infobox "Pacman is running...\n\nInstalling grub-2:2.06.r533.g78bc9a9b2-1 to ${_DESTDIR}...\n\nCheck ${_VC} console (ALT-F${_VC_NUM}) for progress..." 8 70
-        # fix broken grub with last working version:
-        # https://lists.gnu.org/archive/html/grub-devel/2023-06/msg00121.html
-        #if [[ -e "${_LOCAL_DB}" ]]; then
-        #    cp "${_CACHEDIR}/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst" "${_DESTDIR}"
-        #    cp "${_CACHEDIR}/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig" "${_DESTDIR}"
-        #else
-        #    ${_DLPROG} -O --output-dir ${_DESTDIR}" "https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst"
-        #    ${_DLPROG} -O --output-dir "${_DESTDIR} "https://archboot.com/src/grub/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig"
-        #fi
-        #${_NSPAWN} pacman -U --noconfirm /grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst >>"${_LOG}"
-        #rm "${_DESTDIR}/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst"
-        #rm "${_DESTDIR}/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig"
-        #_dialog --no-mouse --infobox "grub-2:2.06.r533.g78bc9a9b2-1 has been installed successfully.\nContinuing in 5 seconds..." 4 70
-        #sleep 5
+    if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]]; then
         ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --fonts="ter-u16n" --locales="en@quot" --themes="" -o "/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
     fi
     rm /.archboot
