@@ -5,6 +5,7 @@ Environment:
 setup:
 - removed ext2/3 from quicksetup
 - don't allow empty luks passphrase
+- added grub bli module in grub.cfg
 ---
 2023.09 Highlights:
 - kernel 6.5.x
