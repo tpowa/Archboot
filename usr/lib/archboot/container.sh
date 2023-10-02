@@ -200,15 +200,6 @@ _install_archboot() {
     fi
 }
 
-#_install_custom_grub() {
-#        [[ -e "${_CACHEDIR}"/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst ]] && \
-#         cp ""${_CACHEDIR}"/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst" \
-#         "${1}"${_CACHEDIR}"/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst"
-#        [[ -e "${_CACHEDIR}"/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig ]] && \
-#         cp ""${_CACHEDIR}"/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig" \
-#         "${1}"${_CACHEDIR}"/grub-2:2.06.r533.g78bc9a9b2-1-x86_64.pkg.tar.zst.sig"
-#}
-
 _copy_mirrorlist_and_pacman_conf() {
     # copy local mirrorlist to container
     echo "Creating pacman config and mirrorlist in container..."
