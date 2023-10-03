@@ -30,8 +30,7 @@ if echo "${_BASENAME}" | grep -qw aarch64 || echo "${_BASENAME}" | grep -qw x86_
     _prepare_uefi_image || exit 1
     _reproducibility
     _grub_mkrescue || exit 1
-    _hide_gpt_partitions || exit 1
-    _reproducibility_iso  || exit 1
+    _unify_gpt_partitions || exit 1
 else
     # running system = riscv64
     echo "Starting Image creation..."

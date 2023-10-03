@@ -248,22 +248,19 @@ _grub_mkrescue() {
     grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="ter-u16n" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" -volid "ARCHBOOT" -- -rm_r /boot/grub/{roms,locale} /efi .disk/ ${_RESCUE_REMOVE} &> "${_IMAGENAME}.log"
 }
 
-_hide_gpt_partitions() {
-    # Hide all partitions, Windows cannot access files on this ISO
-    # Windows will now only error on 1 drive and not all partitions
-    echo "Hide GPT partitions..."
+_unify_gpt_partitions() {
+    # GPT partition layout:
+    # 1: Gap0 | 2: EFI System Partition | 3: HFS/HFS+ | 4: GAP1
+    # --> already set 0: system partition (does not allow delete on Windows)
+    # --> already set 60: readonly
+    # --> 62: hide all partitions, Windows cannot access any files on this ISO
+    #         Windows will now only error on 1 drive and not on all partitions
+    # --> 63: disable freedesktop/systemd automount by default on this ISO
+    echo "Creating reproducible GUID, UUIDs, hide partitions and disable automount on ${_IMAGENAME}.iso GPT..."
+    sgdisk -U 00000000-0000-0000-0000-0000-000000000000 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
     for i in 1 2 3 4; do
-        sgdisk -A ${i}:set:62 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
+        sgdisk -A ${i}:set:62 -A ${i}:set:63 -u ${i}:${i}0000000-0000-0000-0000-0000-000000000000 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
     done
-}
-
-_reproducibility_iso() {
-    echo "Creating reproducible UUIDs on ${_IMAGENAME}.iso GPT..."
-    sgdisk -u 1:1 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
-    sgdisk -u 2:2 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
-    sgdisk -u 3:3 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
-    sgdisk -u 4:4 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
-    sgdisk -U 1 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
 }
 
 _create_cksum() {
