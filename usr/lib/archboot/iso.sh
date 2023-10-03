@@ -256,8 +256,9 @@ _unify_gpt_partitions() {
     # --> 62: hide all partitions, Windows cannot access any files on this ISO
     #         Windows will now only error on 1 drive and not on all partitions
     # --> 63: disable freedesktop/systemd automount by default on this ISO
-    echo "Creating reproducible GUID, UUIDs, hide partitions and disable automount on ISO GPT..."
-    sgdisk -U 00000000-0000-0000-0000-0000-000000000000 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
+    # --> -j 2: Move main table sector from 20 to the default 2
+    echo "Creating reproducible GUID, UUIDs, hide partitions, disable automount and move main table sector on ISO GPT..."
+    sgdisk -j 2 -U 00000000-0000-0000-0000-0000-000000000000 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
     for i in 1 2 3 4; do
         sgdisk -A ${i}:set:62 -A ${i}:set:63 -u ${i}:${i}0000000-0000-0000-0000-0000-000000000000 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
     done
