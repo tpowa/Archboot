@@ -3,6 +3,8 @@ Environment:
 - simplified grub-mkstandalone calls
 - added grub bli module loading on x86_64 EFI systems
 - higher maximum of 20 seconds for network connection
+- unified GPT values: GUID and UUIDs on ISO images
+- hide GPT partitions and disabled GPT automount on ISO images
 setup:
 - removed ext2/3 from Quick Setup
 - don't allow empty luks passphrase
