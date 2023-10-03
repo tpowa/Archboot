@@ -178,7 +178,7 @@ _prepare_uefi_image() {
     IMGSZ=$((BOOTSIZE/1024 + 2048)) # image size in KB
     VFAT_IMAGE="${_ISODIR}/efi.img"
     ## Creating efi.img
-    mkfs.vfat --invariant -C "${VFAT_IMAGE}" "${IMGSZ}" >"${_NO_LOG}"
+    mkfs.vfat -n ARCHBOOT --invariant -C "${VFAT_IMAGE}" "${IMGSZ}" >"${_NO_LOG}"
     ## Copying all files to UEFI vfat image
     mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI "${_ISODIR}"/boot ::/
     # leave EFI/ and /boot/kernel for virtualbox and other restricted VM emulators :(
@@ -226,7 +226,7 @@ device: "${VFAT_IMAGE}"
 unit: sectors
 "${VFAT_IMAGE}"1 : start=        2048, type=83, bootable
 EOF
-    mkfs.vfat --offset=2048 --invariant "${VFAT_IMAGE}" >"${_NO_LOG}"
+    mkfs.vfat -n "ARCHBOOT" --offset=2048 --invariant "${VFAT_IMAGE}" >"${_NO_LOG}"
     ## Copying all files to UEFI vfat image
     mcopy -m -i "${VFAT_IMAGE}"@@1048576  -s "${_ISODIR}"/boot ::/
     mv "${VFAT_IMAGE}" "${_IMAGENAME}.img"
@@ -239,12 +239,22 @@ _grub_mkrescue() {
     #set date for reproducibility
     # --set_all_file_dates for all files
     # --modification-date= for boot.catalog
-    # -- --rm_r /efi .disk/ /boot/grub/{roms,locale} ${_RESCUE_REMOVE} for removing reproducibility breakers
+    # --volid set ISO label ARCHBOOT
+    # -- -rm_r /efi .disk/ /boot/grub/{roms,locale} ${_RESCUE_REMOVE} for removing reproducibility breakers
     echo "Generating ${_ARCH} hybrid ISO..."
     [[ "${_ARCH}" == "x86_64" ]] && _RESCUE_REMOVE="mach_kernel /System /boot/grub/i386-efi /boot/grub/x86_64-efi"
     [[ "${_ARCH}" == "aarch64" ]] && _RESCUE_REMOVE="/boot/grub/arm64-efi"
     #shellcheck disable=SC2086
-    grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="ter-u16n" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" -- --rm_r /boot/grub/{roms,locale} /efi .disk/ ${_RESCUE_REMOVE} &> "${_IMAGENAME}.log"
+    grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="ter-u16n" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" -volid "ARCHBOOT" -- -rm_r /boot/grub/{roms,locale} /efi .disk/ ${_RESCUE_REMOVE} &> "${_IMAGENAME}.log"
+}
+
+_hide_gpt_partitions() {
+    # Hide all partitions, Windows cannot access files on this ISO
+    # Windows will now only error on 1 drive and not all partitions
+    echo "Hide GPT partitions..."
+    for i in 1 2 3 4; do
+        sgdisk -A ${i}:set:62 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
+    done
 }
 
 _reproducibility_iso() {
