@@ -1,20 +1,7 @@
-# STRONG HTACCESS PROTECTION
-<Files ~ "^.*\.([Hh][Tt][Aa])">
- order allow,deny
- deny from all
-</Files>
 Options +Indexes
-IndexOptions FancyIndexing HTMLTable XHTML SuppressRules IconsAreLinks NameWidth=* FoldersFirst SuppressDescription
-IndexHeadInsert "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
-ServerSignature Off
-AddIcon (IMG,/package.png) .zst .xz
-AddIcon (IMG,/signature.png) .sig
-AddIcon (IMG,/db.png) .db .files .db.tar.gz .files.tar.gz
-AddIcon (IMG,/boot.png) .efi .img -x86_64 -aarch64 -riscv64 -aarch64.gz
-AddIcon (IMG,/iso.png) .iso
-AddIcon (IMG,/text.png) .txt LICENSE .amd-ucode
-AddIcon (DIR,/directory.png) ^^DIRECTORY^^
-AddBlankIcon /blank.png ^^BLANKICON^^
-AddIcon /up.png ..
-HeaderName /header.html
-IndexStyleSheet "/styles.css"
+IndexOptions FancyIndexing
+<FilesMatch "\.(sig|efi|img|zst|db|files)$">
+   ForceType application/octet-stream
+   Header set Content-Disposition attachment
+</FilesMatch>
+
