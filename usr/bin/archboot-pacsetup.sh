@@ -102,18 +102,18 @@ _task_update_environment() {
     _ONLINE_KERNEL=""
     pacman -Sy &>"${_LOG}"
     #shellcheck disable=SC2086
-    _LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+    _LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##g')"
     if  [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         #shellcheck disable=SC2086
-        _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+        _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##g')"
     else
         if [[ -n "${_DOTESTING}" ]]; then
             #shellcheck disable=SC2086
-            _ONLINE_KERNEL="$(pacman -Si core-testing/${_KERNELPKG} 2>${_NO_LOG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+            _ONLINE_KERNEL="$(pacman -Si core-testing/${_KERNELPKG} 2>${_NO_LOG} | grep Version | cut -d ':' -f2 | sed -e 's# ##g')"
         fi
         if [[ -z "${_ONLINE_KERNEL}" ]]; then
             #shellcheck disable=SC2086
-            _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+            _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##g')"
         fi
     fi
     rm /.archboot

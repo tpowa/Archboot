@@ -13,7 +13,7 @@ Use:
 Don't use:
 - fuse, perl, python
 
-Kernel Modules:
+Kernel Modules / Kernel Firmware:
 - only modules that are needed to access filesystems, input, network
   video and virtualization
 - only network modules for max. 1 Gigabit.
