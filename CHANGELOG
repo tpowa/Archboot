@@ -6,6 +6,8 @@ Environment:
 - unified ISO GPT values:
   GUID, UUIDs, hide all partitions, disabled automount
   and move main table to sector 2
+pacsetup:
+- fixed kernel detection
 setup:
 - removed ext2/3 from Quick Setup
 - don't allow empty luks passphrase
