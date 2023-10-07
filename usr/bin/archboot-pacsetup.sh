@@ -102,19 +102,23 @@ _task_update_environment() {
     _ONLINE_KERNEL=""
     pacman -Sy &>"${_LOG}"
     #shellcheck disable=SC2086
-    _LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##g')"
+    _LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
     if  [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         #shellcheck disable=SC2086
-        _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##g')"
+        _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
     else
         if [[ -n "${_DOTESTING}" ]]; then
             #shellcheck disable=SC2086
-            _ONLINE_KERNEL="$(pacman -Si core-testing/${_KERNELPKG} 2>${_NO_LOG} | grep Version | cut -d ':' -f2 | sed -e 's# ##g')"
+            _ONLINE_KERNEL="$(pacman -Si core-testing/${_KERNELPKG} 2>${_NO_LOG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
         fi
         if [[ -z "${_ONLINE_KERNEL}" ]]; then
             #shellcheck disable=SC2086
-            _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##g')"
+            _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
         fi
+    fi
+    echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
+    if ! [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
+        echo "${_ONLINE_KERNEL}" > /.new_kernel
     fi
     rm /.archboot
 }
@@ -122,15 +126,13 @@ _update_environment() {
     : > /.archboot
     _task_update_environment &
     _progress_wait "0" " 97" "Checking on new online kernel version..." "0.025"
-    echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
-    if [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
+    if ! [[ -f "/.new_kernel" ]]; then
         _progress "98" "No new kernel online available. Skipping update environment."
         sleep 1
         _progress "100" "Pacman configuration completed successfully."
         sleep 2
     else
         _progress "100" "New kernel online available. Asking for update..."
-        echo "${_ONLINE_KERNEL}" > /.new_kernel
         sleep 2
     fi
 }
