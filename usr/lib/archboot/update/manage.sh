@@ -49,9 +49,9 @@ _network_check() {
         fi
         _COUNT=$((_COUNT+1))
         # abort after 20 seconds
-        _progress "$((_COUNT*20))" "Waiting $((20-_COUNT)) seconds for network link to come up..."
+        _progress "$((_COUNT*5))" "Waiting $((20-_COUNT)) seconds for network link to come up..."
         [[ "${_COUNT}" == 20 ]] && break
-    done | _dialog --title " Network Configuration " --no-mouse --gauge "Waiting 10 seconds for network link to come up..." 6 75 0
+    done | _dialog --title " Network Configuration " --no-mouse --gauge "Waiting 20 seconds for network link to come up..." 6 75 0
     if ! getent hosts www.google.com &>"${_NO_LOG}"; then
         clear
         echo -e "\e[91mAborting:\e[m"
