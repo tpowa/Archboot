@@ -40,7 +40,7 @@ if [[ -n "${_D_SCRIPTS}" ]]; then
     _update_installer_check
     _network_check
     : > /.update
-    _TITLE="Archboot $(uname -m) | Basic Setup | GIT Master Scripts"
+    _TITLE="Archboot ${_RUNNING_ARCH} | $(uname -r) | Basic Setup | GIT Master Scripts"
     _download_latest | _dialog --title " Archboot GIT Master " --gauge "Downloading latest GIT..." 6 75 0
     clear
 fi
@@ -48,7 +48,7 @@ fi
 if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]] && [[ -z "${_G_RELEASE}" ]]; then
     _update_installer_check
     : > /.update
-    _TITLE="Archboot $(uname -m) | Basic Setup | New Environment"
+    _TITLE="Archboot ${_RUNNING_ARCH} | $(uname -r) | Basic Setup | New Environment"
     _new_environment | _dialog --title "${_MENU_TITLE}" --gauge "Waiting for pacman keyring..." 6 75 0
     clear
 fi
@@ -56,7 +56,7 @@ fi
 if [[ -n "${_G_RELEASE}" ]]; then
     _update_installer_check
     : > /.update
-    _TITLE="Archboot $(uname -m) | Basic Setup | New Images"
+    _TITLE="Archboot ${_RUNNING_ARCH} | $(uname -r) | Basic Setup | New Images"
     _new_image | _dialog --title "${_MENU_TITLE}" --gauge "Removing not necessary files from /..." 6 75 0
     clear
 fi
@@ -67,7 +67,7 @@ fi
 # Gnome, KDE/PLASMA or XFCE launch
 if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" || -n "${_L_GNOME_WAYLAND}" || -n "${_L_PLASMA_WAYLAND}" ]]; then
     : > /.update
-    _TITLE="Archboot $(uname -m) | Basic Setup | Desktop Environment"
+    _TITLE="Archboot ${_RUNNING_ARCH} | $(uname .r) | Basic Setup | Desktop Environment"
     [[ -e /var/cache/pacman/pkg/archboot.db ]] && : > /.graphic_installed
     if [[ -n "${_L_XFCE}" ]]; then
         _ENVIRONMENT="XFCE"
@@ -125,7 +125,7 @@ if [[ -n "${_FULL_SYSTEM}" ]]; then
     _full_system_check
     _update_installer_check
     : > /.update
-    _TITLE="Archboot $(uname -m) | Basic Setup | Full System"
+    _TITLE="Archboot ${_RUNNING_ARCH} | $(uname -r) | Basic Setup | Full System"
     _full_system | _dialog --title "${_MENU_TITLE}" --gauge "Refreshing pacman package database..." 6 75 0
     clear
 fi
