@@ -6,9 +6,9 @@
 TTY=${TTY#/dev/}
 
 _welcome () {
-    [[ "$({_RUNNING_ARCH})" == "x86_64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux X86_64\e[m"
-    [[ "$({_RUNNING_ARCH})" == "aarch64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux AARCH64\e[m"
-    [[ "$({_RUNNING_ARCH})" == "riscv64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux RISCV64\e[m"
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux X86_64\e[m"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux AARCH64\e[m"
+    [[ "${_RUNNING_ARCH}" == "riscv64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux RISCV64\e[m"
     echo -e "\e[1m--------------------------------------------------------------------\e[m"
     _local_mode
 }
@@ -114,7 +114,7 @@ fi
 
 if [[ "${TTY}" = "tty1" ]] ; then
     if ! mount | grep -q zram0; then
-        _TITLE="Archboot $({_RUNNING_ARCH}) | $(uname -r) | Basic Setup | ZRAM"
+        _TITLE="Archboot ${_RUNNING_ARCH} | $(uname -r) | Basic Setup | ZRAM"
         _switch_root_zram | _dialog --title " Initializing System " --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
         # fix clear screen on all terminals
         printf "\ec" | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
