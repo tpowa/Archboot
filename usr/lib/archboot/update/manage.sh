@@ -40,7 +40,8 @@ _create_container() {
 }
 
 _network_check() {
-    # wait 10 seconds for dhcp
+    _TITLE="Archboot ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Network Check"
+    # wait 20 seconds for network link
     _COUNT=0
     while true; do
         sleep 1
