@@ -328,7 +328,7 @@ _full_system() {
     pacman -S --noconfirm man-db man-pages texinfo >"${_LOG}" 2>&1 || exit 1
     _progress "98" "Checking kernel version..."
     _INSTALLED_KERNEL="$(pacman -Qi linux | grep Version | cut -d ':' -f 2 | sed -e 's# ##g' -e 's#\.arch#-arch#g')"
-    if ! [[ "${_INSTALLED_KERNEL}" == "$(uname -r)" ]]; then
+    if ! [[ "${_INSTALLED_KERNEL}" == "${_RUNNING_KERNEL}" ]]; then
         _progress "99" "Skipping kernel module loading..."
     else
         _progress "99" "Trigger kernel module loading..."

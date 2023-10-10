@@ -44,7 +44,7 @@ _linux_firmware() {
 _marvell_firmware() {
     _MARVELL=""
     _PACKAGES="${_PACKAGES//\ linux-firmware-marvell\ / }"
-    for i in $(find /lib/modules/"$(uname -r)" | grep -w wireless | grep -w marvell); do
+    for i in $(find /lib/modules/"${_RUNNING_KERNEL}" | grep -w wireless | grep -w marvell); do
         [[ -f $i ]] && _MARVELL="${_MARVELL} $(basename "${i}" | sed -e 's#\..*$##g')"
     done
     # check marvell modules if already loaded

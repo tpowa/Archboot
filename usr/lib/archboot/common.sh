@@ -4,6 +4,7 @@
 . /etc/archboot/defaults
 _BASENAME=${0##*/}
 _RUNNING_ARCH="$(uname -m)"
+_RUNNING_KERNEL="$(uname -r)"
 _LOG="/dev/tty11"
 _NO_LOG="/dev/null"
 _VC_NUM="$(basename ${_LOG} | sed -e 's#tty##g')"

@@ -50,7 +50,7 @@ _prepare_pacman() {
     [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
     ${_PACMAN} -Sy
     _KEYRING="archlinux-keyring"
-    [[ "$(uname -m)" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
     pacman -Sy ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} || exit 1
 }
