@@ -3,7 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _set_title() {
     if [[ "${_DESTDIR}" == "/" ]]; then
-        _TITLE="Archboot ${_RUNNING_ARCH} | Arch Linux Setup (System Mode) | https://archboot.com"
+        _TITLE="Archboot ${_RUNNING_ARCH} | $(uname -r) | Arch Linux Setup (System Mode) | https://archboot.com"
     else
         if [[ -e "${_LOCAL_DB}" ]]; then
             _TITLE="Archboot ${_RUNNING_ARCH} | $(uname -r) | Setup (Offline Mode) | https://archboot.com"
