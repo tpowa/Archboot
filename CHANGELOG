@@ -3,6 +3,7 @@ Environment:
 - simplified grub-mkstandalone calls
 - added grub bli module loading on x86_64 EFI systems
 - higher maximum of 20 seconds for network connection
+- added running kernel version to all titles
 - unified ISO GPT values:
   GUID, UUIDs, hide all partitions, disabled automount
   and move main table to sector 2
