@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# archboot-cpio.sh:
-# Arch Linux mkinitcpio - modular tool for building initramfs images
+# archboot-cpio.sh - modular tool for building initramfs images
 # simplified, stripped down, optimized for size and speed
 # by Tobias Powalowski <tpowa@archlinux.org>
 
