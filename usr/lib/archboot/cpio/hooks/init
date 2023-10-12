@@ -4,20 +4,20 @@
 
 _run() {
     ### init modules
-    __map _module vfat? iso9660? nls_cp437? nls_ascii? cdrom? exfat?
-    __map _binary bash sh blkid mount mountpoint switch_root bsdcpio mkfs.btrfs setfont \
+    _map _module vfat? iso9660? nls_cp437? nls_ascii? cdrom? exfat?
+    _map _binary bash sh blkid mount mountpoint switch_root bsdcpio mkfs.btrfs setfont \
         /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod insmod modprobe \
         gzip uname cat cp dmesg grep ln ls mv rm umount lsblk rmmod cut sed find mkdir dialog
     _file /usr/share/terminfo/l/linux
     _file /usr/share/kbd/consolefonts/ter-v16n.psf.gz /consolefont-16.psf.gz
     _file /usr/share/kbd/consolefonts/ter-v32n.psf.gz /consolefont-32.psf.gz
     rules_d=/usr/lib/udev/rules.d
-    __map _file ${rules_d}/50-udev-default.rules ${rules_d}/60-persistent-storage.rules \
+    _map _file ${rules_d}/50-udev-default.rules ${rules_d}/60-persistent-storage.rules \
         ${rules_d}/64-btrfs.rules ${rules_d}/80-drivers.rules /usr/lib/udev/ata_id \
         /usr/lib/udev/scsi_id
     _file /usr/share/archboot/base/init /init
-    __map _dir /mnt /cdrom /sysroot /ventoy
-    __map _file /etc/bash.bash_logout /etc/bash.bashrc /etc/profile /etc/shells
+    _map _dir /mnt /cdrom /sysroot /ventoy
+    _map _file /etc/bash.bash_logout /etc/bash.bashrc /etc/profile /etc/shells
     _file /usr/share/archboot/base/etc/dialogrc /etc/dialogrc
     # add default bash setup
     for i in .bashrc .bash_profile .bash_logout; do
