@@ -129,13 +129,9 @@ preload_builtin_modules() {
 
 if [[ -z "$1" ]]; then
     usage
-    cleanup 0
+    exit 0
 fi
-### check for root
-if ! [[ ${UID} -eq 0 ]]; then
-    echo "ERROR: Please run as root user!"
-    exit 1
-fi
+_root_check
 
 _opt_short='c:d:g:hk:'
 parseopts "$_opt_short" -- "$@" || exit 1
