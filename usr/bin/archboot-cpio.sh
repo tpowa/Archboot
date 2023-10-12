@@ -15,7 +15,6 @@ _d_install=/lib/initcpio/install
 # options and runtime data
 _optgenimg=''
 _opttargetdir=''
-_optquiet=1 _optcolor=1
 declare -A  _addedmodules _modpaths
 # Sanitize environment further
 # GREP_OPTIONS="--color=always" will break everything
