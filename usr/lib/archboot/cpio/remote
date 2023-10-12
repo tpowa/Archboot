@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-build ()
+_run ()
 {
     map add_binary findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd \
       exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount \

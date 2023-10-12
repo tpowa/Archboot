@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-build ()
+_run ()
 {
     add_all_modules -f '_cs|b43' '/net/wireless/|/net/ieee80211/|/net/mac80211/'
     if [[ "$(uname -m)" == "x86_64" ]]; then

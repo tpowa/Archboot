@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
-build() {
+_run() {
     ### init modules
     map add_module vfat? iso9660? nls_cp437? nls_ascii? cdrom? exfat?
     map add_binary bash sh blkid mount mountpoint switch_root bsdcpio mkfs.btrfs setfont \

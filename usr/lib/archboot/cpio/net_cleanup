@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-build ()
+_run ()
 {
     _APPS="arping clockdiff tracepath ssh arpd \
       genl ifstat ctstat rtstat lnstat nstat rtacct rtmon ss tc \

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-build ()
+_run ()
 {
     map add_binary hwclock tzselect zic zdump
     map add_full_dir /usr/share/zoneinfo /usr/share/zoneinfo-leaps

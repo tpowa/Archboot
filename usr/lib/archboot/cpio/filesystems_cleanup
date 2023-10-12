@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-build ()
+_run ()
 {
     _APPS="mkswap badblocks blkid debugfs dumpe2fs e2fsck e2image e2undo findfs fsck \
           logsave mkfs.ext2 resize2fs chattr lsattr e2freefrag filefrag \

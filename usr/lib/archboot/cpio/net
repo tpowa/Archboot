@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-build ()
+_run ()
 {
     map add_binary arping clockdiff tracepath ssh genl \
       ifstat ctstat rtstat lnstat nstat rtacct rtmon ss tc bridge \

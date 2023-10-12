@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-build ()
+_run ()
 {
     # add firmware files and licenses
     map add_full_dir "/lib/firmware" "/usr/share/licenses/linux-firmware"
