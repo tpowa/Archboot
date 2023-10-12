@@ -14,8 +14,8 @@ _run ()
         /etc/netconfig
     _file /etc/ssh/sshd_config
     # allow root login and empty passwords
-    echo "PermitRootLogin yes" >> "${BUILDROOT}/etc/ssh/sshd_config"
-    echo "PermitEmptyPasswords yes" >> "${BUILDROOT}/etc/ssh/sshd_config"
+    echo "PermitRootLogin yes" >> "${_ROOTFS}/etc/ssh/sshd_config"
+    echo "PermitEmptyPasswords yes" >> "${_ROOTFS}/etc/ssh/sshd_config"
     _full_dir /usr/lib/libnfsidmap
     _map _dir  /var/empty /var/lib/nfs/sm /var/lib/nfs/sm.bak /var/lib/nfs/v4recovery \
         /var/lib/nfs/rpc_pipefs /var/log/gssproxy
@@ -26,8 +26,8 @@ _run ()
     _map _full_dir /etc/gss /etc/gssproxy
     _map _dir /var/lib/gssproxy/{clients,rcache} /var/log/gssproxy
     _dir /var/lib/openldap
-    chmod 700 "${BUILDROOT}/var/lib/openldap"
-    chown 439:439 "${BUILDROOT}/var/lib/openldap"
+    chmod 700 "${_ROOTFS}/var/lib/openldap"
+    chown 439:439 "${_ROOTFS}/var/lib/openldap"
     # start sshd on startup
     _symlink /etc/systemd/system/multi-user.target.wants/sshd.service /usr/lib/systemd/system/sshd.service
     # start ttyd on startup

@@ -22,10 +22,10 @@ _run ()
     _full_dir /usr/share/nano
     _file /etc/nanorc
     # add syntax highlighting
-    echo "include \"/usr/share/nano/*.nanorc\"" >> "${BUILDROOT}/etc/nanorc"
+    echo "include \"/usr/share/nano/*.nanorc\"" >> "${_ROOTFS}/etc/nanorc"
 
     ### add machine-id
-    : > "${BUILDROOT}"/etc/machine-id
+    : > "${_ROOTFS}"/etc/machine-id
 
     ### add file magic file
     _file /usr/share/file/misc/magic.mgc
@@ -67,7 +67,7 @@ _run ()
         # only support UTF-8
         _file /usr/share/i18n/charmaps/UTF-8.gz
         # remove conflicting files from not installed packages: binutils, grub and gdbm
-        find "${BUILDROOT}/usr/share/locale/" -type f \( -name 'grub*' -o -name 'binutils*' -o -name 'gdbm*' -o -name 'bfd*' \
+        find "${_ROOTFS}/usr/share/locale/" -type f \( -name 'grub*' -o -name 'binutils*' -o -name 'gdbm*' -o -name 'bfd*' \
             -o -name 'gettext*' -o -name 'gas*' -o -name 'gold*' -o -name 'gprof*' -o -name 'ld*' \
             -o -name 'man-db*' -o -name 'opcodes*' -o -name 'texinfo*' \) -delete
     fi
@@ -86,7 +86,7 @@ _run ()
         _file  "/etc/skel/${i}" "/root/${i}"
     done
     # add custom bash options
-    echo ". /etc/profile.d/custom-bash-options.sh" >> "${BUILDROOT}/root/.bashrc"
+    echo ". /etc/profile.d/custom-bash-options.sh" >> "${_ROOTFS}/root/.bashrc"
     # add /etc/skel
     _full_dir /etc/skel
     ### add kmod related config file(s)
@@ -160,7 +160,7 @@ _run ()
     # proc-sys-fs-binfmt_misc.automount
     _symlink /etc/systemd/system/proc-sys-fs-binfmt_misc.automount /dev/null
     # remove remote-fs.target from multi-user.target.wants
-    rm -f "${BUILDROOT}"/etc/systemd/system/multi-user.target.wants/remote-fs.target
+    rm -f "${_ROOTFS}"/etc/systemd/system/multi-user.target.wants/remote-fs.target
     # disable lastlog
     _symlink /var/log/lastlog /dev/null
     _file /usr/share/archboot/base/etc/tmpfiles.d/var.conf /etc/tmpfiles.d/var.conf
@@ -171,7 +171,7 @@ _run ()
     _map _file /usr/lib/libnss_compat.so.2 /usr/lib/libnsl.so.1
     ## fix for systemd >=245 set default.target
     # remove initrd-release to allow normal systemd boot without initrd.target
-    rm -f "${BUILDROOT}"/etc/initrd-release
+    rm -f "${_ROOTFS}"/etc/initrd-release
     # mask systemd-gpt-auto-generator, errors out on initramfs usage
     _symlink /etc/systemd/system-generators/systemd-gpt-auto-generator /dev/null
     ### add udev
@@ -204,7 +204,7 @@ _run ()
             cdrtools systemd-ukify python python-pefile limine man-pages libev libpipeline groff \
             man-db texinfo db db5.3 gc rpcbind"
         for i in ${_RM_PACMAN_DB}; do
-            rm -rf "${BUILDROOT}"/var/lib/pacman/local/"${i}"-*-[0-9]* &>"${_NO_LOG}"
+            rm -rf "${_ROOTFS}"/var/lib/pacman/local/"${i}"-*-[0-9]* &>"${_NO_LOG}"
         done
     fi
     ### add nss p11-kit and ca certificates
@@ -223,20 +223,20 @@ _run ()
     _file /usr/share/p11-kit/modules/p11-kit-trust.module
 
     ### remove conflicting grub, man-db, mkinitcpio and rpcbind files
-    rm "${BUILDROOT}"/usr/lib/systemd/system/mkinitcpio-generate-shutdown-ramfs.service \
-       "${BUILDROOT}"/usr/lib/systemd/system/shutdown.target.wants/mkinitcpio-generate-shutdown-ramfs.service \
-       "${BUILDROOT}"/usr/lib/systemd/ukify \
-       "${BUILDROOT}"/usr/lib/systemd/system/man-db* \
-       "${BUILDROOT}"/usr/lib/systemd/system/timers.target.wants/man-db* \
-       "${BUILDROOT}"/usr/lib/tmpfiles.d/man-db* \
-       "${BUILDROOT}"/usr/lib/tmpfiles.d/mkinitcpio.conf \
-       "${BUILDROOT}"/usr/share/bash-completion/completions/lsinitcpio \
-       "${BUILDROOT}"/usr/share/bash-completion/completions/mkinitcpio \
-       "${BUILDROOT}"/usr/share/bash-completion/completions/grub \
-       "${BUILDROOT}"/usr/lib/systemd/system/rpcbind* \
-       "${BUILDROOT}"/usr/lib/tmpfiles.d/rpcbind* \
-       "${BUILDROOT}"/usr/lib/sysusers.d/rpcbind* \
-       "${BUILDROOT}"/usr/lib/modules-load.d/cdrecord.conf
+    rm "${_ROOTFS}"/usr/lib/systemd/system/mkinitcpio-generate-shutdown-ramfs.service \
+       "${_ROOTFS}"/usr/lib/systemd/system/shutdown.target.wants/mkinitcpio-generate-shutdown-ramfs.service \
+       "${_ROOTFS}"/usr/lib/systemd/ukify \
+       "${_ROOTFS}"/usr/lib/systemd/system/man-db* \
+       "${_ROOTFS}"/usr/lib/systemd/system/timers.target.wants/man-db* \
+       "${_ROOTFS}"/usr/lib/tmpfiles.d/man-db* \
+       "${_ROOTFS}"/usr/lib/tmpfiles.d/mkinitcpio.conf \
+       "${_ROOTFS}"/usr/share/bash-completion/completions/lsinitcpio \
+       "${_ROOTFS}"/usr/share/bash-completion/completions/mkinitcpio \
+       "${_ROOTFS}"/usr/share/bash-completion/completions/grub \
+       "${_ROOTFS}"/usr/lib/systemd/system/rpcbind* \
+       "${_ROOTFS}"/usr/lib/tmpfiles.d/rpcbind* \
+       "${_ROOTFS}"/usr/lib/sysusers.d/rpcbind* \
+       "${_ROOTFS}"/usr/lib/modules-load.d/cdrecord.conf
 
     ### fix licenses
     _map _file /usr/share/licenses/shadow/COPYING /usr/share/licenses/iana-etc/LICENSE \

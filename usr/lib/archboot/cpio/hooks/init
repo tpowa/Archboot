@@ -24,13 +24,13 @@ _run() {
         _file  "/etc/skel/${i}" "/root/${i}"
     done
     # add custom bash options
-    echo ". /root/.bashrc" >> "${BUILDROOT}/etc/bash.bashrc"
+    echo ". /root/.bashrc" >> "${_ROOTFS}/etc/bash.bashrc"
     #shellcheck disable=SC2129
-    echo ". /etc/profile.d/custom-bash-options.sh" >> "${BUILDROOT}/root/.bashrc"
-    echo "alias reboot='echo b >/proc/sysrq-trigger'" >> "${BUILDROOT}/root/.bashrc"
-    echo "alias poweroff='echo o >/proc/sysrq-trigger'" >> "${BUILDROOT}/root/.bashrc"
-    echo "root:x:0:root" > "${BUILDROOT}/etc/group"
-    echo "root:x:0:0:/root:/bin/bash" > "${BUILDROOT}/etc/passwd"
+    echo ". /etc/profile.d/custom-bash-options.sh" >> "${_ROOTFS}/root/.bashrc"
+    echo "alias reboot='echo b >/proc/sysrq-trigger'" >> "${_ROOTFS}/root/.bashrc"
+    echo "alias poweroff='echo o >/proc/sysrq-trigger'" >> "${_ROOTFS}/root/.bashrc"
+    echo "root:x:0:root" > "${_ROOTFS}/etc/group"
+    echo "root:x:0:0:/root:/bin/bash" > "${_ROOTFS}/etc/passwd"
     _file "/usr/share/archboot/base/etc/profile.d/custom-bash-options.sh" \
              "/etc/profile.d/custom-bash-options.sh"
     _BASIC_CONFIG="os-release modprobe.d/modprobe.conf"
