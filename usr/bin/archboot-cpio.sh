@@ -143,26 +143,26 @@ set -- "${OPTRET[@]}"
 unset _opt_short OPTRET
 while :; do
     case "$1" in
-        -c|--config)
+        -c)
             shift
             _f_config="$1"
             ;;
-        -k|--kernel)
+        -k)
             shift
             KERNEL="$1"
             ;;
-        -d|--generatedir)
+        -d)
             shift
             _opttargetdir="$1"
             ;;
-        -g|--generate)
+        -g)
             shift
             [[ -d "$1" ]] && die 'Invalid image path -- must not be a directory'
             if ! _optgenimg="$(readlink -f "$1")" || [[ ! -e "${_optgenimg%/*}" ]]; then
                 die "Unable to write to path: '%s'" "$1"
             fi
             ;;
-        -h|--help)
+        -h)
             usage
             cleanup 0
             ;;

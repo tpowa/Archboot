@@ -4,59 +4,6 @@
 # simplified, stripped down, optimized for size and speed
 # by Tobias Powalowski <tpowa@archlinux.org>
 
-# no long options support in archboot
-parseopts() {
-    local opt='' i='' shortopts="$1"
-    local -a unused_argv=()
-    shift
-    shift
-    while (( $# )); do
-        case "$1" in
-            --) # explicit end of options
-                shift
-                break
-                ;;
-            -[!-]*) # short option
-                for (( i = 1; i < ${#1}; i++ )); do
-                    opt=${1:i:1}
-                    # option doesn't exist
-                    if [[ $shortopts != *$opt* ]]; then
-                        printf "%s: invalid option -- '%s'\n" "${0##*/}" "$opt"
-                        OPTRET=(--)
-                        return 1
-                    fi
-                    OPTRET+=("-$opt")
-                    # option requires optarg
-                    if [[ "$shortopts" == *"${opt}:"* ]]; then
-                        # if we're not at the end of the option chunk, the rest is the optarg
-                        if (( i < ${#1} - 1 )); then
-                            OPTRET+=("${1:i+1}")
-                            break
-                        # if we're at the end, grab the the next positional, if it exists
-                        elif (( i == ${#1} - 1 )) && [[ -n "$2" ]]; then
-                            OPTRET+=("$2")
-                            shift
-                            break
-                        # parse failure
-                        else
-                            printf "%s: option '%s' requires an argument\n" "${0##*/}" "-$opt"
-                            OPTRET=(--)
-                            return 1
-                        fi
-                    fi
-                done
-                ;;
-            *) # non-option arg encountered, add it as a parameter
-                unused_argv+=("$1")
-                ;;
-        esac
-        shift
-    done
-    # add end-of-opt terminator and any leftover positional parameters
-    OPTRET+=('--' "${unused_argv[@]}" "$@")
-    return 0
-}
-
 msg() {
     local mesg="$1"; shift
     # shellcheck disable=SC2059
@@ -366,22 +313,6 @@ run_build_hook() {
     # do their own error catching if it's severe enough, and
     # we already capture errors from the add_* functions.
     return 0
-}
-
-try_enable_color() {
-    local colors
-    if ! colors="$(tput colors 2>"${_NO_LOG}")"; then
-        warning "Failed to enable color. Check your TERM environment variable"
-        return
-    fi
-    if (( colors > 0 )) && tput setaf 0 &>"${_NO_LOG}"; then
-        _color_none="$(tput sgr0)"
-        _color_bold="$(tput bold)"
-        _color_blue="$_color_bold$(tput setaf 4)"
-        _color_green="$_color_bold$(tput setaf 2)"
-        _color_red="$_color_bold$(tput setaf 1)"
-        _color_yellow="$_color_bold$(tput setaf 3)"
-    fi
 }
 
 install_modules() {
