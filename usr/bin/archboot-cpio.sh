@@ -55,19 +55,19 @@ build_image() {
     case "$compress" in
         cat)
             msg "Creating uncompressed initcpio image: '%s'" "$out"
-            unset COMPRESSION_OPTIONS
+            unset _COMPRESSION_OPTIONS
             ;;
         *)
             msg "Creating %s-compressed initcpio image: '%s'" "$compress" "$out"
             ;;&
         xz)
-            COMPRESSION_OPTIONS=('-T0' '--check=crc32' "${COMPRESSION_OPTIONS[@]}")
+            _COMPRESSION_OPTIONS=('-T0' '--check=crc32' "${_COMPRESSION_OPTIONS[@]}")
             ;;
         lz4)
-            COMPRESSION_OPTIONS=('-l' "${COMPRESSION_OPTIONS[@]}")
+            _COMPRESSION_OPTIONS=('-l' "${_COMPRESSION_OPTIONS[@]}")
             ;;
         zstd)
-            COMPRESSION_OPTIONS=('-T0' "${COMPRESSION_OPTIONS[@]}")
+            _COMPRESSION_OPTIONS=('-T0' "${_COMPRESSION_OPTIONS[@]}")
             ;;
     esac
     if [[ -f "$out" ]]; then
@@ -86,7 +86,7 @@ build_image() {
             sort -z |
             LANG=C bsdtar --null -cnf - -T - |
             LANG=C bsdtar --null -cf - --format=newc @- |
-            $compress "${COMPRESSION_OPTIONS[@]}" > "$compressout"
+            $compress "${_COMPRESSION_OPTIONS[@]}" > "$compressout"
     pipestatus=("${PIPESTATUS[@]}")
     pipeprogs=('find' 'sort' 'bsdtar (step 1)' 'bsdtar (step 2)' "$compress")
     popd >"${_NO_LOG}" || return
