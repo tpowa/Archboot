@@ -15,7 +15,7 @@ if [[ -z "${1}" ]]; then
 fi
 _root_check
 
-while :; do
+while [ $# -gt 0 ]; do
     case "${1}" in
         -c) shift
             _CONFIG="${1}"
@@ -35,7 +35,6 @@ while :; do
         -h) _usage
             exit 0
             ;;
-        *) _usage ;;
     esac
     shift
 done

@@ -71,11 +71,12 @@ _builtin_modules() {
 }
 
 _map() {
+    _RETURN=0
     for i in "${@:2}"; do
         # shellcheck disable=SC1105,SC2210,SC2035
-        "${1}" "${i}" || (( $# > 255 ? _R=1 : ++_R ))
+        "${1}" "${i}" || (( $# > 255 ? _RETURN=1 : ++_RETURN ))
     done
-    return "${_R}"
+    return "${_RETURN}"
 }
 
 _filter_modules() {

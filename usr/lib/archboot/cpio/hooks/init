@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# created by Tobias Powalowski <tpowa@archlinux.org>
+
+_run() {
+    ### init modules
+    __map _module vfat? iso9660? nls_cp437? nls_ascii? cdrom? exfat?
+    __map _binary bash sh blkid mount mountpoint switch_root bsdcpio mkfs.btrfs setfont \
+        /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod insmod modprobe \
+        gzip uname cat cp dmesg grep ln ls mv rm umount lsblk rmmod cut sed find mkdir dialog
+    _file /usr/share/terminfo/l/linux
+    _file /usr/share/kbd/consolefonts/ter-v16n.psf.gz /consolefont-16.psf.gz
+    _file /usr/share/kbd/consolefonts/ter-v32n.psf.gz /consolefont-32.psf.gz
+    rules_d=/usr/lib/udev/rules.d
+    __map _file ${rules_d}/50-udev-default.rules ${rules_d}/60-persistent-storage.rules \
+        ${rules_d}/64-btrfs.rules ${rules_d}/80-drivers.rules /usr/lib/udev/ata_id \
+        /usr/lib/udev/scsi_id
+    _file /usr/share/archboot/base/init /init
+    __map _dir /mnt /cdrom /sysroot /ventoy
+    __map _file /etc/bash.bash_logout /etc/bash.bashrc /etc/profile /etc/shells
+    _file /usr/share/archboot/base/etc/dialogrc /etc/dialogrc
+    # add default bash setup
+    for i in .bashrc .bash_profile .bash_logout; do
+        _file  "/etc/skel/${i}" "/root/${i}"
+    done
+    # add custom bash options
+    echo ". /root/.bashrc" >> "${BUILDROOT}/etc/bash.bashrc"
+    #shellcheck disable=SC2129
+    echo ". /etc/profile.d/custom-bash-options.sh" >> "${BUILDROOT}/root/.bashrc"
+    echo "alias reboot='echo b >/proc/sysrq-trigger'" >> "${BUILDROOT}/root/.bashrc"
+    echo "alias poweroff='echo o >/proc/sysrq-trigger'" >> "${BUILDROOT}/root/.bashrc"
+    echo "root:x:0:root" > "${BUILDROOT}/etc/group"
+    echo "root:x:0:0:/root:/bin/bash" > "${BUILDROOT}/etc/passwd"
+    _file "/usr/share/archboot/base/etc/profile.d/custom-bash-options.sh" \
+             "/etc/profile.d/custom-bash-options.sh"
+    _BASIC_CONFIG="os-release modprobe.d/modprobe.conf"
+    for i in ${_BASIC_CONFIG}; do
+        _file "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
+    done
+}
+
+help() {
+    cat <<HELPEOF
+Inital setup for archboot ISO booting.
+HELPEOF
+}
+
+# vim: set ft=sh ts=4 sw=4 et:
