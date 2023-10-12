@@ -11,9 +11,9 @@ shopt -s extglob
 . /usr/lib/archboot/cpio.sh
 # needed files/directories
 _CONFIG=""
-_d_install=/lib/initcpio/install
+_INITCPIO=/lib/initcpio/install
 # options and runtime data
-_optgenimg=''
+_GENERATE_IMAGE=""
 _opttargetdir=''
 declare -A  _addedmodules _modpaths
 # Sanitize environment further
@@ -149,7 +149,7 @@ while :; do
         -g)
             shift
             [[ -d "$1" ]] && die 'Invalid image path -- must not be a directory'
-            if ! _optgenimg="$(readlink -f "$1")" || [[ ! -e "${_optgenimg%/*}" ]]; then
+            if ! ${_GENERATE_IMAGE}="$(readlink -f "$1")" || [[ ! -e "${_GENERATE_IMAGE%/*}" ]]; then
                 die "Unable to write to path: '%s'" "$1"
             fi
             ;;
@@ -188,12 +188,12 @@ _hooks=("${HOOKS[@]}")
 if (( ${#_hooks[*]} == 0 )); then
     die "Invalid config: No hooks found"
 fi
-if [[ -n "$_optgenimg" ]]; then
+if [[ -n "${_GENERATE_IMAGE}" ]]; then
     # check for permissions. if the image doesn't already exist,
     # then check the directory
-    if [[ ( -e $_optgenimg && ! -w $_optgenimg ) ||
-            ( ! -d ${_optgenimg%/*} || ! -w ${_optgenimg%/*} ) ]]; then
-        die "Unable to write to '%s'" "$_optgenimg"
+    if [[ ( -e ${_GENERATE_IMAGE} && ! -w ${_GENERATE_IMAGE} ) ||
+            ( ! -d ${${_GENERATE_IMAGE%/*} || ! -w ${${_GENERATE_IMAGE%/*} ) ]]; then
+        die "Unable to write to '%s'" "${_GENERATE_IMAGE}"
     fi
     msg "Starting build: '%s'" "${_KERNELVERSION}"
 elif [[ -n "$_opttargetdir" ]]; then
@@ -212,8 +212,8 @@ ldconfig -r "$BUILDROOT" &>"${_NO_LOG}"
 rm -f -- "$BUILDROOT/var/cache/ldconfig/aux-cache"
 # Set umask to create initramfs images as 600
 umask 077
-if [[ -n "$_optgenimg" ]]; then
-    build_image "$_optgenimg" "${COMPRESSION}" || exit 1
+if [[ -n "${_GENERATE_IMAGE}" ]]; then
+    build_image "${_GENERATE_IMAGE}" "${COMPRESSION}" || exit 1
 elif [[ -n "$_opttargetdir" ]]; then
     msg "Build complete."
 else

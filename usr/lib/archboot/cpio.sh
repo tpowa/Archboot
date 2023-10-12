@@ -271,9 +271,8 @@ run_build_hook() {
     # shellcheck disable=SC2034
     local MODULES=() BINARIES=() FILES=() SCRIPT=''
     # find script in install dirs
-    # _d_install is assigned in mkinitcpio
     # shellcheck disable=SC2154
-    if ! script="$(PATH="$_d_install" type -P "$hook")"; then
+    if ! script="$(PATH="${_INITCPIO}" type -P "$hook")"; then
         error "Hook '$hook' cannot be found"
         return 1
     fi
