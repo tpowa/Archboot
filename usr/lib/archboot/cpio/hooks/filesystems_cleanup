@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+_run ()
+{
+    _APPS="mkswap badblocks blkid debugfs dumpe2fs e2fsck e2image e2undo findfs fsck \
+          logsave mkfs.ext2 resize2fs chattr lsattr e2freefrag filefrag \
+          jfs_debugfs jfs_fsck jfs_fscklog jfs_logdump jfs_mkfs jfs_tune mkfs.xfs \
+          xfs_copy xfs_db xfs_estimate xfs_fsr xfs_io xfs_logprint xfs_mdrestore xfs_repair xfs_rtcp \
+          mkdosfs dosfsck dosfslabel fatlabel mount.smb3 mount.cifs \
+          fsck.ext2 fsck.ext3 fsck.ext4 e2label tune2fs mkfs.ext3 \
+          mkfs.ext4 mke2fs fsck.jfs mkfs.jfs wipefs btrfs-find-root btrfs-image \
+          btrfs-map-logical btrfs-select-super btrfstune mkfs.nilfs2 mount.nilfs2 \
+          nilfs_cleanerd cifs.upcall cifscreds getcifsacl setcifsacl smb2-quota smbinfo umount.nilfs2 \
+          chcp dumpseg lscp lssu mkcp rmcp fsck.cramfs fsck.minix fsfreeze fstrim mkfs.bfs \
+          mkfs.cramfs mkfs.minix mkfs.f2fs fsck.exfat mkfs.exfat \
+          tune.exfat exfatlabel dump.exfat fatresize nvme  fsck.msdos fsck.vfat mkfs.vfat mkfs.msdos  \
+          fsck.btrfs e2mmpstatus e2scrub e2scrub_all e4crypt e4defrag defrag.f2fs dump.f2fs f2fs_io \
+          f2fscrypt fibmap.f2fs resize.f2fs sload.f2fs fsck.f2fs parse.f2fs blkmapd nfsconf \
+          nfsdcld nfsdclddb nfsdclnts nfsid_map nfsv4.exportd nilfs-clean nilfs-resize nilfs-tune \
+          xfs_growfs xfs_quota xfs_spaceman compile_et mk_cmds fsck.xfs xfs_admin \
+          xfs_b_map xfs_freeze xfs_info xfs_metadump xfs_mkfile xfs_ncheck"
+    for i in ${_APPS}; do
+        rm /usr/bin/"${i}"
+    done
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook cleans up binaries of archboot_filesystems hook,
+  for update installer routine.
+  DO NOT USE ON REGULAR SYSTEM!.
+HELPEOF
+}
+
+# vim: set ft=sh ts=4 sw=4 et:

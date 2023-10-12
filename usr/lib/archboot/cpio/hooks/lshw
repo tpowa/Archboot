@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+_run ()
+{
+    _binary lshw
+    for i in manuf oui pnpid; do
+      _file "/usr/share/lshw/${i}.txt"
+    done
+    _file /usr/share/lshw/pnpid.txt
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook will add lshw to your archboot image.
+HELPEOF
+}
+# vim: set ft=sh ts=4 sw=4 et:

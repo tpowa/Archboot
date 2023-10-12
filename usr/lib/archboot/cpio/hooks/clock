@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+_run ()
+{
+    _map _binary hwclock tzselect zic zdump
+    _map _full_dir /usr/share/zoneinfo /usr/share/zoneinfo-leaps
+    _file /usr/bin/archboot-clock.sh /usr/bin/clock
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes the timezone data on an archboot image.
+HELPEOF
+}
+# vim: set ft=sh ts=4 sw=4 et:

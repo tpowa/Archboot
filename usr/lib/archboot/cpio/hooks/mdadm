@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+_run ()
+{
+    _all_modules -f 'dm-' 'drivers/md/*'
+    _map _binary mdmon mdadm
+    _file /etc/mdadm.conf
+    _file /usr/share/mdadm/mdcheck
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook adds complete mdadm to archboot image.
+HELPEOF
+}
+# vim: set ft=sh ts=4 sw=4 et:

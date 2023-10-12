@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+_run ()
+{
+    ### add pcspkr
+    _module pcspkr
+    ### add init modules
+    _map _module zram? btrfs? zstd? libcrc32c?
+    ### keyboard modules
+    _all_modules -f '_cs|ssb-hcd' '/usb/host'
+    _all_modules '/hid/hid-(alps|apple|asus|belkin|cherry|chicony|corsair|elan|hyperv|kensignton|lenovo|logitech|magicmouse|microsoft|razer|redragon|roccat|samsung|sony|speedlink|steelseries)'
+    _module usbhid
+    _all_modules -f 'parkbd' '/input/serio|mouse|keyboard/(applespi|atkbd)'
+    _all_modules -f '9pnet|bluetooth|fs' 'virtio'
+}
+
+help ()
+{
+cat <<HELPEOF
+  This hook includes init, keyboard and pcspkr support
+  for an archboot image.
+  DO NOT remove this one unless you know what you're doing.
+HELPEOF
+}
+# vim: set ft=sh ts=4 sw=4 et:

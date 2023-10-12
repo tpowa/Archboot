@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+_run ()
+{
+    _all_modules -f '_cs|b43' '/net/wireless/|/net/ieee80211/|/net/mac80211/'
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        # add broadcom wl support
+        _module wl.ko
+        _map _file /usr/lib/modprobe.d/broadcom-wl.conf \
+                     /usr/share/licenses/broadcom-wl/LICENSE
+    fi
+    # start iwd service
+    _symlink /etc/systemd/system/multi-user.target.wants/iwd.service /usr/lib/systemd/system/iwd.service
+    _map _binary iw set-wireless-regdom rfkill hwsim iwctl iwmon set-wireless-regdom
+    # add iwd and ead daemon
+    _map _binary /usr/lib/iwd/iwd /usr/lib/iwd/ead
+    # add hwsim helper script
+    _binary archboot-hwsim.sh
+    # crda support
+    _map _file /etc/conf.d/wireless-regdom /usr/lib/crda/regulatory.bin \
+                 /usr/lib/crda/pubkeys/sforshee.key.pub.pem
+    # fixing licenses
+    _map _file /usr/share/licenses/expat/COPYING /usr/share/licenses/wireless-regdb/LICENSE
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes wireless on an archboot image.
+HELPEOF
+}
+# vim: set ft=sh ts=4 sw=4 et:

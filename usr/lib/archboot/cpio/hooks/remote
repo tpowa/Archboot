@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+_run ()
+{
+    _map _binary findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd \
+      exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount \
+      sm-notify start-statd rpc.gssd \
+      nfsdcltrack gssproxy screen tmux rsync ttyd
+    _map _file /etc/screenrc /etc/ssh/ssh_config /etc/ssh/sshd_config /etc/ssh/moduli \
+        /etc/rsyncd.conf /etc/exports  /usr/lib/ssh/sftp-server /usr/lib/ssh/ssh-keysign \
+        /usr/lib/ssh/ssh-pkcs11-helper \
+        /etc/netconfig
+    _file /etc/ssh/sshd_config
+    # allow root login and empty passwords
+    echo "PermitRootLogin yes" >> "${BUILDROOT}/etc/ssh/sshd_config"
+    echo "PermitEmptyPasswords yes" >> "${BUILDROOT}/etc/ssh/sshd_config"
+    _full_dir /usr/lib/libnfsidmap
+    _map _dir  /var/empty /var/lib/nfs/sm /var/lib/nfs/sm.bak /var/lib/nfs/v4recovery \
+        /var/lib/nfs/rpc_pipefs /var/log/gssproxy
+    # mask nfs3 systemd
+    for i in rpcbind.service rpcbind.socket rpcbind.target nfs-server.service; do
+        _symlink "/etc/systemd/system/${i}" /dev/null
+    done
+    _map _full_dir /etc/gss /etc/gssproxy
+    _map _dir /var/lib/gssproxy/{clients,rcache} /var/log/gssproxy
+    _dir /var/lib/openldap
+    chmod 700 "${BUILDROOT}/var/lib/openldap"
+    chown 439:439 "${BUILDROOT}/var/lib/openldap"
+    # start sshd on startup
+    _symlink /etc/systemd/system/multi-user.target.wants/sshd.service /usr/lib/systemd/system/sshd.service
+    # start ttyd on startup
+    _file /usr/lib/libwebsockets-evlib_uv.so
+    _file /usr/share/archboot/remote/usr/bin/remote-login.sh /usr/bin/remote-login.sh
+    _file /usr/share/archboot/remote/etc/systemd/system/ttyd.service /etc/systemd/system/ttyd.service
+    _symlink /etc/systemd/system/multi-user.target.wants/ttyd.service /etc/systemd/system/ttyd.service
+    # fix licenses
+    _map _file /usr/share/licenses/nfsidmap/LICENSE \
+        /usr/share/licenses/tmux/LICENSE /usr/share/licenses/ttyd/LICENSE
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook includes remote tools on an archboot image.
+HELPEOF
+}
+# vim: set ft=sh ts=4 sw=4 et:

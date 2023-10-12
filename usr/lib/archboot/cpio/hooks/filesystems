@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+_run ()
+{
+	_all_modules '/fs/(btrfs|cifs|exfat|ext4|f2fs|fat|hfs|hfsplus|isofs|jfs|nfs|nfsd|nilfs2|nls|ntfs3|udf|xfs|vboxsf)'
+    _all_modules '/(lib/|kernel|arch/*)/crypto'
+    _map _module crypto-crc32c? crypto-crc32? libcrc32c? configfs? nls_cp437? nls_ascii?
+    _map _binary mkswap badblocks blkid debugfs dumpe2fs e2fsck \
+	  e2image e2undo findfs fsck logsave mkfs.ext2 resize2fs chattr lsattr e2freefrag filefrag \
+	  jfs_debugfs jfs_fsck jfs_fscklog jfs_logdump jfs_mkfs jfs_tune mkfs.xfs xfs_copy xfs_db xfs_estimate xfs_fsr xfs_io \
+	  xfs_logprint xfs_mdrestore xfs_repair xfs_rtcp mkdosfs dosfsck fatlabel mount.smb3 mount.cifs \
+	  fsck.ext2 fsck.ext3 fsck.ext4 e2label tune2fs mkfs.ext3 mkfs.ext4 mke2fs fsck.jfs \
+	  mkfs.jfs wipefs btrfs btrfsck btrfs-find-root btrfs-image btrfs-map-logical btrfs-select-super \
+	  btrfstune mkfs.nilfs2 mount.nilfs2 nilfs_cleanerd cifs.id_map cifs.upcall cifscreds getcifsacl \
+	  setcifsacl umount.nilfs2 chcp dumpseg lscp lssu mkcp rmcp fsck.cramfs fsck.minix fsfreeze \
+	  fstrim mkfs.bfs mkfs.cramfs mkfs.minix mkfs.f2fs fsck.exfat mkfs.exfat \
+	  tune.exfat exfatlabel dump.exfat fatresize nvme fsck.msdos fsck.vfat mkfs.vfat mkfs.msdos fsck.btrfs dosfslabel \
+	  e2mmpstatus e2scrub e2scrub_all e4crypt e4defrag defrag.f2fs dump.f2fs f2fs_io f2fscrypt fibmap.f2fs fsck.f2fs \
+	  parse.f2fs resize.f2fs sload.f2fs blkmapd nfsconf nfsdcld nfsid_map nfsv4.exportd nilfs-clean \
+	  nilfs-resize nilfs-tune xfs_growfs xfs_quota \
+	  xfs_spaceman compile_et mk_cmds fsck.xfs xfs_admin xfs_b_map xfs_freeze \
+	  xfs_info xfs_metadump xfs_mkfile xfs_ncheck gpart
+    _file /etc/nilfs_cleanerd.conf
+    _map _full_dir /etc/cifs-utils /etc/request-key.d /etc/nvme
+    # fix libinih for plasma wallpaper
+    for i in /usr/lib/libINI*; do
+		_file "${i}"
+	done
+    # fix licenses
+    _file /usr/share/licenses/e2fsprogs/MIT-LICENSE
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook is responsible for including filesystems on an archboot image.
+HELPEOF
+}
+
+# vim: set ft=sh ts=4 sw=4 et:
