@@ -78,7 +78,6 @@ _map() {
     return "${_R}"
 }
 
-
 _filter_modules() {
     # Add modules to the initcpio, filtered by grep.
     #   $@: filter arguments to grep
