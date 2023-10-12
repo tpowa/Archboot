@@ -10,7 +10,7 @@ shopt -s extglob
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/cpio.sh
 # needed files/directories
-_f_config=
+_CONFIG=""
 _d_install=/lib/initcpio/install
 # options and runtime data
 _optgenimg=''
@@ -141,7 +141,7 @@ while :; do
     case "$1" in
         -c)
             shift
-            _f_config="$1"
+            ${_CONFIG}="$1"
             ;;
         -k)
             shift
@@ -178,7 +178,7 @@ fi
 [[ -e /proc/self/mountinfo ]] || die "/proc must be mounted!"
 [[ -e /dev/fd ]] || die "/dev must be mounted!"
 #shellcheck disable="SC1090"
-! . "$_f_config" 2>"${_NO_LOG}" && die "Failed to read configuration '%s'" "$_f_config"
+! . "${_CONFIG}" 2>"${_NO_LOG}" && die "Failed to read configuration '%s'" "${_CONFIG}"
 if [[ -z "${KERNEL}" ]]; then
     msg "Trying to autodetect ${_RUNNING_ARCH} kernel..."
     [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && KERNEL="/usr/lib/modules/*/vmlinuz"
