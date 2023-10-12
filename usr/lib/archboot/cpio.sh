@@ -4,24 +4,6 @@
 # simplified, stripped down, optimized for size and speed
 # by Tobias Powalowski <tpowa@archlinux.org>
 
-msg() {
-    local mesg="$1"; shift
-    # shellcheck disable=SC2059
-    printf "$_color_green==>$_color_none $_color_bold$mesg$_color_none\n" "$@" >&1
-}
-
-msg2() {
-    local mesg="$1"; shift
-    # shellcheck disable=SC2059
-    printf "  $_color_blue->$_color_none $_color_bold$mesg$_color_none\n" "$@" >&1
-}
-
-warning() {
-    local mesg="$1"; shift
-    # shellcheck disable=SC2059
-    printf "$_color_yellow==> WARNING:$_color_none $_color_bold$mesg$_color_none\n" "$@" >&2
-}
-
 error() {
     local mesg="$1"; shift
     # shellcheck disable=SC2059

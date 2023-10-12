@@ -172,11 +172,7 @@ done
 if [[ -t 1 ]] && (( _optcolor )); then
     try_enable_color
 fi
-# insist that /proc and /dev be mounted (important for chroots)
-# NOTE: avoid using mountpoint for this -- look for the paths that we actually
-# use in mkinitcpio. Avoids issues like FS#26344.
-[[ -e /proc/self/mountinfo ]] || die "/proc must be mounted!"
-[[ -e /dev/fd ]] || die "/dev must be mounted!"
+
 #shellcheck disable="SC1090"
 ! . "${_CONFIG}" 2>"${_NO_LOG}" && die "Failed to read configuration '%s'" "${_CONFIG}"
 if [[ -z "${KERNEL}" ]]; then
