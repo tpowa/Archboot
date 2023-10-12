@@ -14,7 +14,7 @@ _CONFIG=""
 _INITCPIO=/lib/initcpio/install
 # options and runtime data
 _GENERATE_IMAGE=""
-_opttargetdir=''
+_TARGET_DIR=""
 declare -A  _addedmodules _modpaths
 # Sanitize environment further
 # GREP_OPTIONS="--color=always" will break everything
@@ -144,7 +144,7 @@ while :; do
             ;;
         -d)
             shift
-            _opttargetdir="$1"
+            ${_TARGET_DIR}="$1"
             ;;
         -g)
             shift
@@ -182,8 +182,8 @@ fi
 _KERNELVERSION="$(_kver "${KERNEL}")"
 _d_kmoduledir="/lib/modules/${_KERNELVERSION}"
 [[ -d "$_d_kmoduledir" ]] || die "'$_d_kmoduledir' is not a valid kernel module directory"
-_d_workdir="$(initialize_buildroot "${_KERNELVERSION}" "$_opttargetdir")" || exit 1
-BUILDROOT="${_opttargetdir:-$_d_workdir/root}"
+_d_workdir="$(initialize_buildroot "${_KERNELVERSION}" "${_TARGET_DIR}")" || exit 1
+BUILDROOT="${_TARGET_DIR}:-$_d_workdir/root}"
 _hooks=("${HOOKS[@]}")
 if (( ${#_hooks[*]} == 0 )); then
     die "Invalid config: No hooks found"
@@ -196,7 +196,7 @@ if [[ -n "${_GENERATE_IMAGE}" ]]; then
         die "Unable to write to '%s'" "${_GENERATE_IMAGE}"
     fi
     msg "Starting build: '%s'" "${_KERNELVERSION}"
-elif [[ -n "$_opttargetdir" ]]; then
+elif [[ -n "${_TARGET_DIR}" ]]; then
     msg "Starting build: '%s'" "${_KERNELVERSION}"
 else
     msg "Starting dry run: '%s'" "${_KERNELVERSION}"
@@ -214,7 +214,7 @@ rm -f -- "$BUILDROOT/var/cache/ldconfig/aux-cache"
 umask 077
 if [[ -n "${_GENERATE_IMAGE}" ]]; then
     build_image "${_GENERATE_IMAGE}" "${COMPRESSION}" || exit 1
-elif [[ -n "$_opttargetdir" ]]; then
+elif [[ -n "${_TARGET_DIR}" ]]; then
     msg "Build complete."
 else
     msg "Dry run complete, use -g IMAGE to generate a real image"
