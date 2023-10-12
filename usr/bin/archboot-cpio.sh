@@ -133,10 +133,6 @@ if [[ -z "$1" ]]; then
 fi
 _root_check
 
-_opt_short='c:d:g:hk:'
-parseopts "$_opt_short" -- "$@" || exit 1
-set -- "${OPTRET[@]}"
-unset _opt_short OPTRET
 while :; do
     case "$1" in
         -c)
