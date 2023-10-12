@@ -1,16 +1,9 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: GPL-2.0-only
+# SPDX-License-Identifier: GPL-3.0-or-later
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 build ()
 {
     add_all_modules '/acpi/'
-}
-
-help ()
-{
-cat<<HELPEOF
-  This hook includes the acpi subsystem on an archboot image.
-HELPEOF
 }
 # vim: set ft=sh ts=4 sw=4 et:
