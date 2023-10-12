@@ -11,7 +11,7 @@ shopt -s extglob
 . /usr/lib/archboot/cpio/cpio.sh
 # needed files/directories
 _CONFIG=""
-_INITCPIO=/usr/lib/archboot/cpio/
+_CPIO=/usr/lib/archboot/cpio/
 # options and runtime data
 _GENERATE_IMAGE=""
 _TARGET_DIR=""
@@ -43,21 +43,16 @@ EOF
 build_image() {
     local out="$1" compressout="$1" compress="$2" errmsg pipestatus
     case "$compress" in
-        cat)
-            msg "Creating uncompressed initcpio image: '%s'" "$out"
+        cat) msg "Creating uncompressed initcpio image: '%s'" "$out"
             unset _COMPRESSION_OPTIONS
             ;;
-        *)
-            msg "Creating %s-compressed initcpio image: '%s'" "$compress" "$out"
+        *) msg "Creating %s-compressed initcpio image: '%s'" "$compress" "$out"
             ;;&
-        xz)
-            _COMPRESSION_OPTIONS=('-T0' '--check=crc32' "${_COMPRESSION_OPTIONS[@]}")
+        xz) _COMPRESSION_OPTIONS=('-T0' '--check=crc32' "${_COMPRESSION_OPTIONS[@]}")
             ;;
-        lz4)
-            _COMPRESSION_OPTIONS=('-l' "${_COMPRESSION_OPTIONS[@]}")
+        lz4) _COMPRESSION_OPTIONS=('-l' "${_COMPRESSION_OPTIONS[@]}")
             ;;
-        zstd)
-            _COMPRESSION_OPTIONS=('-T0' "${_COMPRESSION_OPTIONS[@]}")
+        zstd) _COMPRESSION_OPTIONS=('-T0' "${_COMPRESSION_OPTIONS[@]}")
             ;;
     esac
     if [[ -f "$out" ]]; then

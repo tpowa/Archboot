@@ -275,7 +275,7 @@ run_build_hook() {
     local MODULES=() BINARIES=() FILES=() SCRIPT=''
     # find script in install dirs
     # shellcheck disable=SC2154
-    if ! script="$(PATH="${_INITCPIO}" type -P "$hook")"; then
+    if ! script="$(PATH="${_CPIO}" type -P "$hook")"; then
         error "Hook '$hook' cannot be found"
         return 1
     fi
