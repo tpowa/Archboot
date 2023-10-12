@@ -169,9 +169,6 @@ while :; do
     esac
     shift
 done
-if [[ -t 1 ]] && (( _optcolor )); then
-    try_enable_color
-fi
 
 #shellcheck disable="SC1090"
 ! . "${_CONFIG}" 2>"${_NO_LOG}" && die "Failed to read configuration '%s'" "${_CONFIG}"
