@@ -192,7 +192,7 @@ if [[ -n "${_GENERATE_IMAGE}" ]]; then
     # check for permissions. if the image doesn't already exist,
     # then check the directory
     if [[ ( -e ${_GENERATE_IMAGE} && ! -w ${_GENERATE_IMAGE} ) ||
-            ( ! -d ${${_GENERATE_IMAGE%/*} || ! -w ${${_GENERATE_IMAGE%/*} ) ]]; then
+            ( ! -d ${_GENERATE_IMAGE%/*} || ! -w ${_GENERATE_IMAGE%/*} ) ]]; then
         die "Unable to write to '%s'" "${_GENERATE_IMAGE}"
     fi
     msg "Starting build: '%s'" "${_KERNELVERSION}"
