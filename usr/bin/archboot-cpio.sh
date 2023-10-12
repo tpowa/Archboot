@@ -15,7 +15,7 @@ _CPIO=/usr/lib/archboot/cpio/
 # options and runtime data
 _GENERATE_IMAGE=""
 _TARGET_DIR=""
-declare -A  _addedmodules _modpaths
+declare -A _addedmodules _modpaths
 # Sanitize environment further
 # GREP_OPTIONS="--color=always" will break everything
 # CDPATH can affect cd and pushd
@@ -40,30 +40,20 @@ usage: ${0##*/} <options>
 EOF
 }
 
-build_image() {
-    local out="$1" compressout="$1" compress="$2" errmsg pipestatus
-    case "$compress" in
-        cat) msg "Creating uncompressed initcpio image: '%s'" "$out"
-            unset _COMPRESSION_OPTIONS
-            ;;
-        *) msg "Creating %s-compressed initcpio image: '%s'" "$compress" "$out"
-            ;;&
-        xz) _COMPRESSION_OPTIONS=('-T0' '--check=crc32' "${_COMPRESSION_OPTIONS[@]}")
-            ;;
-        lz4) _COMPRESSION_OPTIONS=('-l' "${_COMPRESSION_OPTIONS[@]}")
-            ;;
-        zstd) _COMPRESSION_OPTIONS=('-T0' "${_COMPRESSION_OPTIONS[@]}")
-            ;;
+_build_cpio() {
+    case "${_COMP}" in
+        cat)    echo "Creating uncompressed initcpio image: ${_OUT}"
+                unset _COMP_OPTS
+                ;;
+        *)      echo "Creating ${_COMP} compressed initcpio image: ${_OUT}"
+                ;;
+        xz)     _COMP_OPTS=('-T0' '--check=crc32' "${_COMP_OPTS[@]}")
+                ;;
+        lz4)    _COMP_OPTS=('-l' "${_COMP_OPTS[@]}")
+                ;;
+        zstd)   _COMP_OPTS=('-T0' "${_COMP_OPTS[@]}")
+                ;;
     esac
-    if [[ -f "$out" ]]; then
-        local curr_size space_left_on_device
-        curr_size="$(stat --format="%s" "$out")"
-        space_left_on_device="$(($(stat -f --format="%a*%S" "$out")))"
-        # check if there is enough space on the device to write the image to a tempfile, fallback otherwise
-        # this assumes that the new image is not more than 1¼ times the size of the old one
-        (( $((curr_size + (curr_size/4))) < space_left_on_device )) && compressout="$out".tmp
-    fi
-    pushd "$BUILDROOT" >"${_NO_LOG}" || return
     # Reproducibility: set all timestamps to 0
     find . -mindepth 1 -execdir touch -hcd "@0" "{}" +
     # If this pipeline changes, |pipeprogs| below needs to be updated as well.
@@ -71,30 +61,7 @@ build_image() {
             sort -z |
             LANG=C bsdtar --null -cnf - -T - |
             LANG=C bsdtar --null -cf - --format=newc @- |
-            $compress "${_COMPRESSION_OPTIONS[@]}" > "$compressout"
-    pipestatus=("${PIPESTATUS[@]}")
-    pipeprogs=('find' 'sort' 'bsdtar (step 1)' 'bsdtar (step 2)' "$compress")
-    popd >"${_NO_LOG}" || return
-    for (( i = 0; i < ${#pipestatus[*]}; ++i )); do
-        if (( pipestatus[i] )); then
-            errmsg="${pipeprogs[i]} reported an error"
-            break
-        fi
-    done
-    if (( _builderrors )); then
-        warning "errors were encountered during the build. The image may not be complete."
-    fi
-    if [[ -n "$errmsg" ]]; then
-        error "Image generation FAILED: '%s'" "$errmsg"
-        return 1
-    elif (( _builderrors == 0 )); then
-        msg "Image generation successful"
-    fi
-    # sync and rename as we only wrote to a tempfile so far to ensure consistency
-    if [[ "$compressout" != "$out" ]]; then
-        sync -d -- "$compressout"
-        mv -f -- "$compressout" "$out"
-    fi
+            ${_COMP} "${_COMP_OPTS[@]}" > "${_OUT}" || _abort "initcpio image creation failed!"
 }
 
 preload_builtin_modules() {
@@ -129,9 +96,9 @@ while :; do
             ${_TARGET_DIR}="${1}"
             ;;
         -g) shift
-            [[ -d "${1}" ]] && die 'Invalid image path -- must not be a directory'
+            [[ -d "${1}" ]] && _abort "Invalid image path -- ${1} is a directory!"
             if ! ${_GENERATE_IMAGE}="$(readlink -f "$1")" || [[ ! -e "${_GENERATE_IMAGE%/*}" ]]; then
-                die "Unable to write to path: '%s'" "${1}"
+                _abort "Unable to write to path!" "${1}"
             fi
             ;;
         -h) _usage
@@ -143,7 +110,7 @@ while :; do
 done
 
 #shellcheck disable="SC1090"
-! . "${_CONFIG}" 2>"${_NO_LOG}" && die "Failed to read configuration '%s'" "${_CONFIG}"
+! . "${_CONFIG}" 2>"${_NO_LOG}" && _abort "Failed to read configuration '%s'" "${_CONFIG}"
 if [[ -z "${KERNEL}" ]]; then
     msg "Trying to autodetect ${_RUNNING_ARCH} kernel..."
     [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && KERNEL="/usr/lib/modules/*/vmlinuz"
@@ -154,23 +121,23 @@ fi
 KERNEL="$(echo ${KERNEL})"
 msg "Using kernel: ${KERNEL}"
 if [[ ! -f "${KERNEL}" ]]; then
-    die "kernel image does not exist!"
+    _abort "kernel image does not exist!"
 fi
 _KERNELVERSION="$(_kver "${KERNEL}")"
 _d_kmoduledir="/lib/modules/${_KERNELVERSION}"
-[[ -d "$_d_kmoduledir" ]] || die "'$_d_kmoduledir' is not a valid kernel module directory"
+[[ -d "$_d_kmoduledir" ]] || _abort "'$_d_kmoduledir' is not a valid kernel module directory"
 _d_workdir="$(initialize_buildroot "${_KERNELVERSION}" "${_TARGET_DIR}")" || exit 1
-BUILDROOT="${_TARGET_DIR}:-$_d_workdir/root}"
+_ROOTFS="${_TARGET_DIR}:-$_d_workdir/root}"
 _hooks=("${HOOKS[@]}")
 if (( ${#_hooks[*]} == 0 )); then
-    die "Invalid config: No hooks found"
+    _abort "Invalid config: No hooks found"
 fi
 if [[ -n "${_GENERATE_IMAGE}" ]]; then
     # check for permissions. if the image doesn't already exist,
     # then check the directory
     if [[ ( -e ${_GENERATE_IMAGE} && ! -w ${_GENERATE_IMAGE} ) ||
             ( ! -d ${_GENERATE_IMAGE%/*} || ! -w ${_GENERATE_IMAGE%/*} ) ]]; then
-        die "Unable to write to '%s'" "${_GENERATE_IMAGE}"
+        _abort "Unable to write to '%s'" "${_GENERATE_IMAGE}"
     fi
     msg "Starting build: '%s'" "${_KERNELVERSION}"
 elif [[ -n "${_TARGET_DIR}" ]]; then
@@ -184,13 +151,13 @@ preload_builtin_modules
 map run_build_hook "${_hooks[@]}" || (( ++_builderrors ))
 install_modules "${!_modpaths[@]}"
 # this is simply a nice-to-have -- it doesn't matter if it fails.
-ldconfig -r "$BUILDROOT" &>"${_NO_LOG}"
-# remove /var/cache/ldconfig/aux-cache for reproducability
-rm -f -- "$BUILDROOT/var/cache/ldconfig/aux-cache"
+ldconfig -r "${_ROOTFS}" &>"${_NO_LOG}"
+# remove /var/cache/ldconfig/aux-cache for reproducibility
+rm -f -- "${_ROOTFS}/var/cache/ldconfig/aux-cache"
 # Set umask to create initramfs images as 600
 umask 077
 if [[ -n "${_GENERATE_IMAGE}" ]]; then
-    build_image "${_GENERATE_IMAGE}" "${COMPRESSION}" || exit 1
+    _build_cpio "${_GENERATE_IMAGE}" "${COMPRESSION}" || exit 1
 elif [[ -n "${_TARGET_DIR}" ]]; then
     msg "Build complete."
 else
