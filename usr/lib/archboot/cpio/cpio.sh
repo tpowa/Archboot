@@ -90,7 +90,7 @@ _filter_modules() {
     done
     shift $(( OPTIND - 1 ))
     # shellcheck disable=SC2154
-    while read -r -d '' mod; do
+    while read -r -d '' _MOD_INPUT; do
         (( ++_COUNT ))
         for f in "${_MOD_FILTER[@]}"; do
             [[ "${_MOD_INPUT}" =~ $f ]] && continue 2
