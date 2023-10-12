@@ -8,10 +8,10 @@
 shopt -s extglob
 
 . /usr/lib/archboot/common.sh
-. /usr/lib/archboot/cpio.sh
+. /usr/lib/archboot/cpio/cpio.sh
 # needed files/directories
 _CONFIG=""
-_INITCPIO=/lib/initcpio/install
+_INITCPIO=/usr/lib/archboot/cpio/
 # options and runtime data
 _GENERATE_IMAGE=""
 _TARGET_DIR=""
@@ -38,16 +38,6 @@ Tool for creating an archboot initramfs image.
 
 usage: ${0##*/} <options>
 EOF
-}
-
-# The function is called from the EXIT trap
-# shellcheck disable=SC2317
-cleanup() {
-    local err="${1:-$?}"
-    if [[ -n "$_d_workdir" ]]; then
-        rm -rf -- "$_d_workdir"
-    fi
-    exit "$err"
 }
 
 build_image() {
@@ -133,34 +123,26 @@ fi
 _root_check
 
 while :; do
-    case "$1" in
-        -c)
-            shift
-            ${_CONFIG}="$1"
+    case "${1}" in
+        -c) shift
+            ${_CONFIG}="${1}"
             ;;
-        -k)
-            shift
-            KERNEL="$1"
+        -k) shift
+            KERNEL="${1}"
             ;;
-        -d)
-            shift
-            ${_TARGET_DIR}="$1"
+        -d) shift
+            ${_TARGET_DIR}="${1}"
             ;;
-        -g)
-            shift
-            [[ -d "$1" ]] && die 'Invalid image path -- must not be a directory'
+        -g) shift
+            [[ -d "${1}" ]] && die 'Invalid image path -- must not be a directory'
             if ! ${_GENERATE_IMAGE}="$(readlink -f "$1")" || [[ ! -e "${_GENERATE_IMAGE%/*}" ]]; then
-                die "Unable to write to path: '%s'" "$1"
+                die "Unable to write to path: '%s'" "${1}"
             fi
             ;;
-        -h)
-            _usage
+        -h) _usage
             exit 0
             ;;
-        --)
-            shift
-            break 2
-            ;;
+        *) _usage ;;
     esac
     shift
 done
