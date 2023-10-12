@@ -13,7 +13,10 @@ error() {
 
 die() {
     error "$@"
-    cleanup 1
+    if [[ -n "$_d_workdir" ]]; then
+        rm -rf -- "$_d_workdir"
+    fi
+    exit 1
 }
 
 map() {
