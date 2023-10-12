@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# archboot-cpio.sh - modular tool for _runing an initramfs image
+# archboot-cpio.sh - modular tool for building an initramfs image
 # simplified, stripped down, optimized for size and speed
 # by Tobias Powalowski <tpowa@archlinux.org>
 
@@ -232,44 +232,44 @@ add_binary() {
     return 0
 }
 
-initialize__runroot() {
-    # creates a temporary directory for the _runroot and initialize it with a
+initialize_buildroot() {
+    # creates a temporary directory for the buildroot and initialize it with a
     # basic set of necessary directories and symlinks
-    local workdir='' kernver="$1" arch _runroot
+    local workdir='' kernver="$1" arch buildroot
     arch="$(uname -m)"
     if ! workdir="$(mktemp -d --tmpdir mkinitcpio.XXXXXX)"; then
         error 'Failed to create temporary working directory in %s' "${TMPDIR:-/tmp}"
         return 1
     fi
-    _runroot="${2:-$workdir/root}"
+    buildroot="${2:-$workdir/root}"
     if [[ ! -w "${2:-$workdir}" ]]; then
-        error 'Unable to write to _run root: %s' "$_runroot"
+        error 'Unable to write to build root: %s' "$buildroot"
         return 1
     fi
     # base directory structure
-    install -dm755 "$_runroot"/{new_root,proc,sys,dev,run,tmp,var,etc,usr/{local{,/bin,/sbin,/lib},lib,bin}}
-    ln -s "usr/lib" "$_runroot/lib"
-    ln -s "bin"     "$_runroot/usr/sbin"
-    ln -s "usr/bin" "$_runroot/bin"
-    ln -s "usr/bin" "$_runroot/sbin"
-    ln -s "/run"    "$_runroot/var/run"
+    install -dm755 "$buildroot"/{new_root,proc,sys,dev,run,tmp,var,etc,usr/{local{,/bin,/sbin,/lib},lib,bin}}
+    ln -s "usr/lib" "$buildroot/lib"
+    ln -s "bin"     "$buildroot/usr/sbin"
+    ln -s "usr/bin" "$buildroot/bin"
+    ln -s "usr/bin" "$buildroot/sbin"
+    ln -s "/run"    "$buildroot/var/run"
     case "$arch" in
         x86_64)
-            ln -s "lib"     "$_runroot/usr/lib64"
-            ln -s "usr/lib" "$_runroot/lib64"
+            ln -s "lib"     "$buildroot/usr/lib64"
+            ln -s "usr/lib" "$buildroot/lib64"
             ;;
     esac
     # kernel module dir
-    [[ "$kernver" != 'none' ]] && install -dm755 "$_runroot/usr/lib/modules/$kernver/kernel"
+    [[ "$kernver" != 'none' ]] && install -dm755 "$buildroot/usr/lib/modules/$kernver/kernel"
     # mount tables
-    ln -s ../proc/self/mounts "$_runroot/etc/mtab"
-    : >"$_runroot/etc/fstab"
+    ln -s ../proc/self/mounts "$buildroot/etc/mtab"
+    : >"$buildroot/etc/fstab"
     # add a blank ld.so.conf to keep ldconfig happy
-    : >"$_runroot/etc/ld.so.conf"
+    : >"$buildroot/etc/ld.so.conf"
     printf '%s' "$workdir"
 }
 
-run__run_hook() {
+run_build_hook() {
     local hook="$1" script=''
     # shellcheck disable=SC2034
     local MODULES=() BINARIES=() FILES=() SCRIPT=''
@@ -280,19 +280,19 @@ run__run_hook() {
         return 1
     fi
     # source
-    unset -f _run
+    unset -f build
     # shellcheck disable=SC1090
     if ! . "$script"; then
         error 'Failed to read %s' "$script"
         return 1
     fi
-    if ! declare -f _run >"${_NO_LOG}"; then
-        error "Hook '%s' has no _run function" "${script}"
+    if ! declare -f build >"${_NO_LOG}"; then
+        error "Hook '%s' has no build function" "${script}"
         return 1
     fi
     # run
-    msg2 "Running _run hook: [%s]" "${script##*/}"
-    _run
+    msg2 "Running build hook: [%s]" "${script##*/}"
+    build
     # if we made it this far, return successfully. Hooks can
     # do their own error catching if it's severe enough, and
     # we already capture errors from the add_* functions.
