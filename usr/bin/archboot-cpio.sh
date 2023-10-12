@@ -22,7 +22,7 @@ declare -A  _addedmodules _modpaths
 # LIBMOUNT_* options can affect findmnt and other tools
 unset GREP_OPTIONS CDPATH "${!LIBMOUNT_@}"
 
-usage() {
+_usage() {
     cat <<EOF
 ARCHBOOT CPIO
 -------------
@@ -127,7 +127,7 @@ preload_builtin_modules() {
 }
 
 if [[ -z "$1" ]]; then
-    usage
+    _usage
     exit 0
 fi
 _root_check
@@ -154,8 +154,8 @@ while :; do
             fi
             ;;
         -h)
-            usage
-            cleanup 0
+            _usage
+            exit 0
             ;;
         --)
             shift
