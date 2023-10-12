@@ -38,6 +38,7 @@ Tool for creating an archboot initramfs image.
 
 usage: ${0##*/} <options>
 EOF
+    exit 0
 }
 
 _build_cpio() {
@@ -80,7 +81,6 @@ preload_builtin_modules() {
 
 if [[ -z "$1" ]]; then
     _usage
-    exit 0
 fi
 _root_check
 
