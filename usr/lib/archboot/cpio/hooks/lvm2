@@ -23,10 +23,4 @@ _run ()
     _file /etc/lvm/lvm.conf
 }
 
-help ()
-{
-cat<<HELPEOF
-  This hook adds complete lvm2 to archboot image, 
-HELPEOF
-}
 # vim: set ft=sh ts=4 sw=4 et:

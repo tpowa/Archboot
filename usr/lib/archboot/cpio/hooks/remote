@@ -40,10 +40,4 @@ _run ()
         /usr/share/licenses/tmux/LICENSE /usr/share/licenses/ttyd/LICENSE
 }
 
-help ()
-{
-cat<<HELPEOF
-  This hook includes remote tools on an archboot image.
-HELPEOF
-}
 # vim: set ft=sh ts=4 sw=4 et:

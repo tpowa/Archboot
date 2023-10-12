@@ -28,10 +28,4 @@ _run ()
         /usr/share/licenses/dnssec-anchors/LICENSE
 }
 
-help ()
-{
-cat<<HELPEOF
-  This hook includes the additional network tools on an archboot image.
-HELPEOF
-}
 # vim: set ft=sh ts=4 sw=4 et:

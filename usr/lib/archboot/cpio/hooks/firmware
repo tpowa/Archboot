@@ -13,10 +13,4 @@ _run ()
     find "${BUILDROOT}/lib/firmware" -type f -name "*README*" -exec rm {} \;
 }
 
-help ()
-{
-cat<<HELPEOF
-  This hook includes linux-firmware on an archboot image.
-HELPEOF
-}
 # vim: set ft=sh ts=4 sw=4 et:

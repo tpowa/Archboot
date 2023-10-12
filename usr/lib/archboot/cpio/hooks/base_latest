@@ -13,10 +13,4 @@ _run ()
     _full_dir /usr/share/kbd/keymaps/include
 }
 
-help ()
-{
-cat <<HELPEOF
-  This hook sets up stripped down base for for latest image.
-HELPEOF
-}
 # vim: set ft=sh ts=4 sw=4 et:

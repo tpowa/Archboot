@@ -244,13 +244,4 @@ _run ()
 
 }
 
-help ()
-{
-cat <<HELPEOF
-  This hook sets up all common initial directories and installs base, kmod,
-  pam, pacman, shadow, systemd, udev utilities and libraries 
-  for a archboot image. 
-  DO NOT remove this one unless you know what you're doing.
-HELPEOF
-}
 # vim: set ft=sh ts=4 sw=4 et:

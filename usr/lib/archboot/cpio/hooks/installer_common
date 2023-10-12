@@ -14,10 +14,4 @@ _run ()
     echo ". /usr/lib/archboot/login.sh" >> "${BUILDROOT}/root/.bashrc"
 }
 
-help ()
-{
-cat<<HELPEOF
-  This hook adds basic installer files on an archboot image.
-HELPEOF
-}
 # vim: set ft=sh ts=4 sw=4 et:

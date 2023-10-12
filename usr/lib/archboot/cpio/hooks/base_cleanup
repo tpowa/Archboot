@@ -43,12 +43,4 @@ _run ()
     done
 }
 
-help ()
-{
-cat <<HELPEOF
-  This hook cleans up binaries of archboot_base,
-  for a update installer routine.
-  DO NOT USE ON REGULAR SYSTEM!.
-HELPEOF
-}
 # vim: set ft=sh ts=4 sw=4 et:

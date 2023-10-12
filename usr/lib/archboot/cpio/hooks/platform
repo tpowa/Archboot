@@ -7,11 +7,4 @@ _run ()
     _all_modules -f 'media' '/platform/'
 }
 
-help ()
-{
-cat<<HELPEOF
-  This hook adds the necessary modules for a platform device.
-HELPEOF
-}
- 
 # vim: set ft=sh ts=4 sw=4 et:

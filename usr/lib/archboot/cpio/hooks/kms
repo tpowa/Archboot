@@ -16,10 +16,4 @@ _run ()
     _map _all_modules 'chromeos_privacy_screen?' 'thinkpad_acpi?'
 }
 
-help ()
-{
-cat <<HELPEOF
-  This hook includes kms support for an archboot image.
-HELPEOF
-}
 # vim: set ft=sh ts=4 sw=4 et:

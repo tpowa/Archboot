@@ -12,10 +12,4 @@ _run ()
     _file /usr/share/archboot/nvim/nvim-lastplace.lua /usr/share/nvim/runtime/plugin/nvim-lastplace.lua
 }
 
-help ()
-{
-cat<<HELPEOF
-  This hook includes neovim on an archboot image.
-HELPEOF
-} 
 # vim: set ft=sh ts=4 sw=4 et:

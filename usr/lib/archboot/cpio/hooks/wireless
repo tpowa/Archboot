@@ -25,10 +25,4 @@ _run ()
     _map _file /usr/share/licenses/expat/COPYING /usr/share/licenses/wireless-regdb/LICENSE
 }
 
-help ()
-{
-cat<<HELPEOF
-  This hook includes wireless on an archboot image.
-HELPEOF
-}
 # vim: set ft=sh ts=4 sw=4 et:

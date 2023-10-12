@@ -31,11 +31,4 @@ fi
     _file "${MOTD}" /etc/motd
 }
 
-help ()
-{
-cat <<HELPEOF
-  This hook sets up dynamically the motd message, depending on
-  your system.
-HELPEOF
-}
 # vim: set ft=sh ts=4 sw=4 et:

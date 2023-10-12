@@ -32,11 +32,4 @@ _run ()
     _file /usr/share/licenses/e2fsprogs/MIT-LICENSE
 }
 
-help ()
-{
-cat<<HELPEOF
-  This hook is responsible for including filesystems on an archboot image.
-HELPEOF
-}
-
 # vim: set ft=sh ts=4 sw=4 et:

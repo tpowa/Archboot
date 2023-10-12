@@ -19,11 +19,4 @@ _run ()
     _file /usr/share/archboot/grub/archboot-background.png
 }
 
-help ()
-{
-cat<<HELPEOF
-  This hook includes the archboot installer,archinstaller and arch-install-scripts 
-  on an archboot image.
-HELPEOF
-}
 # vim: set ft=sh ts=4 sw=4 et:

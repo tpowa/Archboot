@@ -7,12 +7,4 @@ _run ()
   rm -rf /var/cache/pacman/pkg
 }
 
-help ()
-{
-cat<<HELPEOF
-  This hook removes /var/cache/pacman/pkg
-  for update installer routine.
-  DO NOT USE ON REGULAR SYSTEM!.
-HELPEOF
-}
 # vim: set ft=sh ts=4 sw=4 et:

@@ -7,10 +7,4 @@ _run ()
     _map _binary kexec vmcore-dmesg
 }
 
-help ()
-{
-cat<<HELPEOF
-  This hook includes kexec on an archboot image.
-HELPEOF
-} 
 # vim: set ft=sh ts=4 sw=4 et:

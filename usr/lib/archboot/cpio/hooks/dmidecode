@@ -8,11 +8,4 @@ _run ()
     _map _binary dmidecode biosdecode
 }
 
-help ()
-{
-cat<<HELPEOF
-  This hook includes dmidecode on an archboot image.
-HELPEOF
-}
-
 # vim: set ft=sh ts=4 sw=4 et:
