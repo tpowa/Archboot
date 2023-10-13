@@ -18,9 +18,9 @@ _run ()
           tune.exfat exfatlabel dump.exfat fatresize nvme  fsck.msdos fsck.vfat mkfs.vfat mkfs.msdos  \
           fsck.btrfs e2mmpstatus e2scrub e2scrub_all e4crypt e4defrag defrag.f2fs dump.f2fs f2fs_io \
           f2fscrypt fibmap.f2fs resize.f2fs sload.f2fs fsck.f2fs parse.f2fs blkmapd nfsconf \
-          nfsdcld nfsdclddb nfsdclnts nfsid_map nfsv4.exportd nilfs-clean nilfs-resize nilfs-tune \
+          nfsdcld nfsdclddb nfsdclnts nfsidmap nfsv4.exportd nilfs-clean nilfs-resize nilfs-tune \
           xfs_growfs xfs_quota xfs_spaceman compile_et mk_cmds fsck.xfs xfs_admin \
-          xfs_b_map xfs_freeze xfs_info xfs_metadump xfs_mkfile xfs_ncheck"
+          xfs_bmap xfs_freeze xfs_info xfs_metadump xfs_mkfile xfs_ncheck"
     for i in ${_APPS}; do
         rm /usr/bin/"${i}"
     done

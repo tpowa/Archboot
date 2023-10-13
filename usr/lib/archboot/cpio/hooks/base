@@ -14,7 +14,7 @@ _run ()
           ionice ipcmk ipcrm ipcs swapoff look lscpu mcookie namei prlimit rename \
           renice rev script scriptreplay setarch setsid setterm taskset ul unshare \
           uuidgen whereis write addpart delpart ldattach partx readprofile rtcwake uuidd \
-          sysctl pidwait pkill p_map pwdx slabtop tload vmstat watch eject keyctl request-key \
+          sysctl pidwait pkill pmap pwdx slabtop tload vmstat watch eject keyctl request-key \
           tac sulogin resizepart lslocks wdctl zless zgrep fold hexdump ldd \
           shred blockdev blkdiscard newgrp nsenter runuser vigr vipw diff depmod \
           linux32 linux64 lsmod lzcat lzcmp lzdiff lzegrep lzfgrep lzgrep lzegrep \
