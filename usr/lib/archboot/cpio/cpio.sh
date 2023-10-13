@@ -121,33 +121,29 @@ _module() {
     (( _INCLUDED_MODS["${_CHECK}"] == 1 )) && return
     while IFS=':= ' read -r -d '' _FIELD _VALUE; do
         case "${_FIELD}" in
-            filename)
-                # Only add modules with filenames that look like paths (e.g.
-                # it might be reported as "(builtin)"). We'll defer actually
-                # checking whether or not the file exists -- any errors can be
-                # handled during module install time.
-                if [[ "${_VALUE}" == /* ]]; then
-                    _MOD="${_VALUE##*/}" _MOD="${_MOD%.ko*}"
-                    _MOD_PATH[".${_VALUE}"]=1
-                    _INCLUDED_MODS["${_MOD//-/_}"]=1
-                fi
-                ;;
-            depends)
-                IFS=',' read -r -a _DEPS <<< "${_VALUE}"
-                _map _module "${_DEPS[@]}"
-                ;;
-            firmware)
-                _FW+=("${_VALUE}")
-                ;;
-            softdep)
-                read -ra _SOFT <<<"${_VALUE}"
-                for i in "${_SOFT[@]}"; do
-                    [[ ${i} == *: ]] && continue
-                    _module "${i}?"
-                done
-                ;;
+            filename)   # Only add modules with filenames that look like paths (e.g.
+                        # it might be reported as "(builtin)"). We'll defer actually
+                        # checking whether or not the file exists -- any errors can be
+                        # handled during module install time.
+                        if [[ "${_VALUE}" == /* ]]; then
+                            _MOD="${_VALUE##*/}" _MOD="${_MOD%.ko*}"
+                            _MOD_PATH[".${_VALUE}"]=1
+                            _INCLUDED_MODS["${_MOD//-/_}"]=1
+                        fi
+                        ;;
+            depends)    IFS=',' read -r -a _DEPS <<< "${_VALUE}"
+                        _map _module "${_DEPS[@]}"
+                        ;;
+            firmware)   _FW+=("${_VALUE}")
+                        ;;
+            softdep)    read -ra _SOFT <<<"${_VALUE}"
+                        for i in "${_SOFT[@]}"; do
+                            [[ ${i} == *: ]] && continue
+                            _module "${i}?"
+                        done
+                        ;;
         esac
-    done < <(modinfo -b "${_MODULE_DIR}" -k "${_KERNELVERSION}" -0 "${_CHECK}" 2>"${_NO_LOG}")
+    done < <(modinfo -k "${_KERNELVERSION}" -0 "${_CHECK}" 2>"${_NO_LOG}")
     if (( ${#_FW[*]} )); then
         _firmware "${_FW[@]}"
     fi
@@ -293,8 +289,6 @@ _run_hook() {
         _abort "Hook ${_HOOK_FILE} has no run function!"
         return 1
     fi
-    # run
-    echo "Running hook:" "${_HOOK_FILE##*/}"
     _run
 }
 
@@ -322,7 +316,6 @@ _create_cpio() {
         zstd)   _COMP_OPTS=('-T0' "${_COMP_OPTS[@]}")
                 ;;
     esac
-
     # Reproducibility: set all timestamps to 0
     pushd "${_ROOTFS}" >"${_NO_LOG}" || return
     find . -mindepth 1 -execdir touch -hcd "@0" "{}" +

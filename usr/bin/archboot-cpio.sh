@@ -49,7 +49,6 @@ fi
 # allow * in config
 #shellcheck disable=SC2116,2086
 _KERNEL="$(echo ${_KERNEL})"
-echo "Using kernel: ${_KERNEL}"
 if [[ ! -f "${_KERNEL}" ]]; then
     _abort "kernel image does not exist!"
 fi
@@ -58,28 +57,45 @@ _MODULE_DIR="/lib/modules/${_KERNELVERSION}"
 [[ -d "${_MODULE_DIR}" ]] || _abort "${_MODULE_DIR} is not a valid kernel module directory!"
 _BUILD_DIR="$(_init_rootfs "${_KERNELVERSION}" "${_TARGET_DIR}")" || exit 1
 _ROOTFS="${_TARGET_DIR:-${_BUILD_DIR}/root}"
-if (( ${#_HOOKS[*]} == 0 )); then
-    _abort "No hooks found in config file!"
-fi
-echo "Using kernel version: ${_KERNELVERSION}"
-if [[ -n "${_GENERATE_IMAGE}" || -n "${_TARGET_DIR}" ]]; then
-    echo "Starting build..."
+if [[ -n "${_GENERATE_IMAGE}" ]]; then
+    echo "Starting build: ${_GENERATE_IMAGE}"
+elif [[ -n "${_TARGET_DIR}" ]]; then
+    echo "Starting build directory: ${_TARGET_DIR}"
 else
     echo "Starting dry run..."
 fi
+if (( ${#_HOOKS[*]} == 0 )); then
+    _abort "No hooks found in config file!"
+fi
+echo "Using kernel: ${_KERNEL}"
+echo "Detected kernel version: ${_KERNELVERSION}"
 _builtin_modules
-_map _run_hook "${_HOOKS[@]}"
+_HOOK_COUNT=1
+_HOOKS_END_COUNT="$(echo ${_HOOKS[@]} | wc -w)"
+if [[ "${_HOOKS_END_COUNT}" -lt 10 ]]; then
+    _ADD_ZERO=""
+else
+    _ADD_ZERO=1
+fi
+echo "Running ${_HOOKS_END_COUNT} hooks..."
+for i in "${_HOOKS[@]}"; do
+    if [[ -n "${_ADD_ZERO}" && "${_HOOK_COUNT}" -lt 10 ]]; then
+        echo "0${_HOOK_COUNT}/${_HOOKS_END_COUNT}: ${i}"
+    else
+        echo "${_HOOK_COUNT}/${_HOOKS_END_COUNT}: ${i}"
+    fi
+    _run_hook "${i}"
+    _HOOK_COUNT="$((_HOOK_COUNT+1))"
+done
 _install_modules "${!_MOD_PATH[@]}"
-# this is simply a nice-to-have -- it doesn't matter if it fails.
-ldconfig -r "${_ROOTFS}" &>"${_NO_LOG}"
+ldconfig -r "${_ROOTFS}" &>"${_NO_LOG}" || exit 1
 # remove /var/cache/ldconfig/aux-cache for reproducibility
 rm -f -- "${_ROOTFS}/var/cache/ldconfig/aux-cache"
-# Set umask to create initramfs images as 600
-umask 077
 if [[ -n "${_GENERATE_IMAGE}" ]]; then
     _create_cpio "${_GENERATE_IMAGE}" "${_COMP}" || exit 1
-elif [[ -n "${_TARGET_DIR}" ]]; then
     echo "Build complete."
+elif [[ -n "${_TARGET_DIR}" ]]; then
+    echo "Build directory complete."
 else
     echo "Dry run complete."
 fi
