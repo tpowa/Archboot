@@ -39,10 +39,4 @@ _run() {
     done
 }
 
-help() {
-    cat <<HELPEOF
-Inital setup for archboot ISO booting.
-HELPEOF
-}
-
 # vim: set ft=sh ts=4 sw=4 et:

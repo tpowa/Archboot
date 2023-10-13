@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 # archboot-cpio.sh - modular tool for building initramfs images
-# focused and optimized for size and speed
+# optimized for size and speed
 # by Tobias Powalowski <tpowa@archlinux.org>
 
 shopt -s extglob
@@ -40,7 +40,7 @@ while [ $# -gt 0 ]; do
 done
 
 #shellcheck disable="SC1090"
-! . "${_CONFIG}" 2>"${_NO_LOG}" && _abort "Failed to read ${_CONFIG} configuration file"
+. "${_CONFIG}" 2>"${_NO_LOG}" || _abort "Failed to read ${_CONFIG} configuration file"
 if [[ -z "${_KERNEL}" ]]; then
     echo "Trying to autodetect ${_RUNNING_ARCH} kernel..."
     [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _KERNEL="/usr/lib/modules/*/vmlinuz"
@@ -57,14 +57,15 @@ _KERNELVERSION="$(_kver "${_KERNEL}")"
 _MODULE_DIR="/lib/modules/${_KERNELVERSION}"
 [[ -d "${_MODULE_DIR}" ]] || _abort "${_MODULE_DIR} is not a valid kernel module directory!"
 _BUILD_DIR="$(_init_rootfs "${_KERNELVERSION}" "${_TARGET_DIR}")" || exit 1
-_ROOTFS="${_TARGET_DIR}:-${_BUILD_DIR}/root}"
+_ROOTFS="${_TARGET_DIR:-${_BUILD_DIR}/root}"
 if (( ${#_HOOKS[*]} == 0 )); then
     _abort "No hooks found in config file!"
 fi
+echo "Using kernel version: ${_KERNELVERSION}"
 if [[ -n "${_GENERATE_IMAGE}" || -n "${_TARGET_DIR}" ]]; then
-    echo "Starting build: ${_KERNELVERSION}"
+    echo "Starting build..."
 else
-    echo "Starting dry run: ${_KERNELVERSION}"
+    echo "Starting dry run..."
 fi
 _builtin_modules
 _map _run_hook "${_HOOKS[@]}"
@@ -78,9 +79,9 @@ umask 077
 if [[ -n "${_GENERATE_IMAGE}" ]]; then
     _create_cpio "${_GENERATE_IMAGE}" "${_COMP}" || exit 1
 elif [[ -n "${_TARGET_DIR}" ]]; then
-    msg "Build complete."
+    echo "Build complete."
 else
-    msg "Dry run complete, use -g IMAGE to generate a real image"
+    echo "Dry run complete."
 fi
 
 # vim: set ft=sh ts=4 sw=4 et:

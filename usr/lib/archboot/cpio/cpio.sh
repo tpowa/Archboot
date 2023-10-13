@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # archboot-cpio.sh - modular tool for building an initramfs image
-# simplified, stripped down, optimized for size and speed
+# optimized for size and speed
 # by Tobias Powalowski <tpowa@archlinux.org>
 
 _CONFIG=""
@@ -35,27 +35,6 @@ _abort() {
         rm -rf -- "$_d_workdir"
     fi
     exit 1
-}
-
-_create_cpio() {
-    case "${_COMP}" in
-        cat)    echo "Creating uncompressed initcpio image: ${_OUT}"
-                unset _COMP_OPTS
-                ;;
-        *)      echo "Creating ${_COMP} compressed initcpio image: ${_OUT}"
-                ;;&
-        xz)     _COMP_OPTS=('-T0' '--check=crc32' "${_COMP_OPTS[@]}")
-                ;;
-        lz4)    _COMP_OPTS=('-l' "${_COMP_OPTS[@]}")
-                ;;
-        zstd)   _COMP_OPTS=('-T0' "${_COMP_OPTS[@]}")
-                ;;
-    esac
-    # Reproducibility: set all timestamps to 0
-    find . -mindepth 1 -execdir touch -hcd "@0" "{}" +
-    find . -mindepth 1 -printf '%P\0' | sort -z | LANG=C bsdtar --null -cnf - -T - |
-            LANG=C bsdtar --null -cf - --format=newc @- |
-            ${_COMP} "${_COMP_OPTS[@]}" > "${_OUT}" || _abort "initcpio image creation failed!"
 }
 
 _builtin_modules() {
@@ -231,7 +210,7 @@ _file() {
         if [[ "${_SRC}" != "${_DEST}" ]]; then
             command tar --hard-dereference --transform="s|${_SRC}|${_DEST}|" -C / -cpf - ."${_SRC}" | tar -C "${_ROOTFS}" -xpf - || return 1
         else
-            command tar --hard-dereference -C / -cpf - ."${_SRC}" | tar -C "${_DEST}" -xpf - || return 1
+            command tar --hard-dereference -C / -cpf - ."${_SRC}" | tar -C "${_ROOTFS}" -xpf - || return 1
         fi
         if [[ -L "${_SRC}" ]]; then
             _LINK_SOURCE="$(realpath -- "${_SRC}")"
@@ -296,6 +275,7 @@ _init_rootfs() {
     : >"${_ROOTFS}/etc/fstab"
     # add a blank ld.so.conf to keep ldconfig happy
     : >"${_ROOTFS}/etc/ld.so.conf"
+    echo "${_TMPDIR}"
 }
 
 _run_hook() {
@@ -326,4 +306,28 @@ _install_modules() {
     # remove all non-binary module.* files (except devname for on-demand module loading
     # and builtin.modinfo for checking on builtin modules)
     rm "${_ROOTFS}${_MODULE_DIR}"/modules.!(*.bin|*.modinfo|devname|softdep)
+}
+
+_create_cpio() {
+    case "${_COMP}" in
+        cat)    echo "Creating uncompressed image: ${_GENERATE_IMAGE}"
+                unset _COMP_OPTS
+                ;;
+        *)      echo "Creating ${_COMP} compressed image: ${_GENERATE_IMAGE}"
+                ;;&
+        xz)     _COMP_OPTS=('-T0' '--check=crc32' "${_COMP_OPTS[@]}")
+                ;;
+        lz4)    _COMP_OPTS=('-l' "${_COMP_OPTS[@]}")
+                ;;
+        zstd)   _COMP_OPTS=('-T0' "${_COMP_OPTS[@]}")
+                ;;
+    esac
+
+    # Reproducibility: set all timestamps to 0
+    pushd "${_ROOTFS}" >"${_NO_LOG}" || return
+    find . -mindepth 1 -execdir touch -hcd "@0" "{}" +
+    find . -mindepth 1 -printf '%P\0' | sort -z | LANG=C bsdtar --null -cnf - -T - |
+            LANG=C bsdtar --null -cf - --format=newc @- |
+            ${_COMP} "${_COMP_OPTS[@]}" > "${_GENERATE_IMAGE}" || _abort "Image creation failed!"
+    popd >"${_NO_LOG}" || return
 }
