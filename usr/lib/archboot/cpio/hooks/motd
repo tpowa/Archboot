@@ -13,14 +13,14 @@ _run ()
     echo -e "\e[1m----------------------------------------\e[m" >> "${MOTD}"
     echo -e "\e[1mVconsole:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92mALT + F1 - F12\e[m keys to change the virtual console." >> "${MOTD}"
-if  echo "${_HOOKS[@]}" | grep -qw archboot_net; then
+if  echo "${_HOOKS[@]}" | grep -qw net; then
     #shellcheck disable=SC2129
     echo -e "\e[1mFor Additional Wi-Fi Authentification Or Online Help:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92m'elinks'\e[m text mode browser." >> "${MOTD}"
     echo -e "\e[1mIRC Support Channel:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92m'weechat'\e[m IRC client." >> "${MOTD}"
 fi
-if  echo "${_HOOKS[@]}" | grep -qw archboot_installer; then
+if  echo "${_HOOKS[@]}" | grep -qw installer; then
     #shellcheck disable=SC2129
     echo -e "\e[1mManage Archboot Environment:\e[m" >> "${MOTD}"
     echo -e "  - Use the \e[1;92m'launcher'\e[m or the expert \e[1;92m'update'\e[m script." >> "${MOTD}"
