@@ -6,7 +6,7 @@ _run ()
 {
     _map _file /etc/archboot/defaults /usr/lib/archboot/common.sh \
         /usr/lib/archboot/container.sh /usr/bin/archboot-"$(uname -m)"-create-container.sh \
-        /usr/lib/archboot/login.sh /usr/lib/archboot/cpio.sh /usr/bin/archboot-cpio.sh
+        /usr/lib/archboot/login.sh
     _full_dir /usr/lib/archboot/update
     _file /usr/bin/archboot-update.sh /usr/bin/update
     _file /usr/share/archboot/gpg/tpowa.gpg

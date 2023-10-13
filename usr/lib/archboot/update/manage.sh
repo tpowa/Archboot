@@ -145,7 +145,7 @@ _download_latest_task() {
     for i in ${_SCRIPTS}; do
         [[ -e "${_BIN}/${i}" ]] && ${_DLPROG} -o "${_BIN}/${i}" "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false"
     done
-    _SCRIPTS="binary-check.sh not-installed.sh secureboot-keys.sh mkkeys.sh hwsim.sh cpio,sh"
+    _SCRIPTS="binary-check.sh not-installed.sh secureboot-keys.sh mkkeys.sh hwsim.sh"
     for i in ${_SCRIPTS}; do
         [[ -e "${_BIN}/${i}" ]] && ${_DLPROG} -o "${_BIN}/${i}" "${_SOURCE}${_BIN}/archboot-${i}?inline=false"
         [[ -e "${_BIN}/archboot-${i}" ]] && ${_DLPROG} -o "${_BIN}/archboot-${i}" "${_SOURCE}${_BIN}/archboot-${i}?inline=false"
@@ -155,7 +155,7 @@ _download_latest_task() {
         [[ -e "${_HELP}/${i}" ]] && ${_DLPROG} -o "${_HELP}/${i}" "${_SOURCE}${_HELP}/${i}?inline=false"
     done
     # main libs
-    LIBS="common.sh container.sh release.sh iso.sh login.sh cpio.sh"
+    LIBS="common.sh container.sh release.sh iso.sh login.sh"
     for i in ${LIBS}; do
         ${_DLPROG} -o "${_LIB}/${i}" "${_SOURCE}${_LIB}/${i}?inline=false"
     done
