@@ -1,7 +1,6 @@
 Coding style:
 - bash syntax
-- variables are named _BIG, only exception is /etc/archboot/*.conf 
-  mkinitcpio only understands HOOKS etc.
+- variables,arrays are named _BIG
 - functions are named _small
 
 Use:
