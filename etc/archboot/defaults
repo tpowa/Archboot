@@ -1,4 +1,3 @@
-# defaults for archboot
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 # SPDX-License-Identifier: GPL-3.0-or-later
 # packages to install (eg. firmware, kernel packages)
