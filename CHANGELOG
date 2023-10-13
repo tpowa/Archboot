@@ -7,6 +7,7 @@ Environment:
 - unified ISO GPT values:
   GUID, UUIDs, hide all partitions, disabled automount
   and move main table to sector 2
+- archboot-cpio.sh rewrite
 pacsetup:
 - fixed kernel detection
 setup:
