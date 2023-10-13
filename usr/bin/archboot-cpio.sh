@@ -6,15 +6,12 @@
 # by Tobias Powalowski <tpowa@archlinux.org>
 
 shopt -s extglob
-
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/cpio/cpio.sh
-
 if [[ -z "${1}" ]]; then
     _usage
 fi
 _root_check
-
 while [ $# -gt 0 ]; do
     case "${1}" in
         -c) shift
@@ -38,7 +35,6 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
-
 #shellcheck disable="SC1090"
 . "${_CONFIG}" 2>"${_NO_LOG}" || _abort "Failed to read ${_CONFIG} configuration file"
 if [[ -z "${_KERNEL}" ]]; then
@@ -99,5 +95,4 @@ elif [[ -n "${_TARGET_DIR}" ]]; then
 else
     echo "Dry run complete."
 fi
-
 # vim: set ft=sh ts=4 sw=4 et:
