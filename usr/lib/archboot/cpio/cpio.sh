@@ -174,18 +174,12 @@ _binary() {
     # Add a binary file to the rootfs. library dependencies will
     # be discovered and added.
     #   $1: path to binary
-    #   $2: destination on rootfs (optional, defaults to same as source)
     if [[ "${1:0:1}" != '/' ]]; then
         _BIN="$(type -P "${1}")"
     else
         _BIN="${1}"
     fi
-    _ROOTFS_BIN="${2:-${_BIN}}"
-    if [[ "${_BIN}" == "${_ROOTFS_BIN}" ]]; then
-        _file "${_BIN}"
-    else
-        _file_rename "${_BIN}" "${_ROOTFS_BIN}"
-    fi
+    _file "${_BIN}"
     # non-binaries
     if ! _LDD="$(ldd "${_BIN}" 2>"${_NO_LOG}")"; then
         return 0
