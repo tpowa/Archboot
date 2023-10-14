@@ -8,7 +8,7 @@ _run ()
         /usr/lib/archboot/container.sh /usr/bin/archboot-"$(uname -m)"-create-container.sh \
         /usr/lib/archboot/login.sh
     _full_dir /usr/lib/archboot/update
-    _file /usr/bin/archboot-update.sh /usr/bin/update
+    _file_rename /usr/bin/archboot-update.sh /usr/bin/update
     _file /usr/share/archboot/gpg/tpowa.gpg
     # use /etc/profile to launch login.sh
     echo ". /usr/lib/archboot/login.sh" >> "${_ROOTFS}/root/.bashrc"

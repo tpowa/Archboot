@@ -47,7 +47,7 @@ _run ()
     _map _file /etc/profile /etc/shells
     _BASIC_CONFIG="dialogrc hostname issue modprobe.d/modprobe.conf os-release tmpfiles.d/var.conf"
     for i in ${_BASIC_CONFIG}; do
-        _file "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
+        _file_rename "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done
 
     ### add coreutils,cryptsetup,terminfo libs and charmaps
@@ -79,11 +79,11 @@ _run ()
     # unlock and delete root password, if not set by user!
     # use color grep and ls output
     for i in custom-bash-options.sh archboot-reset-root-password.sh; do
-        _file "/usr/share/archboot/base/etc/profile.d/${i}" "/etc/profile.d/${i}"
+        _file_rename "/usr/share/archboot/base/etc/profile.d/${i}" "/etc/profile.d/${i}"
     done
     # add default bash setup
     for i in .bashrc .bash_profile .bash_logout; do
-        _file  "/etc/skel/${i}" "/root/${i}"
+        _file_rename  "/etc/skel/${i}" "/root/${i}"
     done
     # add custom bash options
     echo ". /etc/profile.d/custom-bash-options.sh" >> "${_ROOTFS}/root/.bashrc"
@@ -133,12 +133,12 @@ _run ()
     _map _dir /etc/tmpfiles.d /etc/modules-load.d /etc/binfmt.d/ /var/lib/systemd
     _map _full_dir /etc/sysctl.d  /etc/systemd /etc/xdg  /usr/lib/systemd  /usr/share/systemd  /usr/share/factory \
                      /usr/share/polkit-1 /usr/lib/tmpfiles.d /usr/lib/modules-load.d /usr/lib/sysusers.d /usr/lib/sysctl.d
-    _file /usr/share/archboot/base/etc/locale.conf /etc/locale.conf
-    _file /usr/share/archboot/base/etc/vconsole.conf /etc/vconsole.conf
-    _file /usr/share/archboot/base/etc/systemd/system/getty@.service /etc/systemd/system/getty@.service
-    _file /usr/share/archboot/base/etc/systemd/system/serial-getty@.service /etc/systemd/system/serial-getty@.service
-    _file /usr/share/archboot/base/etc/systemd/system/windowkeys.service /etc/systemd/system/windowkeys.service
-    _file /usr/share/archboot/base/etc/systemd/journald.conf.d/fw-tty12.conf /etc/systemd/journald.conf.d/fw-tty12.conf
+    _file_rename /usr/share/archboot/base/etc/locale.conf /etc/locale.conf
+    _file_rename /usr/share/archboot/base/etc/vconsole.conf /etc/vconsole.conf
+    _file_rename /usr/share/archboot/base/etc/systemd/system/getty@.service /etc/systemd/system/getty@.service
+    _file_rename /usr/share/archboot/base/etc/systemd/system/serial-getty@.service /etc/systemd/system/serial-getty@.service
+    _file_rename /usr/share/archboot/base/etc/systemd/system/windowkeys.service /etc/systemd/system/windowkeys.service
+    _file_rename /usr/share/archboot/base/etc/systemd/journald.conf.d/fw-tty12.conf /etc/systemd/journald.conf.d/fw-tty12.conf
     _symlink /etc/systemd/system/multi-user.target.wants/windowkeys.service /etc/systemd/system/windowkeys.service
     ### disable systemd mounts:
     # disable configfs, debugfs, fuse, hugepages, mqueue and tracefs
@@ -163,7 +163,7 @@ _run ()
     rm -f "${_ROOTFS}"/etc/systemd/system/multi-user.target.wants/remote-fs.target
     # disable lastlog
     _symlink /var/log/lastlog /dev/null
-    _file /usr/share/archboot/base/etc/tmpfiles.d/var.conf /etc/tmpfiles.d/var.conf
+    _file_rename /usr/share/archboot/base/etc/tmpfiles.d/var.conf /etc/tmpfiles.d/var.conf
     ### add missing libsystemd files
     _map _file /usr/lib/libnss_myhostname.so.2 /usr/lib/libnss_mymachines.so.2 \
                  /usr/lib/libnss_resolve.so.2 /usr/lib/libnss_systemd.so.2
@@ -179,10 +179,10 @@ _run ()
     # add rule files
     _full_dir /usr/lib/udev
     # add schedule rules file
-    _file /usr/share/archboot/base/etc/udev/rules.d/60-ioschedulers.rules /etc/udev/rules.d/60-ioschedulers.rules
+    _file_rename /usr/share/archboot/base/etc/udev/rules.d/60-ioschedulers.rules /etc/udev/rules.d/60-ioschedulers.rules
 
     # add swapiness sysctl config file
-    _file /usr/share/archboot/base/etc/sysctl.d/99-sysctl.conf /etc/sysctl.d/99-sysctl.conf
+    _file_rename /usr/share/archboot/base/etc/sysctl.d/99-sysctl.conf /etc/sysctl.d/99-sysctl.conf
 
     ### add pacman
     _map _binary pacman pacman-conf pacman-key pacman-db-upgrade makepkg \
@@ -192,7 +192,7 @@ _run ()
     _map _file /etc/pacman.conf /etc/makepkg.conf /etc/pacman.d/mirrorlist
     # add pacman initialisation of gpg keys
     _dir /etc/pacman.d/gnupg
-    _file /usr/share/archboot/base/etc/systemd/system/pacman-init.service /etc/systemd/system/pacman-init.service
+    _file_rename /usr/share/archboot/base/etc/systemd/system/pacman-init.service /etc/systemd/system/pacman-init.service
     _map _full_dir /usr/share/pacman/keyrings /usr/share/makepkg
     # add local installed pacman database in container mode
     if grep -qw 'archboot' /etc/hostname; then

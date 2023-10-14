@@ -12,7 +12,6 @@ _run ()
         /etc/rsyncd.conf /etc/exports  /usr/lib/ssh/sftp-server /usr/lib/ssh/ssh-keysign \
         /usr/lib/ssh/ssh-pkcs11-helper \
         /etc/netconfig
-    _file /etc/ssh/sshd_config
     # allow root login and empty passwords
     echo "PermitRootLogin yes" >> "${_ROOTFS}/etc/ssh/sshd_config"
     echo "PermitEmptyPasswords yes" >> "${_ROOTFS}/etc/ssh/sshd_config"
@@ -29,8 +28,8 @@ _run ()
     _symlink /etc/systemd/system/multi-user.target.wants/sshd.service /usr/lib/systemd/system/sshd.service
     # start ttyd on startup
     _file /usr/lib/libwebsockets-evlib_uv.so
-    _file /usr/share/archboot/remote/usr/bin/remote-login.sh /usr/bin/remote-login.sh
-    _file /usr/share/archboot/remote/etc/systemd/system/ttyd.service /etc/systemd/system/ttyd.service
+    _file_rename /usr/share/archboot/remote/usr/bin/remote-login.sh /usr/bin/remote-login.sh
+    _file_rename /usr/share/archboot/remote/etc/systemd/system/ttyd.service /etc/systemd/system/ttyd.service
     _symlink /etc/systemd/system/multi-user.target.wants/ttyd.service /etc/systemd/system/ttyd.service
     # fix licenses
     _map _file /usr/share/licenses/nfsidmap/LICENSE \

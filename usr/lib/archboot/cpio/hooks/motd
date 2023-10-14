@@ -5,30 +5,28 @@
 _run ()
 {
     ### generate motd
-    MOTD=$(mktemp /var/tmp/motd.XXXX)
-    [[ "$(uname -m)" == "x86_64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux X86_64\e[m" >> "${MOTD}"
-    [[ "$(uname -m)" == "aarch64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux AARCH64\e[m" >> "${MOTD}"
-    [[ "$(uname -m)" == "riscv64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux RISCV64\e[m" >> "${MOTD}"
+    _MOTD="${_ROOTFS}/etc/motd"
+    [[ "$(uname -m)" == "x86_64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux X86_64\e[m" >> "${_MOTD}"
+    [[ "$(uname -m)" == "aarch64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux AARCH64\e[m" >> "${_MOTD}"
+    [[ "$(uname -m)" == "riscv64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux RISCV64\e[m" >> "${_MOTD}"
     #shellcheck disable=SC2129
-    echo -e "\e[1m----------------------------------------\e[m" >> "${MOTD}"
-    echo -e "\e[1mVconsole:\e[m" >> "${MOTD}"
-    echo -e "  - Use the \e[1;92mALT + F1 - F12\e[m keys to change the virtual console." >> "${MOTD}"
+    echo -e "\e[1m----------------------------------------\e[m" >> "${_MOTD}"
+    echo -e "\e[1mVconsole:\e[m" >> "${_MOTD}"
+    echo -e "  - Use the \e[1;92mALT + F1 - F12\e[m keys to change the virtual console." >> "${_MOTD}"
 if  echo "${_HOOKS[@]}" | grep -qw net; then
     #shellcheck disable=SC2129
-    echo -e "\e[1mFor Additional Wi-Fi Authentification Or Online Help:\e[m" >> "${MOTD}"
-    echo -e "  - Use the \e[1;92m'elinks'\e[m text mode browser." >> "${MOTD}"
-    echo -e "\e[1mIRC Support Channel:\e[m" >> "${MOTD}"
-    echo -e "  - Use the \e[1;92m'weechat'\e[m IRC client." >> "${MOTD}"
+    echo -e "\e[1mFor Additional Wi-Fi Authentification Or Online Help:\e[m" >> "${_MOTD}"
+    echo -e "  - Use the \e[1;92m'elinks'\e[m text mode browser." >> "${_MOTD}"
+    echo -e "\e[1mIRC Support Channel:\e[m" >> "${_MOTD}"
+    echo -e "  - Use the \e[1;92m'weechat'\e[m IRC client." >> "${_MOTD}"
 fi
 if  echo "${_HOOKS[@]}" | grep -qw installer; then
     #shellcheck disable=SC2129
-    echo -e "\e[1mManage Archboot Environment:\e[m" >> "${MOTD}"
-    echo -e "  - Use the \e[1;92m'launcher'\e[m or the expert \e[1;92m'update'\e[m script." >> "${MOTD}"
-    echo -e "\e[1mInstallation:\e[m" >> "${MOTD}"
-    echo -e "  - Use the \e[1;92m'setup'\e[m or the expert \e[1;92m'quickinst'\e[m script." >> "${MOTD}"
+    echo -e "\e[1mManage Archboot Environment:\e[m" >> "${_MOTD}"
+    echo -e "  - Use the \e[1;92m'launcher'\e[m or the expert \e[1;92m'update'\e[m script." >> "${_MOTD}"
+    echo -e "\e[1mInstallation:\e[m" >> "${_MOTD}"
+    echo -e "  - Use the \e[1;92m'setup'\e[m or the expert \e[1;92m'quickinst'\e[m script." >> "${_MOTD}"
 fi
-    chmod 644 "${MOTD}"
-    _file "${MOTD}" /etc/motd
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

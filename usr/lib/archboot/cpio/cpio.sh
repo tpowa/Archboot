@@ -5,7 +5,7 @@
 # by Tobias Powalowski <tpowa@archlinux.org>
 
 _CONFIG=""
-_CPIO=/usr/lib/archboot/cpio/hooks/
+_CPIO=/usr/lib/archboot/cpio/hooks
 _GENERATE_IMAGE=""
 _TARGET_DIR=""
 declare -A _INCLUDED_MODS _MOD_PATH
@@ -30,7 +30,7 @@ EOF
 }
 
 _abort() {
-    echo "Error:" "$@"
+    echo "ERROR:" "$@"
     if [[ -n "${_BUILD_DIR}" ]]; then
         rm -rf -- "${_BUILD_DIR}"
     fi
@@ -38,8 +38,6 @@ _abort() {
 }
 
 _builtin_modules() {
-    # Prime the _INCLUDED_MODS list with the builtins for this kernel.
-    # kmod>=27 and kernel >=5.2 required!
     while IFS=.= read -rd '' _MODULE _FIELD _VALUE; do
         _INCLUDED_MODS[${_MODULE//-/_}]=2
         case "$_FIELD" in
@@ -59,11 +57,11 @@ _map() {
 }
 
 _filter_modules() {
-    # Add modules to the initcpio, filtered by grep.
+    # Add modules to the rootfs, filtered by grep.
     #   $@: filter arguments to grep
     #   -f FILTER: ERE to filter found modules
     local -i _COUNT=0
-    local _MOD_INPUT="" OPTIND="" OPTARG="" _MOD_FILTER=()
+    _MOD_INPUT="" OPTIND="" OPTARG="" _MOD_FILTER=()
     while getopts ':f:' _FLAG; do
         [[ "${_FLAG}" = "f" ]] && _MOD_FILTER+=("$OPTARG")
     done
@@ -83,7 +81,6 @@ _filter_modules() {
 _all_modules() {
     # Add modules to the initcpio.
     #   $@: arguments to all_modules
-    local _MOD_INPUT
     local -a _MODS
     mapfile -t _MODS < <(_filter_modules "$@")
     _map _module "${_MODS[@]}"
@@ -94,7 +91,7 @@ _module() {
     # Add a kernel module to the rootfs. Dependencies will be
     # discovered and added.
     #   $1: module name
-    local _CHECK="" _MOD="" _SOFT=() _DEPS=() _FIELD="" _VALUE="" _FW=()
+    _CHECK="" _MOD="" _SOFT=() _DEPS=() _FIELD="" _VALUE="" _FW=()
     if [[ "${1}" == *\? ]]; then
         set -- "${1%?}"
     fi
@@ -127,23 +124,12 @@ _module() {
 }
 
 _full_dir() {
-    # Add a directory and all its contents, recursively, to the rootfs.
-    # No parsing is performed and the contents of the directory is added as is.
-    #   $1: path to directory
     tar -C / --hard-dereference -cpf - ."${1}" | tar -C "${_ROOTFS}" -xpf - || return 1
 }
 
 _dir() {
-    # add a directory (with parents) to $BUILDROOT
-    #   $1: pathname on initcpio
-    #   $2: mode (optional)
-    local _MODE="${2:-755}"
-    # shellcheck disable=SC2153
-    if [[ -d "${_ROOTFS}${1}" ]]; then
-        # ignore dir already exists
-        return 0
-    fi
-    mkdir -p -m "${_MODE}" "${_ROOTFS}${1}" || return 1
+    [[ -d "${_ROOTFS}${1}" ]] && return 0
+    mkdir -p "${_ROOTFS}${1}" || return 1
 }
 
 _symlink() {
@@ -151,7 +137,7 @@ _symlink() {
     # to ensure that the target of the symlink exists.
     #   $1: pathname of symlink on image
     #   $2: absolute path to target of symlink (optional, can be read from $1)
-    local _LINK_NAME="${1}" _LINK_SOURCE="${2:-$1}" _LINK_DEST
+    _LINK_NAME="${1}" _LINK_SOURCE="${2:-$1}"
     # find out the link target
     if [[ "${_LINK_NAME}" == "${_LINK_SOURCE}" ]]; then
         _LINK_DEST="$(find "${_LINK_SOURCE}" -prune -printf '%l')"
@@ -170,23 +156,18 @@ _symlink() {
 }
 
 _file() {
-    # Add a plain file to the rootfs. No parsing is performed and only
-    # the singular file is added.
-    #   $1: path to file
-    #   $2: destination on rootfs (optional, defaults to same as source)
-    # determine source and destination
-    local _SRC="${1}" _DEST="${2:-$1}" _MODE="${3}"
-    if [[ ! -e "${_ROOTFS}${_DEST}" ]]; then
-        if [[ "${_SRC}" != "${_DEST}" ]]; then
-            tar --hard-dereference --transform="s|${_SRC}|${_DEST}|" -C / -cpf - ."${_SRC}" | tar -C "${_ROOTFS}" -xpf - || return 1
-        else
-            tar --hard-dereference -C / -cpf - ."${_SRC}" | tar -C "${_ROOTFS}" -xpf - || return 1
-        fi
-        if [[ -L "${_SRC}" ]]; then
-            _LINK_SOURCE="$(realpath -- "${_SRC}")"
-            _file  "${_LINK_SOURCE}" "${_LINK_SOURCE}" "${_MODE}"
+    if [[ ! -e "${_ROOTFS}${1}" ]]; then
+        tar --hard-dereference -C / -cpf - ."${1}" | tar -C "${_ROOTFS}" -xpf - || return 1
+        if [[ -L "${1}" ]]; then
+            _LINK_SOURCE="$(realpath -- "${1}")"
+            _file  "${_LINK_SOURCE}"
         fi
     fi
+}
+
+_file_rename() {
+    _SRC="${1}" _DEST="${2:-$1}"
+    tar --hard-dereference --transform="s|${1}|${2}|" -C / -cpf - ."${1}" | tar -C "${_ROOTFS}" -xpf - || return 1
 }
 
 _binary() {
@@ -200,7 +181,7 @@ _binary() {
         _BIN="${1}"
     fi
     _ROOTFS_BIN="${2:-${_BIN}}"
-    _file "${_BIN}" "${_ROOTFS_BIN}"
+    _file_rename "${_BIN}" "${_ROOTFS_BIN}"
     # non-binaries
     if ! _LDD="$(ldd "${_BIN}" 2>"${_NO_LOG}")"; then
         return 0
@@ -212,7 +193,7 @@ _binary() {
             _LIB="${BASH_REMATCH[2]}"
         fi
         if [[ -f "${_LIB}" && ! -e "${_ROOTFS}${_LIB}" ]]; then
-            _file "${_LIB}" "${_LIB}"
+            _file "${_LIB}"
         fi
     done <<< "${_LDD}"
     return 0
@@ -224,7 +205,7 @@ _init_rootfs() {
     _TMPDIR="$(mktemp -d --tmpdir mkinitcpio.XXXX)"
     _ROOTFS="${2:-${_TMPDIR}/root}"
     # base directory structure
-    install -dm755 "${_ROOTFS}"/{new_root,proc,sys,dev,run,tmp,var,etc,usr/{local{,/bin,/sbin,/lib},lib,bin}}
+    mkdir -p "${_ROOTFS}"/{new_root,proc,sys,dev,run,tmp,var,etc,usr/{local{,/bin,/sbin,/lib},lib,bin}}
     ln -s "usr/lib" "${_ROOTFS}/lib"
     ln -s "bin" "${_ROOTFS}/usr/sbin"
     ln -s "usr/bin" "${_ROOTFS}/bin"
@@ -235,7 +216,7 @@ _init_rootfs() {
         ln -s "usr/lib" "${_ROOTFS}/lib64"
     fi
     # kernel module dir
-    [[ "${_KERNELVERSION}" != 'none' ]] && install -dm755 "${_ROOTFS}/usr/lib/modules/${_KERNELVERSION}/kernel"
+    [[ "${_KERNELVERSION}" != 'none' ]] && mkdir -p "${_ROOTFS}/usr/lib/modules/${_KERNELVERSION}/kernel"
     # mount tables
     ln -s ../proc/self/mounts "${_ROOTFS}/etc/mtab"
     : >"${_ROOTFS}/etc/fstab"
@@ -245,16 +226,13 @@ _init_rootfs() {
 }
 
 _run_hook() {
-    # find script in install dirs
-    # shellcheck disable=SC2154
-    if ! _HOOK_FILE="$(PATH="${_CPIO}" type -P "${1}")"; then
+    if [[ ! -f ${_CPIO}/"${1}" ]]; then
         _abort "Hook ${1} cannot be found!"
-        return 1
     fi
     # source
     unset -f _run
     # shellcheck disable=SC1090
-    . "${_HOOK_FILE}"
+    . "${_CPIO}/${1}"
     _run
 }
 

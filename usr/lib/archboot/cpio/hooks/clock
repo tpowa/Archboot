@@ -6,7 +6,7 @@ _run ()
 {
     _map _binary hwclock tzselect zic zdump
     _map _full_dir /usr/share/zoneinfo /usr/share/zoneinfo-leaps
-    _file /usr/bin/archboot-clock.sh /usr/bin/clock
+    _file_rename /usr/bin/archboot-clock.sh /usr/bin/clock
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

@@ -30,9 +30,9 @@ _run ()
           setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 gunzip zcat wipe \
           capsh getcap getpcaps setcap file blkpr fadvise isosize pg pipesz tunelp
 
-    [[ "$(uname -m)" == "x86_64" ]] && _map _binary i386 x86_64 peekfd waitpid
-    [[ "$(uname -m)" == "aarch64" ]] && _binary peekfd
-    [[ "$(uname -m)" == "riscv64" ]] && _map _binary waitpid
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _map _binary i386 x86_64 peekfd waitpid
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _binary peekfd
+    [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _map _binary waitpid
     ### add C.UTF-8 locale
     _dir /usr/lib/locale
     _full_dir /usr/lib/locale/C.utf8

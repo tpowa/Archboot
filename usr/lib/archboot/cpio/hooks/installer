@@ -6,14 +6,14 @@ _run ()
 {
     _map _binary genfstab arch-chroot pacstrap \
     archboot-binary-check.sh archboot-not-installed.sh hwdetect
-    _file /usr/bin/archboot-setup.sh /usr/bin/setup
-    _file /usr/bin/archboot-launcher.sh /usr/bin/launcher
-    _file /usr/bin/archboot-quickinst.sh /usr/bin/quickinst
-    _file /usr/bin/archboot-localize.sh /usr/bin/localize
-    _file /usr/bin/archboot-pacsetup.sh /usr/bin/pacsetup
-    _file /usr/bin/archboot-copy-mountpoint.sh /usr/bin/copy-mountpoint.sh
-    _file /usr/bin/archboot-rsync-backup.sh /usr/bin/rsync-backup.sh
-    _file /usr/bin/archboot-restore-usbstick.sh /usr/bin/restore-usbstick.sh
+    _file_rename /usr/bin/archboot-setup.sh /usr/bin/setup
+    _file_rename /usr/bin/archboot-launcher.sh /usr/bin/launcher
+    _file_rename /usr/bin/archboot-quickinst.sh /usr/bin/quickinst
+    _file_rename /usr/bin/archboot-localize.sh /usr/bin/localize
+    _file_rename /usr/bin/archboot-pacsetup.sh /usr/bin/pacsetup
+    _file_rename /usr/bin/archboot-copy-mountpoint.sh /usr/bin/copy-mountpoint.sh
+    _file_rename /usr/bin/archboot-rsync-backup.sh /usr/bin/rsync-backup.sh
+    _file_rename /usr/bin/archboot-restore-usbstick.sh /usr/bin/restore-usbstick.sh
     _full_dir /usr/lib/archboot/installer
     _file /etc/archboot/defaults
     _file /usr/share/archboot/grub/archboot-background.png

@@ -9,7 +9,7 @@ _run ()
     _map _file /usr/share/licenses/neovim/LICENSE.txt
     # add lastplace plugin:
     # https://github.com/neovim/neovim/issues/16339
-    _file /usr/share/archboot/nvim/nvim-lastplace.lua /usr/share/nvim/runtime/plugin/nvim-lastplace.lua
+    _file_rename /usr/share/archboot/nvim/nvim-lastplace.lua /usr/share/nvim/runtime/plugin/nvim-lastplace.lua
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

@@ -30,7 +30,6 @@ while [ $# -gt 0 ]; do
             fi
             ;;
         -h) _usage
-            exit 0
             ;;
     esac
     shift
@@ -67,7 +66,7 @@ echo "Using kernel: ${_KERNEL}"
 echo "Detected kernel version: ${_KERNELVERSION}"
 _builtin_modules
 _HOOK_COUNT=1
-_HOOKS_END_COUNT="$(echo ${_HOOKS[@]} | wc -w)"
+_HOOKS_END_COUNT="$(echo "${_HOOKS[@]}" | wc -w)"
 if [[ "${_HOOKS_END_COUNT}" -lt 10 ]]; then
     _ADD_ZERO=""
 else
