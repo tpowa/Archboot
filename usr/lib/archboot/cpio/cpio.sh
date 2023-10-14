@@ -181,7 +181,11 @@ _binary() {
         _BIN="${1}"
     fi
     _ROOTFS_BIN="${2:-${_BIN}}"
-    _file_rename "${_BIN}" "${_ROOTFS_BIN}"
+    if [[ "${_BIN}" == "${_ROOTFS_BIN}" ]]; then
+        _file "${_BIN}"
+    else
+        _file_rename "${_BIN}" "${_ROOTFS_BIN}"
+    fi
     # non-binaries
     if ! _LDD="$(ldd "${_BIN}" 2>"${_NO_LOG}")"; then
         return 0
