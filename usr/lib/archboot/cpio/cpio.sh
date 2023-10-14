@@ -31,8 +31,8 @@ EOF
 
 _abort() {
     echo "Error:" "$@"
-    if [[ -n "$_d_workdir" ]]; then
-        rm -rf -- "$_d_workdir"
+    if [[ -n "${_BUILD_DIR}" ]]; then
+        rm -rf -- "${_BUILD_DIR}"
     fi
     exit 1
 }
@@ -90,24 +90,6 @@ _all_modules() {
     return $(( !${#_MODS[*]} ))
 }
 
-_firmware() {
-    # add a firmware file to the image.
-    #   $1: firmware path fragment
-    local _FW _FW_DIR
-    local -a _FW_BIN
-    _FW_DIR=/lib/firmware
-    for _FW; do
-        # shellcheck disable=SC2154,SC2153
-        if ! compgen -G "${_ROOTFS}${_FW_DIR}/${_FW}?(.*)" &>"${_NO_LOG}"; then
-            if read -r _FW_BIN < <(compgen -G "${_FW_DIR}/${_FW}?(.*)"); then
-                _map _file "${_FW_BIN[@]}"
-                break
-            fi
-        fi
-    done
-    return 0
-}
-
 _module() {
     # Add a kernel module to the rootfs. Dependencies will be
     # discovered and added.
@@ -134,8 +116,6 @@ _module() {
             depends)    IFS=',' read -r -a _DEPS <<< "${_VALUE}"
                         _map _module "${_DEPS[@]}"
                         ;;
-            firmware)   _FW+=("${_VALUE}")
-                        ;;
             softdep)    read -ra _SOFT <<<"${_VALUE}"
                         for i in "${_SOFT[@]}"; do
                             [[ ${i} == *: ]] && continue
@@ -144,18 +124,13 @@ _module() {
                         ;;
         esac
     done < <(modinfo -k "${_KERNELVERSION}" -0 "${_CHECK}" 2>"${_NO_LOG}")
-    if (( ${#_FW[*]} )); then
-        _firmware "${_FW[@]}"
-    fi
 }
 
 _full_dir() {
     # Add a directory and all its contents, recursively, to the rootfs.
     # No parsing is performed and the contents of the directory is added as is.
     #   $1: path to directory
-    if [[ -n "${1}" && -d "${1}" ]]; then
-        command tar -C / --hard-dereference -cpf - ."${1}" | tar -C "${_ROOTFS}" -xpf - || return 1
-    fi
+    tar -C / --hard-dereference -cpf - ."${1}" | tar -C "${_ROOTFS}" -xpf - || return 1
 }
 
 _dir() {
@@ -168,7 +143,7 @@ _dir() {
         # ignore dir already exists
         return 0
     fi
-    command mkdir -p -m "${_MODE}" "${_ROOTFS}${1}" || return 1
+    mkdir -p -m "${_MODE}" "${_ROOTFS}${1}" || return 1
 }
 
 _symlink() {
@@ -191,30 +166,25 @@ _symlink() {
         _LINK_SOURCE="$(realpath -eq -- "${_LINK_SOURCE}")"
     fi
     _dir "${_LINK_NAME%/*}"
-    command ln -sfn "${_LINK_SOURCE}" "${_ROOTFS}${_LINK_NAME}"
+    ln -sfn "${_LINK_SOURCE}" "${_ROOTFS}${_LINK_NAME}"
 }
 
 _file() {
     # Add a plain file to the rootfs. No parsing is performed and only
     # the singular file is added.
     #   $1: path to file
-    #   $2: destination on initcpio (optional, defaults to same as source)
-    #   $3: mode
+    #   $2: destination on rootfs (optional, defaults to same as source)
     # determine source and destination
     local _SRC="${1}" _DEST="${2:-$1}" _MODE="${3}"
     if [[ ! -e "${_ROOTFS}${_DEST}" ]]; then
         if [[ "${_SRC}" != "${_DEST}" ]]; then
-            command tar --hard-dereference --transform="s|${_SRC}|${_DEST}|" -C / -cpf - ."${_SRC}" | tar -C "${_ROOTFS}" -xpf - || return 1
+            tar --hard-dereference --transform="s|${_SRC}|${_DEST}|" -C / -cpf - ."${_SRC}" | tar -C "${_ROOTFS}" -xpf - || return 1
         else
-            command tar --hard-dereference -C / -cpf - ."${_SRC}" | tar -C "${_ROOTFS}" -xpf - || return 1
+            tar --hard-dereference -C / -cpf - ."${_SRC}" | tar -C "${_ROOTFS}" -xpf - || return 1
         fi
         if [[ -L "${_SRC}" ]]; then
             _LINK_SOURCE="$(realpath -- "${_SRC}")"
             _file  "${_LINK_SOURCE}" "${_LINK_SOURCE}" "${_MODE}"
-        else
-            if [[ -n "${_MODE}" ]]; then
-                command chmod "${_MODE}" "${_ROOTFS}${_DEST}"
-            fi
         fi
     fi
 }
@@ -261,8 +231,8 @@ _init_rootfs() {
     ln -s "usr/bin" "${_ROOTFS}/sbin"
     ln -s "/run" "${_ROOTFS}/var/run"
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-            ln -s "lib" "${_ROOTFS}/usr/lib64"
-            ln -s "usr/lib" "${_ROOTFS}/lib64"
+        ln -s "lib" "${_ROOTFS}/usr/lib64"
+        ln -s "usr/lib" "${_ROOTFS}/lib64"
     fi
     # kernel module dir
     [[ "${_KERNELVERSION}" != 'none' ]] && install -dm755 "${_ROOTFS}/usr/lib/modules/${_KERNELVERSION}/kernel"
@@ -285,15 +255,11 @@ _run_hook() {
     unset -f _run
     # shellcheck disable=SC1090
     . "${_HOOK_FILE}"
-    if ! declare -f _run >"${_NO_LOG}"; then
-        _abort "Hook ${_HOOK_FILE} has no run function!"
-        return 1
-    fi
     _run
 }
 
 _install_modules() {
-    command tar --hard-dereference -C / -cpf - "$@" | tar -C "${_ROOTFS}" -xpf -
+    tar --hard-dereference -C / -cpf - "$@" | tar -C "${_ROOTFS}" -xpf -
     echo "Generating module dependencies..."
     _map _file "${_MODULE_DIR}"/modules.{builtin,builtin.modinfo,order}
     depmod -b "${_ROOTFS}" "${_KERNELVERSION}"

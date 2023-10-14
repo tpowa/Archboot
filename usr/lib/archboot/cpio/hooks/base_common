@@ -58,7 +58,7 @@ _run ()
     if grep -qw 'archboot' /etc/hostname; then
         _map _binary locale-gen localedef
         _file /etc/locale.gen
-        _LANG="be bg cs da de en el es fi fr hu it lt lv mk nl nn pl pt ro ru sk sr sv uk"
+        _LANG="be bg cs da de en_US el es fi fr hu it lt lv mk nl nn pl pt ro ru sk sr sv uk"
         for i in ${_LANG}; do
             _full_dir "/usr/share/locale/${i}"
         done
@@ -116,7 +116,7 @@ _run ()
     _map _binary dbus-cleanup-sockets dbus-daemon dbus-launch dbus-monitor dbus-run-session dbus-send dbus-test-tool \
           dbus-update-activation-environment dbus-uuidgen /usr/lib/dbus-1.0/dbus-daemon-launch-helper
     _dir /var/lib/dbus
-    _map _full_dir /etc/dbus-1 /usr/share/dbus-1
+    _map _full_dir /usr/share/dbus-1
 
     # tpm2-tss files
     _map _binary secret-tool pinentry pinentry-curses gpgme-tool gpgme-json
@@ -131,7 +131,7 @@ _run ()
           systemd-tty-ask-password-agent timedatectl systemd-repart userdbctl homectl oomctl portablectl systemd-creds \
           systemd-cryptenroll systemd-dissect systemd-id128 systemd-sysext
     _map _dir /etc/tmpfiles.d /etc/modules-load.d /etc/binfmt.d/ /var/lib/systemd
-    _map _full_dir /etc/sysctl.d/  /etc/systemd /etc/xdg  /usr/lib/systemd  /usr/share/systemd  /usr/share/factory \
+    _map _full_dir /etc/sysctl.d  /etc/systemd /etc/xdg  /usr/lib/systemd  /usr/share/systemd  /usr/share/factory \
                      /usr/share/polkit-1 /usr/lib/tmpfiles.d /usr/lib/modules-load.d /usr/lib/sysusers.d /usr/lib/sysctl.d
     _file /usr/share/archboot/base/etc/locale.conf /etc/locale.conf
     _file /usr/share/archboot/base/etc/vconsole.conf /etc/vconsole.conf
@@ -241,7 +241,6 @@ _run ()
     ### fix licenses
     _map _file /usr/share/licenses/shadow/COPYING /usr/share/licenses/iana-etc/LICENSE \
                  /usr/share/licenses/dbus/COPYING /usr/share/licenses/p11-kit/COPYING
-
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

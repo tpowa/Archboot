@@ -35,7 +35,7 @@ _run ()
     [[ "$(uname -m)" == "riscv64" ]] && _map _binary waitpid
     ### add C.UTF-8 locale
     _dir /usr/lib/locale
-    _full_dir /usr/lib/locale/C.UTF-8
+    _full_dir /usr/lib/locale/C.utf8
     ### add custom locale
     [[ -e "/usr/lib/locale/locale-archive" ]] && _file /usr/lib/locale/locale-archive
     

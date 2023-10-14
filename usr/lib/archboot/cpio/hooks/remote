@@ -25,9 +25,6 @@ _run ()
     done
     _map _full_dir /etc/gss /etc/gssproxy
     _map _dir /var/lib/gssproxy/{clients,rcache} /var/log/gssproxy
-    _dir /var/lib/openldap
-    chmod 700 "${_ROOTFS}/var/lib/openldap"
-    chown 439:439 "${_ROOTFS}/var/lib/openldap"
     # start sshd on startup
     _symlink /etc/systemd/system/multi-user.target.wants/sshd.service /usr/lib/systemd/system/sshd.service
     # start ttyd on startup
