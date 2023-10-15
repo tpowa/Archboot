@@ -100,7 +100,7 @@ _second_stage() {
     read -r -t 2
     # remove files and directories
     rm -r /sysroot/sysroot &>/dev/null
-    rm -f /sysroot/init &>/dev/null
+    rm /sysroot/init &>/dev/null
 }
 # mount kernel filesystems
 mount -t proc proc /proc -o nosuid,noexec,nodev
