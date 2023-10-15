@@ -88,10 +88,13 @@ ldconfig -r "${_ROOTFS}" &>"${_NO_LOG}" || exit 1
 rm -f -- "${_ROOTFS}/var/cache/ldconfig/aux-cache"
 if [[ -n "${_GENERATE_IMAGE}" ]]; then
     _create_cpio "${_GENERATE_IMAGE}" "${_COMP}" || exit 1
+    _cleanup
     echo "Build complete."
 elif [[ -n "${_TARGET_DIR}" ]]; then
+    _cleanup
     echo "Build directory complete."
 else
+    _cleanup
     echo "Dry run complete."
 fi
 # vim: set ft=sh ts=4 sw=4 et:

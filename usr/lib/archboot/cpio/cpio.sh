@@ -31,10 +31,13 @@ EOF
 
 _abort() {
     echo "ERROR:" "$@"
+    exit 1
+}
+
+_cleanup() {
     if [[ -n "${_BUILD_DIR}" ]]; then
         rm -rf -- "${_BUILD_DIR}"
     fi
-    exit 1
 }
 
 _builtin_modules() {
