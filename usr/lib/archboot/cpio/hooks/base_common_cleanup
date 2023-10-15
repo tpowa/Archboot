@@ -4,8 +4,6 @@
 
 _run ()
 {
-    # remove initrd-release
-    rm -f /tmp/etc/initrd-release
     # remove pacman-init.service
     rm -f /tmp/etc/systemd/system/multi-user.target.wants/pacman-init.service
     rm -f /tmp/etc/systemd/system/pacman-init.service
