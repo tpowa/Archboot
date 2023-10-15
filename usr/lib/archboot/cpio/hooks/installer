@@ -4,6 +4,7 @@
 
 _run ()
 {
+    _dir /install
     _map _binary genfstab arch-chroot pacstrap \
     archboot-binary-check.sh archboot-not-installed.sh hwdetect
     _file_rename /usr/bin/archboot-setup.sh /usr/bin/setup

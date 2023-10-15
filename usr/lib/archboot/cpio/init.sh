@@ -99,8 +99,8 @@ _second_stage() {
     _progress "100" "The boot medium can be safely removed now."
     read -r -t 2
     # remove files and directories
-    rm -r /sysroot/sysroot &>/dev/null
-    rm /sysroot/init &>/dev/null
+    rm -r /sysroot/sysroot
+    rm /sysroot/init
 }
 # mount kernel filesystems
 mount -t proc proc /proc -o nosuid,noexec,nodev
