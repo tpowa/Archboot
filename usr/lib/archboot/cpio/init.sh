@@ -1,4 +1,4 @@
-f#!/usr/bin/bash
+#!/usr/bin/bash
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 LANG=C
