@@ -161,7 +161,7 @@ _file() {
 }
 
 _file_rename() {
-    tar --hard-dereference --transform="s|${1}|${2}|" -C / -cpf - ."${1}" | tar -C "${_ROOTFS}" -xpf - || return 1
+    tar --hard-dereference --transform="s|${1}|${2}|" -C / -cpf - ."${1}" | tar -C "${_ROOTFS}" -xpf -
 }
 
 _binary() {
