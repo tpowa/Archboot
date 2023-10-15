@@ -29,13 +29,13 @@ _run ()
           bzdiff bzgrep bzip2recover bzmore chacl getfacl setfacl attr getfattr \
           setfattr pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 \
           gunzip zcat wipe file blkpr fadvise isosize pg pipesz tunelp"
-    if [[ "$(uname -m)" == "x86_64" ]]; then
+    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _APPS="i386 x86_64 peekfd waitpid ${_APPS}"
     fi
-    if [[ "$(uname -m)" == "aarch64" ]]; then
+    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         _APPS="peekfd ${_APPS}"
     fi
-    if [[ "$(uname -m)" == "riscv64" ]]; then
+    if [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         _APPS="waitpid ${_APPS}"
     fi
     for i in ${_APPS}; do

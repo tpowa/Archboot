@@ -6,9 +6,9 @@ _run ()
 {
     ### generate motd
     _MOTD="${_ROOTFS}/etc/motd"
-    [[ "$(uname -m)" == "x86_64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux X86_64\e[m" >> "${_MOTD}"
-    [[ "$(uname -m)" == "aarch64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux AARCH64\e[m" >> "${_MOTD}"
-    [[ "$(uname -m)" == "riscv64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux RISCV64\e[m" >> "${_MOTD}"
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux X86_64\e[m" >> "${_MOTD}"
+    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux AARCH64\e[m" >> "${_MOTD}"
+    [[ "${_RUNNING_ARCH}" == "riscv64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux RISCV64\e[m" >> "${_MOTD}"
     #shellcheck disable=SC2129
     echo -e "\e[1m----------------------------------------\e[m" >> "${_MOTD}"
     echo -e "\e[1mVconsole:\e[m" >> "${_MOTD}"

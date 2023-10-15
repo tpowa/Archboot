@@ -124,19 +124,14 @@ _module() {
 }
 
 _full_dir() {
-    tar -C / --hard-dereference -cpf - ."${1}" | tar -C "${_ROOTFS}" -xpf - || return 1
+    tar -C / --hard-dereference -cpf - ."${1}" | tar -C "${_ROOTFS}" -xpf -
 }
 
 _dir() {
-    [[ -d "${_ROOTFS}${1}" ]] && return 0
-    mkdir -p "${_ROOTFS}${1}" || return 1
+    [[ -d "${_ROOTFS}${1}" ]] || mkdir -p "${_ROOTFS}${1}"
 }
 
 _symlink() {
-    # Add a symlink to the rootfs. There is no checking done
-    # to ensure that the target of the symlink exists.
-    #   $1: pathname of symlink on image
-    #   $2: absolute path to target of symlink (optional, can be read from $1)
     _LINK_NAME="${1}" _LINK_SOURCE="${2:-$1}"
     # find out the link target
     if [[ "${_LINK_NAME}" == "${_LINK_SOURCE}" ]]; then
@@ -166,14 +161,10 @@ _file() {
 }
 
 _file_rename() {
-    _SRC="${1}" _DEST="${2:-$1}"
     tar --hard-dereference --transform="s|${1}|${2}|" -C / -cpf - ."${1}" | tar -C "${_ROOTFS}" -xpf - || return 1
 }
 
 _binary() {
-    # Add a binary file to the rootfs. library dependencies will
-    # be discovered and added.
-    #   $1: path to binary
     if [[ "${1:0:1}" != '/' ]]; then
         _BIN="$(type -P "${1}")"
     else
@@ -258,8 +249,8 @@ _create_cpio() {
         zstd)   _COMP_OPTS=('-T0' "${_COMP_OPTS[@]}")
                 ;;
     esac
-    # Reproducibility: set all timestamps to 0
     pushd "${_ROOTFS}" >"${_NO_LOG}" || return
+    # Reproducibility: set all timestamps to 0
     find . -mindepth 1 -execdir touch -hcd "@0" "{}" +
     find . -mindepth 1 -printf '%P\0' | sort -z | LANG=C bsdtar --null -cnf - -T - |
             LANG=C bsdtar --null -cf - --format=newc @- |
