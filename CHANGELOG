@@ -9,6 +9,8 @@ Environment:
   and move main table to sector 2
 archboot-cpio.sh:
 - rewritten from scratch
+hooks:
+- ported to new syntax
 pacsetup:
 - fixed kernel detection
 setup:
