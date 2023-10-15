@@ -196,7 +196,7 @@ _init_rootfs() {
     # basic set of necessary directories and symlinks
     _TMPDIR="$(mktemp -d --tmpdir mkinitcpio.XXXX)"
     _ROOTFS="${2:-${_TMPDIR}/root}"
-    # base directory structure
+    # basic directory structure
     mkdir -p "${_ROOTFS}"/{dev,etc,inststall,mnt,proc,root,run,sys,sysroot,tmp,usr/{local{,/bin,/sbin,/lib},lib,bin},var}
     ln -s "usr/lib" "${_ROOTFS}/lib"
     ln -s "bin" "${_ROOTFS}/usr/sbin"
