@@ -4,11 +4,6 @@
 
 _run ()
 {
-    ### setting up base structure
-    _map _dir /root /mnt /sysroot /install /var/log /home /var/tmp
-    _symlink /var/run ../run
-    _symlink /var/lock ../run/lock
-
     ### add basic apps
     _map _binary init agetty basename mount umount clear env printf gawk tty bash rbash \
             partprobe cp dir du ls mv rm sed grep kill killall more ps pwd rmdir true cat \

@@ -47,9 +47,9 @@ if [[ "${TTY}" = "tty1" ]]; then
         --exclude="./run/*" --exclude="./mnt/*" --exclude="./tmp/*" --exclude="./sysroot/*" \
         -clpf - . | tar -C /sysroot -xlspf - &>"${_NO_LOG}"; rm /.archboot) &
     _progress_wait "4" "99" "Copying archboot rootfs to /sysroot..." "0.125"
-    # cleanup mkinitcpio directories and files
-    rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>"${_NO_LOG}"
-    rm -f /sysroot/{VERSION,config,buildconfig,init,.archboot} &>"${_NO_LOG}"
+    # cleanup directories and files
+    rm -r /sysroot/sysroot &>"${_NO_LOG}"
+    rm /sysroot/init &>"${_NO_LOG}"
     _progress "100" "System is ready."
     read -r -t 1
 else

@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+f#!/usr/bin/bash
 # SPDX-License-Identifier: GPL-2.0-only
 # created by Tobias Powalowski <tpowa@archlinux.org>
 LANG=C
@@ -98,9 +98,9 @@ _second_stage() {
     _progress_wait "98" "99" "${_KEEP} Unmounting archboot rootfs..." "1"
     _progress "100" "The boot medium can be safely removed now."
     read -r -t 2
-    # remove mkinitcpio files and directories
-    rm -rf /sysroot/{hooks,install,kernel,new_root,sysroot} &>/dev/null
-    rm -f /sysroot/{VERSION,config,buildconfig,init} &>/dev/null
+    # remove files and directories
+    rm -r /sysroot/sysroot &>/dev/null
+    rm -f /sysroot/init &>/dev/null
 }
 # mount kernel filesystems
 mount -t proc proc /proc -o nosuid,noexec,nodev
