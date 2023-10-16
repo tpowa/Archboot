@@ -141,7 +141,7 @@ _umount_special() {
 
 _install_base_packages() {
     if [[ "${_ARCH}" == "aarch64" ]]; then
-        _MKINITCPIO="mkinitcpio\=99"
+        _MKINITCPIO="mkinitcpio=99"
     else
         _MKINITCPIO=initramfs
     fi
