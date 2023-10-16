@@ -15,6 +15,8 @@ etc/{ca-certificates/extracted,default,pam.d,pinentry,profile.d,security,skel,ss
 usr/lib/{coreutils,cryptsetup,gconv,modules-load.d,p11-kit,pam.d,pkcs11,security,sysctl.d,systemd,sysusers.d,tmpfiles.d,udev} \
 usr/share/{bash-completion,dbus-1,factory,hwdata,i18n/locales,makepkg,nano,pacman/keyrings,polkit-1,readline,systemd,terminfo} \
 | tar -C "${_ROOTFS}" -xpf -
+
+    ### only run on archboot container
     if grep -qw 'archboot' /etc/hostname; then
         _map _binary locale-gen localedef
         _map _file /etc/locale.gen /usr/share/locale/locale.alias
@@ -36,6 +38,7 @@ usr/share/{locale/{be,bg,cs,da,de,en_US,el,es,fi,fr,hu,it,lt,lv,mk,nl,nn,pl,pt,r
 var/lib/pacman/local \
 | tar -C "${_ROOTFS}" -xpf -
     fi
+
     ### add basic apps
     _map _binary init agetty basename mount umount clear env printf gawk tty bash rbash \
             partprobe cp dir du ls mv rm sed grep kill killall more ps pwd rmdir true cat \
