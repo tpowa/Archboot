@@ -9,6 +9,10 @@ Environment:
   and move main table to sector 2
 archboot-cpio.sh:
 - rewritten from scratch
+container.sh:
+- don't run mkinitcpio during container creation
+update:
+- don't run mkinitcpio during full system creation
 hooks:
 - ported to new syntax
 pacsetup:
