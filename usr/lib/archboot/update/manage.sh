@@ -229,8 +229,8 @@ _new_environment() {
         mv "${_ROOTFS_DIR}"/* "${_RAM}/"
         # cleanup mkinitcpio directories and files
         _progress "95" "Cleanup ${_RAM}..."
-        rm -rf "${_RAM}"/{hooks,install,kernel,new_root,sysroot,mkinitcpio.*} &>"${_NO_LOG}"
-        rm -f "${_RAM}"/{VERSION,config,buildconfig,init,"${_VMLINUZ}"} &>"${_NO_LOG}"
+        rm -r "${_RAM}"/sysroot &>"${_NO_LOG}"
+        rm "${_RAM}"/{init,"${_VMLINUZ}"} &>"${_NO_LOG}"
         _progress "100" "Switching to rootfs ${_RAM}..."
         sleep 2
         # https://www.freedesktop.org/software/systemd/man/bootup.html
@@ -320,11 +320,12 @@ _full_system() {
             _progress "$((_COUNT*100/_PACKAGE_COUNT-4))" "Reinstalling all packages, installing ${i} now..."
         fi
         #shellcheck disable=SC2086
-        pacman -S --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
-        # avoid running mkinitcpio
-        rm -f /usr/share/libalpm/{scripts/mkinitcpio,hooks/*mkinitcpio*}
+        pacman -S --noconfirm ${i} --assume-installed initramfs >"${_LOG}" 2>&1 || exit 1
         _COUNT="$((_COUNT+1))"
     done
+    : >/tmp/{60-mkinitcpio-remove.hook,90-mkinitcpio-install.hook}
+    # install mkinitcpio as last package, without rebuild trigger
+    pacman -S --hookdir /tmp --noconfirm mkinitcpio >"${_LOG}" 2>&1 || exit 1
     _progress "97" "Adding texinfo and man-pages..."
     pacman -S --noconfirm man-db man-pages texinfo >"${_LOG}" 2>&1 || exit 1
     _progress "98" "Checking kernel version..."
