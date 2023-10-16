@@ -316,7 +316,7 @@ _full_system() {
     _COUNT=0
     _PACKAGE_COUNT="$(pacman -Qqn | wc -l)"
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        _MKINITCPIO="mkinitcpio\=99"
+        _MKINITCPIO="mkinitcpio=99"
     else
         _MKINITCPIO="initramfs"
     fi
