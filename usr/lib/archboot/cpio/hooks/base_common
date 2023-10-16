@@ -4,6 +4,39 @@
 
 _run ()
 {
+    ### remove conflicting grub, man-db, mkinitcpio and rpcbind files
+    tar -C / --exclude=/etc/systemd/system/multi-user.target.wants/remote-fs.target \
+--exclude=usr/share/bash-completion/completions/{grub,lsinitcpio,mkinitcpio} \
+--exclude=usr/lib/{modules-load.d/cdrecord.conf,systemd/system/{"man-db*","rpcbind*",\
+shutdown.target.wants/mkinitcpio-generate-shutdown-ramfs.service,"timers.target.wants/man-db*"},"sysusers.d/rpcbind*",\
+tmpfiles.d/{"man-db*",mkinitcpio.conf,"rpcbind*"},ukify} \
+--hard-dereference -cpf - \
+etc/{ca-certificates/extracted,default,pam.d,pinentry,profile.d,security,skel,ssl/certs,sysctl.d,systemd,tpm2-tss,xdg} \
+usr/lib/{coreutils,cryptsetup,gconv,modules-load.d,p11-kit,pam.d,pkcs11,security,sysctl.d,systemd,sysusers.d,tmpfiles.d,udev} \
+usr/share/{bash-completion,dbus-1,factory,hwdata,i18n/locales,makepkg,nano,pacman/keyrings,polkit-1,readline,systemd,terminfo} \
+| tar -C "${_ROOTFS}" -xpf -
+
+    if grep -qw 'archboot' /etc/hostname; then
+        _map _binary locale-gen localedef
+        _map _file /etc/locale.gen /usr/share/locale/locale.alias
+        # only support UTF-8
+        _file /usr/share/i18n/charmaps/UTF-8.gz
+        tar -C / --exclude=var/lib/pacman/local/{"base-*-[0-9]*","grub-*-[0-9]*","libxml2-*-[0-9]*","icu-*-[0-9]*","gettext-*-[0-9]*",\
+"refind-*-[0-9]*","amd-ucode-*-[0-9]*","intel-ucode-*-[0-9]*","edk2-shell-*-[0-9]*","libisoburn-*-[0-9]*","libburn-*-[0-9]*",\
+"libisofs-*-[0-9]*","mkinitcpio-*-[0-9]*","memtest-*-[0-9]*","linux-api-headers-*-[0-9]*","jansson-*-[0-9]*","libwbclient-*-[0-9]*",\
+"libbsd-*-[0-9]*","libmd-*-[0-9]*","libpcap-*-[0-9]*","libnftnl-*-[0-9]*","libnfnetlink-*-[0-9]*","libnetfilter_conntrack-*-[0-9]*",\
+"libsasl-*-[0-9]*","libldap-*-[0-9]*","memtest86+-*-[0-9]*","memtest86+-efi-*-[0-9]*","mkinitcpio-busybox-*-[0-9]*","mtools-*-[0-9]*",\
+"libsysprof-capture-*-[0-9]*","libnsl-*-[0-9]*","libksba-*-[0-9]*","gdbm-*-[0-9]*","binutils-*-[0-9]*","cdrtools-*-[0-9]*",\
+"systemd-ukify-*-[0-9]*","python-*-[0-9]*","python-pefile-*-[0-9]*","limine-*-[0-9]*","man-pages-*-[0-9]*","libev-*-[0-9]*",\
+"libpipeline-*-[0-9]*","groff-*-[0-9]*","man-db-*-[0-9]*","texinfo-*-[0-9]*","db-*-[0-9]*","db5.3-*-[0-9]*","gc-*-[0-9]*",\
+"rpcbind-*-[0-9]*"} \
+--exclude=usr/share/locale/*/{"grub*","binutils*","gdbm*","bfd*","gettext*","gas*","gold*","gprof*","ld*",\
+"man-db*","opcodes*","texinfo*"} \
+--hard-dereference -cpf - \
+usr/share/{locale/{be,bg,cs,da,de,en_US,el,es,fi,fr,hu,it,lt,lv,mk,nl,nn,pl,pt,ro,ru,sk,sr,sv,uk},i18n/locales} \
+var/lib/pacman/local \
+| tar -C "${_ROOTFS}" -xpf -
+    fi
     ### add basic apps
     _map _binary init agetty basename mount umount clear env printf gawk tty bash rbash \
             partprobe cp dir du ls mv rm sed grep kill killall more ps pwd rmdir true cat \
@@ -14,7 +47,6 @@ _run ()
 
     ### add nano
     _binary nano
-    _full_dir /usr/share/nano
     _file /etc/nanorc
     # add syntax highlighting
     echo "include \"/usr/share/nano/*.nanorc\"" >> "${_ROOTFS}/etc/nanorc"
@@ -27,9 +59,8 @@ _run ()
 
     _file /usr/lib/libkmod.so
     _symlink /init /usr/lib/systemd/systemd
-    
+
     ### adding needed files from running system
-    _map _full_dir /etc/profile.d /usr/share/terminfo
     _symlink /usr/lib/terminfo ../share/terminfo
     _SYSTEMFILES="bash.bash_logout bash.bashrc crypttab fstab host.conf hosts \
                  inputrc mke2fs.conf nsswitch.conf protocols \
@@ -45,31 +76,7 @@ _run ()
         _file_rename "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done
 
-    ### add coreutils,cryptsetup,terminfo libs and charmaps
-    _map _full_dir /usr/lib/coreutils /usr/lib/cryptsetup \
-        /usr/lib/gconv /usr/share/readline
-
-    ### add locale support on archboot container
-    if grep -qw 'archboot' /etc/hostname; then
-        _map _binary locale-gen localedef
-        _file /etc/locale.gen
-        _LANG="be bg cs da de en_US el es fi fr hu it lt lv mk nl nn pl pt ro ru sk sr sv uk"
-        for i in ${_LANG}; do
-            _full_dir "/usr/share/locale/${i}"
-        done
-        _file /usr/share/locale/locale.alias
-        _full_dir /usr/share/i18n/locales
-        # only support UTF-8
-        _file /usr/share/i18n/charmaps/UTF-8.gz
-        # remove conflicting files from not installed packages: binutils, grub and gdbm
-        find "${_ROOTFS}/usr/share/locale/" -type f \( -name 'grub*' -o -name 'binutils*' -o -name 'gdbm*' -o -name 'bfd*' \
-            -o -name 'gettext*' -o -name 'gas*' -o -name 'gold*' -o -name 'gprof*' -o -name 'ld*' \
-            -o -name 'man-db*' -o -name 'opcodes*' -o -name 'texinfo*' \) -delete
-    fi
-
     ### add bash configuration
-    # add bash-completion
-    _full_dir /usr/share/bash-completion
     # use color bash prompt
     # unlock and delete root password, if not set by user!
     # use color grep and ls output
@@ -82,40 +89,32 @@ _run ()
     done
     # add custom bash options
     echo ". /etc/profile.d/custom-bash-options.sh" >> "${_ROOTFS}/root/.bashrc"
-    # add /etc/skel
-    _full_dir /etc/skel
     ### add kmod related config file(s)
     _file /usr/lib/depmod.d/search.conf
 
     ### fixing network support from glibc
     _map _file /lib/libnss_files.so.2 /lib/libnss_dns.so.2
 
-    ### add hwdata
-    _full_dir /usr/share/hwdata
-
     ### add pam
     _map _binary mkhomedir_helper pam_timestamp_check unix_chkpwd unix_update
-    _map _full_dir /etc/security /etc/default /etc/pam.d /usr/lib/security /usr/lib/pam.d
     _file /etc/environment
 
     ### add shadow
     _map _binary login nologin
     _file /etc/login.defs
-    
+
     ### add systemd
     # add systemd kernel modules
     _all_modules 'nfs|autofs4|loop'
     _map _binary mount.nfs4 umount.nfs umount.nfs4 mount.nfs setfont loadkeys
-    
+
     #dbus files
     _map _binary dbus-cleanup-sockets dbus-daemon dbus-launch dbus-monitor dbus-run-session dbus-send dbus-test-tool \
           dbus-update-activation-environment dbus-uuidgen /usr/lib/dbus-1.0/dbus-daemon-launch-helper
     _dir /var/lib/dbus
-    _map _full_dir /usr/share/dbus-1
 
     # tpm2-tss files
     _map _binary secret-tool pinentry pinentry-curses gpgme-tool gpgme-json
-    _map _full_dir /etc/tpm2-tss /etc/pinentry
     #systemd files
     _map _binary systemd-umount busctl bootctl coredumpctl hostnamectl journalctl kernel-install localectl \
           loginctl machinectl mount.ddi networkctl systemctl systemd-ac-power systemd-analyze systemd-ask-password \
@@ -126,8 +125,6 @@ _run ()
           systemd-tty-ask-password-agent timedatectl systemd-repart userdbctl homectl oomctl portablectl systemd-creds \
           systemd-cryptenroll systemd-dissect systemd-id128 systemd-sysext
     _map _dir /etc/tmpfiles.d /etc/modules-load.d /etc/binfmt.d/ /var/lib/systemd
-    _map _full_dir /etc/sysctl.d  /etc/systemd /etc/xdg  /usr/lib/systemd  /usr/share/systemd  /usr/share/factory \
-                     /usr/share/polkit-1 /usr/lib/tmpfiles.d /usr/lib/modules-load.d /usr/lib/sysusers.d /usr/lib/sysctl.d
     _file_rename /usr/share/archboot/base/etc/locale.conf /etc/locale.conf
     _file_rename /usr/share/archboot/base/etc/vconsole.conf /etc/vconsole.conf
     _file_rename /usr/share/archboot/base/etc/systemd/system/getty@.service /etc/systemd/system/getty@.service
@@ -154,8 +151,6 @@ _run ()
     ### disable autonount:
     # proc-sys-fs-binfmt_misc.automount
     _symlink /etc/systemd/system/proc-sys-fs-binfmt_misc.automount /dev/null
-    # remove remote-fs.target from multi-user.target.wants
-    rm -f "${_ROOTFS}"/etc/systemd/system/multi-user.target.wants/remote-fs.target
     # disable lastlog
     _symlink /var/log/lastlog /dev/null
     _file_rename /usr/share/archboot/base/etc/tmpfiles.d/var.conf /etc/tmpfiles.d/var.conf
@@ -168,8 +163,6 @@ _run ()
     _symlink /etc/systemd/system-generators/systemd-gpt-auto-generator /dev/null
     ### add udev
     _map _binary /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles logger
-    # add rule files
-    _full_dir /usr/lib/udev
     # add schedule rules file
     _file_rename /usr/share/archboot/base/etc/udev/rules.d/60-ioschedulers.rules /etc/udev/rules.d/60-ioschedulers.rules
 
@@ -185,50 +178,14 @@ _run ()
     # add pacman initialisation of gpg keys
     _dir /etc/pacman.d/gnupg
     _file_rename /usr/share/archboot/base/etc/systemd/system/pacman-init.service /etc/systemd/system/pacman-init.service
-    _map _full_dir /usr/share/pacman/keyrings /usr/share/makepkg
-    # add local installed pacman database in container mode
-    if grep -qw 'archboot' /etc/hostname; then
-        _full_dir /var/lib/pacman/local
-        _RM_PACMAN_DB="base grub libxml2 icu gettext refind amd-ucode intel-ucode edk2-shell \
-            libisoburn libburn libisofs mkinitcpio memtest linux-api-headers jansson libwbclient \
-            libbsd libmd libpcap libnftnl libnfnetlink libnetfilter_conntrack libsasl libldap memtest86+ \
-            memtest86+-efi mkinitcpio-busybox mtools libsysprof-capture libnsl libksba gdbm binutils \
-            cdrtools systemd-ukify python python-pefile limine man-pages libev libpipeline groff \
-            man-db texinfo db db5.3 gc rpcbind"
-        for i in ${_RM_PACMAN_DB}; do
-            rm -rf "${_ROOTFS}"/var/lib/pacman/local/"${i}"-*-[0-9]* &>"${_NO_LOG}"
-        done
-    fi
+
     ### add nss p11-kit and ca certificates
     _map _binary p11-kit trust certutil cmsutil crlutil modutil nss-config pk12util \
                    shlibsign signtool signver ssltap symkeyutil update-ca-trust
-    cafile="tls-ca-bundle.pem"
-    cert="cert.pem"
-    cert2="ca-certificates.crt"
-    ca_dir="/etc/ca-certificates/extracted"
-    cert_dir="/etc/ssl"
-    cert2_dir="/etc/ssl/certs"
-    _map _full_dir "$ca_dir" "$cert2_dir" /usr/lib/p11-kit /usr/lib/pkcs11
-    _symlink "${cert_dir}/${cert}" "../ca-certificates/extracted/${cafile}"
-    _symlink "${cert2_dir}/${cert2}" "../../ca-certificates/extracted/${cafile}"
+    _symlink "/etc/ssl/cert.pem" "../ca-certificates/extracted/tls-ca-bundle.pem"
+    _symlink "/etc/ssl/certs/ca-certificates.crt" "../../ca-certificates/extracted/tls-ca-bundle.pem"
     _file /usr/share/ca-certificates/trust-source/mozilla.trust.p11-kit
     _file /usr/share/p11-kit/modules/p11-kit-trust.module
-
-    ### remove conflicting grub, man-db, mkinitcpio and rpcbind files
-    rm "${_ROOTFS}"/usr/lib/systemd/system/mkinitcpio-generate-shutdown-ramfs.service \
-       "${_ROOTFS}"/usr/lib/systemd/system/shutdown.target.wants/mkinitcpio-generate-shutdown-ramfs.service \
-       "${_ROOTFS}"/usr/lib/systemd/ukify \
-       "${_ROOTFS}"/usr/lib/systemd/system/man-db* \
-       "${_ROOTFS}"/usr/lib/systemd/system/timers.target.wants/man-db* \
-       "${_ROOTFS}"/usr/lib/tmpfiles.d/man-db* \
-       "${_ROOTFS}"/usr/lib/tmpfiles.d/mkinitcpio.conf \
-       "${_ROOTFS}"/usr/share/bash-completion/completions/lsinitcpio \
-       "${_ROOTFS}"/usr/share/bash-completion/completions/mkinitcpio \
-       "${_ROOTFS}"/usr/share/bash-completion/completions/grub \
-       "${_ROOTFS}"/usr/lib/systemd/system/rpcbind* \
-       "${_ROOTFS}"/usr/lib/tmpfiles.d/rpcbind* \
-       "${_ROOTFS}"/usr/lib/sysusers.d/rpcbind* \
-       "${_ROOTFS}"/usr/lib/modules-load.d/cdrecord.conf
 
     ### fix licenses
     _map _file /usr/share/licenses/shadow/COPYING /usr/share/licenses/iana-etc/LICENSE \
