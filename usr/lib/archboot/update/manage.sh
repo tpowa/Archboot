@@ -315,12 +315,17 @@ _full_system() {
     _PACKAGES="$(pacman -Qqn)"
     _COUNT=0
     _PACKAGE_COUNT="$(pacman -Qqn | wc -l)"
+    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+        _MKINITCPIO="mkinitcpio\=99"
+    else
+        _MKINITCPIO="initramfs"
+    fi
     for i in ${_PACKAGES}; do
         if [[ "$((_COUNT*100/_PACKAGE_COUNT-4))" -gt 1 ]]; then
             _progress "$((_COUNT*100/_PACKAGE_COUNT-4))" "Reinstalling all packages, installing ${i} now..."
         fi
         #shellcheck disable=SC2086
-        pacman -S --noconfirm ${i} --assume-installed initramfs >"${_LOG}" 2>&1 || exit 1
+        pacman -S --assume-installed ${_MKINITCPIO} --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
         _COUNT="$((_COUNT+1))"
     done
     : >/tmp/{60-mkinitcpio-remove.hook,90-mkinitcpio-install.hook}

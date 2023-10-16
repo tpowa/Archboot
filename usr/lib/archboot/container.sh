@@ -140,22 +140,27 @@ _umount_special() {
 }
 
 _install_base_packages() {
+    if [[ "${_ARCH}" == "aarch64" ]]; then
+        _MKINITCPIO="mkinitcpio\=99"
+    else
+        _MKINITCPIO=initramfs
+    fi
     if [[ "${2}" == "use_binfmt" ]]; then
-        echo "Downloading  ${_KEYRING} ${_PACKAGES} to ${1}..."
+        echo "Downloading ${_KEYRING} ${_PACKAGES} to ${1}..."
         if grep -q 'archboot' /etc/hostname; then
             #shellcheck disable=SC2086
-            ${_PACMAN} -Syw --assume-installed initramfs ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_LOG}" || exit 1
+            ${_PACMAN} -Syw --assume-installed ${_MKINITCPIO} ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_LOG}" || exit 1
         else
             #shellcheck disable=SC2086
-            ${_PACMAN} -Syw --assume-installed initramfs ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
+            ${_PACMAN} -Syw --assume-installed ${_MKINITCPIO} ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
         fi
     fi
     echo "Installing ${_KEYRING} ${_PACKAGES} to ${1}..."
     if grep -q 'archboot' /etc/hostname; then
-        ${_PACMAN} -Sy --assume-installed initramfs ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
+        ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
     else
         #shellcheck disable=SC2086
-        ${_PACMAN} -Sy  --assume-installed initramfs ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
+        ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
     fi
 }
 
