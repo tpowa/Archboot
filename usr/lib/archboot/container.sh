@@ -173,7 +173,7 @@ _install_archboot() {
         ${_PACMAN} -Syw ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_LOG}" || exit 1
     else
         #shellcheck disable=SC2086
-        ${_PACMAN} -Sy ${_ARCHBOOT} ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
+        ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
         echo "Downloading ${_MAN_INFO_PACKAGES} to ${1}..."
         ${_PACMAN} -Syw ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
     fi
