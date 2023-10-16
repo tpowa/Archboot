@@ -77,14 +77,8 @@ _clean_container() {
 
 # removing mkinitcpio hooks to speed up process, removing not needed initramdisks
 _clean_mkinitcpio() {
-    echo "Cleaning mkinitcpio from ${1}..."
-    [[ -e "${1}/usr/share/libalpm/hooks/60-mkinitcpio-remove.hook" ]] && rm "${1}/usr/share/libalpm/hooks/60-mkinitcpio-remove.hook"
-    [[ -e "${1}/usr/share/libalpm/hooks/90-mkinitcpio-install.hook" ]] && rm "${1}/usr/share/libalpm/hooks/90-mkinitcpio-install.hook"
-    # aarch64 kernel installs hooks too!
-    if [[ -e "${1}/usr/bin/mkinitcpio" ]]; then
-        rm "${1}/usr/bin/mkinitcpio"
-        ln -s "/usr/bin/true" "${1}/usr/bin/mkinitcpio"
-    fi
+    echo "Disable mkinitcpio from ${1}..."
+    ln -s "/usr/bin/true" "${1}/usr/bin/mkinitcpio"
 }
 
 _prepare_pacman() {
@@ -156,25 +150,19 @@ _install_base_packages() {
         echo "Downloading ${_PACKAGES} ${_KEYRING} to ${1}..."
         if grep -q 'archboot' /etc/hostname; then
             #shellcheck disable=SC2086
-            ${_PACMAN} -Syw ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_LOG}" || exit 1
+            ${_PACMAN} -Syw --assume-installed mkinitcpio ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_LOG}" || exit 1
         else
             #shellcheck disable=SC2086
-            ${_PACMAN} -Syw ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
+            ${_PACMAN} -Syw --assume-installed mkinitcpio ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
         fi
     fi
     echo "Installing ${_PACKAGES} ${_KEYRING} to ${1}..."
+    _clean_mkinitcpio "${1}"
     if grep -q 'archboot' /etc/hostname; then
-        #shellcheck disable=SC2086
-        ${_PACMAN} -Sy mkinitcpio ${_KEYRING} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
-        _clean_mkinitcpio "${1}"
-        #shellcheck disable=SC2086
-        ${_PACMAN} -Sy ${_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
+        ${_PACMAN} -Sy --assume-installed mkinitcpio ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
     else
         #shellcheck disable=SC2086
-        ${_PACMAN} -Sy ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
-        _clean_mkinitcpio "${1}"
-        #shellcheck disable=SC2086
-        ${_PACMAN} -Sy ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
+        ${_PACMAN} -Sy  --assume-installed mkinitcpio ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
     fi
 }
 
