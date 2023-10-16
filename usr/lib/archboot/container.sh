@@ -156,7 +156,6 @@ _install_base_packages() {
         fi
     fi
     echo "Installing ${_KEYRING} ${_PACKAGES} ${_MKINITCPIO} to ${1}..."
-    : >/tmp/{60-mkinitcpio-remove.hook,90-mkinitcpio-install.hook}
     if grep -q 'archboot' /etc/hostname; then
         #shellcheck disable=SC2086
         ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
