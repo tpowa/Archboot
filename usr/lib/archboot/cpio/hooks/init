@@ -16,7 +16,7 @@ _run() {
         ${rules_d}/64-btrfs.rules ${rules_d}/80-drivers.rules /usr/lib/udev/ata_id \
         /usr/lib/udev/scsi_id
     _file_rename /usr/lib/archboot/cpio/init.sh /init
-    _map _dir /mnt /cdrom /sysroot /ventoy
+    _map _dir /cdrom /ventoy
     _map _file /etc/bash.bash_logout /etc/bash.bashrc /etc/profile /etc/shells
     _file_rename /usr/share/archboot/base/etc/dialogrc /etc/dialogrc
     # add default bash setup
