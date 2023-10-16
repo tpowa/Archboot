@@ -75,12 +75,6 @@ _clean_container() {
     fi
 }
 
-# removing mkinitcpio hooks to speed up process, removing not needed initramdisks
-_clean_mkinitcpio() {
-    echo "Disable mkinitcpio from ${1}..."
-    ln -s "/usr/bin/true" "${1}/usr/bin/mkinitcpio"
-}
-
 _prepare_pacman() {
     # prepare pacman dirs
     echo "Creating directories in ${1}..."
@@ -147,22 +141,21 @@ _umount_special() {
 
 _install_base_packages() {
     if [[ "${2}" == "use_binfmt" ]]; then
-        echo "Downloading ${_PACKAGES} ${_KEYRING} to ${1}..."
+        echo "Downloading  ${_KEYRING} ${_PACKAGES} to ${1}..."
         if grep -q 'archboot' /etc/hostname; then
             #shellcheck disable=SC2086
-            ${_PACMAN} -Syw --assume-installed mkinitcpio ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_LOG}" || exit 1
+            ${_PACMAN} -Syw --assume-installed initramfs ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_LOG}" || exit 1
         else
             #shellcheck disable=SC2086
-            ${_PACMAN} -Syw --assume-installed mkinitcpio ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
+            ${_PACMAN} -Syw --assume-installed initramfs ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
         fi
     fi
-    echo "Installing ${_PACKAGES} ${_KEYRING} to ${1}..."
-    _clean_mkinitcpio "${1}"
+    echo "Installing ${_KEYRING} ${_PACKAGES} to ${1}..."
     if grep -q 'archboot' /etc/hostname; then
-        ${_PACMAN} -Sy --assume-installed mkinitcpio ${_PACKAGES} ${_KEYRING} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
+        ${_PACMAN} -Sy --assume-installed initramfs ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
     else
         #shellcheck disable=SC2086
-        ${_PACMAN} -Sy  --assume-installed mkinitcpio ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
+        ${_PACMAN} -Sy  --assume-installed initramfs ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
     fi
 }
 
@@ -172,13 +165,15 @@ _install_archboot() {
     else
         _pacman_key_system
     fi
-    echo "Installing ${_ARCHBOOT} ${_MAN_INFO_PACKAGES} to ${1}..."
+    echo "Installing ${_ARCHBOOT}, downloading ${_MAN_INFO_PACKAGES} to ${1}..."
     if grep -q 'archboot' /etc/hostname; then
         #shellcheck disable=SC2086
-        ${_PACMAN} -Sy ${_ARCHBOOT} ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
+        ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
+        ${_PACMAN} -Syw ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
     else
         #shellcheck disable=SC2086
         ${_PACMAN} -Sy ${_ARCHBOOT} ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
+        ${_PACMAN} -Syw ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
     fi
     # cleanup
     if ! [[ "${2}"  == "use_binfmt" ]]; then
