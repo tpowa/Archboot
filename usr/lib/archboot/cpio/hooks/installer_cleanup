@@ -4,6 +4,7 @@
 
 _run ()
 {
+    ! grep -qw 'archboot' /etc/hostname && return
     # save RAM with deleting already copied content
     rm -rf /var/cache/pacman/pkg
 }

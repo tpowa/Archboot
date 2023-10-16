@@ -4,6 +4,7 @@
 
 _run ()
 {
+    ! grep -qw 'archboot' /etc/hostname && return
     _APPS="head id cksum tail test uptime w who whoami xargs \
           swapon uniq seq fdisk sfdisk cfdisk parted free less \
           chgrp dmesg egrep fgrep stty hdparm sync bsdcpio\
