@@ -328,7 +328,8 @@ _full_system() {
         pacman -S --assume-installed ${_MKINITCPIO} --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
         _COUNT="$((_COUNT+1))"
     done
-    : >/tmp/{60-mkinitcpio-remove.hook,90-mkinitcpio-install.hook}
+    : >/tmp/60-mkinitcpio-remove.hook
+    : >/tmp/90-mkinitcpio-install.hook
     # install mkinitcpio as last package, without rebuild trigger
     pacman -S --hookdir /tmp --noconfirm mkinitcpio >"${_LOG}" 2>&1 || exit 1
     _progress "97" "Adding texinfo and man-pages..."
