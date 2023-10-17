@@ -159,13 +159,13 @@ _install_base_packages() {
     if grep -q 'archboot' /etc/hostname; then
         #shellcheck disable=SC2086
         ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
-        echo "Downloading ${_MKINITCPIO} to ${1}..."
+        echo "Downloading mkinitcpio to ${1}..."
         #shellcheck disable=SC2086
         ${_PACMAN} -Syw mkinitcpio ${_PACMAN_DEFAULTS} >"${_LOG}" 2>&1 || exit 1
     else
         #shellcheck disable=SC2086
         ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
-        echo "Downloading ${_MKINITCPIO} to ${1}..."
+        echo "Downloading mkinitcpio to ${1}..."
         #shellcheck disable=SC2086
         ${_PACMAN} -Syw mkinitcpio ${_PACMAN_DEFAULTS} >"${_NO_LOG}" 2>&1 || exit 1
     fi
