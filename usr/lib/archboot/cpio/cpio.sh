@@ -221,7 +221,7 @@ _install_modules() {
 
 _install_libs() {
     # add libraries for binaries in bin/ and /lib/systemd
-    echo "Adding libraries for / and /lib/systemd..."
+    echo "Adding libraries for /bin and /lib/systemd..."
     _LIBS="$(objdump -p "${_ROOTFS}"/bin/* "${_ROOTFS}"/lib/systemd/{systemd-*,libsystemd*} 2>${_NO_LOG} |
             grep 'NEEDED' | sort -u | sed -e 's#NEEDED##g' -e 's# .* #/lib/#g')"
     while read -r i; do
