@@ -82,6 +82,7 @@ for i in "${_HOOKS[@]}"; do
     _run_hook "${i}"
     _HOOK_COUNT="$((_HOOK_COUNT+1))"
 done
+_install_libs
 _install_modules "${!_MOD_PATH[@]}"
 ldconfig -r "${_ROOTFS}" &>"${_NO_LOG}" || exit 1
 # remove /var/cache/ldconfig/aux-cache for reproducibility

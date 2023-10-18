@@ -8,6 +8,8 @@ _run() {
     _map _binary bash sh blkid mount mountpoint switch_root bsdcpio mkfs.btrfs setfont \
         /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod insmod modprobe \
         gzip uname cat cp dmesg grep ln ls mv rm umount lsblk rmmod cut sed find mkdir dialog
+    # needed library for udevadm!
+    _map _file /usr/lib/systemd/libsystemd-shared*
     _file /usr/share/terminfo/l/linux
     _file_rename /usr/share/kbd/consolefonts/ter-v16n.psf.gz /consolefont-16.psf.gz
     _file_rename /usr/share/kbd/consolefonts/ter-v32n.psf.gz /consolefont-32.psf.gz

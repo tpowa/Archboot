@@ -164,7 +164,7 @@ var/lib/pacman/local \
     # mask systemd-gpt-auto-generator, errors out on initramfs usage
     _symlink /etc/systemd/system-generators/systemd-gpt-auto-generator /dev/null
     ### add udev
-    _map _binary /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles logger
+    _map _binary udevadm systemd-tmpfiles logger
     # add schedule rules file
     _file_rename /usr/share/archboot/base/etc/udev/rules.d/60-ioschedulers.rules /etc/udev/rules.d/60-ioschedulers.rules
 

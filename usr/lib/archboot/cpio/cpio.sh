@@ -168,27 +168,8 @@ _file_rename() {
 }
 
 _binary() {
-    if [[ "${1:0:1}" != '/' ]]; then
-        _BIN="$(type -P "${1}")"
-    else
-        _BIN="${1}"
-    fi
+    _BIN="$(type -P "${1}")"
     _file "${_BIN}"
-    # non-binaries
-    if ! _LDD="$(ldd "${_BIN}" 2>"${_NO_LOG}")"; then
-        return 0
-    fi
-    # resolve libraries
-    _REGULAR_EXPRESSION='^(|.+ )(/.+) \(0x[a-fA-F0-9]+\)'
-    while read -r i; do
-        if [[ "${i}" =~ ${_REGULAR_EXPRESSION} ]]; then
-            _LIB="${BASH_REMATCH[2]}"
-        fi
-        if [[ -f "${_LIB}" && ! -e "${_ROOTFS}${_LIB}" ]]; then
-            _file "${_LIB}"
-        fi
-    done <<< "${_LDD}"
-    return 0
 }
 
 _init_rootfs() {
@@ -236,6 +217,28 @@ _install_modules() {
     # remove all non-binary module.* files (except devname for on-demand module loading
     # and builtin.modinfo for checking on builtin modules)
     rm "${_ROOTFS}${_MODULE_DIR}"/modules.!(*.bin|*.modinfo|devname|softdep)
+}
+
+_install_libs() {
+    # add libraries for binaries in bin/ and /lib/systemd
+    echo "Adding libraries for / and /lib/systemd..."
+    _LIBS="$(objdump -p "${_ROOTFS}"/bin/* "${_ROOTFS}"/lib/systemd/{systemd-*,libsystemd*} 2>${_NO_LOG} |
+            grep 'NEEDED' | sort -u | sed -e 's#NEEDED##g' -e 's# .* #/lib/#g')"
+    while read -r i; do
+        [[ -e "${i}" ]] && _file "${i}"
+    done <<< "${_LIBS}"
+    echo "Checking libraries in /lib..."
+    _LIB_COUNT=""
+    while true; do
+        _LIBS="$(objdump -p "${_ROOTFS}"/lib/*.so* |
+                grep 'NEEDED' | sort -u | sed -e 's#NEEDED##g' -e 's# .* #/lib/#g')"
+        while read -r i; do
+            [[ -e "${i}" ]] && _file "${i}"
+        done <<< "${_LIBS}"
+        _LIB_COUNT2="$(ls "${_ROOTFS}"/lib/*.so* | wc -l)"
+        [[ "${_LIB_COUNT}" == "${_LIB_COUNT2}" ]] && break
+        _LIB_COUNT="${_LIB_COUNT2}"
+    done
 }
 
 _create_cpio() {
