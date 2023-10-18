@@ -9,7 +9,7 @@ if [[ "${UID}" == 0 ]]; then
     PS1='[\[\e[1;31m\]\u\[\e[m\]@\[\e[1;32m\]\h\[\e[m\] \e[1m\w\e[m]\$ '
 else
     # blue for normal user,host green, print full working dir
-    PS1='[\[\e[1;34m\]\u\[\e[m\]@\[\e[1;32m\]\h\[\e[m\] \e[1m\w\e[m]]\$ '
+    PS1='[\[\e[1;34m\]\u\[\e[m\]@\[\e[1;32m\]\h\[\e[m\] \e[1m\w\e[m]\$ '
 fi
 # color man pages
 export GROFF_NO_SGR=1
