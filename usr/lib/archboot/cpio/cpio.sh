@@ -210,6 +210,7 @@ _run_hook() {
 }
 
 _install_modules() {
+    echo "Adding kernel modules..."
     tar --hard-dereference -C / -cpf - "$@" | tar -C "${_ROOTFS}" -xpf -
     echo "Generating module dependencies..."
     _map _file "${_MODULE_DIR}"/modules.{builtin,builtin.modinfo,order}
