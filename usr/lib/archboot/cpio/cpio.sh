@@ -234,6 +234,7 @@ _install_libs() {
             [[ -e "${i}" ]] && _file "${i}"
         done < <(objdump -p "${_ROOTFS}"/lib/*.so* |
                 grep 'NEEDED' | sort -u | sed -e 's#NEEDED##g' -e 's# .* #/lib/#g')
+        # rerun loop if new libs were discovered, else break
         _LIB_COUNT2="$(ls "${_ROOTFS}"/lib/*.so* | wc -l)"
         [[ "${_LIB_COUNT}" == "${_LIB_COUNT2}" ]] && break
         _LIB_COUNT="${_LIB_COUNT2}"
