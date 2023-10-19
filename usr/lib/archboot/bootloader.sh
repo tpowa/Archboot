@@ -66,8 +66,6 @@ _prepare_uefi_AA64() {
     _GRUB_ARCH="arm64-efi"
     _GRUB_EFI="grubaa64.efi"
     mkdir "${1}"/grub-efi
-    mkdir "${1}"/usr/share/archboot/grub/
-    cp "${_GRUB_ISO}" "${1}/${_GRUB_ISO}"
     #shellcheck disable=SC2086
     _grub_mkstandalone "${_NSPAWN}" "${1}"
     mv "${1}/grub-efi/${_GRUB_EFI}" grub-efi/
@@ -80,8 +78,6 @@ _prepare_uefi_RISCV64() {
     _GRUB_ARCH="riscv64-efi"
     _GRUB_EFI="grubriscv64.efi"
     mkdir "${1}"/grub-efi
-    mkdir "${1}"/usr/share/archboot/grub/
-    cp "${_GRUB_ISO}" "${1}/${_GRUB_ISO}"
     #shellcheck disable=SC2086
     _grub_mkstandalone "${_NSPAWN}" "${1}"
     mv "${1}/grub-efi/${_GRUB_EFI}" grub-efi/
