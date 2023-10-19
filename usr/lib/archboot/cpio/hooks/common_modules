@@ -7,7 +7,7 @@ _run ()
     ### add pcspkr
     _module pcspkr
     ### add init modules
-    _map _module zram? btrfs? zstd? libcrc32c?
+    _map _module zram btrfs zstd libcrc32c
     ### keyboard modules
     _all_modules -f '_cs|ssb-hcd' '/usb/host'
     _all_modules '/hid/hid-(alps|apple|asus|belkin|cherry|chicony|corsair|elan|hyperv|kensignton|lenovo|logitech|magicmouse|microsoft|razer|redragon|roccat|samsung|sony|speedlink|steelseries)'

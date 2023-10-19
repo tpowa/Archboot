@@ -95,9 +95,6 @@ _module() {
     # discovered and added.
     #   $1: module name
     _CHECK="" _MOD="" _SOFT=() _DEPS=() _FIELD="" _VALUE="" _FW=()
-    if [[ "${1}" == *\? ]]; then
-        set -- "${1%?}"
-    fi
     _CHECK="${1%.ko*}" _CHECK="${_CHECK//-/_}"
     # skip expensive stuff if this module has already been added
     (( _INCLUDED_MODS["${_CHECK}"] == 1 )) && return

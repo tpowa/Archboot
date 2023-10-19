@@ -1061,17 +1061,84 @@ There are the following configuration files for ISO creation:
 </ul>
 <h4 data-number="7.2.3.3" id="archboot-cpio.sh"><span class="header-section-number">7.2.3.3</span> <strong>archboot-cpio.sh</strong></h4>
 <ul>
-<li>The archboot initrd toolchain uses its own cpio generator.</li>
-<li>objdump is used for library detecton. It's faster than ldd!</li>
-<li>libraries for binaries outside of bin/ are not detected!</li>
-<li>libraries outside of lib/ are not checked!</li>
-<li>tar is used for creating/moving files and directories. It's faster than mkdir, install and cp!</li>
-<p></p>
-<li> <strong>Only</strong> options supported in <strong>config</strong> files:<br>
-<strong>_KERNEL, _HOOKS, _COMP, COMP_OPTS</strong></li>
-<li> <strong>Only</strong> functions supported in <strong>HOOK</strong> files:<br>
-<strong>_map, _dir, _full_dir, _binary, _file, _file_rename, _symlink, _module, _all_modules</strong></li>
+<li>The archboot initrd toolchain uses its <strong>own</strong> cpio generator.</li>
+<li><strong>objdump</strong> is used for library detection. It's faster than ldd!</li>
+<li>libraries for binaries outside of bin/ are <strong>not</strong> detected!</li>
+<li>libraries outside of lib/ are <strong>not</strong> checked!</li>
+<li><strong>tar</strong> is used for copying/moving files and directories. It's faster than mkdir, install and cp!</li>
 </ul>
+Options supported in <strong>/etc/archboot/&lt;yourconfig&gt;.conf</strong> files:<br>
+<table>
+<thead>
+<tr class="header">
+<th>Option</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>_KERNEL=""</td>
+<td>defines used kernel</td>
+<tr class="even">
+<td>_HOOKS=()</td>
+<td>Array that defines the used hooks</td>
+</tr>
+<tr class="odd">
+<td>_COMP=""</td>
+<td>defines used compression method</td>
+</tr>
+<tr class="even">
+<td>_COMP_OPTS=()</td>
+<td>defines compression method options</td>
+</tr>
+</tbody>
+</table>
+Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong> files:<br>
+<table>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>_map &lt;function&gt; &lt;args&gt;</td>
+<td>redo &lt;function&gt; on &lt;args&gt;</td>
+<tr class="even">
+<td>_dir &lt;directory&gt;</td>
+<td>Only creates &lt;directory&gt; on &lt;rootfs&gt;</td>
+</tr>
+<tr class="odd">
+<td>_full_dir  &lt;directory&gt;</td>
+<td>Copies the &lt;full directory&gt; as is to &lt;rootfs&gt;</td>
+</tr>
+<tr class="even">
+<td>_binary &lt;binary&gt;</td>
+<td>Adds &lt;binary&gt; to rootfs, PATH is added,<br>libraries are detected</td>
+</tr>
+<tr class="odd">
+<td>_file &lt;file&gt;</td>
+<td>Adds &lt;file&gt; as is to rootfs</td>
+</tr>
+<tr class="even">
+<td>_file_rename &lt;file&gt; &lt;file_rootfs&gt;</td>
+<td>Adds &lt;file&gt; as is to rootfs &lt;file_rootfs&gt;</td>
+</tr>
+<tr class="odd">
+<td>_symlink &lt;linkname&gt; &lt;linkedfile&gt;</td>
+<td>Adds symlink &lt;linkname&gt; to &lt;linkedfile&gt; on &lt;rootfs&gt;</td>
+</tr>
+<tr class="even">
+<td>_module &lt;module&gt;</td>
+<td>Adds kernel &lt;module&gt; to &lt;rootfs&gt;</td>
+</tr>
+<tr class="odd">
+<td>_all_modules -f &lt;exlude_pattern&gt; &lt;pattern&gt;</td>
+<td>Adds all kernel modules &lt;pattern&gt; to &lt;rootfs&gt;,<br>use -f flag to exclude modules</td>
+</tr>
+</tbody>
+</table>
 <h4 data-number="7.2.3.4" id="archboot-x86_64-iso.sh"><span class="header-section-number">7.2.3.4</span> <strong>archboot-x86_64-iso.sh</strong></h4>
 <p>Script for image creation from running system or for use in archboot container.</p>
 <table>
