@@ -15,7 +15,7 @@
 <body>
 <p><span><img src="logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br><strong>Last update: 17.10.2023 14:45</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br><strong>Last update: 19.10.2023 14:30</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -982,21 +982,6 @@ The calculated size to boot the image follows the formula:<br>
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <strong>qemu-user-static</strong> package for building <strong>aarch64</strong> or <strong>riscv64</strong> images on <strong>x86_64</strong> hardware.</li>
 </ul>
 <p>If you want to build <strong>aarch64</strong> or <strong>riscv64</strong> images replace <strong>x86_64</strong> with the architecture of your choice in the commands and files below.</p>
-<table>
-<thead>
-<tr class="header">
-<th class="MyNo">Caveat:</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td class="MyOpt"><ul><li><strong>Qemu 8.1.1-1</strong> packages don't work with <strong>binfmt</strong> and <strong>segfaults</strong> on <strong>aarch64</strong>!</li>
-<li>Use <strong>Qemu 8.1.1-2</strong></a> from <strong>[extra-testing]</strong> until it gets fixed upstream.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
 <h2 data-number="7.1" id="create-rescue-system"><span class="header-section-number">7.1</span> <strong>Create Rescue System Out Of The Running System</strong></h2>
 <table>
 <thead>
@@ -1075,11 +1060,16 @@ There are the following configuration files for ISO creation:
 <li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the KERNEL and the HOOKS, which are used for the initrd.</li>
 </ul>
 <h4 data-number="7.2.3.3" id="archboot-cpio.sh"><span class="header-section-number">7.2.3.3</span> <strong>archboot-cpio.sh</strong></h4>
-<p>The archboot initrd toolchain uses its own cpio generator and <strong>only</strong> uses the following options:</p>
 <ul>
-<li>Options supported in <strong>config</strong> files:<br>
+<li>The archboot initrd toolchain uses its own cpio generator.</li>
+<li>objdump is used for library detecton. It's faster than ldd!</li>
+<li>libraries for binaries outside of bin/ are not detected!</li>
+<li>libraries outside of lib/ are not checked!</li>
+<li>tar is used for creating/moving files and directories. It's faster than mkdir, install and cp!</li>
+<p></p>
+<li> <strong>Only</strong> options supported in <strong>config</strong> files:<br>
 <strong>_KERNEL, _HOOKS, _COMP, COMP_OPTS</strong></li>
-<li>Functions supported in <strong>HOOK</strong> files:<br>
+<li> <strong>Only</strong> functions supported in <strong>HOOK</strong> files:<br>
 <strong>_map, _dir, _full_dir, _binary, _file, _file_rename, _symlink, _module, _all_modules</strong></li>
 </ul>
 <h4 data-number="7.2.3.4" id="archboot-x86_64-iso.sh"><span class="header-section-number">7.2.3.4</span> <strong>archboot-x86_64-iso.sh</strong></h4>
