@@ -83,10 +83,10 @@ _filter_mods() {
 
 _all_mods() {
     # Add modules to the initcpio.
-    #   $@: arguments to all_modules
+    #   $@: arguments to all_mods
     local -a _MODS
     mapfile -t _MODS < <(_filter_mods "$@")
-    _map _module "${_MODS[@]}"
+    _map _mod "${_MODS[@]}"
     return $(( !${#_MODS[*]} ))
 }
 
@@ -111,7 +111,7 @@ _mod() {
                         fi
                         ;;
             depends)    IFS=',' read -r -a _DEPS <<< "${_VALUE}"
-                        _map _module "${_DEPS[@]}"
+                        _map _mod "${_DEPS[@]}"
                         ;;
             softdep)    read -ra _SOFT <<<"${_VALUE}"
                         for i in "${_SOFT[@]}"; do
