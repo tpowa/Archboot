@@ -4,7 +4,7 @@
 
 _run ()
 {
-    _all_modules -f 'media' '/platform/'
+    _all_mods -f 'media' '/platform/'
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

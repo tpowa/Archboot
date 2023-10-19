@@ -4,7 +4,7 @@
 
 _run ()
 {
-    _all_modules '/firmware/dmi-sysfs'
+    _all_mods '/firmware/dmi-sysfs'
     _map _binary dmidecode biosdecode
 }
 

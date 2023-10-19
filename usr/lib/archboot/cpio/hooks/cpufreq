@@ -4,7 +4,7 @@
 
 _run ()
 {
-    _all_modules 'arch/x86/kernel/cpu/cpufreq|drivers/cpufreq'
+    _all_mods 'arch/x86/kernel/cpu/cpufreq|drivers/cpufreq'
     _map _binary cpupower cpufreq-bench_plot.sh
     _file /etc/cpufreq-bench.conf
 }

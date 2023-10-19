@@ -108,7 +108,7 @@ var/lib/pacman/local \
 
     ### add systemd
     # add systemd kernel modules
-    _all_modules 'nfs|autofs4|loop'
+    _all_mods 'nfs|autofs4|loop'
     _map _binary mount.nfs4 umount.nfs umount.nfs4 mount.nfs setfont loadkeys
 
     #dbus files

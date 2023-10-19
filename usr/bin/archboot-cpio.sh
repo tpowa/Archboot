@@ -64,7 +64,7 @@ if (( ${#_HOOKS[*]} == 0 )); then
 fi
 echo "Using kernel: ${_KERNEL}"
 echo "Detected kernel version: ${_KERNELVERSION}"
-_builtin_modules
+_builtin_mods
 _HOOK_COUNT=1
 _HOOKS_END_COUNT="$(echo "${_HOOKS[@]}" | wc -w)"
 if [[ "${_HOOKS_END_COUNT}" -lt 10 ]]; then
@@ -83,7 +83,7 @@ for i in "${_HOOKS[@]}"; do
     _HOOK_COUNT="$((_HOOK_COUNT+1))"
 done
 _install_libs
-_install_modules "${!_MOD_PATH[@]}"
+_install_mods "${!_MOD_PATH[@]}"
 ldconfig -r "${_ROOTFS}" &>"${_NO_LOG}" || exit 1
 # remove /var/cache/ldconfig/aux-cache for reproducibility
 rm -f -- "${_ROOTFS}/var/cache/ldconfig/aux-cache"

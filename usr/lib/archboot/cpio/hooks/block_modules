@@ -6,20 +6,20 @@ _run()
 {
     ### add block device support
     # sata, scsi, nvme
-    _map _all_modules 'scsi/.*ata' \
+    _map _all_mods 'scsi/.*ata' \
             'ata/(ahci|pdc_adma|ata_piix|ata_generic)'
-    _all_modules -f 'pcmcia|scsi/(ch|imm|ppa|sg|st)|rdma|rnbd|rbd|nbd|qed|cxgb|bnx2|csiostor|qla1280|qla2xxx|qla4xxx|iscsi|brd|aoe|null_blk|pktcdvd|drbd|floppy|lpfc|ublk_drv|bfa|snic|fnic|fcoe' '/(block|scsi|fusion|nvme)/'
-    _all_modules -f 'parport' 'ata/sata_'
+    _all_mods -f 'pcmcia|scsi/(ch|imm|ppa|sg|st)|rdma|rnbd|rbd|nbd|qed|cxgb|bnx2|csiostor|qla1280|qla2xxx|qla4xxx|iscsi|brd|aoe|null_blk|pktcdvd|drbd|floppy|lpfc|ublk_drv|bfa|snic|fnic|fcoe' '/(block|scsi|fusion|nvme)/'
+    _all_mods -f 'parport' 'ata/sata_'
     # usb
-    _all_modules '/drivers/usb/storage/'
+    _all_mods '/drivers/usb/storage/'
     # mmc
-    _all_modules -f '_cs' '/(drivers/mmc|tifm_)'
+    _all_mods -f '_cs' '/(drivers/mmc|tifm_)'
     # spi (mmc in spi mode)
-    _all_modules -f 'butterfly|lm70llp' '/drivers/spi/'
+    _all_mods -f 'butterfly|lm70llp' '/drivers/spi/'
     # nvdimm
-    _all_modules '/drivers/nvdimm/'
+    _all_mods '/drivers/nvdimm/'
 	# Intel Volume Management Device
-    _all_modules 'vmd'
+    _all_mods 'vmd'
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

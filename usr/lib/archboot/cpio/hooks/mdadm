@@ -4,7 +4,7 @@
 
 _run ()
 {
-    _all_modules -f 'dm-' 'drivers/md/*'
+    _all_mods -f 'dm-' 'drivers/md/*'
     _map _binary mdmon mdadm
     _file /etc/mdadm.conf
     _file /usr/share/mdadm/mdcheck

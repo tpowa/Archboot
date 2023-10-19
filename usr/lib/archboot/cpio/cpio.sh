@@ -40,7 +40,7 @@ _cleanup() {
     fi
 }
 
-_builtin_modules() {
+_builtin_mods() {
     while IFS=.= read -rd '' _MODULE _FIELD _VALUE; do
         _INCLUDED_MODS[${_MODULE//-/_}]=2
         case "$_FIELD" in
@@ -59,7 +59,7 @@ _map() {
     return "${_RETURN}"
 }
 
-_filter_modules() {
+_filter_mods() {
     # Add modules to the rootfs, filtered by grep.
     #   $@: filter arguments to grep
     #   -f FILTER: ERE to filter found modules
@@ -81,16 +81,16 @@ _filter_modules() {
     (( _COUNT ))
 }
 
-_all_modules() {
+_all_mods() {
     # Add modules to the initcpio.
     #   $@: arguments to all_modules
     local -a _MODS
-    mapfile -t _MODS < <(_filter_modules "$@")
+    mapfile -t _MODS < <(_filter_mods "$@")
     _map _module "${_MODS[@]}"
     return $(( !${#_MODS[*]} ))
 }
 
-_module() {
+_mod() {
     # Add a kernel module to the rootfs. Dependencies will be
     # discovered and added.
     #   $1: module name
@@ -116,7 +116,7 @@ _module() {
             softdep)    read -ra _SOFT <<<"${_VALUE}"
                         for i in "${_SOFT[@]}"; do
                             [[ ${i} == *: ]] && continue
-                            _module "${i}?"
+                            _mod "${i}?"
                         done
                         ;;
         esac
@@ -206,7 +206,7 @@ _run_hook() {
     _run
 }
 
-_install_modules() {
+_install_mods() {
     echo "Adding kernel modules..."
     tar --hard-dereference -C / -cpf - "$@" | tar -C "${_ROOTFS}" -xpf -
     echo "Generating module dependencies..."

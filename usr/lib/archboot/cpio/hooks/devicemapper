@@ -4,7 +4,7 @@
 
 _run ()
 {
-    _all_modules 'md/dm-*'
+    _all_mods 'md/dm-*'
     _map _binary dmsetup dmeventd blkdeactivate dmstats cryptsetup \
         integritysetup veritysetup
     _dir /dev/mapper

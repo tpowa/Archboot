@@ -5,15 +5,15 @@
 _run ()
 {
     ### add pcspkr
-    _module pcspkr
+    _mod pcspkr
     ### add init modules
-    _map _module zram btrfs zstd libcrc32c
+    _map _mod zram btrfs zstd libcrc32c
     ### keyboard modules
-    _all_modules -f '_cs|ssb-hcd' '/usb/host'
-    _all_modules '/hid/hid-(alps|apple|asus|belkin|cherry|chicony|corsair|elan|hyperv|kensignton|lenovo|logitech|magicmouse|microsoft|razer|redragon|roccat|samsung|sony|speedlink|steelseries)'
-    _module usbhid
-    _all_modules -f 'parkbd' '/input/serio|mouse|keyboard/(applespi|atkbd)'
-    _all_modules -f '9pnet|bluetooth|fs' 'virtio'
+    _all_mods -f '_cs|ssb-hcd' '/usb/host'
+    _all_mods '/hid/hid-(alps|apple|asus|belkin|cherry|chicony|corsair|elan|hyperv|kensignton|lenovo|logitech|magicmouse|microsoft|razer|redragon|roccat|samsung|sony|speedlink|steelseries)'
+    _mod usbhid
+    _all_mods -f 'parkbd' '/input/serio|mouse|keyboard/(applespi|atkbd)'
+    _all_mods -f '9pnet|bluetooth|fs' 'virtio'
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

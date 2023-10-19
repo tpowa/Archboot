@@ -4,7 +4,7 @@
 
 _run ()
 {
-    _all_modules '/hv/hv_*'
+    _all_mods '/hv/hv_*'
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
