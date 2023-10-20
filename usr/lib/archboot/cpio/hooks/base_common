@@ -56,20 +56,13 @@ var/lib/pacman/local \
     ### add file magic file
     _file /usr/share/file/misc/magic.mgc
 
-    ### fix kmod
-    _file /usr/lib/libkmod.so
-
     ### launch systemd
     _symlink /init /usr/lib/systemd/systemd
 
     ### adding needed files from running system
     _symlink /usr/lib/terminfo ../share/terminfo
-    _SYSTEMFILES="bash.bash_logout bash.bashrc crypttab fstab host.conf hosts \
-                 inputrc mke2fs.conf nsswitch.conf protocols \
-                 request-key.conf securetty services"
-    for i in ${_SYSTEMFILES}; do
-        _file "/etc/${i}"
-    done
+    _map _file /etc/{bash.bash_logout,bash.bashrc,crypttab,fstab,host.conf,hosts,\
+inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
 
     ### adding config files of installation system
     _map _file /etc/{profile,shells}
@@ -98,13 +91,9 @@ var/lib/pacman/local \
     ### fixing network support from glibc
     _map _file /usr/lib/{libnss_files.so.2,libnss_dns.so.2}
 
-    ### add pam
-    _map _binary mkhomedir_helper pam_timestamp_check unix_chkpwd unix_update
-    _file /etc/environment
-
-    ### add shadow
-    _map _binary login nologin
-    _file /etc/login.defs
+    ### add pam and shadow
+    _map _binary mkhomedir_helper pam_timestamp_check unix_chkpwd unix_update login nologin
+    _map _file /etc/{environment,login.defs}
 
     ### add systemd
     # add systemd kernel modules
