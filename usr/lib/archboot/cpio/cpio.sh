@@ -125,7 +125,7 @@ _mod() {
                         done
                         ;;
         esac
-    done <<<(modinfo -k "${_KERNELVERSION}" -0 "${_CHECK}" 2>"${_NO_LOG}")
+    done < <(modinfo -k "${_KERNELVERSION}" -0 "${_CHECK}" 2>"${_NO_LOG}")
 }
 
 _full_dir() {
