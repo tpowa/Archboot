@@ -15,7 +15,7 @@
 <body>
 <p><span><img src="logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br><strong>Last update: 19.10.2023 21:14</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br><strong>Last update: 20.10.2023 07:31</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -1057,22 +1057,22 @@ The calculated size to boot the image follows the formula:<br>
 There are the following configuration files for ISO creation:
 <ul>
 <li><strong>/etc/archboot/defaults</strong>: defaults for packages, bootloader config and server setup.</li>
-<li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the KERNEL and the HOOKS, which are used for the initrd.</li>
+<li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the _KERNEL and the _HOOKS, which are used for the initrd.</li>
 </ul>
 <h4 data-number="7.2.3.3" id="archboot-cpio.sh"><span class="header-section-number">7.2.3.3</span> <strong>archboot-cpio.sh</strong></h4>
+The archboot initrd toolchain uses its <strong>own</strong> cpio generator. Some differences to other initcpio creators:
 <ul>
-<li>The archboot initrd toolchain uses its <strong>own</strong> cpio generator.</li>
 <li><strong>objdump</strong> is used for library detection. It's faster than ldd!</li>
 <li>libraries for binaries outside of bin/ are <strong>not</strong> detected!</li>
 <li>libraries outside of lib/ are <strong>not</strong> checked!</li>
 <li><strong>tar</strong> is used for copying/moving files and directories. It's faster than mkdir, install and cp!</li>
 </ul>
-Options supported in <strong>/etc/archboot/&lt;yourconfig&gt;.conf</strong> files:<br>
+Options supported in <strong>/etc/archboot/&lt;profile&gt;.conf</strong> files:<br>
 <table>
 <thead>
 <tr class="header">
 <th>Option</th>
-<th>Usage</th>
+<th>Explanation</th>
 </tr>
 </thead>
 <tbody>
@@ -1089,7 +1089,7 @@ Options supported in <strong>/etc/archboot/&lt;yourconfig&gt;.conf</strong> file
 </tr>
 <tr class="even">
 <td>_COMP_OPTS=()</td>
-<td>defines compression method options</td>
+<td>Array that defines any options for the compressor</td>
 </tr>
 </tbody>
 </table>
@@ -1098,7 +1098,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 <thead>
 <tr class="header">
 <th>Function</th>
-<th>Usage</th>
+<th>Explanation</th>
 </tr>
 </thead>
 <tbody>
@@ -1115,11 +1115,11 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tr>
 <tr class="even">
 <td>_binary &lt;binary&gt;</td>
-<td>Adds &lt;binary&gt; to rootfs, PATH is added,<br>libraries are detected</td>
+<td>Adds &lt;binary&gt; to rootfs, PATH is added,<br>libraries are detected, symlinks are resolved</td>
 </tr>
 <tr class="odd">
 <td>_file &lt;file&gt;</td>
-<td>Adds &lt;file&gt; as is to rootfs</td>
+<td>Adds &lt;file&gt; as is to rootfs, symlinks are resolved</td>
 </tr>
 <tr class="even">
 <td>_file_rename &lt;file&gt; &lt;file_rootfs&gt;</td>
