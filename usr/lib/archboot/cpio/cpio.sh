@@ -121,11 +121,11 @@ _mod() {
             softdep)    read -ra _SOFT <<<"${_VALUE}"
                         for i in "${_SOFT[@]}"; do
                             [[ ${i} == *: ]] && continue
-                            _mod "${i}?"
+                            _mod "${i}"
                         done
                         ;;
         esac
-    done < <(modinfo -k "${_KERNELVERSION}" -0 "${_CHECK}" 2>"${_NO_LOG}")
+    done <<<(modinfo -k "${_KERNELVERSION}" -0 "${_CHECK}" 2>"${_NO_LOG}")
 }
 
 _full_dir() {
