@@ -15,7 +15,7 @@
 <body>
 <p><span><img src="logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br><strong>Last update: 20.10.2023 07:31</strong></p>
+<p><strong>&copy; 2006 - 2023 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br><strong>Last update: 20.10.2023 08:49</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -1065,7 +1065,8 @@ The archboot initrd toolchain uses its <strong>own</strong> cpio generator. Some
 <li><strong>objdump</strong> is used for library detection. It's faster than ldd!</li>
 <li>libraries for binaries outside of bin/ are <strong>not</strong> detected!</li>
 <li>libraries outside of lib/ are <strong>not</strong> checked!</li>
-<li><strong>tar</strong> is used for copying/moving files and directories. It's faster than mkdir, install and cp!</li>
+<li><strong>tar</strong> is used for copying/renaming files and directories. It's faster than install and cp!</li>
+<li><strong>mkdir</strong> is used for creating directories. It's faster than install!</li>
 </ul>
 Options supported in <strong>/etc/archboot/&lt;profile&gt;.conf</strong> files:<br>
 <table>
