@@ -164,6 +164,7 @@ _file() {
 }
 
 _install_files() {
+    # shellcheck disable=SC2086
     tar --hard-dereference -C / -cpf - ${_FILES} | tar -C "${_ROOTFS}" -xpf - || return 1
     _FILES=""
 }
@@ -231,7 +232,7 @@ _install_libs() {
     echo "Adding libraries for /bin and /lib/systemd..."
     while read -r i; do
         [[ -e "${i}" ]] && _file "${i}"
-    done < <(objdump -p "${_ROOTFS}"/bin/* "${_ROOTFS}"/lib/systemd/{systemd-*,libsystemd*} 2>${_NO_LOG} |
+    done < <(objdump -p "${_ROOTFS}"/bin/* "${_ROOTFS}"/lib/systemd/{systemd-*,libsystemd*} 2>"${_NO_LOG}" |
                 grep 'NEEDED' | sort -u | sed -e 's#NEEDED##g' -e 's# .* #/lib/#g')
     _install_files
     echo "Checking libraries in /lib..."
@@ -243,7 +244,7 @@ _install_libs() {
                 grep 'NEEDED' | sort -u | sed -e 's#NEEDED##g' -e 's# .* #/lib/#g')
         _install_files
         # rerun loop if new libs were discovered, else break
-        _LIB_COUNT2="$(ls "${_ROOTFS}"/lib/*.so* | wc -l)"
+        _LIB_COUNT2="$(echo "${_ROOTFS}"/lib/*.so* | wc -w)"
         [[ "${_LIB_COUNT}" == "${_LIB_COUNT2}" ]] && break
         _LIB_COUNT="${_LIB_COUNT2}"
     done
