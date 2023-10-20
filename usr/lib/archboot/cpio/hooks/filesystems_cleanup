@@ -22,6 +22,7 @@ _run ()
           nfsdcld nfsdclddb nfsdclnts nfsidmap nfsv4.exportd nilfs-clean nilfs-resize nilfs-tune \
           xfs_growfs xfs_quota xfs_spaceman compile_et mk_cmds fsck.xfs xfs_admin \
           xfs_bmap xfs_freeze xfs_info xfs_metadump xfs_mkfile xfs_ncheck"
+    _install_files
     for i in ${_APPS}; do
         rm /usr/bin/"${i}"
     done

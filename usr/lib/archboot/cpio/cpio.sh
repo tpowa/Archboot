@@ -59,6 +59,11 @@ _map() {
     return "${_RETURN}"
 }
 
+_loaded_mods() {
+modinfo -k ${_KERNELVERSION} --field filename $(cut -d ' ' -f1 </proc/modules) $(modinfo --field depends $(cut -d ' ' -f1 </proc/modules) | sed -e 's#,# #g') 2>/dev/null
+modinfo -k ${_KERNELVERSION} --field firmware $(cut -d ' ' -f1 </proc/modules) | sed -e 's#^#/usr/lib/firmware/#g' -e 's#$#.zst#g'
+}
+
 _filter_mods() {
     # Add modules to the rootfs, filtered by grep.
     #   $@: filter arguments to grep
@@ -151,13 +156,16 @@ _symlink() {
 }
 
 _file() {
-    if [[ ! -e "${_ROOTFS}${1}" ]]; then
-        tar --hard-dereference -C / -cpf - ."${1}" | tar -C "${_ROOTFS}" -xpf - || return 1
-        if [[ -L "${1}" ]]; then
-            _LINK_SOURCE="$(realpath -- "${1}")"
-            _file  "${_LINK_SOURCE}"
-        fi
+    _FILES+="${1##/} "
+    if [[ -L "${1}" ]]; then
+        _LINK_SOURCE="$(realpath -- "${1}")"
+        _file  "${_LINK_SOURCE}"
     fi
+}
+
+_install_files() {
+    tar --hard-dereference -C / -cpf - ${_FILES} | tar -C "${_ROOTFS}" -xpf - || return 1
+    _FILES=""
 }
 
 _file_rename() {
@@ -207,10 +215,11 @@ _run_hook() {
 }
 
 _install_mods() {
+    _map _file "${_MODULE_DIR}"/modules.{builtin,builtin.modinfo,order}
+    _install_files
     echo "Adding kernel modules..."
     tar --hard-dereference -C / -cpf - "$@" | tar -C "${_ROOTFS}" -xpf -
     echo "Generating module dependencies..."
-    _map _file "${_MODULE_DIR}"/modules.{builtin,builtin.modinfo,order}
     depmod -b "${_ROOTFS}" "${_KERNELVERSION}"
     # remove all non-binary module.* files (except devname for on-demand module loading
     # and builtin.modinfo for checking on builtin modules)
@@ -224,6 +233,7 @@ _install_libs() {
         [[ -e "${i}" ]] && _file "${i}"
     done < <(objdump -p "${_ROOTFS}"/bin/* "${_ROOTFS}"/lib/systemd/{systemd-*,libsystemd*} 2>${_NO_LOG} |
                 grep 'NEEDED' | sort -u | sed -e 's#NEEDED##g' -e 's# .* #/lib/#g')
+    _install_files
     echo "Checking libraries in /lib..."
     _LIB_COUNT=""
     while true; do
@@ -231,6 +241,7 @@ _install_libs() {
             [[ -e "${i}" ]] && _file "${i}"
         done < <(objdump -p "${_ROOTFS}"/lib/*.so* |
                 grep 'NEEDED' | sort -u | sed -e 's#NEEDED##g' -e 's# .* #/lib/#g')
+        _install_files
         # rerun loop if new libs were discovered, else break
         _LIB_COUNT2="$(ls "${_ROOTFS}"/lib/*.so* | wc -l)"
         [[ "${_LIB_COUNT}" == "${_LIB_COUNT2}" ]] && break

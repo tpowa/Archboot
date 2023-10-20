@@ -46,7 +46,7 @@ var/lib/pacman/local \
 
     ### add nano
     _binary nano
-    _file /etc/nanorc
+    _file_rename /etc/nanorc /etc/nanorc
     # add syntax highlighting
     echo "include \"/usr/share/nano/*.nanorc\"" >> "${_ROOTFS}/etc/nanorc"
 

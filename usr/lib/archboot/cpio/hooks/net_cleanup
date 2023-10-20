@@ -8,6 +8,7 @@ _run ()
     _APPS="arping clockdiff tracepath ssh arpd \
       genl ifstat ctstat rtstat lnstat nstat rtacct rtmon ss tc \
       bridge dcb devlink rdma tipc vdpa ethtool elinks brctl"
+    _install_files
     for i in ${_APPS}; do
         rm /usr/bin/"${i}"
     done

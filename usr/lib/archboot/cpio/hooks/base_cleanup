@@ -39,6 +39,7 @@ _run ()
     if [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         _APPS="waitpid ${_APPS}"
     fi
+    _install_files
     for i in ${_APPS}; do
         rm /usr/bin/"${i}"
     done

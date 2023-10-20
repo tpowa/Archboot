@@ -8,10 +8,11 @@ _run ()
       exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount \
       sm-notify start-statd rpc.gssd \
       nfsdcltrack gssproxy screen tmux rsync ttyd
-    _map _file /etc/screenrc /etc/ssh/ssh_config /etc/ssh/sshd_config /etc/ssh/moduli \
+    _map _file /etc/screenrc /etc/ssh/ssh_config /etc/ssh/moduli \
         /etc/rsyncd.conf /etc/exports  /usr/lib/ssh/sftp-server /usr/lib/ssh/ssh-keysign \
         /usr/lib/ssh/ssh-pkcs11-helper \
         /etc/netconfig
+    _file_rename /etc/ssh/sshd_config /etc/ssh/sshd_config
     # allow root login and empty passwords
     echo "PermitRootLogin yes" >> "${_ROOTFS}/etc/ssh/sshd_config"
     echo "PermitEmptyPasswords yes" >> "${_ROOTFS}/etc/ssh/sshd_config"
