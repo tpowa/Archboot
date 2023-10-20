@@ -114,7 +114,6 @@ var/lib/pacman/local \
     #dbus files
     _map _binary dbus-cleanup-sockets dbus-daemon dbus-launch dbus-monitor dbus-run-session dbus-send dbus-test-tool \
           dbus-update-activation-environment dbus-uuidgen /usr/lib/dbus-1.0/dbus-daemon-launch-helper
-    _dir /var/lib/dbus
 
     # tpm2-tss files
     _map _binary secret-tool pinentry pinentry-curses gpgme-tool gpgme-json
@@ -127,7 +126,7 @@ var/lib/pacman/local \
           systemd-run systemd-socket-activate systemd-stdio-bridge systemd-sysusers \
           systemd-tty-ask-password-agent timedatectl systemd-repart userdbctl homectl oomctl portablectl systemd-creds \
           systemd-cryptenroll systemd-dissect systemd-id128 systemd-sysext
-    _map _dir /etc/tmpfiles.d /etc/modules-load.d /etc/binfmt.d/ /var/lib/systemd
+    _map _dir /etc/tmpfiles.d /etc/modules-load.d /etc/binfmt.d/
     _file_rename /usr/share/archboot/base/etc/locale.conf /etc/locale.conf
     _file_rename /usr/share/archboot/base/etc/vconsole.conf /etc/vconsole.conf
     _file_rename /usr/share/archboot/base/etc/systemd/system/getty@.service /etc/systemd/system/getty@.service
