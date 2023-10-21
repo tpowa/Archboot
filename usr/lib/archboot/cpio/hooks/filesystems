@@ -23,7 +23,7 @@ _run ()
         xfs_spaceman compile_et mk_cmds fsck.xfs xfs_admin xfs_bmap xfs_freeze \
         xfs_info xfs_metadump xfs_mkfile xfs_ncheck gpart
     _file /etc/nilfs_cleanerd.conf
-    _map _full_dir /etc/cifs-utils /etc/request-key.d /etc/nvme
+    _map _full_dir /etc/{cifs-utils,request-key.d,nvme}
     # fix libinih for plasma wallpaper
     _map _file /usr/lib/libINI*
     # fix licenses

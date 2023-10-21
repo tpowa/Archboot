@@ -132,7 +132,7 @@ _mod() {
 }
 
 _full_dir() {
-    tar -C / --hard-dereference -cpf - "${1##/}" | tar -C "${_ROOTFS}" -xpf -
+    tar -C / --hard-dereference -cpf - ${1##/} | tar -C "${_ROOTFS}" -xpf -
 }
 
 _dir() {
