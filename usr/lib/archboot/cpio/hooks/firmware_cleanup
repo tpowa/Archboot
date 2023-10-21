@@ -5,7 +5,6 @@
 _run ()
 {
     ! grep -qw 'archboot' /etc/hostname && return
-    _install_files
     rm -r /lib/firmware
 }
 
