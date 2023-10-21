@@ -25,9 +25,7 @@ _run ()
     _file /etc/nilfs_cleanerd.conf
     _map _full_dir /etc/cifs-utils /etc/request-key.d /etc/nvme
     # fix libinih for plasma wallpaper
-    for i in /usr/lib/libINI*; do
-        _file "${i}"
-    done
+    _map _file /usr/lib/libINI*
     # fix licenses
     _file /usr/share/licenses/e2fsprogs/MIT-LICENSE
 }
