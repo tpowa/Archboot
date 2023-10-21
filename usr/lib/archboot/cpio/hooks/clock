@@ -5,7 +5,7 @@
 _run ()
 {
     _map _binary hwclock tzselect zic zdump
-    _map _full_dir /usr/share/zoneinfo /usr/share/zoneinfo-leaps
+    _map _full_dir /usr/share/{zoneinfo,zoneinfo-leaps}
     _file_rename /usr/bin/archboot-clock.sh /usr/bin/clock
 }
 
