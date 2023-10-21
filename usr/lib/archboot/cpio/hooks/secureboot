@@ -11,14 +11,10 @@ _run ()
     # modiiied to use uuidgen instead of python
     _file_rename /usr/bin/archboot-mkkeys.sh /usr/bin/mkkeys.sh
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-        for i in shimx64.efi mmx64.efi mmia32.efi shimia32.efi; do
-            _file "/usr/share/archboot/bootloader/${i}"
-        done
+        _map _file /usr/share/archboot/bootloader/{shimx64.efi,mmx64.efi,mmia32.efi,shimia32.efi}
     fi
-     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        for i in mmaa64.efi shimaa64.efi; do
-            _file "/usr/share/archboot/bootloader/${i}"
-        done
+    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+        _map _file /usr/share/archboot/bootloader/{mmaa64.efi,shimaa64.efi}
     fi
     # add generate keys script
     _file_rename /usr/bin/archboot-secureboot-keys.sh /usr/bin/secureboot-keys.sh
