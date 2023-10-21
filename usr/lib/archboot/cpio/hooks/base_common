@@ -139,7 +139,7 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
     for i in hwdb-update firstboot machine-id-commit pcrmachine  binfmt boot-random-seed repart pcrphase pcrphase-sysinit; do
         _symlink "/etc/systemd/system/systemd-${i}.service" /dev/null
     done
-    ### disable autonount:
+    ### disable automount:
     # proc-sys-fs-binfmt_misc.automount
     _symlink /etc/systemd/system/proc-sys-fs-binfmt_misc.automount /dev/null
     # disable lastlog
