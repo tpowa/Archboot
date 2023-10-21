@@ -5,9 +5,7 @@
 _run ()
 {
     _binary lshw
-    for i in manuf oui pnpid; do
-      _file "/usr/share/lshw/${i}.txt"
-    done
+    _map _file /usr/share/lshw/{manuf,oui,pnpid}.txt
     _file /usr/share/lshw/pnpid.txt
 }
 
