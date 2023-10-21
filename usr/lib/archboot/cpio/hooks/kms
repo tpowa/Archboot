@@ -15,7 +15,7 @@ _run ()
     # modules that implement the privacy screen interface
     # TODO: Replace with dynamic lookup of modules that depend on the drm_privacy_screen_register symbol
     # See https://gitlab.archlinux.org/archlinux/mkinitcpio/mkinitcpio/-/issues/132
-    _map _all_mods 'chromeos_privacy_screen?' 'thinkpad_acpi?'
+    _map _all_mods 'chromeos_privacy_screen' 'thinkpad_acpi'
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
