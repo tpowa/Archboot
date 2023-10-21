@@ -9,14 +9,10 @@ _run ()
         integritysetup veritysetup
     _dir /dev/mapper
     _full_dir /usr/lib/device-mapper
-    for i in /usr/lib/libdevmapper*; do
-        _file "${i}"
-    done
+    _map _file /usr/lib/libdevmapper*
     # cryptsetup calls pthread_create(), which dlopen()s libgcc_s.so.1
-    _file /usr/lib/libgcc_s.so.1
-
     # cryptsetup loads the legacy provider which is required for whirlpool
-    _file /usr/lib/ossl-modules/legacy.so
+    _map _file /usr/lib/{libgcc_s.so.1,ossl-modules/legacy.so}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
