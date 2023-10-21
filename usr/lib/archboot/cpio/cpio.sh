@@ -60,7 +60,10 @@ _map() {
 }
 
 _loaded_mods() {
-modinfo -k ${_KERNELVERSION} --field filename $(cut -d ' ' -f1 </proc/modules) $(modinfo --field depends $(cut -d ' ' -f1 </proc/modules) | sed -e 's#,# #g') 2>/dev/null
+modinfo -k ${_KERNELVERSION} --field filename $(cut -d ' ' -f1 </proc/modules) \
+$(modinfo --field depends $(cut -d ' ' -f1 </proc/modules) | sed -e 's#,# #g') \
+$(modinfo --field softdep $(cut -d ' ' -f1 </proc/modules) | sed -e 's#.*:\ # #g') 2>/dev/null |\
+grep -v builtin
 modinfo -k ${_KERNELVERSION} --field firmware $(cut -d ' ' -f1 </proc/modules) | sed -e 's#^#/usr/lib/firmware/#g' -e 's#$#.zst#g'
 }
 
