@@ -129,7 +129,7 @@ _mod() {
 }
 
 _full_dir() {
-    tar -C / --hard-dereference -cpf - ."${1}" | tar -C "${_ROOTFS}" -xpf -
+    tar -C / --hard-dereference -cpf - "${1##/}" | tar -C "${_ROOTFS}" -xpf -
 }
 
 _dir() {
@@ -170,7 +170,8 @@ _install_files() {
 }
 
 _file_rename() {
-    tar --hard-dereference --transform="s|${1}|${2}|" -C / -cpf - ."${1}" | tar -C "${_ROOTFS}" -xpf -
+    _SRC="${1##/}" _DEST="${2##/}"
+    tar --hard-dereference --transform="s|${_SRC}|${_DEST}|" -C / -cpf - "${_SRC}" | tar -C "${_ROOTFS}" -xpf -
 }
 
 _binary() {

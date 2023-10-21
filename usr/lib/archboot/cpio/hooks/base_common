@@ -5,7 +5,7 @@
 _run ()
 {
     ### remove conflicting grub, rpcbind and ukify files
-    tar -C / --exclude=/etc/systemd/system/multi-user.target.wants/remote-fs.target \
+    tar -C / --exclude=etc/systemd/system/multi-user.target.wants/remote-fs.target \
 --exclude=usr/share/bash-completion/completions/grub \
 --exclude=usr/lib/{modules-load.d/cdrecord.conf,systemd/{system/"rpcbind*",ukify},"sysusers.d/rpcbind*",\
 tmpfiles.d/"rpcbind*"} \
