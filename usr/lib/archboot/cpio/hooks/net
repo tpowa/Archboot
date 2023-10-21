@@ -12,10 +12,7 @@ _run ()
     # add dnssec-anchors
     _file /etc/trusted-key.key
     # add weechat plugins and defaults
-    _PLUGINS="alias exec lua relay typing buflist fifo irc xfer charset fset logger script trigger"
-    for i in ${_PLUGINS}; do
-      _file "/usr/lib/weechat/plugins/${i}.so"
-    done
+    _map _file /usr/lib/weechat/plugins/{alias,exec,lua,relay,typing,buflist,fifo,irc,xfer,charset,fset,logger,script,trigger}.so
     _file_rename /usr/share/archboot/net/etc/weechat/irc.conf /etc/weechat/irc.conf
     _file_rename /usr/share/archboot/net/etc/weechat/weechat.conf /etc/weechat/weechat.conf
     _file_rename /usr/share/archboot/net/etc/profile.d/weechat.sh /etc/profile.d/weechat.sh
@@ -23,9 +20,7 @@ _run ()
     _file_rename /usr/share/archboot/net/etc/elinks/bookmarks /etc/elinks/bookmarks
     _file_rename /usr/share/archboot/net/etc/profile.d/elinks.sh /etc/profile.d/elinks.sh
     # fixing licenses
-    _map _file /usr/share/licenses/krb5/LICENSE /usr/share/licenses/openssh/LICENCE \
-        /usr/share/licenses/openssl/LICENSE.txt /usr/share/licenses/sqlite/license.txt \
-        /usr/share/licenses/dnssec-anchors/LICENSE
+    _map _file /usr/share/licenses/{krb5/LICENSE,openssh/LICENCE,openssl/LICENSE.txt,sqlite/license.txt,dnssec-anchors/LICENSE}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
