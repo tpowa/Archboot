@@ -6,11 +6,8 @@ _run ()
 {
     ### adding default font and keymap
     _binary loadkeys
-    _file /usr/share/kbd/consolefonts/ter-v16n.psf.gz
-    _file /usr/share/kbd/consolefonts/ter-v32n.psf.gz
-    _file /usr/share/kbd/keymaps/i386/qwerty/us.map.gz
-    _full_dir /usr/share/kbd/keymaps/i386/include
-    _full_dir /usr/share/kbd/keymaps/include
+    _map _file /usr/share/kbd/{consolefonts/{ter-v16n.psf.gz,ter-v32n.psf.gz},keymaps/i386/qwerty/us.map.gz}
+    _map _full_dir /usr/share/kbd/keymaps/{i386/include,include}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
