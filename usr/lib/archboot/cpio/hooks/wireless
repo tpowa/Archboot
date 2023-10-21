@@ -15,14 +15,13 @@ _run ()
     _symlink /etc/systemd/system/multi-user.target.wants/iwd.service /usr/lib/systemd/system/iwd.service
     _map _binary iw set-wireless-regdom rfkill hwsim iwctl iwmon set-wireless-regdom
     # add iwd and ead daemon
-    _map _binary /usr/lib/iwd/iwd /usr/lib/iwd/ead
+    _map _binary /usr/lib/iwd/{iwd,ead}
     # add hwsim helper script
     _binary archboot-hwsim.sh
     # crda support
-    _map _file /etc/conf.d/wireless-regdom /usr/lib/crda/regulatory.bin \
-                 /usr/lib/crda/pubkeys/sforshee.key.pub.pem
+    _map _file /etc/conf.d/wireless-regdom /usr/lib/crda/{regulatory.bin,pubkeys/sforshee.key.pub.pem}
     # fixing licenses
-    _map _file /usr/share/licenses/expat/COPYING /usr/share/licenses/wireless-regdb/LICENSE
+    _map _file /usr/share/licenses/{expat/COPYING,wireless-regdb/LICENSE}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
