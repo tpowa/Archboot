@@ -6,9 +6,9 @@ _run ()
 {
     # add firmware files and licenses
     for i in amdgpu i915 nvidia radeon; do
-        [[ -d "/lib/firmware/${i}" ]] && _full_dir "/lib/firmware/${i}"
+        [[ -d "/lib/firmware/${i}" ]] && _full_dir /lib/firmware/${i}
     done
-    _full_dir  "/usr/share/licenses/linux-firmware"
+    _full_dir /usr/share/licenses/linux-firmware
     ### kmx modules
     # AGP and DRM modules for GPUs
     _map _all_mods '/drivers/char/agp/' '/drivers/gpu/drm/'

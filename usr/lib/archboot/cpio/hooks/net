@@ -8,7 +8,7 @@ _run ()
       ifstat ctstat rtstat lnstat nstat rtacct rtmon ss tc bridge \
       dcb devlink rdma tipc vdpa ethtool elinks weechat brctl
     # add iproute 2, add openssl helper libraries
-    _map _full_dir /usr/lib/tc /usr/share/tc /usr/lib/engines-3
+    _map _full_dir /usr/lib/{tc,engines-3} /usr/share/tc
     # add dnssec-anchors
     _file /etc/trusted-key.key
     # add weechat plugins and defaults
