@@ -16,10 +16,8 @@ _run ()
           pvmove pvremove pvresize pvs pvscan lvchange lvconvert lvcreate lvdisplay \
           lvextend lvmdiskscan lvmsadc lvmsar lvreduce lvremove lvrename lvresize lvs \
           lvscan lvm_import_vdo lvmdevices lvmpolld vgimportdevices
-    _map _dir /etc/lvm/backup /etc/lvm/archive
-    for i in /usr/lib/liblvm*; do
-        _file "${i}"
-    done
+    _map _dir /etc/lvm/{backup,archive}
+    _map _file /usr/lib/liblvm*
     _file /etc/lvm/lvm.conf
 }
 
