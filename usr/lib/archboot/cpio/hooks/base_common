@@ -165,7 +165,7 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
           gpgconf gpg-connect-agent repo-remove archlinux-keyring-wkd-sync
     _map _dir /var/cache/pacman/pkg /var/lib/pacman
     _map _file /etc/{pacman.conf,makepkg.conf,pacman.d/mirrorlist}
-    # add pacman initialisation of gpg keys
+    # add pacman initialization of gpg keys
     _dir /etc/pacman.d/gnupg
     _file_rename /usr/share/archboot/base/etc/systemd/system/pacman-init.service /etc/systemd/system/pacman-init.service
 
