@@ -210,7 +210,7 @@ _efistub_uefi() {
             "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" \
             "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
     elif [[ "${_RUNNING_ARCH}" == "x86_64" && -n "${_EFI_MIXED}" ]]; then
-            _dialog --title " EFISTUB " --menu "" 10 60 3 \
+        _dialog --title " EFISTUB " --menu "" 10 60 3 \
             "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
             "LIMINE" "LIMINE for ${_UEFI_ARCH} UEFI" \
             "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
