@@ -32,6 +32,7 @@ _create_initrd_dir() {
 }
 
 _compress_initrd() {
+    echo "Creating ${1}..."
     pushd "${_W_DIR}/tmp/initrd" >"${_NO_LOG}" || return
     # Reproducibility: set all timestamps to 0
     find . -mindepth 1 -execdir touch -hcd "@0" "{}" +

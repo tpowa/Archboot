@@ -84,6 +84,7 @@ _prepare_kernel_initrd_files() {
     echo "${_CONFIG}" | grep -qw local && _INITRD="initrd-local-${_ARCH}.img"
     echo "${_CONFIG}" | grep -qw latest && _INITRD="initrd-latest-${_ARCH}.img"
     if [[ -f "${_INITRD}" ]]; then
+        echo "Using existing ${_INITRD}..."
         mv "./${_INITRD}" "${_ISODIR}/boot/initrd-${_ARCH}.img"
     fi
     if ! [[ -f "${_ISODIR}/boot/initrd-${_ARCH}.img" ]]; then
