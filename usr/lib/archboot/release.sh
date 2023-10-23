@@ -26,6 +26,21 @@ _usage () {
     exit 0
 }
 
+_create_initrd_dir() {
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-cpio.sh \
+        -k "${_KERNEL}" -c "/etc/archboot/${1}" -d /tmp/initrd" || exit 1
+}
+
+_compress_initrd() {
+    pushd "${_W_DIR}/tmp/initrd" >"${_NO_LOG}" || return
+    # Reproducibility: set all timestamps to 0
+    find . -mindepth 1 -execdir touch -hcd "@0" "{}" +
+    find . -mindepth 1 -printf '%P\0' | sort -z | LANG=C bsdtar --null -cnf - -T - |
+            LANG=C bsdtar --null -cf - --format=newc @- |
+            ${_COMP} "${_COMP_OPTS[@]}" > "../../${1}" || exit 1
+    popd >"${_NO_LOG}" || return
+}
+
 _create_iso() {
     mkdir -p "${1}"
     cd "${1}" || exit 1
@@ -37,6 +52,35 @@ _create_iso() {
     #shellcheck disable=SC2116,SC2046,SC2027,2086
     _KERNEL_VERSION="$(${_NSPAWN} "${_W_DIR}" /bin/bash -c "_KERNEL="$(echo ${_KERNEL})";. /usr/lib/archboot/common.sh; _kver ${_KERNEL}")"
     _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_KERNEL_VERSION}"
+    if [[ "${_RUNNING_ARCH}" == "x86_64"  ]]; then
+        if ! echo "${_BASENAME}" | grep -qw x86_64 ; then
+        ### to speedup build for riscv64 and aarch64 on x86_64, run compressor on host system
+        echo "Generating initramdisks..."
+        # init ramdisk
+        _create_initrd_dir "${_ARCH}-init.conf"
+        . "/etc/archboot/${_ARCH}-init.conf"
+        _compress_initrd init-${_ARCH}.img
+        if ! [[ "${_ARCH}" == "riscv64" ]]; then
+            # local ramdisk
+            echo "Removing lvm2 from container ${_W_DIR}..."
+            ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>"${_NO_LOG}"
+            echo "Generating local initramdisk..."
+            _create_initrd_dir "${_CONFIG_LOCAL}"
+            . "/etc/archboot/${_CONFIG_LOCAL}"
+            _compress_initrd initrd-local-${_ARCH}.img
+            # latest ramdisk
+            echo "Generating latest initramdisk..."
+            _create_initrd_dir "${_CONFIG_LATEST}"
+            . "/etc/archboot/${_CONFIG_LATEST}"
+            _compress_initrd initrd-latest-${_ARCH}.img
+            echo "Installing lvm2 to container ${_W_DIR}..."
+            ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>"${_NO_LOG}"
+        fi
+        # normal ramdisk
+        _create_initrd_dir "${_ARCH}.conf"
+        . "/etc/archboot/${_ARCH}.conf"
+        _compress_initrd initrd-${_ARCH}.img
+    fi
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
         # generate tarball in container, umount tmp container tmpfs, else weird things could happen

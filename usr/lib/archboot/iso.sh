@@ -78,12 +78,19 @@ _prepare_kernel_initrd_files() {
         # save init ramdisk for further images
         if [[ -n "${_SAVE_INIT}" ]]; then
             cp "${_ISODIR}/boot/init-${_ARCH}.img" ./
-            chmod 644 "./init-${_ARCH}.img"
         fi
     fi
-    echo "Running archboot-cpio.sh for initrd-${_ARCH}.img..."
-    #shellcheck disable=SC2154
-    archboot-cpio.sh -c "${_CONFIG}" -k "${_KERNEL}" -g "${_ISODIR}/boot/initrd-${_ARCH}.img" || exit 1
+    _INITRD="initrd-${_ARCH}.img"
+    [[ $(echo ${_CONFIG} | grep -qw local) ]] && _INITRD="initrd-local-${_ARCH}.img"
+    [[ $(echo ${_CONFIG} | grep -qw latest) ]] && _INITRD="initrd-latest-${_ARCH}.img"
+    if [[ -f "${_INITRD}" ]]; then
+        mv "./${_INITRD}" "${_ISODIR}/boot/initrd-${_ARCH}.img"
+    fi
+    if ! [[ -f "${_ISODIR}/boot/initrd-${_ARCH}.img" ]]; then
+        echo "Running archboot-cpio.sh for initrd-${_ARCH}.img..."
+        #shellcheck disable=SC2154
+        archboot-cpio.sh -c "${_CONFIG}" -k "${_KERNEL}" -g "${_ISODIR}/boot/initrd-${_ARCH}.img" || exit 1
+    fi
     # delete cachedir on archboot environment
     if grep -qw 'archboot' /etc/hostname; then
         if [[ -d "${_CACHEDIR}" ]]; then
