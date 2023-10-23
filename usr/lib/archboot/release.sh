@@ -54,32 +54,33 @@ _create_iso() {
     _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_KERNEL_VERSION}"
     if [[ "${_RUNNING_ARCH}" == "x86_64"  ]]; then
         if ! echo "${_BASENAME}" | grep -qw x86_64 ; then
-        ### to speedup build for riscv64 and aarch64 on x86_64, run compressor on host system
-        echo "Generating initramdisks..."
-        # init ramdisk
-        _create_initrd_dir "${_ARCH}-init.conf"
-        . "/etc/archboot/${_ARCH}-init.conf"
-        _compress_initrd init-${_ARCH}.img
-        if ! [[ "${_ARCH}" == "riscv64" ]]; then
+            ### to speedup build for riscv64 and aarch64 on x86_64, run compressor on host system
+            echo "Generating initramdisks..."
+            # init ramdisk
+            _create_initrd_dir "${_ARCH}-init.conf"
+            . "/etc/archboot/${_ARCH}-init.conf"
+            _compress_initrd "init-${_ARCH}.img"
+            if ! [[ "${_ARCH}" == "riscv64" ]]; then
             # local ramdisk
-            echo "Removing lvm2 from container ${_W_DIR}..."
-            ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>"${_NO_LOG}"
-            echo "Generating local initramdisk..."
-            _create_initrd_dir "${_CONFIG_LOCAL}"
-            . "/etc/archboot/${_CONFIG_LOCAL}"
-            _compress_initrd initrd-local-${_ARCH}.img
-            # latest ramdisk
-            echo "Generating latest initramdisk..."
-            _create_initrd_dir "${_CONFIG_LATEST}"
-            . "/etc/archboot/${_CONFIG_LATEST}"
-            _compress_initrd initrd-latest-${_ARCH}.img
-            echo "Installing lvm2 to container ${_W_DIR}..."
-            ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>"${_NO_LOG}"
+                echo "Removing lvm2 from container ${_W_DIR}..."
+                ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>"${_NO_LOG}"
+                echo "Generating local initramdisk..."
+                _create_initrd_dir "${_CONFIG_LOCAL}"
+                . "/etc/archboot/${_CONFIG_LOCAL}"
+                _compress_initrd "initrd-local-${_ARCH}.img"
+                # latest ramdisk
+                echo "Generating latest initramdisk..."
+                _create_initrd_dir "${_CONFIG_LATEST}"
+                . "/etc/archboot/${_CONFIG_LATEST}"
+                _compress_initrd "initrd-latest-${_ARCH}.img"
+                echo "Installing lvm2 to container ${_W_DIR}..."
+                ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>"${_NO_LOG}"
+            fi
+            # normal ramdisk
+            _create_initrd_dir "${_ARCH}.conf"
+            . "/etc/archboot/${_ARCH}.conf"
+            _compress_initrd "initrd-${_ARCH}.img"
         fi
-        # normal ramdisk
-        _create_initrd_dir "${_ARCH}.conf"
-        . "/etc/archboot/${_ARCH}.conf"
-        _compress_initrd initrd-${_ARCH}.img
     fi
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
