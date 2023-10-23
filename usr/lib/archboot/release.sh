@@ -32,7 +32,7 @@ _create_initrd_dir() {
 }
 
 _compress_initrd() {
-    echo "Creating ${1}..."
+    echo "Creating ${_COMP} compressed image: ${1}..."
     pushd "${_W_DIR}/tmp/initrd" >"${_NO_LOG}" || return
     # Reproducibility: set all timestamps to 0
     find . -mindepth 1 -execdir touch -hcd "@0" "{}" +
@@ -40,6 +40,7 @@ _compress_initrd() {
             LANG=C bsdtar --null -cf - --format=newc @- |
             ${_COMP} "${_COMP_OPTS[@]}" > "../../${1}" || exit 1
     popd >"${_NO_LOG}" || return
+    echo "Build complete."
 }
 
 _create_iso() {
@@ -62,17 +63,18 @@ _create_iso() {
         _compress_initrd "init-${_ARCH}.img"
         if ! [[ "${_ARCH}" == "riscv64" ]]; then
             # local ramdisk
-            echo "Generating local initramdisk..."
+            echo "Generating local initramfs..."
             _create_initrd_dir "${_CONFIG_LOCAL}"
             . "/etc/archboot/${_CONFIG_LOCAL}"
             _compress_initrd "initrd-local-${_ARCH}.img"
             # latest ramdisk
-            echo "Generating latest initramdisk..."
+            echo "Generating latest initramfs..."
             _create_initrd_dir "${_CONFIG_LATEST}"
             . "/etc/archboot/${_CONFIG_LATEST}"
             _compress_initrd "initrd-latest-${_ARCH}.img"
         fi
         # normal ramdisk
+        echo "Generating normal initramfs..."
         _create_initrd_dir "${_ARCH}.conf"
         . "/etc/archboot/${_ARCH}.conf"
         _compress_initrd "initrd-${_ARCH}.img"
