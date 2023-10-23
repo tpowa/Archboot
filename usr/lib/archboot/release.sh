@@ -53,42 +53,34 @@ _create_iso() {
     #shellcheck disable=SC2116,SC2046,SC2027,2086
     _KERNEL_VERSION="$(${_NSPAWN} "${_W_DIR}" /bin/bash -c "_KERNEL="$(echo ${_KERNEL})";. /usr/lib/archboot/common.sh; _kver ${_KERNEL}")"
     _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_KERNEL_VERSION}"
-    if [[ "${_RUNNING_ARCH}" == "x86_64"  ]]; then
-        if ! echo "${_BASENAME}" | grep -qw x86_64 ; then
-            ### to speedup build for riscv64 and aarch64 on x86_64, run compressor on host system
-            echo "Generating initramdisks..."
-            # init ramdisk
-            _create_initrd_dir "${_ARCH}-init.conf"
-            . "/etc/archboot/${_ARCH}-init.conf"
-            _compress_initrd "init-${_ARCH}.img"
-            if ! [[ "${_ARCH}" == "riscv64" ]]; then
+    if ! [[ "${_RUNNING_ARCH}" == "${_ARCH}" ]]; then
+        ### to speedup build for riscv64 and aarch64 on x86_64, run compressor on host system
+        echo "Generating initramdisks..."
+        # init ramdisk
+        _create_initrd_dir "${_ARCH}-init.conf"
+        . "/etc/archboot/${_ARCH}-init.conf"
+        _compress_initrd "init-${_ARCH}.img"
+        if ! [[ "${_ARCH}" == "riscv64" ]]; then
             # local ramdisk
-                echo "Removing lvm2 from container ${_W_DIR}..."
-                ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>"${_NO_LOG}"
-                echo "Generating local initramdisk..."
-                _create_initrd_dir "${_CONFIG_LOCAL}"
-                . "/etc/archboot/${_CONFIG_LOCAL}"
-                _compress_initrd "initrd-local-${_ARCH}.img"
-                # latest ramdisk
-                echo "Generating latest initramdisk..."
-                _create_initrd_dir "${_CONFIG_LATEST}"
-                . "/etc/archboot/${_CONFIG_LATEST}"
-                _compress_initrd "initrd-latest-${_ARCH}.img"
-                echo "Installing lvm2 to container ${_W_DIR}..."
-                ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>"${_NO_LOG}"
-            fi
-            # normal ramdisk
-            _create_initrd_dir "${_ARCH}.conf"
-            . "/etc/archboot/${_ARCH}.conf"
-            _compress_initrd "initrd-${_ARCH}.img"
+            echo "Generating local initramdisk..."
+            _create_initrd_dir "${_CONFIG_LOCAL}"
+            . "/etc/archboot/${_CONFIG_LOCAL}"
+            _compress_initrd "initrd-local-${_ARCH}.img"
+            # latest ramdisk
+            echo "Generating latest initramdisk..."
+            _create_initrd_dir "${_CONFIG_LATEST}"
+            . "/etc/archboot/${_CONFIG_LATEST}"
+            _compress_initrd "initrd-latest-${_ARCH}.img"
         fi
+        # normal ramdisk
+        _create_initrd_dir "${_ARCH}.conf"
+        . "/etc/archboot/${_ARCH}.conf"
+        _compress_initrd "initrd-${_ARCH}.img"
     fi
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
         # generate tarball in container, umount tmp container tmpfs, else weird things could happen
         # removing not working lvm2 from latest and local image first
-        echo "Removing lvm2 from container ${_W_DIR}..."
-        ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>"${_NO_LOG}"
         echo "Generating local ISO..."
         # generate local iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -s \
@@ -97,8 +89,6 @@ _create_iso() {
         # generate latest iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g \
             -c=${_CONFIG_LATEST} -i=${_ISONAME}-latest-${_ARCH}" || exit 1
-        echo "Installing lvm2 to container ${_W_DIR}..."
-        ${_NSPAWN} "${_W_DIR}" pacman -Sy lvm2 --noconfirm &>"${_NO_LOG}"
     fi
     echo "Generating normal ISO..."
     # generate iso in container
