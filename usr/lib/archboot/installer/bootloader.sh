@@ -203,14 +203,13 @@ _efistub_uefi() {
     _uefi_common || return 1
     _efistub_parameters
     _common_bootloader_checks
-    if [[ -z ${_EFI_MIXED} ]]; then
-    if [[ "${_RUNNING_ARCH}" == "x86_64" && -z ${_EFI_MIXED} ]]; then
+    if [[ "${_RUNNING_ARCH}" == "x86_64" && -z "${_EFI_MIXED}" ]]; then
         _dialog --title " EFISTUB " --menu "" 10 60 3 \
             "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
             "LIMINE" "LIMINE for ${_UEFI_ARCH} UEFI" \
             "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" \
             "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
-    elif [[ "${_RUNNING_ARCH}" == "x86_64" && -n ${_EFI_MIXED} ]]; then
+    elif [[ "${_RUNNING_ARCH}" == "x86_64" && -n "${_EFI_MIXED}" ]]; then
             "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
             "LIMINE" "LIMINE for ${_UEFI_ARCH} UEFI" \
             "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
