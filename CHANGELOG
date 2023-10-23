@@ -1,4 +1,8 @@
-On the road to 2023.10:
+2023.10 Highlights:
+- GeoIP - CDN Hosting: https://archboot.com,
+  the other used addresses redirect to the .com again.
+- many speed improvements all over the places.
+- removed pretty all bottlenecks in the ISO build chain.
 Environment:
 - simplified grub-mkstandalone calls
 - added grub bli module loading on x86_64 EFI systems
@@ -16,9 +20,10 @@ update:
 - don't run mkinitcpio during full system creation
 hooks:
 - ported to new syntax
+- tightened and cleaned up
 release.sh:
-- run compressor on host system when building aarch64 and riscv64
-  on x86_64
+- run compressor on host system,
+  when building aarch64 and riscv64 on x86_64
 pacsetup:
 - fixed kernel detection
 setup:
