@@ -17,7 +17,7 @@ _run ()
           lvextend lvmdiskscan lvmsadc lvmsar lvreduce lvremove lvrename lvresize lvs \
           lvscan lvm_import_vdo lvmdevices lvmpolld vgimportdevices
     _map _dir /etc/lvm/{backup,archive}
-    _map _file /etc/lvm/lvm.conf /usr/lib/{liblvm*,systemd/{system/{lvm2*,blk-availability.service},sysinit.target.wants/lvm2*}}
+    _map _file /etc/lvm/lvm.conf /usr/lib/{liblvm*,systemd/system/{lvm2*,blk-availability.service,sysinit.target.wants/lvm2*}}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
