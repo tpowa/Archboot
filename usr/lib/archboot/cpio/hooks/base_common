@@ -7,7 +7,7 @@ _run ()
     ### remove conflicting grub, rpcbind and ukify files
     tar -C / --exclude=etc/systemd/system/multi-user.target.wants/remote-fs.target \
 --exclude=usr/share/bash-completion/completions/grub \
---exclude=usr/lib/{modules-load.d/cdrecord.conf,systemd/{system/{blk-availability.service,"lvm2*","rpcbind*","sysinit.target.wants/lvm2*"},ukify,"sysusers.d/rpcbind*",\
+--exclude=usr/lib/{modules-load.d/cdrecord.conf,systemd/{system/{blk-availability.service,"lvm2*","rpcbind*","sysinit.target.wants/lvm2*"},ukify},"sysusers.d/rpcbind*",\
 tmpfiles.d/"rpcbind*"} \
 --hard-dereference -cpf - \
 etc/{ca-certificates/extracted,default,pam.d,pinentry,profile.d,security,skel,ssl/certs,sysctl.d,systemd,tpm2-tss,xdg} \
