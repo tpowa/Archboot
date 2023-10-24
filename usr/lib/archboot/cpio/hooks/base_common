@@ -13,7 +13,7 @@ tmpfiles.d/rpcbind*} \
 etc/{ca-certificates/extracted,default,pam.d,pinentry,profile.d,security,skel,ssl/certs,sysctl.d,systemd,tpm2-tss,xdg} \
 usr/lib/{coreutils,cryptsetup,gconv,modules-load.d,p11-kit,pam.d,pkcs11,security,sysctl.d,systemd,sysusers.d,tmpfiles.d,udev} \
 usr/share/{bash-completion,dbus-1,factory,hwdata,i18n/locales,makepkg,nano,pacman/keyrings,polkit-1,readline,systemd,terminfo} \
-| tar -C ${_ROOTFS} -xpf -
+| tar -C "${_ROOTFS}" -xpf -
 
     ### only run on archboot container
     if grep -qw 'archboot' /etc/hostname; then
@@ -33,7 +33,7 @@ groff-*-[0-9]*,db-*-[0-9]*,db5.3-*-[0-9]*,gc-*-[0-9]*,rpcbind-*-[0-9]*} \
 --hard-dereference -cpf - \
 usr/share/{locale/{be,bg,cs,da,de,en_US,el,es,fi,fr,hu,it,lt,lv,mk,nl,nn,pl,pt,ro,ru,sk,sr,sv,uk},i18n/locales} \
 var/lib/pacman/local \
-| tar -C ${_ROOTFS} -xpf -
+| tar -C "${_ROOTFS}" -xpf -
     fi
 
     ### add basic apps
@@ -48,10 +48,10 @@ var/lib/pacman/local \
     _binary nano
     _file_rename /etc/nanorc /etc/nanorc
     # add syntax highlighting
-    echo include \/usr/share/nano/*.nanorc\ >> ${_ROOTFS}/etc/nanorc
+    echo "include \"/usr/share/nano/*.nanorc\"" >> "${_ROOTFS}/etc/nanorc"
 
     ### add machine-id
-    : > ${_ROOTFS}/etc/machine-id
+    : > "${_ROOTFS}"/etc/machine-id
 
     ### add file magic file
     _file /usr/share/file/misc/magic.mgc
@@ -66,9 +66,9 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
 
     ### adding config files of installation system
     _map _file /etc/{profile,shells}
-    _BASIC_CONFIG=dialogrc hostname issue modprobe.d/modprobe.conf os-release tmpfiles.d/var.conf
+    _BASIC_CONFIG="dialogrc hostname issue modprobe.d/modprobe.conf os-release tmpfiles.d/var.conf"
     for i in ${_BASIC_CONFIG}; do
-        _file_rename /usr/share/archboot/base/etc/${i} /etc/${i}
+        _file_rename "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done
 
     ### add bash configuration
@@ -76,14 +76,14 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
     # unlock and delete root password, if not set by user!
     # use color grep and ls output
     for i in custom-bash-options.sh archboot-reset-root-password.sh; do
-        _file_rename /usr/share/archboot/base/etc/profile.d/${i} /etc/profile.d/${i}
+        _file_rename "/usr/share/archboot/base/etc/profile.d/${i}" "/etc/profile.d/${i}"
     done
     # add default bash setup
     for i in .bashrc .bash_profile .bash_logout; do
-        _file_rename  /etc/skel/${i} /root/${i}
+        _file_rename  "/etc/skel/${i}" "/root/${i}"
     done
     # add custom bash options
-    echo . /etc/profile.d/custom-bash-options.sh >> ${_ROOTFS}/root/.bashrc
+    echo ". /etc/profile.d/custom-bash-options.sh" >> "${_ROOTFS}/root/.bashrc"
 
     ### add kmod related config file(s)
     _file /usr/lib/depmod.d/search.conf
@@ -126,18 +126,18 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
     ### disable systemd mounts:
     # disable configfs, debugfs, fuse, hugepages, mqueue and tracefs
     for i in dev-mqueue dev-hugepages sys-kernel-debug sys-kernel-tracing sys-kernel-config sys-fs-fuse-connections tmp; do
-        _symlink /etc/systemd/system/${i}.mount /dev/null
+        _symlink "/etc/systemd/system/${i}.mount" /dev/null
     done
     ### disable systemd targets:
     # swap cryptsetup integritysetup veritysetup
     for i in cryptsetup first-boot-complete integritysetup swap veritysetup; do
-        _symlink /etc/systemd/system/${i}.target /dev/null
+        _symlink "/etc/systemd/system/${i}.target" /dev/null
     done
     ### disable systemd services:
     # hwdb-update firstboot machine-id-commit pcrmachine  binfmt
     # boot-random-seed repart pcrphase pcrphase-sysinit
     for i in hwdb-update firstboot machine-id-commit pcrmachine  binfmt boot-random-seed repart pcrphase pcrphase-sysinit; do
-        _symlink /etc/systemd/system/systemd-${i}.service /dev/null
+        _symlink "/etc/systemd/system/systemd-${i}.service" /dev/null
     done
     ### disable automount:
     # proc-sys-fs-binfmt_misc.automount
@@ -172,8 +172,8 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
     ### add nss p11-kit and ca certificates
     _map _binary p11-kit trust certutil cmsutil crlutil modutil nss-config pk12util \
                    shlibsign signtool signver ssltap symkeyutil update-ca-trust
-    _symlink /etc/ssl/cert.pem ../ca-certificates/extracted/tls-ca-bundle.pem
-    _symlink /etc/ssl/certs/ca-certificates.crt ../../ca-certificates/extracted/tls-ca-bundle.pem
+    _symlink "/etc/ssl/cert.pem" "../ca-certificates/extracted/tls-ca-bundle.pem"
+    _symlink "/etc/ssl/certs/ca-certificates.crt" "../../ca-certificates/extracted/tls-ca-bundle.pem"
     _map _file /usr/share/{ca-certificates/trust-source/mozilla.trust.p11-kit,p11-kit/modules/p11-kit-trust.module}
 
     ### fix licenses
