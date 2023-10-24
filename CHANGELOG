@@ -20,7 +20,7 @@ update:
 - don't run mkinitcpio during full system creation
 hooks:
 - ported to new syntax
-- tightened and cleaned up
+- tightened up and cleaned up
 release.sh:
 - run compressor on host system,
   when building aarch64 and riscv64 on x86_64
