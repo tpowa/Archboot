@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+_run ()
+{
+    _all_mods '/fs/(btrfs|cifs|exfat|ext4|f2fs|fat|hfs|hfsplus|isofs|jfs|nfs|nfsd|nilfs2|nls|ntfs3|udf|xfs|vboxsf)'
+    _all_mods '/(lib/|kernel|arch/*)/crypto'
+    _map _mod crypto-crc32c crypto-crc32 libcrc32c configfs nls_cp437 nls_ascii
+}
+
+# vim: set ft=sh ts=4 sw=4 et:

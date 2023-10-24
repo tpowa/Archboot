@@ -3,8 +3,6 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 _run() {
-    ### init modules
-    _map _mod vfat iso9660 nls_cp437 nls_ascii cdrom exfat
     _map _binary bash sh blkid mount mountpoint switch_root bsdcpio mkfs.btrfs setfont \
         /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod insmod modprobe \
         gzip uname cat cp dmesg grep ln ls mv rm umount lsblk rmmod cut sed find mkdir dialog
