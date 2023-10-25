@@ -8,7 +8,6 @@ _CONFIG=""
 _CPIO=/usr/lib/archboot/cpio/hooks
 _GENERATE_IMAGE=""
 _TARGET_DIR=""
-declare -A _INCLUDED_MODS _MOD_PATH
 
 _usage() {
     cat <<EOF
@@ -38,16 +37,6 @@ _cleanup() {
     if [[ -n "${_BUILD_DIR}" ]]; then
         rm -rf -- "${_BUILD_DIR}"
     fi
-}
-
-_builtin_mods() {
-    while IFS=.= read -rd '' _MODULE _FIELD _VALUE; do
-        _INCLUDED_MODS[${_MODULE//-/_}]=2
-        case "$_FIELD" in
-            alias)  _INCLUDED_MODS["${_VALUE//-/_}"]=2
-                    ;;
-        esac
-    done <"${_MODULE_DIR}/modules.builtin.modinfo"
 }
 
 _map() {
@@ -92,10 +81,9 @@ _filter_mods() {
 _all_mods() {
     # Add modules to the initcpio.
     #   $@: arguments to all_mods
-    local -a _MODS
-    mapfile -t _MODS < <(_filter_mods "$@")
-    _map _mod "${_MODS[@]}"
-    return $(( !${#_MODS[*]} ))
+    mapfile -t _CHECKED_MODS < <(_filter_mods "$@")
+    _map _mod "${_CHECKED_MODS[@]}"
+    return $(( !${#_CHECKED_MODS[*]} ))
 }
 
 _mod() {
@@ -104,7 +92,7 @@ _mod() {
     #   $1: module name
     _CHECK=""
     _CHECK="${1%.ko*}" 
-    _MOD_PATH+="$_CHECK "
+    _MODS+="$_CHECK "
 }
 
 _full_dir() {
@@ -197,9 +185,11 @@ _run_hook() {
 
 _install_mods() {
     echo "Checking kernel module dependencies..."
-    _MOD_DEPS="$(modinfo -k "${_KERNELVERSION}" -F depends $_MOD_PATH 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
-               $(modinfo -k "${_KERNELVERSION}" -F softdep $_MOD_PATH 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u)"
+    # first try, pull in the easy modules
+    _MOD_DEPS="$(modinfo -k "${_KERNELVERSION}" -F depends $_MODS 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
+               $(modinfo -k "${_KERNELVERSION}" -F softdep $_MODS 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u)"
     _DEP_COUNT=0
+    # next tries, ensure to catch all modules with depends
     while true; do
         _MOD_DEPS="$(echo $_MOD_DEPS \
                 $(modinfo -k "${_KERNELVERSION}" -F depends $_MOD_DEPS 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
@@ -212,7 +202,10 @@ _install_mods() {
     _map _file "${_MODULE_DIR}"/modules.{builtin,builtin.modinfo,order}
     _install_files
     echo "Adding kernel modules..."
-    tar --hard-dereference -C / -cpf - $(modinfo  -k "${_KERNELVERSION}" -F filename $_MOD_PATH $_MOD_DEPS 2>/dev/null \
+    # - pull in all modules with depends
+    # - builtin needs to be removed
+    # - all starting / needs to be removed from paths
+    tar --hard-dereference -C / -cpf - $(modinfo  -k "${_KERNELVERSION}" -F filename $_MODS $_MOD_DEPS 2>/dev/null \
     | grep -v builtin | sed -e 's#^/##g' -e 's# /# #g') | tar -C "${_ROOTFS}" -xpf -
     echo "Generating new kernel module dependencies..."
     depmod -b "${_ROOTFS}" "${_KERNELVERSION}"
