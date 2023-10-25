@@ -32,7 +32,19 @@ _create_initrd_dir() {
 }
 
 _compress_initrd() {
-    echo "Creating ${_COMP} compressed image: ${1}..."
+   case "${_COMP}" in
+        cat)    echo "Creating uncompressed image: ${1}"
+                unset _COMP_OPTS
+                ;;
+        *)      echo "Creating ${_COMP} compressed image: ${1}"
+                ;;&
+        xz)     _COMP_OPTS=('-T0' '--check=crc32' "${_COMP_OPTS[@]}")
+                ;;
+        lz4)    _COMP_OPTS=('-l' "${_COMP_OPTS[@]}")
+                ;;
+        zstd)   _COMP_OPTS=('-T0' "${_COMP_OPTS[@]}")
+                ;;
+    esac
     pushd "${_W_DIR}/tmp/initrd" >"${_NO_LOG}" || return
     # Reproducibility: set all timestamps to 0
     find . -mindepth 1 -execdir touch -hcd "@0" "{}" +
