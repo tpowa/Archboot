@@ -83,16 +83,10 @@ _all_mods() {
     #   $@: arguments to all_mods
     mapfile -t _CHECKED_MODS < <(_filter_mods "$@")
     _map _mod "${_CHECKED_MODS[@]}"
-    return $(( !${#_CHECKED_MODS[*]} ))
 }
 
 _mod() {
-    # Add a kernel module to the rootfs. Dependencies will be
-    # discovered and added.
-    #   $1: module name
-    _CHECK=""
-    _CHECK="${1%.ko*}" 
-    _MODS+="$_CHECK "
+    _MODS+="${1} "
 }
 
 _full_dir() {
