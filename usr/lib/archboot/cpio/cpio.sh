@@ -214,7 +214,7 @@ _install_mods() {
     echo "Adding kernel modules..."
     tar --hard-dereference -C / -cpf - $(modinfo -F filename $_MOD_PATH $_MOD_DEPS 2>/dev/null \
     | grep -v builtin | sed -e 's#^/##g' -e 's# /# #g') | tar -C "${_ROOTFS}" -xpf -
-    echo "Generating module dependencies..."
+    echo "Generating new kernel module dependencies..."
     depmod -b "${_ROOTFS}" "${_KERNELVERSION}"
     # remove all non-binary module.* files (except devname for on-demand module loading
     # and builtin.modinfo for checking on builtin modules)
