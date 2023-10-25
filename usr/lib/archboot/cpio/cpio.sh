@@ -84,7 +84,7 @@ _filter_mods() {
             [[ "${_MOD_INPUT}" =~ $f ]] && continue 2
         done
         _MOD_INPUT="${_MOD_INPUT##*/}" _MOD_INPUT="${_MOD_INPUT%.ko*}"
-        printf '%s\n' "${_MOD_INPUT//-/_}"
+        printf '%s\n' "${_MOD_INPUT}"
     done < <(find "${_MODULE_DIR}" -name '*.ko*' -print0 2>"${_NO_LOG}" | grep -EZz "$@")
     (( _COUNT ))
 }
@@ -102,33 +102,39 @@ _mod() {
     # Add a kernel module to the rootfs. Dependencies will be
     # discovered and added.
     #   $1: module name
-    _CHECK="" _MOD="" _SOFT=() _DEPS=() _FIELD="" _VALUE="" _FW=()
-    _CHECK="${1%.ko*}" _CHECK="${_CHECK//-/_}"
+    _CHECK="" _MOD="" _SOFT=() _DEPS=() _FIELD="" _VALUE="" 
+    _CHECK="${1%.ko*}" 
     # skip expensive stuff if this module has already been added
-    (( _INCLUDED_MODS["${_CHECK}"] == 1 )) && return
-    while IFS=':= ' read -r -d '' _FIELD _VALUE; do
-        case "${_FIELD}" in
-            filename)   # Only add modules with filenames that look like paths (e.g.
+    #echo $_CHECK
+    #return
+    #echo $_MOD_PATH | grep -q $_CHECK && return
+    _MOD_PATH+="$_CHECK "
+    #echo $_MOD_PATH | sort -u
+    #echo $_CHECK
+    #while IFS=':= ' read -r -d '' _FIELD _VALUE; do
+    #    case "${_FIELD}" in
+    #        filename)   # Only add modules with filenames that look like paths (e.g.
                         # it might be reported as "(builtin)"). We'll defer actually
                         # checking whether or not the file exists -- any errors can be
                         # handled during module install time.
-                        if [[ "${_VALUE}" == /* ]]; then
-                            _MOD="${_VALUE##*/}" _MOD="${_MOD%.ko*}"
-                            _MOD_PATH[".${_VALUE}"]=1
-                            _INCLUDED_MODS["${_MOD//-/_}"]=1
-                        fi
-                        ;;
-            depends)    IFS=',' read -r -a _DEPS <<< "${_VALUE}"
-                        _map _mod "${_DEPS[@]}"
-                        ;;
-            softdep)    read -ra _SOFT <<<"${_VALUE}"
-                        for i in "${_SOFT[@]}"; do
-                            [[ ${i} == *: ]] && continue
-                            _mod "${i}"
-                        done
-                        ;;
-        esac
-    done < <(modinfo -k "${_KERNELVERSION}" -0 "${_CHECK}" 2>"${_NO_LOG}")
+                        #if [[ "${_VALUE}" == /* ]]; then
+			    #_MOD="${_VALUE##*/}" _MOD="${_MOD%.ko*}"
+			    #echo $_VALUE
+    #                        _MOD_PATH+="${_VALUE} "
+                            #_INCLUDED_MODS["${_MOD//-/_}"]=1
+                        #fi
+    #                    ;;
+    #        depends)    IFS=',' read -r -a _DEPS <<< "${_VALUE}"
+    #                    _map _mod "${_DEPS[@]}"
+    #                    ;;
+    #        softdep)    read -ra _SOFT <<<"${_VALUE}"
+    #                    for i in "${_SOFT[@]}"; do
+    #                        [[ ${i} == *: ]] && continue
+    #                        _mod "${i}"
+    #                    done
+    #                    ;;
+    #    esac
+    #done < <(modinfo -k "${_KERNELVERSION}" -0 "${_CHECK}" 2>"${_NO_LOG}")
 }
 
 _full_dir() {
