@@ -197,13 +197,13 @@ _run_hook() {
 
 _install_mods() {
     echo "Checking kernel module dependencies..."
-    _MOD_DEPS="$(modinfo -F depends $_MOD_PATH 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
-               $(modinfo -F softdep $_MOD_PATH 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u)"
+    _MOD_DEPS="$(modinfo -k "${_KERNELVERSION}" -F depends $_MOD_PATH 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
+               $(modinfo -k "${_KERNELVERSION}" -F softdep $_MOD_PATH 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u)"
     _DEP_COUNT=0
     while true; do
         _MOD_DEPS="$(echo $_MOD_DEPS \
-                $(modinfo -F depends $_MOD_DEPS 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
-                $(modinfo -F softdep $_MOD_DEPS 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u) \
+                $(modinfo -k "${_KERNELVERSION}" -F depends $_MOD_DEPS 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
+                $(modinfo -k "${_KERNELVERSION}" -F softdep $_MOD_DEPS 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u) \
                 | tr " " "\n" | sort -u)"
         _DEP_COUNT2="$(echo "$_MOD_DEPS" | wc -w)"
         [[ "${_DEP_COUNT}" == "${_DEP_COUNT2}" ]] && break
@@ -212,7 +212,7 @@ _install_mods() {
     _map _file "${_MODULE_DIR}"/modules.{builtin,builtin.modinfo,order}
     _install_files
     echo "Adding kernel modules..."
-    tar --hard-dereference -C / -cpf - $(modinfo -F filename $_MOD_PATH $_MOD_DEPS 2>/dev/null \
+    tar --hard-dereference -C / -cpf - $(modinfo  -k "${_KERNELVERSION}" -F filename $_MOD_PATH $_MOD_DEPS 2>/dev/null \
     | grep -v builtin | sed -e 's#^/##g' -e 's# /# #g') | tar -C "${_ROOTFS}" -xpf -
     echo "Generating new kernel module dependencies..."
     depmod -b "${_ROOTFS}" "${_KERNELVERSION}"
