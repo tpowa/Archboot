@@ -206,19 +206,19 @@ _new_environment() {
     _progress_wait "2" "40" "Generating container in ${_W_DIR}..." "5.5"
     _clean_kernel_cache
     _ram_check
-    # write initramfs to "${_ROOTFS_DIR}
-    : > "${_W_DIR}"/.archboot
-    _collect_files &
-    _progress_wait "41" "83" "Collecting rootfs files in ${_W_DIR}..." "3.75"
-    _progress "84" "Moving kernel ${_VMLINUZ} to ${_RAM}/..."
+    _progress "41" "Copying kernel ${_VMLINUZ} to ${_RAM}/..."
     # use ramfs to get immediate free space on file deletion
     mkdir "${_RAM}"
     mount -t ramfs none "${_RAM}"
     #shellcheck disable=SC2116,2086
     [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="$(echo ${_W_DIR}/usr/lib/modules/*/vmlinuz)"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="${_W_DIR}/boot/Image"
-    mv "${_VMLINUZ}" "${_RAM}/"
+    cp "${_VMLINUZ}" "${_RAM}/"
     _VMLINUZ="$(basename "${_VMLINUZ}")"
+    # write initramfs to "${_ROOTFS_DIR}
+    : > "${_W_DIR}"/.archboot
+    _collect_files &
+    _progress_wait "42" "84" "Collecting rootfs files in ${_W_DIR}..." "3.75"
     _progress "85" "Cleanup ${_W_DIR}..."
     find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
     _clean_kernel_cache
