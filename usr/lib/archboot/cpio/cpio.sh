@@ -102,39 +102,9 @@ _mod() {
     # Add a kernel module to the rootfs. Dependencies will be
     # discovered and added.
     #   $1: module name
-    _CHECK="" _MOD="" _SOFT=() _DEPS=() _FIELD="" _VALUE="" 
+    _CHECK=""
     _CHECK="${1%.ko*}" 
-    # skip expensive stuff if this module has already been added
-    #echo $_CHECK
-    #return
-    #echo $_MOD_PATH | grep -q $_CHECK && return
     _MOD_PATH+="$_CHECK "
-    #echo $_MOD_PATH | sort -u
-    #echo $_CHECK
-    #while IFS=':= ' read -r -d '' _FIELD _VALUE; do
-    #    case "${_FIELD}" in
-    #        filename)   # Only add modules with filenames that look like paths (e.g.
-                        # it might be reported as "(builtin)"). We'll defer actually
-                        # checking whether or not the file exists -- any errors can be
-                        # handled during module install time.
-                        #if [[ "${_VALUE}" == /* ]]; then
-			    #_MOD="${_VALUE##*/}" _MOD="${_MOD%.ko*}"
-			    #echo $_VALUE
-    #                        _MOD_PATH+="${_VALUE} "
-                            #_INCLUDED_MODS["${_MOD//-/_}"]=1
-                        #fi
-    #                    ;;
-    #        depends)    IFS=',' read -r -a _DEPS <<< "${_VALUE}"
-    #                    _map _mod "${_DEPS[@]}"
-    #                    ;;
-    #        softdep)    read -ra _SOFT <<<"${_VALUE}"
-    #                    for i in "${_SOFT[@]}"; do
-    #                        [[ ${i} == *: ]] && continue
-    #                        _mod "${i}"
-    #                    done
-    #                    ;;
-    #    esac
-    #done < <(modinfo -k "${_KERNELVERSION}" -0 "${_CHECK}" 2>"${_NO_LOG}")
 }
 
 _full_dir() {
@@ -226,10 +196,24 @@ _run_hook() {
 }
 
 _install_mods() {
+    echo "Checking kernel module dependencies..."
+    _MOD_DEPS="$(modinfo -F depends $_MOD_PATH 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
+               $(modinfo -F softdep $_MOD_PATH 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u)"
+    _DEP_COUNT=0
+    while true; do
+        _MOD_DEPS="$(echo $_MOD_DEPS \
+                $(modinfo -F depends $_MOD_DEPS 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
+                $(modinfo -F softdep $_MOD_DEPS 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u) \
+                | tr " " "\n" | sort -u)"
+        _DEP_COUNT2="$(echo "$_MOD_DEPS" | wc -w)"
+        [[ "${_DEP_COUNT}" == "${_DEP_COUNT2}" ]] && break
+        _DEP_COUNT="${_DEP_COUNT2}"
+    done
     _map _file "${_MODULE_DIR}"/modules.{builtin,builtin.modinfo,order}
     _install_files
     echo "Adding kernel modules..."
-    tar --hard-dereference -C / -cpf - "$@" | tar -C "${_ROOTFS}" -xpf -
+    tar --hard-dereference -C / -cpf - $(modinfo -F filename $_MOD_PATH $_MOD_DEPS 2>/dev/null \
+    | grep -v builtin | sed -e 's#^/##g' -e 's# /# #g') | tar -C "${_ROOTFS}" -xpf -
     echo "Generating module dependencies..."
     depmod -b "${_ROOTFS}" "${_KERNELVERSION}"
     # remove all non-binary module.* files (except devname for on-demand module loading

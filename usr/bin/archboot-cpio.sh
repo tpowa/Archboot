@@ -84,16 +84,7 @@ for i in "${_HOOKS[@]}"; do
 done
 _install_files
 _install_libs
-_MOD_DEPS="$(modinfo -F depends $_MOD_PATH 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) $(modinfo -F softdep $_MOD_PATH 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u)"
-_DEP_COUNT=0
-while true; do
- _MOD_DEPS="$(echo $_MOD_DEPS $(modinfo -F depends $_MOD_DEPS 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) | tr " " "\n" | sort -u )"
- _MOD_DEPS="$(echo $_MOD_DEPS $(modinfo -F softdep $_MOD_DEPS 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u) | tr " " "\n" | sort -u)"
- _DEP_COUNT2="$(echo "$_MOD_DEPS" | wc -w)"
- [[ "${_DEP_COUNT}" == "${_DEP_COUNT2}" ]] && break
- _DEP_COUNT="${_DEP_COUNT2}"
-done
-_install_mods $(modinfo -F filename $_MOD_PATH $_MOD_DEPS 2>/dev/null | grep -v builtin | sed -e 's#^/##g' -e 's# /# #g')
+_install_mods
 ldconfig -r "${_ROOTFS}" &>"${_NO_LOG}" || exit 1
 # remove /var/cache/ldconfig/aux-cache for reproducibility
 rm -f -- "${_ROOTFS}/var/cache/ldconfig/aux-cache"
