@@ -178,7 +178,7 @@ _run_hook() {
 }
 
 _install_mods() {
-    echo "Checking kernel module dependencies..."
+    # Checking kernel module dependencies:
     # first try, pull in the easy modules
     _MOD_DEPS="$(modinfo -k "${_KERNELVERSION}" -F depends $_MODS 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
                $(modinfo -k "${_KERNELVERSION}" -F softdep $_MODS 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u)"
@@ -195,13 +195,13 @@ _install_mods() {
     done
     _map _file "${_MODULE_DIR}"/modules.{builtin,builtin.modinfo,order}
     _install_files
-    echo "Adding kernel modules..."
+    # Adding kernel modules:
     # - pull in all modules with depends
     # - builtin needs to be removed
     # - all starting / needs to be removed from paths
     tar --hard-dereference -C / -cpf - $(modinfo  -k "${_KERNELVERSION}" -F filename $_MODS $_MOD_DEPS 2>/dev/null \
     | grep -v builtin | sed -e 's#^/##g' -e 's# /# #g') | tar -C "${_ROOTFS}" -xpf -
-    echo "Generating new kernel module dependencies..."
+    # generate new kernel module dependencies"
     depmod -b "${_ROOTFS}" "${_KERNELVERSION}"
     # remove all non-binary module.* files (except devname for on-demand module loading
     # and builtin.modinfo for checking on builtin modules)

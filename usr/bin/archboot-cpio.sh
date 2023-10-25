@@ -86,6 +86,7 @@ _install_libs
 if [[ -z "${_MODS}" && -z "${_MOD_DEPS}" ]]; then
     echo "Skipping kernel modules..."
 else
+    echo "Adding kernel modules..."
     _install_mods
 fi
 ldconfig -r "${_ROOTFS}" &>"${_NO_LOG}" || exit 1
