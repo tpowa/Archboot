@@ -8,7 +8,6 @@ _CONFIG=""
 _CPIO=/usr/lib/archboot/cpio/hooks
 _GENERATE_IMAGE=""
 _TARGET_DIR=""
-_ALL_MODS="$(find "${_MODULE_DIR}" -name '*.ko*' -print 2>"${_NO_LOG}")"
 
 _usage() {
     cat <<EOF
@@ -100,7 +99,7 @@ _filter_mods() {
         done
         _MOD_INPUT="${_MOD_INPUT##*/}" _MOD_INPUT="${_MOD_INPUT%.ko*}"
         printf '%s\n' "${_MOD_INPUT}"
-    done < <(grep -EZz "$@" <<<${_ALL_MODS})
+    done < <(find "${_MODULE_DIR}" -name '*.ko*' -print0 2>"${_NO_LOG}" | grep -EZz "$@")
     (( _COUNT ))
 }
 
