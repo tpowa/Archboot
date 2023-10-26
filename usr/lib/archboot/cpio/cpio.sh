@@ -74,11 +74,11 @@ _map() {
 }
 
 _loaded_mods() {
-modinfo -k ${_KERNELVERSION} --field filename $(cut -d ' ' -f1 </proc/modules) \
+modinfo -k "${_KERNELVERSION}" --field filename $(cut -d ' ' -f1 </proc/modules) \
 $(modinfo --field depends $(cut -d ' ' -f1 </proc/modules) | sed -e 's#,# #g') \
 $(modinfo --field softdep $(cut -d ' ' -f1 </proc/modules) | sed -e 's#.*:\ # #g') 2>/dev/null |\
 grep -v builtin
-modinfo -k ${_KERNELVERSION} --field firmware $(cut -d ' ' -f1 </proc/modules) | sed -e 's#^#/usr/lib/firmware/#g' -e 's#$#.zst#g'
+modinfo -k "${_KERNELVERSION}" --field firmware $(cut -d ' ' -f1 </proc/modules) | sed -e 's#^#/usr/lib/firmware/#g' -e 's#$#.zst#g'
 }
 
 _filter_mods() {
@@ -191,16 +191,16 @@ _run_hook() {
 _install_mods() {
     # Checking kernel module dependencies:
     # first try, pull in the easy modules
-    _MOD_DEPS="$(modinfo -k "${_KERNELVERSION}" -F depends $_MODS 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
-               $(modinfo -k "${_KERNELVERSION}" -F softdep $_MODS 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u)"
+    _MOD_DEPS="$(modinfo -k "${_KERNELVERSION}" -F depends ${_MODS} 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
+               $(modinfo -k "${_KERNELVERSION}" -F softdep ${_MODS} 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u)"
     _DEP_COUNT=0
     # next tries, ensure to catch all modules with depends
     while true; do
-        _MOD_DEPS="$(echo $_MOD_DEPS \
-                $(modinfo -k "${_KERNELVERSION}" -F depends $_MOD_DEPS 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
-                $(modinfo -k "${_KERNELVERSION}" -F softdep $_MOD_DEPS 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u) \
+        _MOD_DEPS="$(echo ${_MOD_DEPS} \
+                $(modinfo -k "${_KERNELVERSION}" -F depends ${_MOD_DEPS} 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
+                $(modinfo -k "${_KERNELVERSION}" -F softdep ${_MOD_DEPS} 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u) \
                 | tr " " "\n" | sort -u)"
-        _DEP_COUNT2="$(echo "$_MOD_DEPS" | wc -w)"
+        _DEP_COUNT2="$(wc -w <<< "$_MOD_DEPS")"
         [[ "${_DEP_COUNT}" == "${_DEP_COUNT2}" ]] && break
         _DEP_COUNT="${_DEP_COUNT2}"
     done
