@@ -76,16 +76,16 @@ _map() {
 _loaded_mods() {
 modinfo -k "${_KERNELVERSION}" --field filename $(cut -d ' ' -f1 </proc/modules) \
 $(modinfo --field depends $(cut -d ' ' -f1 </proc/modules) | sed -e 's#,# #g') \
-$(modinfo --field softdep $(cut -d ' ' -f1 </proc/modules) | sed -e 's#.*:\ # #g') 2>/dev/null |\
+$(modinfo --field softdep $(cut -d ' ' -f1 </proc/modules) | sed -e 's#.*:\ # #g') 2>"${_NO_LOG}" |\
 grep -v builtin
 modinfo -k "${_KERNELVERSION}" --field firmware $(cut -d ' ' -f1 </proc/modules) | sed -e 's#^#/usr/lib/firmware/#g' -e 's#$#.zst#g'
 }
 
 _filter_mods() {
     if [[ -z "${2}" ]]; then
-        grep -E "${1}" <<<"$_ALL_MODS"
+        grep -E "${1}" <<<"${_ALL_MODS}"
     else
-        grep -E "${3}" <<<"$_ALL_MODS" | grep -v -E "${2}"
+        grep -E "${3}" <<<"${_ALL_MODS}" | grep -v -E "${2}"
     fi
 }
 
@@ -191,16 +191,16 @@ _run_hook() {
 _install_mods() {
     # Checking kernel module dependencies:
     # first try, pull in the easy modules
-    _MOD_DEPS="$(modinfo -k "${_KERNELVERSION}" -F depends ${_MODS} 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
-               $(modinfo -k "${_KERNELVERSION}" -F softdep ${_MODS} 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u)"
+    _MOD_DEPS="$(modinfo -k "${_KERNELVERSION}" -F depends ${_MODS} 2>"${_NO_LOG}" | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
+               $(modinfo -k "${_KERNELVERSION}" -F softdep ${_MODS} 2>"${_NO_LOG}" | sed -e 's#.*: # #g' | tr " " "\n" | sort -u)"
     _DEP_COUNT=0
     # next tries, ensure to catch all modules with depends
     while true; do
         _MOD_DEPS="$(echo ${_MOD_DEPS} \
-                $(modinfo -k "${_KERNELVERSION}" -F depends ${_MOD_DEPS} 2>/dev/null | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
-                $(modinfo -k "${_KERNELVERSION}" -F softdep ${_MOD_DEPS} 2>/dev/null | sed -e 's#.*: # #g' | tr " " "\n" | sort -u) \
+                $(modinfo -k "${_KERNELVERSION}" -F depends ${_MOD_DEPS} 2>"${_NO_LOG}" | sed -e 's#,# #g' | tr " " "\n" | sort -u) \
+                $(modinfo -k "${_KERNELVERSION}" -F softdep ${_MOD_DEPS} 2>"${_NO_LOG}" | sed -e 's#.*: # #g' | tr " " "\n" | sort -u) \
                 | tr " " "\n" | sort -u)"
-        _DEP_COUNT2="$(wc -w <<< "$_MOD_DEPS")"
+        _DEP_COUNT2="$(wc -w <<< "${_MOD_DEPS}")"
         [[ "${_DEP_COUNT}" == "${_DEP_COUNT2}" ]] && break
         _DEP_COUNT="${_DEP_COUNT2}"
     done
@@ -210,7 +210,7 @@ _install_mods() {
     # - pull in all modules with depends
     # - builtin needs to be removed
     # - all starting / needs to be removed from paths
-    tar --hard-dereference -C / -cpf - $(modinfo  -k "${_KERNELVERSION}" -F filename $_MODS $_MOD_DEPS 2>/dev/null \
+    tar --hard-dereference -C / -cpf - $(modinfo  -k "${_KERNELVERSION}" -F filename ${_MODS} ${_MOD_DEPS} 2>"${_NO_LOG}" \
     | grep -v builtin | sed -e 's#^/##g' -e 's# /# #g') | tar -C "${_ROOTFS}" -xpf -
     # generate new kernel module dependencies"
     depmod -b "${_ROOTFS}" "${_KERNELVERSION}"
