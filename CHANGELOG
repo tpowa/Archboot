@@ -1,8 +1,9 @@
 2023.10 Highlights:
 - GeoIP - CDN Hosting: https://archboot.com,
   the other used addresses redirect to the .com again.
-- many speed improvements all over the places.
-- removed pretty all bottlenecks in the ISO build chain.
+- many speed improvements all over the places
+- solved pretty all bottlenecks in the ISO build chain
+  and the running system.
 Environment:
 - simplified grub-mkstandalone calls
 - added grub bli module loading on x86_64 EFI systems
