@@ -28,6 +28,31 @@ EOF
     exit 0
 }
 
+_parameters() {
+while [ $# -gt 0 ]; do
+    case "${1}" in
+        -c) shift
+            _CONFIG="${1}"
+            ;;
+        -k) shift
+            _KERNEL="${1}"
+            ;;
+        -d) shift
+            _TARGET_DIR="${1}"
+            ;;
+        -g) shift
+            [[ -d "${1}" ]] && _abort "Invalid image path -- ${1} is a directory!"
+            if ! _GENERATE_IMAGE="$(readlink -f "${1}")" || [[ ! -e "${_GENERATE_IMAGE%/*}" ]]; then
+                _abort "Unable to write to path!" "${1}"
+            fi
+            ;;
+        -h) _usage
+            ;;
+    esac
+    shift
+done
+}
+
 _abort() {
     echo "ERROR:" "$@"
     exit 1
