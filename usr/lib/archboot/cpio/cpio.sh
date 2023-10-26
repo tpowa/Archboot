@@ -28,6 +28,11 @@ EOF
     exit 0
 }
 
+_abort() {
+    echo "ERROR:" "$@"
+    exit 1
+}
+
 _parameters() {
 while [ $# -gt 0 ]; do
     case "${1}" in
@@ -51,11 +56,6 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
-}
-
-_abort() {
-    echo "ERROR:" "$@"
-    exit 1
 }
 
 _cleanup() {
