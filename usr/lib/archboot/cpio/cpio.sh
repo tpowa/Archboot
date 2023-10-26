@@ -82,25 +82,11 @@ modinfo -k ${_KERNELVERSION} --field firmware $(cut -d ' ' -f1 </proc/modules) |
 }
 
 _filter_mods() {
-    # Add modules to the rootfs, filtered by grep.
-    #   $@: filter arguments to grep
-    #   -f FILTER: ERE to filter found modules
-    local -i _COUNT=0
-    _MOD_INPUT="" OPTIND="" OPTARG="" _MOD_FILTER=()
-    while getopts ':f:' _FLAG; do
-        [[ "${_FLAG}" = "f" ]] && _MOD_FILTER+=("$OPTARG")
-    done
-    shift $(( OPTIND - 1 ))
-    # shellcheck disable=SC2154
-    while read -r -d '' _MOD_INPUT; do
-        (( ++_COUNT ))
-        for f in "${_MOD_FILTER[@]}"; do
-            [[ "${_MOD_INPUT}" =~ $f ]] && continue 2
-        done
-        _MOD_INPUT="${_MOD_INPUT##*/}" _MOD_INPUT="${_MOD_INPUT%.ko*}"
-        printf '%s\n' "${_MOD_INPUT}"
-    done < <(find "${_MODULE_DIR}" -name '*.ko*' -print0 2>"${_NO_LOG}" | grep -EZz "$@")
-    (( _COUNT ))
+    if [[ -z "${2}" ]]; then
+        grep -E "${1}" <<<"$_ALL_MODS"
+    else
+        grep -E "${3}" <<<"$_ALL_MODS" | grep -v -E "${2}"
+    fi
 }
 
 _all_mods() {
