@@ -90,10 +90,7 @@ _filter_mods() {
 }
 
 _all_mods() {
-    # Add modules to the initcpio.
-    #   $@: arguments to all_mods
-    mapfile -t _CHECKED_MODS < <(_filter_mods "$@")
-    _map _mod "${_CHECKED_MODS[@]}"
+    _map _mod $(_filter_mods "$@")
 }
 
 _mod() {
