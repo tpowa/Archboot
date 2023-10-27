@@ -144,8 +144,7 @@ _file_rename() {
 }
 
 _binary() {
-    _BIN="$(type -P "${1}")"
-    _file "${_BIN}"
+    _file "$(type -P "${1}")"
 }
 
 _init_rootfs() {
