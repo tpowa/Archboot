@@ -106,29 +106,14 @@ _dir() {
 }
 
 _symlink() {
-    _LINK_NAME="${1}" _LINK_SOURCE="${2:-$1}"
-    # find out the link target
-    if [[ "${_LINK_NAME}" == "${_LINK_SOURCE}" ]]; then
-        _LINK_DEST="$(find "${_LINK_SOURCE}" -prune -printf '%l')"
-        # use relative path if the target is a file in the same directory as the link
-        # anything more would lead to the insanity of parsing each element in its path
-        if [[ "${_LINK_DEST}" != *'/'* && ! -L "${_LINK_NAME%/*}/${_LINK_DEST}" ]]; then
-            _LINK_SOURCE="${_LINK_DEST}"
-        else
-            _LINK_SOURCE="$(realpath -eq -- "${_LINK_SOURCE}")"
-        fi
-    elif [[ -L "${_LINK_SOURCE}" ]]; then
-        _LINK_SOURCE="$(realpath -eq -- "${_LINK_SOURCE}")"
-    fi
-    _dir "${_LINK_NAME%/*}"
-    ln -sfn "${_LINK_SOURCE}" "${_ROOTFS}${_LINK_NAME}"
+    _dir "${1%/*}"
+    ln -sfn "${2}" "${_ROOTFS}${1}"
 }
 
 _file() {
     _FILES+="${1##/} "
     if [[ -L "${1}" ]]; then
-        _LINK_SOURCE="$(realpath -- "${1}")"
-        _file  "${_LINK_SOURCE}"
+        _file  "$(realpath -- "${1}")"
     fi
 }
 
@@ -163,8 +148,6 @@ _init_rootfs() {
         ln -s "lib" "${_ROOTFS}/usr/lib64"
         ln -s "usr/lib" "${_ROOTFS}/lib64"
     fi
-    # kernel module dir
-    [[ "${_KERNELVERSION}" != 'none' ]] && mkdir -p "${_ROOTFS}/usr/lib/modules/${_KERNELVERSION}/kernel"
     # mount tables
     ln -s ../proc/self/mounts "${_ROOTFS}/etc/mtab"
     : >"${_ROOTFS}/etc/fstab"
