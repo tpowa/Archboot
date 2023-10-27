@@ -5,7 +5,6 @@
 # optimized for size and speed
 # by Tobias Powalowski <tpowa@archlinux.org>
 
-shopt -s extglob
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/cpio/cpio.sh
 if [[ -z "${1}" ]]; then

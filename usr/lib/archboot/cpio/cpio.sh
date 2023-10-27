@@ -212,7 +212,7 @@ _install_mods() {
     depmod -b "${_ROOTFS}" "${_KERNELVERSION}"
     # remove all non-binary module.* files (except devname for on-demand module loading
     # and builtin.modinfo for checking on builtin modules)
-    rm "${_ROOTFS}${_MODULE_DIR}"/modules.!(*.bin|*.modinfo|devname|softdep)
+    rm "${_ROOTFS}${_MODULE_DIR}"/modules.{alias,builtin,dep,order,symbols}
 }
 
 _install_libs() {
