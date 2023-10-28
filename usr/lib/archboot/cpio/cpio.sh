@@ -176,15 +176,14 @@ _install_mods() {
                $(modinfo -k "${_KERNELVERSION}" -F softdep ${_MODS} 2>"${_NO_LOG}" | tr ".*: " "\n" | sort -u)"
     _DEP_COUNT=0
     # next tries, ensure to catch all modules with depends
-    while true; do
+    while ! [[ "${_DEP_COUNT}" == "${_DEP_COUNT2}" ]]; do
+        _DEP_COUNT="${_DEP_COUNT2}"
         #shellcheck disable=SC2046,SC2086
         _MOD_DEPS="$(echo ${_MOD_DEPS} \
                 $(modinfo -k "${_KERNELVERSION}" -F depends ${_MOD_DEPS} 2>"${_NO_LOG}" | tr "," "\n" | sort -u) \
                 $(modinfo -k "${_KERNELVERSION}" -F softdep ${_MOD_DEPS} 2>"${_NO_LOG}" | tr ".*: " "\n" | sort -u) \
                 | tr " " "\n" | sort -u)"
         _DEP_COUNT2="$(wc -w <<< "${_MOD_DEPS}")"
-        [[ "${_DEP_COUNT}" == "${_DEP_COUNT2}" ]] && break
-        _DEP_COUNT="${_DEP_COUNT2}"
     done
     _map _file "${_MODULE_DIR}"/modules.{builtin,builtin.modinfo,order}
     _install_files
@@ -211,8 +210,9 @@ _install_libs() {
                 grep 'NEEDED' | sort -u | sed -e 's#NEEDED##g' -e 's# .* #/lib/#g')
     _install_files
     echo "Checking libraries in /lib..."
-    _LIB_COUNT=""
-    while true; do
+    _LIB_COUNT="0"
+    while ! [[ "${_LIB_COUNT}" == "${_LIB_COUNT2}" ]]; do
+        _LIB_COUNT="${_LIB_COUNT2}"
         while read -r i; do
             [[ -e "${i}" ]] && _file "${i}"
         done < <(objdump -p "${_ROOTFS}"/lib/*.so* |
@@ -220,8 +220,6 @@ _install_libs() {
         _install_files
         # rerun loop if new libs were discovered, else break
         _LIB_COUNT2="$(echo "${_ROOTFS}"/lib/*.so* | wc -w)"
-        [[ "${_LIB_COUNT}" == "${_LIB_COUNT2}" ]] && break
-        _LIB_COUNT="${_LIB_COUNT2}"
     done
 }
 
