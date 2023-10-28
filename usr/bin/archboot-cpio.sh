@@ -60,7 +60,12 @@ for i in "${_HOOKS[@]}"; do
     _run_hook "${i}"
     _HOOK_COUNT="$((_HOOK_COUNT+1))"
 done
-_install_files
+if [[ -z "${_FILES}" ]]; then
+    echo "Skipping files..."
+else
+    echo "Adding files..."
+    _install_files
+fi
 _install_libs
 if [[ -z "${_MODS}" && -z "${_MOD_DEPS}" ]]; then
     echo "Skipping kernel modules..."
