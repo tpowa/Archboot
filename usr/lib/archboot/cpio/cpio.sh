@@ -185,7 +185,7 @@ _install_mods() {
                 | tr " " "\n" | sort -u)"
         _DEP_COUNT2="$(wc -w <<< "${_MOD_DEPS}")"
     done
-    _map _file "${_MODULE_DIR}"/modules.{builtin,builtin.modinfo,order}
+    _map _file "${_MOD_DIR}"/modules.{builtin,builtin.modinfo,order}
     _install_files
     # Adding kernel modules:
     # - pull in all modules with depends
@@ -198,7 +198,7 @@ _install_mods() {
     depmod -b "${_ROOTFS}" "${_KERNELVERSION}"
     # remove all non-binary module.* files (except devname for on-demand module loading
     # and builtin.modinfo for checking on builtin modules)
-    rm "${_ROOTFS}${_MODULE_DIR}"/modules.{alias,builtin,dep,order,symbols}
+    rm "${_ROOTFS}${_MOD_DIR}"/modules.{alias,builtin,dep,order,symbols}
 }
 
 _install_libs() {

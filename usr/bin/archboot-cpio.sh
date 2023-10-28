@@ -26,9 +26,9 @@ if [[ ! -f "${_KERNEL}" ]]; then
     _abort "kernel image does not exist!"
 fi
 _KERNELVERSION="$(_kver "${_KERNEL}")"
-_MODULE_DIR="/lib/modules/${_KERNELVERSION}"
-[[ -d "${_MODULE_DIR}" ]] || _abort "${_MODULE_DIR} is not a valid kernel module directory!"
-_ALL_MODS="$(find "${_MODULE_DIR}" -name '*.ko*' 2>"${_NO_LOG}")"
+_MOD_DIR="/lib/modules/${_KERNELVERSION}"
+[[ -d "${_MOD_DIR}" ]] || _abort "${_MOD_DIR} is not a valid kernel module directory!"
+_ALL_MODS="$(find "${_MOD_DIR}" -name '*.ko*' 2>"${_NO_LOG}")"
 _BUILD_DIR="$(_init_rootfs "${_KERNELVERSION}" "${_TARGET_DIR}")" || exit 1
 _ROOTFS="${_TARGET_DIR:-${_BUILD_DIR}/root}"
 if [[ -n "${_GENERATE_IMAGE}" ]]; then
