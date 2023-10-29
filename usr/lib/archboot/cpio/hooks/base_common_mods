@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+_run ()
+{
+    # add systemd kernel modules
+    _all_mods 'nfs|autofs4|loop'
+}
+
+# vim: set ft=sh ts=4 sw=4 et:

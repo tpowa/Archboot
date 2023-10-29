@@ -96,8 +96,6 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
     _map _file /etc/{environment,login.defs}
 
     ### add systemd
-    # add systemd kernel modules
-    _all_mods 'nfs|autofs4|loop'
     _map _binary mount.nfs4 umount.nfs umount.nfs4 mount.nfs setfont loadkeys
 
     #dbus files
