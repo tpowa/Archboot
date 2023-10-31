@@ -134,7 +134,7 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
     ### disable systemd services:
     # hwdb-update firstboot machine-id-commit pcrmachine  binfmt
     # boot-random-seed repart pcrphase pcrphase-sysinit
-    for i in hwdb-update firstboot machine-id-commit pcrmachine  binfmt boot-random-seed repart pcrphase pcrphase-sysinit; do
+    for i in hwdb-update firstboot machine-id-commit pcrmachine binfmt boot-random-seed repart pcrphase pcrphase-sysinit; do
         _symlink "/etc/systemd/system/systemd-${i}.service" /dev/null
     done
     ### disable automount:
