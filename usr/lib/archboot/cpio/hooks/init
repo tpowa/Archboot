@@ -6,11 +6,10 @@ _run ()
 {
     _map _dir /cdrom /ventoy
     ### add basic apps
-    _map _binary mount env bash cp mv rm grep cat mkdir echo kmod modprobe sh bsdcpio \
-                mkfs.btrfs mountpoint cut grep mkdir uname find sed dialog sulogin systemctl \
-                setfont gzip loadkeys systemd-tmpfiles systemd-sysusers \
-                sleep halt shutdown reboot poweroff
-    ### systemd
+    _map _binary bash blkid bsdcpio cat cp cut dialog echo env find grep gzip halt journalctl  \
+                 kmod loadkeys ls lsblk mkdir mkfs.btrfs modprobe mount mountpoint mv poweroff \
+                 reboot rm sh shutdown sleep sed setfont sulogin systemctl systemd-{tmpfiles,sysusers} \
+                 umount uname
     _map _binary /usr/lib/systemd/systemd{,-sulogin-shell,-modules-load,-udevd,-sysctl,-vconsole-setup}
     _map _file /usr/lib/systemd/{lib*,system-generators/systemd-fstab-generator}
     _map _file $(pacman -Ql systemd | grep '/usr/lib/systemd/system/.' | cut -d ' ' -f2)
@@ -31,7 +30,7 @@ _run ()
         _symlink "/etc/systemd/system/${i}.target" /dev/null
     done
     ### disable systemd services and sockets:
-    for i in lvm2-{lvmpolld,monitor} systemd-{journald,repart,vconsole-setup}; do
+    for i in lvm2-{lvmpolld,monitor} systemd-{repart,vconsole-setup}; do
         _symlink "/etc/systemd/system/${i}.service" /dev/null
     done
     _symlink "/etc/systemd/system/lvm2-lvmpolld.socket" /dev/null
