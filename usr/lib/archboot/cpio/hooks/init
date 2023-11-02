@@ -13,7 +13,7 @@ _run ()
     ### systemd
     _map _binary /usr/lib/systemd/systemd{,-sulogin-shell,-modules-load,-udevd,-sysctl,-vconsole-setup}
     _map _file /usr/lib/systemd/{lib*,system-generators/systemd-fstab-generator}
-    _map _full_dir /usr/lib/modules-load.d /usr/lib/systemd/system
+    _map _file $(pacman -Ql systemd | grep '/usr/lib/systemd/system/' | cut -d ' ' -f2)
     _map _file /usr/share/systemd/{kbd-model-map,language-fallback-map}
 
     ### turn on initrd mode
