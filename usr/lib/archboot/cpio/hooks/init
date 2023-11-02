@@ -7,14 +7,14 @@ _run ()
     _map _dir /cdrom /ventoy
     ### add basic apps
     _map _binary bash blkid bsdcpio cat cp cut dialog echo env find grep gzip halt journalctl  \
-                 kmod loadkeys ls lsblk mkdir mkfs.btrfs modprobe mount mountpoint mv poweroff \
+                 kmod loadkeys ls lsblk mkdir mkfs.btrfs modprobe less mount mountpoint mv poweroff \
                  reboot rm sh shutdown sleep sed setfont sulogin systemctl systemd-{tmpfiles,sysusers} \
                  umount uname
-    _map _binary /usr/lib/systemd/systemd{,-sulogin-shell,-modules-load,-udevd,-sysctl,-vconsole-setup}
+    _map _binary /usr/lib/systemd/systemd{,-journald,-sulogin-shell,-modules-load,-udevd,-sysctl,-vconsole-setup}
     _map _file /usr/lib/systemd/{lib*,system-generators/systemd-fstab-generator}
     _map _file $(pacman -Ql systemd | grep '/usr/lib/systemd/system/.' | cut -d ' ' -f2)
     _map _file /usr/share/systemd/{kbd-model-map,language-fallback-map}
-
+    _full_dir /usr/lib/sysusers.d
     ### turn on initrd mode
     : > "${_ROOTFS}"/etc/initrd-release
     ### launch systemd
@@ -42,9 +42,9 @@ _run ()
     _map _file /usr/share/terminfo/l/linux /usr/share/kbd/{consolefonts/ter-v{16,32}n.psf.gz,keymaps/i386/\
 {include/{qwerty-layout,compose,linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz}} \
     /usr/share/kbd/keymaps/{include/compose.latin1,i386/include/euro{,1}.map.gz}
-    _map _file /usr/lib/udev/rules.d/{50-udev-default,60-persistent-storage,64-btrfs,80-drivers,\
-90-vconsole,99-systemd}.rules /usr/lib/udev/ata_id /usr/lib/udev/scsi_id
-    _BASIC_CONFIG="dialogrc hostname modprobe.d/modprobe.conf"
+    _map _file /usr/lib/udev/rules.d/{50-udev-default,60-persistent-storage,64-btrfs,80-drivers,99-systemd}.rules \
+    /usr/lib/udev/ata_id /usr/lib/udev/scsi_id
+    _BASIC_CONFIG="dialogrc os-release hostname modprobe.d/modprobe.conf"
     for i in ${_BASIC_CONFIG}; do
         _file_rename "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done

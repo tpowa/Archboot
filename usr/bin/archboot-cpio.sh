@@ -73,6 +73,7 @@ else
     echo "Adding kernel modules..."
     _install_mods
 fi
+systemd-sysusers --root "${_ROOTFS}" &>"${_NO_LOG}"
 ldconfig -r "${_ROOTFS}" &>"${_NO_LOG}" || exit 1
 # remove /var/cache/ldconfig/aux-cache for reproducibility
 rm -f -- "${_ROOTFS}/var/cache/ldconfig/aux-cache"
