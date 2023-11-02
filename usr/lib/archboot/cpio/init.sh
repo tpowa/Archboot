@@ -146,6 +146,7 @@ setfont ter-v${SIZE}n -C /dev/console
 _second_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Removing files..." 6 75 0
 # set font size in vconsole.conf
 echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
+systemd-sysusers --root=/sysroot &>/dev/null
 printf "\ec"
 echo "Launching systemd $(udevadm --version)..."
 # vim: set ft=sh ts=4 sw=4 et:
