@@ -1,3 +1,5 @@
+On the road to 2023.11:
+- switched to pure systemd boot in early userspace
 2023.10 Highlights:
 - GeoIP - CDN Hosting: https://archboot.com,
   the other used addresses redirect to the .com again.
