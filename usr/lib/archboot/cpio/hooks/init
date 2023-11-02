@@ -62,7 +62,7 @@ _run ()
     echo "root::0:0:root:/root:/bin/bash" > "${_ROOTFS}/etc/passwd"
     _file_rename "/usr/share/archboot/base/etc/profile.d/custom-bash-options.sh" \
              "/etc/profile.d/custom-bash-options.sh"
-    _file /system-init.sh
+    _file /usr/lib/archboot/cpio/init.sh
     _file_rename /usr/share/archboot/base/etc/systemd/system/archboot-init.service /etc/systemd/system/archboot-init.service
     _file_rename /usr/share/archboot/base/etc/systemd/system/initrd-cleanup.service /etc/systemd/system/initrd-cleanup.service
 }

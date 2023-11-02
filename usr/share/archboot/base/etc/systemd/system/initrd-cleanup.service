@@ -13,7 +13,7 @@ DefaultDependencies=no
 AssertPathExists=/etc/initrd-release
 OnFailure=emergency.target
 OnFailureJobMode=replace-irreversibly
-Requires=system-init.service
+Requires=archboot-init.service
 After=initrd-root-fs.target initrd-fs.target initrd.target archboot-init.service
 
 [Service]
