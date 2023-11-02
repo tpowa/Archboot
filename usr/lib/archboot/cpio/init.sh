@@ -85,7 +85,7 @@ _second_stage() {
     _task unmount &
     _progress_wait "98" "99" "${_KEEP} Unmounting archboot rootfs..." "1"
     _progress "100" "The boot medium can be safely removed now."
-    sleep -r -t 2
+    sleep 2
     # remove files and directories
     rm -r /sysroot/sysroot
     rm /sysroot/init
