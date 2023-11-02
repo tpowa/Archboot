@@ -1,0 +1,8 @@
+[Unit]
+Description=Initializes archboot rootfs
+
+[Service]
+Type=oneshot
+StandardOutput=tty
+RemainAfterExit=yes
+ExecStart=/usr/lib/archboot/cpio/init.sh

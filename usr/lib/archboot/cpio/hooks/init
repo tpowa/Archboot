@@ -1,24 +1,53 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# created by Tobias Powalowski <tpowa@archlinux.org>
+# Created by Tobias Powalowski <tpowa@archlinux.org>
 
-_run() {
-    _map _binary bash sh blkid mount mountpoint switch_root bsdcpio mkfs.btrfs setfont \
-        /usr/lib/systemd/systemd-udevd udevadm systemd-tmpfiles kmod insmod modprobe \
-        gzip uname cat cp dmesg grep ln ls mv rm umount lsblk rmmod cut sed find mkdir dialog
-    # needed library for udevadm!
-    _map _file /usr/lib/systemd/libsystemd-shared*
-    _file /usr/share/terminfo/l/linux
-    _file_rename /usr/share/kbd/consolefonts/ter-v16n.psf.gz /consolefont-16.psf.gz
-    _file_rename /usr/share/kbd/consolefonts/ter-v32n.psf.gz /consolefont-32.psf.gz
-    rules_d=/usr/lib/udev/rules.d
-    _map _file ${rules_d}/50-udev-default.rules ${rules_d}/60-persistent-storage.rules \
-        ${rules_d}/64-btrfs.rules ${rules_d}/80-drivers.rules /usr/lib/udev/ata_id \
-        /usr/lib/udev/scsi_id
-    _file_rename /usr/lib/archboot/cpio/init.sh /init
+_run ()
+{
     _map _dir /cdrom /ventoy
-    _map _file /etc/bash.bash_logout /etc/bash.bashrc /etc/profile /etc/shells
-    _file_rename /usr/share/archboot/base/etc/dialogrc /etc/dialogrc
+    ### add basic apps
+    _map _binary mount env bash cp mv rm grep cat mkdir echo kmod modprobe sh bsdcpio \
+                mkfs.btrfs mountpoint cut grep mkdir uname find sed dialog sulogin systemctl \
+                setfont gzip loadkeys systemd-tmpfiles sleep halt shutdown reboot poweroff
+    ### systemd
+    _map _binary /usr/lib/systemd/systemd{,-sulogin-shell,-modules-load,-udevd,-sysctl,-vconsole-setup}
+    _map _file /usr/lib/systemd/{lib*,system-generators/systemd-fstab-generator}
+    _map _full_dir /usr/lib/modules-load.d /usr/lib/systemd/system
+    _map _file /usr/share/systemd/{kbd-model-map,language-fallback-map}
+
+    ### turn on initrd mode
+    : > "${_ROOTFS}"/etc/initrd-release
+    ### launch systemd
+    _symlink /init /usr/lib/systemd/systemd
+    ### disable systemd mounts:
+    # disable configfs, debugfs, fuse, hugepages, mqueue and tracefs
+    for i in dev-mqueue dev-hugepages sys-kernel-debug sys-kernel-tracing sys-kernel-config sys-fs-fuse-connections tmp; do
+        _symlink "/etc/systemd/system/${i}.mount" /dev/null
+    done
+    ### disable systemd targets:
+    # swap cryptsetup integritysetup veritysetup
+    for i in cryptsetup integritysetup remote-{veritysetup,cryptsetup} slices sockets swap timers veritysetup; do
+        _symlink "/etc/systemd/system/${i}.target" /dev/null
+    done
+    ### disable systemd services and sockets:
+    for i in lvm2-{lvmpolld,monitor} systemd-{journald,repart,vconsole-setup}; do
+        _symlink "/etc/systemd/system/${i}.service" /dev/null
+    done
+    _symlink "/etc/systemd/system/lvm2-lvmpolld.socket" /dev/null
+    ### adding needed files from running system
+    _map _file /etc/{bash.bash_logout,bash.bashrc,profile,shells}
+    ### add kmod related config file(s)
+    _file /usr/lib/depmod.d/search.conf
+    ### add vconsole
+    _map _file /usr/share/terminfo/l/linux /usr/share/kbd/{consolefonts/ter-v{16,32}n.psf.gz,keymaps/i386/\
+{include/{qwerty-layout,compose,linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz}} \
+    /usr/share/kbd/keymaps/{include/compose.latin1,i386/include/euro{,1}.map.gz}
+    _map _file /usr/lib/udev/rules.d/{50-udev-default,60-persistent-storage,64-btrfs,80-drivers,\
+90-vconsole,99-systemd}.rules /usr/lib/udev/ata_id /usr/lib/udev/scsi_id
+    _BASIC_CONFIG="dialogrc hostname modprobe.d/modprobe.conf"
+    for i in ${_BASIC_CONFIG}; do
+        _file_rename "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
+    done
     # add default bash setup
     for i in .bashrc .bash_profile .bash_logout; do
         _file_rename "/etc/skel/${i}" "/root/${i}"
@@ -29,14 +58,13 @@ _run() {
     echo ". /etc/profile.d/custom-bash-options.sh" >> "${_ROOTFS}/root/.bashrc"
     echo "alias reboot='echo b >/proc/sysrq-trigger'" >> "${_ROOTFS}/root/.bashrc"
     echo "alias poweroff='echo o >/proc/sysrq-trigger'" >> "${_ROOTFS}/root/.bashrc"
-    echo "root:x:0:root" > "${_ROOTFS}/etc/group"
-    echo "root:x:0:0:/root:/bin/bash" > "${_ROOTFS}/etc/passwd"
+    echo "root::0:root" > "${_ROOTFS}/etc/group"
+    echo "root::0:0:root:/root:/bin/bash" > "${_ROOTFS}/etc/passwd"
     _file_rename "/usr/share/archboot/base/etc/profile.d/custom-bash-options.sh" \
              "/etc/profile.d/custom-bash-options.sh"
-    _BASIC_CONFIG="os-release modprobe.d/modprobe.conf"
-    for i in ${_BASIC_CONFIG}; do
-        _file_rename "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
-    done
+    _file /system-init.sh
+    _file_rename /usr/share/archboot/base/etc/systemd/system/archboot-init.service /etc/systemd/system/archboot-init.service
+    _file_rename /usr/share/archboot/base/etc/systemd/system/initrd-cleanup.service /etc/systemd/system/initrd-cleanup.service
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
