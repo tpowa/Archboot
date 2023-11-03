@@ -7,7 +7,7 @@ _run ()
     _map _dir /cdrom /ventoy
     ### add basic apps
     _map _binary bash blkid bsdcpio cat cp cut dialog echo env find grep gzip halt journalctl  \
-                 kmod loadkeys ls lsblk mkdir mkfs.btrfs modprobe less mount mountpoint mv poweroff \
+                 kmod loadkeys ls lsblk lsmod mkdir mkfs.btrfs modprobe less mount mountpoint mv poweroff \
                  reboot rm sh shutdown sleep sed setfont sulogin systemctl systemd-{tmpfiles,sysusers} \
                  umount uname
     _map _binary /usr/lib/systemd/systemd{,-journald,-sulogin-shell,-modules-load,-udevd,-sysctl,-vconsole-setup}
@@ -20,8 +20,8 @@ _run ()
     ### launch systemd
     _symlink /init /usr/lib/systemd/systemd
     ### disable systemd mounts:
-    # disable configfs, debugfs, fuse, hugepages, mqueue and tracefs
-    for i in dev-mqueue dev-hugepages sys-kernel-debug sys-kernel-tracing sys-kernel-config sys-fs-fuse-connections tmp; do
+    # disable debugfs, fuse, hugepages, mqueue and tracefs
+    for i in dev-mqueue dev-hugepages sys-kernel-debug sys-kernel-tracing sys-fs-fuse-connections tmp; do
         _symlink "/etc/systemd/system/${i}.mount" /dev/null
     done
     ### disable systemd targets:
