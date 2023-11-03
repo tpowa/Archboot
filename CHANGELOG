@@ -1,6 +1,8 @@
 On the road to 2023.11:
 - kernel 6.6.x
-- switched to pure systemd boot in early userspace
+Environment:
+- switched to systemd in early userspace
+- reenabled configfs for systemd
 2023.10 Highlights:
 - GeoIP - CDN Hosting: https://archboot.com,
   the other used addresses redirect to the .com again.
