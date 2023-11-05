@@ -530,8 +530,7 @@ _mkfs() {
     # _GUID_VALUE:
     # get real device name from lsblk first to get GUID_VALUE from blkid
     if [[ -z "${_MOUNTOPTIONS}" ]]; then
-        _GUID_VALUE="$(${_BLKID} -p -i -s PART_ENTRY_TYPE -o value "$(${_LSBLK} NAME,UUID,LABEL,PARTLABEL,PARTUUID |\
-                    grep "$(echo "${1}" | cut -d"=" -f2)" | cut -d" " -f 1)")"
+        _GUID_VALUE="$(${_LSBLK} PARTTYPE "${1}")"
         if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" && "${5}" == "/home" ||\
                 "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${5}" == "swap" ||\
                 "${5}" == "/" ]]; then
