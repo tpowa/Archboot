@@ -9,7 +9,6 @@ _NEXTITEM=""
 _EDITOR=""
 # programs
 _LSBLK="lsblk -rpno"
-_BLKID="blkid -c ${_NO_LOG}"
 _FINDMNT="findmnt -vno SOURCE"
 # don't use _DESTDIR=/mnt because it's intended to mount other things there!
 # check first if bootet in archboot
