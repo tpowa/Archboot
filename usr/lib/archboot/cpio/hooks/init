@@ -14,7 +14,7 @@ _run ()
     _map _file /usr/lib/systemd/{lib*,system-generators/systemd-fstab-generator}
     _map _file $(pacman -Ql systemd | grep '/usr/lib/systemd/system/.' | cut -d ' ' -f2)
     _map _file /usr/share/systemd/{kbd-model-map,language-fallback-map}
-    _full_dir /usr/lib/sysusers.d
+    _map _file /usr/lib/sysusers.d/{arch,basic}.conf
     ### turn on initrd mode
     : > "${_ROOTFS}"/etc/initrd-release
     ### launch systemd
