@@ -20,12 +20,10 @@ _run ()
     ### launch systemd
     _symlink /init /usr/lib/systemd/systemd
     ### disable systemd mounts:
-    # disable debugfs, fuse, hugepages, mqueue and tracefs
     for i in dev-mqueue dev-hugepages sys-kernel-debug sys-kernel-tracing sys-fs-fuse-connections tmp; do
         _symlink "/etc/systemd/system/${i}.mount" /dev/null
     done
     ### disable systemd targets:
-    # swap cryptsetup integritysetup veritysetup
     for i in cryptsetup first-boot-complete integritysetup remote-{veritysetup,cryptsetup} slices sockets swap timers veritysetup; do
         _symlink "/etc/systemd/system/${i}.target" /dev/null
     done
