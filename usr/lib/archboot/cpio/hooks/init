@@ -62,8 +62,10 @@ _run ()
     _file_rename "/usr/share/archboot/base/etc/profile.d/custom-bash-options.sh" \
              "/etc/profile.d/custom-bash-options.sh"
     _file /usr/lib/archboot/cpio/init.sh
-    _file_rename /usr/share/archboot/base/etc/systemd/system/archboot-init.service /etc/systemd/system/archboot-init.service
-    _file_rename /usr/share/archboot/base/etc/systemd/system/initrd-cleanup.service /etc/systemd/system/initrd-cleanup.service
+    _file_rename /usr/share/archboot/base/etc/systemd/system/archboot-init.service \
+                 /etc/systemd/system/archboot-init.service
+    _file_rename /usr/share/archboot/base/etc/systemd/system/initrd-cleanup.service \
+                 /etc/systemd/system/initrd-cleanup.service
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
