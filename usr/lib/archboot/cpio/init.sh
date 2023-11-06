@@ -32,7 +32,7 @@ _progress_wait() {
     done
 }
 _task() {
-    [[ "${1}" == kernel ]] && bsdcpio -u -i "*/lib/modules/"  "*/lib/firmware/" <"/mnt/boot/initrd-$(uname -m).img" &>/dev/null
+    [[ "${1}" == kernel ]] && bsdcpio -u -i "*/lib/modules/"  "*/lib/firmware/" <"/mnt/efi/boot/initrd-$(uname -m).img" &>/dev/null
     if [[ "${1}" == cleanup ]]; then
         rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,platform,net,scsi,soc,spi,usb,video} /lib/modules/*/extramodules
         # keep ethernet NIC firmware
@@ -48,16 +48,16 @@ _task() {
         mv /lib/modules /sysroot/usr/lib
         mv /lib/firmware /sysroot/usr/lib
         cd /sysroot
-        bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i<"/mnt/boot/initrd-$(uname -m).img" &>/dev/null
+        bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i<"/mnt/efi/boot/initrd-$(uname -m).img" &>/dev/null
     fi
     if [[ "${1}" == unmount ]]; then
-        if mountpoint /ventoy &>/dev/null; then
-            for i in /mnt /cdrom /ventoy; do
+        if mountpoint /mnt/ventoy &>/dev/null; then
+            for i in /mnt/{efi,cdrom,ventoy}; do
                 umount -q -A "${i}" 2>/dev/null
             done
         fi
-        if mountpoint /cdrom &>/dev/null; then
-            for i in /mnt /cdrom; do
+        if mountpoint /mnt/cdrom &>/dev/null; then
+            for i in /mnt/{efi,cdrom}; do
                 umount -q -A "${i}" 2>/dev/null
             done
         fi
@@ -104,12 +104,12 @@ echo "Searching 10 seconds for Archboot $(uname -m) rootfs..."
 _COUNT=0
 while ! [[ "${_COUNT}" == 10 ]]; do
     # dd / rufus
-    mount UUID=1234-ABCD /mnt &>/dev/null && break
+    mount UUID=1234-ABCD /mnt/efi &>/dev/null && break
     # ventoy
     if mount LABEL=Ventoy /ventoy &>/dev/null; then
-        mount /ventoy/archboot-*-*-"$(uname -r)"-"$(uname -m)".iso /cdrom &>/dev/null && break
-        mount /ventoy/archboot-*-*-"$(uname -r)"-latest-"$(uname -m)".iso /cdrom &>/dev/null && break
-        mount /ventoy/archboot-*-*-"$(uname -r)"-local-"$(uname -m)".iso /cdrom &>/dev/null && break
+        mount /mnt/ventoy/archboot-*-*-"$(uname -r)"-"$(uname -m)".iso /mnt/cdrom &>/dev/null && break
+        mount /mnt/ventoy/archboot-*-*-"$(uname -r)"-latest-"$(uname -m)".iso /mnt/cdrom &>/dev/null && break
+        mount /mnt/ventoy/archboot-*-*-"$(uname -r)"-local-"$(uname -m)".iso /mnt/cdrom &>/dev/null && break
     fi
     if [[ -b /dev/sr0 ]]; then
         mount /dev/sr0 /cdrom &>/dev/null && break
@@ -117,8 +117,8 @@ while ! [[ "${_COUNT}" == 10 ]]; do
     sleep 1
     _COUNT=$((_COUNT+1))
 done
-if ! [[ -f "/mnt/boot/initrd-$(uname -m).img" ]] ; then
-    if ! mount /cdrom/efi.img /mnt &>/dev/null; then
+if ! [[ -f "/mnt/efi/boot/initrd-$(uname -m).img" ]] ; then
+    if ! mount /mnt/cdrom/efi.img /mnt/efi &>/dev/null; then
         echo -e "\e[1;91mArchboot Emergeny Shell:\e[m"
         echo -e "\e[1;91mError: Didn't find a device with archboot rootfs! \e[m"
         echo -e "\e[1mThis needs further debugging. Please contact the archboot author.\e[m"
