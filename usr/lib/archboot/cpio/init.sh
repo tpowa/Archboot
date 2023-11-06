@@ -106,7 +106,7 @@ while ! [[ "${_COUNT}" == 10 ]]; do
     # dd / rufus
     mount UUID=1234-ABCD /mnt/efi &>/dev/null && break
     # ventoy
-    if mount LABEL=Ventoy /ventoy &>/dev/null; then
+    if mount LABEL=Ventoy /mnt/ventoy &>/dev/null; then
         mount /mnt/ventoy/archboot-*-*-"$(uname -r)"-"$(uname -m)".iso /mnt/cdrom &>/dev/null && break
         mount /mnt/ventoy/archboot-*-*-"$(uname -r)"-latest-"$(uname -m)".iso /mnt/cdrom &>/dev/null && break
         mount /mnt/ventoy/archboot-*-*-"$(uname -r)"-local-"$(uname -m)".iso /mnt/cdrom &>/dev/null && break
