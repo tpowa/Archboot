@@ -3,6 +3,10 @@ On the road to 2023.11:
 Environment:
 - switched to systemd in early userspace
 - reenabled configfs for systemd
+- moved mounting directories in init to /mnt/{cdrom,ventoy,efi}
+setup:
+changed default installation path to /mnt/install
+
 2023.10 Highlights:
 - GeoIP - CDN Hosting: https://archboot.com,
   the other used addresses redirect to the .com again.
