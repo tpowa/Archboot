@@ -26,11 +26,12 @@ _run ()
     done
     ### disable systemd targets:
     # swap cryptsetup integritysetup veritysetup
-    for i in cryptsetup integritysetup remote-{veritysetup,cryptsetup} slices sockets swap timers veritysetup; do
+    for i in cryptsetup first-boot-complete integritysetup remote-{veritysetup,cryptsetup} slices sockets swap timers veritysetup; do
         _symlink "/etc/systemd/system/${i}.target" /dev/null
     done
     ### disable systemd services and sockets:
-    for i in lvm2-{lvmpolld,monitor} systemd-{repart,vconsole-setup}; do
+    for i in ldconfig lvm2-{lvmpolld,monitor} systemd-{binfmt,boot{,-random-seed},firstboot,hwdb-update,journal{-flush,-catalog-update}\
+,machine-id-commit,modules-load,pcrmachine,pcrphase{,-initrd,-sysinit},random-seed,repart,sysusers,update-{done,utmp},vconsole-setup}; do
         _symlink "/etc/systemd/system/${i}.service" /dev/null
     done
     _symlink "/etc/systemd/system/lvm2-lvmpolld.socket" /dev/null
