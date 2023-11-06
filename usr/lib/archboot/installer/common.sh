@@ -13,7 +13,7 @@ _FINDMNT="findmnt -vno SOURCE"
 # don't use _DESTDIR=/mnt because it's intended to mount other things there!
 # check first if bootet in archboot
 if grep -qw '^archboot' /etc/hostname; then
-    _DESTDIR="/install"
+    _DESTDIR="/mnt/install"
     _NSPAWN="systemd-nspawn -q -D ${_DESTDIR}"
 else
     _DESTDIR="/"
