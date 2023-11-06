@@ -112,7 +112,7 @@ while ! [[ "${_COUNT}" == 10 ]]; do
         mount /mnt/ventoy/archboot-*-*-"$(uname -r)"-local-"$(uname -m)".iso /mnt/cdrom &>/dev/null && break
     fi
     if [[ -b /dev/sr0 ]]; then
-        mount /dev/sr0 /cdrom &>/dev/null && break
+        mount /dev/sr0 /mnt/cdrom &>/dev/null && break
     fi
     sleep 1
     _COUNT=$((_COUNT+1))
