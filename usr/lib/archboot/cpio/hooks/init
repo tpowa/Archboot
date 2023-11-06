@@ -4,7 +4,7 @@
 
 _run ()
 {
-    _map _dir /mnt/{cdrom,ventoy,efi}
+    _map _dir mnt/{cdrom,ventoy,efi}
     ### add basic apps
     _map _binary bash blkid bsdcpio cat cp cut dialog echo env find grep gzip halt journalctl  \
                  kmod loadkeys ls lsblk lsmod mkdir mkfs.btrfs modprobe less mount mountpoint mv poweroff \
