@@ -15,7 +15,7 @@ _run ()
     echo "PermitEmptyPasswords yes" >> "${_ROOTFS}/etc/ssh/sshd_config"
     _full_dir /usr/lib/libnfsidmap
     _map _dir /var/lib/{nfs/{sm,sm.bak,v4recovery,rpc_pipefs},gssproxy/{clients,rcache}} \
-              /var/{log/gssproxy,empty}
+              /var/log/gssproxy
     # mask nfs3 systemd
     for i in rpcbind.service rpcbind.socket rpcbind.target nfs-server.service; do
         _symlink "/etc/systemd/system/${i}" /dev/null

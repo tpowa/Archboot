@@ -147,6 +147,7 @@ _second_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Removi
 # set font size in vconsole.conf
 echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
 systemd-sysusers --root=/sysroot &>/dev/null
+systemd-tmpfiles -E --create --root=/sysroot &>/dev/null
 printf "\ec"
 echo "Launching systemd $(udevadm --version)..."
 # vim: set ft=sh ts=4 sw=4 et:
