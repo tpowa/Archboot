@@ -4,8 +4,12 @@
 
 _run ()
 {
+    ### acpi
+    _all_mods '/acpi/'
     ### add pcspkr
     _mod pcspkr
+    ### platform modules
+    _all_mods -f 'media' '/platform/'
     ### add init modules
     _map _mod zram btrfs zstd libcrc32c
     ### keyboard modules
