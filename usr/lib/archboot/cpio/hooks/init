@@ -24,12 +24,14 @@ _run ()
         _symlink "/etc/systemd/system/${i}.mount" /dev/null
     done
     ### disable systemd targets:
-    for i in cryptsetup first-boot-complete integritysetup remote-{veritysetup,cryptsetup} slices sockets swap timers veritysetup; do
+    for i in cryptsetup first-boot-complete integritysetup remote-{veritysetup,cryptsetup} \
+    slices sockets swap timers veritysetup; do
         _symlink "/etc/systemd/system/${i}.target" /dev/null
     done
     ### disable systemd services and sockets:
-    for i in ldconfig lvm2-{lvmpolld,monitor} systemd-{binfmt,boot{,-random-seed},firstboot,hwdb-update,journal{-flush,-catalog-update}\
-,machine-id-commit,modules-load,pcrmachine,pcrphase{,-initrd,-sysinit},random-seed,repart,sysusers,update-{done,utmp},vconsole-setup}; do
+    for i in ldconfig lvm2-{lvmpolld,monitor} systemd-{binfmt,boot{,-random-seed}\
+,firstboot,hwdb-update,journal{-flush,-catalog-update},machine-id-commit,modules-load,pcrmachine\
+,pcrphase{,-initrd,-sysinit},random-seed,repart,sysusers,update-{done,utmp},vconsole-setup}; do
         _symlink "/etc/systemd/system/${i}.service" /dev/null
     done
     _symlink "/etc/systemd/system/lvm2-lvmpolld.socket" /dev/null
@@ -42,7 +44,7 @@ _run ()
 {include/{qwerty-layout,compose,linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz}} \
     /usr/share/kbd/keymaps/{include/compose.latin1,i386/include/euro{,1}.map.gz}
     _map _file /usr/lib/udev/rules.d/{50-udev-default,60-persistent-storage,64-btrfs,80-drivers,99-systemd}.rules \
-    /usr/lib/udev/ata_id /usr/lib/udev/scsi_id
+    /usr/lib/udev/{ata,scsi}_id
     _BASIC_CONFIG="dialogrc os-release hostname modprobe.d/modprobe.conf"
     for i in ${_BASIC_CONFIG}; do
         _file_rename "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
