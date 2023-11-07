@@ -4,6 +4,8 @@ Environment:
 - switched to systemd in early userspace
 - reenabled configfs for systemd
 - moved mounting directories in init to /mnt/{cdrom,ventoy,efi}
+cpio:
+- merged acpi and platform into common_mods 
 setup:
 changed default installation path to /mnt/install
 
