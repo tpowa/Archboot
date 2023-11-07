@@ -28,13 +28,14 @@ _run ()
     slices sockets swap timers veritysetup; do
         _symlink "/etc/systemd/system/${i}.target" /dev/null
     done
-    ### disable systemd services and sockets:
+    ### disable systemd services:
     for i in ldconfig lvm2-{lvmpolld,monitor} systemd-{binfmt,boot{,-random-seed}\
 ,firstboot,hwdb-update,journal{-flush,-catalog-update},machine-id-commit,modules-load,pcrmachine\
 ,pcrphase{,-initrd,-sysinit},random-seed,repart,sysusers,update-{done,utmp},vconsole-setup}; do
         _symlink "/etc/systemd/system/${i}.service" /dev/null
     done
-    _symlink "/etc/systemd/system/lvm2-lvmpolld.socket" /dev/null
+    ### disable systemd sockets:
+    _symlink /etc/systemd/system/lvm2-lvmpolld.socket /dev/null
     ### adding needed files from running system
     _map _file /etc/{bash.bash_logout,bash.bashrc,profile,shells}
     ### add kmod related config file(s)
@@ -61,8 +62,8 @@ _run ()
     echo "alias poweroff='echo o >/proc/sysrq-trigger'" >> "${_ROOTFS}/root/.bashrc"
     echo "root::0:root" > "${_ROOTFS}/etc/group"
     echo "root::0:0:root:/root:/bin/bash" > "${_ROOTFS}/etc/passwd"
-    _file_rename "/usr/share/archboot/base/etc/profile.d/custom-bash-options.sh" \
-             "/etc/profile.d/custom-bash-options.sh"
+    _file_rename /usr/share/archboot/base/etc/profile.d/custom-bash-options.sh \
+                 /etc/profile.d/custom-bash-options.sh
     _file /usr/lib/archboot/cpio/init.sh
     _file_rename /usr/share/archboot/base/etc/systemd/system/archboot-init.service \
                  /etc/systemd/system/archboot-init.service
