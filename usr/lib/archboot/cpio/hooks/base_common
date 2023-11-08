@@ -159,8 +159,8 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
     _file_rename /usr/share/archboot/base/etc/udev/rules.d/60-ioschedulers.rules /etc/udev/rules.d/60-ioschedulers.rules
     # add minimal vconsole
     _map _file /usr/share/terminfo/l/linux /usr/share/kbd/{consolefonts/ter-v{16,32}n.psf.gz,keymaps/i386/\
-{include/{qwerty-layout,compose,linux-with-alt-and-altgr,linux-keys-bare}.inc,windowkeys.map.gz,qwerty/us.map.gz}} \
-    /usr/share/kbd/keymaps/{include/compose.latin1,i386/include/euro{,1}.map.gz}
+{include/{qwerty-layout,compose,linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz}} \
+    /usr/share/kbd/keymaps/{include/compose.latin1,i386/include/{euro{,1},windowkeys}.map.gz}
     # add swapiness sysctl config file
     _file_rename /usr/share/archboot/base/etc/sysctl.d/99-sysctl.conf /etc/sysctl.d/99-sysctl.conf
     # add root user with empty password
