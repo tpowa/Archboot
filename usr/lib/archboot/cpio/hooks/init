@@ -24,7 +24,7 @@ _run ()
         _symlink "/etc/systemd/system/${i}.mount" /dev/null
     done
     ### disable systemd targets:
-    for i in cryptsetup first-boot-complete integritysetup remote-{veritysetup,cryptsetup} \
+    for i in cryptsetup first-boot-complete integritysetup local-fs remote-{veritysetup,cryptsetup} \
     slices sockets swap timers veritysetup; do
         _symlink "/etc/systemd/system/${i}.target" /dev/null
     done
@@ -36,6 +36,8 @@ _run ()
     done
     ### disable systemd sockets:
     _symlink /etc/systemd/system/lvm2-lvmpolld.socket /dev/null
+    ### disable automount:
+    _symlink /etc/systemd/system/proc-sys-fs-binfmt_misc.automount /dev/null
     ### adding needed files from running system
     _map _file /etc/{bash.bash_logout,bash.bashrc,profile,shells}
     ### add kmod related config file(s)

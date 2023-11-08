@@ -143,7 +143,6 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
         _symlink "/etc/systemd/system/${i}.timer" /dev/null
     done
     ### disable automount:
-    # proc-sys-fs-binfmt_misc.automount
     _symlink /etc/systemd/system/proc-sys-fs-binfmt_misc.automount /dev/null
     # disable lastlog
     _symlink /var/log/lastlog /dev/null
