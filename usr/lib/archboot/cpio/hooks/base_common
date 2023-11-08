@@ -165,7 +165,7 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
     _file_rename /usr/share/archboot/base/etc/sysctl.d/99-sysctl.conf /etc/sysctl.d/99-sysctl.conf
     # add root user with empty password
     echo "root::0:root" > "${_ROOTFS}/etc/group"
-    echo "root:x:0:0:Super User:/root:/bin/bash" > "${_ROOTFS}/etc/passwd"
+    echo "root::0:0:Super User:/root:/bin/bash" > "${_ROOTFS}/etc/passwd"
     echo "root::0::::::" > "${_ROOTFS}/etc/shadow"
     ### add pacman
     _map _binary pacman pacman-conf pacman-key pacman-db-upgrade makepkg \
