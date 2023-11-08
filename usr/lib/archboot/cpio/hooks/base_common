@@ -134,7 +134,7 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
     ### disable systemd services:
     for i in binfmt boot-random-seed firstboot hwdb-update journal-{flush,catalog-update} \
              machine-id-commit modules-load pcrmachine repart pcrphase{,-sysinit} \
-             update-{done,utmp} user-sessions; do
+             update-{done,utmp}; do
         _symlink "/etc/systemd/system/systemd-${i}.service" /dev/null
     done
     _symlink /etc/systemd/system/ldconfig.service /dev/null
