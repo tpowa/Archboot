@@ -75,7 +75,7 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
     # use color bash prompt
     # unlock and delete root password, if not set by user!
     # use color grep and ls output
-    for i in custom-bash-options.sh archboot-reset-root-password.sh; do
+    for i in custom-bash-options.sh; do
         _file_rename "/usr/share/archboot/base/etc/profile.d/${i}" "/etc/profile.d/${i}"
     done
     # add default bash setup
@@ -121,21 +121,24 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
     _file_rename /usr/share/archboot/base/etc/systemd/system/windowkeys.service /etc/systemd/system/windowkeys.service
     _file_rename /usr/share/archboot/base/etc/systemd/journald.conf.d/fw-tty12.conf /etc/systemd/journald.conf.d/fw-tty12.conf
     _symlink /etc/systemd/system/multi-user.target.wants/windowkeys.service /etc/systemd/system/windowkeys.service
+    ### use: systemctl status for everything
+    ### use: systemctl list-dependencies for tree
     ### disable systemd mounts:
-    # disable debugfs, fuse, hugepages, mqueue and tracefs
     for i in dev-mqueue dev-hugepages sys-kernel-debug sys-kernel-tracing sys-fs-fuse-connections tmp; do
         _symlink "/etc/systemd/system/${i}.mount" /dev/null
     done
     ### disable systemd targets:
-    # swap cryptsetup integritysetup veritysetup
     for i in cryptsetup first-boot-complete integritysetup swap veritysetup; do
         _symlink "/etc/systemd/system/${i}.target" /dev/null
     done
     ### disable systemd services:
-    # hwdb-update firstboot machine-id-commit pcrmachine  binfmt
-    # boot-random-seed repart pcrphase pcrphase-sysinit
-    for i in hwdb-update firstboot machine-id-commit pcrmachine binfmt boot-random-seed repart pcrphase pcrphase-sysinit; do
+    for i in hwdb-update firstboot machine-id-commit pcrmachine binfmt boot-random-seed repart \
+             pcrphase pcrphase-sysinit user-sessions; do
         _symlink "/etc/systemd/system/systemd-${i}.service" /dev/null
+    done
+    ### disable systemd timers:
+    for i in man-db shadow; do
+        _symlink "/etc/systemd/system/systemd-${i}.timer" /dev/null
     done
     ### disable automount:
     # proc-sys-fs-binfmt_misc.automount
@@ -159,7 +162,9 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
     /usr/share/kbd/keymaps/{include/compose.latin1,i386/include/euro{,1}.map.gz}
     # add swapiness sysctl config file
     _file_rename /usr/share/archboot/base/etc/sysctl.d/99-sysctl.conf /etc/sysctl.d/99-sysctl.conf
-
+    # add root user with empty password
+    echo "root::0:root" > "${_ROOTFS}/etc/group"
+    echo "root::0:0:Super User:/root:/bin/bash" > "${_ROOTFS}/etc/passwd"
     ### add pacman
     _map _binary pacman pacman-conf pacman-key pacman-db-upgrade makepkg \
           repo-add repo-elephant testpkg vercmp curl gpg-agent gpg \

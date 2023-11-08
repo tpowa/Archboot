@@ -5,7 +5,7 @@
 Description=TTYD
 After=syslog.target
 After=network.target
-After=default.target
+After=multi-user.target
 
 [Service]
 ExecStart=/usr/bin/ttyd remote-login.sh
