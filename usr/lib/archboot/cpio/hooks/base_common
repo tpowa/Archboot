@@ -128,7 +128,7 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
         _symlink "/etc/systemd/system/${i}.mount" /dev/null
     done
     ### disable systemd targets:
-    for i in cryptsetup first-boot-complete integritysetup local-fs swap slices veritysetup; do
+    for i in cryptsetup first-boot-complete integritysetup swap slices veritysetup; do
         _symlink "/etc/systemd/system/${i}.target" /dev/null
     done
     ### disable systemd services:
