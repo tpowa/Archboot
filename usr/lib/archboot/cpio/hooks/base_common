@@ -132,13 +132,13 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
         _symlink "/etc/systemd/system/${i}.target" /dev/null
     done
     ### disable systemd services:
-    for i in hwdb-update firstboot machine-id-commit pcrmachine binfmt boot-random-seed repart \
+    for i in hwdb-update firstboot ldconfig machine-id-commit modules-load pcrmachine binfmt boot-random-seed repart \
              pcrphase pcrphase-sysinit user-sessions; do
         _symlink "/etc/systemd/system/systemd-${i}.service" /dev/null
     done
     ### disable systemd timers:
     for i in man-db shadow; do
-        _symlink "/etc/systemd/system/systemd-${i}.timer" /dev/null
+        _symlink "/etc/systemd/system/${i}.timer" /dev/null
     done
     ### disable automount:
     # proc-sys-fs-binfmt_misc.automount
