@@ -44,7 +44,7 @@ _run ()
     _file /usr/lib/depmod.d/search.conf
     ### add vconsole
     _map _file /usr/share/terminfo/l/linux /usr/share/kbd/{consolefonts/ter-v{16,32}n.psf.gz,keymaps/i386/\
-{include/{qwerty-layout,compose,linux-with-alt-and-altgr,linux-keys-bare}.inc,windowkeys.map.gz,qwerty/us.map.gz}} \
+{include/{qwerty-layout,compose,linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz}} \
     /usr/share/kbd/keymaps/{include/compose.latin1,i386/include/euro{,1}.map.gz}
     _map _file /usr/lib/udev/rules.d/{50-udev-default,60-persistent-storage,64-btrfs,80-drivers,99-systemd}.rules \
     /usr/lib/udev/{ata,scsi}_id
