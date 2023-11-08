@@ -27,7 +27,7 @@ _run ()
     _file /usr/lib/libwebsockets-evlib_uv.so
     _file_rename /usr/share/archboot/remote/usr/bin/remote-login.sh /usr/bin/remote-login.sh
     _file_rename /usr/share/archboot/remote/etc/systemd/system/ttyd.service /etc/systemd/system/ttyd.service
-    _symlink /etc/systemd/system/default.target.wants/ttyd.service /etc/systemd/system/ttyd.service
+    _symlink /etc/systemd/system/multi-user.target.wants/ttyd.service /etc/systemd/system/ttyd.service
     # fix licenses
     _map _file /usr/share/licenses/{nfsidmap/LICENSE,tmux/LICENSE,ttyd/LICENSE}
 }
