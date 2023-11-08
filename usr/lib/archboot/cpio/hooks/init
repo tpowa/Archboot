@@ -64,7 +64,8 @@ _run ()
     echo "alias poweroff='echo o >/proc/sysrq-trigger'" >> "${_ROOTFS}/root/.bashrc"
     echo "root::0:root" > "${_ROOTFS}/etc/group"
     echo "root::0:0:Super User:/root:/bin/bash" > "${_ROOTFS}/etc/passwd"
-    echo "root::0::::::" > "${_ROOTFS}/etc/shadow"
+    # use 1 to keep ssh happy :)
+    echo "root::1::::::" > "${_ROOTFS}/etc/shadow"
     _file_rename /usr/share/archboot/base/etc/profile.d/custom-bash-options.sh \
                  /etc/profile.d/custom-bash-options.sh
     _file /usr/lib/archboot/cpio/init.sh
