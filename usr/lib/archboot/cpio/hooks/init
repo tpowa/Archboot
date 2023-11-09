@@ -12,6 +12,7 @@ _run ()
                  umount uname
     _map _binary /usr/lib/systemd/systemd{,-journald,-sulogin-shell,-modules-load,-udevd,-sysctl,-vconsole-setup}
     _map _file /usr/lib/systemd/{lib*,system-generators/systemd-fstab-generator}
+    pacman -Sy &>"${_NO_LOG}"
     _map _file $(pacman -Ql systemd | grep '/usr/lib/systemd/system/.' | cut -d ' ' -f2)
     _map _file /usr/share/systemd/{kbd-model-map,language-fallback-map}
     _map _file /usr/lib/sysusers.d/{arch,basic}.conf

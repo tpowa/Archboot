@@ -188,6 +188,7 @@ _create_iso() {
     touch boot/*
     # create Release.txt with included main archlinux packages
     echo "Generating Release.txt..."
+    $(${_NSPAWN} "${_W_DIR}" pacman -Sy "${_W_DIR}" &>"${_NO_LOG}"
     (echo "ARCHBOOT - ARCH LINUX INSTALLATION / RESCUE SYSTEM"
     echo "(c) 2006 - 2023 | https://archboot.com"
     echo "Tobias Powalowski <tpowa@archlinux.org>"
