@@ -130,7 +130,7 @@ fi
 _first_stage | _dialog --title " Loading Kernel Modules " --gauge "${_KEEP} Loading files..." 6 75 0
 # avoid screen messup, don't run dialog on module loading!
 printf "\ec"
-udevadm trigger --type=all --action=add --prioritized-subsystem=module,block,tpmrm,net,tty,input
+udevadm trigger --settle --type=all --action=add --prioritized-subsystem=module,block,tpmrm,net,tty,input
 udevadm settle
 # autodetect screen size
 FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
