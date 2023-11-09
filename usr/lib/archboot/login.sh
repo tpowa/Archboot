@@ -37,9 +37,9 @@ if [[ "${TTY}" = "tty1" ]]; then
     mount -o discard /dev/zram0 /sysroot &>"${_NO_LOG}"
     _progress "3" "Removing firmware and modules..."
     # cleanup firmware and modules
-    mv /lib/firmware/regulatory* /tmp/
+    mv /lib/firmware/regulatory* /tmp/ &>"${_NO_LOG}"
     rm -rf /lib/firmware/*
-    mv /tmp/regulatory* /lib/firmware/
+    mv /tmp/regulatory* /lib/firmware/ &>"${_NO_LOG}"
     rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,platform,net,scsi,soc,spi,usb,video}
     rm -rf /lib/modules/*/extramodules
     : > /.archboot
