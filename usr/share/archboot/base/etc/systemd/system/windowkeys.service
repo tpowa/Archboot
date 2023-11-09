@@ -3,7 +3,7 @@ Description=Load windowkeys on console
 
 [Service]
 Type=simple
-RemainAfterExit=No
+RemainAfterExit=Yes
 ExecStart=loadkeys windowkeys
 
 [Install]
