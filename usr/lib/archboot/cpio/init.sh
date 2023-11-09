@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 LANG=C
-_TITLE="Archboot $(uname -m) | $(uname -r) | Basic Setup | Early Userspace"
+_R_KVER="$(uname -r)"
+_R_ARCH="$(uname -m)"
+_TITLE="Archboot ${_R_ARCH} | ${_R_KVER} | Basic Setup | Early Userspace"
 _KEEP="Please keep the boot medium inserted."
 _dialog() {
     dialog --backtitle "${_TITLE}" "$@"
@@ -32,11 +34,19 @@ _progress_wait() {
     done
 }
 _task() {
-    [[ "${1}" == kernel ]] && bsdcpio -u -i "*/lib/modules/"  "*/lib/firmware/" <"/mnt/efi/boot/initrd-$(uname -m).img" &>/dev/null
+    if [[ "${1}" == kernel ]]; then
+        bsdcpio -u -i "*/lib/modules/"  "*/lib/firmware/" <"/mnt/efi/boot/initrd-${_R_ARCH}.img" &>/dev/null
+        # wait 1 second until proceeding with module loading, needed at least for kms activation
+        sleep 1
+    fi
     if [[ "${1}" == cleanup ]]; then
-        rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,platform,net,scsi,soc,spi,usb,video} /lib/modules/*/extramodules
+        rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,\
+input,platform,net,scsi,soc,spi,usb,video} /lib/modules/*/extramodules
         # keep ethernet NIC firmware
-        rm -rf /lib/firmware/{RTL8192E,advansys,amd*,ar3k,ath*,atmel,brcm,cavium,cirrus,cxgb*,cypress,dvb*,ene-ub6250,i915,imx,intel,iwlwifi-[8-9]*,iwlwifi-[a-z]*,iwlwifi-[A-Z]*,keyspan*,korg,libertas,matrox,mediatek,mrvl,mwl*,nvidia,nxp,qca,radeon,r128,rsi,rtlwifi,rtl_bt,rtw*,ti-connectivity,tehuti,wfx,yam,yamaha}
+        rm -rf /lib/firmware/{RTL8192E,advansys,amd*,ar3k,ath*,atmel,brcm,cavium,cirrus,cxgb*,\
+cypress,dvb*,ene-ub6250,i915,imx,intel,iwlwifi-[8-9]*,iwlwifi-[a-z]*,iwlwifi-[A-Z]*,keyspan*,\
+korg,libertas,matrox,mediatek,mrvl,mwl*,nvidia,nxp,qca,radeon,r128,rsi,rtlwifi,rtl_bt,rtw*,\
+ti-connectivity,tehuti,wfx,yam,yamaha}
     fi
     if [[ "${1}" == system ]]; then
         echo "zstd" >/sys/block/zram0/comp_algorithm
@@ -48,7 +58,7 @@ _task() {
         mv /lib/modules /sysroot/usr/lib
         mv /lib/firmware /sysroot/usr/lib
         cd /sysroot
-        bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i<"/mnt/efi/boot/initrd-$(uname -m).img" &>/dev/null
+        bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i<"/mnt/efi/boot/initrd-${_R_ARCH}.img" &>/dev/null
     fi
     if [[ "${1}" == unmount ]]; then
         if mountpoint /mnt/ventoy &>/dev/null; then
@@ -100,16 +110,16 @@ printf "\ec"
 # it needs one echo before, in order to reset the consolefont!
 setfont ter-v16n -C /dev/console
 loadkeys us
-echo "Searching 10 seconds for Archboot $(uname -m) rootfs..."
+echo "Searching 10 seconds for Archboot ${_R_ARCH} rootfs..."
 _COUNT=0
 while ! [[ "${_COUNT}" == 10 ]]; do
     # dd / rufus
     mount UUID=1234-ABCD /mnt/efi &>/dev/null && break
     # ventoy
     if mount LABEL=Ventoy /mnt/ventoy &>/dev/null; then
-        mount /mnt/ventoy/archboot-*-*-"$(uname -r)"-"$(uname -m)".iso /mnt/cdrom &>/dev/null && break
-        mount /mnt/ventoy/archboot-*-*-"$(uname -r)"-latest-"$(uname -m)".iso /mnt/cdrom &>/dev/null && break
-        mount /mnt/ventoy/archboot-*-*-"$(uname -r)"-local-"$(uname -m)".iso /mnt/cdrom &>/dev/null && break
+        mount /mnt/ventoy/archboot-*-*-"${_R_KVER}"-"${_R_ARCH}".iso /mnt/cdrom &>/dev/null && break
+        mount /mnt/ventoy/archboot-*-*-"${_R_KVER}"-latest-"${_R_ARCH}".iso /mnt/cdrom &>/dev/null && break
+        mount /mnt/ventoy/archboot-*-*-"${_R_KVER}"-local-"${_R_ARCH}".iso /mnt/cdrom &>/dev/null && break
     fi
     if [[ -b /dev/sr0 ]]; then
         mount /dev/sr0 /mnt/cdrom &>/dev/null && break
@@ -117,7 +127,7 @@ while ! [[ "${_COUNT}" == 10 ]]; do
     sleep 1
     _COUNT=$((_COUNT+1))
 done
-if ! [[ -f "/mnt/efi/boot/initrd-$(uname -m).img" ]] ; then
+if ! [[ -f "/mnt/efi/boot/initrd-${_R_ARCH}.img" ]] ; then
     if ! mount /mnt/cdrom/efi.img /mnt/efi &>/dev/null; then
         echo -e "\e[1;91mArchboot Emergeny Shell:\e[m"
         echo -e "\e[1;91mError: Didn't find a device with archboot rootfs! \e[m"
@@ -130,7 +140,7 @@ fi
 _first_stage | _dialog --title " Loading Kernel Modules " --gauge "${_KEEP} Loading files..." 6 75 0
 # avoid screen messup, don't run dialog on module loading!
 printf "\ec"
-udevadm trigger --settle --type=all --action=add --prioritized-subsystem=module,block,tpmrm,net,tty,input
+udevadm trigger --type=all --action=add --prioritized-subsystem=module,block,tpmrm,net,tty,input
 udevadm settle
 # autodetect screen size
 FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"

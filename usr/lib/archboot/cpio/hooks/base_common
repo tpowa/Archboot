@@ -42,7 +42,7 @@ var/lib/pacman/local \
             mkdir echo false sleep kmod pidof touch chmod find wc uname yes awk halt \
             shutdown reboot poweroff insmod modprobe sh dd sort zstd date tee mktemp \
             install pgrep mkfs.btrfs rmmod mountpoint gzip ldconfig ln top df cut \
-            stat tr passwd od tar bsdtar dialog
+            stat tr passwd od tar bsdtar dialog less
 
     ### add nano
     _binary nano
