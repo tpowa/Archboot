@@ -4,9 +4,9 @@
 
 _run ()
 {
-    _map _binary findssl.sh scp sftp ssh-add ssh-agent ssh-copy-id ssh-keygen ssh-keyscan sshd \
-      exportfs nfsstat rpc.idmapd rpc.mountd rpc.nfsd rpc.statd rpcdebug showmount \
-      sm-notify start-statd rpc.gssd nfsdcltrack gssproxy screen tmux rsync ttyd
+    _map _binary findssl.sh scp sftp ssh-{add,agent,copy-id,keygen,keyscan} sshd \
+      exportfs nfsstat rpc.{gssd,idmapd,mountd,nfsd,statd} rpcdebug showmount \
+      sm-notify start-statd nfsdcltrack gssproxy screen tmux rsync ttyd
     _map _file /etc/{screenrc,ssh/{ssh_config,/moduli},rsyncd.conf,exports,netconfig} \
           /usr/lib/ssh/{sftp-server,ssh-keysign,ssh-pkcs11-helper}
     _file_rename /etc/ssh/sshd_config /etc/ssh/sshd_config
@@ -25,9 +25,12 @@ _run ()
     _symlink /etc/systemd/system/multi-user.target.wants/sshd.service /usr/lib/systemd/system/sshd.service
     # start ttyd on startup
     _file /usr/lib/libwebsockets-evlib_uv.so
-    _file_rename /usr/share/archboot/remote/usr/bin/remote-login.sh /usr/bin/remote-login.sh
-    _file_rename /usr/share/archboot/remote/etc/systemd/system/ttyd.service /etc/systemd/system/ttyd.service
-    _symlink /etc/systemd/system/multi-user.target.wants/ttyd.service /etc/systemd/system/ttyd.service
+    _file_rename /usr/share/archboot/remote/usr/bin/remote-login.sh \
+                 /usr/bin/remote-login.sh
+    _file_rename /usr/share/archboot/remote/etc/systemd/system/ttyd.service \
+                 /etc/systemd/system/ttyd.service
+    _symlink /etc/systemd/system/multi-user.target.wants/ttyd.service \
+             /etc/systemd/system/ttyd.service
     # fix licenses
     _map _file /usr/share/licenses/{nfsidmap/LICENSE,tmux/LICENSE,ttyd/LICENSE}
 }
