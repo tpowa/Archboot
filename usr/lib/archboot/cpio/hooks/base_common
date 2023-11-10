@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+_run ()
+{
+    # add basic apps
+    _map _binary bash blkid bsdcpio cat cp cut dialog echo env find grep gzip halt init journalctl  \
+                 kmod loadkeys logger ls lsblk lsmod mkdir mkfs.btrfs modprobe less mount mountpoint mv poweroff \
+                 reboot rm sh shutdown sleep sed setfont sulogin systemctl systemd-{tmpfiles,sysusers} \
+                 udevadm umount uname
+    # launch systemd
+    _symlink /init /usr/lib/systemd/systemd
+    ### adding needed files from running system
+    _map _file /etc/{bash.bash_logout,bash.bashrc,profile,shells}
+    # add kmod related config file(s)
+    _file /usr/lib/depmod.d/search.conf
+    _BASIC_CONFIG="dialogrc hostname modprobe.d/modprobe.conf os-release"
+    for i in ${_BASIC_CONFIG}; do
+        _file_rename "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
+    done
+    # add bash configuration, use color bash prompt, use color grep and ls output
+    _file_rename /usr/share/archboot/base/etc/profile.d/custom-bash-options.sh \
+                 /etc/profile.d/custom-bash-options.sh
+    # add default bash setup
+    for i in .bashrc .bash_profile .bash_logout; do
+        _file_rename  "/etc/skel/${i}" "/root/${i}"
+    done
+    # add custom bash options
+    echo ". /etc/profile.d/custom-bash-options.sh" >> "${_ROOTFS}/root/.bashrc"
+    # add root user with empty password
+    echo "root::0:root" > "${_ROOTFS}/etc/group"
+    echo "root::0:0:Super User:/root:/bin/bash" > "${_ROOTFS}/etc/passwd"
+    # create a shadow file and use 1 to keep ssh happy :)
+    echo "root::1::::::" > "${_ROOTFS}/etc/shadow"
+    # use: systemctl status for everything
+    # use: systemctl list-dependencies for tree
+    # disable systemd mounts:
+    for i in dev-mqueue dev-hugepages sys-kernel-debug sys-kernel-tracing sys-fs-fuse-connections tmp; do
+        _symlink "/etc/systemd/system/${i}.mount" /dev/null
+    done
+    # disable systemd targets:
+    for i in cryptsetup first-boot-complete integritysetup swap slices veritysetup; do
+        _symlink "/etc/systemd/system/${i}.target" /dev/null
+    done
+    # disable systemd services:
+    for i in ldconfig systemd-{binfmt,boot-random-seed\
+,firstboot,hwdb-update,journal{-flush,-catalog-update},machine-id-commit,modules-load,pcrmachine\
+,pcrphase{,-initrd,-sysinit},repart}; do
+        _symlink "/etc/systemd/system/${i}.service" /dev/null
+    done
+    # disable systemd automount:
+    _symlink /etc/systemd/system/proc-sys-fs-binfmt_misc.automount /dev/null
+    # add terminus font
+    _map _file /usr/share/terminfo/l/linux /usr/share/kbd/consolefonts/ter-v{16,32}n.psf.gz
+}
+
+# vim: set ft=sh ts=4 sw=4 et:
