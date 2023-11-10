@@ -29,17 +29,20 @@ if echo "${_BASENAME}" | grep -qw "${_RUNNING_ARCH}"; then
             echo "Enable [core-testing] and [extra-testing] repository in container..."
             sed -i -e '/^#\[core-testing\]/ { n ; s/^#// }' "${1}/etc/pacman.conf"
             sed -i -e '/^#\[extra-testing\]/ { n ; s/^#// }' "${1}/etc/pacman.conf"
-            sed -i -e 's:^#\[core-testing\]:\[core-testing\]:g' -e  's:^#\[extra-testing\]:\[extra-testing\]:g' "${1}/etc/pacman.conf"
+            sed -i -e 's:^#\[core-testing\]:\[core-testing\]:g' \
+                   -e  's:^#\[extra-testing\]:\[extra-testing\]:g' "${1}/etc/pacman.conf"
         fi
     fi
 else
     # running system != creating system
     if [[ "${_RUNNING_ARCH}" == "x86_64"  ]]; then
         if echo "${_BASENAME}" | grep -qw aarch64; then
-            _pacman_chroot "${1}" "${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}" "${_PACMAN_AARCH64_CHROOT}" || exit 1
+            _pacman_chroot "${1}" "${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}" \
+                           "${_PACMAN_AARCH64_CHROOT}" || exit 1
         fi
         if echo "${_BASENAME}" | grep -qw riscv64; then
-            _pacman_chroot "${1}" "${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}" "${_PACMAN_RISCV64_CHROOT}" || exit 1
+            _pacman_chroot "${1}" "${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}" \
+                           "${_PACMAN_RISCV64_CHROOT}" || exit 1
         fi
         _create_pacman_conf "${1}" "use_binfmt"
         _pacman_parameters "${1}" "use_binfmt"
