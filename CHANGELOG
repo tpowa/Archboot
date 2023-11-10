@@ -8,6 +8,7 @@ Environment:
 cpio:
 - merged acpi_mods and platform_mods into common_mods
 - renamed base_common_mods to systemd_mods
+- create new base_ hooks
 setup:
 changed default installation path to /mnt/install
 
