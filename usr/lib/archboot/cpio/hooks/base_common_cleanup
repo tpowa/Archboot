@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Created by Tobias Powalowski <tpowa@archlinux.org>
+
+_run ()
+{
+    ! grep -qw 'archboot' /etc/hostname && return
+    _APPS="journalctl setfont mkfs.btrfs gzip systemctl mountpoint"
+    _install_files
+    for i in ${_APPS}; do
+        rm /usr/bin/"${i}"
+    done
+}
+
+# vim: set ft=sh ts=4 sw=4 et:
