@@ -12,7 +12,7 @@ findfs,fsck,logsave,resize2fs,chattr,lsattr,filefrag,\
 jfs_{debugfs,fsck,fscklog,logdump,mkfs,tune},\
 xfs_{admin,bmap,copy,db,estimate,freeze,fsr,growfs,info,io,logprint,\
 metadump,mdrestore,mkfile,ncheck,quota,repair,rtcp,spaceman},\
-mkdosfs,dosfsck,fatlabel,mount.smb3,mount.cifs,tune2fs,,mke2fs,wipefs,\
+mkdosfs,dosfsck,fatlabel,mount.smb3,mount.cifs,tune2fs,mke2fs,wipefs,\
 btrfs,btrfsck,btrfs-{find-root,image,map-logical,select-super},btrfstune,\
 mount.nilfs2,nilfs_cleanerd,cifs.{idmap,upcall},cifscreds,getcifsacl,\
 setcifsacl,umount.nilfs2,chcp,dumpseg,lscp,lssu,mkcp,rmcp,\
