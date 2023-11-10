@@ -74,7 +74,8 @@ _prepare_kernel_initrd_files() {
         cp "./init-${_ARCH}.img" "${_ISODIR}/boot/"
     else
         echo "Running archboot-cpio.sh for init-${_ARCH}.img..."
-        archboot-cpio.sh -c "/etc/archboot/${_ARCH}-init.conf" -k "${_KERNEL}" -g "${_ISODIR}/boot/init-${_ARCH}.img" || exit 1
+        archboot-cpio.sh -c "/etc/archboot/${_ARCH}-init.conf" -k "${_KERNEL}" \
+                         -g "${_ISODIR}/boot/init-${_ARCH}.img" || exit 1
         # save init ramdisk for further images
         if [[ -n "${_SAVE_INIT}" ]]; then
             cp "${_ISODIR}/boot/init-${_ARCH}.img" ./
@@ -90,7 +91,8 @@ _prepare_kernel_initrd_files() {
     if ! [[ -f "${_ISODIR}/boot/initrd-${_ARCH}.img" ]]; then
         echo "Running archboot-cpio.sh for initrd-${_ARCH}.img..."
         #shellcheck disable=SC2154
-        archboot-cpio.sh -c "${_CONFIG}" -k "${_KERNEL}" -g "${_ISODIR}/boot/initrd-${_ARCH}.img" || exit 1
+        archboot-cpio.sh -c "${_CONFIG}" -k "${_KERNEL}" \
+                         -g "${_ISODIR}/boot/initrd-${_ARCH}.img" || exit 1
     fi
     # delete cachedir on archboot environment
     if grep -qw 'archboot' /etc/hostname; then
@@ -253,7 +255,13 @@ _grub_mkrescue() {
     [[ "${_ARCH}" == "x86_64" ]] && _RESCUE_REMOVE="mach_kernel /System /boot/grub/i386-efi /boot/grub/x86_64-efi"
     [[ "${_ARCH}" == "aarch64" ]] && _RESCUE_REMOVE="/boot/grub/arm64-efi"
     #shellcheck disable=SC2086
-    grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' --modification-date=1970010100000000 --compress=xz --fonts="ter-u16n" --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" -volid "ARCHBOOT" -- -rm_r /boot/grub/{roms,locale} /efi .disk/ ${_RESCUE_REMOVE} &> "${_IMAGENAME}.log"
+    grub-mkrescue --set_all_file_dates 'Jan 1 00:00:00 UTC 1970' \
+                  --modification-date=1970010100000000 --compress=xz --fonts="ter-u16n" \
+                  --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ \
+                  "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" \
+                  "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" \
+                  -volid "ARCHBOOT" -- -rm_r /boot/grub/{roms,locale} /efi .disk/ \
+                  ${_RESCUE_REMOVE} &> "${_IMAGENAME}.log"
 }
 
 _unify_gpt_partitions() {
@@ -268,7 +276,8 @@ _unify_gpt_partitions() {
     echo "Creating reproducible GUID, UUIDs, hide partitions, disable automount and move main table sector on ISO GPT..."
     sgdisk -j 2 -U 00000000-0000-0000-0000-0000-000000000000 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
     for i in 1 2 3 4; do
-        sgdisk -A ${i}:set:62 -A ${i}:set:63 -u ${i}:${i}0000000-0000-0000-0000-0000-000000000000 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
+        sgdisk -A ${i}:set:62 -A ${i}:set:63 -u ${i}:${i}0000000-0000-0000-0000-0000-000000000000 \
+               "${_IMAGENAME}.iso" &>"${_NO_LOG}"
     done
 }
 

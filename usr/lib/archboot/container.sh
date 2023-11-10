@@ -67,10 +67,14 @@ _clean_container() {
         rm -r "${1}"/usr/share/{aclocal,applications,audit,awk,common-lisp,emacs,et,fish,gdb,gettext,gettext-[0-9]*,glib-[0-9]*,gnupg,gtk-doc,iana-etc,icons,icu,keyutils,libalpm,libgpg-error,makepkg-template,misc,pixmaps,pkgconfig,screen,smartmontools,ss,tabset,vala,xml,man,doc,info,xtables}
         rm -r "${1}"/usr/lib/{audit,awk,binfmt.d,cmake,dracut,e2fsprogs,environment.d,gawk,getconf,gettext,girepository-[0-9]*,glib-[0-9]*,gnupg,gssproxy,icu,krb5,ldscripts,libnl,pkgconfig,sasl2,siconv,tar,xfsprogs,xtables}
         # locale cleaning
-        find "${1}"/usr/share/locale/ -mindepth 2 ! -path '*/be/*' ! -path '*/bg/*' ! -path '*/cs/*' ! -path '*/da/*' ! -path '*/de/*' \
-        ! -path '*/en/*' ! -path '*/el/*' ! -path '*/es/*' ! -path '*/fi/*' ! -path '*/fr/*' ! -path '*/hu/*' ! -path '*/it/*' \
-        ! -path '*/lt/*' ! -path '*/lv/*' ! -path '*/mk/*' ! -path '*/nl/*' ! -path '*/nn/*' ! -path '*/pl/*' ! -path '*/pt/*' \
-        ! -path '*/ro/*' ! -path '*/ru/*' ! -path '*/sk/*' ! -path '*/sr/*' ! -path '*/sv/*' ! -path '*/tr/*' ! -path '*/uk/*' -delete &>"${_NO_LOG}"
+        find "${1}"/usr/share/locale/ -mindepth 2 ! -path '*/be/*' ! -path '*/bg/*' \
+             ! -path '*/cs/*' ! -path '*/da/*' ! -path '*/de/*' ! -path '*/en/*' \
+             ! -path '*/el/*' ! -path '*/es/*' ! -path '*/fi/*' ! -path '*/fr/*' \
+             ! -path '*/hu/*' ! -path '*/it/*' ! -path '*/lt/*' ! -path '*/lv/*' \
+             ! -path '*/mk/*' ! -path '*/nl/*' ! -path '*/nn/*' ! -path '*/pl/*' \
+             ! -path '*/pt/*' ! -path '*/ro/*' ! -path '*/ru/*' ! -path '*/sk/*' \
+             ! -path '*/sr/*' ! -path '*/sv/*' ! -path '*/tr/*' ! -path '*/uk/*' \
+             -delete &>"${_NO_LOG}"
         find "${1}"/usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>"${_NO_LOG}"
     fi
 }
@@ -149,22 +153,26 @@ _install_base_packages() {
         echo "Downloading ${_KEYRING} ${_PACKAGES} to ${1}..."
         if grep -q 'archboot' /etc/hostname; then
             #shellcheck disable=SC2086
-            ${_PACMAN} -Syw ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_LOG}" || exit 1
+            ${_PACMAN} -Syw ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} \
+                        ${_PACMAN_DB} &>"${_LOG}" || exit 1
         else
             #shellcheck disable=SC2086
-            ${_PACMAN} -Syw ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
+            ${_PACMAN} -Syw ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} \
+                       ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
         fi
     fi
     echo "Installing ${_KEYRING} ${_PACKAGES} to ${1}..."
     if grep -q 'archboot' /etc/hostname; then
         #shellcheck disable=SC2086
-        ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
+        ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} ${_KEYRING} ${_PACKAGES} \
+                   ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
         echo "Downloading mkinitcpio to ${1}..."
         #shellcheck disable=SC2086
         ${_PACMAN} -Syw mkinitcpio ${_PACMAN_DEFAULTS} >"${_LOG}" 2>&1 || exit 1
     else
         #shellcheck disable=SC2086
-        ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
+        ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} ${_KEYRING} ${_PACKAGES} \
+                   ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
         echo "Downloading mkinitcpio to ${1}..."
         #shellcheck disable=SC2086
         ${_PACMAN} -Syw mkinitcpio ${_PACMAN_DEFAULTS} >"${_NO_LOG}" 2>&1 || exit 1
@@ -183,13 +191,15 @@ _install_archboot() {
         ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
         echo "Downloading ${_MAN_INFO_PACKAGES} to ${1}..."
         #shellcheck disable=SC2086
-        ${_PACMAN} -Syw ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_LOG}" || exit 1
+        ${_PACMAN} -Syw ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} \
+                   ${_PACMAN_DB} &>"${_LOG}" || exit 1
     else
         #shellcheck disable=SC2086
         ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
         echo "Downloading ${_MAN_INFO_PACKAGES} to ${1}..."
         #shellcheck disable=SC2086
-        ${_PACMAN} -Syw ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
+        ${_PACMAN} -Syw ${_MAN_INFO_PACKAGES} ${_PACMAN_DEFAULTS} \
+                   ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
     fi
     # cleanup
     if ! [[ "${2}"  == "use_binfmt" ]]; then

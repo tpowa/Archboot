@@ -19,6 +19,13 @@ _local_mode () {
     fi
 }
 
+_memory_error () {
+    echo -e "\e[1m\e[91mMemory check failed:\e[m"
+    echo -e "\e[91m- Not engough memory detected! \e[m"
+    echo -e "\e[93m- Please add \e[1mmore\e[m\e[93m than \e[1m${1}\e[m\e[93m RAM.\e[m"
+    echo -e "\e[91mAborting...\e[m"
+}
+
 # use -o discard for RAM cleaning on delete
 # (online fstrimming the block device!)
 # fstrim <mountpoint> for manual action
@@ -40,7 +47,8 @@ if [[ "${TTY}" = "tty1" ]]; then
     mv /lib/firmware/regulatory* /tmp/ &>"${_NO_LOG}"
     rm -rf /lib/firmware/*
     mv /tmp/regulatory* /lib/firmware/ &>"${_NO_LOG}"
-    rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,platform,net,scsi,soc,spi,usb,video}
+    rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,\
+platform,net,scsi,soc,spi,usb,video}
     rm -rf /lib/modules/*/extramodules
     : > /.archboot
     (tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
@@ -164,19 +172,13 @@ if [[ -e /usr/bin/setup ]]; then
 # latest image, fail if less than 2GB RAM available
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 1970000 ]]; then
     _welcome
-    echo -e "\e[1m\e[91mMemory check failed:\e[m"
-    echo -e "\e[91m- Not engough memory detected! \e[m"
-    echo -e "\e[93m- Please add \e[1mmore\e[m\e[93m than \e[1m2.0GB\e[m\e[93m RAM.\e[m"
-    echo -e "\e[91mAborting...\e[m"
+    _memory_error "2.0GB"
     _enter_shell
 # local image, fail if less than 3.3GB  RAM available
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 &&\
 -e "${_LOCAL_DB}" ]]; then
     _welcome
-    echo -e "\e[1m\e[91mMemory check failed:\e[m"
-    echo -e "\e[91m- Not engough memory detected! \e[m"
-    echo -e "\e[93m- Please add \e[1mmore\e[m\e[93m than \e[1m2.6GB\e[m\e[93m RAM.\e[m"
-    echo -e "\e[91mAborting...\e[m"
+    _memory_error "2.6GB"
     _enter_shell
 else
     _welcome
