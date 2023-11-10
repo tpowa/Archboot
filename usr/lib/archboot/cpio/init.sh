@@ -109,7 +109,6 @@ echo "Initializing Console..."
 printf "\ec"
 # it needs one echo before, in order to reset the consolefont!
 setfont ter-v16n -C /dev/console
-loadkeys us
 echo "Searching 10 seconds for Archboot ${_ARCH} rootfs..."
 _COUNT=0
 while ! [[ "${_COUNT}" == 10 ]]; do
