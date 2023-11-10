@@ -5,13 +5,9 @@
 _run ()
 {
     ! grep -qw 'archboot' /etc/hostname && return
-    _APPS="arping clockdiff tracepath ssh arpd \
-      genl ifstat ctstat rtstat lnstat nstat rtacct rtmon ss tc \
-      bridge dcb devlink rdma tipc vdpa ethtool elinks brctl"
     _install_files
-    for i in ${_APPS}; do
-        rm /usr/bin/"${i}"
-    done
+    rm /usr/bin/{arping,clockdiff,tracepath,ssh,arpd,genl,ifstat,ctstat,rtstat,lnstat,\
+nstat,rtacct,rtmon,ss,tc,bridge,dcb,devlink,rdma,tipc,vdpa,ethtool,elinks,brctl}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

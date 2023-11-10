@@ -5,11 +5,9 @@
 _run ()
 {
     ! grep -qw 'archboot' /etc/hostname && return
-    _APPS="journalctl setfont mkfs.btrfs gzip systemctl mountpoint"
     _install_files
-    for i in ${_APPS}; do
-        rm /usr/bin/"${i}"
-    done
+    rm /usr/bin/{bsdcpio,blkid,gzip,journalctl,less,lsmod,mkfs.btrfs,\
+mountpoint,setfont,sulogin,systemctl}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

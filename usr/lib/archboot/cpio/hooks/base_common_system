@@ -54,8 +54,7 @@ var/lib/pacman/local \
     # add needed files from running system
     _map _file /etc/{crypttab,fstab,host.conf,hosts,inputrc,mke2fs.conf,nsswitch.conf,\
 protocols,request-key.conf,securetty,services}
-    _BASIC_CONFIG="issue tmpfiles.d/var.conf"
-    for i in ${_BASIC_CONFIG}; do
+    for i in issue tmpfiles.d/var.conf; do
         _file_rename "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done
     # fixing network support from glibc
