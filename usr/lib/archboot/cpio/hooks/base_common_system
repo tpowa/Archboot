@@ -4,7 +4,7 @@
 
 _run ()
 {
-    ### remove conflicting grub, rpcbind and ukify files
+    # remove conflicting grub, rpcbind and ukify files
     tar -C / --exclude=etc/systemd/system/multi-user.target.wants/remote-fs.target \
 --exclude=usr/share/bash-completion/completions/grub \
 --exclude=usr/lib/{modules-load.d/cdrecord.conf,systemd/{system/{blk-availability.service,lvm2*,rpcbind*,sysinit.target.wants/lvm2*},ukify},sysusers.d/rpcbind*,\
@@ -14,8 +14,7 @@ etc/{ca-certificates/extracted,default,pam.d,pinentry,profile.d,security,skel,ss
 usr/lib/{coreutils,cryptsetup,gconv,modules-load.d,p11-kit,pam.d,pkcs11,security,sysctl.d,systemd,sysusers.d,tmpfiles.d,udev} \
 usr/share/{bash-completion,dbus-1,factory,hwdata,i18n/locales,makepkg,nano,pacman/keyrings,polkit-1,readline,systemd,terminfo} \
 | tar -C "${_ROOTFS}" -xpf -
-
-    ### only run on archboot container
+    # only run on archboot container
     if grep -qw 'archboot' /etc/hostname; then
         _map _binary locale-gen localedef
         _map _file /etc/locale.gen /usr/share/locale/locale.alias
@@ -35,76 +34,43 @@ usr/share/{locale/{be,bg,cs,da,de,en_US,el,es,fi,fr,hu,it,lt,lv,mk,nl,nn,pl,pt,r
 var/lib/pacman/local \
 | tar -C "${_ROOTFS}" -xpf -
     fi
-
-    ### add basic apps
-    _map _binary init agetty basename mount umount clear env printf gawk tty bash rbash \
-            partprobe cp dir du ls mv rm sed grep kill killall more ps pwd rmdir true cat \
-            mkdir echo false sleep kmod pidof touch chmod find wc uname yes awk halt \
-            shutdown reboot poweroff insmod modprobe sh dd sort zstd date tee mktemp \
-            install pgrep mkfs.btrfs rmmod mountpoint gzip ldconfig ln top df cut \
-            stat tr passwd od tar bsdtar dialog less
-
-    ### add nano
+    # add basic apps
+    _map _binary agetty awk basename bsdtar chmod clear date dd df dir du \
+                 false gawk insmod install kill killall ldconfig mktemp \
+                 more mountpoint od partprobe passwd pgrep pidof printf ps \
+                 pwd rmdir true rbash rmmod sh sort stat  tar tee top touch \
+                 tr tty wc yes zstd
+    # add nano
     _binary nano
     _file_rename /etc/nanorc /etc/nanorc
     # add syntax highlighting
     echo "include \"/usr/share/nano/*.nanorc\"" >> "${_ROOTFS}/etc/nanorc"
-
     ### add machine-id
     : > "${_ROOTFS}"/etc/machine-id
-
-    ### add file magic file
+    # add file magic file
     _file /usr/share/file/misc/magic.mgc
-
-    ### launch systemd
-    _symlink /init /usr/lib/systemd/systemd
-
-    ### adding needed files from running system
+    # add terminfo
     _symlink /usr/lib/terminfo ../share/terminfo
-    _map _file /etc/{bash.bash_logout,bash.bashrc,crypttab,fstab,host.conf,hosts,\
-inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
-
-    ### adding config files of installation system
-    _map _file /etc/{profile,shells}
-    _BASIC_CONFIG="dialogrc hostname issue modprobe.d/modprobe.conf os-release tmpfiles.d/var.conf"
+    # add needed files from running system
+    _map _file /etc/{crypttab,fstab,host.conf,hosts,inputrc,mke2fs.conf,nsswitch.conf,\
+protocols,request-key.conf,securetty,services}
+    _BASIC_CONFIG="issue tmpfiles.d/var.conf"
     for i in ${_BASIC_CONFIG}; do
         _file_rename "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done
-
-    ### add bash configuration
-    # use color bash prompt
-    # unlock and delete root password, if not set by user!
-    # use color grep and ls output
-    for i in custom-bash-options.sh; do
-        _file_rename "/usr/share/archboot/base/etc/profile.d/${i}" "/etc/profile.d/${i}"
-    done
-    # add default bash setup
-    for i in .bashrc .bash_profile .bash_logout; do
-        _file_rename  "/etc/skel/${i}" "/root/${i}"
-    done
-    # add custom bash options
-    echo ". /etc/profile.d/custom-bash-options.sh" >> "${_ROOTFS}/root/.bashrc"
-
-    ### add kmod related config file(s)
-    _file /usr/lib/depmod.d/search.conf
-
-    ### fixing network support from glibc
+    # fixing network support from glibc
     _map _file /usr/lib/{libnss_files.so.2,libnss_dns.so.2}
-
-    ### add pam and shadow
+    ## add pam and shadow
     _map _binary mkhomedir_helper pam_timestamp_check unix_chkpwd unix_update login nologin
     _map _file /etc/{environment,login.defs}
-
-    ### add systemd
-    _map _binary mount.nfs4 umount.nfs umount.nfs4 mount.nfs setfont loadkeys
-
-    #dbus files
+    # add systemd service apps
+    _map _binary mount.nfs4 umount.nfs umount.nfs4 mount.nfs loadkeys
+    # dbus files
     _map _binary dbus-cleanup-sockets dbus-daemon dbus-launch dbus-monitor dbus-run-session dbus-send dbus-test-tool \
           dbus-update-activation-environment dbus-uuidgen /usr/lib/dbus-1.0/dbus-daemon-launch-helper
-
     # tpm2-tss files
     _map _binary secret-tool pinentry pinentry-curses gpgme-tool gpgme-json
-    #systemd files
+    # systemd files
     _map _binary systemd-umount busctl bootctl coredumpctl hostnamectl journalctl kernel-install localectl \
           loginctl machinectl mount.ddi networkctl systemctl systemd-ac-power systemd-analyze systemd-ask-password \
           systemd-cat systemd-cgls systemd-cgtop systemd-confext \
@@ -128,54 +94,32 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
                  /etc/systemd/journald.conf.d/fw-tty12.conf
     _symlink /etc/systemd/system/multi-user.target.wants/windowkeys.service \
              /etc/systemd/system/windowkeys.service
-    ### use: systemctl status for everything
-    ### use: systemctl list-dependencies for tree
-    ### disable systemd mounts:
-    for i in dev-mqueue dev-hugepages sys-kernel-debug sys-kernel-tracing sys-fs-fuse-connections tmp; do
-        _symlink "/etc/systemd/system/${i}.mount" /dev/null
-    done
-    ### disable systemd targets:
-    for i in cryptsetup first-boot-complete integritysetup swap slices veritysetup; do
+    # disable systemd targets:
+    for i in remote-{veritysetup,cryptsetup} sockets timers; do
         _symlink "/etc/systemd/system/${i}.target" /dev/null
     done
-    ### disable systemd services:
-    for i in binfmt boot-random-seed firstboot hwdb-update journal-{flush,catalog-update} \
-             machine-id-commit modules-load pcrmachine repart pcrphase{,-sysinit} \
-             update-{done,utmp}; do
-        _symlink "/etc/systemd/system/systemd-${i}.service" /dev/null
-    done
-    _symlink /etc/systemd/system/ldconfig.service /dev/null
-    ### disable systemd timers:
-    for i in man-db shadow systemd-tmpfiles-clean; do
+    # disable systemd timers:
+    for i in shadow systemd-tmpfiles-clean; do
         _symlink "/etc/systemd/system/${i}.timer" /dev/null
     done
-    ### disable automount:
-    _symlink /etc/systemd/system/proc-sys-fs-binfmt_misc.automount /dev/null
+    # disable systemd-gpt-auto-generator, errors out on initramfs usage
+    _symlink /etc/systemd/system-generators/systemd-gpt-auto-generator /dev/null
     # disable lastlog
     _symlink /var/log/lastlog /dev/null
     _file_rename /usr/share/archboot/base/etc/tmpfiles.d/var.conf /etc/tmpfiles.d/var.conf
-    ### add missing libsystemd files
+    # add missing libsystemd files
     _map _file /usr/lib/{libnss_myhostname.so.2,libnss_mymachines.so.2,libnss_resolve.so.2,libnss_systemd.so.2}
-    ### fix tmpfiles startup
+    # fix tmpfiles startup
     _map _file /usr/lib/{libnss_compat.so.2,libnsl.so.1}
-    # mask systemd-gpt-auto-generator, errors out on initramfs usage
-    _symlink /etc/systemd/system-generators/systemd-gpt-auto-generator /dev/null
-    ### add udev
-    _map _binary udevadm systemd-tmpfiles logger
     # add schedule rules file
     _file_rename /usr/share/archboot/base/etc/udev/rules.d/60-ioschedulers.rules /etc/udev/rules.d/60-ioschedulers.rules
     # add minimal vconsole
-    _map _file /usr/share/terminfo/l/linux /usr/share/kbd/{consolefonts/ter-v{16,32}n.psf.gz,keymaps/i386/\
+    _map _file /usr/share/kbd/{keymaps/i386/\
 {include/{qwerty-layout,compose,linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz}} \
     /usr/share/kbd/keymaps/{include/compose.latin1,i386/include/{euro{,1},windowkeys}.map.gz}
     # add swapiness sysctl config file
     _file_rename /usr/share/archboot/base/etc/sysctl.d/99-sysctl.conf /etc/sysctl.d/99-sysctl.conf
-    # add root user with empty password
-    echo "root::0:root" > "${_ROOTFS}/etc/group"
-    echo "root::0:0:Super User:/root:/bin/bash" > "${_ROOTFS}/etc/passwd"
-    # create a shadow file and use 1 to keep ssh happy :)
-    echo "root::1::::::" > "${_ROOTFS}/etc/shadow"
-    ### add pacman
+    # add pacman
     _map _binary pacman pacman-conf pacman-key pacman-db-upgrade makepkg \
           repo-add repo-elephant testpkg vercmp curl gpg-agent gpg \
           gpgconf gpg-connect-agent repo-remove archlinux-keyring-wkd-sync
@@ -185,14 +129,13 @@ inputrc,mke2fs.conf,nsswitch.conf,protocols,request-key.conf,securetty,services}
     _dir /etc/pacman.d/gnupg
     _file_rename /usr/share/archboot/base/etc/systemd/system/pacman-init.service \
                  /etc/systemd/system/pacman-init.service
-    ### add nss p11-kit and ca certificates
+    # add nss p11-kit and ca certificates
     _map _binary p11-kit trust certutil cmsutil crlutil modutil nss-config pk12util \
                    shlibsign signtool signver ssltap symkeyutil update-ca-trust
     _symlink "/etc/ssl/cert.pem" "../ca-certificates/extracted/tls-ca-bundle.pem"
     _symlink "/etc/ssl/certs/ca-certificates.crt" "../../ca-certificates/extracted/tls-ca-bundle.pem"
     _map _file /usr/share/{ca-certificates/trust-source/mozilla.trust.p11-kit,p11-kit/modules/p11-kit-trust.module}
-
-    ### fix licenses
+    # fix licenses
     _map _file /usr/share/licenses/{shadow/COPYING,iana-etc/LICENSE,dbus/COPYING,p11-kit/COPYING}
 }
 
