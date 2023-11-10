@@ -38,7 +38,7 @@ var/lib/pacman/local \
     _map _binary agetty awk basename bsdtar chmod clear date dd df dir du \
                  false gawk insmod install kill killall ldconfig mktemp \
                  more mountpoint od partprobe passwd pgrep pidof printf ps \
-                 pwd rmdir true rbash rmmod sh sort stat  tar tee top touch \
+                 pwd rmdir true rbash rmmod sort stat  tar tee top touch \
                  tr tty wc yes zstd
     # add nano
     _binary nano
