@@ -37,7 +37,8 @@ _run ()
     # use: systemctl status for everything
     # use: systemctl list-dependencies for tree
     # disable systemd mounts:
-    for i in dev-mqueue dev-hugepages sys-kernel-debug sys-kernel-tracing sys-fs-fuse-connections tmp; do
+    for i in dev-mqueue dev-hugepages sys-kernel-debug sys-kernel-tracing \
+            sys-fs-fuse-connections tmp; do
         _symlink "/etc/systemd/system/${i}.mount" /dev/null
     done
     # disable systemd targets:
