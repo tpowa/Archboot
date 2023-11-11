@@ -4,34 +4,33 @@
 
 _run ()
 {
-    _map _binary head id cksum tail test uptime w who whoami xargs swapon uniq seq fdisk \
-                 sfdisk cfdisk parted free chgrp chown dmesg egrep fgrep stty hdparm sync \
-                 dirname chroot expr bzip2 su sdparm tput losetup mkfifo mknod readlink \
-                 lzmadec lzop xz last wall mesg utmpdump xzdec switch_root pivot_root chcpu \
-                 ctrlaltdel gdisk sgdisk cgdisk fixparts findmnt lsfd lsblk swaplabel cal \
-                 chrt col colcrt colrm column fallocate flock getopt ionice ipcmk ipcrm \
-                 ipcs swapoff look lscpu mcookie namei prlimit rename renice rev script \
-                 scriptreplay setarch setsid setterm taskset ul unshare uuidgen whereis \
-                 write addpart delpart ldattach partx readprofile rtcwake uuidd sysctl \
-                 pidwait pkill pmap pwdx slabtop tload vmstat watch eject keyctl request-key \
-                 tac resizepart lslocks wdctl zless zgrep fold hexdump ldd shred blockdev \
-                 blkdiscard newgrp nsenter runuser vigr vipw diff depmod linux32 linux64 \
-                 lzcat lzcmp lzdiff lzegrep lzfgrep lzgrep lzegrep lzless lzmore lzma \
-                 modinfo reset unlzma unxz xzcat lastb blkzone chmem choom fincore \
-                 hardlink irqtop lsipc lsirq lslogins lsmem lsns mkfs scriptlive setpriv \
-                 uclampset uname26 uuidparse zramctl [ b2sum base32 base64 basenc chcon \
-                 comm csplit dircolors expand factor fmt hostid join link logname md5sum \
-                 nice nl nohup nproc numfmt paste pathchk pinky pr printenv ptx realpath \
-                 runcon sha1sum sha224sum sha256sum sha384sum sha512sum shuf split stdbuf \
-                 sum timeout truncate tsort unexpand unlink users vdir fuser prtstat pslog \
-                 pstree newgid_map newuid_map lzmainfo xzcmp xzgrep xzegrep xzfgrep gzexe \
-                 uncompress zcmp zdiff zegrep zfgrep zforce zmore znew bunzip2 bzcat bzdiff \
-                 bzgrep bzip2recover bzmore chacl getfacl setfacl attr getfattr setfattr \
-                 pzstd unzstd zstdcat zstdgrep zstdless zstdmt lz4 lz4c lz4cat unlz4 gunzip \
-                 zcat wipe capsh getcap getpcaps setcap file blkpr fadvise isosize pg pipesz tunelp
+    _map _binary [ addpart attr b2sum base{32,64} basenc blk{discard,pr,zone} blockdev bunzip2 \
+                 bz{cat,diff,grep,ip2,ip2recover,more} cal capsh ch{acl,con,cpu,grp,mem,oom,own,root,rt} \
+                 cfdisk cgdisk cksum col{,crt,rm,umn} comm csplit ctrlaltdel delpart diff \
+                 depmod dir{name,colors} dmesg eject egrep expand expr fallocate factor fadvise \
+                 fdisk fgrep file fincore findmnt fixparts flock fmt fold free fuser gdisk \
+                 get{cap,facl,fattr,opt,pcaps} gunzip gzexe hardlink hdparm head hexdump hostid \
+                 id ionice ipc{mk,rm,s} irqtop isosize join keyctl last{,b} ldattach ldd \
+                 link linux{32,64} logname look losetup ls{cpu,fd,ipc,irq,locks,logins,mem,ns} \
+                 lz4{,c,cat} lz{cat,cmp,diff,egrep,fgrep,grep,less,more,ma,madec,mainfo,op} \
+                 mcookie md5sum mesg mk{fifo,fs,nod} modinfo namei new{grp,gid_map,uid_map} \
+                 nice nl nohup nproc nsenter numfmt parted partx paste pathchk pidwait pinky \
+                 pg pipesz {pivot,switch}_root pkill pmap pr printenv prlimit prtstat pslog \
+                 pstree ptx pwdx pzstd read{link,profile} realpath rename renice request-key \
+                 resizepart reset rev rtcwake run{con,user} script{,live,replay} sdparm \
+                 seq set{arch,cap,facl,fattr,priv,sid,term} sfdisk sgdisk \
+                 sha{1sum,224sum,256sum,384sum,512sum} shred shuf slabtop split stdbuf stty \
+                 su sum swap{label,off,on} sync sysctl tac tail taskset test timeout tload \
+                 tput truncate tsort tunelp uclampset ul \
+                 un{ame26,compress,expand,iq,link,lz4,lzma,share,xz,zstd} uptime users utmpdump \
+                 uuidd uuidgen uuidparse vdir vigr vipw vmstat w wall watch wdctl whereis who \
+                 whoami wipe write xargs xz{,cat,cmp,dec,grep,egrep,fgrep} \
+                 z{cat,cmp,diff,egrep,fgrep,force,grep,less,more,new,ramctl} zstd{cat,grep,less,mt}
     [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _map _binary i386 x86_64 peekfd waitpid
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _binary peekfd
     [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _map _binary waitpid
+    # add file magic file
+    _file /usr/share/file/misc/magic.mgc
     # add C.UTF-8 locale
     _dir /usr/lib/locale
     [[ -d /usr/lib/locale/C.utf8 ]] && _full_dir /usr/lib/locale/C.utf8
@@ -42,9 +41,8 @@ _run ()
           {chg,ch,g}passwd group{add,del,mems,mod} grp{ck,conv,unconv} \
           newusers pw{ck,conv,unconv} user{add,del,mod} sg getsubids
     # fix licenses
-    _map _file /usr/share/licenses/file/COPYING /usr/share/licenses/bzip2/LICENSE \
-                 /usr/share/licenses/hdparm/LICENSE.TXT /usr/share/licenses/ncurses/COPYING \
-                 /usr/share/licenses/sdparm/LICENSE /usr/share/licenses/zlib/LICENSE
+    _map _file /usr/share/licenses/{file/COPYING,bzip2/LICENSE,hdparm/LICENSE.TXT,\
+ncurses/COPYING,sdparm/LICENSE,zlib/LICENSE}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

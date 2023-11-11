@@ -46,8 +46,6 @@ var/lib/pacman/local \
     echo "include \"/usr/share/nano/*.nanorc\"" >> "${_ROOTFS}/etc/nanorc"
     ### add machine-id
     : > "${_ROOTFS}"/etc/machine-id
-    # add file magic file
-    _file /usr/share/file/misc/magic.mgc
     # add terminfo
     _symlink /usr/lib/terminfo ../share/terminfo
     # add needed files from running system
