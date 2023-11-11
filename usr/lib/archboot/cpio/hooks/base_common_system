@@ -16,7 +16,7 @@ usr/share/{bash-completion,dbus-1,factory,hwdata,i18n/locales,makepkg,nano,pacma
 | tar -C "${_ROOTFS}" -xpf -
     # only run on archboot container
     if grep -qw 'archboot' /etc/hostname; then
-        _map _binary locale-gen localedef
+        _map _binary locale{-gen,def}
         _map _file /etc/locale.gen /usr/share/locale/locale.alias
         # only support UTF-8
         _file /usr/share/i18n/charmaps/UTF-8.gz
@@ -34,7 +34,6 @@ usr/share/{locale/{be,bg,cs,da,de,en_US,el,es,fi,fr,hu,it,lt,lv,mk,nl,nn,pl,pt,r
 var/lib/pacman/local \
 | tar -C "${_ROOTFS}" -xpf -
     fi
-    # add basic apps
     _map _binary agetty awk basename bsdtar chmod clear date dd df dir du \
                  false gawk insmod install kill killall ldconfig mktemp \
                  more od partprobe passwd pgrep pidof printf ps \
@@ -60,23 +59,22 @@ protocols,request-key.conf,securetty,services}
     # fixing network support from glibc
     _map _file /usr/lib/{libnss_files.so.2,libnss_dns.so.2}
     ## add pam and shadow
-    _map _binary mkhomedir_helper pam_timestamp_check unix_chkpwd unix_update login nologin
+    _map _binary mkhomedir_helper pam_timestamp_check unix_{chkpwd,update} login nologin
     _map _file /etc/{environment,login.defs}
     # add systemd service apps
-    _map _binary mount.nfs4 umount.nfs umount.nfs4 mount.nfs loadkeys
+    _map _binary mount.nfs{,4} umount.nfs{,4} loadkeys
     # dbus files
     _map _binary dbus-{cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
 update-activation-environment,uuidgen} /usr/lib/dbus-1.0/dbus-daemon-launch-helper
     # tpm2-tss files
-    _map _binary secret-tool pinentry pinentry-curses gpgme-tool gpgme-json
+    _map _binary secret-tool pinentry{,-curses} gpgme-{tool,json}
     # systemd files
-    _map _binary busctl bootctl coredumpctl hostnamectl journalctl \
-                 kernel-install localectl loginctl machinectl mount.ddi networkctl \
-                 systemctl systemd-{ac-power,analyze,ask-password,cat,cgls,cgtop,confext\
-delta,detect-virt,escape,firstboot,hwdb,inhibit,machine-id-setup,mount,notify,nspawn,path,resolve,repart\
-run,socket-activate,stdio-bridge,sysusers,tty-ask-password-agent,umount,creds,cryptenroll,dissect,id128,sysext} \
-                 timedatectl systemd- userdbctl homectl oomctl portablectl
-    _map _dir /etc/tmpfiles.d /etc/modules-load.d /etc/binfmt.d/
+    _map _binary {bus,boot,coredump,hostname,journal,locale,login,machine,network,\
+system,timedate,userdb,home,oom,portable}ctl kernel-install  mount.ddi systemd-{ac-power,\
+analyze,ask-password,cat,cgls,cgtop,confextdelta,detect-virt,escape,firstboot,hwdb,inhibit,\
+machine-id-setup,mount,notify,nspawn,path,resolve,repartrun,socket-activate,stdio-bridge,\
+sysusers,tty-ask-password-agent,umount,creds,cryptenroll,dissect,id128,sysext}
+    _map _dir /etc/tmpfiles.d /etc/modules-load.d /etc/binfmt.d
     _file_rename /usr/share/archboot/base/etc/locale.conf /etc/locale.conf
     _file_rename /usr/share/archboot/base/etc/vconsole.conf /etc/vconsole.conf
     _file_rename /usr/share/archboot/base/etc/systemd/system/systemd-user-sessions.service \
@@ -118,10 +116,10 @@ linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz} \
     # add swapiness sysctl config file
     _file_rename /usr/share/archboot/base/etc/sysctl.d/99-sysctl.conf /etc/sysctl.d/99-sysctl.conf
     # add pacman
-    _map _binary pacman pacman-conf pacman-key pacman-db-upgrade makepkg \
-          repo-add repo-elephant testpkg vercmp curl gpg-agent gpg \
-          gpgconf gpg-connect-agent repo-remove archlinux-keyring-wkd-sync
-    _map _dir /var/cache/pacman/pkg /var/lib/pacman
+    _map _binary pacman{,-conf,-key,-db-upgrade} makepkg \
+          repo-{add,elephant,remove} testpkg vercmp curl gpg{,-agent,conf,-connect-agent} \
+          archlinux-keyring-wkd-sync
+    _map _dir /var/{cache/pacman/pkg,lib/pacman}
     _map _file /etc/{pacman.conf,makepkg.conf,pacman.d/mirrorlist}
     # add pacman initialization of gpg keys
     _dir /etc/pacman.d/gnupg

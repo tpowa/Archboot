@@ -38,9 +38,9 @@ _run ()
     # add custom locale
     [[ -e "/usr/lib/locale/locale-archive" ]] && _file /usr/lib/locale/locale-archive
     # add shadow
-    _map _binary groups chage chfn chsh expiry faillog gpasswd lastlog \
-          chgpasswd chpasswd groupadd groupdel groupmems groupmod grpck grpconv grpunconv \
-          newusers pwck pwconv pwunconv useradd userdel usermod sg getsubids
+    _map _binary groups ch{age,fn,sh} expiry {fail,last}log \
+          {chg,ch,g}passwd group{add,del,mems,mod} grp{ck,conv,unconv} \
+          newusers pw{ck,conv,unconv} user{add,del,mod} sg getsubids
     # fix licenses
     _map _file /usr/share/licenses/file/COPYING /usr/share/licenses/bzip2/LICENSE \
                  /usr/share/licenses/hdparm/LICENSE.TXT /usr/share/licenses/ncurses/COPYING \
