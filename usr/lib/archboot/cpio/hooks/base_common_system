@@ -34,13 +34,22 @@ usr/share/{locale/{be,bg,cs,da,de,en_US,el,es,fi,fr,hu,it,lt,lv,mk,nl,nn,pl,pt,r
 var/lib/pacman/local \
 | tar -C "${_ROOTFS}" -xpf -
     fi
-    _map _binary agetty awk basename bsdtar chmod clear date dd df dir du \
-                 false gawk insmod install kill killall ldconfig mktemp \
-                 more od partprobe passwd pgrep pidof printf ps \
-                 pwd rmdir true rbash rmmod sort stat  tar tee top touch \
-                 tr tty wc yes zstd
+    _map _binary agetty archlinux-keyring-wkd-sync awk basename bsdtar \
+                 {bus,boot,coredump,hostname,journal,locale,login,machine,network,\
+system,timedate,userdb,home,oom,portable}ctl certutil chmod clear cmsutil crlutil curl date \
+                 dbus-{cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
+update-activation-environment,uuidgen} dd df dir du false gawk gpg{,-agent,conf,-connect-agent} \
+                 gpgme-{tool,json} insmod install kernel-install kill{,all} loadkeys ldconfig \
+                 login makepkg mktemp mkhomedir_helper modutil more mount.ddi mount.nfs{,4} \
+                 nano nologin nss-config od p11-kit pk12util pam_timestamp_check pacman{,-conf,-key,-db-upgrade} \
+                 partprobe passwd pgrep pidof pinentry{,-curses} printf ps pwd rmdir tr true \
+                 repo-{add,elephant,remove} rbash rmmod secret-tool shlibsign sign{tool,ver} sort \
+                 ssltap stat symkeyutil systemd-{ac-power,analyze,ask-password,cat,cgls,cgtop,confextdelta,\
+detect-virt,escape,firstboot,hwdb,inhibit,machine-id-setup,mount,notify,nspawn,path,resolve,repartrun,\
+socket-activate,stdio-bridge,sysusers,tty-ask-password-agent,umount,creds,cryptenroll,dissect,id128,sysext} \
+                 tar tee testpkg top touch trust tty unix_{chkpwd,update} /usr/lib/dbus-1.0/dbus-daemon-launch-helper \
+                 umount.nfs{,4} update-ca-trust vercmp wc yes zstd
     # add nano
-    _binary nano
     _file_rename /etc/nanorc /etc/nanorc
     # add syntax highlighting
     echo "include \"/usr/share/nano/*.nanorc\"" >> "${_ROOTFS}/etc/nanorc"
@@ -57,21 +66,8 @@ protocols,request-key.conf,securetty,services}
     # fixing network support from glibc
     _map _file /usr/lib/{libnss_files.so.2,libnss_dns.so.2}
     ## add pam and shadow
-    _map _binary login nologin mkhomedir_helper pam_timestamp_check unix_{chkpwd,update}
     _map _file /etc/{environment,login.defs}
-    # add systemd service apps
-    _map _binary loadkeys mount.nfs{,4} umount.nfs{,4}
-    # dbus files
-    _map _binary dbus-{cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
-update-activation-environment,uuidgen} /usr/lib/dbus-1.0/dbus-daemon-launch-helper
-    # tpm2-tss files
-    _map _binary secret-tool pinentry{,-curses} gpgme-{tool,json}
     # systemd files
-    _map _binary {bus,boot,coredump,hostname,journal,locale,login,machine,network,\
-system,timedate,userdb,home,oom,portable}ctl kernel-install  mount.ddi systemd-{ac-power,\
-analyze,ask-password,cat,cgls,cgtop,confextdelta,detect-virt,escape,firstboot,hwdb,inhibit,\
-machine-id-setup,mount,notify,nspawn,path,resolve,repartrun,socket-activate,stdio-bridge,\
-sysusers,tty-ask-password-agent,umount,creds,cryptenroll,dissect,id128,sysext}
     _map _dir /etc/tmpfiles.d /etc/modules-load.d /etc/binfmt.d
     _file_rename /usr/share/archboot/base/etc/locale.conf /etc/locale.conf
     _file_rename /usr/share/archboot/base/etc/vconsole.conf /etc/vconsole.conf
@@ -114,9 +110,6 @@ linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz} \
     # add swapiness sysctl config file
     _file_rename /usr/share/archboot/base/etc/sysctl.d/99-sysctl.conf /etc/sysctl.d/99-sysctl.conf
     # add pacman
-    _map _binary pacman{,-conf,-key,-db-upgrade} makepkg \
-          repo-{add,elephant,remove} testpkg vercmp curl gpg{,-agent,conf,-connect-agent} \
-          archlinux-keyring-wkd-sync
     _map _dir /var/{cache/pacman/pkg,lib/pacman}
     _map _file /etc/{pacman.conf,makepkg.conf,pacman.d/mirrorlist}
     # add pacman initialization of gpg keys
@@ -124,8 +117,6 @@ linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz} \
     _file_rename /usr/share/archboot/base/etc/systemd/system/pacman-init.service \
                  /etc/systemd/system/pacman-init.service
     # add nss p11-kit and ca certificates
-    _map _binary p11-kit trust certutil cmsutil crlutil modutil nss-config pk12util \
-                   shlibsign signtool signver ssltap symkeyutil update-ca-trust
     _symlink "/etc/ssl/cert.pem" "../ca-certificates/extracted/tls-ca-bundle.pem"
     _symlink "/etc/ssl/certs/ca-certificates.crt" "../../ca-certificates/extracted/tls-ca-bundle.pem"
     _map _file /usr/share/{ca-certificates/trust-source/mozilla.trust.p11-kit,p11-kit/modules/p11-kit-trust.module}
