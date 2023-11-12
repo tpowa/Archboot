@@ -203,13 +203,12 @@ _install_mods() {
 
 _install_libs() {
     # add libraries for binaries in bin/ and /lib/systemd
-    echo "Adding libraries for /bin and /lib/systemd..."
+    echo "Adding libraries..."
     while read -r i; do
         [[ -e "${i}" ]] && _file "${i}"
     done < <(objdump -p "${_ROOTFS}"/bin/* "${_ROOTFS}"/lib/systemd/{systemd-*,libsystemd*} 2>"${_NO_LOG}" |
                 grep 'NEEDED' | sort -u | sed -e 's#NEEDED##g' -e 's# .* #/lib/#g')
     _install_files
-    echo "Checking libraries in /lib..."
     _LIB_COUNT="0"
     while ! [[ "${_LIB_COUNT}" == "${_LIB_COUNT2}" ]]; do
         _LIB_COUNT="${_LIB_COUNT2}"
