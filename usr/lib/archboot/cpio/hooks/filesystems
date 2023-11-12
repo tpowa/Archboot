@@ -4,9 +4,9 @@
 
 _run ()
 {
-    _map _binary badblock blkmapd btrfs-{find-root,image,map-logical,select-super} btrfs{,ck,tune} \
+    _map _binary badblocks blkmapd btrfs-{find-root,image,map-logical,select-super} btrfs{,ck,tune} \
                  chattr chcp cifscreds cifs.{idmap,upcall} compile_et debugfs defrag.f2fs \
-                 dosfsck dosfslabel dump.{exfat,f2f}s dump{e2fs,seg} e2{freefrag,fsck,image,label,\
+                 dosfsck dosfslabel dump.{exfat,f2fs} dump{e2fs,seg} e2{freefrag,fsck,image,label,\
 mmpstatus,scrub,scrub_all,undo} e4{crypt,defrag} exfatlabel f2fs{_io,crypt} fat{label,resize} findfs fsck \
                  logsave resize2fs lsattr filefrag fsck.{btrfs,cramfs,exfat,ext2,ext3,ext4,f2fs,jfs,\
 minix,msdos,vfat,xfs} fibmap.f2fs fs{freeze,trim} getcifsacl gpart jfs_{debugfs,fsck,fscklog,\
