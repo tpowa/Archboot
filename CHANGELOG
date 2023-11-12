@@ -7,8 +7,9 @@ Environment:
 - create empty root password in a much better way
 cpio:
 - merged acpi_mods and platform_mods into common_mods
-- renamed base_common_mods to systemd_mods
 - create new base_ hooks
+- added error message on failed _binary adding
+- added message about used config file
 setup:
 changed default installation path to /mnt/install
 
