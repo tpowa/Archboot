@@ -130,7 +130,7 @@ _file_rename() {
 }
 
 _binary() {
-    _file "$(type -P "${1}")"
+    _file "$(type -P "${1}")" || echo "${1} not found!"
 }
 
 _init_rootfs() {
