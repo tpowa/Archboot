@@ -6,8 +6,8 @@ _run ()
 {
     # add basic apps
     _map _binary bash blkid bsdcpio cat cp cut dialog echo env find grep \
-                 gzip halt init journalctl kmod loadkeys logger ls lsblk \
-                 lsmod mkdir mkfs.btrfs modprobe less mount mountpoint mv \
+                 gzip halt init journalctl kmod loadkeys logger ls{,blk,mod} \
+                 mkdir mkfs.btrfs modprobe less mount mountpoint mv \
                  poweroff reboot rm sh shutdown sleep sed setfont sulogin \
                  systemctl systemd-{tmpfiles,sysctl} udevadm umount uname
     # rdinit= kernel parameter defaults to /init
