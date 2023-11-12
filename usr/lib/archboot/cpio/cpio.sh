@@ -228,7 +228,7 @@ _create_cpio() {
         cat)    echo "Creating uncompressed image..."
                 unset _COMP_OPTS
                 ;;
-        *)      echo "Creating ${_COMP} compressed image---"
+        *)      echo "Creating ${_COMP} compressed image..."
                 ;;&
         xz)     _COMP_OPTS=('-T0' '--check=crc32' "${_COMP_OPTS[@]}")
                 ;;
