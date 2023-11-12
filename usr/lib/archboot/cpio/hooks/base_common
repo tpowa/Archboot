@@ -10,8 +10,9 @@ _run ()
                  lsmod mkdir mkfs.btrfs modprobe less mount mountpoint mv \
                  poweroff reboot rm sh shutdown sleep sed setfont sulogin \
                  systemctl systemd-{tmpfiles,sysctl} udevadm umount uname
-    # launch systemd
-    _symlink /init /usr/lib/systemd/systemd
+    # rdinit= kernel parameter defaults to /init
+    # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/init/main.c
+    _symlink /init bin/init
     ### adding needed files from running system
     _map _file /etc/{bash.bash_logout,bash.bashrc,profile,shells}
     # add kmod related config file(s)
