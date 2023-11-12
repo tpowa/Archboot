@@ -3,7 +3,7 @@ On the road to 2023.11:
 Environment:
 - switched to systemd in early userspace
 - reenabled configfs for systemd
-- moved mounting directories in init to /mnt/{cdrom,ventoy,efi}
+- moved mounting directories in init.service to /mnt/{cdrom,ventoy,efi}
 - create empty root password in a much better way
 cpio:
 - merged acpi_mods and platform_mods into common_mods
