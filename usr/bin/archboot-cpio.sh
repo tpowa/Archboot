@@ -32,6 +32,11 @@ _MOD_DIR="/lib/modules/${_KERNELVERSION}"
 _ALL_MODS="$(find "${_MOD_DIR}" -name '*.ko*' 2>"${_NO_LOG}")"
 _BUILD_DIR="$(_init_rootfs "${_KERNELVERSION}" "${_TARGET_DIR}")" || exit 1
 _ROOTFS="${_TARGET_DIR:-${_BUILD_DIR}/root}"
+if (( ${#_HOOKS[*]} == 0 )); then
+    _abort "No hooks found in config file!"
+fi
+echo "Using kernel: ${_KERNEL}"
+echo "Detected kernel version: ${_KERNELVERSION}"
 if [[ -n "${_GENERATE_IMAGE}" ]]; then
     echo "Starting build: ${_GENERATE_IMAGE}"
 elif [[ -n "${_TARGET_DIR}" ]]; then
@@ -39,11 +44,6 @@ elif [[ -n "${_TARGET_DIR}" ]]; then
 else
     echo "Starting dry run..."
 fi
-if (( ${#_HOOKS[*]} == 0 )); then
-    _abort "No hooks found in config file!"
-fi
-echo "Using kernel: ${_KERNEL}"
-echo "Detected kernel version: ${_KERNELVERSION}"
 _HOOK_COUNT=1
 _HOOKS_END_COUNT="$(echo "${_HOOKS[@]}" | wc -w)"
 if [[ "${_HOOKS_END_COUNT}" -lt 10 ]]; then
