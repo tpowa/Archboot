@@ -14,6 +14,7 @@ _root_check
 _parameters "$@"
 #shellcheck disable="SC1090"
 . "${_CONFIG}" 2>"${_NO_LOG}" || _abort "Failed to read ${_CONFIG} configuration file"
+echo "Using config: ${_CONFIG}"
 if [[ -z "${_KERNEL}" ]]; then
     echo "Trying to autodetect ${_RUNNING_ARCH} kernel..."
     [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _KERNEL="/usr/lib/modules/*/vmlinuz"
