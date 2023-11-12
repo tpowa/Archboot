@@ -4,16 +4,13 @@
 
 _run ()
 {
-    local symlink
-    ### from thin-provisioning-tools
-    _binary pdata_tools
-    for symlink in cache_{check,dump,metadata_size,repair,restore} \
+    for i in cache_{check,dump,metadata_size,repair,restore} \
                    thin_{check,delta,dump,ls,metadata_size,repair,restore,rmap,trim}; do
-        _symlink "/usr/bin/${symlink}" pdata_tools
+        _symlink "/usr/bin/${i}" pdata_tools
     done
     _map _binary fsadm lv{change,convert,create,display,extend,reduce,remove,rename,resize,s,scan} \
                  lvm{dump,config,devices,polld,diskscan,sadc,sar,_import_vdo} \
-                 pv{change,ck,create,display,move,remove,resize,s,scan} \
+                 pdata_tools pv{change,ck,create,display,move,remove,resize,s,scan} \
                  vg{importclone,importdevices,cfgbackup,cfgrestore,change,ck,convert,\
 create,display,export,extend,import,merge,mknodes,reduce,remove,rename,s,scan,split}
     _map _dir /etc/lvm/{backup,archive}
