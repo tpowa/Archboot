@@ -54,8 +54,7 @@ _run ()
     # disable systemd automount:
     _symlink /etc/systemd/system/proc-sys-fs-binfmt_misc.automount /dev/null
     # add terminus font
-    _map _file /usr/share/terminfo/l/linux /usr/share/kbd/consolefonts/ter-v{16,32}n.psf.gz
-    _file /usr/share/licenses/terminus-font/LICENSE
-}
+    _map _file /usr/share/{terminfo/l/linux,licenses/terminus-font/LICENSE,\
+kbd/consolefonts/ter-v{16,32}n.psf.gz}
 
 # vim: set ft=sh ts=4 sw=4 et:
