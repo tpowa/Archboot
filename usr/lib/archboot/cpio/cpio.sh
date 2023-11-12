@@ -225,10 +225,10 @@ _install_libs() {
 
 _create_cpio() {
     case "${_COMP}" in
-        cat)    echo "Creating uncompressed image: ${_GENERATE_IMAGE}"
+        cat)    echo "Creating uncompressed image..."
                 unset _COMP_OPTS
                 ;;
-        *)      echo "Creating ${_COMP} compressed image: ${_GENERATE_IMAGE}"
+        *)      echo "Creating ${_COMP} compressed image---"
                 ;;&
         xz)     _COMP_OPTS=('-T0' '--check=crc32' "${_COMP_OPTS[@]}")
                 ;;
