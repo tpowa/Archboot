@@ -4,9 +4,9 @@
 
 _run ()
 {
-    _map _binary arping clockdiff tracepath ssh genl \
-      ifstat ctstat rtstat lnstat nstat rtacct rtmon ss tc bridge \
-      dcb devlink rdma tipc vdpa ethtool elinks weechat brctl
+    _map _binary arping brctl bridge clockdiff ctstat dcb devlink \
+                 elinks ethtool genl ifstat lnstat nstat rdma rtacct \
+                 rtmon rtstat ss ssh tc tipc tracepath vdpa weechat
     # add iproute 2, add openssl helper libraries
     _map _full_dir /usr/lib/{tc,engines-3} /usr/share/tc
     # add dnssec-anchors

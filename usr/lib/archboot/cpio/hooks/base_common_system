@@ -57,10 +57,10 @@ protocols,request-key.conf,securetty,services}
     # fixing network support from glibc
     _map _file /usr/lib/{libnss_files.so.2,libnss_dns.so.2}
     ## add pam and shadow
-    _map _binary mkhomedir_helper pam_timestamp_check unix_{chkpwd,update} login nologin
+    _map _binary login nologin mkhomedir_helper pam_timestamp_check unix_{chkpwd,update}
     _map _file /etc/{environment,login.defs}
     # add systemd service apps
-    _map _binary mount.nfs{,4} umount.nfs{,4} loadkeys
+    _map _binary loadkeys mount.nfs{,4} umount.nfs{,4}
     # dbus files
     _map _binary dbus-{cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
 update-activation-environment,uuidgen} /usr/lib/dbus-1.0/dbus-daemon-launch-helper

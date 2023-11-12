@@ -6,7 +6,7 @@ _run ()
 {
     # start iwd service
     _symlink /etc/systemd/system/multi-user.target.wants/iwd.service /usr/lib/systemd/system/iwd.service
-    _map _binary iw set-wireless-regdom rfkill hwsim iwctl iwmon
+    _map _binary hwsim iw{,ctl,mon} rfkill set-wireless-regdom
     # add iwd and ead daemon
     _map _binary /usr/lib/iwd/{iwd,ead}
     # add hwsim helper script

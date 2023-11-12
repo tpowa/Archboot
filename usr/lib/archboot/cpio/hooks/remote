@@ -4,9 +4,10 @@
 
 _run ()
 {
-    _map _binary findssl.sh scp sftp ssh-{add,agent,copy-id,keygen,keyscan} sshd \
-      exportfs nfsstat rpc.{gssd,idmapd,mountd,nfsd,statd} rpcdebug showmount \
-      sm-notify start-statd nfsdcltrack gssproxy screen tmux rsync ttyd
+    _map _binary exportfs findssl.sh gssproxy nfsstat nfsdcltrack \
+                 rpc.{gssd,idmapd,mountd,nfsd,statd} rpcdebug rsync showmount \
+                 scp screen sftp sm-notify ssh-{add,agent,copy-id,keygen,keyscan} \
+                 sshd start-statd tmux ttyd
     _map _file /etc/{screenrc,ssh/{ssh_config,/moduli},rsyncd.conf,exports,netconfig} \
           /usr/lib/ssh/{sftp-server,ssh-keysign,ssh-pkcs11-helper}
     _file_rename /etc/ssh/sshd_config /etc/ssh/sshd_config

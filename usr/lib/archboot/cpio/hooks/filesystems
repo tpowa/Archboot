@@ -4,22 +4,17 @@
 
 _run ()
 {
-    _map _binary mkswap badblocks debugfs dumpe2fs e2{freefrag,fsck,image,label,mmpstatus,\
-scrub,scrub_all,undo} \
-                 findfs fsck logsave resize2fs chattr lsattr filefrag \
-                 jfs_{debugfs,fsck,fscklog,logdump,mkfs,tune} \
-                 xfs_{admin,bmap,copy,db,estimate,freeze,fsr,growfs,info,io,logprint,\
-metadump,mdrestore,mkfile,ncheck,quota,repair,rtcp,spaceman} \
-                 mkdosfs dosfsck fatlabel mount.smb3 mount.cifs tune2fs  mke2fs wipefs \
-                 btrfs btrfsck btrfs-{find-root,image,map-logical,select-super} btrfstune \
-                 mount.nilfs2 nilfs_cleanerd cifs.{idmap,upcall} cifscreds getcifsacl \
-                 setcifsacl umount.nilfs2 chcp dumpseg lscp lssu mkcp rmcp \
-                 fsfreeze fstrim tune.exfat exfatlabel dump.exfat fatresize nvme dosfslabel \
-                 e4{crypt,defrag} defrag.f2fs dump.f2fs f2fs{_io,crypt} fibmap.f2fs \
-                 parse.f2fs resize.f2fs sload.f2fs blkmapd nfsconf nfsdcld \
-                 nfsidmap nfsv4.exportd nilfs-{clean,resize,tune} gpart compile_et mk_cmds \
-                 mkfs.{bfs,cramfs,exfat,ext2,ext3,ext4,f2fs,jfs,minix,msdos,nilfs2,vfat,xfs} \
-                 fsck.{btrfs,cramfs,exfat,ext2,ext3,ext4,f2fs,jfs,minix,msdos,vfat,xfs}
+    _map _binary badblock blkmapd btrfs-{find-root,image,map-logical,select-super} btrfs{,ck,tune} \
+                 chattr chcp cifscreds cifs.{idmap,upcall} compile_et debugfs defrag.f2fs \
+                 dosfsck dosfslabel dump.{exfat,f2f}s dump{e2fs,seg} e2{freefrag,fsck,image,label,\
+mmpstatus,scrub,scrub_all,undo} e4{crypt,defrag} exfatlabel f2fs{_io,crypt} fat{label,resize} findfs fsck \
+                 logsave resize2fs lsattr filefrag fsck.{btrfs,cramfs,exfat,ext2,ext3,ext4,f2fs,jfs,\
+minix,msdos,vfat,xfs} fibmap.f2fs fs{freeze,trim} getcifsacl gpart jfs_{debugfs,fsck,fscklog,\
+logdump,mkfs,tune} ls{cp,su} mk{_cmds,cp,dosfs,e2fs,swap} mkfs.{bfs,cramfs,exfat,ext2,ext3,ext4,\
+f2fs,jfs,minix,msdos,nilfs2,vfat,xfs} mount.{cifs,nilfs2,smb3,cifs} nfs{conf,dcld,idmap} nfsv4.exportd \
+nilfs_cleanerd nilfs-{clean,resize,tune} nvme parse.f2fs resize.f2fs rmcp setcifsacl sload.f2fs \
+                 tune.exfat tune2fs umount.nilfs2 wipefs xfs_{admin,bmap,copy,db,estimate,freeze,fsr,\
+growfs,info,io,logprint,metadump,mdrestore,mkfile,ncheck,quota,repair,rtcp,spaceman}
     _file /etc/nilfs_cleanerd.conf
     _map _full_dir /etc/{cifs-utils,request-key.d,nvme}
     # fix libinih for plasma wallpaper

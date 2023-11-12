@@ -4,7 +4,7 @@
 
 _run ()
 {
-    _map _binary mdmon mdadm
+    _map _binary mdadm mdmon
     _file /etc/mdadm.conf
     _file /usr/share/mdadm/mdcheck
 }
