@@ -53,7 +53,7 @@ _run ()
     done
     # disable systemd automount:
     _symlink /etc/systemd/system/proc-sys-fs-binfmt_misc.automount /dev/null
-    # add terminus font
+    # vconsole terminus font
     _map _file /usr/share/{terminfo/l/linux,licenses/terminus-font/LICENSE,\
 kbd/consolefonts/ter-v{16,32}n.psf.gz}
 
