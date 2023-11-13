@@ -11,7 +11,7 @@ mmpstatus,scrub,scrub_all,undo} e4{crypt,defrag} exfatlabel f2fs{_io,crypt} fat{
                  logsave resize2fs lsattr filefrag fsck.{btrfs,cramfs,exfat,ext2,ext3,ext4,f2fs,jfs,\
 minix,msdos,vfat,xfs} fibmap.f2fs fs{freeze,trim} getcifsacl gpart jfs_{debugfs,fsck,fscklog,\
 logdump,mkfs,tune} ls{cp,su} mk{_cmds,cp,dosfs,e2fs,swap} mkfs.{bfs,cramfs,exfat,ext2,ext3,ext4,\
-f2fs,jfs,minix,msdos,nilfs2,vfat,xfs} mount.{cifs,nilfs2,smb3,cifs} nfs{conf,dcld,idmap} nfsv4.exportd \
+f2fs,jfs,minix,msdos,nilfs2,vfat,xfs} mount.{cifs,nilfs2,smb3} nfs{conf,dcld,idmap} nfsv4.exportd \
 nilfs_cleanerd nilfs-{clean,resize,tune} nvme parse.f2fs resize.f2fs rmcp setcifsacl sload.f2fs \
                  tune.exfat tune2fs umount.nilfs2 wipefs xfs_{admin,bmap,copy,db,estimate,freeze,fsr,\
 growfs,info,io,logprint,metadump,mdrestore,mkfile,ncheck,quota,repair,rtcp,spaceman}
