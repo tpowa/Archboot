@@ -36,8 +36,6 @@ _progress_wait() {
 _task() {
     if [[ "${1}" == kernel ]]; then
         bsdcpio -u -i "*/lib/modules/"  "*/lib/firmware/" <"/mnt/efi/boot/initrd-${_ARCH}.img" &>/dev/null
-        # wait 1 second until proceeding with module loading, needed at least for kms activation
-        sleep 1
     fi
     if [[ "${1}" == cleanup ]]; then
         rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,\
@@ -95,7 +93,6 @@ _second_stage() {
     _task unmount &
     _progress_wait "98" "99" "${_KEEP} Unmounting archboot rootfs..." "1"
     _progress "100" "The boot medium can be safely removed now."
-    sleep 2
     # remove files and directories
     rm -r /sysroot/sysroot
     rm /sysroot/init
@@ -137,8 +134,7 @@ if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]] ; then
     fi
 fi
 _first_stage | _dialog --title " Loading Kernel Modules " --gauge "${_KEEP} Loading files..." 6 75 0
-# avoid screen messup, don't run dialog on module loading!
-printf "\ec"
+sleep 0.75
 udevadm trigger --type=all --action=add --prioritized-subsystem=module,block,tpmrm,net,tty,input
 udevadm settle
 # autodetect screen size
@@ -158,5 +154,7 @@ echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
 systemd-sysusers --root=/sysroot &>/dev/null
 systemd-tmpfiles -E --create --root=/sysroot &>/dev/null
 printf "\ec"
+echo "The boot medium can be safely removed now."
+echo ""
 echo "Launching systemd $(udevadm --version)..."
 # vim: set ft=sh ts=4 sw=4 et:
