@@ -18,7 +18,7 @@ ${2}
 XXX
 EOF
 }
-_info() {
+_msg() {
     echo -e "\e[1m${1}\e[m"
 }
 _warn() {
@@ -112,10 +112,10 @@ modprobe -q usb-storage
 modprobe -q zram
 modprobe -q zstd
 # it needs one echo before, in order to reset the consolefont!
-_info "Initializing Console..."
+_msg "Initializing Console..."
 _clear
 setfont ter-v16n -C /dev/console
-_info "Searching 10 seconds for Archboot ${_ARCH} rootfs..."
+_msg "Searching 10 seconds for Archboot ${_ARCH} rootfs..."
 _COUNT=0
 while ! [[ "${_COUNT}" == 10 ]]; do
     # dd / rufus
@@ -136,8 +136,8 @@ if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]] ; then
     if ! mount /mnt/cdrom/efi.img /mnt/efi &>/dev/null; then
         _warn "Archboot Emergeny Shell:"
         _warn "Error: Didn't find a device with archboot rootfs!"
-        _info "This needs further debugging. Please contact the archboot author."
-        _info "Tobias Powalowski: tpowa@archlinux.org"
+        _msg "This needs further debugging. Please contact the archboot author."
+        _msg "Tobias Powalowski: tpowa@archlinux.org"
         echo ""
         systemctl start emergency.service
     fi
@@ -157,7 +157,7 @@ else
     SIZE="16"
 fi
 # clear screen
-_info "Initializing Console..."
+_msg "Initializing Console..."
 _clear
 setfont ter-v${SIZE}n -C /dev/console
 _second_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Removing files..." 6 75 0
@@ -166,7 +166,7 @@ echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
 systemd-sysusers --root=/sysroot &>/dev/null
 systemd-tmpfiles -E --create --root=/sysroot &>/dev/null
 _clear
-_info "The boot medium can be safely removed now."
+_msg "The boot medium can be safely removed now."
 echo ""
-_info "Launching systemd $(udevadm --version)..."
+_msg "Launching systemd $(udevadm --version)..."
 # vim: set ft=sh ts=4 sw=4 et:
