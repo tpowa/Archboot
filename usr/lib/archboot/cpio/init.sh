@@ -21,7 +21,7 @@ EOF
 _msg() {
     echo -e "\e[1m${1}\e[m"
 }
-_warn() {
+_wrn() {
     echo -e "\e[1;91m${1}\e[m"
 }
 _clear() {
@@ -134,8 +134,8 @@ while ! [[ "${_COUNT}" == 10 ]]; do
 done
 if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]] ; then
     if ! mount /mnt/cdrom/efi.img /mnt/efi &>/dev/null; then
-        _warn "Archboot Emergeny Shell:"
-        _warn "Error: Didn't find a device with archboot rootfs!"
+        _wrn "Archboot Emergeny Shell:"
+        _wrn "Error: Didn't find a device with archboot rootfs!"
         _msg "This needs further debugging. Please contact the archboot author."
         _msg "Tobias Powalowski: tpowa@archlinux.org"
         echo ""
