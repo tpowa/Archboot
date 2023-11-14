@@ -5,6 +5,8 @@ Environment:
 - reenabled configfs for systemd
 - moved mounting directories in init.service to /mnt/{cdrom,ventoy,efi}
 - create empty root password in a much better way
+init:
+- functionalized messages
 cpio:
 - merged acpi_mods and platform_mods into common_mods
 - create new base_ hooks
