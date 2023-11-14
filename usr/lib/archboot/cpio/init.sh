@@ -19,10 +19,10 @@ XXX
 EOF
 }
 _info() {
-    echo "\e[1m${1}\e[m"
+    echo -e "\e[1m${1}\e[m"
 }
 _warn() {
-    echo "\e[1;91m${1}\e[m"
+    echo -e "\e[1;91m${1}\e[m"
 }
 _clear() {
     printf "\ec"
