@@ -24,6 +24,9 @@ _info() {
 _warn() {
     echo "\e[1;91m${1}\e[m"
 }
+_clear() {
+    printf "\ec"
+}
 # $1: start percentage $2: end percentage $3: message $4: sleep time
 _progress_wait() {
     _COUNT=${1}
@@ -110,7 +113,7 @@ modprobe -q zram
 modprobe -q zstd
 # it needs one echo before, in order to reset the consolefont!
 _info "Initializing Console..."
-printf "\ec"
+_clear
 setfont ter-v16n -C /dev/console
 _info "Searching 10 seconds for Archboot ${_ARCH} rootfs..."
 _COUNT=0
@@ -143,7 +146,7 @@ _first_stage | _dialog --title " Loading Kernel Modules " --gauge "${_KEEP} Load
 # add short break to get modules initialized correct.
 sleep 0.75
 # avoid screen messup, don't run dialog on module loading!
-printf "\ec"
+_clear
 udevadm trigger --type=all --action=add --prioritized-subsystem=module,block,tpmrm,net,tty,input
 udevadm settle
 # autodetect screen size
@@ -155,14 +158,14 @@ else
 fi
 # clear screen
 _info "Initializing Console..."
-printf "\ec"
+_clear
 setfont ter-v${SIZE}n -C /dev/console
 _second_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Removing files..." 6 75 0
 # set font size in vconsole.conf
 echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
 systemd-sysusers --root=/sysroot &>/dev/null
 systemd-tmpfiles -E --create --root=/sysroot &>/dev/null
-printf "\ec"
+_clear
 _info "The boot medium can be safely removed now."
 echo ""
 _info "Launching systemd $(udevadm --version)..."
