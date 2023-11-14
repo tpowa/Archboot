@@ -18,6 +18,12 @@ ${2}
 XXX
 EOF
 }
+_info() {
+    echo "\e[1m${1}\e[m"
+}
+_warn() {
+    echo "\e[1;91m${1}\e[m"
+}
 # $1: start percentage $2: end percentage $3: message $4: sleep time
 _progress_wait() {
     _COUNT=${1}
@@ -102,11 +108,11 @@ modprobe -q cdrom
 modprobe -q usb-storage
 modprobe -q zram
 modprobe -q zstd
-echo "Initializing Console..."
-printf "\ec"
 # it needs one echo before, in order to reset the consolefont!
+_info "Initializing Console..."
+printf "\ec"
 setfont ter-v16n -C /dev/console
-echo "Searching 10 seconds for Archboot ${_ARCH} rootfs..."
+_info "Searching 10 seconds for Archboot ${_ARCH} rootfs..."
 _COUNT=0
 while ! [[ "${_COUNT}" == 10 ]]; do
     # dd / rufus
@@ -125,10 +131,10 @@ while ! [[ "${_COUNT}" == 10 ]]; do
 done
 if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]] ; then
     if ! mount /mnt/cdrom/efi.img /mnt/efi &>/dev/null; then
-        echo -e "\e[1;91mArchboot Emergeny Shell:\e[m"
-        echo -e "\e[1;91mError: Didn't find a device with archboot rootfs! \e[m"
-        echo -e "\e[1mThis needs further debugging. Please contact the archboot author.\e[m"
-        echo -e "\e[1mTobias Powalowski: tpowa@archlinux.org\e[m"
+        _warn "Archboot Emergeny Shell:"
+        _warn "Error: Didn't find a device with archboot rootfs!"
+        _info "This needs further debugging. Please contact the archboot author."
+        _info "Tobias Powalowski: tpowa@archlinux.org"
         echo ""
         systemctl start emergency.service
     fi
@@ -148,7 +154,7 @@ else
     SIZE="16"
 fi
 # clear screen
-echo "Initializing Console..."
+_info "Initializing Console..."
 printf "\ec"
 setfont ter-v${SIZE}n -C /dev/console
 _second_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Removing files..." 6 75 0
@@ -157,7 +163,7 @@ echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
 systemd-sysusers --root=/sysroot &>/dev/null
 systemd-tmpfiles -E --create --root=/sysroot &>/dev/null
 printf "\ec"
-echo "The boot medium can be safely removed now."
+_info "The boot medium can be safely removed now."
 echo ""
-echo "Launching systemd $(udevadm --version)..."
+_info "Launching systemd $(udevadm --version)..."
 # vim: set ft=sh ts=4 sw=4 et:
