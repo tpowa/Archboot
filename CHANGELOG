@@ -12,7 +12,7 @@ cpio:
 - create new base_ hooks
 - added error message on failed _binary adding
 - added message about used config file
-- only allow to use zstd compression/decompression
+- use only zstd compression/decompression
 setup:
 changed default installation path to /mnt/install
 2023.10 Highlights:
