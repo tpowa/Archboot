@@ -52,7 +52,11 @@ _select_mirror() {
     sed -i -e 's|^Server|#Server|g' /etc/pacman.d/mirrorlist
     #shellcheck disable=SC2027,SC2086
     echo "Server = "${_SYNC_URL}"" >> /etc/pacman.d/mirrorlist
-    return 0
+    if ! pacman -Sy; then
+        _dialog --title " ERROR " --no-mouse --infobox "Your mirror is not working correctly, please configure again!" 3 60
+        _SYNC_URL=""
+        return 1
+    fi
 }
 
 _enable_testing() {
