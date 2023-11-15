@@ -44,6 +44,7 @@ _progress_wait() {
 }
 _task() {
     if [[ "${1}" == kernel ]]; then
+        # fastest uncompression of zstd cpio format
         bsdcpio -u -i "*/lib/modules/"  "*/lib/firmware/" <"/mnt/efi/boot/initrd-${_ARCH}.img" &>/dev/null
     fi
     if [[ "${1}" == cleanup ]]; then
@@ -65,6 +66,7 @@ ti-connectivity,tehuti,wfx,yam,yamaha}
         mv /lib/modules /sysroot/usr/lib
         mv /lib/firmware /sysroot/usr/lib
         cd /sysroot
+        # fastest uncompression of zstd cpio format
         bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i<"/mnt/efi/boot/initrd-${_ARCH}.img" &>/dev/null
     fi
     if [[ "${1}" == unmount ]]; then
@@ -107,10 +109,9 @@ _second_stage() {
     rm /sysroot/init
 }
 # not all devices trigger autoload!
-modprobe -q cdrom
-modprobe -q usb-storage
-modprobe -q zram
-modprobe -q zstd
+for i in cdrom usb-storage zram zstd; do
+    modprobe -q "${i}"
+done
 # it needs one echo before, in order to reset the consolefont!
 _msg "Initializing Console..."
 _clear
