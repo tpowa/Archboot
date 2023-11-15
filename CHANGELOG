@@ -7,6 +7,7 @@ Environment:
 - create empty root password in a much better way
 init:
 - functionalized messages
+- added qxl quirk
 cpio:
 - merged acpi_mods and platform_mods into common_mods
 - create new base_ hooks
