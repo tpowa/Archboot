@@ -32,25 +32,15 @@ _create_initrd_dir() {
 }
 
 _compress_initrd() {
-   case "${_COMP}" in
-        cat)    echo "Creating uncompressed image: ${1}"
-                unset _COMP_OPTS
-                ;;
-        *)      echo "Creating ${_COMP} compressed image: ${1}"
-                ;;&
-        xz)     _COMP_OPTS=('-T0' '--check=crc32' "${_COMP_OPTS[@]}")
-                ;;
-        lz4)    _COMP_OPTS=('-l' "${_COMP_OPTS[@]}")
-                ;;
-        zstd)   _COMP_OPTS=('-T0' "${_COMP_OPTS[@]}")
-                ;;
-    esac
+    echo "Creating zstd compressed image: ${1}"
     pushd "${_W_DIR}/tmp/initrd" >"${_NO_LOG}" || return
     # Reproducibility: set all timestamps to 0
     find . -mindepth 1 -execdir touch -hcd "@0" "{}" +
-    find . -mindepth 1 -printf '%P\0' | sort -z | LANG=C bsdtar --null -cnf - -T - |
-            LANG=C bsdtar --null -cf - --format=newc @- |
-            ${_COMP} "${_COMP_OPTS[@]}" > "../../${1}" || exit 1
+    # use zstd only it has best compression and decompression
+    find . -mindepth 1 -printf '%P\0' | sort -z |
+        LANG=C bsdtar --null -cnf - -T - |
+        LANG=C bsdtar --null -cf - --format=newc @- |
+        zstd -T0 -19 > "../../${1}" || exit 1
     popd >"${_NO_LOG}" || return
     echo "Build complete."
 }
