@@ -55,7 +55,6 @@ _select_mirror() {
     if ! pacman -Sy; then
         _dialog --title " ERROR " --no-mouse --infobox "Your mirror is not working correctly, please configure again!" 3 60
         _SYNC_URL=""
-        return 1
     fi
 }
 
