@@ -143,10 +143,10 @@ if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]] ; then
     fi
 fi
 _first_stage | _dialog --title " Loading Kernel Modules " --gauge "${_KEEP} Loading files..." 6 75 0
-# add short break to get modules initialized correct.
-sleep 0.75
 # avoid screen messup, don't run dialog on module loading!
 _clear
+# quirk for qxl module it get's not always loaded at this stage
+grep -q QEMU /proc/cpuinfo && modprobe qxl
 udevadm trigger --type=all --action=add --prioritized-subsystem=module,block,tpmrm,net,tty,input
 udevadm settle
 # autodetect screen size

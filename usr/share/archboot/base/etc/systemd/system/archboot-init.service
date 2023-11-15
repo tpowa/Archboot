@@ -1,5 +1,6 @@
 [Unit]
 Description=Initializes archboot rootfs
+After=systemd-udev-settle.service
 
 [Service]
 Type=oneshot
