@@ -54,6 +54,7 @@ _select_mirror() {
     echo "Server = "${_SYNC_URL}"" >> /etc/pacman.d/mirrorlist
     if ! pacman -Sy; then
         _dialog --title " ERROR " --no-mouse --infobox "Your mirror is not working correctly, please configure again!" 3 60
+        sleep 3
         _SYNC_URL=""
     fi
 }
