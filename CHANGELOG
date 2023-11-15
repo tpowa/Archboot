@@ -14,6 +14,8 @@ cpio:
 - added error message on failed _binary adding
 - added message about used config file
 - use only zstd compression/decompression
+pacsetup:
+- added check on working mirror state
 setup:
 changed default installation path to /mnt/install
 2023.10 Highlights:
