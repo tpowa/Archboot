@@ -31,25 +31,22 @@ _select_mirror() {
     # This regex doesn't honor commenting
     _MIRRORS=$(grep -E -o '(https)://[^/]*' "${_PACMAN_MIRROR}" | sed 's|$| _|g')
     [[ -z ${_MIRRORS} ]] && _MIRRORS=$(grep -E -o '(http)://[^/]*' "${_PACMAN_MIRROR}" | sed 's|$| _|g')
-    _SYNC_URL=""
-    while [[ -z "${_SYNC_URL}" ]]; do
-        #shellcheck disable=SC2086
-        _dialog --cancel-label "${_LABEL}" --title " Package Mirror " --menu "" 13 55 7 \
-        "Custom Mirror" "_"  ${_MIRRORS} 2>${_ANSWER} || _abort
-        #shellcheck disable=SC2155
-        local _SERVER=$(cat "${_ANSWER}")
-        if [[ "${_SERVER}" == "Custom Mirror" ]]; then
-            _dialog  --inputbox "Enter the full URL to repositories." 8 65 \
-                "" 2>"${_ANSWER}" || _SYNC_URL=""
-                _SYNC_URL=$(cat "${_ANSWER}")
-        else
-            # Form the full URL for our mirror by grepping for the server name in
-            # our mirrorlist and pulling the full URL out. Substitute 'core' in
-            # for the repository name, and ensure that if it was listed twice we
-            # only return one line for the mirror.
-            _SYNC_URL=$(grep -E -o "${_SERVER}.*" "${_PACMAN_MIRROR}" | head -n1)
-        fi
-    done
+    #shellcheck disable=SC2086
+    _dialog --cancel-label "${_LABEL}" --title " Package Mirror " --menu "" 13 55 7 \
+    "Custom Mirror" "_"  ${_MIRRORS} 2>${_ANSWER} || return 1
+    #shellcheck disable=SC2155
+    local _SERVER=$(cat "${_ANSWER}")
+    if [[ "${_SERVER}" == "Custom Mirror" ]]; then
+        _dialog  --inputbox "Enter the full URL to repositories." 8 65 \
+            "" 2>"${_ANSWER}" || _SYNC_URL=""
+            _SYNC_URL=$(cat "${_ANSWER}")
+    else
+        # Form the full URL for our mirror by grepping for the server name in
+        # our mirrorlist and pulling the full URL out. Substitute 'core' in
+        # for the repository name, and ensure that if it was listed twice we
+        # only return one line for the mirror.
+        _SYNC_URL=$(grep -E -o "${_SERVER}.*" "${_PACMAN_MIRROR}" | head -n1)
+    fi
     echo "Using mirror: ${_SYNC_URL}" >"${_LOG}"
     # comment already existing entries
     sed -i -e 's|^Server|#Server|g' /etc/pacman.d/mirrorlist
@@ -164,7 +161,10 @@ EOF
         if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
             _enable_testing
         fi
-        _select_mirror
+        _SYNC_URL=""
+        while [[ -z "${_SYNC_URL}" ]]; do
+            _select_mirror || _abort
+        done
     fi
     if _prepare_pacman | _dialog --title " Pacman Configuration " --no-mouse --gauge "Update Arch Linux keyring..." 6 70 0; then
         break
