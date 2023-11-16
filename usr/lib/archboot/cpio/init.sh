@@ -94,7 +94,7 @@ _task() {
 _mount_stage() {
     : >/.archboot
     _task mount &
-    _progress_wait "0" "99" "${_KEEP} Searching 10 seconds for rootfs..." "0.1"
+    _progress_wait "0" "99" "${_KEEP} Searching for rootfs..." "0.1"
     : >/.archboot
     _progress "100" "${_KEEP}"
 }
@@ -118,7 +118,7 @@ done
 _msg "Initializing Console..."
 _clear
 setfont ter-v16n -C /dev/console
-_mount_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Searching 10 seconds for rootfs..." 6 75 0
+_mount_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Searching for rootfs..." 6 75 0
 if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]] ; then
     if ! mount /mnt/cdrom/efi.img /mnt/efi &>/dev/null; then
         _clear
