@@ -65,6 +65,7 @@ _task() {
         echo "zstd" >/sys/block/zram0/comp_algorithm
         echo "5G" >/sys/block/zram0/disksize
         mkfs.btrfs /dev/zram0 &>/dev/null
+        # use discard to get immediate remove of files
         mount -o discard /dev/zram0 /sysroot
     fi
     if [[ "${1}" == system ]]; then
@@ -105,7 +106,6 @@ _sysroot_stage() {
     _task system &
     _progress_wait "0" "95" "${_KEEP} Copying rootfs to /sysroot..." "0.5"
     : >/.archboot
-    # unmount everything after copying
     _task unmount &
     _progress_wait "96" "99" "${_KEEP} Unmounting rootfs..." "1"
     _progress "100" "The boot medium can be safely removed now."
