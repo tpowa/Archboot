@@ -79,6 +79,27 @@ _loaded_mods() {
     grep -v builtin
     #shellcheck disable=SC2046
     modinfo -k "${_KERNELVERSION}" --field firmware $(cut -d ' ' -f1 </proc/modules) | sed -e 's#^#/usr/lib/firmware/#g' -e 's#$#.zst#g'
+    ### get filenames for extraction
+    # modules from /sys
+    _MODS="$(modinfo --field filename $(find /sys -name modalias) 2>/dev/null | grep -v builtin | sort -u)"
+    # Checking kernel module dependencies:
+    # first try, pull in the easy modules
+    #shellcheck disable=SC2086
+    _MOD_DEPS="$(modinfo -F depends ${_MODS} 2>"${_NO_LOG}" | tr "," "\n" | sort -u) \
+               $(modinfo -F softdep ${_MODS} 2>"${_NO_LOG}" | tr ".*: " "\n" | sort -u)"
+    _DEP_COUNT=0
+    # next tries, ensure to catch all modules with depends
+    while ! [[ "${_DEP_COUNT}" == "${_DEP_COUNT2}" ]]; do
+        _DEP_COUNT="${_DEP_COUNT2}"
+        #shellcheck disable=SC2046,SC2086
+        _MOD_DEPS="$(echo ${_MOD_DEPS} \
+                $(modinfo -F depends ${_MOD_DEPS} 2>"${_NO_LOG}" | tr "," "\n" | sort -u) \
+                $(modinfo -F softdep ${_MOD_DEPS} 2>"${_NO_LOG}" | tr ".*: " "\n" | sort -u) \
+                | tr " " "\n" | sort -u)"
+        _DEP_COUNT2="$(wc -w <<< "${_MOD_DEPS}")"
+    done
+    _MOD_DEPS="$(modinfo --field filename ${_MOD_DEPS} 2>/dev/null | grep -v builtin | sort -u)"
+    # firmware
 }
 
 _filter_mods() {

@@ -43,31 +43,37 @@ _progress_wait() {
     done
 }
 _task() {
-    if [[ "${1}" == kernel ]]; then
-        # fastest uncompression of zstd cpio format
-        bsdcpio -u -i "*/lib/modules/"  "*/lib/firmware/" <"/mnt/efi/boot/initrd-${_ARCH}.img" &>/dev/null
+    if [[ "${1}" == mount ]]; then
+        _COUNT=0
+        while ! [[ "${_COUNT}" == 10 ]]; do
+            # dd / rufus
+            mount UUID=1234-ABCD /mnt/efi &>/dev/null && break
+            # ventoy
+            if mount LABEL=Ventoy /mnt/ventoy &>/dev/null; then
+                mount /mnt/ventoy/archboot-*-*-"${_KVER}"-"${_ARCH}".iso /mnt/cdrom &>/dev/null && break
+                mount /mnt/ventoy/archboot-*-*-"${_KVER}"-latest-"${_ARCH}".iso /mnt/cdrom &>/dev/null && break
+                mount /mnt/ventoy/archboot-*-*-"${_KVER}"-local-"${_ARCH}".iso /mnt/cdrom &>/dev/null && break
+            fi
+            if [[ -b /dev/sr0 ]]; then
+                mount /dev/sr0 /mnt/cdrom &>/dev/null && break
+            fi
+            sleep 1
+            _COUNT=$((_COUNT+1))
+        done
     fi
-    if [[ "${1}" == cleanup ]]; then
-        rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,\
-input,platform,net,scsi,soc,spi,usb,video} /lib/modules/*/extramodules
-        # keep ethernet NIC firmware
-        rm -rf /lib/firmware/{RTL8192E,advansys,amd*,ar3k,ath*,atmel,brcm,cavium,cirrus,cxgb*,\
-cypress,dvb*,ene-ub6250,i915,imx,intel,iwlwifi-[8-9]*,iwlwifi-[a-z]*,iwlwifi-[A-Z]*,keyspan*,\
-korg,libertas,matrox,mediatek,mrvl,mwl*,nvidia,nxp,qca,radeon,r128,rsi,rtlwifi,rtl_bt,rtw*,\
-ti-connectivity,tehuti,wfx,yam,yamaha}
-    fi
-    if [[ "${1}" == system ]]; then
+    if [[ "${1}" == btrfs ]]; then
         echo "zstd" >/sys/block/zram0/comp_algorithm
         echo "5G" >/sys/block/zram0/disksize
         mkfs.btrfs /dev/zram0 &>/dev/null
-        # use discard to get free RAM on delete!
-        mount -o discard /dev/zram0 /sysroot &>/dev/null
-        mkdir -p /sysroot/usr/lib
-        mv /lib/modules /sysroot/usr/lib
-        mv /lib/firmware /sysroot/usr/lib
+        mount -o discard /dev/zram0 /sysroot
+    fi
+    if [[ "${1}" == system ]]; then
+        rm -r /lib/modules
         cd /sysroot
         # fastest uncompression of zstd cpio format
-        bsdcpio -u -f "*/lib/modules/" -f "*/lib/firmware/" -i<"/mnt/efi/boot/initrd-${_ARCH}.img" &>/dev/null
+        bsdcpio -i -d -u <"/mnt/efi/boot/initrd-${_ARCH}.img" &>/dev/null
+        rm -r /sysroot/sysroot
+        rm /sysroot/init
     fi
     if [[ "${1}" == unmount ]]; then
         if mountpoint /mnt/ventoy &>/dev/null; then
@@ -84,57 +90,38 @@ ti-connectivity,tehuti,wfx,yam,yamaha}
     fi
     rm /.archboot
 }
-_first_stage() {
-    cd /
-    # move in modules from main initrd
+_mount_stage() {
     : >/.archboot
-    _task kernel &
-    _progress_wait "0" "99" "${_KEEP} Loading files..." "0.5"
+    _task mount &
+    _progress_wait "0" "99" "${_KEEP} Searching 10 seconds for rootfs..." "0.1"
+    : >/.archboot
     _progress "100" "${_KEEP}"
 }
-_second_stage() {
+_sysroot_stage() {
     : >/.archboot
-    _task cleanup &
-    _progress_wait "0" "3" "${_KEEP} Removing files..." "0.125"
+    _task btrfs &
+    _progress_wait "0" "10" "${_KEEP} Creating ZRAM device..." "0.1"
     : >/.archboot
     _task system &
-    _progress_wait "4" "97" "${_KEEP} Creating rootfs in /sysroot..." "0.125"
+    _progress_wait "0" "95" "${_KEEP} Copying rootfs to /sysroot..." "0.5"
     : >/.archboot
     # unmount everything after copying
     _task unmount &
-    _progress_wait "98" "99" "${_KEEP} Unmounting archboot rootfs..." "1"
+    _progress_wait "96" "99" "${_KEEP} Unmounting rootfs..." "1"
     _progress "100" "The boot medium can be safely removed now."
-    # remove files and directories
-    rm -r /sysroot/sysroot
-    rm /sysroot/init
 }
 # not all devices trigger autoload!
 for i in cdrom usb-storage zram zstd; do
     modprobe -q "${i}"
 done
-# it needs one echo before, in order to reset the consolefont!
+    # it needs one echo before, in order to reset the consolefont!
 _msg "Initializing Console..."
 _clear
 setfont ter-v16n -C /dev/console
-_msg "Searching 10 seconds for Archboot ${_ARCH} rootfs..."
-_COUNT=0
-while ! [[ "${_COUNT}" == 10 ]]; do
-    # dd / rufus
-    mount UUID=1234-ABCD /mnt/efi &>/dev/null && break
-    # ventoy
-    if mount LABEL=Ventoy /mnt/ventoy &>/dev/null; then
-        mount /mnt/ventoy/archboot-*-*-"${_KVER}"-"${_ARCH}".iso /mnt/cdrom &>/dev/null && break
-        mount /mnt/ventoy/archboot-*-*-"${_KVER}"-latest-"${_ARCH}".iso /mnt/cdrom &>/dev/null && break
-        mount /mnt/ventoy/archboot-*-*-"${_KVER}"-local-"${_ARCH}".iso /mnt/cdrom &>/dev/null && break
-    fi
-    if [[ -b /dev/sr0 ]]; then
-        mount /dev/sr0 /mnt/cdrom &>/dev/null && break
-    fi
-    sleep 1
-    _COUNT=$((_COUNT+1))
-done
+_mount_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Searching 10 seconds for rootfs..." 6 75 0
 if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]] ; then
     if ! mount /mnt/cdrom/efi.img /mnt/efi &>/dev/null; then
+        _clear
         _wrn "Archboot Emergeny Shell:"
         _wrn "Error: Didn't find a device with archboot rootfs!"
         _msg "This needs further debugging. Please contact the archboot author."
@@ -143,27 +130,7 @@ if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]] ; then
         systemctl start emergency.service
     fi
 fi
-_first_stage | _dialog --title " Loading Kernel Modules " --gauge "${_KEEP} Loading files..." 6 75 0
-# avoid screen messup, don't run dialog on module loading!
-_clear
-# quirk for qxl module it get's not always loaded at this stage
-grep -q QEMU /proc/cpuinfo && modprobe qxl
-udevadm trigger --type=all --action=add --prioritized-subsystem=module,block,tpmrm,net,tty,input
-udevadm settle
-# autodetect screen size
-FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" | sed -e 's#.*:##g')"
-if [[ "${FB_SIZE}" -gt '1900' ]]; then
-    SIZE="32"
-else
-    SIZE="16"
-fi
-# clear screen
-_msg "Initializing Console..."
-_clear
-setfont ter-v${SIZE}n -C /dev/console
-_second_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Removing files..." 6 75 0
-# set font size in vconsole.conf
-echo FONT=ter-v${SIZE}n >> /sysroot/etc/vconsole.conf
+_sysroot_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Creating ZRAM device..." 6 75 0
 systemd-sysusers --root=/sysroot &>/dev/null
 systemd-tmpfiles -E --create --root=/sysroot &>/dev/null
 _clear
