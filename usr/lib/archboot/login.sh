@@ -117,6 +117,8 @@ if ! [[ -e /.vconsole-run ]]; then
     fi
     echo KEYMAP=us >/etc/vconsole.conf
     echo FONT=ter-v${SIZE}n >>/etc/vconsole.conf
+    echo -e "\e[1mInitializing Console...\e[m"
+    printf "\ec"
     systemctl restart systemd-vconsole-setup
 fi
 
@@ -181,6 +183,7 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     _memory_error "2.6GB"
     _enter_shell
 else
+    sleep 1
     _welcome
     _run_update_installer
 fi
