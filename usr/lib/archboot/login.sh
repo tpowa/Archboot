@@ -117,7 +117,6 @@ if ! [[ -e /.vconsole-run ]]; then
     fi
     echo KEYMAP=us >/etc/vconsole.conf
     echo FONT=ter-v${SIZE}n >>/etc/vconsole.conf
-    echo -e "\e[1mInitializing Console...\e[m"
     systemctl restart systemd-vconsole-setup
 fi
 
@@ -183,6 +182,7 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     _enter_shell
 else
     _welcome
+    sleep 1
     _run_update_installer
 fi
 # vim: set ft=sh ts=4 sw=4 et:
