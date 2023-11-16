@@ -7,7 +7,9 @@ Environment:
 - create empty root password in a much better way
 init:
 - functionalized messages
-- added qxl quirk
+- removed quirks for modules cleanup
+- dialog shows up at the beginning
+- unpack complete rootfs at once to /sysroot
 cpio:
 - merged acpi_mods and platform_mods into common_mods
 - create new base_ hooks
