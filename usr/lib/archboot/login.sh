@@ -122,6 +122,7 @@ fi
 
 if [[ "${TTY}" = "tty1" ]] ; then
     if ! mount | grep -q zram0; then
+        sleep 1
         _TITLE="Archboot ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | ZRAM"
         _switch_root_zram | _dialog --title " Initializing System " --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
         # fix clear screen on all terminals
