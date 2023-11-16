@@ -7,8 +7,8 @@ Environment:
 - create empty root password in a much better way
 init:
 - functionalized messages
-- removed quirks for modules cleanup
-- dialog shows up at the beginning
+- removed all quirks for modules handling
+- dialog shows up at the beginning of early userspace
 - unpack complete rootfs at once to /sysroot
 cpio:
 - merged acpi_mods and platform_mods into common_mods
