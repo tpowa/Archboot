@@ -35,13 +35,13 @@ if [[ "${TTY}" = "tty1" ]]; then
     clear
     : > /.archboot
     [[ -d /sysroot ]] || mkdir /sysroot
-    (modprobe zram &>"${_NO_LOG}";
-    modprobe zstd &>"${_NO_LOG}";
-    echo "1" >/sys/block/zram0/reset;
-    echo "zstd" >/sys/block/zram0/comp_algorithm;
-    echo "5G" >/sys/block/zram0/disksize;
-    mkfs.btrfs /dev/zram0 &>"${_NO_LOG}") &
-    mount -o discard /dev/zram0 /sysroot &>"${_NO_LOG}"
+    (modprobe zram &>"${_NO_LOG}"
+    modprobe zstd &>"${_NO_LOG}"
+    echo "1" >/sys/block/zram0/reset
+    echo "zstd" >/sys/block/zram0/comp_algorithm
+    echo "5G" >/sys/block/zram0/disksize
+    mkfs.btrfs /dev/zram0 &>"${_NO_LOG}"
+    mount -o discard /dev/zram0 /sysroot &>"${_NO_LOG}") &
     _progress_wait "1" "5"  "Creating btrfs on /dev/zram0..." "1"
     : > /.archboot
     (tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
