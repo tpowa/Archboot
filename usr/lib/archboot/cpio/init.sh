@@ -95,7 +95,6 @@ _mount_stage() {
     : >/.archboot
     _task mount &
     _progress_wait "0" "99" "${_KEEP} Searching for rootfs..." "0.1"
-    : >/.archboot
     _progress "100" "${_KEEP}"
 }
 _sysroot_stage() {
