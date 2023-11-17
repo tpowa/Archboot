@@ -6,9 +6,7 @@
 TTY=${TTY#/dev/}
 
 _welcome () {
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux X86_64\e[m"
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux AARCH64\e[m"
-    [[ "${_RUNNING_ARCH}" == "riscv64" ]] && echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux RISCV64\e[m"
+    echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux ${_RUNNING_ARCH^^}\e[m"
     echo -e "\e[1m--------------------------------------------------------------------\e[m"
     _local_mode
 }
