@@ -53,8 +53,8 @@ if [[ "${TTY}" = "tty1" ]]; then
     clear
     [[ -d /sysroot ]] || mkdir /sysroot
     : > /.archboot
-    _progress_wait "0" "10" "Creating btrfs on /dev/zram0..." "0.2"
     _create_btrfs &
+    _progress_wait "0" "10" "Creating btrfs on /dev/zram0..." "0.2"
     : > /.archboot
     _copy_root &
     _progress_wait "11" "99" "Copying archboot rootfs to /sysroot..." "0.125"
