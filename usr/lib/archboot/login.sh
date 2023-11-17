@@ -26,15 +26,7 @@ _memory_error () {
     echo -e "\e[91mAborting...\e[m"
 }
 
-# use -o discard for RAM cleaning on delete
-# (online fstrimming the block device!)
-# fstrim <mountpoint> for manual action
-# it needs some seconds to get RAM free on delete!
-_switch_root_zram() {
-if [[ "${TTY}" = "tty1" ]]; then
-    clear
-    _progress "1" "Creating btrfs on /dev/zram0..."
-    [[ -d /sysroot ]] || mkdir /sysroot
+_create_btrfs() {
     modprobe -q zram
     modprobe -q zstd
     echo "1" >/sys/block/zram0/reset
@@ -42,11 +34,30 @@ if [[ "${TTY}" = "tty1" ]]; then
     echo "5G" >/sys/block/zram0/disksize
     mkfs.btrfs /dev/zram0 &>"${_NO_LOG}"
     mount -o discard /dev/zram0 /sysroot &>"${_NO_LOG}"
-    : > /.archboot
-    (tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
+    rm /.archboot
+}
+
+_copy_root() {
+    tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
         --exclude="./run/*" --exclude="./mnt/*" --exclude="./tmp/*" --exclude="./sysroot/*" \
-        -clpf - . | tar -C /sysroot -xlspf - &>"${_NO_LOG}"; rm /.archboot) &
-    _progress_wait "2" "99" "Copying archboot rootfs to /sysroot..." "0.125"
+        -clpf - . | tar -C /sysroot -xlspf - &>"${_NO_LOG}"
+    rm /.archboot
+}
+
+# use -o discard for RAM cleaning on delete
+# (online fstrimming the block device!)
+# fstrim <mountpoint> for manual action
+# it needs some seconds to get RAM free on delete!
+_switch_root_zram() {
+if [[ "${TTY}" = "tty1" ]]; then
+    clear
+    [[ -d /sysroot ]] || mkdir /sysroot
+    : > /.archboot
+    _progress_wait "0" "10" "Creating btrfs on /dev/zram0..." "0.2"
+    _create_btrfs &
+    : > /.archboot
+    _copy_root &
+    _progress_wait "11" "99" "Copying archboot rootfs to /sysroot..." "0.125"
     # cleanup directories and files
     rm -r /sysroot/sysroot &>"${_NO_LOG}"
     rm /sysroot/init &>"${_NO_LOG}"
@@ -116,7 +127,7 @@ if [[ "${TTY}" = "tty1" ]] ; then
     if ! mount | grep -q zram0; then
         sleep 1
         _TITLE="Archboot ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | ZRAM"
-        _switch_root_zram | _dialog --title " Initializing System " --gauge "Creating /dev/zram0 with zstd compression..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
+        _switch_root_zram | _dialog --title " Initializing System " --gauge "Creating btrfs on /dev/zram0..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
         # fix clear screen on all terminals
         printf "\ec" | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
         echo "Launching systemd $(udevadm --version)..."
