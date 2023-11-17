@@ -34,22 +34,14 @@ _switch_root_zram() {
 if [[ "${TTY}" = "tty1" ]]; then
     clear
     [[ -d /sysroot ]] || mkdir /sysroot
-    modprobe zram &>"${_NO_LOG}"
+    (modprobe zram &>"${_NO_LOG}"
     modprobe zstd &>"${_NO_LOG}"
     echo "1" >/sys/block/zram0/reset
     echo "zstd" >/sys/block/zram0/comp_algorithm
     echo "5G" >/sys/block/zram0/disksize
-    _progress "1" "Creating btrfs on /dev/zram0..."
-    mkfs.btrfs /dev/zram0 &>"${_NO_LOG}"
+    mkfs.btrfs /dev/zram0 &>"${_NO_LOG}") &
     mount -o discard /dev/zram0 /sysroot &>"${_NO_LOG}"
-    _progress "3" "Removing firmware and modules..."
-    # cleanup firmware and modules
-    mv /lib/firmware/regulatory* /tmp/ &>"${_NO_LOG}"
-    rm -rf /lib/firmware/*
-    mv /tmp/regulatory* /lib/firmware/ &>"${_NO_LOG}"
-    rm -rf /lib/modules/*/kernel/drivers/{acpi,ata,gpu,bcma,block,bluetooth,hid,input,\
-platform,net,scsi,soc,spi,usb,video}
-    rm -rf /lib/modules/*/extramodules
+    _progress_wait "0" "5"  "Creating btrfs on /dev/zram0..." "1"
     : > /.archboot
     (tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
         --exclude="./run/*" --exclude="./mnt/*" --exclude="./tmp/*" --exclude="./sysroot/*" \
