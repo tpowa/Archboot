@@ -9,7 +9,7 @@ _run ()
                  gzip halt init journalctl kmod loadkeys logger ls{,blk,mod} \
                  mkdir mkfs.btrfs modprobe less mount mountpoint mv \
                  poweroff realpath reboot rm sed setfont sh shutdown sleep sulogin \
-                 systemctl systemd-{tmpfiles,sysctl} udevadm umount uname
+                 systemctl systemd-tmpfiles udevadm umount uname
     # rdinit= kernel parameter defaults to /init
     # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/init/main.c
     _symlink /init bin/init

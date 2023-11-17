@@ -113,7 +113,7 @@ _sysroot_stage() {
 for i in cdrom usb-storage zram zstd; do
     modprobe -q "${i}"
 done
-    # it needs one echo before, in order to reset the consolefont!
+# it needs one echo before, in order to reset the consolefont!
 _msg "Initializing Console..."
 _clear
 setfont ter-v16n -C /dev/console
@@ -130,8 +130,6 @@ if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]] ; then
     fi
 fi
 _sysroot_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Creating ZRAM device..." 6 75 0
-systemd-sysusers --root=/sysroot &>/dev/null
-systemd-tmpfiles -E --create --root=/sysroot &>/dev/null
 _clear
 _msg "The boot medium can be safely removed now."
 echo ""
