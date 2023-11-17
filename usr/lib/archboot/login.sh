@@ -41,7 +41,8 @@ if [[ "${TTY}" = "tty1" ]]; then
     echo "zstd" >/sys/block/zram0/comp_algorithm
     echo "5G" >/sys/block/zram0/disksize
     mkfs.btrfs /dev/zram0 &>"${_NO_LOG}"
-    mount -o discard /dev/zram0 /sysroot &>"${_NO_LOG}") &
+    mount -o discard /dev/zram0 /sysroot &>"${_NO_LOG}"
+    rm /.archboot) &
     _progress_wait "1" "5"  "Creating btrfs on /dev/zram0..." "1"
     : > /.archboot
     (tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
