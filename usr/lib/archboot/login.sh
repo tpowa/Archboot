@@ -55,9 +55,10 @@ if [[ "${TTY}" = "tty1" ]]; then
     : > /.archboot
     _create_btrfs &
     _progress_wait "0" "10" "Creating btrfs on /dev/zram0..." "0.2"
+    _progress "10" "Creating btrfs on /dev/zram0..."
     : > /.archboot
     _copy_root &
-    _progress_wait "11" "99" "Copying archboot rootfs to /sysroot..." "0.125"
+    _progress_wait "11" "99" "Copying rootfs to /sysroot..." "0.125"
     # cleanup directories and files
     rm -r /sysroot/sysroot &>"${_NO_LOG}"
     rm /sysroot/init &>"${_NO_LOG}"
