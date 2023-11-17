@@ -55,6 +55,7 @@ if [[ "${TTY}" = "tty1" ]]; then
     : > /.archboot
     _create_btrfs &
     _progress_wait "0" "10" "Creating btrfs on /dev/zram0..." "0.2"
+    # avoid clipping, insert status message
     _progress "10" "Creating btrfs on /dev/zram0..."
     : > /.archboot
     _copy_root &

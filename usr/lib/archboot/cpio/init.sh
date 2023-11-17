@@ -30,7 +30,7 @@ _clear() {
 # $1: start percentage $2: end percentage $3: message $4: sleep time
 _progress_wait() {
     _COUNT=${1}
-    while true; do
+    while [[ -e /.archboot ]]; do
         if [[ "${_COUNT}" -lt "${2}" ]]; then
             _progress "${_COUNT}" "${3}"
         fi
@@ -39,7 +39,6 @@ _progress_wait() {
         fi
         _COUNT="$((_COUNT+1))"
         sleep "${4}"
-        ! [[ -e /.archboot ]] && break
     done
 }
 _task() {
