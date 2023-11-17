@@ -35,19 +35,19 @@ if [[ "${TTY}" = "tty1" ]]; then
     clear
     : > /.archboot
     [[ -d /sysroot ]] || mkdir /sysroot
-    (modprobe zram &>"${_NO_LOG}"
-    modprobe zstd &>"${_NO_LOG}"
-    echo "1" >/sys/block/zram0/reset
-    echo "zstd" >/sys/block/zram0/comp_algorithm
-    echo "5G" >/sys/block/zram0/disksize
+    (modprobe zram &>"${_NO_LOG}";
+    modprobe zstd &>"${_NO_LOG}";
+    echo "1" >/sys/block/zram0/reset;
+    echo "zstd" >/sys/block/zram0/comp_algorithm;
+    echo "5G" >/sys/block/zram0/disksize;
     mkfs.btrfs /dev/zram0 &>"${_NO_LOG}") &
     mount -o discard /dev/zram0 /sysroot &>"${_NO_LOG}"
-    _progress_wait "0" "5"  "Creating btrfs on /dev/zram0..." "1"
+    _progress_wait "1" "5"  "Creating btrfs on /dev/zram0..." "1"
     : > /.archboot
     (tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
         --exclude="./run/*" --exclude="./mnt/*" --exclude="./tmp/*" --exclude="./sysroot/*" \
         -clpf - . | tar -C /sysroot -xlspf - &>"${_NO_LOG}"; rm /.archboot) &
-    _progress_wait "4" "99" "Copying archboot rootfs to /sysroot..." "0.125"
+    _progress_wait "6" "99" "Copying archboot rootfs to /sysroot..." "0.125"
     # cleanup directories and files
     rm -r /sysroot/sysroot &>"${_NO_LOG}"
     rm /sysroot/init &>"${_NO_LOG}"
