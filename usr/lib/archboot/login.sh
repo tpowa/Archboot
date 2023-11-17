@@ -43,7 +43,7 @@ if [[ "${TTY}" = "tty1" ]]; then
     mkfs.btrfs /dev/zram0 &>"${_NO_LOG}"
     mount -o discard /dev/zram0 /sysroot &>"${_NO_LOG}"
     rm /.archboot) &
-    _progress_wait "1" "5"  "Creating btrfs on /dev/zram0..." "1"
+    _progress_wait "1" "5" "Creating btrfs on /dev/zram0..." "1"
     : > /.archboot
     (tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
         --exclude="./run/*" --exclude="./mnt/*" --exclude="./tmp/*" --exclude="./sysroot/*" \
