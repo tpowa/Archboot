@@ -106,7 +106,7 @@ _progress_wait() {
             _progress "${_COUNT}" "${3}"
         fi
         if [[ "${_COUNT}" -gt "${2}" ]]; then
-            _progress "${2}"  "${3}"
+            _progress "${2}" "${3}"
         fi
         _COUNT="$((_COUNT+1))"
         sleep "${4}"

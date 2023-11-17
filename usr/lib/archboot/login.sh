@@ -35,8 +35,8 @@ if [[ "${TTY}" = "tty1" ]]; then
     clear
     : > /.archboot
     [[ -d /sysroot ]] || mkdir /sysroot
-    (modprobe zram &>"${_NO_LOG}"
-    modprobe zstd &>"${_NO_LOG}"
+    (modprobe -q zram
+    modprobe -q zstd
     echo "1" >/sys/block/zram0/reset
     echo "zstd" >/sys/block/zram0/comp_algorithm
     echo "5G" >/sys/block/zram0/disksize
