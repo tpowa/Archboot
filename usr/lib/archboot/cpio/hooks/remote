@@ -21,6 +21,8 @@ _run ()
     for i in rpcbind.service rpcbind.socket rpcbind.target nfs-server.service; do
         _symlink "/etc/systemd/system/${i}" /dev/null
     done
+    # systemd tmpfile does not work every time
+    _dir /var/empty
     _map _full_dir /etc/{gss,gssproxy}
     # start sshd on startup
     _symlink /etc/systemd/system/multi-user.target.wants/sshd.service /usr/lib/systemd/system/sshd.service
