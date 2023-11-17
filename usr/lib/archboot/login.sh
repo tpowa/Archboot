@@ -52,12 +52,12 @@ if [[ "${TTY}" = "tty1" ]]; then
     [[ -d /sysroot ]] || mkdir /sysroot
     : > /.archboot
     _create_btrfs &
-    _progress_wait "0" "10" "Creating btrfs on /dev/zram0..." "0.2"
+    _progress_wait "0" "5" "Creating btrfs on /dev/zram0..." "0.2"
     # avoid clipping, insert status message
-    _progress "10" "Creating btrfs on /dev/zram0..."
+    _progress "6" "Creating btrfs on /dev/zram0..."
     : > /.archboot
     _copy_root &
-    _progress_wait "11" "99" "Copying rootfs to /sysroot..." "0.125"
+    _progress_wait "7" "99" "Copying rootfs to /sysroot..." "0.125"
     # cleanup directories and files
     rm -r /sysroot/sysroot &>"${_NO_LOG}"
     rm /sysroot/init &>"${_NO_LOG}"
@@ -121,11 +121,12 @@ if ! [[ -e /.vconsole-run ]]; then
     echo KEYMAP=us >/etc/vconsole.conf
     echo FONT=ter-v${SIZE}n >>/etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
+    # avoid screen font changing
+    sleep 1
 fi
 
 if [[ "${TTY}" = "tty1" ]] ; then
     if ! mount | grep -q zram0; then
-        sleep 1
         _TITLE="Archboot ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | ZRAM"
         _switch_root_zram | _dialog --title " Initializing System " --gauge "Creating btrfs on /dev/zram0..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
         # fix clear screen on all terminals
@@ -186,7 +187,6 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     _enter_shell
 else
     _welcome
-    sleep 1
     _run_update_installer
 fi
 # vim: set ft=sh ts=4 sw=4 et:
