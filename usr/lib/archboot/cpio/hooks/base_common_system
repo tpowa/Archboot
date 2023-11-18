@@ -85,10 +85,16 @@ protocols,request-key.conf,securetty,services}
                  /usr/bin/detect-vconsole.sh
     _file_rename /usr/share/archboot/base/etc/systemd/system/detect-vconsole.service \
                  /etc/systemd/system/detect-vconsole.service
+    _file_rename /usr/share/archboot/base/etc/systemd/system/detect-vconsole-restart.service \
+                 /etc/systemd/system/detect-vconsole-restart.service
+    _file_rename /usr/share/archboot/base/etc/systemd/system/detect-vconsole-restart.path \
+                 /etc/systemd/system/detect-vconsole-restart.path
     _symlink /etc/systemd/system/multi-user.target.wants/windowkeys.service \
              /etc/systemd/system/windowkeys.service
     _symlink /etc/systemd/system/sysinit.target.wants/detect-vconsole.service \
              /etc/systemd/system/detect-vconsole.service
+    _symlink /etc/systemd/system/sysinit.target.wants/detect-vconsole-restart.path \
+             /etc/systemd/system/detect-vconsole-restart.path
     # disable systemd targets:
     for i in remote-{veritysetup,cryptsetup} sockets timers; do
         _symlink "/etc/systemd/system/${i}.target" /dev/null

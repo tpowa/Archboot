@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: LGPL-2.1-or-later
+# by Tobias Powalowski <tpowa@archlinux.org>
+
+[Path]
+PathChanged=/sys/class/graphics/fb0/modes
+
+[Install]
+WantedBy=sysinit.target
