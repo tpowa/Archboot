@@ -109,20 +109,6 @@ _run_update_installer() {
     fi
 }
 
-if ! [[ -e /.vconsole-run ]]; then
-    : > /.vconsole-run
-    udevadm settle
-    FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" 2>"${_NO_LOG}" | sed -e 's#.*:##g')"
-    if [[ "${FB_SIZE}" -gt '1900' ]]; then
-        SIZE="32"
-    else
-        SIZE="16"
-    fi
-    echo KEYMAP=us >/etc/vconsole.conf
-    echo FONT=ter-v${SIZE}n >>/etc/vconsole.conf
-    /lib/systemd/systemd-vconsole-setup
-fi
-
 if [[ "${TTY}" = "tty1" ]] ; then
     if ! mount | grep -q zram0; then
         _TITLE="Archboot ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | ZRAM"

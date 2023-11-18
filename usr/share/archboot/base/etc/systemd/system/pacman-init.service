@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# by Tobias Powalowski <tpowa@archlinux.org>
+
 [Unit]
 Description=Initializes Pacman keyring
 
