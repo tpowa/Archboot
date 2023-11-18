@@ -72,8 +72,8 @@ _task() {
         cd /sysroot
         # fastest uncompression of zstd cpio format
         bsdcpio -i -d -u <"/mnt/efi/boot/initrd-${_ARCH}.img" &>/dev/null
-        rm -r /sysroot/sysroot
-        rm /sysroot/init
+        rm -r sysroot
+        rm init
     fi
     if [[ "${1}" == unmount ]]; then
         if mountpoint /mnt/ventoy &>/dev/null; then
