@@ -5,7 +5,7 @@
 #    by Tobias Powalowski <tpowa@archlinux.org>
 #
 udevadm settle
-FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '/sys/class/graphics/fb0/modes')" 2>/dev/null | sed -e 's#.*:##g')"
+FB_SIZE="$(cut -d 'x' -f 1 /sys/class/graphics/fb0/modes 2>/dev/null | sed -e 's#.*:##g')"
 if [[ "${FB_SIZE}" -gt '1900' ]]; then
     SIZE="32"
 else
