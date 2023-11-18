@@ -5,10 +5,12 @@
 Description=Set vconsole on display resolution
 After=systemd-udev-settle.service
 Before=systemd-vconsole-setup.service
-Requires=systemd-udev-settle.service systemd-vconsole-setup.service
+Wants=systemd-udev-settle.service systemd-vconsole-setup.service
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/bin/detect-vconsole.sh
 
+[Install]
+WantedBy=sysinit.target
