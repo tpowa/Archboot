@@ -121,8 +121,6 @@ if ! [[ -e /.vconsole-run ]]; then
     echo KEYMAP=us >/etc/vconsole.conf
     echo FONT=ter-v${SIZE}n >>/etc/vconsole.conf
     /lib/systemd/systemd-vconsole-setup
-    # avoid screen font changing
-    sleep 1
 fi
 
 if [[ "${TTY}" = "tty1" ]] ; then
