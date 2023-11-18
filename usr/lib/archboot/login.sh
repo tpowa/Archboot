@@ -120,7 +120,7 @@ if ! [[ -e /.vconsole-run ]]; then
     fi
     echo KEYMAP=us >/etc/vconsole.conf
     echo FONT=ter-v${SIZE}n >>/etc/vconsole.conf
-    systemctl restart systemd-vconsole-setup
+    systemd-vconsole-setup
     # avoid screen font changing
     sleep 1
 fi
