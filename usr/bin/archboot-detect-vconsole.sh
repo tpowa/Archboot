@@ -4,7 +4,7 @@
 #    archboot-vconsole.sh - sets bigger font on bigger display resolutions
 #    by Tobias Powalowski <tpowa@archlinux.org>
 #
-
+udevadm settle
 FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" 2>"${_NO_LOG}" | sed -e 's#.*:##g')"
 if [[ "${FB_SIZE}" -gt '1900' ]]; then
     SIZE="32"
