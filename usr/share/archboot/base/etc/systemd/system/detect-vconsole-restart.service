@@ -9,6 +9,7 @@ Description=Restart vconsole detection if modes changed
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=systemctl restart detect-vconsole.service
+ExecStart=systemctl restart systemd-vconsole-setup
 
 [Install]
 WantedBy=sysinit.target
