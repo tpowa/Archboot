@@ -3,9 +3,9 @@
 
 [Unit]
 Description=Set vconsole on display resolution
-After=systemd-udev-settle.service
+After=systemd-udev-trigger.service
 Before=systemd-vconsole-setup.service
-Wants=systemd-udev-settle.service systemd-vconsole-setup.service
+Wants=systemd-vconsole-setup.service
 
 [Service]
 Type=oneshot
