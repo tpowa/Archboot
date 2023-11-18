@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# 
-#    archboot-vconsole.sh - sets bigger font on bigger display resolutions
-#    by Tobias Powalowski <tpowa@archlinux.org>
+#  archboot--detect-vconsole.sh:
+#  sets bigger font on bigger display resolutions
+#  by Tobias Powalowski <tpowa@archlinux.org>
 #
 udevadm settle
-FB_SIZE="$(cut -d 'x' -f 1 /sys/class/graphics/fb0/modes 2>/dev/null | sed -e 's#.*:##g')"
+FB_SIZE="$(sed -e 's#.*:##g' -e 's#x.*##g' /sys/class/graphics/fb0/modes 2>/dev/null)"
 if [[ "${FB_SIZE}" -gt '1900' ]]; then
     SIZE="32"
 else
