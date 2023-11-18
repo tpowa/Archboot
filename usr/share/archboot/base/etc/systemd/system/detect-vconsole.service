@@ -11,4 +11,3 @@ Wants=systemd-vconsole-setup.service
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/bin/detect-vconsole.sh
-
