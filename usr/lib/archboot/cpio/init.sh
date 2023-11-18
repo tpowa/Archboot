@@ -99,7 +99,7 @@ _mount_stage() {
 _sysroot_stage() {
     : >/.archboot
     _task btrfs &
-    _progress_wait "0" "10" "${_KEEP} Creating ZRAM device..." "0.5"
+    _progress_wait "0" "10" "${_KEEP} Creating btrfs on /dev/zram0..." "0.5"
     : >/.archboot
     _task system &
     _progress_wait "11" "95" "${_KEEP} Copying rootfs to /sysroot..." "0.5"
