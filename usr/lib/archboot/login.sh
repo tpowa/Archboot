@@ -176,7 +176,7 @@ elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 
     _welcome
     _memory_error "2.0GB"
     _enter_shell
-# local image, fail if less than 3.3GB  RAM available
+# local image, fail if less than 2.6GB  RAM available
 elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 &&\
 -e "${_LOCAL_DB}" ]]; then
     _welcome
