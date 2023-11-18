@@ -6,12 +6,9 @@ Description=Set vconsole on display resolution
 After=systemd-udev-trigger.service
 Before=systemd-vconsole-setup.service
 Wants=systemd-vconsole-setup.service
-ConditionPathExists=/sys/class/graphics/fb0/modes
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/bin/detect-vconsole.sh
 
-[Install]
-WantedBy=sysinit.target
