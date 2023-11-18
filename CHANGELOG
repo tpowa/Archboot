@@ -5,6 +5,8 @@ Environment:
 - reenabled configfs for systemd
 - moved mounting directories in init.service to /mnt/{cdrom,ventoy,efi}
 - create empty root password in a much better way
+- moved vconsole setup and screen detection to systemd path unit
+- added systemd 255 support
 init:
 - functionalized messages
 - removed all quirks for modules handling
@@ -12,7 +14,7 @@ init:
 - unpack complete rootfs at once to /sysroot
 cpio:
 - merged acpi_mods and platform_mods into common_mods
-- create new base_ hooks
+- created new base_ hooks
 - added error message on failed _binary adding
 - added message about used config file
 - use only zstd compression/decompression
