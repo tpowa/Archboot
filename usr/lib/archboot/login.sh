@@ -111,6 +111,7 @@ _run_update_installer() {
 
 if ! [[ -e /.vconsole-run ]]; then
     : > /.vconsole-run
+    udevadm settle
     FB_SIZE="$(cut -d 'x' -f 1 "$(find /sys -wholename '*fb0/modes')" 2>"${_NO_LOG}" | sed -e 's#.*:##g')"
     if [[ "${FB_SIZE}" -gt '1900' ]]; then
         SIZE="32"
