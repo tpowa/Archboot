@@ -90,19 +90,27 @@ _task() {
     fi
     rm /.archboot
 }
-_mount_stage() {
+_initrd_stage() {
     : >/.archboot
     _task mount &
-    _progress_wait "0" "99" "${_KEEP} Searching for rootfs..." "0.1"
-    _progress "100" "${_KEEP}"
-}
-_sysroot_stage() {
+    _progress_wait "0" "10" "${_KEEP} Searching for rootfs..." "1"
+    if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]] ; then
+        if ! mount /mnt/cdrom/efi.img /mnt/efi &>/dev/null; then
+            _clear
+            _wrn "Archboot Emergeny Shell:"
+            _wrn "Error: Didn't find a device with archboot rootfs!"
+            _msg "This needs further debugging. Please contact the archboot author."
+            _msg "Tobias Powalowski: tpowa@archlinux.org"
+            echo ""
+            systemctl start emergency.service
+        fi
+    fi
     : >/.archboot
     _task btrfs &
-    _progress_wait "0" "10" "${_KEEP} Creating btrfs on /dev/zram0..." "0.5"
+    _progress_wait "11" "20" "${_KEEP} Creating btrfs on /dev/zram0..." "0.5"
     : >/.archboot
     _task system &
-    _progress_wait "11" "95" "${_KEEP} Copying rootfs to /sysroot..." "0.5"
+    _progress_wait "21" "95" "${_KEEP} Copying rootfs to /sysroot..." "0.75"
     : >/.archboot
     _task unmount &
     _progress_wait "96" "99" "${_KEEP} Unmounting rootfs..." "1"
@@ -116,19 +124,7 @@ done
 _msg "Initializing Console..."
 _clear
 setfont ter-v16n -C /dev/console
-_mount_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Searching for rootfs..." 6 75 0
-if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]] ; then
-    if ! mount /mnt/cdrom/efi.img /mnt/efi &>/dev/null; then
-        _clear
-        _wrn "Archboot Emergeny Shell:"
-        _wrn "Error: Didn't find a device with archboot rootfs!"
-        _msg "This needs further debugging. Please contact the archboot author."
-        _msg "Tobias Powalowski: tpowa@archlinux.org"
-        echo ""
-        systemctl start emergency.service
-    fi
-fi
-_sysroot_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Creating ZRAM device..." 6 75 0
+_initrd_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Searching for rootfs..." 6 75 0
 _clear
 _msg "The boot medium can be safely removed now."
 echo ""
