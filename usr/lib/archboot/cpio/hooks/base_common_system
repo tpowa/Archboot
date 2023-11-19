@@ -85,10 +85,8 @@ protocols,request-key.conf,securetty,services}
                  /usr/bin/detect-vconsole.sh
     _file_rename /usr/share/archboot/base/etc/systemd/system/detect-vconsole.service \
                  /etc/systemd/system/detect-vconsole.service
-    _file_rename /usr/share/archboot/base/etc/systemd/system/detect-vconsole.path \
-                 /etc/systemd/system/detect-vconsole.path
-    _symlink /etc/systemd/system/sysinit.target.wants/detect-vconsole.path \
-             /etc/systemd/system/detect-vconsole.path
+    _symlink /etc/systemd/system/sysinit.target.wants/detect-vconsole.service \
+             /etc/systemd/system/detect-vconsole.service
     _symlink /etc/systemd/system/multi-user.target.wants/windowkeys.service \
              /etc/systemd/system/windowkeys.service
     # disable systemd targets:
