@@ -2,7 +2,7 @@
 # by Tobias Powalowski <tpowa@archlinux.org>
 
 [Path]
-PathModified=/sys/class/graphics/fb0
+PathModified=/sys/class/graphics/fbcon
 
 [Install]
 WantedBy=sysinit.target
