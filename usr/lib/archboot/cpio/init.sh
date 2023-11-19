@@ -60,6 +60,19 @@ _task() {
             _COUNT=$((_COUNT+1))
         done
     fi
+    if [[ "${1}" == check ]]; then
+        if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]] ; then
+            if ! mount /mnt/cdrom/efi.img /mnt/efi &>/dev/null; then
+                _clear
+                _wrn "Archboot Emergeny Shell:"
+                _wrn "Error: Didn't find a device with archboot rootfs!"
+                _msg "This needs further debugging. Please contact the archboot author."
+                _msg "Tobias Powalowski: tpowa@archlinux.org"
+                echo ""
+                systemctl start emergency.service
+            fi
+        fi
+    fi
     if [[ "${1}" == btrfs ]]; then
         echo "zstd" >/sys/block/zram0/comp_algorithm
         echo "5G" >/sys/block/zram0/disksize
@@ -94,20 +107,12 @@ _initrd_stage() {
     : >/.archboot
     _task mount &
     _progress_wait "0" "10" "${_KEEP} Searching for rootfs..." "1"
-    if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]] ; then
-        if ! mount /mnt/cdrom/efi.img /mnt/efi &>/dev/null; then
-            _clear
-            _wrn "Archboot Emergeny Shell:"
-            _wrn "Error: Didn't find a device with archboot rootfs!"
-            _msg "This needs further debugging. Please contact the archboot author."
-            _msg "Tobias Powalowski: tpowa@archlinux.org"
-            echo ""
-            systemctl start emergency.service
-        fi
-    fi
+    : >/.archboot
+    _task check &
+    _progress_wait "11" "12" "${_KEEP} Checking rootfs..." "1"
     : >/.archboot
     _task btrfs &
-    _progress_wait "11" "20" "${_KEEP} Creating btrfs on /dev/zram0..." "0.5"
+    _progress_wait "13" "20" "${_KEEP} Creating btrfs on /dev/zram0..." "0.5"
     : >/.archboot
     _task system &
     _progress_wait "21" "95" "${_KEEP} Copying rootfs to /sysroot..." "0.75"
