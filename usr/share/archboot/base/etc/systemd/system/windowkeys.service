@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# by Tobias Powalowski <tpowa@archlinux.org>
+
 [Unit]
 Description=Load windowkeys on console
 
@@ -6,5 +9,3 @@ Type=simple
 RemainAfterExit=Yes
 ExecStart=loadkeys windowkeys
 
-[Install]
-WantedBy=multi-user.target

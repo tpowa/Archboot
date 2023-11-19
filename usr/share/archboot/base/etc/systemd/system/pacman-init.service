@@ -9,5 +9,3 @@ Type=simple
 RemainAfterExit=yes
 ExecStart=/usr/bin/bash -c "/usr/bin/pacman-key --init; /usr/bin/pacman-key --populate"
 
-[Install]
-WantedBy=multi-user.target
