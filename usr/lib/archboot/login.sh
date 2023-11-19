@@ -146,16 +146,16 @@ if [[ -e /usr/bin/setup ]]; then
         localize
         . /etc/locale.conf
     fi
-    if [[ ! -e /.network ]]; then
+    if ! [[ -e /.network ]]; then
         network
     fi
     if ! [[ -e /.clock ]]; then
         clock
     fi
-    if [[ ! -e /.pacsetup ]]; then
+    if ! [[ -e /.pacsetup ]]; then
         pacsetup
     fi
-    if [[ ! -e /.launcher ]]; then
+    if ! [[ -e /.launcher ]]; then
         launcher
     fi
 # latest image, fail if less than 2GB RAM available
