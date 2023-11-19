@@ -16,3 +16,4 @@ fi
 # update vconsole.conf accordingly
 echo KEYMAP=us >/etc/vconsole.conf
 echo FONT=ter-v${SIZE}n >>/etc/vconsole.conf
+/lib/systemd/systemd-vconsole-setup
