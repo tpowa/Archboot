@@ -127,10 +127,17 @@ for i in cdrom usb-storage zram zstd; do
 done
 # fix parallels screen
 [[ "${_ARCH}" == "aarch64" ]] && sleep 1
+# get screen setting mode from /sys
+FB_SIZE="$(sed -e 's#.*:##g' -e 's#x.*##g' /sys/class/graphics/fb0/modes 2>/dev/null)"
+if [[ "${FB_SIZE}" -gt '1900' ]]; then
+    SIZE="32"
+else
+    SIZE="16"
+fi
 # it needs one echo before, in order to reset the consolefont!
 _msg "Initializing Console..."
 _clear
-setfont ter-v16n -C /dev/console
+setfont ter-v${_SIZE}n -C /dev/console
 _initrd_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Searching for rootfs..." 6 75 0
 _clear
 _msg "The boot medium can be safely removed now."
