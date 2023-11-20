@@ -15,7 +15,7 @@ _GRUB_ISO="/usr/share/archboot/grub/archboot-iso-grub.cfg"
 _grub_mkstandalone() {
     #shellcheck disable=SC2086
     ${1} ${2} grub-mkstandalone -d "/usr/lib/grub/${_GRUB_ARCH}" -O "${_GRUB_ARCH}" \
-    --sbat=/usr/share/grub/sbat.csv --fonts=ter-u16n --locales="" --themes="" \
+    --sbat=/usr/share/grub/sbat.csv --fonts=ter-u16n ${_GRUB_CORE_COMPRESS} --locales="" --themes="" \
     -o "grub-efi/${_GRUB_EFI}" "boot/grub/grub.cfg=${_GRUB_ISO}"
 }
 
@@ -67,6 +67,8 @@ _prepare_uefi_AA64() {
     echo "Preparing AA64 Grub..."
     _GRUB_ARCH="arm64-efi"
     _GRUB_EFI="grubaa64.efi"
+    # virtualbox does not support compressed bootloaders on aarch64
+    _GRUB_CORE_COMPRESS="--core-compress=none"
     mkdir "${1}"/grub-efi
     #shellcheck disable=SC2086
     _grub_mkstandalone "${_NSPAWN}" "${1}"
