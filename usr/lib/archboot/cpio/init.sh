@@ -128,11 +128,11 @@ done
 # fix parallels screen
 [[ "${_ARCH}" == "aarch64" ]] && sleep 1
 # get screen setting mode from /sys
-FB_SIZE="$(sed -e 's#.*:##g' -e 's#x.*##g' /sys/class/graphics/fb0/modes 2>/dev/null)"
-if [[ "${FB_SIZE}" -gt '1900' ]]; then
-    SIZE="32"
+_FB_SIZE="$(sed -e 's#.*:##g' -e 's#x.*##g' /sys/class/graphics/fb0/modes 2>/dev/null)"
+if [[ "${_FB_SIZE}" -gt '1900' ]]; then
+    _SIZE="32"
 else
-    SIZE="16"
+    _SIZE="16"
 fi
 # it needs one echo before, in order to reset the consolefont!
 _msg "Initializing Console..."
