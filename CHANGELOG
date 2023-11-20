@@ -7,6 +7,7 @@ Environment:
 - create empty root password in a much better way
 - moved vconsole setup and screen detection to systemd service 
 - added systemd 255 support
+- fixed retina high resolution on aarch64
 init:
 - functionalized messages
 - removed all quirks for modules handling
