@@ -129,6 +129,8 @@ done
 _msg "Initializing Console..."
 _clear
 setfont ter-v16n -C /dev/console
+# fix parallels screen
+[[ "${_ARCH}" == "aarch64" ]] && sleep 1
 _initrd_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Searching for rootfs..." 6 75 0
 _clear
 _msg "The boot medium can be safely removed now."
