@@ -126,7 +126,7 @@ for i in cdrom usb-storage zram zstd; do
     modprobe -q "${i}"
 done
 # take care of builtin drm modules
-udevadm -w -s drm
+udevadm settle
 # get screen setting mode from /sys
 _FB_SIZE="$(sed -e 's#.*:##g' -e 's#x.*##g' /sys/class/graphics/fb0/modes 2>/dev/null)"
 if [[ "${_FB_SIZE}" -gt '1900' ]]; then
