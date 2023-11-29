@@ -1,4 +1,6 @@
-On the road to 2023.11:
+On the road to 2023.12:
+---
+2023.11 Highlights:
 - kernel 6.6.x
 Environment:
 - switched to systemd in early userspace
@@ -6,7 +8,7 @@ Environment:
 - moved mounting directories in init.service to /mnt/{cdrom,ventoy,efi}
 - create empty root password in a much better way
 - moved vconsole setup and screen detection to systemd service 
-- added systemd 255 support
+- added upcoming systemd 255 support
 - fixed retina high resolution on aarch64
 init:
 - functionalized messages
@@ -24,6 +26,7 @@ pacsetup:
 - added check on working mirror state
 setup:
 changed default installation path to /mnt/install
+---
 2023.10 Highlights:
 - GeoIP - CDN Hosting: https://archboot.com,
   the other used addresses redirect to the .com again.
