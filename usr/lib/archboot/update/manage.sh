@@ -233,17 +233,7 @@ _new_environment() {
         rm "${_RAM}"/{init,"${_VMLINUZ}"} &>"${_NO_LOG}"
         _progress "100" "Switching to rootfs ${_RAM}..."
         sleep 2
-        # https://www.freedesktop.org/software/systemd/man/bootup.html
-        # enable systemd  initrd functionality
-        : > /etc/initrd-release
-        # fix /run/nouser issues
-        systemctl stop systemd-user-sessions.service
-        # avoid issues by taking down services in ordered way
-        systemctl stop dbus-org.freedesktop.login1.service
-        systemctl stop dbus.socket
-        # prepare for initrd-switch-root
-        systemctl start initrd-cleanup.service
-        systemctl start initrd-switch-root.target
+        systemctl soft-reboot
     fi
     _progress "86" "Preserving Basic Setup values..."
     if [[ -e '/.localize' ]]; then

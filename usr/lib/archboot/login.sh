@@ -31,14 +31,14 @@ _create_btrfs() {
     echo "zstd" >/sys/block/zram0/comp_algorithm
     echo "5G" >/sys/block/zram0/disksize
     mkfs.btrfs /dev/zram0 &>"${_NO_LOG}"
-    mount -o discard /dev/zram0 /sysroot
+    mount -o discard /dev/zram0 /run/nextroot
     rm /.archboot
 }
 
 _copy_root() {
     tar -C / --exclude="./dev/*" --exclude="./proc/*" --exclude="./sys/*" \
         --exclude="./run/*" --exclude="./mnt/*" --exclude="./tmp/*" --exclude="./sysroot/*" \
-        -clpf - . | tar -C /sysroot -xlspf - &>"${_NO_LOG}"
+        -clpf - . | tar -C /run/nextroot -xlspf - &>"${_NO_LOG}"
     rm /.archboot
 }
 
@@ -49,7 +49,7 @@ _copy_root() {
 _switch_root_zram() {
 if [[ "${TTY}" = "tty1" ]]; then
     clear
-    [[ -d /sysroot ]] || mkdir /sysroot
+    [[ -d /run/nextroot ]] || mkdir /run/nextroot
     : > /.archboot
     _create_btrfs &
     _progress_wait "0" "5" "Creating btrfs on /dev/zram0..." "0.2"
@@ -57,10 +57,10 @@ if [[ "${TTY}" = "tty1" ]]; then
     _progress "6" "Creating btrfs on /dev/zram0..."
     : > /.archboot
     _copy_root &
-    _progress_wait "7" "99" "Copying rootfs to /sysroot..." "0.125"
+    _progress_wait "7" "99" "Copying rootfs to /run/nextroot..." "0.125"
     # cleanup directories and files
-    rm -r /sysroot/sysroot &>"${_NO_LOG}"
-    rm /sysroot/init &>"${_NO_LOG}"
+    rm -r /run/nextroot/sysroot &>"${_NO_LOG}"
+    rm /run/nextroot/sysroot/init &>"${_NO_LOG}"
     _progress "100" "System is ready."
     read -r -t 1
 else
@@ -117,17 +117,7 @@ if [[ "${TTY}" = "tty1" ]] ; then
         # fix clear screen on all terminals
         printf "\ec" | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
         echo "Launching systemd $(udevadm --version)..."
-        # https://www.freedesktop.org/software/systemd/man/bootup.html
-        # enable systemd  initrd functionality
-        : > /etc/initrd-release
-        # fix /run/nouser issues
-        systemctl stop systemd-user-sessions.service
-        # avoid issues by taking down services in ordered way
-        systemctl stop dbus-org.freedesktop.login1.service
-        systemctl stop dbus.socket
-        # prepare for initrd-switch-root
-        systemctl start initrd-cleanup.service
-        systemctl start initrd-switch-root.target
+        systemctl soft-reboot
     else
         if ! [[ -e "${_LOCAL_DB}" ]]; then
             systemctl start systemd-networkd
