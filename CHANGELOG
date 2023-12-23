@@ -1,5 +1,6 @@
 On the road to 2023.12:
 - systemd 255
+- grub 2.12
 - switched to systemd soft-reboot mechanism, instead of switch-root
 ---
 2023.11 Highlights:
