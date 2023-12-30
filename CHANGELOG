@@ -1,6 +1,9 @@
-On the road to 2023.12:
+On the road to 2024.01:
+---
+2023.12 Highlights:
 - systemd 255
 - grub 2.12
+Environment:
 - switched to systemd soft-reboot mechanism, instead of switch-root
 ---
 2023.11 Highlights:
