@@ -37,7 +37,7 @@ var/lib/pacman/local \
     _map _binary agetty archlinux-keyring-wkd-sync awk basename bsdtar \
                  {bus,boot,coredump,hostname,journal,locale,login,machine,network,\
 system,timedate,userdb,home,oom,portable}ctl certutil chmod clear cmsutil crlutil curl date \
-                 dbus-{cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
+                 dbus-{broker{,-launch},cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
 update-activation-environment,uuidgen} dd df dir du false gawk gpg{,-agent,conf,-connect-agent} \
                  gpgme-{tool,json} insmod install kernel-install kill{,all} loadkeys ldconfig \
                  login makepkg mktemp mkhomedir_helper modutil more mount.ddi mount.nfs{,4} \
