@@ -3,6 +3,7 @@ Highlights:
 - kernel 6.7.x
 Environment:
 - switch to dbus-broker
+- added bcachefs-tools
 ---
 2023.12 Highlights:
 - systemd 255
