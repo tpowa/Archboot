@@ -50,6 +50,7 @@ _select_filesystem() {
     command -v mkfs.btrfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} btrfs Btrfs"
     command -v mkfs.ext4 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext4 Ext4"
     command -v mkfs.xfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} xfs XFS"
+    command -v mkfs.bcachefs &>"${_NO_LOG}" && modinfo bcachefs >${_NO_LOG} && _FSOPTS="${_FSOPTS} bcachefs Bcachefs"
     command -v mkfs.ext2 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext2 Ext2"
     command -v mkfs.vfat &>"${_NO_LOG}" && [[ -n "${_ROOT_DONE}" ]] && _FSOPTS="${_FSOPTS} vfat FAT32"
     command -v mkfs.f2fs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} f2fs F2FS"
@@ -404,6 +405,7 @@ _mkfs() {
                 ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}"; ret=$? ;;
                 f2fs)     mkfs.f2fs ${7} -f -l "${6}" \
                                     -O extra_attr,inode_checksum,sb_checksum ${1} &>"${_LOG}"; ret=$? ;;
+                bcachefs) mkfs.bcachefs ;;
                 btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} &>"${_LOG}"; ret=$? ;;
                 nilfs2)   mkfs.nilfs2 -f ${7} -L "${6}" ${1} &>"${_LOG}"; ret=$? ;;
                 vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}"; ret=$? ;;
