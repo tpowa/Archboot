@@ -1,4 +1,7 @@
 On the road to 2024.02:
+Environment:
+- added archlinux-userland-fs-cmp on x86_64
+---
 2024.01 Highlights:
 - kernel 6.7.x
 Environment:
