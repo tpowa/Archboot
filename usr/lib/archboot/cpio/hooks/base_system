@@ -26,7 +26,7 @@ _run ()
                  uuidd uuidgen uuidparse vdir vigr vipw vmstat w wall watch wdctl whereis who \
                  whoami wipe write xargs xz{,cat,cmp,dec,grep,egrep,fgrep} \
                  z{cat,cmp,diff,egrep,fgrep,force,grep,less,more,new,ramctl} zstd{cat,grep,less,mt}
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _map _binary i386 x86_64 peekfd waitpid
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _map _binary archlinux-userland-fs-cmp i386 x86_64 peekfd waitpid
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _binary peekfd
     [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _map _binary waitpid
     # add file magic file

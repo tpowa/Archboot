@@ -28,7 +28,7 @@ uuidgen,uuidparse,vdir,vigr,vipw,vmstat,w,wall,watch,wdctl,whereis,who,whoami,wi
 write,xargs,xz{,cat,cmp,dec,grep,egrep,fgrep},z{cat,cmp,diff,egrep,fgrep,force,\
 grep,less,more,new,ramctl},zstd{cat,grep,less,mt}}
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-        rm /usr/bin/{i386,x86_64,peekfd,waitpid}
+        rm /usr/bin/{archlinux-userland-fs-cmp,i386,x86_64,peekfd,waitpid}
     fi
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         rm /usr/bin/peekfd
