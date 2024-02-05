@@ -1,6 +1,9 @@
 On the road to 2024.02:
 Environment:
 - added archlinux-userland-fs-cmp on x86_64
+- added bcachefs modules
+Setup:
+- add simple bcachefs support
 ---
 2024.01 Highlights:
 - kernel 6.7.x
