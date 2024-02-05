@@ -385,7 +385,7 @@ _mkfs() {
     else
         # make sure the fstype is one we can handle
         local _KNOWNFS=0
-        for fs in xfs jfs ext2 ext3 ext4 f2fs btrfs nilfs2 vfat; do
+        for fs in xfs jfs ext2 ext3 ext4 f2fs bcachefs btrfs nilfs2 vfat; do
             [[ "${2}" == "${fs}" ]] && _KNOWNFS=1 && break
         done
         if [[ ${_KNOWNFS} -eq 0 ]]; then
@@ -405,7 +405,7 @@ _mkfs() {
                 ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}"; ret=$? ;;
                 f2fs)     mkfs.f2fs ${7} -f -l "${6}" \
                                     -O extra_attr,inode_checksum,sb_checksum ${1} &>"${_LOG}"; ret=$? ;;
-                bcachefs) mkfs.bcachefs format ;;
+                bcachefs) mkfs.bcachefs -f ${7} -L "${6}" ${1} &>"${_LOG}"; ret=$? ;;
                 btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} &>"${_LOG}"; ret=$? ;;
                 nilfs2)   mkfs.nilfs2 -f ${7} -L "${6}" ${1} &>"${_LOG}"; ret=$? ;;
                 vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}"; ret=$? ;;
