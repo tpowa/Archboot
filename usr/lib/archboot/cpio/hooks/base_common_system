@@ -49,6 +49,11 @@ detect-virt,escape,firstboot,hwdb,inhibit,machine-id-setup,mount,notify,nspawn,p
 socket-activate,stdio-bridge,sysusers,tty-ask-password-agent,umount,creds,cryptenroll,dissect,id128,sysext} \
                  tar tee testpkg top touch trust tty unix_{chkpwd,update} /usr/lib/dbus-1.0/dbus-daemon-launch-helper \
                  umount.nfs{,4} update-ca-trust vercmp wc yes zstd
+    # use patched aarch64 pacman-key
+    # https://archlinuxarm.org/forum/viewtopic.php?f=15&t=16701
+    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+        _file_rename "/usr/share/archboot/patches/pacman-key-aarch64" "/usr/bin/pacman-key"
+    fi
     # add nano
     _file_rename /etc/nanorc /etc/nanorc
     # add syntax highlighting
