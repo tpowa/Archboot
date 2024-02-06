@@ -52,6 +52,7 @@ socket-activate,stdio-bridge,sysusers,tty-ask-password-agent,umount,creds,crypte
     # use patched aarch64 pacman-key
     # https://archlinuxarm.org/forum/viewtopic.php?f=15&t=16701
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+        _install_files
         _file_rename "/usr/share/archboot/patches/pacman-key-aarch64" "/usr/bin/pacman-key"
     fi
     # add nano
