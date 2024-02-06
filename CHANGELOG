@@ -2,6 +2,7 @@ On the road to 2024.02:
 Environment:
 - added archlinux-userland-fs-cmp on x86_64
 - added bcachefs modules
+- added aarch64 gpg keyring workaround
 Setup:
 - add simple bcachefs support
 ---
