@@ -95,6 +95,9 @@ _local_pacman_conf() {
 
 _auto_packages() {
     # Add filesystem packages
+    if ${_LSBLK} FSTYPE | grep -q bcachefs; then
+        ! echo "${_PACKAGES}" | grep -qw bcachefs-tools && _PACKAGES="${_PACKAGES} bcachefs-tools"
+    fi
     if ${_LSBLK} FSTYPE | grep -q btrfs; then
         ! echo "${_PACKAGES}" | grep -qw btrfs-progs && _PACKAGES="${_PACKAGES} btrfs-progs"
     fi
