@@ -33,7 +33,7 @@ _clear_fs_values() {
 _ssd_optimization() {
     # ext4, jfs, xfs, btrfs, nilfs2, f2fs  have ssd mount option support
     _SSD_MOUNT_OPTIONS=""
-    if echo "${_FSTYPE}" | grep -Eq 'ext4|jfs|btrfs|xfs|nilfs2|f2fs'; then
+    if echo "${_FSTYPE}" | grep -Eq 'ext4|jfs|bcachefs|btrfs|xfs|nilfs2|f2fs'; then
         # check all underlying devices on ssd
         for i in $(${_LSBLK} NAME,TYPE "${_DEV}" -s 2>"${_NO_LOG}" | grep "disk$" | cut -d' ' -f 1); do
             # check for ssd
@@ -50,15 +50,14 @@ _select_filesystem() {
     command -v mkfs.btrfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} btrfs Btrfs"
     command -v mkfs.ext4 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext4 Ext4"
     command -v mkfs.xfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} xfs XFS"
-    command -v mkfs.bcachefs &>"${_NO_LOG}" && modinfo bcachefs >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} bcachefs Bcachefs"
     command -v mkfs.ext2 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext2 Ext2"
     command -v mkfs.vfat &>"${_NO_LOG}" && [[ -n "${_ROOT_DONE}" ]] && _FSOPTS="${_FSOPTS} vfat FAT32"
+    command -v mkfs.bcachefs &>"${_NO_LOG}" && modinfo bcachefs >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} bcachefs Bcachefs"
     command -v mkfs.f2fs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} f2fs F2FS"
     command -v mkfs.nilfs2 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
-    command -v mkfs.ext3 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext3 Ext3"
     command -v mkfs.jfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} jfs JFS"
     #shellcheck disable=SC2086
-    _dialog --title " Filesystem on ${_DEV} " --no-cancel --menu "" 16 50 10 ${_FSOPTS} 2>"${_ANSWER}" || return 1
+    _dialog --title " Filesystem on ${_DEV} " --no-cancel --menu "" 15 50 9 ${_FSOPTS} 2>"${_ANSWER}" || return 1
     _FSTYPE=$(cat "${_ANSWER}")
 }
 
@@ -116,21 +115,21 @@ _check_mkfs_values() {
 
 _run_mkfs() {
     while read -r line; do
-        _DEV=$(echo "${line}" | cut -d: -f 1)
-        _FSTYPE=$(echo "${line}" | cut -d: -f 2)
-        _MP=$(echo "${line}" | cut -d: -f 3)
-        _DOMKFS=$(echo "${line}" | cut -d: -f 4)
-        _LABEL_NAME=$(echo "${line}" | cut -d: -f 5)
-        _FS_OPTIONS=$(echo "${line}" | cut -d: -f 6)
+        _DEV=$(echo "${line}" | cut -d\| -f 1)
+        _FSTYPE=$(echo "${line}" | cut -d\| -f 2)
+        _MP=$(echo "${line}" | cut -d\| -f 3)
+        _DOMKFS=$(echo "${line}" | cut -d\| -f 4)
+        _LABEL_NAME=$(echo "${line}" | cut -d\| -f 5)
+        _FS_OPTIONS=$(echo "${line}" | cut -d\| -f 6)
         [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
-        _BTRFS_DEVS=$(echo "${line}" | cut -d: -f 7)
+        _BTRFS_DEVS=$(echo "${line}" | cut -d\| -f 7)
         # remove # from array
         _BTRFS_DEVS="${_BTRFS_DEVS//#/\ }"
-        _BTRFS_LEVEL=$(echo "${line}" | cut -d: -f 8)
+        _BTRFS_LEVEL=$(echo "${line}" | cut -d\| -f 8)
         [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _BTRFS_LEVEL="${_FS_OPTIONS} -m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
-        _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d: -f 9)
+        _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d\| -f 9)
         [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _BTRFS_SUBVOLUME=""
-        _BTRFS_COMPRESS=$(echo "${line}" | cut -d: -f 10)
+        _BTRFS_COMPRESS=$(echo "${line}" | cut -d\| -f 10)
         [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
         _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
               "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
@@ -304,7 +303,13 @@ _mountpoints() {
                     _find_btrfsraid_devices
                     _btrfs_parts
                     _check_mkfs_values
-                    echo "${_DEV}:${_FSTYPE}:${_MP}:${_DOMKFS}:${_LABEL_NAME}:${_FS_OPTIONS}:${_BTRFS_DEVS}:${_BTRFS_LEVEL}:${_BTRFS_SUBVOLUME}:${_BTRFS_COMPRESS}" >>/tmp/.parts
+                    if [[ "${_FSTYPE}" == "btrfs" ]]; then
+                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BTRFS_DEVS}|${_BTRFS_LEVEL}|${_BTRFS_SUBVOLUME}|${_BTRFS_COMPRESS}" >>/tmp/.parts
+                    elif [[ "${_FSTYPE}" == "bcachefs" ]]; then
+                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BTRFS_DEVS}|${_BTRFS_LEVEL}|${_BTRFS_SUBVOLUME}|${_BTRFS_COMPRESS}" >>/tmp/.parts
+                    else
+                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BTRFS_DEVS}|${_BTRFS_LEVEL}|${_BTRFS_SUBVOLUME}|${_BTRFS_COMPRESS}" >>/tmp/.parts
+                    fi
                     # btrfs is a special case! not really elegant
                     # remove root btrfs on ESP selection menu, readd it on top aftwerwards
                     if [[ ! "${_FSTYPE}" == "btrfs" ]]; then
@@ -329,7 +334,7 @@ _mountpoints() {
             _MOUNT_TEXT="mount"
         fi
         #shellcheck disable=SC2028
-        _dialog --title " Summary " --yesno "Syntax\n------\nDEVICE:FSTYPE:MOUNTPOINT:FORMAT:LABEL:FSOPTIONS:BTRFS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _DEVFINISH="DONE"
+        _dialog --title " Summary " --yesno "Syntax\n------\nDEVICE|FSTYPE|MOUNTPOINT|FORMAT|LABEL|FSOPTIONS|FS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _DEVFINISH="DONE"
     done
     # disable swap and all mounted devices
     _umountall
