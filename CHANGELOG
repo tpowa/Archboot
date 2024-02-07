@@ -4,7 +4,7 @@ Environment:
 - added bcachefs modules
 - added pacman-key workaround for aarch64
 Setup:
-- added simple bcachefs support
+- added single device bcachefs support
 - added mkinitcpio kms workaround for aarch64
 ---
 2024.01 Highlights:
