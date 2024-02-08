@@ -424,7 +424,6 @@ _mkfs() {
                 xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"; ret=$? ;;
                 jfs)      yes | mkfs.jfs ${7} -L "${6}" ${1} &>"${_LOG}"; ret=$? ;;
                 ext2)     mkfs.ext2 -F -L ${7} "${6}" ${1} &>"${_LOG}"; ret=$? ;;
-                ext3)     mke2fs -F ${7} -L "${6}" -t ext3 ${1} &>"${_LOG}"; ret=$? ;;
                 ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}"; ret=$? ;;
                 f2fs)     mkfs.f2fs ${7} -f -l "${6}" \
                                     -O extra_attr,inode_checksum,sb_checksum ${1} &>"${_LOG}"; ret=$? ;;

@@ -10,6 +10,7 @@ LANG=C
 . /usr/lib/archboot/installer/autoconfiguration.sh
 . /usr/lib/archboot/installer/quicksetup.sh
 . /usr/lib/archboot/installer/blockdevices.sh
+. /usr/lib/archboot/installer/bcachefs.sh
 . /usr/lib/archboot/installer/bootloader.sh
 . /usr/lib/archboot/installer/bootloader_grub.sh
 . /usr/lib/archboot/installer/bootloader_limine.sh
