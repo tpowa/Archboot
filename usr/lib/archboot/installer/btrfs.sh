@@ -141,7 +141,7 @@ _select_btrfsraid_devices () {
     _BTRFS_DEVS=${_BTRFS_DEVS//${_BTRFS_DEV}\ _/}
     _RAIDNUMBER=2
     #shellcheck disable=SC2086
-    _dialog --title " Device ${_RAIDNUMBER} " --no-cancel --menu 12 50 6 ${_BTRFS_DEVS} 2>"${_ANSWER}" || return 1
+    _dialog --title " Device ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 ${_BTRFS_DEVS} 2>"${_ANSWER}" || return 1
     _BTRFS_DEV=$(cat "${_ANSWER}")
     echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
     while [[ "${_BTRFS_DEV}" != "DONE" ]]; do
