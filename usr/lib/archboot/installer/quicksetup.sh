@@ -274,7 +274,7 @@ _autoprepare() {
         done
         while [[ -z "${_CHOSENFS}" ]]; do
             #shellcheck disable=SC2086
-            _dialog --title " Filesystem / and /home " --no-cancel --menu "" 14 45 8 ${_FSOPTS} 2>"${_ANSWER}" || return 1
+            _dialog --title " Filesystem / and /home " --no-cancel --menu "" 10 45 8 ${_FSOPTS} 2>"${_ANSWER}" || return 1
             _FSTYPE=$(cat "${_ANSWER}")
             _dialog --title " Confirmation " --yesno " Filesystem ${_FSTYPE} will be used for / and /home?" 5 55 && _CHOSENFS=1
         done
