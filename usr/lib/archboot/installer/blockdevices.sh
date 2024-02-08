@@ -296,11 +296,9 @@ _clean_disk() {
 # the destination root partition last!
 _umountall()
 {
-    if [[ "${_DESTDIR}" == "/install" ]] && mountpoint -q "${_DESTDIR}"; then
+    if [[ "${_DESTDIR}" == "/mnt/install" ]] && mountpoint -q "${_DESTDIR}"; then
         swapoff -a &>"${_NO_LOG}"
-        for dev in $(findmnt --list --submounts "${_DESTDIR}" -o TARGET -n | tac); do
-            umount "${dev}"
-        done
+        umount -R "${_DESTDIR}"
         _dialog --no-mouse --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR}..." 4 60
         sleep 3
     fi
