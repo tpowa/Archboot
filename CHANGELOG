@@ -7,6 +7,7 @@ Setup:
 - added single device bcachefs with compression support
 - added mkinitcpio kms workaround for aarch64
 - removed ext3 support
+- simplified umountall routine
 ---
 2024.01 Highlights:
 - kernel 6.7.x
