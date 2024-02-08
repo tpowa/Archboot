@@ -159,9 +159,6 @@ _autoprepare() {
         command -v mkfs.ext4 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext4 Ext4"
         command -v mkfs.xfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} xfs XFS"
         command -v mkfs.bcachefs &>"${_NO_LOG}" && modinfo bcachefs >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} bcachefs Bcachefs"
-        command -v mkfs.f2fs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} f2fs F2FS"
-        command -v mkfs.nilfs2 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
-        command -v mkfs.jfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} jfs JFS"
         _DEV_NUM=0
         # create 2M bios_grub partition for grub BIOS GPT support
         if [[ -n "${_GUIDPARAMETER}" ]]; then

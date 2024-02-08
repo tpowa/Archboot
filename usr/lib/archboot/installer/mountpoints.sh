@@ -27,13 +27,14 @@ _clear_fs_values() {
     _BTRFS_LEVEL=""
     _BTRFS_SUBVOLUME=""
     _BTRFS_COMPRESS=""
+    _BCACHEFS_COMPRESS=""
 }
 
 # add ssd mount options
 _ssd_optimization() {
-    # ext4, jfs, xfs, btrfs, nilfs2, f2fs  have ssd mount option support
+    # bcachefs, btrfs, ext4, and xfs have ssd mount option support
     _SSD_MOUNT_OPTIONS=""
-    if echo "${_FSTYPE}" | grep -Eq 'ext4|jfs|bcachefs|btrfs|xfs|nilfs2|f2fs'; then
+    if echo "${_FSTYPE}" | grep -Eq 'bcachefs|btrfs|ext4|xfs'; then
         # check all underlying devices on ssd
         for i in $(${_LSBLK} NAME,TYPE "${_DEV}" -s 2>"${_NO_LOG}" | grep "disk$" | cut -d ' ' -f 1); do
             # check for ssd
@@ -53,9 +54,6 @@ _select_filesystem() {
     command -v mkfs.ext2 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext2 Ext2"
     command -v mkfs.vfat &>"${_NO_LOG}" && [[ -n "${_ROOT_DONE}" ]] && _FSOPTS="${_FSOPTS} vfat FAT32"
     command -v mkfs.bcachefs &>"${_NO_LOG}" && modinfo bcachefs >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} bcachefs Bcachefs"
-    command -v mkfs.f2fs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} f2fs F2FS"
-    command -v mkfs.nilfs2 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} nilfs2 Nilfs2"
-    command -v mkfs.jfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} jfs JFS"
     #shellcheck disable=SC2086
     _dialog --title " Filesystem on ${_DEV} " --no-cancel --menu "" 15 50 9 ${_FSOPTS} 2>"${_ANSWER}" || return 1
     _FSTYPE=$(cat "${_ANSWER}")
@@ -422,14 +420,10 @@ _mkfs() {
             #shellcheck disable=SC2086
             case ${2} in
                 xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"; ret=$? ;;
-                jfs)      yes | mkfs.jfs ${7} -L "${6}" ${1} &>"${_LOG}"; ret=$? ;;
                 ext2)     mkfs.ext2 -F -L ${7} "${6}" ${1} &>"${_LOG}"; ret=$? ;;
                 ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}"; ret=$? ;;
-                f2fs)     mkfs.f2fs ${7} -f -l "${6}" \
-                                    -O extra_attr,inode_checksum,sb_checksum ${1} &>"${_LOG}"; ret=$? ;;
                 bcachefs) mkfs.bcachefs -f ${7} -L "${6}" ${8} ${1} &>"${_LOG}"; ret=$? ;;
                 btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} &>"${_LOG}"; ret=$? ;;
-                nilfs2)   mkfs.nilfs2 -f ${7} -L "${6}" ${1} &>"${_LOG}"; ret=$? ;;
                 vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}"; ret=$? ;;
                 # don't handle anything else here, we will error later
             esac

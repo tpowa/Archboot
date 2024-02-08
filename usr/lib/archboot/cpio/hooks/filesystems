@@ -5,17 +5,14 @@
 _run ()
 {
     _map _binary badblocks bcachefs blkmapd btrfs-{find-root,image,map-logical,select-super} btrfs{,ck,tune} \
-                 chattr chcp cifscreds cifs.{idmap,upcall} compile_et debugfs defrag.f2fs \
-                 dosfsck dosfslabel dump.{exfat,f2fs} dump{e2fs,seg} e2{freefrag,fsck,image,label,\
-mmpstatus,scrub,scrub_all,undo} e4{crypt,defrag} exfatlabel f2fs{_io,crypt} fat{label,resize} findfs fsck \
-                 logsave resize2fs lsattr filefrag fsck.{bcachefs,btrfs,cramfs,exfat,ext2,ext3,ext4,f2fs,jfs,\
-minix,msdos,vfat,xfs} fibmap.f2fs fs{freeze,trim} getcifsacl gpart jfs_{debugfs,fsck,fscklog,\
-logdump,mkfs,tune} ls{cp,su} mk{_cmds,cp,dosfs,e2fs,swap} mkfs.{bcachefs,bfs,cramfs,exfat,ext2,ext3,ext4,\
-f2fs,jfs,minix,msdos,nilfs2,vfat,xfs} mount.{bcachefs,cifs,nilfs2,smb3} nfs{conf,dcld,idmap} nfsv4.exportd \
-nilfs_cleanerd nilfs-{clean,resize,tune} nvme parse.f2fs resize.f2fs rmcp setcifsacl sload.f2fs \
-                 tune.exfat tune2fs umount.nilfs2 wipefs xfs_{admin,bmap,copy,db,estimate,freeze,fsr,\
+                 chattr cifscreds cifs.{idmap,upcall} compile_et debugfs \
+                 dosfsck dosfslabel dump.exfat dumpe2fs e2{freefrag,fsck,image,label,\
+mmpstatus,scrub,scrub_all,undo} e4{crypt,defrag} exfatlabel fat{label,resize} findfs fsck \
+                 logsave resize2fs lsattr filefrag fsck.{bcachefs,btrfs,cramfs,exfat,ext2,ext3,ext4,\
+minix,msdos,vfat,xfs} fs{freeze,trim} getcifsacl gpart mk{_cmds,dosfs,e2fs,swap} mkfs.{bcachefs,bfs,cramfs,\
+exfat,ext2,ext3,ext4,minix,msdos,vfat,xfs} mount.{bcachefs,cifs,smb3} nfs{conf,dcld,idmap} nfsv4.exportd \
+                 nvme setcifsacl tune.exfat tune2fs wipefs xfs_{admin,bmap,copy,db,estimate,freeze,fsr,\
 growfs,info,io,logprint,metadump,mdrestore,mkfile,ncheck,quota,repair,rtcp,spaceman}
-    _file /etc/nilfs_cleanerd.conf
     _map _full_dir /etc/{cifs-utils,request-key.d,nvme}
     # fix libinih for plasma wallpaper
     _map _file /usr/lib/libINI*
