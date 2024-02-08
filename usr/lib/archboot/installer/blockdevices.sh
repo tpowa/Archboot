@@ -299,7 +299,7 @@ _umountall()
     if [[ "${_DESTDIR}" == "/mnt/install" ]] && mountpoint -q "${_DESTDIR}"; then
         swapoff -a &>"${_NO_LOG}"
         umount -R "${_DESTDIR}"
-        _dialog --no-mouse --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR}..." 4 60
+        _dialog --no-mouse --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR}..." 4 70
         sleep 3
     fi
 }
