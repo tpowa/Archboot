@@ -1,6 +1,6 @@
 On the road to 2024.02:
 Environment:
-- added archlinux-userland-fs-cmp on x86_64
+- added archlinux-userland-fs-cmp on aarch64 & x86_64
 - added bcachefs modules
 - added pacman-key workaround for aarch64
 Setup:
