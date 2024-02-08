@@ -29,7 +29,7 @@ _getpartlabel()
 # lists linux blockdevices
 _blockdevices() {
      # all available block disk devices
-     for dev in $(${_LSBLK} NAME,TYPE | grep "disk$" | cut -d' ' -f1); do
+     for dev in $(${_LSBLK} NAME,TYPE | grep "disk$" | cut -d ' ' -f1); do
         # exclude checks:
         #- iso9660 devices
         #  (${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "iso9660"
@@ -53,7 +53,7 @@ _blockdevices_partitions() {
     # all available block devices partitions
     # _printk off needed cause of parted usage
     _printk off
-    for dev in $(${_LSBLK} NAME,TYPE | grep -v '^/dev/md' | grep "part$"| cut -d' ' -f1); do
+    for dev in $(${_LSBLK} NAME,TYPE | grep -v '^/dev/md' | grep "part$"| cut -d ' ' -f1); do
         # exclude checks:
         #- part of raid device
         #  ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "linux_raid_member"
@@ -84,7 +84,7 @@ _blockdevices_partitions() {
 
 # list none partitionable raid md devices
 _raid_devices() {
-    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$\| linear$" | cut -d' ' -f 1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$\| linear$" | cut -d ' ' -f 1 | sort -u); do
         # exclude checks:
         # - part of lvm2 device_found
         #   ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "LVM2_member"
@@ -106,7 +106,7 @@ _raid_devices() {
 
 # lists linux partitionable raid devices partitions
 _partitionable_raid_devices_partitions() {
-    for dev in $(${_LSBLK} NAME,TYPE | grep "part$" | grep "^/dev/md.*p" 2>"${_NO_LOG}" | cut -d' ' -f 1 | sort -u) ; do
+    for dev in $(${_LSBLK} NAME,TYPE | grep "part$" | grep "^/dev/md.*p" 2>"${_NO_LOG}" | cut -d ' ' -f 1 | sort -u) ; do
         # exclude checks:
         # - part of lvm2 device_found
         #   ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "LVM2_member"
@@ -133,13 +133,13 @@ _partitionable_raid_devices_partitions() {
 
 _dmraid_devices() {
     # isw_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d ' ' -f 1 | sort -u); do
         if ${_LSBLK} NAME,FSTYPE -s "${dev}" 2>"${_NO_LOG}" | grep -q "isw_raid_member$"; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
     # ddf_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d' ' -f 1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE | grep " raid.*$" | cut -d ' ' -f 1 | sort -u); do
         if ${_LSBLK} NAME,FSTYPE -s "${dev}" 2>"${_NO_LOG}" | grep -q "ddf_raid_member$"; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
@@ -148,14 +148,14 @@ _dmraid_devices() {
 
 _dmraid_partitions() {
     # isw_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE | grep " md$" | cut -d' ' -f 1 | sort -u); do
-        if ${_LSBLK} NAME,FSTYPE -s "${dev}" 2>"${_NO_LOG}" | grep "isw_raid_member$" | cut -d' ' -f 1; then
+    for dev in $(${_LSBLK} NAME,TYPE | grep " md$" | cut -d ' ' -f 1 | sort -u); do
+        if ${_LSBLK} NAME,FSTYPE -s "${dev}" 2>"${_NO_LOG}" | grep "isw_raid_member$" | cut -d ' ' -f 1; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
     # ddf_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE | grep " md$" | cut -d' ' -f 1 | sort -u); do
-        if ${_LSBLK} NAME,FSTYPE -s "${dev}" 2>"${_NO_LOG}" | grep "ddf_raid_member$" | cut -d' ' -f 1; then
+    for dev in $(${_LSBLK} NAME,TYPE | grep " md$" | cut -d ' ' -f 1 | sort -u); do
+        if ${_LSBLK} NAME,FSTYPE -s "${dev}" 2>"${_NO_LOG}" | grep "ddf_raid_member$" | cut -d ' ' -f 1; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
@@ -165,7 +165,7 @@ _dmraid_partitions() {
 # - show device mapper devices:
 #   lvm2 and cryptdevices
 _dm_devices() {
-    for dev in $(${_LSBLK} NAME,TYPE | grep -e "lvm$" -e "crypt$" | cut -d' ' -f1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE | grep -e "lvm$" -e "crypt$" | cut -d ' ' -f1 | sort -u); do
         # exclude checks:
         # - part of lvm2 device
         #   ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | grep "LVM2_member"
@@ -237,7 +237,7 @@ _activate_luks()
     if [[ -e /usr/bin/cryptsetup ]]; then
         _dialog --no-mouse --infobox "Scanning for luks encrypted devices..." 0 0
         if ${_LSBLK} FSTYPE | grep -q "crypto_LUKS"; then
-            for part in $(${_LSBLK} NAME,FSTYPE | grep " crypto_LUKS$" | cut -d' ' -f 1); do
+            for part in $(${_LSBLK} NAME,FSTYPE | grep " crypto_LUKS$" | cut -d ' ' -f 1); do
                 # skip already encrypted devices, device mapper!
                 if ! ${_LSBLK} TYPE "${part}" 2>"${_NO_LOG}" | grep -q "crypt$"; then
                     _RUN_LUKS=""
@@ -328,7 +328,7 @@ _stopmd()
         fi
     fi
     if [[ -n "${_DISABLEMD}" || -n "${_DISABLEMDSB}" ]]; then
-        for dev in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d' ' -f 1); do
+        for dev in $(${_LSBLK} NAME,FSTYPE | grep "linux_raid_member$" | cut -d ' ' -f 1); do
             _clean_disk "${dev}"
         done
         _dialog --no-mouse --infobox "Removing superblock(s) on software raid devices done." 3 60
@@ -371,7 +371,7 @@ _stopluks()
     _DETECTED_LUKS=""
     _LUKSDEV=""
     # detect already running luks devices
-    _LUKSDEV="$(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1)"
+    _LUKSDEV="$(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d ' ' -f1)"
     [[ -z "${_LUKSDEV}" ]] || _DETECTED_LUKS=1
     if [[ -n "${_DETECTED_LUKS}" ]]; then
         _dialog --defaultno --yesno "Setup detected running luks encrypted device(s)...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLELUKS=1
@@ -379,7 +379,7 @@ _stopluks()
     if [[ -n "${_DISABLELUKS}" ]]; then
         _umountall
         for dev in ${_LUKSDEV}; do
-            _LUKS_REAL_DEV="$(${_LSBLK} NAME,FSTYPE -s "${_LUKSDEV}" 2>"${_NO_LOG}" | grep " crypto_LUKS$" | cut -d' ' -f1)"
+            _LUKS_REAL_DEV="$(${_LSBLK} NAME,FSTYPE -s "${_LUKSDEV}" 2>"${_NO_LOG}" | grep " crypto_LUKS$" | cut -d ' ' -f1)"
             cryptsetup remove "${dev}" >"${_LOG}"
             # delete header from device
             wipefs -a "${_LUKS_REAL_DEV}" &>"${_NO_LOG}"
@@ -395,7 +395,7 @@ _stopluks()
         _dialog --defaultno --yesno "Setup detected not running luks encrypted device(s)...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLELUKS=1
     fi
     if [[ -n "${_DISABLELUKS}" ]]; then
-        for dev in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS$" | cut -d' ' -f1); do
+        for dev in $(${_LSBLK} NAME,FSTYPE | grep "crypto_LUKS$" | cut -d ' ' -f1); do
            # delete header from device
            wipefs -a "${dev}" &>"${_NO_LOG}"
         done
@@ -539,7 +539,7 @@ _createpv()
         : >/tmp/.pvs-create
         _dialog --no-mouse --infobox "Scanning blockdevices... This may need some time." 3 60
         # Remove all lvm devices with children
-        _LVM_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d' ' -f1 | sort -u); do
+        _LVM_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | grep " lvm$" | cut -d ' ' -f1 | sort -u); do
                     echo "${dev}"
                     done)"
         #shellcheck disable=SC2119
@@ -595,7 +595,7 @@ _createpv()
 #find physical volumes that are not in use
 _findpv()
 {
-    for dev in $(${_LSBLK} NAME,FSTYPE | grep " LVM2_member$" | cut -d' ' -f1 | sort -u); do
+    for dev in $(${_LSBLK} NAME,FSTYPE | grep " LVM2_member$" | cut -d ' ' -f1 | sort -u); do
         # exclude checks:
         #-  not part of running lvm2
         # ! "$(${_LSBLK} TYPE ${dev} 2>"${_NO_LOG}" | grep "lvm")"
@@ -820,7 +820,7 @@ _createluks()
         _activate_special_devices
         _dialog --no-mouse --infobox "Scanning blockdevices... This may need some time." 3 60
         # Remove all crypt devices with children
-        _LUKS_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d' ' -f1 | sort -u); do
+        _LUKS_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | grep " crypt$" | cut -d ' ' -f1 | sort -u); do
                     echo "${dev}"
                     done)"
         #shellcheck disable=SC2119

@@ -8,7 +8,7 @@ _destdir_mounts(){
     _CREATE_MOUNTPOINTS=""
     _ROOTDEV=""
     # check if something is mounted on ${_DESTDIR}
-    _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
+    _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d ' ' -f 1)"
     # Run mountpoints, if nothing is mounted on ${_DESTDIR}
     if [[ -z "${_ROOTDEV}" ]]; then
         _dialog --msgbox "Setup couldn't detect mounted partition(s) in ${_DESTDIR}, please set mountpoints first." 0 0
@@ -35,7 +35,7 @@ _ssd_optimization() {
     _SSD_MOUNT_OPTIONS=""
     if echo "${_FSTYPE}" | grep -Eq 'ext4|jfs|bcachefs|btrfs|xfs|nilfs2|f2fs'; then
         # check all underlying devices on ssd
-        for i in $(${_LSBLK} NAME,TYPE "${_DEV}" -s 2>"${_NO_LOG}" | grep "disk$" | cut -d' ' -f 1); do
+        for i in $(${_LSBLK} NAME,TYPE "${_DEV}" -s 2>"${_NO_LOG}" | grep "disk$" | cut -d ' ' -f 1); do
             # check for ssd
             if [[ "$(cat /sys/block/"$(basename "${i}")"/queue/rotational)" == 0 ]]; then
                 _SSD_MOUNT_OPTIONS="noatime"
@@ -116,28 +116,28 @@ _check_mkfs_values() {
 _run_mkfs() {
     while read -r line; do
         # basic parameters
-        _DEV=$(echo "${line}" | cut -d\| -f 1)
-        _FSTYPE=$(echo "${line}" | cut -d\| -f 2)
-        _MP=$(echo "${line}" | cut -d\| -f 3)
-        _DOMKFS=$(echo "${line}" | cut -d\| -f 4)
-        _LABEL_NAME=$(echo "${line}" | cut -d\| -f 5)
-        _FS_OPTIONS=$(echo "${line}" | cut -d\| -f 6)
+        _DEV=$(echo "${line}" | cut -d '|' -f 1)
+        _FSTYPE=$(echo "${line}" | cut -d '|' -f 2)
+        _MP=$(echo "${line}" | cut -d '|' -f 3)
+        _DOMKFS=$(echo "${line}" | cut -d '|' -f 4)
+        _LABEL_NAME=$(echo "${line}" | cut -d '|' -f 5)
+        _FS_OPTIONS=$(echo "${line}" | cut -d '|' -f 6)
         [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
         # bcachefs and btrfs parameters
         if [[ ${_FSTYPE} == "btrfs" ]]; then
-            _BTRFS_DEVS=$(echo "${line}" | cut -d\| -f 7)
+            _BTRFS_DEVS=$(echo "${line}" | cut -d '|' -f 7)
             # remove # from array
             _BTRFS_DEVS="${_BTRFS_DEVS//#/\ }"
-            _BTRFS_LEVEL=$(echo "${line}" | cut -d\| -f 8)
+            _BTRFS_LEVEL=$(echo "${line}" | cut -d '|' -f 8)
             [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _BTRFS_LEVEL="-m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
-            _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d\| -f 9)
+            _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d '|' -f 9)
             [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _BTRFS_SUBVOLUME=""
-            _BTRFS_COMPRESS=$(echo "${line}" | cut -d\| -f 10)
+            _BTRFS_COMPRESS=$(echo "${line}" | cut -d '|' -f 10)
             [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
                   "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         elif [[ ${_FSTYPE} == "bcachefs" ]]; then
-            _BCACHEFS_COMPRESS=$(echo "${line}" | cut -d\| -f 7)
+            _BCACHEFS_COMPRESS=$(echo "${line}" | cut -d '|' -f 7)
             if [[ "${_BCACHEFS_COMPRESS}" == "NONE" ]];then
                 _BCACHEFS_COMPRESS=""
             else
@@ -362,7 +362,7 @@ _mountpoints() {
     _COUNT=0
     _run_mkfs | _dialog --title " Mountpoints " --no-mouse --gauge "Mountpoints..." 6 75 0
     _printk on
-     _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d' ' -f 1)"
+     _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d ' ' -f 1)"
     _NEXTITEM="5"
 }
 
