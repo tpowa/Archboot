@@ -94,7 +94,7 @@ _auto_create_filesystems() {
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
                   "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         elif [[ "${_FSTYPE}" == "bcachefs" ]]; then
-             _BTRFS_COMPRESS="--compression=zstd"
+             _BCACHEFS_COMPRESS="--compression=zstd"
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
                   "${_BCACHEFS_COMPRESS}" || return 1
         else
