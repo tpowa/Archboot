@@ -8,6 +8,7 @@ Setup:
 - added mkinitcpio kms workaround for aarch64
 - removed ext3 support
 - simplified umountall routine
+- fixed btrfs raid setup
 ---
 2024.01 Highlights:
 - kernel 6.7.x
