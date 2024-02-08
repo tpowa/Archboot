@@ -70,17 +70,17 @@ _auto_create_filesystems() {
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     ## make and mount filesystems
     for fsspec in ${_FSSPECS}; do
-        _DEV="${_DISK}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
+        _DEV="${_DISK}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d '|')"
         # Add check on nvme or mmc controller:
         # NVME uses /dev/nvme0n1pX name scheme
         # MMC uses /dev/mmcblk0pX
         if echo "${_DISK}" | grep -q "nvme" || echo "${_DISK}" | grep -q "mmc"; then
-            _DEV="${_DISK}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d:)"
+            _DEV="${_DISK}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d '|')"
         fi
-        _FSTYPE="$(echo "${fsspec}" | tr -d ' ' | cut -f2 -d:)"
+        _FSTYPE="$(echo "${fsspec}" | tr -d ' ' | cut -f2 -d '|')"
         _DOMKFS=1
-        _MP="$(echo "${fsspec}" | tr -d ' ' | cut -f3 -d:)"
-        _LABEL_NAME="$(echo "${fsspec}" | tr -d ' ' | cut -f4 -d:)"
+        _MP="$(echo "${fsspec}" | tr -d ' ' | cut -f3 -d '|')"
+        _LABEL_NAME="$(echo "${fsspec}" | tr -d ' ' | cut -f4 -d '|')"
         _FS_OPTIONS=""
         _BTRFS_DEVS=""
         _BTRFS_LEVEL=""
@@ -329,14 +329,14 @@ _autoprepare() {
     ## wait until /dev initialized correct devices
     udevadm settle
     ## FSSPECS - default filesystem specs
-    ## <partnum>:<fstype>:<mountpoint>:<labelname>
+    ## <partnum>|<fstype>|<mountpoint>|<labelname>
     ## The partitions in FSSPECS list should be listed in the "mountpoint" order.
     ## Make sure the "root" partition is defined first in the FSSPECS list
-    [[ -z "${_SKIP_SWAP}" ]] && _FSSPEC_SWAPDEV="${_SWAPDEV_NUM}:swap:swap:ARCH_SWAP"
-    _FSSPEC_ROOTDEV="${_ROOTDEV_NUM}:${_FSTYPE}:/:ARCH_ROOT"
-    _FSSPEC_BOOTDEV="${_BOOTDEV_NUM}:ext2:/boot:ARCH_BOOT"
-    [[ -z "${_SKIP_HOME}" ]] &&_FSSPEC_HOMEDEV="${_HOMEDEV_NUM}:${_FSTYPE}:/home:ARCH_HOME"
-    _FSSPEC_UEFISYSDEV="${_UEFISYSDEV_NUM}:vfat:${_UEFISYS_MP}:ESP"
+    [[ -z "${_SKIP_SWAP}" ]] && _FSSPEC_SWAPDEV="${_SWAPDEV_NUM}|swap|swap|ARCH_SWAP"
+    _FSSPEC_ROOTDEV="${_ROOTDEV_NUM}|${_FSTYPE}|/|ARCH_ROOT"
+    _FSSPEC_BOOTDEV="${_BOOTDEV_NUM}|ext2|/boot|ARCH_BOOT"
+    [[ -z "${_SKIP_HOME}" ]] &&_FSSPEC_HOMEDEV="${_HOMEDEV_NUM}|${_FSTYPE}|/home|ARCH_HOME"
+    _FSSPEC_UEFISYSDEV="${_UEFISYSDEV_NUM}|vfat|${_UEFISYS_MP}|ESP"
     if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
         if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
             _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_UEFISYSDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
