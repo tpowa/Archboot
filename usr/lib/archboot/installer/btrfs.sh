@@ -79,8 +79,8 @@ _check_btrfs_filesystem_creation() {
     _DETECT_CREATE_FILESYSTEM=""
     _SKIP_FILESYSTEM=""
     #shellcheck disable=SC2013
-    for i in $(grep "${_DEV}[:#]" /tmp/.parts); do
-        if echo "${i}" | grep -q ":btrfs:"; then
+    for i in $(grep "${_DEV}[|#]" /tmp/.parts); do
+        if echo "${i}" | grep -q "|btrfs|"; then
             _FSTYPE="btrfs"
             _SKIP_FILESYSTEM=1
             # check on filesystem creation, skip subvolume asking then!
