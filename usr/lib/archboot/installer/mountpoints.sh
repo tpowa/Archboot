@@ -180,7 +180,7 @@ _create_filesystem() {
         if [[ "${_FSTYPE}" == "bcachefs" ]]; then
             _bcachefs_compress || return 1
         fi
-        _dialog --no-cancel --title " Custom Options " --inputbox "Options passed to filesystem creator, else just leave it empty." 7 70  2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --title " Custom Options " --inputbox "Options passed to filesystem creator, else just leave it empty." 8 70  2>"${_ANSWER}" || return 1
         _FS_OPTIONS=$(cat "${_ANSWER}")
     else
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
