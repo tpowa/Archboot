@@ -24,6 +24,7 @@ _grub_common_before() {
     _FAIL_COMPLEX=""
     _RAID_ON_LVM=""
     _common_bootloader_checks
+    _abort_f2fs_bootpart || return 1
     _abort_bcachefs_bootpart || return 1
     if [[ ! -d "${_DESTDIR}/usr/lib/grub" ]]; then
         _PACKAGES="grub"
