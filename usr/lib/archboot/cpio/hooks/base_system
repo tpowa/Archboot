@@ -4,11 +4,11 @@
 
 _run ()
 {
-    _map _binary [ addpart attr b2sum base{32,64} basenc blk{discard,pr,zone} blockdev bunzip2 \
-                 bz{cat,diff,grep,ip2,ip2recover,more} cal capsh ch{acl,con,cpu,grp,mem,oom,own,root,rt} \
-                 cfdisk cgdisk cksum col{,crt,rm,umn} comm csplit ctrlaltdel delpart diff \
-                 depmod dir{name,colors} dmesg eject egrep expand expr fallocate factor fadvise \
-                 fdisk fgrep file fincore findmnt fixparts flock fmt fold free fuser gdisk \
+    _map _binary [ addpart archlinux-userland-fs-cmp attr b2sum base{32,64} basenc blk{discard,pr,zone} \
+                 blockdev bunzip2 bz{cat,diff,grep,ip2,ip2recover,more} cal capsh \
+                 ch{acl,con,cpu,grp,mem,oom,own,root,rt} cfdisk cgdisk cksum col{,crt,rm,umn} comm csplit \
+                 ctrlaltdel delpart diff depmod dir{name,colors} dmesg eject egrep expand expr fallocate \
+                 factor fadvise fdisk fgrep file fincore findmnt fixparts flock fmt fold free fuser gdisk \
                  get{cap,facl,fattr,opt,pcaps} gunzip gzexe hardlink hdparm head hexdump hostid \
                  id ionice ipc{mk,rm,s} irqtop isosize join keyctl last{,b} ldattach ldd \
                  link linux{32,64} logname look losetup ls{cpu,fd,ipc,irq,locks,logins,mem,ns} \
@@ -26,7 +26,7 @@ _run ()
                  uuidd uuidgen uuidparse vdir vigr vipw vmstat w wall watch wdctl whereis who \
                  whoami wipe write xargs xz{,cat,cmp,dec,grep,egrep,fgrep} \
                  z{cat,cmp,diff,egrep,fgrep,force,grep,less,more,new,ramctl} zstd{cat,grep,less,mt}
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _map _binary archlinux-userland-fs-cmp i386 x86_64 peekfd waitpid
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _map _binary i386 x86_64 peekfd waitpid
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _binary peekfd
     [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _map _binary waitpid
     # add file magic file
