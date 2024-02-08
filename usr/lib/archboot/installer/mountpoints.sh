@@ -115,6 +115,7 @@ _check_mkfs_values() {
 
 _run_mkfs() {
     while read -r line; do
+        # basic parameters
         _DEV=$(echo "${line}" | cut -d\| -f 1)
         _FSTYPE=$(echo "${line}" | cut -d\| -f 2)
         _MP=$(echo "${line}" | cut -d\| -f 3)
@@ -122,17 +123,31 @@ _run_mkfs() {
         _LABEL_NAME=$(echo "${line}" | cut -d\| -f 5)
         _FS_OPTIONS=$(echo "${line}" | cut -d\| -f 6)
         [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
-        _BTRFS_DEVS=$(echo "${line}" | cut -d\| -f 7)
-        # remove # from array
-        _BTRFS_DEVS="${_BTRFS_DEVS//#/\ }"
-        _BTRFS_LEVEL=$(echo "${line}" | cut -d\| -f 8)
-        [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _BTRFS_LEVEL="${_FS_OPTIONS} -m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
-        _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d\| -f 9)
-        [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _BTRFS_SUBVOLUME=""
-        _BTRFS_COMPRESS=$(echo "${line}" | cut -d\| -f 10)
-        [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
-        _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-              "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+        # bcachefs and btrfs parameters
+        if [[ ${_FSTYPE} == "btrfs" ]]; then
+            _BTRFS_DEVS=$(echo "${line}" | cut -d\| -f 7)
+            # remove # from array
+            _BTRFS_DEVS="${_BTRFS_DEVS//#/\ }"
+            _BTRFS_LEVEL=$(echo "${line}" | cut -d\| -f 8)
+            [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _BTRFS_LEVEL="-m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
+            _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d\| -f 9)
+            [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _BTRFS_SUBVOLUME=""
+            _BTRFS_COMPRESS=$(echo "${line}" | cut -d\| -f 10)
+            [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
+            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
+                  "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+        elif [[ ${_FSTYPE} == "bcachefs" ]]; then
+            _BCACHEFS_COMPRESS=$(echo "${line}" | cut -d\| -f 7)
+            if [[ "${_BCACHEFS_COMPRESS}" == "NONE" ]];then
+                _BCACHEFS_COMPRESS=""
+            else
+                _BCACHEFS_COMPRESS="--compression=${_BCACHEFS_COMPRESS}"
+            fi
+            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
+                  "${_BCACHEFS_COMPRESS}" || return 1
+        else
+            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" || return 1
+        fi
         sleep 1
         _COUNT=$((_COUNT+_PROGRESS_COUNT))
     done < /tmp/.parts
@@ -161,6 +176,9 @@ _create_filesystem() {
         done
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             _prepare_btrfs || return 1
+        fi
+        if [[ "${_FSTYPE}" == "bcachefs" ]]; then
+            _bcachefs_compress || return 1
         fi
         _dialog --no-cancel --title " Custom Options " --inputbox "Options passed to filesystem creator, else just leave it empty." 7 70  2>"${_ANSWER}" || return 1
         _FS_OPTIONS=$(cat "${_ANSWER}")
@@ -306,9 +324,9 @@ _mountpoints() {
                     if [[ "${_FSTYPE}" == "btrfs" ]]; then
                         echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BTRFS_DEVS}|${_BTRFS_LEVEL}|${_BTRFS_SUBVOLUME}|${_BTRFS_COMPRESS}" >>/tmp/.parts
                     elif [[ "${_FSTYPE}" == "bcachefs" ]]; then
-                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BTRFS_DEVS}|${_BTRFS_LEVEL}|${_BTRFS_SUBVOLUME}|${_BTRFS_COMPRESS}" >>/tmp/.parts
+                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BCACHEFS_COMPRESS}" >>/tmp/.parts
                     else
-                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BTRFS_DEVS}|${_BTRFS_LEVEL}|${_BTRFS_SUBVOLUME}|${_BTRFS_COMPRESS}" >>/tmp/.parts
+                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}" >>/tmp/.parts
                     fi
                     # btrfs is a special case! not really elegant
                     # remove root btrfs on ESP selection menu, readd it on top aftwerwards
@@ -410,7 +428,7 @@ _mkfs() {
                 ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}"; ret=$? ;;
                 f2fs)     mkfs.f2fs ${7} -f -l "${6}" \
                                     -O extra_attr,inode_checksum,sb_checksum ${1} &>"${_LOG}"; ret=$? ;;
-                bcachefs) mkfs.bcachefs -f ${7} -L "${6}" ${1} &>"${_LOG}"; ret=$? ;;
+                bcachefs) mkfs.bcachefs -f ${7} -L "${6}" ${8} ${1} &>"${_LOG}"; ret=$? ;;
                 btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} &>"${_LOG}"; ret=$? ;;
                 nilfs2)   mkfs.nilfs2 -f ${7} -L "${6}" ${1} &>"${_LOG}"; ret=$? ;;
                 vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}"; ret=$? ;;
