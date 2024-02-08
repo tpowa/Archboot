@@ -135,9 +135,9 @@ _select_btrfsraid_devices () {
     echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
     #shellcheck disable=SC2001,SC2086
     for i in ${_DEVS}; do
-        echo "${i}" | grep -q /dev && _DEVS="${i} _ "
+        echo "${i}" | grep -q /dev && _BTRFS_DEVS="${i} _ "
     done
-    _BTRFS_DEVS=${_DEVS//${_BTRFS_DEV}\ _/}
+    _BTRFS_DEVS=${_BTRFS_DEVS//${_BTRFS_DEV}\ _/}
     _RAIDNUMBER=2
     #shellcheck disable=SC2086
     _dialog --title " Device ${_RAIDNUMBER} " --no-cancel --menu 12 50 6 ${_BTRFS_DEVS} 2>"${_ANSWER}" || return 1
