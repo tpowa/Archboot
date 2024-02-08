@@ -91,9 +91,15 @@ _auto_create_filesystems() {
             [[ "${_MP}" == "/" ]] && _BTRFS_SUBVOLUME="root"
             [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home"
             _BTRFS_COMPRESS="compress=zstd"
+            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
+                  "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+        elif [[ "${_FSTYPE}" == "bcachefs" ]]; then
+             _BTRFS_COMPRESS="--compression=zstd"
+            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
+                  "${_BCACHEFS_COMPRESS}" || return 1
+        else
+            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" || return 1
         fi
-        _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-              "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         sleep 1
         # set default subvolume for systemd-gpt-autogenerator
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
