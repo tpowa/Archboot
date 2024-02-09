@@ -57,6 +57,7 @@ _select_filesystem() {
     #shellcheck disable=SC2086
     _dialog --title " Filesystem on ${_DEV} " --no-cancel --menu "" 12 50 10 ${_FSOPTS} 2>"${_ANSWER}" || return 1
     _FSTYPE=$(cat "${_ANSWER}")
+    _ROOT_DONE=1
 }
 
 _enter_mountpoint() {
@@ -70,7 +71,6 @@ _enter_mountpoint() {
         _SWAP_DONE=1
     elif [[ -z "${_ROOT_DONE}" ]]; then
         _MP="/"
-        _ROOT_DONE=1
     elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
         _dialog --no-cancel --title " EFI SYSTEM PARTITION (ESP) " --menu "" 8 50 2 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
