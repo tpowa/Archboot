@@ -10,6 +10,7 @@ Setup:
 - removed ext3 support
 - simplified umountall routine
 - fixed btrfs raid setup
+- removed f2fs,nilfs2 and jfs support
 ---
 2024.01 Highlights:
 - kernel 6.7.x
