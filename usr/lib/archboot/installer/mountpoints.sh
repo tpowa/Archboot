@@ -121,8 +121,17 @@ _run_mkfs() {
         _LABEL_NAME=$(echo "${line}" | cut -d '|' -f 5)
         _FS_OPTIONS=$(echo "${line}" | cut -d '|' -f 6)
         [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
-        # bcachefs and btrfs parameters
-        if [[ ${_FSTYPE} == "btrfs" ]]; then
+        # bcachefs, btrfs and other parameters
+        if [[ ${_FSTYPE} == "bcachefs" ]]; then
+            _BCACHEFS_COMPRESS=$(echo "${line}" | cut -d '|' -f 7)
+            if [[ "${_BCACHEFS_COMPRESS}" == "NONE" ]];then
+                _BCACHEFS_COMPRESS=""
+            else
+                _BCACHEFS_COMPRESS="--compression=${_BCACHEFS_COMPRESS}"
+            fi
+            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
+                  "${_BCACHEFS_COMPRESS}" || return 1
+        elif [[ ${_FSTYPE} == "btrfs" ]]; then
             _BTRFS_DEVS=$(echo "${line}" | cut -d '|' -f 7)
             # remove # from array
             _BTRFS_DEVS="${_BTRFS_DEVS//#/\ }"
@@ -134,15 +143,6 @@ _run_mkfs() {
             [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
                   "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
-        elif [[ ${_FSTYPE} == "bcachefs" ]]; then
-            _BCACHEFS_COMPRESS=$(echo "${line}" | cut -d '|' -f 7)
-            if [[ "${_BCACHEFS_COMPRESS}" == "NONE" ]];then
-                _BCACHEFS_COMPRESS=""
-            else
-                _BCACHEFS_COMPRESS="--compression=${_BCACHEFS_COMPRESS}"
-            fi
-            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-                  "${_BCACHEFS_COMPRESS}" || return 1
         else
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" || return 1
         fi
