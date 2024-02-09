@@ -419,12 +419,12 @@ _mkfs() {
             local ret
             #shellcheck disable=SC2086
             case ${2} in
-                xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"; ret=$? ;;
-                ext2)     mkfs.ext2 -F -L ${7} "${6}" ${1} &>"${_LOG}"; ret=$? ;;
-                ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}"; ret=$? ;;
                 bcachefs) mkfs.bcachefs -f ${7} -L "${6}" ${8} ${1} &>"${_LOG}"; ret=$? ;;
                 btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} &>"${_LOG}"; ret=$? ;;
+                ext2)     mkfs.ext2 -F -L ${7} "${6}" ${1} &>"${_LOG}"; ret=$? ;;
+                ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}"; ret=$? ;;
                 vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}"; ret=$? ;;
+                xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"; ret=$? ;;
                 # don't handle anything else here, we will error later
             esac
             if [[ ${ret} != 0 ]]; then
