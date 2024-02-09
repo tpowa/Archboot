@@ -3,7 +3,7 @@ Environment:
 - added archlinux-userland-fs-cmp on aarch64 & x86_64
 - added bcachefs modules
 - added pacman-key workaround for aarch64
-- removed f2fs,nilfs2 and jfs support
+- removed f2fs, nilfs2 and jfs support
 Setup:
 - added single device bcachefs with compression support
 - added mkinitcpio kms workaround for aarch64
