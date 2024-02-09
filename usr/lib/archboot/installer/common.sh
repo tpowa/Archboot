@@ -101,20 +101,11 @@ _auto_packages() {
     if ${_LSBLK} FSTYPE | grep -q btrfs; then
         ! echo "${_PACKAGES}" | grep -qw btrfs-progs && _PACKAGES="${_PACKAGES} btrfs-progs"
     fi
-    if ${_LSBLK} FSTYPE | grep -q nilfs2; then
-        ! echo "${_PACKAGES}" | grep -qw nilfs-utils && _PACKAGES="${_PACKAGES} nilfs-utils"
-    fi
     if ${_LSBLK} FSTYPE | grep -q ext; then
         ! echo "${_PACKAGES}" | grep -qw e2fsprogs && _PACKAGES="${_PACKAGES} e2fsprogs"
     fi
     if ${_LSBLK} FSTYPE | grep -q xfs; then
         ! echo "${_PACKAGES}" | grep -qw xfsprogs && _PACKAGES="${_PACKAGES} xfsprogs"
-    fi
-    if ${_LSBLK} FSTYPE | grep -q jfs; then
-        ! echo "${_PACKAGES}" | grep -qw jfsutils && _PACKAGES="${_PACKAGES} jfsutils"
-    fi
-    if ${_LSBLK} FSTYPE | grep -q f2fs; then
-        ! echo "${_PACKAGES}" | grep -qw f2fs-tools && _PACKAGES="${_PACKAGES} f2fs-tools"
     fi
     if ${_LSBLK} FSTYPE | grep -q vfat; then
         ! echo "${_PACKAGES}" | grep -qw dosfstools && _PACKAGES="${_PACKAGES} dosfstools"

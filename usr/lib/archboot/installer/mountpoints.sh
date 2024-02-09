@@ -406,7 +406,7 @@ _mkfs() {
     else
         # make sure the fstype is one we can handle
         local _KNOWNFS=0
-        for fs in xfs jfs ext2 ext3 ext4 f2fs bcachefs btrfs nilfs2 vfat; do
+        for fs in xfs ext2 ext4 bcachefs btrfs vfat; do
             [[ "${2}" == "${fs}" ]] && _KNOWNFS=1 && break
         done
         if [[ ${_KNOWNFS} -eq 0 ]]; then
@@ -443,13 +443,6 @@ _mkfs() {
         mkdir -p "${3}""${5}"
         # add ssd optimization before mounting
         _ssd_optimization
-        _F2FS_MOUNTOPTIONS=""
-        ### f2fs mount options, taken from wiki:
-        # compress_algorithm=zstd:6 tells F2FS to use zstd for compression at level 6, which should give pretty good compression ratio.
-        # compress_chksum tells the filesystem to verify compressed blocks with a checksum (to avoid corruption)
-        # atgc,gc_merge Enable better garbage collector, and enable some foreground garbage collections to be asynchronous.
-        # lazytime Do not synchronously update access or modification times. Improves IO performance and flash durability.
-        [[ "${2}" == "f2fs" ]] && _F2FS_MOUNTOPTIONS="compress_algorithm=zstd:6,compress_chksum,atgc,gc_merge,lazytime"
         # prepare btrfs mount options
         [[ -n "${10}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} subvol=${10}"
         [[ -n "${11}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} ${11}"
