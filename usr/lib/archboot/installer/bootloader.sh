@@ -114,13 +114,6 @@ _abort_uboot(){
         fi
 }
 
-_abort_f2fs_bootpart() {
-        if  ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "f2fs"; then
-            _dialog --title " ERROR " --no-mouse --infobox "Your selected bootloader cannot boot from f2fs partition with /boot on it." 0 0
-            return 1
-        fi
-}
-
 _abort_bcachefs_bootpart() {
         if  ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "bcachefs"; then
             _dialog --title " ERROR " --no-mouse --infobox "Your selected bootloader cannot boot from bcachefs partition with /boot on it." 0 0
