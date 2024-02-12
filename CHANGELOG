@@ -1,15 +1,15 @@
 On the road to 2024.02:
 Environment:
 - added archlinux-userland-fs-cmp on aarch64 & x86_64
-- added bcachefs modules
+- added bcachefs support
 - added pacman-key workaround for aarch64
-- removed f2fs, nilfs2 and jfs support
+- removed f2fs, jfs and nilfs2 support
 Setup:
 - added single device bcachefs with compression support
 - added mkinitcpio kms workaround for aarch64
 - simplified umountall routine
 - fixed btrfs raid setup
-- removed ext,f2fs,jfs and nilfs2 support
+- removed ext3,f2fs,jfs and nilfs2 support
 - don't allow vfat on / device
 ---
 2024.01 Highlights:
