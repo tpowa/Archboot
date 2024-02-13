@@ -11,6 +11,7 @@ Setup:
 - fixed btrfs raid setup
 - removed ext3,f2fs,jfs and nilfs2 support
 - don't allow vfat on / device
+- fixed typo in pacman_bootloader_hook
 ---
 2024.01 Highlights:
 - kernel 6.7.x
