@@ -15,7 +15,7 @@
 <body>
 <p><span><img src="logo.png" alt="Logo"></span></p>
 <h1>Archboot Project | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
-<p><strong>&copy; 2006 - 2024 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br><strong>Last update: 17.02.2024 21:55</strong></p>
+<p><strong>&copy; 2006 - 2024 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br><strong>Last update: 18.02.2024 08:22</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -85,6 +85,7 @@
 <th>Arch Linux Distribution</th>
 <th>Release</th>
 <th>Download</th>
+<th>Archive</th>
 <th>B2SUM</th>
 <th>Forum</th>
 </tr>
@@ -94,6 +95,7 @@
 <td><a href="https://archlinuxarm.org/"><strong>ARM - aarch64</strong></a><sup>1</sup></td>
 <td><a href="/iso/aarch64/latest/Release.txt"><strong>Packages</strong></a></td>
 <td><a href="/iso/aarch64/latest"><strong>Browse</strong></a></td>
+<td><a href="/iso/aarch64"><strong>Browse</strong></a></td>
 <td><a href="/iso/aarch64/latest/b2sum.txt"><strong>Check</strong></a></td>
 <td><a href="https://archlinuxarm.org/forum/viewtopic.php?f=8&amp;t=15777"><strong>Check</strong></a></td>
 </tr>
@@ -101,6 +103,7 @@
 <td><a href="https://archriscv.felixc.at/"><strong>RISC-V - riscv64</strong></a><sup>2</sup></td>
 <td><a href="/iso/riscv64/latest/Release.txt"><strong>Packages</strong></a></td>
 <td><a href="/iso/riscv64/latest"><strong>Browse</strong></a></td>
+<td><a href="/iso/riscv64"><strong>Browse</strong></a></td>
 <td><a href="/iso/riscv64/latest/b2sum.txt"><strong>Check</strong></a></td>
 <td></td>
 </tr>
@@ -108,6 +111,7 @@
 <td><a href="https://archlinux.org/"><strong>X64 - x86_64</strong></a><sup>3</sup></td>
 <td><a href="/iso/x86_64/latest/Release.txt"><strong>Packages</strong></a></td>
 <td><a href="/iso/x86_64/latest"><strong>Browse</strong></a></td>
+<td><a href="/iso/x86_64"><strong>Browse</strong></a></td>
 <td><a href="/iso/x86_64/latest/b2sum.txt"><strong>Check</strong></a></td>
 <td><a href="https://bbs.archlinux.org/viewtopic.php?id=182439"><strong>Check</strong></a></td>
 </tr>
@@ -776,6 +780,12 @@ The calculated size to boot the image follows the formula:<br>
 <td class="MyYes">&#10004;</td>
 </tr>
 <tr class="odd">
+<td>EXT3, F2FS, JFS, NILFS support </td>
+<td class="MyNo">&#9733;</td>
+<td class="MyYes">&#10004;</td>
+</tr>
+<tr>
+<tr class="odd">
 <td>Man/Info Pages</td>
 <td class="MyOpt">&#9733;</td>
 <td class="MyYes">&#10004;</td>
@@ -1415,7 +1425,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 <ul>
 <li>Official <a href="https://archlinux.org/"><strong>Arch Linux</strong></a> install medium from <strong>Release 0.7</strong> till <strong>2008.03</strong>.</li>
 <li>Provided <strong>i686</strong> and <strong>x86_64</strong> on one ISO until <strong>2018</strong>.</li>
-<li>Since 10-2021 <strong>Secureboot</strong> support.</li>
+<li>Since 10-2021 <strong>Secure Boot</strong> support.</li>
 <li>Since 01-2022 <strong>aarch64</strong> support.</li>
 <li>Since 10-2022 <strong>riscv64</strong> support.</li>
 </ul>
