@@ -8,7 +8,7 @@ After=network.target
 After=multi-user.target
 
 [Service]
-ExecStart=/usr/bin/ttyd remote-login.sh
+ExecStart=/usr/bin/ttyd -W remote-login.sh
 Type=simple
 Restart=always
 
