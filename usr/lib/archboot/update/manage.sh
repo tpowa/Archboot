@@ -85,7 +85,7 @@ _geoip_mirrorlist() {
         if grep -q 'Server = https:' /tmp/pacman_mirrorlist.txt; then
             mv "${_PACMAN_MIRROR}" "${_PACMAN_MIRROR}.bak"
             cp /tmp/pacman_mirrorlist.txt "${_PACMAN_MIRROR}"
-            echo "GeoIP activated successfully." >>"${_LOG}"
+            echo "GeoIP mirrors activated successfully." >>"${_LOG}"
         else
             echo "GeoIP setting failed. Using fallback mirror." >>"${_LOG}"
         fi
