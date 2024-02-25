@@ -49,9 +49,9 @@ _select_mirror() {
     fi
     echo "Using mirror: ${_SYNC_URL}" >"${_LOG}"
     # comment already existing entries
-    sed -i -e 's|^Server|#Server|g' /etc/pacman.d/mirrorlist
+    sed -i -e 's|^Server|#Server|g' "${_PACMAN_MIRROR}"
     #shellcheck disable=SC2027,SC2086
-    echo "Server = "${_SYNC_URL}"" >> /etc/pacman.d/mirrorlist
+    echo "Server = "${_SYNC_URL}"" >> "${_PACMAN_MIRROR}"
     if ! pacman -Sy &>${_LOG}; then
         _dialog --title " ERROR " --no-mouse --infobox "Your selected mirror is not working correctly, please configure again!" 3 75
         sleep 3
