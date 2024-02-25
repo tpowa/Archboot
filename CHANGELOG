@@ -4,15 +4,15 @@ Environment:
 - added bcachefs support
 - added pacman-key workaround for aarch64
 - removed f2fs, jfs and nilfs2 support
-- fixed ttyd to accept input again
-- fixed clock hanging on hwclock not running in UTC mode
-- only copy package cache to new environment on >= 4G RAM
+- fixed ttyd to accept keyboard input again
+- fixed clock script hanging on hwclock not running in UTC mode
+- only copy package cache to new environment on >= 4G RAM machines
 Setup:
 - added single device bcachefs with compression support
 - added mkinitcpio kms workaround for aarch64
 - simplified umountall routine
 - fixed btrfs raid setup
-- removed ext3,f2fs,jfs and nilfs2 support
+- removed ext3, f2fs, jfs and nilfs2 support
 - don't allow vfat on / device
 - fixed typo in pacman_bootloader_hook
 ---
