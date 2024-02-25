@@ -75,7 +75,7 @@ _update_installer_check() {
     fi
 }
 
-# download geoip mirrorlist for x86_64
+# use geoip mirrorlist on x86_64, if not set with pacsetup
 _geoip_mirrorlist() {
     if [[ "${_RUNNING_ARCH}" == "x86_64" && ! -e /.pacsetup  ]]; then
         _COUNTRY="$(${_DLPROG} "http://ip-api.com/csv/?fields=countryCode")"
@@ -302,13 +302,6 @@ _new_environment() {
     fi
     _progress "100" "Restarting with KEXEC_LOAD..."
     kexec -c -f ${_MEM_MIN} "${_RAM}/${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
-    #sleep 1
-    #_clean_kernel_cache
-    #rm "${_RAM}"/{"${_VMLINUZ}","${_INITRD}"}
-    #umount "${_RAM}" &>"${_NO_LOG}"
-    #rm -r "${_RAM}" &>"${_NO_LOG}"
-    #shellcheck disable=SC2115
-    #rm -rf /usr/* &>"${_NO_LOG}"
     while true; do
         _clean_kernel_cache
         read -r -t 1
