@@ -76,7 +76,7 @@ _task_clock() {
 _auto_clock() {
     : > /.archboot
     _task_clock &
-    _progress_wait "0" "99" "Using ${_ZONE} and enable NTP timesyncd..." "0.005"
+    _progress_wait "0" "99" "Using ${_ZONE} and enable NTP timesyncd..." "0.1"
     _progress "100" "${_ZONE} configuration completed successfully."
     sleep 2
 }
