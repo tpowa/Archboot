@@ -5,6 +5,7 @@ Environment:
 - added pacman-key workaround for aarch64
 - removed f2fs, jfs and nilfs2 support
 - fixed ttyd to accept input again
+- fixed clock hanging on hwclock not running in UTC mode
 Setup:
 - added single device bcachefs with compression support
 - added mkinitcpio kms workaround for aarch64
