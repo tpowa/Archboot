@@ -6,6 +6,7 @@ Environment:
 - removed f2fs, jfs and nilfs2 support
 - fixed ttyd to accept input again
 - fixed clock hanging on hwclock not running in UTC mode
+- only copy package cache to new environment on >= 4G RAM
 Setup:
 - added single device bcachefs with compression support
 - added mkinitcpio kms workaround for aarch64
