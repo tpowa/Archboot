@@ -75,6 +75,23 @@ _update_installer_check() {
     fi
 }
 
+# download geoip mirrorlist for x86_64
+_geoip_mirrorlist() {
+    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
+        _COUNTRY="$(${_DLPROG} "http://ip-api.com/csv/?fields=countryCode")"
+        echo "GeoIP country ${_COUNTRY} detected." >>"${_LOG}"
+        ${_DLPROG} -o /tmp/pacman_mirrorlist.txt "https://www.archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on"
+        sed -i -e 's|^#Server|Server|g' /tmp/pacman_mirrorlist.txt
+        if grep -q 'Server = https:' /tmp/pacman_mirrorlist.txt; then
+            mv "${_PACMAN_MIRROR}" "${_PACMAN_MIRROR}.bak"
+            cp /tmp/pacman_mirrorlist.txt "${_PACMAN_MIRROR}"
+            echo "GeoIP activated successfully." >>"${_LOG}"
+        else
+            echo "GeoIP setting failed. Using fallback mirror." >>"${_LOG}"
+        fi
+    fi
+}
+
 _full_system_check() {
     if [[ -e "/.full_system" ]]; then
         clear

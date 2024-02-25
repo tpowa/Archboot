@@ -47,6 +47,7 @@ fi
 # Generate new environment and launch it with kexec
 if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]] && [[ -z "${_G_RELEASE}" ]]; then
     _update_installer_check
+    _geoip_mirrorlist
     : > /.update
     _TITLE="Archboot ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | New Environment"
     _new_environment | _dialog --title "${_MENU_TITLE}" --gauge "Waiting for pacman keyring..." 6 75 0
