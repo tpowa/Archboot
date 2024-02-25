@@ -5,7 +5,6 @@
 _TITLE="Archboot ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Clock Configuration"
 
 _hwclock() {
-    _DATE_PROGRAM=timedatectl
     echo 0.0 0 0.0 > /etc/adjtime
     echo 0 >> /etc/adjtime
     echo UTC >> /etc/adjtime
