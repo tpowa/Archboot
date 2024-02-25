@@ -77,7 +77,7 @@ _update_installer_check() {
 
 # download geoip mirrorlist for x86_64
 _geoip_mirrorlist() {
-    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
+    if [[ "${_RUNNING_ARCH}" == "x86_64" && ! -e /.pacsetup  ]]; then
         _COUNTRY="$(${_DLPROG} "http://ip-api.com/csv/?fields=countryCode")"
         echo "GeoIP country ${_COUNTRY} detected." >>"${_LOG}"
         ${_DLPROG} -o /tmp/pacman_mirrorlist.txt "https://www.archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on"
