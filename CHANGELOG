@@ -1,7 +1,11 @@
-On the road to 2024.02:
-Environment:
-- added archlinux-userland-fs-cmp on aarch64 & x86_64
+On the road to 2024.03:
+---
+2024.02 Highlights:
+- kernel 6.7.6 on aarch64
+- added automatic GeoIP mirror selection on -latest ISOs/UKIs
 - added bcachefs support
+- added archlinux-userland-fs-cmp
+Environment:
 - added pacman-key workaround on aarch64
 - removed f2fs, jfs and nilfs2 support
 - fixed ttyd to accept keyboard input again
@@ -15,10 +19,9 @@ setup:
 - don't allow vfat on / device
 - fixed typo in pacman_bootloader_hook
 clock:
-- fixed clock script hang on hwclock not running in UTC mode
-  machines
+- fixed clock script bug/hang if hwclock was not running in UTC mode
 update:
-- added automatic GeoIP mirror selection on latest ISOs/UKIs
+- added automatic GeoIP mirror selection on -latest ISOs/UKIs
 - only copy package cache to new environment on >=4G RAM machines
 - removed kexec quirk on aarch64
 ---
