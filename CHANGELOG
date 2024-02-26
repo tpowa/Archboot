@@ -6,7 +6,7 @@ Environment:
 - removed f2fs, jfs and nilfs2 support
 - fixed ttyd to accept keyboard input again
 - added CTRL-C hint to login message
-Setup:
+setup:
 - added single device bcachefs with compression support
 - added mkinitcpio kms workaround on aarch64
 - simplified _umountall routine
@@ -14,10 +14,10 @@ Setup:
 - removed ext3, f2fs, jfs and nilfs2 support
 - don't allow vfat on / device
 - fixed typo in pacman_bootloader_hook
-clock.sh:
+clock:
 - fixed clock script hang on hwclock not running in UTC mode
   machines
-update.sh:
+update:
 - added automatic GeoIP mirror selection on latest ISOs/UKIs
 - only copy package cache to new environment on >=4G RAM machines
 - removed kexec quirk on aarch64
