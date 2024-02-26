@@ -295,13 +295,8 @@ _new_environment() {
         [[ "$(($(stat -c %s "${_RAM}/${_INITRD}")*200/100000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
         sleep 1
     done
-    _MEM_MIN=""
-    # only needed on aarch64
-    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-            _MEM_MIN="--mem-min=0xA0000000"
-    fi
     _progress "100" "Restarting with KEXEC_LOAD..."
-    kexec -c -f ${_MEM_MIN} "${_RAM}/${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
+    kexec -c -f "${_RAM}/${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     while true; do
         _clean_kernel_cache
         read -r -t 1
