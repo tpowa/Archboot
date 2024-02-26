@@ -2,19 +2,23 @@ On the road to 2024.02:
 Environment:
 - added archlinux-userland-fs-cmp on aarch64 & x86_64
 - added bcachefs support
-- added pacman-key workaround for aarch64
+- added pacman-key workaround on aarch64
 - removed f2fs, jfs and nilfs2 support
 - fixed ttyd to accept keyboard input again
-- fixed clock script hanging on hwclock not running in UTC mode
-- only copy package cache to new environment on >= 4G RAM machines
 Setup:
 - added single device bcachefs with compression support
-- added mkinitcpio kms workaround for aarch64
-- simplified umountall routine
+- added mkinitcpio kms workaround on aarch64
+- simplified _umountall routine
 - fixed btrfs raid setup
 - removed ext3, f2fs, jfs and nilfs2 support
 - don't allow vfat on / device
 - fixed typo in pacman_bootloader_hook
+clock.sh:
+- fixed clock script hang on hwclock not running in UTC mode
+  machines
+update.sh:
+- added automatic GeoIP mirror selection on latest ISOs/UKIs
+- only copy package cache to new environment on >=4G RAM machines
 ---
 2024.01 Highlights:
 - kernel 6.7.x
