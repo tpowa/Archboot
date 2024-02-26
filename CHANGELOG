@@ -5,6 +5,7 @@ Environment:
 - added pacman-key workaround on aarch64
 - removed f2fs, jfs and nilfs2 support
 - fixed ttyd to accept keyboard input again
+- added CTRL-C hint to login message
 Setup:
 - added single device bcachefs with compression support
 - added mkinitcpio kms workaround on aarch64
