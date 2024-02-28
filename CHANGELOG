@@ -10,6 +10,7 @@ Environment:
 - removed f2fs, jfs and nilfs2 support
 - fixed ttyd to accept keyboard input again
 - added CTRL-C hint to login message
+- print full systemd version during boot
 setup:
 - added single device bcachefs with compression support
 - added mkinitcpio kms workaround on aarch64
