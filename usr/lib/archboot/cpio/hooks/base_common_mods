@@ -14,7 +14,7 @@ _run ()
     _map _mod zram btrfs zstd libcrc32c
     ### keyboard modules
     _all_mods -f '_cs|ssb-hcd' '/usb/host'
-    _all_mods '/hid/hid-(alps|apple|asus|belkin|cherry|chicony|corsair|elan|hyperv|kensignton|lenovo|logitech|magicmouse|microsoft|razer|redragon|roccat|samsung|sony|speedlink|steelseries)'
+    _all_mods '/hid/hid-(alps|apple|asus|belkin|cherry|chicony|corsair|elan|generic|hyperv|kensignton|lenovo|logitech|magicmouse|microsoft|razer|redragon|roccat|samsung|sony|speedlink|steelseries)'
     _mod usbhid
     _all_mods -f 'parkbd' '/input/serio|mouse|keyboard/(applespi|atkbd)'
     _all_mods -f '9pnet|bluetooth|fs' 'virtio'
