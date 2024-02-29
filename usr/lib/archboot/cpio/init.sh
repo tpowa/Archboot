@@ -125,14 +125,15 @@ _initrd_stage() {
 for i in cdrom usb-storage zram zstd; do
     modprobe -q "${i}"
 done
-# take care of builtin drm modules
-udevadm wait --settle /dev/fb0
-# get screen setting mode from /sys
-_FB_SIZE="$(sed -e 's#.*:##g' -e 's#x.*##g' /sys/class/graphics/fb0/modes 2>/dev/null)"
-if [[ "${_FB_SIZE}" -gt '1900' ]]; then
-    _SIZE="32"
-else
-    _SIZE="16"
+# take care of builtin drm modules, timeout after 10 seconds to avoid hang on some systems
+udevadm wait --settle /dev/fb0 -t 10
+_SIZE="16"
+if [[ -e /sys/class/graphics/fb0/modes ]]; then
+    # get screen setting mode from /sys
+    _FB_SIZE="$(sed -e 's#.*:##g' -e 's#x.*##g' /sys/class/graphics/fb0/modes 2>/dev/null)"
+    if [[ "${_FB_SIZE}" -gt '1900' ]]; then
+        _SIZE="32"
+    fi
 fi
 # it needs one echo before, in order to reset the consolefont!
 _msg "Initializing Console..."
