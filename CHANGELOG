@@ -1,4 +1,6 @@
 On the road to 2024.03:
+Environment:
+- retrigger module loading on soft-reboot switching
 ---
 2024.02 Highlights:
 - kernel 6.7.6 on aarch64
