@@ -250,6 +250,8 @@ _new_environment() {
         rm "${_RAM}"/{init,"${_VMLINUZ}"} &>"${_NO_LOG}"
         _progress "100" "Switching to rootfs ${_RAM}..."
         sleep 2
+        # stop coldplug service to retrigger module loading on soft-reboot
+        systemctl stop systemd-udev-trigger
         systemctl soft-reboot
     fi
     _progress "86" "Preserving Basic Setup values..."
