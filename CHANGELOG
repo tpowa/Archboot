@@ -1,6 +1,6 @@
 On the road to 2024.03:
 Environment:
-- retrigger module loading on soft-reboot switching
+- retrigger module loading on soft-reboot
 ---
 2024.02 Highlights:
 - kernel 6.7.6 on aarch64
@@ -15,6 +15,7 @@ Environment:
 - print full systemd version during boot
 - fixed usb keyboards
 - fixed fb0 hanging the boot process
+- added pintctrl modules
 setup:
 - added single device bcachefs with compression support
 - added mkinitcpio kms workaround on aarch64
