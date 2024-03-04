@@ -179,15 +179,9 @@ _efistub_parameters() {
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="${_VMLINUZ_EFISTUB}"
     if [[ "${_UEFISYS_MP}" == "boot" ]]; then
         _KERNEL="${_VMLINUZ}"
-        if [[ -n "${_UCODE}" ]]; then
-            _INITRD_UCODE="${_UCODE}"
-        fi
         _INITRD="${_INITRAMFS}"
     else
         _KERNEL="${_UEFISYS_PATH}/${_VMLINUZ}"
-        if [[ -n "${_UCODE}" ]]; then
-            _INITRD_UCODE="${_UEFISYS_PATH}/${_UCODE}"
-        fi
         _INITRD="${_UEFISYS_PATH}/${_INITRAMFS}"
     fi
 }

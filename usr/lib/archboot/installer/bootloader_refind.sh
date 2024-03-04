@@ -22,11 +22,6 @@ scanfor manual,internal,external,optical,firmware
 menuentry "Arch Linux" {
     icon     /EFI/refind/icons/os_arch.png
     loader   /${_KERNEL}
-CONFEOF
-    if [[ -n "${_INITRD_UCODE}" ]]; then
-        echo "    initrd   /${_INITRD_UCODE}" >> "${_REFIND_CONFIG}"
-    fi
-    cat << CONFEOF >> "${_REFIND_CONFIG}"
     initrd   /${_INITRD}
     options  "${_KERNEL_PARAMS_MOD}"
 }

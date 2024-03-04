@@ -7,9 +7,6 @@ _systemd_boot_uefi() {
     [[ -d "${_DESTDIR}/${_UEFISYS_MP}/loader/entries" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/loader/entries"
     echo "title    Arch Linux" > "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     echo "linux    /${_KERNEL}" >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-    if [[ -n "${_INITRD_UCODE}" ]]; then
-        echo "initrd   /${_INITRD_UCODE}" >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-    fi
     cat << BOOTDEOF >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
 initrd   /${_INITRD}
 options  ${_KERNEL_PARAMS_MOD}

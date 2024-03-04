@@ -18,9 +18,6 @@ _limine_config() {
     KERNEL_PATH=boot://${_KERNEL}
     CMDLINE=${_KERNEL_PARAMS_MOD}
 CONFEOF
-    if [[ -n "${_INITRD_UCODE}" ]]; then
-        echo "MODULE_PATH=boot://${_INITRD_UCODE}" >> "${_LIMINE_CONFIG}"
-    fi
     echo "MODULE_PATH=boot://${_INITRD}" >> "${_LIMINE_CONFIG}"
     ## Edit limine.cfg config file
     _dialog --msgbox "You will now be put into the editor to edit:\nlimine.cfg\n\nAfter you save your changes, exit the editor." 8 50
@@ -41,9 +38,6 @@ _limine_bios() {
     _LIMINE_CONFIG="${_DESTDIR}/boot/limine.cfg"
     _KERNEL="${_SUBDIR}/${_VMLINUZ}"
     _INITRD="${_SUBDIR}/${_INITRAMFS}"
-    if [[ -n "${_UCODE}" ]]; then
-        _INITRD_UCODE="${_SUBDIR}/${_UCODE}"
-    fi
     _limine_config
     _geteditor
     _PARENT_BOOTDEV="$(${_LSBLK} PKNAME "${_BOOTDEV}")"
@@ -69,9 +63,6 @@ _limine_uefi() {
     _LIMINE_CONFIG="${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine.cfg"
     _KERNEL="/${_KERNEL}"
     _INITRD="/${_INITRD}"
-    if [[ -n "${_INITRD_UCODE}" ]]; then
-        _INITRD_UCODE="/${_INITRD_UCODE}"
-    fi
     _limine_config
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI" ]]; then
         _BOOTMGR_LABEL="LIMINE"

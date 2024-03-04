@@ -72,9 +72,6 @@ _grub_config() {
             _SUBDIR="/$(btrfs subvolume show "${_DESTDIR}/boot" | grep Name | cut -c 11-60)"
         fi
     fi
-    if [[ -n "${_UCODE}" ]]; then
-        _INITRD_UCODE="${_SUBDIR}/${_UCODE}"
-    fi
     ## Move old config file, if any
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         _GRUB_CFG="grub${_SPEC_UEFI_ARCH}.cfg"
@@ -168,7 +165,6 @@ menuentry "Arch Linux" {
     set gfxpayload="keep"
     ${_GRUB_ROOT_DRIVE}
     ${_LINUX_MOD_COMMAND}
-    initrd ${_INITRD_UCODE} ${_SUBDIR}/${_INITRAMFS}
 }
 EOF
     _NUMBER=$((_NUMBER+1))
