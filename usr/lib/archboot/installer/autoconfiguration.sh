@@ -207,7 +207,6 @@ _auto_hwdetect() {
     grep -q "^amdgpu" /proc/modules && _FBPARAMETER="--amd-kms"
     grep -q "^i915" /proc/modules && _FBPARAMETER="--intel-kms"
     grep -q "^nouveau" /proc/modules && _FBPARAMETER="--nvidia-kms"
-    # check on nfs and keymap HWPARAMETER
     # check on used keymap, if not us keyboard layout
     ! grep -q '^KEYMAP="us"' "${_DESTDIR}"/etc/vconsole.conf && _HWPARAMETER="${_HWPARAMETER} --keymap"
     _progress "33" "Preconfiguring mkinitcpio settings on installed system..."
@@ -242,10 +241,6 @@ _auto_mkinitcpio() {
     if [[ -z "${_AUTO_MKINITCPIO}" ]]; then
         _printk off
         _AUTO_MKINITCPIO=""
-        # check on nfs
-        if lsmod | grep -q ^nfs; then
-            _dialog --defaultno --yesno "Setup detected nfs driver...\nDo you need support for booting from nfs shares?" 0 0 && _HWPARAMETER="${_HWPARAMETER} --nfs"
-        fi
         _dialog --no-mouse --infobox "" 3 70
         _auto_hwdetect | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Preconfiguring mkinitcpio settings on installed system..." 6 75 0
         # disable fallpack preset
