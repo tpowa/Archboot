@@ -10,7 +10,7 @@ _configure_plasma() {
         cp /usr/share/archboot/grub/archboot-background.png "${i}"
     done
     echo "Replacing menu structure..."
-    cat << EOF >/etc/xdg/menus/applications.menu
+    cat << EOF >/etc/xdg/menus/plasma-applications.menu
  <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
   "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
 
