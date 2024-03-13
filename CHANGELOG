@@ -3,8 +3,8 @@ Highlights:
 - mkinitcpio v38
 Environment:
 - retrigger module loading on soft-reboot
-- added missing ln binary
-- new background
+- fixed missing ln binary
+- added new background
 - fixed plasma 6 application menu
 setup:
 - removed microcode lines from bootloader config files
