@@ -3,12 +3,12 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _set_title() {
     if [[ "${_DESTDIR}" == "/" ]]; then
-        _TITLE="Archboot ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Arch Linux Setup (System Mode) | https://archboot.com"
+        _TITLE="Archboot ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Arch Linux Setup (System Mode) | archboot.com"
     else
         if [[ -e "${_LOCAL_DB}" ]]; then
-            _TITLE="Archboot ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Setup (Offline Mode) | https://archboot.com"
+            _TITLE="Archboot ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Setup (Offline Mode) | archboot.com"
         else
-            _TITLE="Archboot ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Setup (Online Mode) | https://archboot.com"
+            _TITLE="Archboot ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Setup (Online Mode) | archboot.com"
         fi
     fi
 }
