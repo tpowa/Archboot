@@ -109,7 +109,7 @@ _create_pacman_conf() {
         if ! grep -qw "\[archboot\]" "${_PACMAN_CONF}"; then
             echo "Adding archboot repository to ${_PACMAN_CONF}..."
             echo "[archboot]" >> "${_PACMAN_CONF}"
-            echo "Server = https://archboot.com/pkg" >> "${_PACMAN_CONF}"
+            echo "Server = https://pkg.archboot.com" >> "${_PACMAN_CONF}"
         fi
         #shellcheck disable=SC2001
         [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(echo "${_PACMAN_CONF}" | sed -e "s#^${1}##g")"
