@@ -10,6 +10,9 @@ Environment:
 - fixed plasma 6 application menu
 setup:
 - removed microcode lines from bootloader config files
+Hosting:
+- add subdomain src.archboot.com for sources
+- add subdomain pkg.archboot.com for packages
 ---
 2024.02 Highlights:
 - kernel 6.7.6 on aarch64
