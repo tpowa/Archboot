@@ -13,7 +13,7 @@ setup:
 Hosting:
 - add subdomain source.archboot.com for sources
 - add subdomain pkg.archboot.com for packages
-- add subdomain iso.archboot.com for releases
+- add subdomain release.archboot.com for releases
 ---
 2024.02 Highlights:
 - kernel 6.7.6 on aarch64
