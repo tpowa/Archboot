@@ -1,7 +1,8 @@
 On the road to 2024.03:
 Highlights:
 - mkinitcpio release v38
-- pacman release 6.1 
+- pacman release 6.1
+- kernel 6.8.x
 Environment:
 - retrigger module loading on soft-reboot
 - fixed missing ln binary
