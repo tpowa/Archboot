@@ -5,9 +5,12 @@
 # copy header and footer for autoindex litespeed webserver
 # header is placed in plain text on top
 # readme is placed in plain text on bottom
-for i in src pkg release; do
+for i in pkg release src; do
     for k in $(find public_html/${i}/ -type d); do
-	    cp lsws-header-${i}.html ${k}/HEADER.html
+        [[ "${i}" == "release" ]] && _TITLE="CDN Release Mirror"
+        [[ "${i}" == "pkg" ]] && _TITLE="Package Repository"
+        [[ "${i}" == "src" ]] && _TITLE="Sources"
+        echo "Archboot - ${_TITLE} | (c) 2006 - $(date +%Y) Tobias Powalowski | Arch Linux Developer tpowa" > ${k}/HEADER.html
     done
 done
 # vim: set ft=sh ts=4 sw=4 et:
