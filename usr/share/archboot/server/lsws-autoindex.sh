@@ -5,7 +5,9 @@
 # copy header and footer for autoindex litespeed webserver
 # header is placed in plain text on top
 # readme is placed in plain text on bottom
-for i in $(find public_html/*/ -type d); do
-	cp lsws-header.html ${i}/HEADER.html
+for i in src pkg release; do
+    for k in $(find public_html/${i}/ -type d); do
+	    cp lsws-header-${i}.html ${k}/HEADER.html
+    done
 done
 # vim: set ft=sh ts=4 sw=4 et:
