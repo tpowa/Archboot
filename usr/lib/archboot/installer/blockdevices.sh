@@ -51,8 +51,6 @@ _blockdevices() {
 # lists linux blockdevice partitions
 _blockdevices_partitions() {
     # all available block devices partitions
-    # _printk off needed cause of parted usage
-    _printk off
     for dev in $(${_LSBLK} NAME,TYPE | grep -v '^/dev/md' | grep "part$"| cut -d ' ' -f1); do
         # exclude checks:
         #- part of raid device
@@ -79,7 +77,6 @@ _blockdevices_partitions() {
                 ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
-    _printk on
 }
 
 # list none partitionable raid md devices
