@@ -7,12 +7,11 @@ _auto_partition() {
     _clean_disk "${_DISK}"
     # we assume a /dev/sdX,/dev/vdX or /dev/nvmeXnY format
     if [[ -n "${_GUIDPARAMETER}" ]]; then
-        # GPT (GUID) is best supported by 'sgdisk'
         # create fresh GPT
-        sgdisk --clear "${_DISK}" &>"${_LOG}"
+        echo "label: gpt" | sfdisk --wipe always "${_DISK}" &>"${_LOG}"
         # create actual partitions
         _progress "20" "Creating BIOS_GRUB partition..."
-        sgdisk --new="${_GPT_BIOS_GRUB_DEV_NUM}":0:+"${_GPT_BIOS_GRUB_DEV_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEV_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEV_NUM}":BIOS_GRUB "${_DISK}" >"${_LOG}"
+        echo "size=+${_GPT_BIOS_GRUB_DEV_SIZE}M, type=21686148-6449-6E6F-744E-656564454649, name=BIOS_GRUB" | sfdisk -a "${_DISK}" &>"${_LOG}"
         if [[ -n "${_UEFI_BOOT}" ]]; then
             _progress "25" "Creating EFI SYSTEM partition..."
             sgdisk --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":EFI_SYSTEM "${_DISK}" >"${_LOG}"

@@ -5,20 +5,16 @@ _check_gpt() {
     _GUID_DETECTED=""
     [[ "$(${_LSBLK} PTTYPE "${_DISK}")" == "gpt" ]] && _GUID_DETECTED=1
     if [[ -z "${_GUID_DETECTED}" ]]; then
-        _dialog --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${_DISK}.\n\nDo you want to convert the existing MBR table in ${_DISK} to a GUID (gpt) partition table?" 0 0 || return 1
-        sgdisk --mbrtogpt "${_DISK}" >"${_LOG}" && _GUID_DETECTED=1
-        if [[ -z "${_GUID_DETECTED}" ]]; then
-            _dialog --defaultno --yesno "Conversion failed on ${_DISK}.\nSetup detected no GUID (gpt) partition table on ${_DISK}.\n\nDo you want to create a new GUID (gpt) table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
-            _clean_disk "${_DISK}"
-            # create fresh GPT
-            sgdisk --clear "${_DISK}" &>"${_NO_LOG}"
-            _RUN_CFDISK=1
-            _GUID_DETECTED=1
-        fi
+        _dialog --defaultno --yesno "Conversion failed on ${_DISK}.\nSetup detected no GUID (gpt) partition table on ${_DISK}.\n\nDo you want to create a new GUID (gpt) table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
+        _clean_disk "${_DISK}"
+        # create fresh GPT
+        echo "label: gpt" | sfdisk --wipe always "${_DISK}" &>"${_LOG}"
+        _RUN_CFDISK=1
+        _GUID_DETECTED=1
     fi
     if [[ -n "${_GUID_DETECTED}" ]]; then
         if [[ -n "${_CHECK_BIOS_BOOT_GRUB}" ]]; then
-            if ! sgdisk -p "${_DISK}" | grep -q 'EF02'; then
+            if ! ${_LSBLK} PARTTYPE "${_DISK}" | grep -q '21686148-6449-6E6F-744E-656564454649'; then
                 _dialog --msgbox "Setup detected no BIOS BOOT PARTITION in ${_DISK}. Please create a >=1M BIOS BOOT PARTITION for grub BIOS GPT support." 0 0
                 _RUN_CFDISK=1
             fi
