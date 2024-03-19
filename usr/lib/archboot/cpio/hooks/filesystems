@@ -7,7 +7,7 @@ _run ()
     _map _binary badblocks bcachefs blkmapd btrfs-{find-root,image,map-logical,select-super} btrfs{,ck,tune} \
                  chattr cifscreds cifs.{idmap,upcall} compile_et debugfs \
                  dosfsck dosfslabel dump.exfat dumpe2fs e2{freefrag,fsck,image,label,\
-mmpstatus,scrub,scrub_all,undo} e4{crypt,defrag} exfatlabel fat{label,resize} findfs fsck \
+mmpstatus,scrub,scrub_all,undo} e4{crypt,defrag} exfatlabel fatlabel findfs fsck \
                  logsave resize2fs lsattr filefrag fsck.{bcachefs,btrfs,exfat,ext2,ext4,\
 msdos,vfat,xfs} fs{freeze,trim} getcifsacl gpart mk{_cmds,dosfs,e2fs,swap} mkfs.{bcachefs,\
 exfat,ext2,ext4,msdos,vfat,xfs} mount.{bcachefs,cifs,smb3} nfs{conf,dcld,idmap} nfsv4.exportd \
