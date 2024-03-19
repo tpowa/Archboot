@@ -32,9 +32,9 @@ _auto_partition() {
         if [[ -z "${_SKIP_HOME}" ]]; then
             echo "size=+${_ROOTDEV_SIZE}M, type=${_GUID_TYPE}, name=ARCH_LINUX_ROOT" | sfdisk -a "${_DISK}" &>"${_LOG}"
             _progress "85" "Creating HOME partition..."
-            echo "size=+, type=933AC7E1-2EB4-4F13-B844-0E14E2AEF915, name=ARCH_LINUX_SWAP" | sfdisk -a "${_DISK}" &>"${_LOG}"
+            echo "type=933AC7E1-2EB4-4F13-B844-0E14E2AEF915, name=ARCH_LINUX_HOME" | sfdisk -a "${_DISK}" &>"${_LOG}"
         else
-            echo "size=+${_ROOTDEV_SIZE}M, type=${_GUID_TYPE}, name=ARCH_LINUX_ROOT" | sfdisk -a "${_DISK}" &>"${_LOG}"
+            echo "type=${_GUID_TYPE}, name=ARCH_LINUX_ROOT" | sfdisk -a "${_DISK}" &>"${_LOG}"
         fi
         sgdisk --print "${_DISK}" >"${_LOG}"
     else
