@@ -9,7 +9,7 @@ _run ()
                  dosfsck dosfslabel dump.exfat dumpe2fs e2{freefrag,fsck,image,label,\
 mmpstatus,scrub,scrub_all,undo} e4{crypt,defrag} exfatlabel fatlabel findfs fsck \
                  logsave resize2fs lsattr filefrag fsck.{bcachefs,btrfs,exfat,ext2,ext4,\
-msdos,vfat,xfs} fs{freeze,trim} getcifsacl gpart mk{_cmds,dosfs,e2fs,swap} mkfs.{bcachefs,\
+msdos,vfat,xfs} fs{freeze,trim} getcifsacl mk{_cmds,dosfs,e2fs,swap} mkfs.{bcachefs,\
 exfat,ext2,ext4,msdos,vfat,xfs} mount.{bcachefs,cifs,smb3} nfs{conf,dcld,idmap} nfsv4.exportd \
                  nvme setcifsacl tune.exfat tune2fs wipefs xfs_{admin,bmap,copy,db,estimate,freeze,fsr,\
 growfs,info,io,logprint,metadump,mdrestore,mkfile,ncheck,quota,repair,rtcp,spaceman}
