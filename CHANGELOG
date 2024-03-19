@@ -11,6 +11,7 @@ Environment:
 - removed parted and partprobe
 setup:
 - removed microcode lines from bootloader config files
+- switched from parted to sfdisk usage
 Hosting:
 - added subdomain source.archboot.com for sources
 - added subdomain pkg.archboot.com for packages
