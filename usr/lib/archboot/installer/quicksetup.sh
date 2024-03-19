@@ -8,32 +8,33 @@ _auto_partition() {
     # we assume a /dev/sdX,/dev/vdX or /dev/nvmeXnY format
     if [[ -n "${_GUIDPARAMETER}" ]]; then
         # create fresh GPT
+        # GUID codes: https://en.wikipedia.org/wiki/GUID_Partition_Table
         echo "label: gpt" | sfdisk --wipe always "${_DISK}" &>"${_LOG}"
         # create actual partitions
         _progress "20" "Creating BIOS_GRUB partition..."
         echo "size=+${_GPT_BIOS_GRUB_DEV_SIZE}M, type=21686148-6449-6E6F-744E-656564454649, name=BIOS_GRUB" | sfdisk -a "${_DISK}" &>"${_LOG}"
         if [[ -n "${_UEFI_BOOT}" ]]; then
             _progress "25" "Creating EFI SYSTEM partition..."
-            sgdisk --new="${_UEFISYSDEV_NUM}":0:+"${_UEFISYSDEV_SIZE}"M --typecode="${_UEFISYSDEV_NUM}":EF00 --change-name="${_UEFISYSDEV_NUM}":EFI_SYSTEM "${_DISK}" >"${_LOG}"
+            echo "size=+${_UEFISYSDEV_SIZE}M, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B, name=EFI_SYSTEM" | sfdisk -a "${_DISK}" &>"${_LOG}"
         fi
         if [[ -z "${_UEFISYS_BOOTDEV}" ]]; then
             _progress "40" "Creating XBOOTLDR partition..."
-            sgdisk --new="${_BOOTDEV_NUM}":0:+"${_BOOTDEV_SIZE}"M --typecode="${_BOOTDEV_NUM}":EA00 --change-name="${_BOOTDEV_NUM}":ARCH_LINUX_XBOOT "${_DISK}" >"${_LOG}"
+            echo "size=+${_BOOTDEV_SIZE}M, type=BC13C2FF-59E6-4262-A352-B275FD6F7172, name=ARCH_LINUX_XBOOT" | sfdisk -a "${_DISK}" &>"${_LOG}"
         fi
         if [[ -z "${_SKIP_SWAP}" ]]; then
             _progress "55" "Creating SWAP partition..."
-            sgdisk --new="${_SWAPDEV_NUM}":0:+"${_SWAPDEV_SIZE}"M --typecode="${_SWAPDEV_NUM}":8200 --change-name="${_SWAPDEV_NUM}":ARCH_LINUX_SWAP "${_DISK}" >"${_LOG}"
+            echo "size=+${_SWAPDEV_SIZE}M, type=0657FD6D-A4AB-43C4-84E5-0933C84B4F4F, name=ARCH_LINUX_SWAP" | sfdisk -a "${_DISK}" &>"${_LOG}"
         fi
         _progress "70" "Creating ROOT partition..."
-        [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _GUID_TYPE=8305
-        [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GUID_TYPE=FFFF
-        [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _GUID_TYPE=8304
+        [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _GUID_TYPE=B921B045-1DF0-41C3-AF44-4C6F280D3FAE
+        [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GUID_TYPE=BEAEC34B-8442-439B-A40B-984381ED097D
+        [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _GUID_TYPE=4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709
         if [[ -z "${_SKIP_HOME}" ]]; then
-            sgdisk --new="${_ROOTDEV_NUM}":0:+"${_ROOTDEV_SIZE}"M --typecode="${_ROOTDEV_NUM}":"${_GUID_TYPE}" --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
+            echo "size=+${_ROOTDEV_SIZE}M, type=${_GUID_TYPE}, name=ARCH_LINUX_ROOT" | sfdisk -a "${_DISK}" &>"${_LOG}"
             _progress "85" "Creating HOME partition..."
-            sgdisk --new="${_HOMEDEV_NUM}":0:0 --typecode="${_HOMEDEV_NUM}":8302 --change-name="${_HOMEDEV_NUM}":ARCH_LINUX_HOME "${_DISK}" >"${_LOG}"
+            echo "size=+, type=933AC7E1-2EB4-4F13-B844-0E14E2AEF915, name=ARCH_LINUX_SWAP" | sfdisk -a "${_DISK}" &>"${_LOG}"
         else
-            sgdisk --new="${_ROOTDEV_NUM}":0:0 --typecode="${_ROOTDEV_NUM}":"${_GUID_TYPE}" --change-name="${_ROOTDEV_NUM}":ARCH_LINUX_ROOT "${_DISK}" >"${_LOG}"
+            echo "size=+${_ROOTDEV_SIZE}M, type=${_GUID_TYPE}, name=ARCH_LINUX_ROOT" | sfdisk -a "${_DISK}" &>"${_LOG}"
         fi
         sgdisk --print "${_DISK}" >"${_LOG}"
     else
