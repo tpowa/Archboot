@@ -16,7 +16,7 @@ id,ionice,ipc{mk,rm,s},irqtop,isosize,join,keyctl,last{,b},ldattach,ldd,\
 link,linux{32,64},logname,look,losetup,ls{cpu,fd,ipc,irq,locks,logins,mem,ns},\
 lz4{,c,cat},lz{cat,cmp,diff,egrep,fgrep,grep,less,more,ma,madec,mainfo,op},\
 mcookie,md5sum,mesg,mk{fifo,fs,nod},modinfo,namei,new{grp,gidmap,uidmap},\
-nice,nl,nohup,nproc,nsenter,numfmt,parted,partx,paste,pathchk,pidwait,pinky,\
+nice,nl,nohup,nproc,nsenter,numfmt,partx,paste,pathchk,pidwait,pinky,\
 pg,pipesz,{pivot,switch}_root,pkill,pmap,pr,printenv,prlimit,prtstat,pslog,\
 pstree,ptx,pwdx,pzstd,read{link,profile},rename,renice,request-key,\
 resizepart,reset,rev,rtcwake,run{con,user},script{,live,replay},sdparm,\

@@ -42,7 +42,7 @@ update-activation-environment,uuidgen} dd df dir du false gawk gpg{,-agent,conf,
                  gpgme-{tool,json} insmod install kernel-install kill{,all} loadkeys ldconfig \
                  login makepkg mktemp mkhomedir_helper modutil more mount.ddi mount.nfs{,4} \
                  nano nologin nss-config od p11-kit pk12util pam_timestamp_check pacman{,-conf,-key,-db-upgrade} \
-                 partprobe passwd pgrep pidof pinentry{,-curses} printf ps pwd rmdir tr true \
+                 passwd pgrep pidof pinentry{,-curses} printf ps pwd rmdir tr true \
                  repo-{add,elephant,remove} rbash rmmod secret-tool shlibsign sign{tool,ver} sort \
                  ssltap stat symkeyutil systemd-{ac-power,analyze,ask-password,cat,cgls,cgtop,confextdelta,\
 detect-virt,escape,firstboot,hwdb,inhibit,machine-id-setup,mount,notify,nspawn,path,resolve,repartrun,\
