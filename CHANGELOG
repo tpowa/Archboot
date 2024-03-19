@@ -11,9 +11,9 @@ Environment:
 setup:
 - removed microcode lines from bootloader config files
 Hosting:
-- add subdomain source.archboot.com for sources
-- add subdomain pkg.archboot.com for packages
-- add subdomain release.archboot.com for releases
+- added subdomain source.archboot.com for sources
+- added subdomain pkg.archboot.com for packages
+- added subdomain release.archboot.com for releases
 ---
 2024.02 Highlights:
 - kernel 6.7.6 on aarch64
