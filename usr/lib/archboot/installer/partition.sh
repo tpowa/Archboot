@@ -7,8 +7,6 @@ _check_gpt() {
     if [[ -z "${_GUID_DETECTED}" ]]; then
         _dialog --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${_DISK}.\n\nDo you want to convert the existing MBR table in ${_DISK} to a GUID (gpt) partition table?" 0 0 || return 1
         sgdisk --mbrtogpt "${_DISK}" >"${_LOG}" && _GUID_DETECTED=1
-        # reread partitiontable for kernel
-        partprobe "${_DISK}" >"${_LOG}"
         if [[ -z "${_GUID_DETECTED}" ]]; then
             _dialog --defaultno --yesno "Conversion failed on ${_DISK}.\nSetup detected no GUID (gpt) partition table on ${_DISK}.\n\nDo you want to create a new GUID (gpt) table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
             _clean_disk "${_DISK}"
@@ -31,8 +29,6 @@ _check_gpt() {
         clear
         cfdisk "${_DISK}"
         _RUN_CFDISK=""
-        # reread partitiontable for kernel
-        partprobe "${_DISK}"
     fi
 }
 
@@ -74,8 +70,6 @@ _partition() {
                 _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/mbr-partition.txt)" 0 0
                 clear
                 cfdisk "${_DISK}"
-                # reread partitiontable for kernel
-                partprobe "${_DISK}"
             fi
         fi
     done

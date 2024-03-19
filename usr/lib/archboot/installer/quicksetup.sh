@@ -321,8 +321,6 @@ _autoprepare() {
     # disable swap and all mounted partitions, umount / last!
     _printk off
     _auto_partition | _dialog --title " Partitioning " --no-mouse --gauge "Partitioning ${_DISK}..." 6 75 0
-    # reread partitiontable for kernel
-    partprobe "${_DISK}"
     _printk on
     ## wait until /dev initialized correct devices
     udevadm settle
