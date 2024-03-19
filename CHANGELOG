@@ -8,6 +8,7 @@ Environment:
 - fixed missing ln binary
 - added new background
 - fixed plasma 6 application menu
+- removed parted and partprobe
 setup:
 - removed microcode lines from bootloader config files
 Hosting:
