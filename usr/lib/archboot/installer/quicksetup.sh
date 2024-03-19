@@ -36,7 +36,6 @@ _auto_partition() {
         else
             echo "type=${_GUID_TYPE}, name=ARCH_LINUX_ROOT" | sfdisk -a "${_DISK}" &>"${_LOG}"
         fi
-        sgdisk --print "${_DISK}" >"${_LOG}"
     else
         # create DOS MBR with sfdisk
         _progress "20" "Creating BIOS MBR..."
