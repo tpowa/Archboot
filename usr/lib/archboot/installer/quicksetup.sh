@@ -9,7 +9,7 @@ _auto_partition() {
     if [[ -n "${_GUIDPARAMETER}" ]]; then
         # GPT (GUID) is supported only by 'parted' or 'sgdisk'
         # create fresh GPT
-        sgdisk --clear "${_DISK}" &>"${_NO_LOG}"
+        sgdisk --clear "${_DISK}" &>"${_LOG}"
         # create actual partitions
         _progress "20" "Creating BIOS_GRUB partition..."
         sgdisk --new="${_GPT_BIOS_GRUB_DEV_NUM}":0:+"${_GPT_BIOS_GRUB_DEV_SIZE}"M --typecode="${_GPT_BIOS_GRUB_DEV_NUM}":EF02 --change-name="${_GPT_BIOS_GRUB_DEV_NUM}":BIOS_GRUB "${_DISK}" >"${_LOG}"
@@ -41,7 +41,7 @@ _auto_partition() {
         # start at sector 1 for 4k drive compatibility and correct alignment
         # create DOS MBR with parted
         _progress "20" "Creating BIOS MBR..."
-        parted -a optimal -s "${_DISK}" unit MiB mktable msdos &>"${_NO_LOG}"
+        echo "label: dos" | sfdisk --wipe always "${_DISK}" &>"${_LOG}"
         _progress "35" "Creating BOOT partition ..."
         parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_BOOTDEV_SIZE)) >"${_LOG}"
         _progress "50" "Setting bootable flag..."

@@ -65,11 +65,10 @@ _partition() {
                 _check_gpt
             else
                 [[ "$(${_LSBLK} PTTYPE "${_DISK}")" == "dos" ]] && _MSDOS_DETECTED=1
-
                 if [[ -z "${_MSDOS_DETECTED}" ]]; then
                     _dialog --defaultno --yesno "Setup detected no MBR/BIOS partition table on ${_DISK}.\nDo you want to create a MBR/BIOS partition table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
-                   _clean_disk "${_DISK}"
-                    parted -a optimal -s "${_DISK}" mktable msdos >"${_LOG}"
+                    _clean_disk "${_DISK}"
+                    echo "label: dos" | sfdisk --wipe always "${_DISK}" >"${_LOG}"
                 fi
                 # Partition disc
                 _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/mbr-partition.txt)" 0 0
