@@ -13,8 +13,8 @@ setup:
 - removed microcode lines from bootloader config files
 - switched from parted to sfdisk usage
 Hosting:
-- added subdomain source.archboot.com for sources
-- added subdomain pkg.archboot.com for packages
+- added subdomain source.archboot.com for build sources
+- added subdomain pkg.archboot.com for [archboot] repository
 - added subdomain release.archboot.com for releases
 ---
 2024.02 Highlights:
