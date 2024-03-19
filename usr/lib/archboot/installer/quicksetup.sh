@@ -7,7 +7,7 @@ _auto_partition() {
     _clean_disk "${_DISK}"
     # we assume a /dev/sdX,/dev/vdX or /dev/nvmeXnY format
     if [[ -n "${_GUIDPARAMETER}" ]]; then
-        # GPT (GUID) is supported only by 'parted' or 'sgdisk'
+        # GPT (GUID) is best supported by 'sgdisk'
         # create fresh GPT
         sgdisk --clear "${_DISK}" &>"${_LOG}"
         # create actual partitions
@@ -38,25 +38,22 @@ _auto_partition() {
         fi
         sgdisk --print "${_DISK}" >"${_LOG}"
     else
-        # start at sector 1 for 4k drive compatibility and correct alignment
-        # create DOS MBR with parted
+        # create DOS MBR with sfdisk
         _progress "20" "Creating BIOS MBR..."
         echo "label: dos" | sfdisk --wipe always "${_DISK}" &>"${_LOG}"
-        _progress "35" "Creating BOOT partition ..."
-        parted -a optimal -s "${_DISK}" unit MiB mkpart primary 1 $((_BOOTDEV_SIZE)) >"${_LOG}"
-        _progress "50" "Setting bootable flag..."
-        parted -a optimal -s "${_DISK}" unit MiB set 1 boot on >"${_LOG}"
+        _progress "50" "Creating BOOT partition with bootable flag..."
+        echo ",+${_BOOTDEV_SIZE}M,L,*" | sfdisk -a "${_DISK}" &>"${_LOG}"
         if [[ -z "${_SKIP_SWAP}" ]]; then
             _progress "60" "Creating SWAP partition..."
-            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) >"${_LOG}"
+            echo ",+${_SWAPDEV_SIZE}M,S,-" | sfdisk -a "${_DISK}" &>"${_LOG}"
         fi
         _progress "70" "Creating ROOT partition..."
         if [[ -z "${_SKIP_HOME}" ]]; then
-            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE)) $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) >"${_LOG}"
+            echo ",+${_ROOTDEV_SIZE}M,L,-" | sfdisk -a "${_DISK}" &>"${_LOG}"
             _progress "85" "Creating HOME partition..."
-            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
+            echo ",+,L,-" | sfdisk -a "${_DISK}" &>"${_LOG}"
         else
-            parted -a optimal -s "${_DISK}" unit MiB mkpart primary $((_BOOTDEV_SIZE+_SWAPDEV_SIZE+_ROOTDEV_SIZE)) "$(sgdisk -E "${_DISK}" | grep "^[0-9]")S" >"${_LOG}"
+            echo ",+,L,-" | sfdisk -a "${_DISK}" &>"${_LOG}"
         fi
     fi
     _progress "100" "Partitions created successfully."
