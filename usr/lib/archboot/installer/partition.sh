@@ -5,7 +5,7 @@ _check_gpt() {
     _GUID_DETECTED=""
     [[ "$(${_LSBLK} PTTYPE "${_DISK}")" == "gpt" ]] && _GUID_DETECTED=1
     if [[ -z "${_GUID_DETECTED}" ]]; then
-        _dialog --defaultno --yesno "Conversion failed on ${_DISK}.\nSetup detected no GUID (gpt) partition table on ${_DISK}.\n\nDo you want to create a new GUID (gpt) table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
+        _dialog --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${_DISK}.\n\nDo you want to create a new GUID (gpt) table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
         _clean_disk "${_DISK}"
         # create fresh GPT
         echo "label: gpt" | sfdisk --wipe always "${_DISK}" &>"${_LOG}"
