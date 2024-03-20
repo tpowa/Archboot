@@ -267,17 +267,16 @@ _grub_mkrescue() {
 _unify_gpt_partitions() {
     # GPT partition layout:
     # 1: Gap0 | 2: EFI System Partition | 3: HFS/HFS+ | 4: GAP1
+    echo "Creating reproducible GUID, UUIDs, hide partitions and disable automount on ISO GPT..."
+    sfdisk -q --disk-id "${_IMAGENAME}.iso" "00000000-0000-0000-0000-000000000000"
     # --> already set 0: system partition (does not allow delete on Windows)
     # --> already set 60: readonly
     # --> 62: hide all partitions, Windows cannot access any files on this ISO
     #         Windows will now only error on 1 drive and not on all partitions
     # --> 63: disable freedesktop/systemd automount by default on this ISO
-    # --> -j 2: Move main table sector from 20 to the default 2
-    echo "Creating reproducible GUID, UUIDs, hide partitions, disable automount and move main table sector on ISO GPT..."
-    sgdisk -j 2 -U 00000000-0000-0000-0000-0000-000000000000 "${_IMAGENAME}.iso" &>"${_NO_LOG}"
     for i in 1 2 3 4; do
-        sgdisk -A ${i}:set:62 -A ${i}:set:63 -u ${i}:${i}0000000-0000-0000-0000-0000-000000000000 \
-               "${_IMAGENAME}.iso" &>"${_NO_LOG}"
+       sfdisk -q --part-attrs "${_IMAGENAME}.iso" "${i}" "RequiredPartition,60,62,63"
+       sfdisk -q --part-uuid "${_IMAGENAME}.iso" "${i}" "${i}0000000-0000-0000-0000-000000000000"
     done
 }
 
