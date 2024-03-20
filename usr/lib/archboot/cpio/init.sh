@@ -4,7 +4,7 @@
 LANG=C
 _KVER="$(uname -r)"
 _ARCH="$(uname -m)"
-_TITLE="Archboot ${_ARCH} | ${_KVER} | Basic Setup | Early Userspace | archboot.com"
+_TITLE="archboot.com | ${_ARCH} | ${_KVER} | Basic Setup | Early Userspace"
 _KEEP="Please keep the boot medium inserted."
 _dialog() {
     dialog --backtitle "${_TITLE}" "$@"

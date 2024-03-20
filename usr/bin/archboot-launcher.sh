@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # written by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
-_TITLE="Archboot ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Launcher"
+_TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Launcher"
 
 _check_desktop() {
     _DESKTOP=()
