@@ -12,6 +12,7 @@ Environment:
 setup:
 - removed microcode lines from bootloader config files
 - switched partitioning to sfdisk usage
+- removed mbrtogpt conversion option
 Hosting:
 - added subdomain source.archboot.com for build sources
 - added subdomain pkg.archboot.com for [archboot] repository
