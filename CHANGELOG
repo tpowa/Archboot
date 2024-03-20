@@ -8,10 +8,10 @@ Environment:
 - fixed missing ln binary
 - added new background
 - fixed plasma 6 application menu
-- removed fatresize, gpart, parted and partprobe
+- removed fatresize, gpart, gptfdisk, parted and partprobe
 setup:
 - removed microcode lines from bootloader config files
-- switched from parted to sfdisk usage
+- switched partitioning to sfdisk usage
 Hosting:
 - added subdomain source.archboot.com for build sources
 - added subdomain pkg.archboot.com for [archboot] repository
