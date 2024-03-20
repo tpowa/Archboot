@@ -6,14 +6,9 @@ _run ()
 {
     _map _binary arping brctl bridge clockdiff ctstat dcb devlink \
                  elinks ethtool genl ifstat lnstat nstat rdma rtacct \
-                 rtmon rtstat ss ssh tc tipc tracepath vdpa weechat
+                 rtmon rtstat ss ssh tc tipc tracepath vdpa 
     # add iproute 2, add openssl helper libraries
     _map _full_dir /usr/lib/{tc,engines-3} /usr/share/tc
-    # add weechat plugins and defaults
-    _map _file /usr/lib/weechat/plugins/{alias,exec,lua,relay,typing,buflist,fifo,irc,xfer,charset,fset,logger,script,trigger}.so
-    _file_rename /usr/share/archboot/net/etc/weechat/irc.conf /etc/weechat/irc.conf
-    _file_rename /usr/share/archboot/net/etc/weechat/weechat.conf /etc/weechat/weechat.conf
-    _file_rename /usr/share/archboot/net/etc/profile.d/weechat.sh /etc/profile.d/weechat.sh
     # add elinks defaults
     _file_rename /usr/share/archboot/net/etc/elinks/bookmarks /etc/elinks/bookmarks
     _file_rename /usr/share/archboot/net/etc/profile.d/elinks.sh /etc/profile.d/elinks.sh
