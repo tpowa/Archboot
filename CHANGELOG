@@ -19,11 +19,11 @@ Hosting:
 - added new Package Mirrors for [archboot] repository:
   - United States with subdomain pkg.archboot.com
   - Europe with subdomain pkg.archboot.de
-  - Indonesia subdomain pkg.archboot.net
+  - Asia subdomain pkg.archboot.net
 - added new Release Mirrors:
   - United States with subdomain release.archboot.com
   - Europe with subdomain release.archboot.de
-  - Indonesia with subdomain release.archboot.net
+  - Asia with subdomain release.archboot.net
 ---
 2024.02 Highlights:
 - kernel 6.7.6 on aarch64
