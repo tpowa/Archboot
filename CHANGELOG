@@ -1,15 +1,15 @@
 On the road to 2024.03:
 Highlights:
-- pacman release 6.1
 - kernel 6.8.x
+- pacman release 6.1
 - mkinitcpio release v38
 - plasma release 6
 Environment:
 - retrigger module loading on soft-reboot
 - fixed missing ln binary
-- added new background
 - fixed plasma 6 application menu
 - removed fatresize, gpart, gptfdisk, parted, wipe and weechat
+- added new background
 setup:
 - removed microcode lines from bootloader config files
 - switched partitioning to sfdisk usage
