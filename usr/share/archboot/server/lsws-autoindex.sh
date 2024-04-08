@@ -15,21 +15,25 @@ for i in pkg release src; do
     done
 done
 # mirrors
-cd public_html
-for k in $(find release/ -type d); do
-    _TITLE="Release Mirror"
-    [[ -d "~/${k}" ]] && echo "Archboot - ${_TITLE} | (c) 2006 - $(date +%Y) Tobias Powalowski | Arch Linux Developer tpowa" 2>/dev/null > ~/${k}/HEADER.html
-done
-# clean directory first
+# clean and create directories
+rm ~/release/*
 for i in aarch64 riscv64 x86_64; do
+    [[ -d ~/release/${i} ]] || mkdir -p ~/release/${i}
     rm ~/release/${i}/*
 done
+# create html on mirrors
+for i in ./{,aarch64,riscv64,x86_64}; do
+    ln -s ~/public_html/release/${i}/HEADER.html \
+          ~/release/${i}/HEADER.html
+done
 # keep 4 versions on mirrors
-for i in $(seq 0 3); do 
+for i in $(seq 0 3); do
     _SYMLINK=$(date -d "$(date +) - ${i} Months" +%Y.%m)
     for k in aarch64 riscv64 x86_64; do
-        ln -s ~/public_html/release/${k}/${_SYMLINK} \
-              ~/release/${k}/${_SYMLINK}
+        if [[ -d ~/public_html/release/${k}/${_SYMLINK} ]]; then
+            ln -s ~/public_html/release/${k}/${_SYMLINK} \
+                  ~/release/${k}/${_SYMLINK}
+        fi
     done
 done
 # vim: set ft=sh ts=4 sw=4 et:

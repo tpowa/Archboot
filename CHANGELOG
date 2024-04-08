@@ -1,5 +1,10 @@
-On the road to 2024.03:
+On the road to 2024.04:
 Highlights:
+- hwdetect 2024.04.08
+setup:
+- cleanup hwdetect code
+---
+2024.03 Highlights:
 - kernel 6.8.x
 - pacman release 6.1
 - mkinitcpio release v38
