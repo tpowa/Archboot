@@ -207,25 +207,11 @@ _auto_hwdetect() {
     grep -q "^amdgpu" /proc/modules && _FBPARAMETER="--amd-kms"
     grep -q "^i915" /proc/modules && _FBPARAMETER="--intel-kms"
     grep -q "^nouveau" /proc/modules && _FBPARAMETER="--nvidia-kms"
-    # check on used keymap, if not us keyboard layout
-    ! grep -q '^KEYMAP="us"' "${_DESTDIR}"/etc/vconsole.conf && _HWPARAMETER="${_HWPARAMETER} --keymap"
-    _progress "33" "Preconfiguring mkinitcpio settings on installed system..."
-    # get kernel version
-    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-        offset="$(od -An -j0x20E -dN2 "${_DESTDIR}/boot/${_VMLINUZ}")"
-        read -r _HWKVER _ < <(dd if="${_DESTDIR}/boot/${_VMLINUZ}" bs=1 count=127 skip=$((offset + 0x200)) 2>"${_LOG}")
-    elif [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "riscv64" ]]; then
-        reader="cat"
-        # try if the image is gzip compressed
-        bytes="$(od -An -t x2 -N2 "${_DESTDIR}/boot/${_VMLINUZ}" | tr -dc '[:alnum:]')"
-        [[ $bytes == '8b1f' ]] && reader="zcat"
-        read -r _ _ _HWKVER _ < <($reader "${_DESTDIR}/boot/${_VMLINUZ}" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]]+)+')
-    fi
     _progress "66" "Preconfiguring mkinitcpio settings on installed system..."
     # arrange MODULES for mkinitcpio.conf
-    _HWDETECTMODULES="$(hwdetect --kernel_directory="${_DESTDIR}" --kernel_version="${_HWKVER}" --hostcontroller --filesystem "${_FBPARAMETER}")"
+    _HWDETECTMODULES="$(hwdetect --root_directory="${_DESTDIR}" --hostcontroller --filesystem "${_FBPARAMETER}")"
     # arrange HOOKS for mkinitcpio.conf
-    _HWDETECTHOOKS="$(hwdetect --kernel_directory="${_DESTDIR}" --kernel_version="${_HWKVER}" --rootdevice="${_ROOTDEV}" --hooks-dir="${_DESTDIR}"/usr/lib/initcpio/install "${_HWPARAMETER}" --hooks)"
+    _HWDETECTHOOKS="$(hwdetect --root_directory="${_DESTDIR}" --rootdevice="${_ROOTDEV}" --hooks)"
     # change mkinitcpio.conf
     [[ -n "${_HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${_HWDETECTMODULES}/g" "${_DESTDIR}"/etc/mkinitcpio.conf
     [[ -n "${_HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${_HWDETECTHOOKS}/g" "${_DESTDIR}"/etc/mkinitcpio.conf
@@ -234,10 +220,8 @@ _auto_hwdetect() {
 
 _auto_mkinitcpio() {
     _FBPARAMETER=""
-    _HWPARAMETER=""
     _HWDETECTMODULES=""
     _HWDETECTHOOKS=""
-    _HWKVER=""
     if [[ -z "${_AUTO_MKINITCPIO}" ]]; then
         _printk off
         _AUTO_MKINITCPIO=""
