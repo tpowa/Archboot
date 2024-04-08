@@ -1,5 +1,5 @@
 #!/bin/bash
-rsync --delete --delete-before --copy-dirlinks -a archboot.com:release ~/public_html/
+rsync --delete --delete-before -L -k -a archboot.com:release ~/public_html/
 rsync --delete --delete-before --copy-dirlinks -a archboot.com:pkg ~/public_html/
 for i in aarch64 riscv64 x86_64; do
     cd ~/public_html/release/${i}/
