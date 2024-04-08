@@ -16,7 +16,7 @@ for i in pkg release src; do
 done
 # mirrors
 # clean and create directories
-rm ~/release/*
+rm ~/release/* 2>/dev/null
 for i in aarch64 riscv64 x86_64; do
     [[ -d ~/release/${i} ]] || mkdir -p ~/release/${i}
     rm ~/release/${i}/*
