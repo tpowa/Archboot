@@ -21,7 +21,7 @@ BOOTDEOF
     if [[ "${_UEFISYS_MP}" == "efi" && \
           "${_SUBDIR}" == "/boot" && \
           $(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "vfat") &&
-          $(${_LSBLK} PARTTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "bc13c2ff-59e6-4262-a352-b275fd6f7172" ]]; then
+          $(${_LSBLK} PARTTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "bc13c2ff-59e6-4262-a352-b275fd6f7172") ]]; then
         chroot "${_DESTDIR} "bootctl --esp-path=/efi --boot-path=/boot install &>"${_LOG}"
         chroot "${_DESTDIR}" bootctl --esp-path=/efi --boot-path=/boot update &>"${_LOG}"
     else
