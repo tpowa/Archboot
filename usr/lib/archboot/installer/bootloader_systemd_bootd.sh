@@ -44,7 +44,7 @@ BOOTDEOF
         if [[ "${_UEFISYS_MP}" == "efi" && \
               "${_SUBDIR}" == "/boot" && \
               $(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "vfat") &&
-              $(${_LSBLK} PARTTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "bc13c2ff-59e6-4262-a352-b275fd6f7172" ]]; then
+              $(${_LSBLK} PARTTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "bc13c2ff-59e6-4262-a352-b275fd6f7172") ]]; then
             _dialog --title " Skipping " --no-mouse --infobox "Skipped kernel, ucode and initramfs copying to EFI SYSTEM PARTITION." 3 75
             sleep 3
         else
