@@ -183,7 +183,7 @@ _create_iso() {
     echo "archboot.com | (c) 2006 - 2024"
     echo "Tobias Powalowski <tpowa@archlinux.org>"
     echo ""
-    echo "Requirement: ${_ARCH} with 700M RAM and higher"
+    echo "Requirement: ${_ARCH} with 800M RAM and higher"
     echo "Archboot:$(${_NSPAWN} "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" | grep Version |\
          cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")"
     [[ "${_ARCH}" == "riscv64" ]] || echo "Grub: $(${_NSPAWN} "${_W_DIR}" pacman -Qi grub |\
