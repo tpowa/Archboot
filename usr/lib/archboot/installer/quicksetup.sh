@@ -326,7 +326,7 @@ _autoprepare() {
     ## Make sure the "root" partition is defined first in the FSSPECS list
     [[ -z "${_SKIP_SWAP}" ]] && _FSSPEC_SWAPDEV="${_SWAPDEV_NUM}|swap|swap|ARCH_SWAP"
     _FSSPEC_ROOTDEV="${_ROOTDEV_NUM}|${_FSTYPE}|/|ARCH_ROOT"
-    _FSSPEC_BOOTDEV="${_BOOTDEV_NUM}|ext2|/boot|ARCH_BOOT"
+    _FSSPEC_BOOTDEV="${_BOOTDEV_NUM}|vfat|/boot|ARCH_BOOT"
     [[ -z "${_SKIP_HOME}" ]] &&_FSSPEC_HOMEDEV="${_HOMEDEV_NUM}|${_FSTYPE}|/home|ARCH_HOME"
     _FSSPEC_UEFISYSDEV="${_UEFISYSDEV_NUM}|vfat|${_UEFISYS_MP}|ESP"
     if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
