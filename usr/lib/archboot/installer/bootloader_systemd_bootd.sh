@@ -16,8 +16,18 @@ timeout 5
 default archlinux-core-main
 BOOTDEOF
     _chroot_mount
-    chroot "${_DESTDIR}" bootctl --path="/${_UEFISYS_MP}" install &>"${_LOG}"
-    chroot "${_DESTDIR}" bootctl --path="/${_UEFISYS_MP}" update &>"${_LOG}"
+    # systemd-boot https://www.freedesktop.org/software/systemd/man/latest/systemd-gpt-auto-generator.html
+    # /boot XBOOTLDR in vfat format can be booted by systemd-boot
+    if [[ "${_UEFISYS_MP}" == "efi" && \
+          "${_SUBDIR}" == "/boot" && \
+          $(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "vfat") &&
+          $(${_LSBLK} PARTTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "bc13c2ff-59e6-4262-a352-b275fd6f7172" ]]; then
+        chroot "${_DESTDIR} "bootctl --esp-path=/efi --boot-path=/boot install &>"${_LOG}"
+        chroot "${_DESTDIR}" bootctl --esp-path=/efi --boot-path=/boot update &>"${_LOG}"
+    else
+        chroot "${_DESTDIR}" bootctl --path="/${_UEFISYS_MP}" install &>"${_LOG}"
+        chroot "${_DESTDIR}" bootctl --path="/${_UEFISYS_MP}" update &>"${_LOG}"
+    fi
     _chroot_umount
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
@@ -31,7 +41,15 @@ BOOTDEOF
         _geteditor || return 1
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"
-        _efistub_copy_to_efisys | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
+        if [[ "${_UEFISYS_MP}" == "efi" && \
+              "${_SUBDIR}" == "/boot" && \
+              $(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "vfat") &&
+              $(${_LSBLK} PARTTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "bc13c2ff-59e6-4262-a352-b275fd6f7172" ]]; then
+            _dialog --title " Skipping " --no-mouse --infobox "Skipped kernel, ucode and initramfs copying to EFI SYSTEM PARTITION." 3 75
+            sleep 3
+        else
+            _efistub_copy_to_efisys | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
+        fi
         _pacman_hook_systemd_bootd
         _dialog --title " Success " --no-mouse --infobox "SYSTEMD-BOOT has been setup successfully." 3 50
         sleep 3
