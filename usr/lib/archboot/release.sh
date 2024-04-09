@@ -180,7 +180,7 @@ _create_iso() {
     echo "Generating Release.txt..."
     ${_NSPAWN} "${_W_DIR}" pacman -Sy "${_W_DIR}" &>"${_NO_LOG}"
     (echo "ARCHBOOT - ARCH LINUX INSTALLATION / RESCUE SYSTEM"
-    echo "archboot.com | (c) 2006 - 2024"
+    echo "archboot.com | (c) 2006 - $(date +%Y)"
     echo "Tobias Powalowski <tpowa@archlinux.org>"
     echo ""
     echo "Requirement: ${_ARCH} with 800M RAM and higher"
