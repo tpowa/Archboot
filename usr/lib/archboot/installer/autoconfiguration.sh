@@ -211,7 +211,7 @@ _auto_hwdetect() {
     # arrange MODULES for mkinitcpio.conf
     _HWDETECTMODULES="$(hwdetect --root_directory="${_DESTDIR}" --hostcontroller --filesystem "${_FBPARAMETER}")"
     # arrange HOOKS for mkinitcpio.conf
-    _HWDETECTHOOKS="$(hwdetect --root_directory="${_DESTDIR}" --rootdevice="${_ROOTDEV}" --hooks)"
+    _HWDETECTHOOKS="$(hwdetect --root_directory="${_DESTDIR}" --rootdevice="${_ROOTDEV}")"
     # change mkinitcpio.conf
     [[ -n "${_HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${_HWDETECTMODULES}/g" "${_DESTDIR}"/etc/mkinitcpio.conf
     [[ -n "${_HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${_HWDETECTHOOKS}/g" "${_DESTDIR}"/etc/mkinitcpio.conf
