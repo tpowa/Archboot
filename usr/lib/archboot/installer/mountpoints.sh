@@ -74,7 +74,13 @@ _enter_mountpoint() {
     elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
         _dialog --no-cancel --title " EFI SYSTEM PARTITION (ESP) " --menu "" 8 50 2 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
+        if [[ ${_MP} == "/efi" ]]; then
+            _XBOOTLDR=1
+        fi
         _UEFISYSDEV_DONE=1
+    elif [[ -n "${_XBOOTLDR}" ]]; then
+        _MP=/boot
+        _XBOOTLDR=""
     else
         _MP=""
         while [[ -z "${_MP}" ]]; do
@@ -217,13 +223,15 @@ _mountpoints() {
             while [[ -z "${_MP_DONE}" ]]; do
                 #shellcheck disable=SC2086
                 if [[ -z "${_SWAP_DONE}" ]]; then
-                    _dialog --title " Swap Partition " --menu "" 14 45 8 NONE - ${_DEVS} 2>"${_ANSWER}" || return 1
+                    _dialog --title " Swap Partition " --menu "" 14 55 8 NONE - ${_DEVS} 2>"${_ANSWER}" || return 1
                 elif [[ -z "${_ROOT_DONE}" ]]; then
-                    _dialog --title " Root Partition " --no-cancel --menu "" 14 45 8 ${_DEVS} 2>"${_ANSWER}" || return 1
+                    _dialog --title " Root Partition " --no-cancel --menu "" 14 55 8 ${_DEVS} 2>"${_ANSWER}" || return 1
                 elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
-                    _dialog --title " EFI SYSTEM PARTITION (ESP) " --no-cancel --menu "" 14 45 8 ${_DEVS} 2>"${_ANSWER}" || return 1
+                    _dialog --title " EFI SYSTEM PARTITION (ESP) " --no-cancel --menu "" 14 55 8 ${_DEVS} 2>"${_ANSWER}" || return 1
+                elif [[ -n "${_XBOOTLDR}" ]]; then
+                    _dialog --title " Extended Boot Loader Partition (XBOOTLDR) " --no-cancel --menu "" 14 55 8 ${_DEVS} 2>"${_ANSWER}" || return 1
                 else
-                    _dialog --title " Additional Partitions " --no-cancel --menu "" 14 45 8 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
+                    _dialog --title " Additional Partitions " --no-cancel --menu "" 14 55 8 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
                 fi
                 _DEV=$(cat "${_ANSWER}")
                 if [[ "${_DEV}" != "DONE" ]]; then
@@ -252,14 +260,25 @@ _mountpoints() {
                         # create vfat on ESP, if not already vfat format
                         if [[ ! "${_FSTYPE}" == "vfat" && -z "${_UEFISYSDEV_DONE}" && -n "${_ROOT_DONE}" ]]; then
                             _FSTYPE="vfat"
+                            _LABEL_NAME="ESP"
                             _DOMKFS=1
                         fi
                         # don't format ESP, if already vfat format
                         if [[ "${_FSTYPE}" == "vfat" && -z "${_UEFISYSDEV_DONE}" && -n "${_ROOT_DONE}" ]]; then
                             _SKIP_FILESYSTEM="1"
                         fi
+                        # create vfat on XBOOTLDR, if not already vfat format
+                        if [[ ! "${_FSTYPE}" == "vfat" && -n "${_UEFISYSDEV_DONE}" && -n "${_XBOOTLDR}" ]]; then
+                            _FSTYPE="vfat"
+                            _LABEL_NAME="XBOOTLDR"
+                            _DOMKFS=1
+                        fi
+                        # don't format XBOOTLDR, if already vfat format
+                        if [[ "${_FSTYPE}" == "vfat" && -n "${_UEFISYSDEV_DONE}" && -n "${_XBOOTLDR}" ]]; then
+                            _SKIP_FILESYSTEM="1"
+                        fi
                         # allow reformat. if already vfat format
-                        if [[ -n "${_UEFISYSDEV_DONE}" && -n "${_ROOT_DONE}" ]]; then
+                        if [[ -n "${_UEFISYSDEV_DONE}" && -n "${_ROOT_DONE}" && -z "${_XBOOTLDR}" ]]; then
                             [[ "${_FSTYPE}" == "vfat" ]] && _FSTYPE=""
                         fi
                     else
@@ -330,7 +349,7 @@ _mountpoints() {
                     # remove root btrfs on ESP selection menu, readd it on top aftwerwards
                     if [[ ! "${_FSTYPE}" == "btrfs" ]]; then
                         _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
-                        if [[ -n "${_UEFISYSDEV_DONE}" && -n ${_ROOT_BTRFS} ]]; then
+                        if [[ -n "${_UEFISYSDEV_DONE}" && -z "${_XBOOTLDR}" && -n ${_ROOT_BTRFS} ]]; then
                             _DEVS="${_ROOT_BTRFS} ${_DEVS}"
                             _ROOT_BTRFS=""
                         fi
@@ -526,7 +545,7 @@ _mkfs() {
     # https://www.freedesktop.org/software/systemd/man/systemd-gpt-auto-generator.html
     # systemd supports detection on GPT disks:
     # 07/08/2023:
-    # UKI, rEFInd and systemd don't support XBOOT automount!
+    # UKI, rEFInd and systemd don't support XBOOTLDR automount!
     # GRUB does not support /boot and /efi automount!
     ### TODO: recheck if it works later, at the moment safety first and no experiments with /boot and /efi!
     # disabled for now this check: "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${5}" == "/efi"

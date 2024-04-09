@@ -14,15 +14,15 @@ _auto_partition() {
         _progress "20" "Creating BIOS_GRUB partition..."
         echo "size=+${_GPT_BIOS_GRUB_DEV_SIZE}M, type=21686148-6449-6E6F-744E-656564454649, name=BIOS_GRUB" | sfdisk -a "${_DISK}" &>"${_LOG}"
         if [[ -n "${_UEFI_BOOT}" ]]; then
-            _progress "25" "Creating EFI SYSTEM partition..."
-            echo "size=+${_UEFISYSDEV_SIZE}M, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B, name=EFI_SYSTEM" | sfdisk -a "${_DISK}" &>"${_LOG}"
+            _progress "25" "Creating EFI System partition..."
+            echo "size=+${_UEFISYSDEV_SIZE}M, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B, name=ESP" | sfdisk -a "${_DISK}" &>"${_LOG}"
         fi
         if [[ -z "${_UEFISYS_BOOTDEV}" ]]; then
-            _progress "40" "Creating XBOOTLDR partition..."
-            echo "size=+${_BOOTDEV_SIZE}M, type=BC13C2FF-59E6-4262-A352-B275FD6F7172, name=ARCH_LINUX_XBOOT" | sfdisk -a "${_DISK}" &>"${_LOG}"
+            _progress "40" "Creating Extended Boot Loader partition..."
+            echo "size=+${_BOOTDEV_SIZE}M, type=BC13C2FF-59E6-4262-A352-B275FD6F7172, name=XBOOTLDR" | sfdisk -a "${_DISK}" &>"${_LOG}"
         fi
         if [[ -z "${_SKIP_SWAP}" ]]; then
-            _progress "55" "Creating SWAP partition..."
+            _progress "65" "Creating SWAP partition..."
             echo "size=+${_SWAPDEV_SIZE}M, type=0657FD6D-A4AB-43C4-84E5-0933C84B4F4F, name=ARCH_LINUX_SWAP" | sfdisk -a "${_DISK}" &>"${_LOG}"
         fi
         _progress "70" "Creating ROOT partition..."
@@ -173,7 +173,7 @@ _autoprepare() {
             fi
             if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
                 while [[ -z "${_UEFISYSDEV_SET}" ]]; do
-                    _dialog --title " /boot In MiB" --no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | Minimum value is 260" 8 55 "512" 2>"${_ANSWER}" || return 1
+                    _dialog --title " EFI SYSTEM PARTITION (ESP) in MiB " --no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | Minimum value is 260" 8 65 "512" 2>"${_ANSWER}" || return 1
                     _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
                     if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
                         _dialog --title " ERROR " --no-mouse --infobox "You have entered a invalid size, please enter again." 3 60
@@ -192,7 +192,7 @@ _autoprepare() {
                 done
             else
                 while [[ -z "${_UEFISYSDEV_SET}" ]]; do
-                    _dialog --title " EFI SYSTEM PARTITION (ESP) In MiB " --no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | Minimum value is 260" 8 55 "1024" 2>"${_ANSWER}" || return 1
+                    _dialog --title " EFI SYSTEM PARTITION (ESP) in MiB " --no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | Minimum value is 260" 8 65 "1024" 2>"${_ANSWER}" || return 1
                     _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
                     if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
                         _dialog --title " ERROR " --no-mouse --infobox "You have entered a invalid size, please enter again." 3 60
@@ -211,7 +211,7 @@ _autoprepare() {
             fi
             _DISK_SIZE="$((_DISK_SIZE-_UEFISYSDEV_SIZE))"
             while [[ -z "${_BOOTDEV_SET}" ]]; do
-                _dialog --title " /boot In MiB " --no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | Minimum value is 100" 8 55 "512" 2>"${_ANSWER}" || return 1
+                _dialog --title " Extended Boot Loader Partition (XBOOTLDR) in MiB " --no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | Minimum value is 100" 8 65 "512" 2>"${_ANSWER}" || return 1
                 _BOOTDEV_SIZE="$(cat "${_ANSWER}")"
                 if [[ -z "${_BOOTDEV_SIZE}" ]]; then
                     _dialog --title " ERROR " --no-mouse --infobox "You have entered a invalid size, please enter again." 3 60
@@ -229,7 +229,7 @@ _autoprepare() {
             done
         else
             while [[ -z "${_BOOTDEV_SET}" ]]; do
-                _dialog --title " /boot In MiB "--no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | Minimum value is 100" 8 55 "512" 2>"${_ANSWER}" || return 1
+                _dialog --title " /boot in MiB " --no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | Minimum value is 100" 8 65 "512" 2>"${_ANSWER}" || return 1
                 _BOOTDEV_SIZE="$(cat "${_ANSWER}")"
                 if [[ -z "${_BOOTDEV_SIZE}" ]]; then
                     _dialog --title " ERROR " --no-mouse --infobox "You have entered a invalid size, please enter again." 3 60
@@ -250,7 +250,7 @@ _autoprepare() {
         _SWAP_SIZE="256"
         [[ "${_DISK_SIZE}" -lt "256" ]] && _SWAP_SIZE="${_DISK_SIZE}"
         while [[ -z "${_SWAPDEV_SET}" ]]; do
-            _dialog --title " Swap In MiB " --no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | Value 0 skips Swap" 8 55 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
+            _dialog --title " Swap in MiB " --no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | Value 0 skips Swap" 8 65 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
             _SWAPDEV_SIZE=$(cat "${_ANSWER}")
             if [[ -z "${_SWAPDEV_SIZE}" ]]; then
                 _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
@@ -273,7 +273,7 @@ _autoprepare() {
             #shellcheck disable=SC2086
             _dialog --title " Filesystem / and /home " --no-cancel --menu "" 10 45 8 ${_FSOPTS} 2>"${_ANSWER}" || return 1
             _FSTYPE=$(cat "${_ANSWER}")
-            _dialog --title " Confirmation " --yesno " Filesystem ${_FSTYPE} will be used for / and /home?" 5 55 && _CHOSENFS=1
+            _dialog --title " Confirmation " --yesno " Filesystem ${_FSTYPE} will be used for / and /home?" 5 65 && _CHOSENFS=1
         done
         _DISK_SIZE="$((_DISK_SIZE-_SWAPDEV_SIZE))"
         _ROOT_SIZE="7500"
@@ -287,7 +287,7 @@ _autoprepare() {
         _dialog --title " / in MiB " --inputbox "Disk space left: $((_DISK_SIZE-350))M | Minimum value is 2000\nValue 0 skips /home and uses the left ${_DISK_SIZE}M for /" 9 60 "${_ROOT_SIZE}" 2>"${_ANSWER}" || return 1
         _ROOTDEV_SIZE=$(cat "${_ANSWER}")
         if [[ "${_ROOTDEV_SIZE}" == 0 ]]; then
-            if _dialog --title " Confirmation " --yesno "${_DISK_SIZE}M will be used for your / completely?" 5 55; then
+            if _dialog --title " Confirmation " --yesno "${_DISK_SIZE}M will be used for your / completely?" 5 65; then
                 _ROOTDEV_SET=1
                 _SKIP_HOME=1
             fi
@@ -300,7 +300,7 @@ _autoprepare() {
                     _dialog --title " ERROR " --no-mouse --infobox "You have entered a too large size, please enter again." 3 60
                     sleep 5
                 else
-                    if _dialog --title " Confirmation " --yesno "$((_DISK_SIZE-_ROOTDEV_SIZE))M will be used for your /home completely?" 5 55; then
+                    if _dialog --title " Confirmation " --yesno "$((_DISK_SIZE-_ROOTDEV_SIZE))M will be used for your /home completely?" 5 65; then
                         _ROOTDEV_SET=1
                         _HOMEDEV_NUM="$((_DEV_NUM+1))"
                         _DEV_NUM="${_HOMEDEV_NUM}"
@@ -324,9 +324,9 @@ _autoprepare() {
     ## <partnum>|<fstype>|<mountpoint>|<labelname>
     ## The partitions in FSSPECS list should be listed in the "mountpoint" order.
     ## Make sure the "root" partition is defined first in the FSSPECS list
-    [[ -z "${_SKIP_SWAP}" ]] && _FSSPEC_SWAPDEV="${_SWAPDEV_NUM}|swap|swap|ARCH_SWAP"
+    [[ -z "${_SKIP_SWAP}" ]] && _FSSPEC_SWAPDEV="${_SWAPDEV_NUM}|swap|swap|SWAP"
     _FSSPEC_ROOTDEV="${_ROOTDEV_NUM}|${_FSTYPE}|/|ARCH_ROOT"
-    _FSSPEC_BOOTDEV="${_BOOTDEV_NUM}|vfat|/boot|ARCH_BOOT"
+    _FSSPEC_BOOTDEV="${_BOOTDEV_NUM}|vfat|/boot|XBOOTLDR"
     [[ -z "${_SKIP_HOME}" ]] &&_FSSPEC_HOMEDEV="${_HOMEDEV_NUM}|${_FSTYPE}|/home|ARCH_HOME"
     _FSSPEC_UEFISYSDEV="${_UEFISYSDEV_NUM}|vfat|${_UEFISYS_MP}|ESP"
     if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then

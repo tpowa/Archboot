@@ -1,8 +1,10 @@
 On the road to 2024.04:
 Highlights:
-- hwdetect 2024.04.08
+- hwdetect 2024.04.09
 setup:
 - cleanup hwdetect code
+- create XBOOTLDR partition with vfat by default
+- allow systemd-auto-gpt setup without syncinc files to ESP
 ---
 2024.03 Highlights:
 - kernel 6.8.x
