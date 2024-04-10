@@ -189,9 +189,8 @@ _efistub_parameters() {
 
 _efistub_uefi() {
     _uefi_common || return 1
-    _common_bootloader_checks
-    _check_bootpart
     _efistub_parameters
+    _common_bootloader_checks
     if [[ "${_RUNNING_ARCH}" == "x86_64" && -z "${_EFI_MIXED}" ]]; then
         _dialog --title " EFISTUB " --menu "" 10 60 3 \
             "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
