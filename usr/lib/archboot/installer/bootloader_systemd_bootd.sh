@@ -6,9 +6,9 @@ _systemd_boot_uefi() {
     # create directory structure, if it doesn't exist
     [[ -d "${_DESTDIR}/${_UEFISYS_MP}/loader/entries" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/loader/entries"
     echo "title    Arch Linux" > "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-    echo "linux    /${_KERNEL}" >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
+    echo "linux    /${_VMLINUZ}" >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
     cat << BOOTDEOF >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-initrd   /${_INITRD}
+initrd   /${_INITRAMFS}
 options  ${_KERNEL_PARAMS_MOD}
 BOOTDEOF
     cat << BOOTDEOF > "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"

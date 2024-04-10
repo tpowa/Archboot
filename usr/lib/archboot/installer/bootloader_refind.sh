@@ -21,8 +21,8 @@ resolution 1024 768
 scanfor manual,internal,external,optical,firmware
 menuentry "Arch Linux" {
     icon     /EFI/refind/icons/os_arch.png
-    loader   /${_KERNEL}
-    initrd   /${_INITRD}
+    loader   /${_VMLINUZ}
+    initrd   /${_INITRAMFS}
     options  "${_KERNEL_PARAMS_MOD}"
 }
 CONFEOF
@@ -38,7 +38,6 @@ CONFEOF
         _geteditor || return 1
         "${_EDITOR}" "${_REFIND_CONFIG}"
         cp -f "${_REFIND_CONFIG}" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
-        _efistub_copy_to_efisys | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Copying kernel, ucode and initramfs to EFI SYSTEM PARTITION now..." 6 75 0
         _pacman_hook_refind
         _dialog --title " Success " --no-mouse --infobox "rEFInd has been setup successfully." 3 50
         sleep 3

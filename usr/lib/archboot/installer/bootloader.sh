@@ -175,16 +175,7 @@ _uefi_bootmgr_setup() {
 _efistub_parameters() {
     _FAIL_COMPLEX=""
     _RAID_ON_LVM=""
-    _UEFISYS_PATH="EFI/archlinux"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="${_VMLINUZ_EFISTUB}"
-    # all bootloaders can read vfat!
-    if ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "vfat"; then
-        _KERNEL="${_VMLINUZ}"
-        _INITRD="${_INITRAMFS}"
-    else
-        _KERNEL="${_UEFISYS_PATH}/${_VMLINUZ}"
-        _INITRD="${_UEFISYS_PATH}/${_INITRAMFS}"
-    fi
 }
 
 _efistub_uefi() {
