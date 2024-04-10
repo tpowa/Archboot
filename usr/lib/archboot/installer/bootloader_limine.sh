@@ -37,8 +37,8 @@ _limine_bios() {
     fi
     _dialog --no-mouse --infobox "Setting up LIMINE BIOS now..." 3 60
     _LIMINE_CONFIG="${_DESTDIR}/boot/limine.cfg"
-    _KERNEL="${_SUBDIR}/${_VMLINUZ}"
-    _INITRD="${_SUBDIR}/${_INITRAMFS}"
+    _VMLINUZ="${_SUBDIR}/${_VMLINUZ}"
+    _INITRAMFS="${_SUBDIR}/${_INITRAMFS}"
     _limine_config
     _geteditor
     _PARENT_BOOTDEV="$(${_LSBLK} PKNAME "${_BOOTDEV}")"
