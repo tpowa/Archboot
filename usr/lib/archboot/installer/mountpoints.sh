@@ -258,25 +258,27 @@ _mountpoints() {
                                 _DOMKFS=1
                             fi
                         fi
-                        # create vfat on ESP, if not already vfat format
-                        if [[ ! "${_FSTYPE}" == "vfat" && -z "${_UEFISYSDEV_DONE}" && -n "${_ROOT_DONE}" ]]; then
-                            _FSTYPE="vfat"
-                            _LABEL_NAME="ESP"
-                            _DOMKFS=1
+                        if [[ -z "${_UEFISYSDEV_DONE}" && -n "${_ROOT_DONE}" ]]; then
+                            # create vfat on ESP, if not already vfat format
+                            if [[ ! "${_FSTYPE}" == "vfat" ]]; then
+                                _FSTYPE="vfat"
+                                _LABEL_NAME="ESP"
+                                _DOMKFS=1
+                            else
+                                # don't format ESP, if already vfat format
+                                _SKIP_FILESYSTEM="1"
+                            fi
                         fi
-                        # don't format ESP, if already vfat format
-                        if [[ "${_FSTYPE}" == "vfat" && -z "${_UEFISYSDEV_DONE}" && -n "${_ROOT_DONE}" ]]; then
-                            _SKIP_FILESYSTEM="1"
-                        fi
-                        # create vfat on XBOOTLDR, if not already vfat format
-                        if [[ ! "${_FSTYPE}" == "vfat" && -n "${_UEFISYSDEV_DONE}" && -n "${_XBOOTLDR}" ]]; then
-                            _FSTYPE="vfat"
-                            _LABEL_NAME="XBOOTLDR"
-                            _DOMKFS=1
-                        fi
-                        # don't format XBOOTLDR, if already vfat format
-                        if [[ "${_FSTYPE}" == "vfat" && -n "${_UEFISYSDEV_DONE}" && -n "${_XBOOTLDR}" ]]; then
-                            _SKIP_FILESYSTEM="1"
+                        if [[ -n "${_UEFISYSDEV_DONE}" && -n "${_XBOOTLDR}" ]]; then
+                            # create vfat on XBOOTLDR, if not already vfat format
+                            if [[ ! "${_FSTYPE}" == "vfat" ]]; then
+                                _FSTYPE="vfat"
+                                _LABEL_NAME="XBOOTLDR"
+                                _DOMKFS=1
+                            else
+                                # don't format XBOOTLDR, if already vfat format
+                                _SKIP_FILESYSTEM="1"
+                            fi
                         fi
                         # allow reformat. if already vfat format
                         if [[ -n "${_UEFISYSDEV_DONE}" && -n "${_ROOT_DONE}" && -z "${_XBOOTLDR}" ]]; then
@@ -310,6 +312,14 @@ _mountpoints() {
                         elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
                             if ! [[ "${_FSTYPE}" == "vfat" ]]; then
                                 _dialog --title " ERROR " --no-mouse --infobox "EFI SYSTEM PARTITION has not a vfat filesystem." 3 60
+                                sleep 5
+                                _MP_DONE=""
+                            else
+                                _MP_DONE=1
+                            fi
+                         elif [[ -n "${_XBOOTLDR}" ]]; then
+                            if ! [[ "${_FSTYPE}" == "vfat" ]]; then
+                                _dialog --title " ERROR " --no-mouse --infobox "EXTENDED BOOT LOADER PARTITION has not a vfat filesystem." 3 70
                                 sleep 5
                                 _MP_DONE=""
                             else
