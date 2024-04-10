@@ -7,7 +7,7 @@ _systemd_boot_uefi() {
     [[ -d "${_DESTDIR}/boot/loader/entries" ]] || mkdir -p "${_DESTDIR}/boot/loader/entries"
     _MAIN_CFG="boot/loader/entries/archlinux-core-main.conf"
     _LOADER_CFG="boot/loader/loader.conf"
-    cat << BOOTDEOF >> "${_DESTDIR}/${_MAIN_CFG}"
+    cat << BOOTDEOF > "${_DESTDIR}/${_MAIN_CFG}"
 title    Arch Linux
 linux    /${_VMLINUZ}
 initrd   /${_INITRAMFS}
