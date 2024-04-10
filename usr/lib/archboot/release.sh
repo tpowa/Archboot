@@ -223,12 +223,7 @@ _create_iso() {
         fi
     done
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
-        for i in iso/*; do
-            if [[ -f "${i}" ]]; then
-                cksum -a blake2b "${i}" >> b2sum.txt
-            fi
-        done
-        for i in uki/*; do
+        for i in iso/* uki/*; do
             if [[ -f "${i}" ]]; then
                 cksum -a blake2b "${i}" >> b2sum.txt
             fi
