@@ -4,7 +4,8 @@ Highlights:
 setup:
 - cleanup hwdetect code
 - create XBOOTLDR partition with vfat by default
-- allow systemd-auto-gpt setup without syncing files to ESP
+- removed /efi to /boot synchronisation
+- only allow vfat on /efi (ESP) and /boot (XBOOTLDR) as Lennart proposes
 ---
 2024.03 Highlights:
 - kernel 6.8.x
