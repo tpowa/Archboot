@@ -37,8 +37,8 @@ BOOTDEOF
         sleep 2
         _dialog --msgbox "You will now be put into the editor to edit:\nloader.conf and menu entry files\n\nAfter you save your changes, exit the editor." 8 50
         _geteditor || return 1
-        "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-        "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"
+        "${_EDITOR}" "${_DESTDIR}/boot/loader/entries/archlinux-core-main.conf"
+        "${_EDITOR}" "${_DESTDIR}/boot/loader/loader.conf"
         _pacman_hook_systemd_bootd
         _dialog --title " Success " --no-mouse --infobox "SYSTEMD-BOOT has been setup successfully." 3 50
         sleep 3
