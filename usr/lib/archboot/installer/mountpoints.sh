@@ -548,8 +548,8 @@ _mkfs() {
     # /boot or /efi as ESP: c12a7328-f81f-11d2-ba4b-00a0c93ec93b
     # /boot as Extended Boot Loader Partition: bc13c2ff-59e6-4262-a352-b275fd6f7172
     # only as vfat supported by auto-generator!
-    ### limine and refind do not support this! STATUS on 10.04.2024
-    ### grub and systemd-boot work!
+    ### TODO: limine and refind do not support this! STATUS on 10.04.2024
+    # grub and systemd-boot work!
     # "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${5}" == "/efi"
     # "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${5}" == "/boot"
     # "${_GUID_VALUE}" == "bc13c2ff-59e6-4262-a352-b275fd6f7172" && "${5}" == "/boot" && "${2}" == "vfat"
