@@ -32,7 +32,7 @@ _clear_fs_values() {
 
 # add ssd mount options
 _ssd_optimization() {
-    # bcachefs, btrfs, ext4, and xfs have ssd mount option support
+    # bcachefs, btrfs, ext4 and xfs have ssd mount option support
     _SSD_MOUNT_OPTIONS=""
     if echo "${_FSTYPE}" | grep -Eq 'bcachefs|btrfs|ext4|xfs'; then
         # check all underlying devices on ssd
@@ -51,7 +51,6 @@ _select_filesystem() {
     command -v mkfs.btrfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} btrfs Btrfs"
     command -v mkfs.ext4 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext4 Ext4"
     command -v mkfs.xfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} xfs XFS"
-    command -v mkfs.ext2 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext2 Ext2"
     command -v mkfs.vfat &>"${_NO_LOG}" && [[ ! ${_MP} == "/" ]] && _FSOPTS="${_FSOPTS} vfat FAT32"
     command -v mkfs.bcachefs &>"${_NO_LOG}" && modinfo bcachefs >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} bcachefs Bcachefs"
     #shellcheck disable=SC2086
@@ -436,7 +435,7 @@ _mkfs() {
     else
         # make sure the fstype is one we can handle
         local _KNOWNFS=0
-        for fs in xfs ext2 ext4 bcachefs btrfs vfat; do
+        for fs in xfs ext4 bcachefs btrfs vfat; do
             [[ "${2}" == "${fs}" ]] && _KNOWNFS=1 && break
         done
         if [[ ${_KNOWNFS} -eq 0 ]]; then
@@ -452,7 +451,6 @@ _mkfs() {
                 # don't handle anything else here, we will error later
                 bcachefs) mkfs.bcachefs -f ${7} -L "${6}" ${8} ${1} &>"${_LOG}"; ret=$? ;;
                 btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} &>"${_LOG}"; ret=$? ;;
-                ext2)     mkfs.ext2 -F -L ${7} "${6}" ${1} &>"${_LOG}"; ret=$? ;;
                 ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}"; ret=$? ;;
                 vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}"; ret=$? ;;
                 xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"; ret=$? ;;
