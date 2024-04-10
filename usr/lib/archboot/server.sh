@@ -70,7 +70,7 @@ rm latest
 ln -s "${_DIR}" latest
 EOF
     # create autoindex HEADER.html
-    sudo -u "${_USER}" ssh "${_SERVER}" [[ -e lsws-autoindex.sh ]] && ./lsws-autoindex.sh
+    sudo -u "${_USER}" ssh "${_SERVER}" [[ -e ~/lsws-autoindex.sh ]] && ~/./lsws-autoindex.sh
 }
 
 _create_archive() {
