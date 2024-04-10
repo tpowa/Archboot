@@ -10,7 +10,7 @@ _limine_common() {
 }
 
 _limine_config() {
-    _PARTN="$(${LSBLK} PARTN "${_BOOTDEV}")"
+    _PARTN="$(${LSBLK} PARTN ${_BOOTDEV})"
     cat << CONFEOF > "${_LIMINE_CONFIG}"
     TIMEOUT=5
 
