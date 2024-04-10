@@ -10,15 +10,16 @@ _limine_common() {
 }
 
 _limine_config() {
+    _PARTN="$(${LSBLK} PARTN "${_BOOTDEV}")"
     cat << CONFEOF > "${_LIMINE_CONFIG}"
     TIMEOUT=5
 
 :Arch Linux
     PROTOCOL=linux
-    KERNEL_PATH=boot://$(${LSBLK} PARTN "${_BOOTDEV}")${_KERNEL}
+    KERNEL_PATH=boot://${_PARTN}/${_KERNEL}
     CMDLINE=${_KERNEL_PARAMS_MOD}
 CONFEOF
-    echo "MODULE_PATH=boot://$(${LSBLK} PARTN "${_BOOTDEV}")${_INITRD}" >> "${_LIMINE_CONFIG}"
+    echo "MODULE_PATH=boot://${_PARTN}/${_INITRD}" >> "${_LIMINE_CONFIG}"
     ## Edit limine.cfg config file
     _dialog --msgbox "You will now be put into the editor to edit:\nlimine.cfg\n\nAfter you save your changes, exit the editor." 8 50
     _geteditor || return 1
@@ -61,8 +62,6 @@ _limine_uefi() {
     [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
     cp -f "${_DESTDIR}/usr/share/limine/BOOT${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI"
     _LIMINE_CONFIG="${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine.cfg"
-    _KERNEL="/${_KERNEL}"
-    _INITRD="/${_INITRD}"
     _limine_config
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI" ]]; then
         _BOOTMGR_LABEL="LIMINE"
