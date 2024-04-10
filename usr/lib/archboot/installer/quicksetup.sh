@@ -23,7 +23,7 @@ _auto_partition() {
         fi
         if [[ -z "${_SKIP_SWAP}" ]]; then
             _progress "65" "Creating SWAP partition..."
-            echo "size=+${_SWAPDEV_SIZE}M, type=0657FD6D-A4AB-43C4-84E5-0933C84B4F4F, name=ARCH_LINUX_SWAP" | sfdisk -a "${_DISK}" &>"${_LOG}"
+            echo "size=+${_SWAPDEV_SIZE}M, type=0657FD6D-A4AB-43C4-84E5-0933C84B4F4F, name=SWAP" | sfdisk -a "${_DISK}" &>"${_LOG}"
         fi
         _progress "70" "Creating ROOT partition..."
         [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _GUID_TYPE=B921B045-1DF0-41C3-AF44-4C6F280D3FAE

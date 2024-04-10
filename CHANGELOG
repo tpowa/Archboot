@@ -4,7 +4,7 @@ Highlights:
 setup:
 - cleanup hwdetect code
 - create XBOOTLDR partition with vfat by default
-- allow systemd-auto-gpt setup without syncinc files to ESP
+- allow systemd-auto-gpt setup without syncing files to ESP
 ---
 2024.03 Highlights:
 - kernel 6.8.x
