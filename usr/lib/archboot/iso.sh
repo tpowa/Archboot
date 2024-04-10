@@ -274,7 +274,7 @@ _unify_gpt_partitions() {
     # --> 62: hide all partitions, Windows cannot access any files on this ISO
     #         Windows will now only error on 1 drive and not on all partitions
     # --> 63: disable freedesktop/systemd automount by default on this ISO
-    for i in $(seq 1 $(sfdisk -J "${_IMAGENAME}.iso" | grep -w node | wc -l)); do
+    for i in $(seq 1 "$(sfdisk -J "${_IMAGENAME}.iso" | grep -cw node)"); do
        sfdisk -q --part-attrs "${_IMAGENAME}.iso" "${i}" "RequiredPartition,60,62,63"
        sfdisk -q --part-uuid "${_IMAGENAME}.iso" "${i}" "${i}0000000-0000-0000-0000-000000000000"
     done

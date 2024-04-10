@@ -28,7 +28,7 @@ _usage () {
 
 _create_initrd_dir() {
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-cpio.sh \
-        -k "${_KERNEL}" -c "/etc/archboot/${1}" -d /tmp/initrd" || exit 1
+        -k ${_KERNEL} -c /etc/archboot/${1} -d /tmp/initrd" || exit 1
 }
 
 _compress_initrd() {
@@ -202,14 +202,14 @@ _create_iso() {
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
         echo "Creating iso/ directory..."
         mkdir iso
-        mv *.iso iso/
+        mv ./*.iso iso/
         echo "Creating uki/ directory..."
         mkdir uki
         mv boot/*.efi uki/
     else
         echo "Creating img/ directory..."
         mkdir img
-        mv *.img img/
+        mv ./*.img img/
     fi
     echo "Generating b2sum..."
     for i in *; do
