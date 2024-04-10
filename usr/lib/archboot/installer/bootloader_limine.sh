@@ -31,8 +31,8 @@ _limine_bios() {
     _limine_common
     _common_bootloader_checks
     _check_bootpart
-    if ! ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "ext"; then
-        _dialog --title " ERROR " --no-mouse --infobox "LIMINE BIOS can only boot from ext2/3/4 partition with /boot on it." 3 70
+    if ! ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "vfat"; then
+        _dialog --title " ERROR " --no-mouse --infobox "LIMINE BIOS can only boot from vfat partition with /boot on it." 3 70
         return 1
     fi
     _dialog --no-mouse --infobox "Setting up LIMINE BIOS now..." 3 60
