@@ -21,6 +21,7 @@ resolution 1024 768
 scanfor manual,internal,external,optical,firmware
 menuentry "Arch Linux" {
     icon     /EFI/refind/icons/os_arch.png
+    volume   $(${_LSBLK} UUID ${_BOOTDEV})
     loader   /${_VMLINUZ}
     initrd   /${_INITRAMFS}
     options  "${_KERNEL_PARAMS_MOD}"
