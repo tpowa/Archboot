@@ -12,6 +12,7 @@ _run ()
     _map _file /usr/lib/systemd/{lib*,system-generators/systemd-fstab-generator}
     # only take services from systemd package
     pacman -Sy &>"${_NO_LOG}"
+    #shellcheck disable=SC2046
     _map _file $(pacman -Ql systemd | grep '/usr/lib/systemd/system/.' | cut -d ' ' -f2)
     _map _file /usr/lib/sysusers.d/{arch,basic}.conf
     # disable systemd services:

@@ -81,6 +81,7 @@ _loaded_mods() {
     modinfo -k "${_KERNELVERSION}" --field firmware $(cut -d ' ' -f1 </proc/modules) | sed -e 's#^#/usr/lib/firmware/#g' -e 's#$#.zst#g'
     ### get filenames for extraction
     # modules from /sys
+    #shellcheck disable=SC2046
     _MODS="$(modinfo --field filename $(find /sys -name modalias) 2>/dev/null | grep -v builtin | sort -u)"
     # Checking kernel module dependencies:
     # first try, pull in the easy modules
@@ -98,6 +99,7 @@ _loaded_mods() {
                 | tr " " "\n" | sort -u)"
         _DEP_COUNT2="$(wc -w <<< "${_MOD_DEPS}")"
     done
+    #shellcheck disable=SC2086
     _MOD_DEPS="$(modinfo --field filename ${_MOD_DEPS} 2>/dev/null | grep -v builtin | sort -u)"
     # firmware
 }

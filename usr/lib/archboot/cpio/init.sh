@@ -82,6 +82,7 @@ _task() {
     fi
     if [[ "${1}" == system ]]; then
         rm -r /lib/modules
+        #shellcheck disable=SC2164
         cd /sysroot
         # fastest uncompression of zstd cpio format
         bsdcpio -i -d -u <"/mnt/efi/boot/initrd-${_ARCH}.img" &>/dev/null
