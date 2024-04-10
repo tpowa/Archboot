@@ -20,8 +20,7 @@ BOOTDEOF
     _chroot_mount
     # systemd-boot https://www.freedesktop.org/software/systemd/man/latest/systemd-gpt-auto-generator.html
     # /boot XBOOTLDR in vfat format can be booted by systemd-boot
-    if [[ "${_UEFISYS_MP}" == "efi" && \
-          $(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "vfat") ]]; then
+    if [[ "${_UEFISYS_MP}" == "efi" ]] && ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "vfat"; then
         chroot "${_DESTDIR} "bootctl --esp-path=/efi --boot-path=/boot install &>"${_LOG}"
         chroot "${_DESTDIR}" bootctl --esp-path=/efi --boot-path=/boot update &>"${_LOG}"
     else

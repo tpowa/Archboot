@@ -45,7 +45,7 @@ _uki_uefi() {
     _geteditor || return 1
     "${_EDITOR}" "${_CMDLINE}"
     "${_EDITOR}" "${_UKIFY_CONFIG}"
-    ${_NSPAWN} /usr/lib/systemd/ukify build --config=/etc/ukify.conf --output ${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi >>"${_LOG}"
+    ${_NSPAWN} /usr/lib/systemd/ukify build --config=/etc/ukify.conf --output "${_UEFISYS_MP}"/EFI/Linux/archlinux-linux.efi >>"${_LOG}"
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" ]]; then
         _uki_install | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Setting up Unified Kernel Image..." 6 75 0
     else
