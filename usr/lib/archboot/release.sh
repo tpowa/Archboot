@@ -139,13 +139,13 @@ _create_iso() {
         _SPLASH="/usr/share/archboot/uki/archboot-background.bmp"
         _OSREL="/usr/share/archboot/base/etc/os-release"
         # add AMD ucode license
-        mkdir -p boot/licenses/amd-ucode
-        cp /usr/share/licenses/amd-ucode/* boot/licenses/amd-ucode/
+        mkdir -p licenses/amd-ucode
+        cp /usr/share/licenses/amd-ucode/* licenses/amd-ucode/
         _CMDLINE="boot/cmdline.txt"
         if [[ "${_ARCH}" == "x86_64" ]]; then
             # add INTEL ucode license
-            mkdir -p boot/licenses/intel-ucode
-            cp /usr/share/licenses/intel-ucode/* boot/licenses/intel-ucode/
+            mkdir -p licenses/intel-ucode
+            cp /usr/share/licenses/intel-ucode/* licenses/intel-ucode/
             _EFISTUB="/usr/lib/systemd/boot/efi/linuxx64.efi.stub"
             echo "console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto" > ${_CMDLINE}
         fi
@@ -176,7 +176,6 @@ _create_iso() {
         chmod 644 boot/*.efi
     fi
     touch boot/*
-    # create Release.txt with included main archlinux packages
     echo "Generating Release.txt..."
     ${_NSPAWN} "${_W_DIR}" pacman -Sy "${_W_DIR}" &>"${_NO_LOG}"
     (echo "ARCHBOOT - ARCH LINUX INSTALLATION / RESCUE SYSTEM"
@@ -198,10 +197,20 @@ _create_iso() {
     echo "---Complete Package List---"
     ${_NSPAWN} "${_W_DIR}" pacman -Q | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g" \
          -e "s/\x1b\[.*[0-9][h;l]//g") >>Release.txt
-    # removing container
     echo "Removing container ${_W_DIR}..."
     rm -r "${_W_DIR}"
-    # create b2sums
+    if ! [[ "${_ARCH}" == "riscv64" ]]; then
+        echo "Creating iso/ directory..."
+        mkdir iso
+        mv *.iso iso/
+        echo "Creating uki/ directory..."
+        mkdir uki
+        mv boot/*.efi uki/
+    else
+        echo "Creating img/ directory..."
+        mkdir img
+        mv *.img img/
+    fi
     echo "Generating b2sum..."
     for i in *; do
         if [[ -f "${i}" ]]; then
@@ -213,5 +222,23 @@ _create_iso() {
             cksum -a blake2b "${i}" >> b2sum.txt
         fi
     done
+    if ! [[ "${_ARCH}" == "riscv64" ]]; then
+        for i in iso/*; do
+            if [[ -f "${i}" ]]; then
+                cksum -a blake2b "${i}" >> b2sum.txt
+            fi
+        done
+        for i in uki/*; do
+            if [[ -f "${i}" ]]; then
+                cksum -a blake2b "${i}" >> b2sum.txt
+            fi
+        done
+    else
+        for i in img/*; do
+            if [[ -f "${i}" ]]; then
+                cksum -a blake2b "${i}" >> b2sum.txt
+            fi
+        done
+    fi
 }
 # vim: set ft=sh ts=4 sw=4 et:
