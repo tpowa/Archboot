@@ -165,6 +165,8 @@ menuentry "Arch Linux" {
     set gfxpayload="keep"
     ${_GRUB_ROOT_DRIVE}
     ${_LINUX_MOD_COMMAND}
+    initrd ${_SUBDIR}/${_INITRAMFS}
+
 }
 EOF
     _NUMBER=$((_NUMBER+1))
