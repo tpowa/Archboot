@@ -12,6 +12,9 @@ BIOS_GRUB PARTITION            -->            exact 2M\n
 ---------------------------------------------------------------\n
 EFI SYSTEM PARTITION (ESP)     -->            Minimum >= 260M\n
 ---------------------------------------------------------------\n
+EXTENDED BOOT LOADER\n
+PARTITION  (XBOOTLDR)          -->            Minimum >= 260M\n
+---------------------------------------------------------------\n
 ROOT PARTITION                 -->            Minimum >= 2000M\n
 ---------------------------------------------------------------\n
 DATA PARTITION(S) (eg. /home)  -->            As you will need.\n

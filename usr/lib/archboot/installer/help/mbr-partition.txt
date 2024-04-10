@@ -8,6 +8,8 @@ You should consider the following BIOS/MBR partition scheme:\n
         8G - 64G               -->            4G to 0.5X RAM\n
         > 64G                  -->            Minimum 4G\n
 ---------------------------------------------------------------\n
+BOOT PARTITION                 -->            Minimum >= 260M\n
+---------------------------------------------------------------\n
 ROOT PARTITION                 -->            Minimum >= 2000M\n
 ---------------------------------------------------------------\n
 DATA PARTITION(S) (eg. /home)  -->            As you will need.\n
