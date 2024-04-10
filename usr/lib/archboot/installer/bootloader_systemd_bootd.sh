@@ -5,13 +5,15 @@ _systemd_boot_uefi() {
     _dialog --no-mouse --infobox "Setting up SYSTEMD-BOOT now..." 3 40
     # create directory structure, if it doesn't exist
     [[ -d "${_DESTDIR}/boot/loader/entries" ]] || mkdir -p "${_DESTDIR}/boot/loader/entries"
-    cat << BOOTDEOF >> "${_DESTDIR}/boot/loader/entries/archlinux-core-main.conf"
+    _MAIN_CFG="boot/loader/entries/archlinux-core-main.conf"
+    _LOADER_CFG="boot/loader/loader.conf"
+    cat << BOOTDEOF >> "${_DESTDIR}/${_MAIN_CFG}"
 title    Arch Linux
 linux    /${_VMLINUZ}
 initrd   /${_INITRAMFS}
 options  ${_KERNEL_PARAMS_MOD}
 BOOTDEOF
-    cat << BOOTDEOF > "${_DESTDIR}/boot/loader/loader.conf"
+    cat << BOOTDEOF > "${_DESTDIR}/${_LOADER_CFG}"
 timeout 5
 default archlinux-core-main
 BOOTDEOF
@@ -37,8 +39,8 @@ BOOTDEOF
         sleep 2
         _dialog --msgbox "You will now be put into the editor to edit:\nloader.conf and menu entry files\n\nAfter you save your changes, exit the editor." 8 50
         _geteditor || return 1
-        "${_EDITOR}" "${_DESTDIR}/boot/loader/entries/archlinux-core-main.conf"
-        "${_EDITOR}" "${_DESTDIR}/boot/loader/loader.conf"
+        "${_EDITOR}" "${_DESTDIR}/${_MAIN_CFG}"
+        "${_EDITOR}" "${_DESTDIR}/${_LOADER_CFG}"
         _pacman_hook_systemd_bootd
         _dialog --title " Success " --no-mouse --infobox "SYSTEMD-BOOT has been setup successfully." 3 50
         sleep 3
