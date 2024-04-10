@@ -1,11 +1,14 @@
 On the road to 2024.04:
 Highlights:
 - hwdetect 2024.04.09
+- bootloader cleanup 
 setup:
 - cleanup hwdetect code
-- create XBOOTLDR partition with vfat by default
+- create XBOOTLDR partition only with vfat
 - removed /efi to /boot synchronisation
-- only allow vfat on /efi (ESP) and /boot (XBOOTLDR) as Lennart proposes
+- as Lennart Poettering proposes:
+  -> only allow vfat on /efi (ESP) and /boot (XBOOTLDR)
+- removed ext2 support
 ---
 2024.03 Highlights:
 - kernel 6.8.x
