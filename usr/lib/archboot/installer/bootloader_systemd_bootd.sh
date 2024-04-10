@@ -4,14 +4,14 @@
 _systemd_boot_uefi() {
     _dialog --no-mouse --infobox "Setting up SYSTEMD-BOOT now..." 3 40
     # create directory structure, if it doesn't exist
-    [[ -d "${_DESTDIR}/${_UEFISYS_MP}/loader/entries" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/loader/entries"
-    echo "title    Arch Linux" > "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-    echo "linux    /${_VMLINUZ}" >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-    cat << BOOTDEOF >> "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
+    [[ -d "${_DESTDIR}/boot/loader/entries" ]] || mkdir -p "${_DESTDIR}/boot/loader/entries"
+    cat << BOOTDEOF >> "${_DESTDIR}/boot/loader/entries/archlinux-core-main.conf"
+title    Arch Linux
+linux    /${_VMLINUZ}
 initrd   /${_INITRAMFS}
 options  ${_KERNEL_PARAMS_MOD}
 BOOTDEOF
-    cat << BOOTDEOF > "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"
+    cat << BOOTDEOF > "${_DESTDIR}/boot/loader/loader.conf"
 timeout 5
 default archlinux-core-main
 BOOTDEOF
