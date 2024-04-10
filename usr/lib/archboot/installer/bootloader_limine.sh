@@ -15,10 +15,10 @@ _limine_config() {
 
 :Arch Linux
     PROTOCOL=linux
-    KERNEL_PATH=boot://${_KERNEL}
+    KERNEL_PATH=boot://$(${LSBLK} PARTN "${_BOOTDEV}")${_KERNEL}
     CMDLINE=${_KERNEL_PARAMS_MOD}
 CONFEOF
-    echo "MODULE_PATH=boot://${_INITRD}" >> "${_LIMINE_CONFIG}"
+    echo "MODULE_PATH=boot://$(${LSBLK} PARTN "${_BOOTDEV}")${_INITRD}" >> "${_LIMINE_CONFIG}"
     ## Edit limine.cfg config file
     _dialog --msgbox "You will now be put into the editor to edit:\nlimine.cfg\n\nAfter you save your changes, exit the editor." 8 50
     _geteditor || return 1

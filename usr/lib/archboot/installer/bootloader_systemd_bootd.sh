@@ -18,7 +18,7 @@ BOOTDEOF
     _chroot_mount
     # systemd-boot https://www.freedesktop.org/software/systemd/man/latest/systemd-gpt-auto-generator.html
     # /boot XBOOTLDR in vfat format can be booted by systemd-boot
-    if [[ "${_UEFISYS_MP}" == "efi" && "${_SUBDIR}" == "/boot" && \
+    if [[ "${_UEFISYS_MP}" == "efi" && \
           $(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "vfat") ]]; then
         chroot "${_DESTDIR} "bootctl --esp-path=/efi --boot-path=/boot install &>"${_LOG}"
         chroot "${_DESTDIR}" bootctl --esp-path=/efi --boot-path=/boot update &>"${_LOG}"
@@ -39,8 +39,7 @@ BOOTDEOF
         _geteditor || return 1
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
         "${_EDITOR}" "${_DESTDIR}/${_UEFISYS_MP}/loader/loader.conf"
-        if [[ "${_UEFISYS_MP}" == "efi" && "${_SUBDIR}" == "/boot" && \
-              $(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "vfat") ]]; then
+        if ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "vfat"; then
             _dialog --title " Skipping " --no-mouse --infobox "Skipped kernel, ucode and initramfs copying to EFI SYSTEM PARTITION." 3 75
             sleep 3
         else

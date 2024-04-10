@@ -178,7 +178,7 @@ _efistub_parameters() {
     _UEFISYS_PATH="EFI/archlinux"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _VMLINUZ="${_VMLINUZ_EFISTUB}"
     # all bootloaders can read vfat!
-    if [[ $(${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "vfat") ]]; then
+    if ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "vfat"; then
         _KERNEL="${_VMLINUZ}"
         _INITRD="${_INITRAMFS}"
     else
