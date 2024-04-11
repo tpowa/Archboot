@@ -113,7 +113,9 @@ _server_release() {
     # removing b2sum
     rm b2sum.txt
     _sign_b2sum "*"
-    _sign_b2sum "boot/*"
+    for i in boot iso img uki; do
+        [[ -d ${i} ]] && _sign_b2sum "${i}/*"
+    done
     chown -R "${_USER}:${_GROUP}" ./*
     cd ..
     _create_archive
