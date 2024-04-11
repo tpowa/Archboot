@@ -1,7 +1,8 @@
 On the road to 2024.04:
 Highlights:
 - hwdetect 2024.04.09
-- bootloader cleanup 
+- bootloader cleanup
+- shim 15.8
 setup:
 - cleanup hwdetect code
 - create XBOOTLDR partition only with vfat
