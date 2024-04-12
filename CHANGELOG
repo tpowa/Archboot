@@ -5,6 +5,8 @@ Highlights:
 - shim 15.8
 Environment:
 - removed mkfs.ext2 and fsck.ext2
+- added basic tree-sitter neovim plugins
+- added argon2 to environment
 setup:
 - cleanup hwdetect code
 - create XBOOTLDR partition only with vfat
