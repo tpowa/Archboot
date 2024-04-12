@@ -225,11 +225,11 @@ _install_mods() {
 }
 
 _install_libs() {
-    # add libraries for binaries in bin/ and /lib/systemd
+    # add libraries for binaries in bin/, /lib/systemd and /lib/security
     echo "Adding libraries..."
     while read -r i; do
         [[ -e "${i}" ]] && _file "${i}"
-    done < <(objdump -p "${_ROOTFS}"/bin/* "${_ROOTFS}"/lib/systemd/{systemd-*,libsystemd*} 2>"${_NO_LOG}" |
+    done < <(objdump -p "${_ROOTFS}"/bin/* "${_ROOTFS}"/lib/systemd/{systemd-*,libsystemd*} "${_ROOTFS}"/lib/security 2>"${_NO_LOG}" |
                 grep 'NEEDED' | sort -u | sed -e 's#NEEDED##g' -e 's# .* #/lib/#g')
     _install_files
     _LIB_COUNT="0"
