@@ -17,6 +17,7 @@ _archboot_check
 # update pacman db first
 pacman -Sy
 if [[ "${1}" == "base" ]]; then
+    pacman -S base
     _PACKAGE="$(pacman -Qi base | grep Depends | cut -d ":" -f2)"
 else
     _PACKAGE="${1}"
