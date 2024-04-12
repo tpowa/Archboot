@@ -20,14 +20,15 @@ usr/share/{bash-completion,dbus-1,factory,hwdata,i18n/locales,makepkg,nano,pacma
         _map _file /etc/locale.gen /usr/share/locale/locale.alias
         # only support UTF-8
         _file /usr/share/i18n/charmaps/UTF-8.gz
-        tar -C / --exclude=var/lib/pacman/local/{base-*-[0-9]*,grub-*-[0-9]*,libxml2-*-[0-9]*,icu-*-[0-9]*,gettext-*-[0-9]*,\
-refind-*-[0-9]*,amd-ucode-*-[0-9]*,intel-ucode-*-[0-9]*,edk2-shell-*-[0-9]*,libisoburn-*-[0-9]*,libburn-*-[0-9]*,\
-libisofs-*-[0-9]*,memtest-*-[0-9]*,linux-api-headers-*-[0-9]*,jansson-*-[0-9]*,libwbclient-*-[0-9]*,\
-libbsd-*-[0-9]*,libmd-*-[0-9]*,libpcap-*-[0-9]*,libnftnl-*-[0-9]*,libnfnetlink-*-[0-9]*,libnetfilter_conntrack-*-[0-9]*,\
-libsasl-*-[0-9]*,libldap-*-[0-9]*,memtest86+-*-[0-9]*,memtest86+-efi-*-[0-9]*,mtools-*-[0-9]*,\
-libsysprof-capture-*-[0-9]*,libksba-*-[0-9]*,gdbm-*-[0-9]*,binutils-*-[0-9]*,cdrtools-*-[0-9]*,\
-systemd-ukify-*-[0-9]*,python-*-[0-9]*,python-pefile-*-[0-9]*,limine-*-[0-9]*,libev-*-[0-9]*,libpipeline-*-[0-9]*,\
-groff-*-[0-9]*,db-*-[0-9]*,db5.3-*-[0-9]*,gc-*-[0-9]*,rpcbind-*-[0-9]*} \
+        tar -C / --exclude=var/lib/pacman/local/{amd-ucode-*-[0-9]*,base-*-[0-9]*,binutils-*-[0-9]*,\
+cdrtools-*-[0-9]*,db5.3-*-[0-9]*,db-*-[0-9]*,edk2-shell-*-[0-9]*,fuse-common-*-[0-9]*,gc-*-[0-9]*,\
+gdbm-*-[0-9]*,gettext-*-[0-9]*,groff-*-[0-9]*,grub-*-[0-9]*,intel-ucode-*-[0-9]*,jansson-*-[0-9]*,\
+icu-*-[0-9]*,libbsd-*-[0-9]*,libburn-*-[0-9]*,libev-*-[0-9]*,libisoburn-*-[0-9]*,libisofs-*-[0-9]*,\
+libksba-*-[0-9]*,libmd-*-[0-9]*,libldap-*-[0-9]*,libnfnetlink-*-[0-9]*,libnetfilter_conntrack-*-[0-9]*,\
+libnftnl-*-[0-9]*,libpcap-*-[0-9]*,libpipeline-*-[0-9]*,libsasl-*-[0-9]*,libsysprof-capture-*-[0-9]*,\
+libwbclient-*-[0-9]*,libxml2-*-[0-9]*,limine-*-[0-9]*,linux-api-headers-*-[0-9]*,memtest86+-*-[0-9]*,\
+memtest86+-efi-*-[0-9]*,memtest-*-[0-9]*,mtools-*-[0-9]*,python-*-[0-9]*,python-pefile-*-[0-9]*,\
+refind-*-[0-9]*,rpcbind-*-[0-9]*,systemd-ukify-*-[0-9]*} \
 --exclude=usr/share/locale/*/{grub*,binutils*,gdbm*,bfd*,gettext*,gas*,gold*,gprof*,ld*,opcodes*} \
 --hard-dereference -cpf - \
 usr/share/{locale/{be,bg,cs,da,de,en_US,el,es,fi,fr,hu,it,lt,lv,mk,nl,nn,pl,pt,ro,ru,sk,sr,sv,uk},i18n/locales} \

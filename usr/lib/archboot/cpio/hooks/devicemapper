@@ -4,7 +4,7 @@
 
 _run ()
 {
-    _map _binary blkdeactivate cryptsetup dm{eventd,setup,stats} \
+    _map _binary argon2 blkdeactivate cryptsetup dm{eventd,setup,stats} \
                  {integrity,verity}setup
     _dir /dev/mapper
     _full_dir /usr/lib/device-mapper

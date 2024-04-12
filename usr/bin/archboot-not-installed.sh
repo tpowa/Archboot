@@ -20,5 +20,5 @@ for i in $(cat packages.txt); do
     fi
 done
 # remove false positives
-grep -v -E "ca-certificates|iana-etc|linux-firmware-marvell|linux-firmware-whence|pambase|pacman-mirrorlist|licenses" uninstalled.orig.txt >uninstalled.txt
+grep -v -E "ca-certificates|dbus-broker-units|-iana-etc|linux-firmware-marvell|linux-firmware-whence|pambase|pacman-mirrorlist|licenses" uninstalled.orig.txt >uninstalled.txt
 # vim: set ft=sh ts=4 sw=4 et:
