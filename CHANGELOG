@@ -3,6 +3,8 @@ Highlights:
 - hwdetect 2024.04.09
 - bootloader cleanup
 - shim 15.8
+Environment:
+- removed mkfs.ext2 and fsck.ext2
 setup:
 - cleanup hwdetect code
 - create XBOOTLDR partition only with vfat
