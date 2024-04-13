@@ -4,9 +4,9 @@
 _systemd_boot_uefi() {
     _dialog --no-mouse --infobox "Setting up SYSTEMD-BOOT now..." 3 40
     # create directory structure, if it doesn't exist
-    [[ -d "${_DESTDIR}/${_UEFISYS_MP}/loader/entries" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/loader/entries"
-    _MAIN_CFG="${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
-    _LOADER_CFG="${_UEFISYS_MP}/loader/loader.conf"
+    [[ -d "${_DESTDIR}/boot/loader/entries" ]] || mkdir -p "${_DESTDIR}/boot/loader/entries"
+    _MAIN_CFG="boot/loader/entries/archlinux-core-main.conf"
+    _LOADER_CFG="boot/loader/loader.conf"
     cat << BOOTDEOF > "${_DESTDIR}/${_MAIN_CFG}"
 title    Arch Linux
 linux    /${_VMLINUZ}
@@ -20,13 +20,8 @@ BOOTDEOF
     _chroot_mount
     # systemd-boot https://www.freedesktop.org/software/systemd/man/latest/systemd-gpt-auto-generator.html
     # /boot XBOOTLDR in vfat format can be booted by systemd-boot
-    if [[ "${_UEFISYS_MP}" == "efi" ]] && ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "vfat"; then
-        chroot "${_DESTDIR}" bootctl --esp-path=/efi --boot-path=/boot install &>"${_LOG}"
-        chroot "${_DESTDIR}" bootctl --esp-path=/efi --boot-path=/boot update &>"${_LOG}"
-    else
-        chroot "${_DESTDIR}" bootctl --path="/${_UEFISYS_MP}" install &>"${_LOG}"
-        chroot "${_DESTDIR}" bootctl --path="/${_UEFISYS_MP}" update &>"${_LOG}"
-    fi
+    chroot "${_DESTDIR}" bootctl --esp-path=/${_UEFISYS_MP} --boot-path=/boot install &>"${_LOG}"
+    chroot "${_DESTDIR}" bootctl --esp-path=/${_UEFISYS_MP} --boot-path=/boot update &>"${_LOG}"
     _chroot_umount
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
