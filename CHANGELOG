@@ -14,6 +14,8 @@ setup:
 - as Lennart Poettering proposes:
   -> only allow vfat on /efi (ESP) and /boot (XBOOTLDR)
 - removed ext2 support
+- use bootctl to install systemd-boot
+- use refind-install for refind installation
 ---
 2024.03 Highlights:
 - kernel 6.8.x
