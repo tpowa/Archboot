@@ -28,6 +28,7 @@ CONFEOF
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
         [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        rm -f "${_DESTDIR}"/boot/refind_linux.conf
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         sleep 2
         _dialog --msgbox "You will now be put into the editor to edit:\nrefind.conf\n\nAfter you save your changes, exit the editor." 8 50
