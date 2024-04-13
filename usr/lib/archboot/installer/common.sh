@@ -65,7 +65,7 @@ _chroot_mount()
         mount proc "${_DESTDIR}/proc" -t proc -o nosuid,noexec,nodev
         mount sys "${_DESTDIR}/sys" -t sysfs -o nosuid,noexec,nodev,ro
         if mount | grep -qw efivarfs; then
-            mount efivarfs ${_DESTDIR}/sys/firmware/efi/efivarfs -t efivarfs -o nosuid,noexec,nodev
+            mount efivarfs ${_DESTDIR}/sys/firmware/efi/ -t efivarfs -o nosuid,noexec,nodev
         fi
         mount udev "${_DESTDIR}/dev" -t devtmpfs -o mode=0755,nosuid
         mount devpts "${_DESTDIR}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
