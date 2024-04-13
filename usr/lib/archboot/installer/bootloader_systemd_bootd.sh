@@ -5,8 +5,9 @@ _systemd_boot_uefi() {
     _dialog --no-mouse --infobox "Setting up SYSTEMD-BOOT now..." 3 40
     # create directory structure, if it doesn't exist
     [[ -d "${_DESTDIR}/boot/loader/entries" ]] || mkdir -p "${_DESTDIR}/boot/loader/entries"
+    [[ -d "${_DESTDIR}/${_UEFISYS_MP}/loader" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/loader"
     _MAIN_CFG="boot/loader/entries/archlinux-core-main.conf"
-    _LOADER_CFG="boot/loader/loader.conf"
+    _LOADER_CFG="/${_UEFISYS_MP}/loader/loader.conf"
     cat << BOOTDEOF > "${_DESTDIR}/${_MAIN_CFG}"
 title    Arch Linux
 linux    /${_VMLINUZ}
@@ -23,13 +24,6 @@ BOOTDEOF
     chroot "${_DESTDIR}" bootctl install &>"${_LOG}" || chroot "${_DESTDIR}" bootctl update &>"${_LOG}"
     _chroot_umount
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
-        rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi"  \
-              "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        _BOOTMGR_LABEL="SYSTEMD-BOOT"
-        _BOOTMGR_LOADER_PATH="/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi"
-        _uefi_bootmgr_setup
-        sleep 2
         _dialog --msgbox "You will now be put into the editor to edit:\nloader.conf and menu entry files\n\nAfter you save your changes, exit the editor." 8 50
         _geteditor || return 1
         "${_EDITOR}" "${_DESTDIR}/${_MAIN_CFG}"
