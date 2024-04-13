@@ -21,7 +21,7 @@ BOOTDEOF
     _chroot_mount
     # systemd-boot https://www.freedesktop.org/software/systemd/man/latest/systemd-gpt-auto-generator.html
     # /boot XBOOTLDR in vfat format can be booted by systemd-boot
-    chroot "${_DESTDIR}" bootctl --gracefull install &>"${_LOG}" || chroot "${_DESTDIR}" bootctl update &>"${_LOG}"
+    chroot "${_DESTDIR}" bootctl --graceful install &>"${_LOG}" || chroot "${_DESTDIR}" bootctl update &>"${_LOG}"
     _chroot_umount
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
         _dialog --msgbox "You will now be put into the editor to edit:\nloader.conf and menu entry files\n\nAfter you save your changes, exit the editor." 8 50
