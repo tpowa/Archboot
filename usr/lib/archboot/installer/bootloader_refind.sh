@@ -9,6 +9,8 @@ _refind_uefi() {
     fi
     _dialog --no-mouse --infobox "Setting up rEFInd now..." 3 60
     _chroot_mount
+    # refind-install mounts devices again
+    umount -q "${_DESTDIR}"/{boot,efi}
     chroot "${_DESTDIR}" refind-install &>"${_LOG}"
     _chroot_umount
     _REFIND_CONFIG="${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind.conf"
