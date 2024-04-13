@@ -19,6 +19,13 @@ for i in $(pacman -Q | cut -d ' ' -f1); do
         pacman -Sdd ${i} --noconfirm --overwrite '*'
     fi
 done
-# remove false positives
-grep -v -E "licenses" uninstalled.orig.txt >uninstalled.txt
+# remove false positives:
+# ca-certificates has no files
+# dbus-broker-units only systemd files
+# iana-etc only /etc files
+# licenses mandatory removed
+# linux-firmware-whence only license files
+# pacman-mirrorlist only /etc file
+# pambase only /etc files
+grep -v -E "ca-certificates|dbus-broker-units|iana-etc|licenses|linux-firmware-whence|pacman-mirrorlist|pambase" uninstalled.orig.txt >uninstalled.txt
 # vim: set ft=sh ts=4 sw=4 et:
