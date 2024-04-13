@@ -5,7 +5,7 @@
 _run ()
 {
     _binary nvim
-    _map _full_dir /usr/share/nvim /usr/lib/tree-sitter
+    _map _full_dir /usr/share/nvim /usr/lib/tree_sitter
     _map _file /usr/share/licenses/neovim/LICENSE.txt
     # add lastplace plugin:
     # https://github.com/neovim/neovim/issues/16339
