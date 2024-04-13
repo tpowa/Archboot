@@ -4,9 +4,9 @@
 _systemd_boot_uefi() {
     _dialog --no-mouse --infobox "Setting up SYSTEMD-BOOT now..." 3 40
     # create directory structure, if it doesn't exist
-    [[ -d "${_DESTDIR}/boot/loader/entries" ]] || mkdir -p "${_DESTDIR}/boot/loader/entries"
-    _MAIN_CFG="boot/loader/entries/archlinux-core-main.conf"
-    _LOADER_CFG="boot/loader/loader.conf"
+    [[ -d "${_DESTDIR}/${_UEFISYS_MP}/loader/entries" ]] || mkdir -p "${_DESTDIR}/"${_UEFISYS_MP}/loader/entries"
+    _MAIN_CFG="${_UEFISYS_MP}/loader/entries/archlinux-core-main.conf"
+    _LOADER_CFG=""${_UEFISYS_MP}/loader/loader.conf"
     cat << BOOTDEOF > "${_DESTDIR}/${_MAIN_CFG}"
 title    Arch Linux
 linux    /${_VMLINUZ}
