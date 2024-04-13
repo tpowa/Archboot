@@ -64,6 +64,7 @@ _chroot_mount()
         [[ -e "${_DESTDIR}/dev" ]] || mkdir -m 755 "${_DESTDIR}/dev"
         mount proc "${_DESTDIR}/proc" -t proc -o nosuid,noexec,nodev
         mount sys "${_DESTDIR}/sys" -t sysfs -o nosuid,noexec,nodev,ro
+        # needed for efi bootloader installation routines
         if mount | grep -qw efivarfs; then
             mount efivarfs ${_DESTDIR}/sys/firmware/efi/efivars -t efivarfs -o nosuid,noexec,nodev
         fi

@@ -8,11 +8,9 @@ _refind_uefi() {
         _pacman_error
     fi
     _dialog --no-mouse --infobox "Setting up rEFInd now..." 3 60
-    [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
-    cp -f "${_DESTDIR}/usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
-    cp -r "${_DESTDIR}/usr/share/refind/icons" "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
-    cp -r "${_DESTDIR}/usr/share/refind/fonts" "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
-    cp -r "${_DESTDIR}/usr/share/refind/drivers_${_SPEC_UEFI_ARCH}" "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/"
+    _chroot_mount
+    chroot "${_DESTDIR}" refind-install &>"${_LOG}"
+    _chroot_umount
     _REFIND_CONFIG="${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind.conf"
     cat << CONFEOF > "${_REFIND_CONFIG}"
 timeout 20
@@ -28,10 +26,7 @@ menuentry "Arch Linux" {
 }
 CONFEOF
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" ]]; then
-        _BOOTMGR_LABEL="rEFInd"
-        _BOOTMGR_LOADER_PATH="/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi"
-        _uefi_bootmgr_setup
-        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
+        [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         sleep 2
