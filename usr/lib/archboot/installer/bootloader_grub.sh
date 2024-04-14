@@ -240,7 +240,6 @@ _grub_install_bios() {
         --target="i386-pc" \
         --boot-directory="/boot" \
         --recheck \
-        --debug \
         "${_BOOTDEV}" &>"/tmp/grub_bios_install.log"
     cat "/tmp/grub_bios_install.log" >>"${_LOG}"
     _chroot_umount
@@ -337,9 +336,7 @@ _grub_install_uefi() {
         --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
         --target="${_GRUB_ARCH}-efi" \
         --efi-directory="/${_UEFISYS_MP}" \
-        --bootloader-id="grub" \
-        --boot-directory="/boot" \
-        --no-nvram \
+        --bootloader-id="GRUB" \
         --recheck \
         --debug &> "/tmp/grub_uefi_${_UEFI_ARCH}_install.log"
     cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >>"${_LOG}"
@@ -408,9 +405,6 @@ _grub_uefi() {
     _grub_config || return 1
     _setup_grub_uefi_sb | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Setting up GRUB(2) UEFI Secure Boot..." 6 75 0
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" && -z "${_UEFI_SECURE_BOOT}" && -e "${_DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
-        _BOOTMGR_LABEL="GRUB"
-        _BOOTMGR_LOADER_PATH="/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi"
-        _uefi_bootmgr_setup
         _pacman_hook_grub_uefi
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
