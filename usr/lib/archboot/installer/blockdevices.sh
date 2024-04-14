@@ -276,7 +276,7 @@ _set_device_name_scheme() {
     fi
     _NAME_SCHEME_LEVELS="${_NAME_SCHEME_LEVELS} FSUUID UUID=<uuid> FSLABEL LABEL=<label> KERNEL /dev/<kernelname>"
     #shellcheck disable=SC2086
-    _dialog --no-cancel --title " Device Name Scheme " --menu "Use PARTUUID on GPT disks. Use FSUUID on MBR/MSDOS disks." 12 65 6 ${_NAME_SCHEME_LEVELS} 2>"${_ANSWER}" || return 1
+    _dialog --no-cancel --title " Device Name Scheme " --menu "Use PARTUUID on GPT disks. Use FSUUID on MBR/MSDOS disks." 13 65 7 ${_NAME_SCHEME_LEVELS} 2>"${_ANSWER}" || return 1
     _NAME_SCHEME_PARAMETER=$(cat "${_ANSWER}")
     _NAME_SCHEME_PARAMETER_RUN=1
 }
