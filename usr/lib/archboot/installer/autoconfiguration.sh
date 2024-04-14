@@ -227,7 +227,7 @@ _auto_mkinitcpio() {
     _HWDETECTMODULES=""
     _HWDETECTHOOKS=""
     if [[ -z "${_AUTO_MKINITCPIO}" ]]; then
-        if [[ "${_NAME_SCHEME_PARAMETER}" == "SYSTEMD_AUTO_GPT" ]]; then
+        if [[ "${_NAME_SCHEME_PARAMETER}" == "SYSTEMD_AUTO_GENERATOR" ]]; then
             _EARLY_USERSPACE="SYSTEMD"
         else
             _dialog --no-cancel --title " MKINITCPIO EARLY USERSPACE " --menu "" 8 50 2 "BUSYBOX" "Small and Fast" "SYSTEMD" "More Features" 2>"${_ANSWER}" || return 1
