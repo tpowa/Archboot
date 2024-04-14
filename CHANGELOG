@@ -15,11 +15,13 @@ setup:
   -> only allow vfat on /efi (ESP) and /boot (XBOOTLDR)
 - removed ext2 support
 - added bootctl to install systemd-boot
+- removed not needed grub-install options
 - added refind-install for refind installation
 - added refind-install for refind update hook
+- added NVRAM entry for systemd-boot with bootctl
 - added NVRAM entry creation with grub-install
-- removed not needed grub-install options
-- removed most of efibootmgr calls
+- added NVRAM entry creation with refind-install
+- removed not needed efibootmgr calls
 ---
 2024.03 Highlights:
 - kernel 6.8.x
