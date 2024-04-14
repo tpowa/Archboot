@@ -227,7 +227,7 @@ _auto_mkinitcpio() {
     _HWDETECTMODULES=""
     _HWDETECTHOOKS=""
     if [[ -z "${_AUTO_MKINITCPIO}" ]]; then
-        _dialog --no-cancel --title " EARLY USERSPACE " --menu "" 8 50 2 "BUSYBOX" "Small and Fast" "SYSTEMD" "More Features" 2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --title " MKINITCPIO EARLY USERSPACE " --menu "" 8 50 2 "BUSYBOX" "Small and Fast" "SYSTEMD" "More Features" 2>"${_ANSWER}" || return 1
         _EARLY_USERSPACE=$(cat "${_ANSWER}")
         _printk off
         _AUTO_MKINITCPIO=""
