@@ -83,8 +83,13 @@ _bootloader_kernel_parameters() {
     [[ "${_NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] && _getrootpartlabel
     [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]] && _getrootfsuuid
     [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && _getrootfslabel
-    _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTDEV} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_LUKSSETUP}"
-    _KERNEL_PARAMS_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
+    if [[ "${_NAME_SCHEME_PARAMETER}" == "SYSTEMD_AUTO_GENERATOR" ]]; then
+        _KERNEL_PARAMS_COMMON_UNMOD="${_RAIDARRAYS} ${_LUKSSETUP}"
+        _KERNEL_PARAMS_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
+    else
+        _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTDEV} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_LUKSSETUP}"
+        _KERNEL_PARAMS_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sed -e 's#   # #g' | sed -e 's#  # #g')"
+    fi
 }
 
 _common_bootloader_checks() {
@@ -182,13 +187,15 @@ _efistub_uefi() {
     _uefi_common || return 1
     _efistub_parameters
     _common_bootloader_checks
-    if [[ "${_RUNNING_ARCH}" == "x86_64" && -z "${_EFI_MIXED}" ]]; then
+    if [[ "${_RUNNING_ARCH}" == "x86_64" && -z "${_EFI_MIXED}" \
+          && ! "${_NAME_SCHEME_PARAMETER}" == "SYSTEMD_AUTO_GENERATOR" ]]; then
         _dialog --title " EFISTUB " --menu "" 10 60 3 \
             "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
             "LIMINE" "LIMINE for ${_UEFI_ARCH} UEFI" \
             "rEFInd" "rEFInd for ${_UEFI_ARCH} UEFI" \
             "SYSTEMD-BOOT" "SYSTEMD-BOOT for ${_UEFI_ARCH} UEFI" 2>"${_ANSWER}"
-    elif [[ "${_RUNNING_ARCH}" == "x86_64" && -n "${_EFI_MIXED}" ]]; then
+    elif [[ "${_RUNNING_ARCH}" == "x86_64" && -n "${_EFI_MIXED}" \
+            && ! "${_NAME_SCHEME_PARAMETER}" == "SYSTEMD_AUTO_GENERATOR" ]]; then
         _dialog --title " EFISTUB " --menu "" 9 60 3 \
             "FIRMWARE" "Unified Kernel Image for ${_UEFI_ARCH} UEFI" \
             "LIMINE" "LIMINE for ${_UEFI_ARCH} UEFI" \

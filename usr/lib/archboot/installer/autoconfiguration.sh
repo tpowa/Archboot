@@ -227,8 +227,12 @@ _auto_mkinitcpio() {
     _HWDETECTMODULES=""
     _HWDETECTHOOKS=""
     if [[ -z "${_AUTO_MKINITCPIO}" ]]; then
-        _dialog --no-cancel --title " MKINITCPIO EARLY USERSPACE " --menu "" 8 50 2 "BUSYBOX" "Small and Fast" "SYSTEMD" "More Features" 2>"${_ANSWER}" || return 1
-        _EARLY_USERSPACE=$(cat "${_ANSWER}")
+        if [[ "${_NAME_SCHEME_PARAMETER}" == "SYSTEMD_AUTO_GPT" ]]; then
+            _EARLY_USERSPACE="SYSTEMD"
+        else
+            _dialog --no-cancel --title " MKINITCPIO EARLY USERSPACE " --menu "" 8 50 2 "BUSYBOX" "Small and Fast" "SYSTEMD" "More Features" 2>"${_ANSWER}" || return 1
+            _EARLY_USERSPACE=$(cat "${_ANSWER}")
+        fi
         _printk off
         _AUTO_MKINITCPIO=""
         _dialog --no-mouse --infobox "" 3 70

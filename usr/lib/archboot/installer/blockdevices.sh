@@ -272,7 +272,7 @@ _set_device_name_scheme() {
     ## util-linux root=PARTUUID=/root=PARTLABEL= support - https://git.kernel.org/?p=utils/util-linux/util-linux.git;a=commitdiff;h=fc387ee14c6b8672761ae5e67ff639b5cae8f27c;hp=21d1fa53f16560dacba33fffb14ffc05d275c926
     ## mkinitcpio's init root=PARTUUID= support - https://projects.archlinux.org/mkinitcpio.git/tree/init_functions#n185
     if [[ -n "${_UEFI_BOOT}" || -n "${_GUIDPARAMETER}" ]]; then
-        _NAME_SCHEME_LEVELS="${_NAME_SCHEME_LEVELS} PARTUUID PARTUUID=<partuuid> PARTLABEL PARTLABEL=<partlabel>"
+        _NAME_SCHEME_LEVELS="${_NAME_SCHEME_LEVELS} PARTUUID PARTUUID=<partuuid> PARTLABEL PARTLABEL=<partlabel> SYSTEMD_AUTO_GENERATOR none"
     fi
     _NAME_SCHEME_LEVELS="${_NAME_SCHEME_LEVELS} FSUUID UUID=<uuid> FSLABEL LABEL=<label> KERNEL /dev/<kernelname>"
     #shellcheck disable=SC2086
