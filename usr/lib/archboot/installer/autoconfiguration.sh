@@ -211,7 +211,11 @@ _auto_hwdetect() {
     # arrange MODULES for mkinitcpio.conf
     _HWDETECTMODULES="$(hwdetect --root_directory="${_DESTDIR}" --hostcontroller --filesystem "${_FBPARAMETER}")"
     # arrange HOOKS for mkinitcpio.conf
-    _HWDETECTHOOKS="$(hwdetect --root_directory="${_DESTDIR}" --rootdevice="${_ROOTDEV}")"
+    if [[ "${_EARLY_USERSPACE}" == "SYSTEMD" ]]; then
+        _HWDETECTHOOKS="$(hwdetect --root_directory="${_DESTDIR}" --rootdevice="${_ROOTDEV}" --systemd)"
+    else
+        _HWDETECTHOOKS="$(hwdetect --root_directory="${_DESTDIR}" --rootdevice="${_ROOTDEV}")"
+    fi
     # change mkinitcpio.conf
     [[ -n "${_HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${_HWDETECTMODULES}/g" "${_DESTDIR}"/etc/mkinitcpio.conf
     [[ -n "${_HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${_HWDETECTHOOKS}/g" "${_DESTDIR}"/etc/mkinitcpio.conf
@@ -223,6 +227,8 @@ _auto_mkinitcpio() {
     _HWDETECTMODULES=""
     _HWDETECTHOOKS=""
     if [[ -z "${_AUTO_MKINITCPIO}" ]]; then
+        _dialog --no-cancel --title " EARLY USERSPACE " --menu "" 8 50 2 "BUSYBOX" "Small and Fast" "SYSTEMD" "More Features" 2>"${_ANSWER}" || return 1
+        _EARLY_USERSPACE=$(cat "${_ANSWER}")
         _printk off
         _AUTO_MKINITCPIO=""
         _dialog --no-mouse --infobox "" 3 70
