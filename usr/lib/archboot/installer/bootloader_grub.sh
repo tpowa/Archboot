@@ -142,7 +142,9 @@ if loadfont "\${_fontfile}" ; then
 fi
 EOF
     [[ -e "/tmp/.device-names" ]] && sort "/tmp/.device-names" >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
-    if [[ "${_NAME_SCHEME_PARAMETER}" == "PARTUUID" ]] || [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]] ; then
+    if [[ "${_NAME_SCHEME_PARAMETER}" == "PARTUUID" ||\
+        "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ||\
+        "${_NAME_SCHEME_PARAMETER}" == "SYSTEMD_AUTO_-GENERATOR" ]] ; then
         _GRUB_ROOT_DRIVE="search --fs-uuid --no-floppy --set=root ${_BOOTDEV_HINTS_STRING} ${_BOOTDEV_FS_UUID}"
     else
         if [[ "${_NAME_SCHEME_PARAMETER}" == "PARTLABEL" ]] || [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] ; then
