@@ -1,6 +1,6 @@
 On the road to 2024.04:
 Highlights:
-- hwdetect 2024.04.09
+- hwdetect 2024.04.14
 - bootloader cleanup
 - fedora shim 15.8
 Environment:
@@ -9,6 +9,8 @@ Environment:
 - added argon2 to environment
 setup:
 - cleanup hwdetect code
+- added early userspace systemd option
+- added systemd-auto-generator support
 - added XBOOTLDR partition only with vfat
 - removed /efi to /boot synchronisation
 - as Lennart Poettering proposes:
