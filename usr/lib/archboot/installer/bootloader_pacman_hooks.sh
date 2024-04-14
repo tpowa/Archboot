@@ -60,7 +60,7 @@ _pacman_hook_refind() {
     cat << EOF >> "${_HOOKNAME}"
 Description = Update rEFInd after upgrade...
 When = PostTransaction
-Exec = /usr/bin/sh -c "/usr/bin/cp /usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi /${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI;cp /usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi /${_UEFISYS_MP}/EFI/refind/"
+Exec = /usr/bin/sh -c "/usr/bin/cp /usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi /${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI;/usr/bin/refind-install"
 EOF
     _dialog --title " Automatic rEFInd Update " --no-mouse --infobox "Automatic rEFInd update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
     sleep 3
