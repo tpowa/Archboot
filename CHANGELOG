@@ -2,20 +2,24 @@ On the road to 2024.04:
 Highlights:
 - hwdetect 2024.04.09
 - bootloader cleanup
-- shim 15.8
+- fedora shim 15.8
 Environment:
 - removed mkfs.ext2 and fsck.ext2
 - added basic tree-sitter neovim plugins
 - added argon2 to environment
 setup:
 - cleanup hwdetect code
-- create XBOOTLDR partition only with vfat
+- added XBOOTLDR partition only with vfat
 - removed /efi to /boot synchronisation
 - as Lennart Poettering proposes:
   -> only allow vfat on /efi (ESP) and /boot (XBOOTLDR)
 - removed ext2 support
-- use bootctl to install systemd-boot
-- use refind-install for refind installation
+- added bootctl to install systemd-boot
+- added refind-install for refind installation
+- added refind-install for refind update hook
+- added NVRAM entry creation with grub-install
+- removed not needed grub-install options
+- removed most of efibootmgr calls
 ---
 2024.03 Highlights:
 - kernel 6.8.x
