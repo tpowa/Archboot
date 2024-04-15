@@ -8,4 +8,5 @@ if ! screen -ls &>/dev/null; then
     echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mshell\e[m login."
     read -r
 fi
-screen -q -xRR
+# define /bin/bash, else /bin/sh is the screen default
+SHELL=/bin/bash screen -q -xRR
