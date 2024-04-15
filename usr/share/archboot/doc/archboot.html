@@ -16,7 +16,8 @@
 <p><span><img src="logo.png" alt="Logo"></span></p>
 <h1>Archboot Home | <a href="https://archboot.com/gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2024 Fundraise: 0% <progress max="100" value="1">0%</progress> 100%</h2>
-<p><strong>&copy; 2006 - 2024 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br><strong>Last update: 15.04.2024 06.58</strong></p>
+<p><strong>&copy; 2006 - 2024 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
+<strong>Last update: 15.04.2024 13:56</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -235,9 +236,9 @@
 <td class="MyYes">&#10004;</td>
 <td class="MyYes">&#10004;</td>
 <td class="MyNo">&#10006;</td>
-<td>373M</td>
+<td>377M</td>
 <td>463M</td>
-<td>498M</td>
+<td>504M</td>
 </tr>
 <tr class="even">
 <td><strong><em>date</em>-latest</strong></td>
@@ -255,9 +256,9 @@
 <td class="MyYes">&#10004;</td>
 <td class="MyYes">&#10004;</td>
 <td class="MyYes">&#10004;</td>
-<td>668M</td>
+<td>677M</td>
 <td></td>
-<td>901M</td>
+<td>907M</td>
 </tr>
 </tbody>
 </table>
@@ -571,7 +572,7 @@
 <ul>
 <li>You prepare your storage drive, <a href="https://wiki.archlinux.org/title/Filesystems" title="Filesystems"><strong>filesystems</strong></a> and define your mountpoints.</li>
 <li>Quick Setup, manual <a href="https://wiki.archlinux.org/title/Partitioning" title="Partitioning"><strong>partitioning</strong></a>, <a href="https://wiki.archlinux.org/title/GUID" title="GUID"><strong>GUID</strong></a> (GPT) support, <a href="https://wiki.archlinux.org/title/MBR" title="MBR"><strong>MBR</strong></a> (BIOS) support,<br><a href="https://wiki.archlinux.org/title/Advanced_Format" title="Advanced Format"><strong>Advanced Format</strong></a> 4k sector drive support etc.</li>
-<li><a href="https://wiki.archlinux.org/title/Persistent_block_device_naming" title="Persistent block device naming"><strong>Persistent block device naming</strong></a> support: <a href="https://wiki.archlinux.org/title/PARTUUID" title="PARTUUID"><strong>PARTUUID</strong></a>, <a href="https://wiki.archlinux.org/title/PARTLABEL" title="PARTLABEL"><strong>PARTLABEL</strong></a>, <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd-gpt-auto-generator.html" title="SYSTEMD_AUTO_GENERATOR"><strong>SYSTEMD_AUTO_GENERATOR</strong></a>, UUID, LABEL and KERNEL</li>
+<li><a href="https://wiki.archlinux.org/title/Persistent_block_device_naming" title="Persistent block device naming"><strong>Persistent block device naming</strong></a> support: <a href="https://wiki.archlinux.org/title/PARTUUID" title="PARTUUID"><strong>PARTUUID</strong></a>, <a href="https://wiki.archlinux.org/title/PARTLABEL" title="PARTLABEL"><strong>PARTLABEL</strong></a>, <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd-gpt-auto-generator.html" title="SD_GPT_AUTO_GENERATOR"><strong>SD_GPT_AUTO_GENERATOR</strong></a>, UUID, LABEL and KERNEL</li>
 <li>Creation of software <a href="https://wiki.archlinux.org/title/RAID" title="RAID"><strong>RAID</strong></a>, RAID_partitions, <a href="https://wiki.archlinux.org/title/LVM" title="LVM"><strong>LVM</strong></a> devices and <a href="https://wiki.archlinux.org/title/LUKS" title="LUKS"><strong>LUKS</strong></a> encrypted devices</li>
 <li>Supports standard linux, <a href="https://wiki.archlinux.org/title/RAID" title="RAID"><strong>RAID</strong></a>, RAID_partitions, <a href="https://wiki.archlinux.org/title/Fakeraid" title="Fakeraid"><strong>dmraid/fakeraid</strong></a>, <a href="https://wiki.archlinux.org/title/LVM" title="LVM"><strong>LVM</strong></a> and <a href="https://wiki.archlinux.org/title/LUKS" title="LUKS"><strong>LUKS</strong></a> encrypted devices</li>
 <li>Filesystem support: <a href="https://wiki.archlinux.org/title/Bcachefs" title="BCACHEFS"><strong>BCACHEFS</strong></a>, <a href="https://wiki.archlinux.org/title/Btrfs" title="BTRFS"><strong>BTRFS</strong></a>, <a href="https://wiki.archlinux.org/title/Ext4" title="EXT4"><strong>Ext4</strong></a>, <a href="https://wiki.archlinux.org/title/XFS" title="XFS"><strong>XFS</strong></a>, <a href="https://wiki.archlinux.org/title/VFAT" title="VFAT"><strong>VFAT</strong></a></li>
@@ -819,7 +820,7 @@ The calculated size to boot the image follows the formula:<br>
 <tr>
 <td>Virtual Machine boot to prompt<sup>3</sup></td>
 <td class="MyYes">20 seconds</td>
-<td class="MyNo">24 seconds</td>
+<td class="MyNo">25 seconds</td>
 </tr>
 <tr class="odd">
 <td>Virtual Machine systemd-analyze<sup>3</sup></td>
@@ -829,7 +830,7 @@ The calculated size to boot the image follows the formula:<br>
 <tr class="odd">
 <td>Minimum RAM to boot in MiB<sup>3</sup></td>
 <td class="MyYes">790</td>
-<td class="MyNo">930</td>
+<td class="MyNo">940</td>
 </tr>
 <tr>
 <td>Free RAM on system in MiB<sup>3</sup></td>
@@ -838,8 +839,8 @@ The calculated size to boot the image follows the formula:<br>
 </tr>
 <tr class="odd">
 <td>Imagesize in MiB</td>
-<td class="MyYes">225 - 901</td>
-<td class="MyNo">988</td>
+<td class="MyYes">225 - 907</td>
+<td class="MyNo">1002</td>
 </tr>
 <tr class="even">
 <td>ROOTFS size in MiB</td>
@@ -848,7 +849,7 @@ The calculated size to boot the image follows the formula:<br>
 </tr>
 <tr class="odd">
 <td>ROOTFS packages</td>
-<td class="MyYes">191</td>
+<td class="MyYes">198</td>
 <td class="MyNo">426</td>
 </tr>
 <tr class="even">
@@ -958,8 +959,8 @@ The calculated size to boot the image follows the formula:<br>
 </tr>
 <tr class="even">
 <td>Release build speed</td>
-<td class="MyYes">6 min 11 sec<br>3 ISOs &amp; 3 UKIs</td>
-<td class="MyNo">6 min 26 sec<br>1 ISO</td>
+<td class="MyYes">7 min 21 sec<br>3 ISOs &amp; 3 UKIs</td>
+<td class="MyNo">7 min 46 sec<br>1 ISO</td>
 </tr>
 <tr class="odd">
 <td>Image assembling</td>
