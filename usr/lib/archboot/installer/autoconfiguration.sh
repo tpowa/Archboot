@@ -211,7 +211,7 @@ _auto_hwdetect() {
     # arrange MODULES for mkinitcpio.conf
     _HWDETECTMODULES="$(hwdetect --root_directory="${_DESTDIR}" --hostcontroller --filesystem "${_FBPARAMETER}")"
     # arrange HOOKS for mkinitcpio.conf
-    if [[ "${_EARLY_USERSPACE}" == "SYSTEMD" ]]; then
+    if [[ -n "${_SD_EARLY_USERSPACE}" ]]; then
         _HWDETECTHOOKS="$(hwdetect --root_directory="${_DESTDIR}" --rootdevice="${_ROOTDEV}" --systemd)"
     else
         _HWDETECTHOOKS="$(hwdetect --root_directory="${_DESTDIR}" --rootdevice="${_ROOTDEV}")"
@@ -223,15 +223,18 @@ _auto_hwdetect() {
 }
 
 _auto_mkinitcpio() {
+    _SD_EARLY_USERSPACE=""
     _FBPARAMETER=""
     _HWDETECTMODULES=""
     _HWDETECTHOOKS=""
     if [[ -z "${_AUTO_MKINITCPIO}" ]]; then
         if [[ "${_NAME_SCHEME_PARAMETER}" == "SD_GPT_AUTO_GENERATOR" ]]; then
-            _EARLY_USERSPACE="SYSTEMD"
+            _SD_EARLY_USERSPACE=1
         else
             _dialog --no-cancel --title " MKINITCPIO EARLY USERSPACE " --menu "" 8 50 2 "BUSYBOX" "Small and Fast" "SYSTEMD" "More Features" 2>"${_ANSWER}" || return 1
-            _EARLY_USERSPACE=$(cat "${_ANSWER}")
+            if [[ $(cat "${_ANSWER}") == "SYSTEMD" ]]; then
+                _SD_EARLY_USERSPACE=1
+            fi
         fi
         _printk off
         _AUTO_MKINITCPIO=""
