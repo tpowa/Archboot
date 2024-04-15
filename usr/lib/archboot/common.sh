@@ -123,7 +123,7 @@ _show_login() {
 }
 
 _abort() {
-    if _dialog --yesno "Abort$(echo "${_TITLE}" | cut -d '|' -f3) ?" 5 45; then
+    if _dialog --yesno "Abort$(echo "${_TITLE}" | cut -d '|' -f5) ?" 5 45; then
         [[ -e "${_ANSWER}-running" ]] && rm "${_ANSWER}-running"
         [[ -e "${_ANSWER}" ]] && rm "${_ANSWER}"
         clear
