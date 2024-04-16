@@ -9,7 +9,7 @@ _run ()
     rm /usr/bin/{badblocks,blkmapd,btrfs-{find-root,image,map-logical,select-super},btrfs{,ck,tune},\
 chattr,cifscreds,cifs.{idmap,upcall},compile_et,debugfs,\
 dosfsck,dosfslabel,dump.exfat,dumpe2fs,e2{freefrag,fsck,image,label,\
-mmpstatus,scrub,scrub_all,undo},e4{crypt,defrag},exfatlabel,fat{label,resize},findfs,fsck,\
+mmpstatus,scrub,scrub_all,undo},e4{crypt,defrag},exfatlabel,fatlabel,findfs,fsck,\
 logsave,resize2fs,lsattr,filefrag,fsck.{btrfs,exfat,ext2,ext4,\
 msdos,vfat,xfs},fs{freeze,trim},getcifsacl,\
 mk{_cmds,dosfs,e2fs,swap},mkfs.{exfat,ext2,ext4,\
