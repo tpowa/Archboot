@@ -7,7 +7,7 @@ if ! screen -ls &>/dev/null; then
     if [[ -z "${SSH_TTY}" ]]; then
         _LOGIN=ttyd
     else
-        _LOGIN="${SSH_TTY}"
+        _LOGIN=ssh
         clear
     fi
     echo -e "\e[1mLogin on ${_LOGIN} | $(uname -r) | $(date)\e[m"
