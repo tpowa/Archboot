@@ -7,6 +7,9 @@ Environment:
 - removed mkfs.ext2 and fsck.ext2
 - added basic tree-sitter neovim plugins
 - added argon2 to environment
+- fixed ttyd bash login
+Basic Setup:
+- fixed abort dialog
 setup:
 - cleanup hwdetect code
 - added early userspace busybox or systemd option
