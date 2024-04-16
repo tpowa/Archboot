@@ -5,7 +5,7 @@
 # simulate login from tty on first screen session
 if ! screen -ls &>/dev/null; then
     clear
-    echo -e "\e[1mLogin on ttyd | $(uname -m) | $(uname -r) | $(date)\e[m"
+    echo -e "\e[1mLogin on ttyd | $(uname -r) | $(date)\e[m"
     echo ""
     cat /etc/motd
     echo ""
