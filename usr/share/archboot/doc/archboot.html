@@ -17,18 +17,15 @@
 <h1>Archboot Home | <a href="https://archboot.com/gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2024 Fundraise: 0% <progress max="100" value="1">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2024 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 15.04.2024 13:56</strong></p>
+<strong>Last update: 16.04.2024 08:08</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
 <li><a href="#releases" id="toc-releases"><strong><span class="toc-section-number">2.</span> Releases</strong></a></li>
 <li><ul>
-<li><a href="#iso" id="toc-iso"><span class="toc-section-number">2.1</span> ISOs - USB / CD / Virtual Machine</a></li>
-<li><a href="#unified-kernel-image" id="toc-unified-kernel-image"><span class="toc-section-number">2.2</span> UKIs - Unified Kernel Images</a></li>
-<li><a href="#pxe-booting-rescue-system" id="toc-pxe-booting-rescue-system"><span class="toc-section-number">2.3</span> Kernel / Initrd / Microcode / Rescue System / PXE</a></li>
-<li><a href="#image-types" id="toc-features-of-the-images"><span class="toc-section-number">2.4</span> ISO / Initrd / UKI Types</a></li>
-<li><a href="#boot-modes" id="toc-boot-modes"><span class="toc-section-number">2.5</span> ISO Boot Modes</a></li>
-<li><a href="#writing-to-usb-cd" id="toc-writing-to-usb-cd"><span class="toc-section-number">2.6</span> ISO Writing To USB / CD</a></li>
+<li><a href="#image-types" id="toc-features-of-the-images"><span class="toc-section-number">2.1</span> ISO / Initrd / UKI Types</a></li>
+<li><a href="#boot-modes" id="toc-boot-modes"><span class="toc-section-number">2.2</span> ISO Boot Modes</a></li>
+<li><a href="#writing-to-usb-cd" id="toc-writing-to-usb-cd"><span class="toc-section-number">2.3</span> ISO Writing To USB / CD</a></li>
 </ul></li>
 <li><a href="#archboot-in-a-nutshell" id="toc-archboot-in-a-nutshell"><strong><span class="toc-section-number">3.</span> Features In A Nutshell</strong></a></li>
 <li><ul>
@@ -75,13 +72,11 @@
 <ul>
 <li><a href="https://www.reddit.com/r/archboot/"><strong>Latest News</strong></a>, <a href="https://gitlab.archlinux.org/tpowa/archboot/-/blob/master/CHANGELOG"><strong>Changelog</strong></a></li>
 <li><strong>Release schedule</strong>: on kernel updates, important package updates, bugfixing and feature updates</li>
-<li><strong>Mirrors:</strong> <a href="https://release.archboot.com"><strong>United States</strong></a> | <a href="https://release.archboot.de"><strong>Europe</strong></a> | <a href="https://release.archboot.net"><strong>Asia</strong></a></li>
 <li><a href="https://source.archboot.com"><strong>Build Sources</strong></a></li>
 <li><a href="https://wiki.syslinux.org/wiki/index.php?title=Isohybrid"><strong>Hybrid images</strong></a>, <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Images</strong></a>, <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernels</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initrd</strong></a>, and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcodes</strong></a> are provided.</li>
 <li><strong>PGP KEY</strong>: <a href="https://keyserver.ubuntu.com/pks/lookup?op=vindex&amp;fingerprint=on&amp;exact=on&amp;search=0x5B7E3FB71B7F10329A1C03AB771DF6627EDF681F"><strong>5B7E 3FB7 1B7F 1032 9A1C 03AB 771D F662 7EDF 681F</strong></a> for file verification is provided.</li>
 <li><strong>Supported Glibc Locales</strong>: be, bg, cs, da, de, en, el, es, fi, fr, hu, it, lt, lv, mk, nl, nn, pl, pt, ro, ru, sk, sr, sv, tr, uk</li>
 </ul>
-<h3 data-number="2.1" id="iso"><span class="header-section-number">2.1</span> <strong>ISOs - USB / CD / Virtual Machine</strong></h3>
 <table>
 <thead>
 <tr class="header">
@@ -120,102 +115,15 @@
 </tr>
 </tbody>
 </table>
-<p><sup>1</sup> The ISO supports <strong>aarch64, Apple Mac M1 and higher</strong> for virtual machines eg. <a href="https://wiki.archlinux.org/title/Parallels_Desktop" title="Parallels Desktop"><strong>Parallels Desktop</strong></a>, <a href="https://mac.getutm.app/" title="UTM MacOS"><strong>UTM</strong></a> and <a href="https://wiki.archlinux.org/title/VMware" title="VMware"><strong>VMware</strong></a><br>
-<sup>2</sup> The ISO supports <strong>riscv64</strong> and needs <a href="https://www.denx.de/wiki/U-Boot" title="U-Boot"><strong>U-Boot</strong></a> to launch. Recommended <strong>only</strong> for testing in a virtual machine.<br>
-<sup>3</sup> The ISO supports <strong>x86_64</strong>. Use it for <strong>real</strong> machines <strong>and/or</strong> virtual machines.</p>
-<h3 data-number="2.2" id="unified-kernel-image"><span class="header-section-number">2.2 </span> UKIs - Unified Kernel Images</h3>
-<table>
-<thead>
-<tr class="header">
-<th>AARCH64</th>
-<th>X86_64</th>
-</tr>
-</thead>
-<tbody>
-<tr class="even">
-<td>
-<a href="https://release.archboot.com/aarch64/latest/uki/archboot-aarch64.efi" download><strong>archboot-aarch64.efi</strong></a> | <a href="https://release.archboot.com/aarch64/latest/uki/archboot-aarch64.efi.sig" download><strong>.sig</strong></a>
-</td>
-<td>
-<a href="https://release.archboot.com/x86_64/latest/uki/archboot-x86_64.efi" download><strong>archboot-x86_64.efi</strong></a> | <a href="https://release.archboot.com/x86_64/latest/uki/archboot-x86_64.efi.sig"  download><strong>.sig</strong></a>
-</td>
-</tr>
-<tr class="odd">
-<td>
-<a href="https://release.archboot.com/aarch64/latest/uki/archboot-latest-aarch64.efi" download><strong>archboot-latest-aarch64.efi</strong></a> | <a href="https://release.archboot.com/aarch64/latest/uki/archboot-latest-aarch64.efi.sig"  download><strong>.sig</strong></a>
-</td>
-<td>
-<a href="https://release.archboot.com/x86_64/latest/uki/archboot-latest-x86_64.efi" download><strong>archboot-latest-x86_64.efi</strong></a> | <a href="https://release.archboot.com/x86_64/latest/uki/archboot-latest-x86_64.efi.sig"  download><strong>.sig</strong></a>
-</td>
-</tr>
-<tr class="even">
-<td>
-<a href="https://release.archboot.com/aarch64/latest/uki/archboot-local-aarch64.efi" download><strong>archboot-local-aarch64.efi</strong></a> | <a href="https://release.archboot.com/aarch64/uki/boot/archboot-local-aarch64.efi.sig" download><strong>.sig</strong></a>
-</td>
-<td>
-<a href="https://release.archboot.com/x86_64/latest/uki/archboot-local-x86_64.efi" download><strong>archboot-local-x86_64.efi</strong></a> | <a href="https://release.archboot.com/x86_64/uki/boot/archboot-local-x86_64.efi.sig" download><strong>.sig</strong></a>
-</td>
-</tr>
-</tbody>
-</table>
-<p>The <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Image</strong></a> can be booted from your <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> firmware or <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> like any other <strong>&lt;EFI&gt;</strong> file.</p>
-<h3 data-number="2.3" id="pxe-booting-rescue-system"><span class="header-section-number">2.3 </span> Kernel / Initrd / Microcode / Rescue System / PXE</h3>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th>AARCH64</th>
-<th>RISCV64</th>
-<th>X86_64</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>Kernel</strong></td>
-<td>
-<a href="https://release.archboot.com/aarch64/latest/boot/Image-aarch64" download><strong>Image-aarch64</strong></a> | <a href="https://release.archboot.com/aarch64/latest/boot/Image-aarch64.sig" download><strong>.sig</strong></a><br>
-<a href="https://release.archboot.com/aarch64/latest/boot/Image-aarch64.gz" download><strong>Image-aarch64.gz</strong></a> | <a href="https://release.archboot.com/aarch64/latest/boot/Image-aarch64.gz.sig" download><strong>.sig</strong></a>
-</td>
-<td>
-<a href="https://release.archboot.com/riscv64/latest/boot/vmlinuz-riscv64" download><strong>vmlinuz-riscv64</strong></a> | <a href="https://release.archboot.com/riscv64/latest/boot/vmlinuz-riscv64.sig" download><strong>.sig</strong></a>
-</td>
-<td>
- <a href="https://release.archboot.com/x86_64/latest/boot/vmlinuz-x86_64" download><strong>vmlinuz-x86_64</strong></a> | <a href="https://release.archboot.com/x86_64/latest/boot/vmlinuz-x86_64.sig" download><strong>.sig</strong></a>
-</td>
-</tr>
-<tr class="even">
-<td><strong>Initrd</strong></td>
-<td>
-<a href="https://release.archboot.com/aarch64/latest/boot/initrd-aarch64.img" download><strong>initrd-aarch64.img</strong></a> | <a href="https://release.archboot.com/aarch64/latest/boot/initrd-aarch64.img.sig" download><strong>.sig</strong></a><br>
-<a href="https://release.archboot.com/aarch64/latest/boot/initrd-latest-aarch64.img" download><strong>initrd-latest-aarch64.img</strong></a> | <a href="https://release.archboot.com/aarch64/latest/boot/initrd-latest-aarch64.img.sig" download><strong>.sig</strong></a><br>
-<a href="https://release.archboot.com/aarch64/latest/boot/initrd-local-aarch64.img" download><strong>initrd-local-aarch64.img</strong></a> | <a href="https://release.archboot.com/aarch64/latest/boot/initrd-local-aarch64.img.sig" download><strong>.sig</strong></a>
-</td>
-<td>
-<a href="https://release.archboot.com/riscv64/latest/boot/initrd-riscv64.img" download><strong>initrd-riscv64.img</strong></a> | <a href="https://release.archboot.com/riscv64/latest/boot/initrd-riscv64.img.sig" download><strong>.sig</strong></a>
-</td>
-<td>
-<a href="https://release.archboot.com/x86_64/latest/boot/initrd-x86_64.img" download><strong>initrd-x86_64.img</strong></a> | <a href="https://release.archboot.com/x86_64/latest/boot/initrd-x86_64.img.sig" download><strong>.sig</strong></a><br>
-<a href="https://release.archboot.com/x86_64/latest/boot/initrd-latest-x86_64.img" download><strong>initrd-latest-x86_64.img</strong></a> | <a href="https://release.archboot.com/x86_64/latest/boot/initrd-latest-x86_64.img.sig" download><strong>.sig</strong></a><br>
-<a href="https://release.archboot.com/x86_64/latest/boot/initrd-local-x86_64.img" download><strong>initrd-local-x86_64.img</strong></a> | <a href="https://release.archboot.com/x86_64/latest/boot/initrd-local-x86_64.img.sig" download><strong>.sig</strong></a>
-</td>
-</tr>
-<tr class="odd">
-<td><strong>Microcode</strong></td>
-<td>
-<a href="https://release.archboot.com/aarch64/latest/boot/amd-ucode.img" download><strong>amd-ucode.img</strong></a> | <a href="https://release.archboot.com/aarch64/latest/boot/amd-ucode.img.sig" download><strong>.sig</strong></a>
-</td>
-<td></td>
-<td>
-<a href="https://release.archboot.com/x86_64/latest/boot/amd-ucode.img" download><strong>amd-ucode.img</strong></a> | <a href="https://release.archboot.com/x86_64/latest/boot/amd-ucode.img.sig" download><strong>.sig</strong></a><br>
-<a href="https://release.archboot.com/x86_64/latest/boot/intel-ucode.img" download><strong>intel-ucode.img</strong></a> | <a href="https://release.archboot.com/x86_64/latest/boot/intel-ucode.img.sig" download><strong>.sig</strong></a>
-</td>
-</tbody>
-</table>
+<p><sup>1</sup> Supports <strong>aarch64, Apple Mac M1 and higher</strong> for virtual machines eg. <a href="https://wiki.archlinux.org/title/Parallels_Desktop" title="Parallels Desktop"><strong>Parallels Desktop</strong></a>, <a href="https://mac.getutm.app/" title="UTM MacOS"><strong>UTM</strong></a> and <a href="https://wiki.archlinux.org/title/VMware" title="VMware"><strong>VMware</strong></a><br>
+<sup>2</sup> Supports <strong>riscv64</strong> and needs <a href="https://www.denx.de/wiki/U-Boot" title="U-Boot"><strong>U-Boot</strong></a> to launch. Recommended <strong>only</strong> for testing in a virtual machine.<br>
+<sup>3</sup> Supports <strong>x86_64</strong>. Use it for <strong>real</strong> machines <strong>and/or</strong> virtual machines.</p>
 <ul>
+<li>The <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Image / UKI</strong></a> can be booted from your <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> firmware or <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> like any other <strong>&lt;EFI&gt;</strong> file.</li>
 <li>For <strong>rescue booting</strong>, add an entry pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initrd</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a>.</li>
 <li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting, add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initrd</strong></a> and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong></a> setup.</li>
 </ul>
-<h3 data-number="2.4" id="image-types"><span class="header-section-number">2.4</span> <strong>ISO / Initrd / UKI Types</strong></h3>
+<h3 data-number="2.1" id="image-types"><span class="header-section-number">2.1</span> <strong>ISO / Initrd / UKI Types</strong></h3>
 <table>
 <thead>
 <tr class="header">
@@ -267,7 +175,7 @@
 <li><strong>With</strong> a fast <strong>ethernet</strong> internet connection <strong>and</strong> a running <a href="https://wiki.archlinux.org/title/DHCP" title="DHCP"><strong>DHCP</strong></a> server, go for the <strong>latest</strong> image.<br>If your system holds at least 4G RAM the package cache will be preserved.</li>
 <li><strong>Without</strong> an internet connection or an <strong>insecure</strong> network environment (eg. setting up a remote server at a hosting company),<br>you should use the <strong>local</strong> image. It includes a <strong>local package repository</strong> for installation.<br>It will <strong>not</strong> use any network interfaces/services, until you explicitly switch to <strong>Online</strong> mode.</li>
 </ul>
-<h3 data-number="2.5" id="boot-modes"><span class="header-section-number">2.5</span> <strong>ISO Boot Modes</strong></h3>
+<h3 data-number="2.2" id="boot-modes"><span class="header-section-number">2.2</span> <strong>ISO Boot Modes</strong></h3>
 <table>
 <thead>
 <tr class="header">
@@ -311,7 +219,7 @@
 </tbody>
 </table>
 <p>* Firmware 32bit / OS 64bit</p>
-<h3 data-number="2.6" id="writing-to-usb-cd"><span class="header-section-number">2.6</span> <strong>ISO Writing To USB / CD</strong></h3>
+<h3 data-number="2.3" id="writing-to-usb-cd"><span class="header-section-number">2.3</span> <strong>ISO Writing To USB / CD</strong></h3>
 <p>A hybrid image file is a standard CD/DVD-burnable image and also a raw disk image.</p>
 <ul>
 <li>Can be burned to CD/DVD(RW) media using most <a href="https://wiki.archlinux.org/title/CD_Burning" title="CD Burning"><strong>CD Burning</strong></a> utilities.</li>
