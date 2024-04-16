@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="https://archboot.com/gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2024 Fundraise: 0% <progress max="100" value="1">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2024 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 16.04.2024 08:08</strong></p>
+<strong>Last update: 16.04.2024 09:23</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -132,9 +132,6 @@
 <th>WiFi<br>support</th>
 <th>LAN<br>support</th>
 <th>Package cache<br>for installation</th>
-<th>Size<br>AARCH64</th>
-<th>Size<br>RISCV64</th>
-<th>Size<br>X86_64</th>
 </tr>
 </thead>
 <tbody>
@@ -144,9 +141,6 @@
 <td class="MyYes">&#10004;</td>
 <td class="MyYes">&#10004;</td>
 <td class="MyNo">&#10006;</td>
-<td>377M</td>
-<td>463M</td>
-<td>504M</td>
 </tr>
 <tr class="even">
 <td><strong><em>date</em>-latest</strong></td>
@@ -154,9 +148,6 @@
 <td class="MyNo">&#10006;</td>
 <td class="MyOpt">local DHCP<br>server needed</td>
 <td class="MyOpt">&gt;= 4G RAM<br>needed</td>
-<td>173M</td>
-<td></td>
-<td>225M</td>
 </tr>
 <tr class="odd">
 <td><strong><em>date</em>-local</strong></td>
@@ -164,9 +155,6 @@
 <td class="MyYes">&#10004;</td>
 <td class="MyYes">&#10004;</td>
 <td class="MyYes">&#10004;</td>
-<td>677M</td>
-<td></td>
-<td>907M</td>
 </tr>
 </tbody>
 </table>
@@ -617,6 +605,11 @@ Some hardware does not like the <a href="https://wiki.archlinux.org/title/KMS" t
 <li><strong>Package</strong> XYZ is <strong>missing</strong> in archboot environment.<br>
 <a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the missing package as needed.
 For example, <a href="https://wiki.archlinux.org/title/Archinstall" title="Archinstall"><strong>archinstall</strong></a> is not included by default.<br>It needs python3, which is a large dependency.
+</li>
+</ul>
+<ul>
+<li> <a href="https://www.ventoy.net" title="ventoy"><strong>Ventoy</strong></a> boot does not load kernel modules / errors out.<br>
+<strong>Workaround</strong>: Do <strong>not</strong> store more than one Archboot ISO with the same kernel on disk.
 </li>
 </ul>
 <ul>
