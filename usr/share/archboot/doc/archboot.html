@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="https://archboot.com/gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2024 Fundraise: 0% <progress max="100" value="1">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2024 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 16.04.2024 09:23</strong></p>
+<strong>Last update: 17.04.2024 10:36</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -354,12 +354,12 @@
 <table>
 <thead>
 <tr class="header">
-<th>Connect with ssh as root user:</th>
+<th>Connect with ssh as root user (don't touch users known_hosts file):</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ ssh root@archboot.local</code></td>
+<td><code>$ ssh -o StrictHostKeychecking=no -o UserKnownHostsFile=/dev/null root@archboot.local</code></td>
 </tr>
 </tbody>
 </table>
@@ -1299,6 +1299,18 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 <tbody>
 <tr class="odd">
 <td><code>-drive file=yourimagefile,if=virtio,format=raw</code></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr class="header">
+<th>QXL Video device with 800x600 resolution:</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>-device qxl-vga,xres=800,yres=600</code></td>
 </tr>
 </tbody>
 </table>
