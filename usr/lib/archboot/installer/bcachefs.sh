@@ -4,6 +4,7 @@
 
 _bcfs_raid_options() {
     # add durability
+    _DURABILITY=""
     _BCFS_DURABILITY="1 Normal_Device 0 Cache_Device Custom _"
     _dialog --no-cancel --title " Durability " --menu "" 13 50 7 ${_BCFS_DURABILITY} 2>"${_ANSWER}" || return 1
     _BCFS_DURABILITY_SELECTED=$(cat "${_ANSWER}")
