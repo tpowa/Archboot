@@ -28,7 +28,7 @@ _bcfs_raid_options() {
         _BCFS_SSD_OPTIONS="--foreground_target=ssd --promote_target=ssd"
     else
         _BCFS_HDD_COUNT=$((_BCFS_HDD_COUNT + 1))
-        _BCFS_LABEL="--label hdd.${_BCFS_HDD_COUNT}"
+        _BCFS_LABEL="--label hdd.hdd${_BCFS_HDD_COUNT}"
         _BCFS_HDD_OPTIONS="--background_target=hdd"
     fi
     echo "${_DURABILITY}" "${_BCFS_LABEL}" "${_BCFS_DEV}" >>/tmp/.bcfs-devices
@@ -83,7 +83,7 @@ _bcfs_raid_level() {
     : >/tmp/.bcfs-devices
     while [[ "${_BCFS_RAID_FINISH}" != "DONE" ]]; do
         #shellcheck disable=SC2086
-        _dialog --no-cancel --title " Raid Data Level " --menu "" 9 30 5 ${_BCFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --title " Raid Data Level " --menu ""11 30 7 ${_BCFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
         _BCFS_LEVEL=$(cat "${_ANSWER}")
         if [[ "${_BCFS_LEVEL}" == "NONE" ]]; then
             echo "${_BCFS_DEV}" >>/tmp/.bcfs-devices
