@@ -27,7 +27,7 @@ _clear_fs_values() {
     _BTRFS_LEVEL=""
     _BTRFS_SUBVOLUME=""
     _BTRFS_COMPRESS=""
-    _BCACHEFS_COMPRESS=""
+    _BCFS_COMPRESS=""
 }
 
 # add ssd mount options
@@ -128,14 +128,14 @@ _run_mkfs() {
         [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
         # bcachefs, btrfs and other parameters
         if [[ ${_FSTYPE} == "bcachefs" ]]; then
-            _BCACHEFS_COMPRESS=$(echo "${line}" | cut -d '|' -f 7)
-            if [[ "${_BCACHEFS_COMPRESS}" == "NONE" ]];then
-                _BCACHEFS_COMPRESS=""
+            _BCFS_COMPRESS=$(echo "${line}" | cut -d '|' -f 7)
+            if [[ "${_BCFS_COMPRESS}" == "NONE" ]];then
+                _BCFS_COMPRESS=""
             else
-                _BCACHEFS_COMPRESS="--compression=${_BCACHEFS_COMPRESS}"
+                _BCFS_COMPRESS="--compression=${_BCFS_COMPRESS}"
             fi
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-                  "${_BCACHEFS_COMPRESS}" || return 1
+                  "${_BCFS_COMPRESS}" || return 1
         elif [[ ${_FSTYPE} == "btrfs" ]]; then
             _BTRFS_DEVS=$(echo "${line}" | cut -d '|' -f 7)
             # remove # from array
@@ -181,7 +181,7 @@ _create_filesystem() {
             _prepare_btrfs || return 1
         fi
         if [[ "${_FSTYPE}" == "bcachefs" ]]; then
-            _bcachefs_compress || return 1
+            _prepare_bcfs || return 1
         fi
         _dialog --no-cancel --title " Custom Options " --inputbox "Options passed to filesystem creator, else just leave it empty." 8 70  2>"${_ANSWER}" || return 1
         _FS_OPTIONS=$(cat "${_ANSWER}")
@@ -351,7 +351,7 @@ _mountpoints() {
                     if [[ "${_FSTYPE}" == "btrfs" ]]; then
                         echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BTRFS_DEVS}|${_BTRFS_LEVEL}|${_BTRFS_SUBVOLUME}|${_BTRFS_COMPRESS}" >>/tmp/.parts
                     elif [[ "${_FSTYPE}" == "bcachefs" ]]; then
-                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BCACHEFS_COMPRESS}" >>/tmp/.parts
+                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BCFS_COMPRESS}" >>/tmp/.parts
                     else
                         echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}" >>/tmp/.parts
                     fi
