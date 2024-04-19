@@ -6,7 +6,7 @@ _bcfs_raid_options() {
     # add durability
     _DURABILITY=""
     _BCFS_DURABILITY="1 Normal_Device 0 Cache_Device Custom _"
-    _dialog --no-cancel --title " Durability " --menu "" 11 50 5 ${_BCFS_DURABILITY} 2>"${_ANSWER}" || return 1
+    _dialog --no-cancel --title " Durability " --menu "" 9 30 5 ${_BCFS_DURABILITY} 2>"${_ANSWER}" || return 1
     _BCFS_DURABILITY_SELECTED=$(cat "${_ANSWER}")
     if [[ ${_BCFS_DURABILITY_SELECTED} == 1 ]]; then
         _DURABILITY=""
@@ -15,7 +15,7 @@ _bcfs_raid_options() {
         _DUR_COUNT=$((_DUR_COUNT - 1))
     else
         if [[ ${_BCFS_DURABILITY_SELECTED} == "Custom" ]]; then
-            _dialog  --inputbox "Enter custom durability level (number):" 5 65 \
+            _dialog  --inputbox "Enter custom durability level (number):" 8 65 \
                 "2" 2>"${_ANSWER}" || return 1
                 _BCFS_DURABILITY_SELECTED="$(cat "${_ANSWER}")"
                 _DURABILITY="--durability=${_BCFS_DURABILITY_SELECTED}"
@@ -83,7 +83,7 @@ _bcfs_raid_level() {
     : >/tmp/.bcfs-devices
     while [[ "${_BCFS_RAID_FINISH}" != "DONE" ]]; do
         #shellcheck disable=SC2086
-        _dialog --no-cancel --title " Raid Data Level " --menu "" 13 50 7 ${_BCFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --title " Raid Data Level " --menu "" 9 30 5 ${_BCFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
         _BCFS_LEVEL=$(cat "${_ANSWER}")
         if [[ "${_BCFS_LEVEL}" == "NONE" ]]; then
             echo "${_BCFS_DEV}" >>/tmp/.bcfs-devices
@@ -91,7 +91,7 @@ _bcfs_raid_level() {
         else
             # replicas
             _BCFS_REPLICATION="2 - 3 - Custom _"
-            _dialog --no-cancel --title " Replication Level " --menu "" 11 50 5 ${_BCFS_REPLICATION} 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --title " Replication Level " --menu "" 9 30 5 ${_BCFS_REPLICATION} 2>"${_ANSWER}" || return 1
             _BCFS_REP_COUNT="$(cat ${_ANSWER})"
             if [[ ${_BCFS_REP_COUNT} == "Custom" ]]; then
                 _dialog  --inputbox "Enter custom replication level (number):" 8 65 \
