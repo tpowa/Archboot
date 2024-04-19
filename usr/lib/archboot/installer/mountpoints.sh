@@ -435,7 +435,7 @@ _mkfs() {
     else
         # make sure the fstype is one we can handle
         local _KNOWNFS=0
-        for fs in xfs ext4 bcachefs btrfs vfat; do
+        for fs in bcachefs btrfs ext4 vfat xfs; do
             [[ "${2}" == "${fs}" ]] && _KNOWNFS=1 && break
         done
         if [[ ${_KNOWNFS} -eq 0 ]]; then
