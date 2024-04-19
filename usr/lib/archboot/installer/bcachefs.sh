@@ -3,7 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 # select bcfs raid devices
-_select_bcfsraid_devices () {
+_bcfs_select_raid_devices () {
     # select the second device to use, no missing option available!
     : >/tmp/.bcfs-devices
     echo "${_BCFS_DEV}" >>/tmp/.bcfs-devices
@@ -71,7 +71,7 @@ _select_bcfsraid_devices () {
 }
 
 # choose raid level to use on bcfs device
-_bcfsraid_level() {
+_bcfs_raid_level() {
     _BCFS_RAIDLEVELS="NONE - raid1 - raid5 - raid6 - raid10 -"
     _BCFS_RAID_FINISH=""
     _BCFS_LEVEL=""
@@ -94,7 +94,7 @@ _bcfsraid_level() {
                         "4" 2>"${_ANSWER}" || return 1
                     _BCFS_REPLICATION=$(cat "${_ANSWER}")
             fi
-            _select_bcfsraid_devices
+            _bcfs_select_raid_devices
         fi
     done
 }
@@ -114,5 +114,5 @@ _bcfs_compress() {
 # prepare new btrfs device
 _prepare_bcfs() {
     _bcfs_raid_level || return 1
-    _prepare_bcfs_subvolume || return 1
+    #_prepare_bcfs_subvolume || return 1
 }
