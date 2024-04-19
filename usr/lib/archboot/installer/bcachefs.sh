@@ -83,7 +83,7 @@ _bcfs_raid_level() {
     : >/tmp/.bcfs-devices
     while [[ "${_BCFS_RAID_FINISH}" != "DONE" ]]; do
         #shellcheck disable=SC2086
-        _dialog --no-cancel --title " Raid Data Level " --menu ""11 30 7 ${_BCFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --title " Raid Data Level " --menu "" 11 30 7 ${_BCFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
         _BCFS_LEVEL=$(cat "${_ANSWER}")
         if [[ "${_BCFS_LEVEL}" == "NONE" ]]; then
             echo "${_BCFS_DEV}" >>/tmp/.bcfs-devices
