@@ -92,12 +92,11 @@ _bcfs_raid_level() {
             # replicas
             _BCFS_REPLICATION="2 - 3 - Custom _"
             _dialog --no-cancel --title " Replication Level " --menu "" 13 50 7 ${_BCFS_REPLICATION} 2>"${_ANSWER}" || return 1
-
             _BCFS_REP_COUNT="$(cat ${_ANSWER})"
-            if [[ ${_BCFS_REPLICATION} == "Custom" ]]; then
+            if [[ ${_BCFS_REP_COUNT} == "Custom" ]]; then
                 _dialog  --inputbox "Enter custom replication level (number):" 8 65 \
                         "4" 2>"${_ANSWER}" || return 1
-                    _BCFS_REPLICATION=$(cat "${_ANSWER}")
+                    _BCFS_REP_COUNT="$(cat "${_ANSWER}")"
             fi
             _bcfs_raid_options
             _bcfs_select_raid_devices
