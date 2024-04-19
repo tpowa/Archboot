@@ -2,15 +2,42 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
+_bcfs_raid_options() {
+    # add durability
+    _BCFS_DURABILITY="1 Normal_Device 0 Cache_Device Custom _"
+    _dialog --no-cancel --title " Durability " --menu "" 13 50 7 ${_BCFS_DURABILITY} 2>"${_ANSWER}" || return 1
+    _BCFS_DURABILITY_SELECTED=$(cat "${_ANSWER}")
+    if [[ ${_BCFS_DURABILITY_SELECTED} == 1 ]]; then
+        _DURABILITY=""
+    elif [[ ${_BCFS_DURABILITY_SELECTED} == 0 ]]; then
+        _DURABILITY="--durability=0"
+        _DUR_COUNT=$((_DUR_COUNT - 1))
+    else
+        if [[ ${_BCFS_DURABILITY_SELECTED} == "Custom" ]]; then
+            _dialog  --inputbox "Enter custom durability level (number):" 8 65 \
+                    "2" 2>"${_ANSWER}" || return 1
+                    _BCFS_DURABILITY_SELECTED="$(cat "${_ANSWER}")"
+                    _DURABILITY="--durability=${_BCFS_DURABILITY_SELECTED}"
+        fi
+        _DUR_COUNT=$((_DUR_COUNT + _BCFS_DURABILITY_SELECTED))
+    fi
+    if [[ "$(cat /sys/block/"$(basename "${_BCFS_DEV}")"/queue/rotational)" == 0 ]]; then
+        _BCFS_SSD_COUNT=$((_BCFS_SSD_COUNT + 1))
+        _BCFS_LABEL="--label ssd.ssd${_BCFS_SSD_COUNT}"
+        _BCFS_SSD_OPTIONS="--foreground_target=ssd --promote_target=ssd"
+    else
+        _BCFS_HDD_COUNT=$((_BCFS_HDD_COUNT + 1))
+        _BCFS_LABEL="--label hdd.${_BCFS_HDD_COUNT}"
+        _BCFS_HDD_OPTIONS="--background_target=hdd"
+    fi
+}
+
 # select bcfs raid devices
 _bcfs_select_raid_devices () {
     # select the second device to use, no missing option available!
     : >/tmp/.bcfs-devices
     echo "${_BCFS_DEV}" >>/tmp/.bcfs-devices
     _BCFS_DEVS=""
-    _DUR_COUNT="0"
-    _BCFS_HDD_COUNT="0"
-    _BCFS_SSD_COUNT="0"
     #shellcheck disable=SC2001,SC2086
     for i in ${_DEVS}; do
         echo "${i}" | grep -q /dev && _BCFS_DEVS="${_BCFS_DEVS} ${i} _ "
@@ -36,33 +63,7 @@ _bcfs_select_raid_devices () {
         _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 ${_BCFS_DEVS} ${_BCFS_DONE} 2>"${_ANSWER}" || return 1
         _BCFS_DEV=$(cat "${_ANSWER}")
         [[ "${_BCFS_DEV}" == "DONE" ]] && break
-        # add durability
-        _BCFS_DURABILITY="1 Normal_Device 0 Cache_Device Custom _"
-        _dialog --no-cancel --title " Durability " --menu "" 13 50 7 ${_BCFS_DURABILITY} 2>"${_ANSWER}" || return 1
-        _BCFS_DURABILITY_SELECTED=$(cat "${_ANSWER}")
-        if [[ ${_BCFS_DURABILITY_SELECTED} == 1 ]]; then
-            _DURABILITY=""
-        elif [[ ${_BCFS_DURABILITY_SELECTED} == 0 ]]; then
-            _DURABILITY="--durability=0"
-            _DUR_COUNT=$((_DUR_COUNT - 1))
-        else
-            if [[ ${_BCFS_DURABILITY_SELECTED} == "Custom" ]]; then
-                _dialog  --inputbox "Enter custom durability level (number):" 8 65 \
-                        "2" 2>"${_ANSWER}" || return 1
-                     _BCFS_DURABILITY_SELECTED="$(cat "${_ANSWER}")"
-                     _DURABILITY="--durability=${_BCFS_DURABILITY_SELECTED}"
-            fi
-            _DUR_COUNT=$((_DUR_COUNT + _BCFS_DURABILITY_SELECTED))
-        fi
-        if [[ "$(cat /sys/block/"$(basename "${_BCFS_DEV}")"/queue/rotational)" == 0 ]]; then
-            _BCFS_SSD_COUNT=$((_BCFS_SSD_COUNT + 1))
-            _BCFS_LABEL="--label ssd.ssd${_BCFS_SSD_COUNT}"
-            _BCFS_SSD_OPTIONS="--foreground_target=ssd --promote_target=ssd"
-        else
-            _BCFS_HDD_COUNT=$((_BCFS_HDD_COUNT + 1))
-            _BCFS_LABEL="--label hdd.${_BCFS_HDD_COUNT}"
-            _BCFS_HDD_OPTIONS="--background_target=hdd"
-        fi
+        _bcfs_raid_options || return 1
         echo "${_DURABILITY}" "${_BCFS_LABEL}" "${_BCFS_DEV}" >>/tmp/.bcfs-devices
      done
      # final step ask if everything is ok?
@@ -76,6 +77,9 @@ _bcfs_raid_level() {
     _BCFS_RAID_FINISH=""
     _BCFS_LEVEL=""
     _BCFS_DEV="${_DEV}"
+    _DUR_COUNT="0"
+    _BCFS_HDD_COUNT="0"
+    _BCFS_SSD_COUNT="0"
     : >/tmp/.bcfs-devices
     while [[ "${_BCFS_RAID_FINISH}" != "DONE" ]]; do
         #shellcheck disable=SC2086
@@ -88,12 +92,14 @@ _bcfs_raid_level() {
             # replicas
             _BCFS_REPLICATION="2 - 3 - Custom _"
             _dialog --no-cancel --title " Replication Level " --menu "" 13 50 7 ${_BCFS_REPLICATION} 2>"${_ANSWER}" || return 1
+
             _BCFS_REP_COUNT="$(cat ${_ANSWER})"
             if [[ ${_BCFS_REPLICATION} == "Custom" ]]; then
                 _dialog  --inputbox "Enter custom replication level (number):" 8 65 \
                         "4" 2>"${_ANSWER}" || return 1
                     _BCFS_REPLICATION=$(cat "${_ANSWER}")
             fi
+            _bcfs_raid_options
             _bcfs_select_raid_devices
         fi
     done
