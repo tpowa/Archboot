@@ -15,9 +15,9 @@ _bcfs_raid_options() {
     else
         if [[ ${_BCFS_DURABILITY_SELECTED} == "Custom" ]]; then
             _dialog  --inputbox "Enter custom durability level (number):" 8 65 \
-                    "2" 2>"${_ANSWER}" || return 1
-                    _BCFS_DURABILITY_SELECTED="$(cat "${_ANSWER}")"
-                    _DURABILITY="--durability=${_BCFS_DURABILITY_SELECTED}"
+                "2" 2>"${_ANSWER}" || return 1
+                _BCFS_DURABILITY_SELECTED="$(cat "${_ANSWER}")"
+                _DURABILITY="--durability=${_BCFS_DURABILITY_SELECTED}"
         fi
         _DUR_COUNT=$((_DUR_COUNT + _BCFS_DURABILITY_SELECTED))
     fi
@@ -30,6 +30,7 @@ _bcfs_raid_options() {
         _BCFS_LABEL="--label hdd.${_BCFS_HDD_COUNT}"
         _BCFS_HDD_OPTIONS="--background_target=hdd"
     fi
+    echo "${_DURABILITY}" "${_BCFS_LABEL}" "${_BCFS_DEV}" >>/tmp/.bcfs-devices
 }
 
 # select bcfs raid devices
@@ -64,7 +65,6 @@ _bcfs_select_raid_devices () {
         _BCFS_DEV=$(cat "${_ANSWER}")
         [[ "${_BCFS_DEV}" == "DONE" ]] && break
         _bcfs_raid_options || return 1
-        echo "${_DURABILITY}" "${_BCFS_LABEL}" "${_BCFS_DEV}" >>/tmp/.bcfs-devices
      done
      # final step ask if everything is ok?
      #shellcheck disable=SC2028
