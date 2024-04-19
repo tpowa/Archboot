@@ -31,7 +31,7 @@ _bcfs_raid_options() {
         _BCFS_LABEL="--label hdd.hdd${_BCFS_HDD_COUNT}"
         _BCFS_HDD_OPTIONS="--background_target=hdd"
     fi
-    echo "${_DURABILITY}" "${_BCFS_LABEL}" "${_BCFS_DEV}" >>/tmp/.bcfs-devices
+    echo "${_DURABILITY}":"${_BCFS_LABEL}":"${_BCFS_DEV}" >>/tmp/.bcfs-devices
 }
 
 # select bcfs raid devices
