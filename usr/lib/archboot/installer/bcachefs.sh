@@ -5,22 +5,24 @@
 _bcfs_raid_options() {
     # add durability
     _DURABILITY=""
-    _BCFS_DURABILITY="1 'Normal Device' 0 'Cache Device' Custom _"
-    _dialog --no-cancel --title " Durability " --menu "" 9 30 5 ${_BCFS_DURABILITY} 2>"${_ANSWER}" || return 1
-    _BCFS_DURABILITY_SELECTED=$(cat "${_ANSWER}")
-    if [[ ${_BCFS_DURABILITY_SELECTED} == 1 ]]; then
+    _dialog --no-cancel --title " Durability " --menu "" 9 30 5 \
+        "1" "Normal Device" \
+        "0" "Cache Device" \
+        "Custom" "_" 2>"${_ANSWER}" || return 1
+    _BCFS_DURABILITY=$(cat "${_ANSWER}")
+    if [[ ${_BCFS_DURABILITY} == 1 ]]; then
         _DURABILITY=""
-    elif [[ ${_BCFS_DURABILITY_SELECTED} == 0 ]]; then
+    elif [[ ${_BCFS_DURABILITY} == 0 ]]; then
         _DURABILITY="--durability=0"
         _DUR_COUNT=$((_DUR_COUNT - 1))
     else
-        if [[ ${_BCFS_DURABILITY_SELECTED} == "Custom" ]]; then
+        if [[ ${_BCFS_DURABILITY} == "Custom" ]]; then
             _dialog  --inputbox "Enter custom durability level (number):" 8 65 \
                 "2" 2>"${_ANSWER}" || return 1
-                _BCFS_DURABILITY_SELECTED="$(cat "${_ANSWER}")"
-                _DURABILITY="--durability=${_BCFS_DURABILITY_SELECTED}"
+                _BCFS_DURABILITY="$(cat "${_ANSWER}")"
+                _DURABILITY="--durability=${_BCFS_DURABILITY}"
         fi
-        _DUR_COUNT=$((_DUR_COUNT + _BCFS_DURABILITY_SELECTED))
+        _DUR_COUNT=$((_DUR_COUNT + _BCFS_DURABILITY))
     fi
     if [[ "$(cat /sys/block/"$(basename "${_BCFS_DEV}")"/queue/rotational)" == 0 ]]; then
         _BCFS_SSD_COUNT=$((_BCFS_SSD_COUNT + 1))
