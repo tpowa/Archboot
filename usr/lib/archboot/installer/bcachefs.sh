@@ -37,7 +37,6 @@ _bcfs_raid_options() {
 # select bcfs raid devices
 _bcfs_select_raid_devices () {
     # select the second device to use, no missing option available!
-    : >/tmp/.bcfs-devices
     _BCFS_DEVS=""
     #shellcheck disable=SC2001,SC2086
     for i in ${_DEVS}; do
@@ -73,6 +72,7 @@ _bcfs_select_raid_devices () {
 
 # choose raid level to use on bcfs device
 _bcfs_raid_level() {
+    : >/tmp/.bcfs-devices
     _BCFS_RAIDLEVELS="NONE - raid1 - raid5 - raid6 - raid10 -"
     _BCFS_RAID_FINISH=""
     _BCFS_LEVEL=""
