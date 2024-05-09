@@ -123,7 +123,6 @@ _clean_archboot() {
     # remove everything not necessary
     rm -rf /usr/lib/firmware
     rm -rf /usr/lib/modules
-    rm -rf /usr/lib/libstdc++*
     _SHARE_DIRS="bash-completion efitools fonts hwdata kbd licenses lshw nano nvim pacman systemd tc zoneinfo"
     for i in ${_SHARE_DIRS}; do
         #shellcheck disable=SC2115
