@@ -65,11 +65,11 @@ _bcfs_select_raid_devices () {
         _BCFS_DEV=$(cat "${_ANSWER}")
         [[ "${_BCFS_DEV}" == "DONE" ]] && break
         _bcfs_raid_options || return 1
-        echo "${_DURABILITY}" "${_BCFS_LABEL}" "${_BCFS_DEV}" >>/tmp/.bcfs-raid-device
-        echo "${_BCFS_SSD_OPTIONS}" >>/tmp/.bcfs-raid-device
-        echo "${_BCFS_HDD_OPTIONS}" >>/tmp/.bcfs-raid-device
+        echo "${_DURABILITY}" "${_BCFS_LABEL}" "${_BCFS_DEV}" >>/tmp/.bcfs-raid-device-raw
+        echo "${_BCFS_SSD_OPTIONS}" >>/tmp/.bcfs-raid-device-raw
+        echo "${_BCFS_HDD_OPTIONS}" >>/tmp/.bcfs-raid-device-raw
      done
-     #sort -u /tmp/.bcfs-raid-device > /tmp/.bcfs-raid-device
+     sort -u /tmp/.bcfs-raid-device-raw > /tmp/.bcfs-raid-device
      # final step ask if everything is ok?
      #shellcheck disable=SC2028
      _dialog --title " Summary " --yesno "LEVEL:\n${_BCFS_LEVEL}\n\nDEVICES:\n$(while read -r i; do echo "${i}\n"; done </tmp/.bcfs-raid-device)" 0 0 && _BCFS_RAID_FINISH="DONE"
@@ -78,6 +78,7 @@ _bcfs_select_raid_devices () {
 # choose raid level to use on bcfs device
 _bcfs_raid_level() {
     : >/tmp/.bcfs-device
+    : >/tmp/.bcfs-raid-device-raw
     : >/tmp/.bcfs-raid-device
     _BCFS_RAIDLEVELS="NONE - raid1 - raid5 - raid6 - raid10 -"
     _BCFS_RAID_FINISH=""
@@ -103,9 +104,9 @@ _bcfs_raid_level() {
         fi
         while [[ "${_BCFS_RAID_FINISH}" != "DONE" ]]; do
             _bcfs_raid_options
-            echo "${_DURABILITY}" "${_BCFS_LABEL}" "${_BCFS_DEV}" >>/tmp/.bcfs-raid-device
-            echo "${_BCFS_SSD_OPTIONS}" >>/tmp/.bcfs-raid-device
-            echo "${_BCFS_HDD_OPTIONS}" >>/tmp/.bcfs-raid-device
+            echo "${_DURABILITY}" "${_BCFS_LABEL}" "${_BCFS_DEV}" >>/tmp/.bcfs-raid-device-raw
+            echo "${_BCFS_SSD_OPTIONS}" >>/tmp/.bcfs-raid-device-raw
+            echo "${_BCFS_HDD_OPTIONS}" >>/tmp/.bcfs-raid-device-raw
             _bcfs_select_raid_devices
         done
     fi
