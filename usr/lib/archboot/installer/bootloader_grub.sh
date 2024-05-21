@@ -303,7 +303,7 @@ _grub_bios() {
     #shellcheck disable=SC2086
     _dialog --title " Grub Boot Device " --no-cancel --menu "" 14 55 7 ${_DEVS} 2>"${_ANSWER}" || return 1
     _BOOTDEV=$(cat "${_ANSWER}")
-    if [[ "$(${_LSBLK} PTTYPE "${_BOOTDEV}")" == "gpt" ]]; then
+    if [[ "$(${_LSBLK} PTTYPE -d "${_BOOTDEV}")" == "gpt" ]]; then
         _CHECK_BIOS_BOOT_GRUB=1
         _RUN_CFDISK=""
         _DISK="${_BOOTDEV}"
