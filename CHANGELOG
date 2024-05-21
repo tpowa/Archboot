@@ -1,7 +1,7 @@
 On the road to 2024.05:
 - kernel 6.9.x
 setup:
-- fixed bios_grub gpt check
+- fixed BIOS/MBR dos and UEFI gpt device check
 ---
 2024.04 Highlights:
 - fedora shim 15.8
