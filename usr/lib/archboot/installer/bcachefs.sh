@@ -69,7 +69,7 @@ _bcfs_select_raid_devices () {
         echo "${_BCFS_SSD_OPTIONS}" >>/tmp/.bcfs-raid-device
         echo "${_BCFS_HDD_OPTIONS}" >>/tmp/.bcfs-raid-device
      done
-     sort -u /tmp/.bcfs-raid-device > /tmp/.bcfs-raid-device
+     #sort -u /tmp/.bcfs-raid-device > /tmp/.bcfs-raid-device
      # final step ask if everything is ok?
      #shellcheck disable=SC2028
      _dialog --title " Summary " --yesno "LEVEL:\n${_BCFS_LEVEL}\n\nDEVICES:\n$(while read -r i; do echo "${i}\n"; done </tmp/.bcfs-raid-device)" 0 0 && _BCFS_RAID_FINISH="DONE"
