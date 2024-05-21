@@ -45,6 +45,10 @@ _bcfs_select_raid_devices () {
     done
     _BCFS_DEVS=${_BCFS_DEVS//${_BCFS_DEV}\ _/}
     _RAIDNUMBER=1
+    _bcfs_raid_options || return 1
+    echo "${_DURABILITY}" "${_BCFS_LABEL}" "${_BCFS_DEV}" >>/tmp/.bcfs-raid-device
+    echo "${_BCFS_SSD_OPTIONS}" >>/tmp/.bcfs-raid-device
+    echo "${_BCFS_HDD_OPTIONS}" >>/tmp/.bcfs-raid-device
     while [[ "${_BCFS_DEV}" != "DONE" ]]; do
         _BCFS_DONE=""
         _RAIDNUMBER=$((_RAIDNUMBER + 1))
