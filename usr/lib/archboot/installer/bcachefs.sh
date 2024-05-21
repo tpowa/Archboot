@@ -57,7 +57,6 @@ _bcfs_select_raid_devices () {
             "${_BCFS_LEVEL}" == "raid5" ]] && _BCFS_DONE="DONE _"
         [[ "$((_RAIDNUMBER + _DUR_COUNT))" -ge "$((_BCFS_REP_COUNT + 3))" &&\
             "${_BCFS_LEVEL}" == "raid10" || "${_BCFS_LEVEL}" == "raid6" ]] && _BCFS_DONE="DONE _"
-        _bcfs_raid_options || return 1
         # clean loop from used partition and options
         _BCFS_DEVS=${_BCFS_DEVS//${_BCFS_DEV}\ _/}
         # add more devices
