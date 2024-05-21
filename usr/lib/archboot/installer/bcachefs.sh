@@ -65,7 +65,6 @@ _bcfs_select_raid_devices () {
         _BCFS_DEV=$(cat "${_ANSWER}")
         [[ "${_BCFS_DEV}" == "DONE" ]] && break
         _bcfs_raid_options || return 1
-
         echo "${_DURABILITY}" "${_BCFS_LABEL}" "${_BCFS_DEV}" >>/tmp/.bcfs-raid-device
         echo "${_BCFS_SSD_OPTIONS}" >>/tmp/.bcfs-raid-device
         echo "${_BCFS_HDD_OPTIONS}" >>/tmp/.bcfs-raid-device
@@ -87,27 +86,26 @@ _bcfs_raid_level() {
     _DUR_COUNT="0"
     _BCFS_HDD_COUNT="0"
     _BCFS_SSD_COUNT="0"
-    while [[ "${_BCFS_RAID_FINISH}" != "DONE" ]]; do
-        #shellcheck disable=SC2086
-        _dialog --no-cancel --title " Raid Data Level " --menu "" 11 30 7 ${_BCFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
-        _BCFS_LEVEL=$(cat "${_ANSWER}")
-        if [[ "${_BCFS_LEVEL}" == "NONE" ]]; then
-            echo "${_BCFS_DEV}" >>/tmp/.bcfs-device
-            break
-        else
-            # replicas
-            _BCFS_REPLICATION="2 - 3 - Custom _"
-            _dialog --no-cancel --title " Replication Level " --menu "" 9 30 5 ${_BCFS_REPLICATION} 2>"${_ANSWER}" || return 1
-            _BCFS_REP_COUNT="$(cat ${_ANSWER})"
-            if [[ ${_BCFS_REP_COUNT} == "Custom" ]]; then
-                _dialog  --inputbox "Enter custom replication level (number):" 8 65 \
-                        "4" 2>"${_ANSWER}" || return 1
-                    _BCFS_REP_COUNT="$(cat "${_ANSWER}")"
-            fi
+    #shellcheck disable=SC2086
+    _dialog --no-cancel --title " Raid Data Level " --menu "" 11 30 7 ${_BCFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
+    _BCFS_LEVEL=$(cat "${_ANSWER}")
+    if [[ "${_BCFS_LEVEL}" == "NONE" ]]; then
+        echo "${_BCFS_DEV}" >>/tmp/.bcfs-device
+    else
+        # replicas
+        _BCFS_REPLICATION="2 - 3 - Custom _"
+        _dialog --no-cancel --title " Replication Level " --menu "" 9 30 5 ${_BCFS_REPLICATION} 2>"${_ANSWER}" || return 1
+        _BCFS_REP_COUNT="$(cat ${_ANSWER})"
+        if [[ ${_BCFS_REP_COUNT} == "Custom" ]]; then
+            _dialog  --inputbox "Enter custom replication level (number):" 8 65 \
+                    "4" 2>"${_ANSWER}" || return 1
+                _BCFS_REP_COUNT="$(cat "${_ANSWER}")"
+        fi
+        while [[ "${_BCFS_RAID_FINISH}" != "DONE" ]]; do
             _bcfs_raid_options
             _bcfs_select_raid_devices
-        fi
-    done
+        done
+    fi
 }
 
 # ask for bcfs compress option
