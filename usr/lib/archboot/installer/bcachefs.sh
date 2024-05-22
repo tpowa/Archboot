@@ -77,13 +77,13 @@ _bcfs_select_raid_devices () {
      done
     [[ -n "${_BCFS_SSD_OPTIONS}" ]] && echo "--foreground_target=ssd --promote_target=ssd" >> /tmp/.bcfs-raid-device
     [[ -n "${_BCFS_HDD_OPTIONS}" ]] && echo "--background_target=hdd" >> /tmp/.bcfs-raid-device
-     # final step ask if everything is ok?
-     #shellcheck disable=SC2028
-     _dialog --title " Summary " --yesno "LEVEL:\n${_BCFS_LEVEL}\n\nDEVICES:\n$(while read -r i; do echo ""${i}"\n"; done </tmp/.bcfs-raid-device)" 0 0 && _BCFS_RAID_FINISH="DONE"
+    _BCFS_RAID_FINISH="1"
 }
 
 # choose raid level to use on bcfs device
 _bcfs_raid_level() {
+    _BCFS_DEVICE_FINISH=""
+ while [[ -z "${_BCFS_DEVICE_FINISH}" ]]; do
     : >/tmp/.bcfs-device
     : >/tmp/.bcfs-raid-device
     _BCFS_RAIDLEVELS="NONE - raid1 - raid5 - raid6 - raid10 -"
@@ -101,6 +101,7 @@ _bcfs_raid_level() {
     _BCFS_LEVEL=$(cat "${_ANSWER}")
     if [[ "${_BCFS_LEVEL}" == "NONE" ]]; then
         echo "${_BCFS_DEV}" >>/tmp/.bcfs-device
+        _BCFS_DEVICE_FINISH="1"
     else
         # replicas
         _BCFS_REPLICATION="2 - 3 - Custom _"
@@ -111,11 +112,14 @@ _bcfs_raid_level() {
                     "4" 2>"${_ANSWER}" || return 1
                 _BCFS_REP_COUNT="$(cat "${_ANSWER}")"
         fi
-        while [[ "${_BCFS_RAID_FINISH}" != "DONE" ]]; do
+        while [[ -z "${_BCFS_RAID_FINISH}" ]]; do
             _bcfs_raid_options
             _bcfs_options
             _bcfs_select_raid_devices
         done
+        # final step ask if everything is ok?
+        #shellcheck disable=SC2028
+        _dialog --title " Summary " --yesno "LEVEL:\n${_BCFS_LEVEL}\n:\n$(while read -r i; do echo ""${i}"\n"; done </tmp/.bcfs-raid-device)" 0 0 && _BCFS_DEVICE_FINISH="1"
     fi
 }
 
