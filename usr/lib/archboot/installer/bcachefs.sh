@@ -119,7 +119,7 @@ _bcfs_raid_level() {
             # final step ask if everything is ok?
             #shellcheck disable=SC2028
             _dialog --title " Summary " --yesno \
-                "LEVEL:\n${_BCFS_LEVEL}\n:\n$(while read -r i; do echo ""${i}"\n"; done </tmp/.bcfs-raid-device)" \
+                "LEVEL:\n${_BCFS_LEVEL}\nDEVICES:\n$(while read -r i; do echo ""${i}"\n"; done </tmp/.bcfs-raid-device)" \
                 0 0 && _BCFS_DEVICE_FINISH="1"
         fi
     done
