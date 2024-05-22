@@ -87,6 +87,7 @@ _bcfs_raid_level() {
     while [[ -z "${_BCFS_DEVICE_FINISH}" ]]; do
         : >/tmp/.bcfs-raid-device
         _BCFS_RAIDLEVELS="NONE - raid1 - raid5 - raid6 - raid10 -"
+        _BCFS_RAID_DEV="${_DEV}"
         _BCFS_RAID_FINISH=""
         _BCFS_LEVEL=""
         _DUR_COUNT="0"
