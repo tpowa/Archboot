@@ -85,7 +85,7 @@ _auto_create_filesystems() {
         # bcachefs, btrfs and other parameters
         if [[ "${_FSTYPE}" == "bcachefs" ]]; then
             _BCFS_DEVS="${_DEV}"
-            _BCFS_COMPRESS="NONE"
+            _BCFS_COMPRESS=""
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
                    "${_BCFS_DEVS}" "${_BCFS_COMPRESS}" || return 1
         elif [[ "${_FSTYPE}" == "btrfs" ]]; then
