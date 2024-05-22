@@ -75,6 +75,7 @@ _bcfs_select_raid_devices () {
         _bcfs_raid_options || return 1
         _bcfs_options
      done
+    echo "--replicas=${_BCFS_REP_COUNT}" >> /tmp/.bcfs-raid-device
     [[ -n "${_BCFS_SSD_OPTIONS}" ]] && echo "--foreground_target=ssd --promote_target=ssd" >> /tmp/.bcfs-raid-device
     [[ -n "${_BCFS_HDD_OPTIONS}" ]] && echo "--background_target=hdd" >> /tmp/.bcfs-raid-device
     _BCFS_RAID_FINISH="1"
