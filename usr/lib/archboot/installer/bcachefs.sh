@@ -24,7 +24,7 @@ _bcfs_raid_options() {
         fi
         _DUR_COUNT=$((_DUR_COUNT + _BCFS_DURABILITY))
     fi
-    if [[ "$(cat /sys/block/"$(basename "${_BCFS_DEV}")"/queue/rotational)" == 0 ]]; then
+    if [[ "$(cat /sys/block/"$(basename "${_BCFS_RAID_DEV}")"/queue/rotational)" == 0 ]]; then
         _BCFS_SSD_COUNT=$((_BCFS_SSD_COUNT + 1))
         _BCFS_LABEL="--label ssd.ssd${_BCFS_SSD_COUNT}"
         _BCFS_SSD_OPTIONS=1
@@ -37,9 +37,9 @@ _bcfs_raid_options() {
 
 _bcfs_options() {
     if [[ -n ${_DURABILITY} ]]; then
-        echo "${_DURABILITY} ${_BCFS_LABEL} ${_BCFS_DEV}" >>/tmp/.bcfs-raid-device
+        echo "${_DURABILITY} ${_BCFS_LABEL} ${_BCFS_RAID_DEV}" >>/tmp/.bcfs-raid-device
     else
-        echo "${_BCFS_LABEL} ${_BCFS_DEV}" >>/tmp/.bcfs-raid-device
+        echo "${_BCFS_LABEL} ${_BCFS_RAID_DEV}" >>/tmp/.bcfs-raid-device
     fi
 }
 
@@ -66,7 +66,7 @@ _bcfs_select_raid_devices () {
         [[ "$((_RAIDNUMBER + _DUR_COUNT))" -ge "$((_BCFS_REP_COUNT + 3))" &&\
             "${_BCFS_LEVEL}" == "raid10" || "${_BCFS_LEVEL}" == "raid6" ]] && _BCFS_DONE="DONE _"
         # clean loop from used partition and options
-        _BCFS_DEVS=${_BCFS_DEVS//${_BCFS_DEV}\ _/}
+        _BCFS_DEVS=${_BCFS_DEVS//${_BCFS_RAID_DEV}\ _/}
         # add more devices
         #shellcheck disable=SC2086
         _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 ${_BCFS_RAID_DEVS} ${_BCFS_DONE} 2>"${_ANSWER}" || return 1
