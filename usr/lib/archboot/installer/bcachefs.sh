@@ -46,14 +46,14 @@ _bcfs_options() {
 # select bcfs raid devices
 _bcfs_select_raid_devices () {
     # select the second device to use, no missing option available!
-    _BCFS_DEVS=""
+    _BCFS_RAID_DEVS=""
     #shellcheck disable=SC2001,SC2086
     for i in ${_DEVS}; do
-        echo "${i}" | grep -q /dev && _BCFS_DEVS="${_BCFS_DEVS} ${i} _ "
+        echo "${i}" | grep -q /dev && _BCFS_RAID_DEVS="${_BCFS_RAID_DEVS} ${i} _ "
     done
-    _BCFS_DEVS=${_BCFS_DEVS//${_BCFS_DEV}\ _/}
+    _BCFS_RAID_DEVS=${_BCFS_RAID_DEVS//${_BCFS_RAID_DEV}\ _/}
     _RAIDNUMBER=1
-    while [[ "${_BCFS_DEV}" != "DONE" ]]; do
+    while [[ "${_BCFS_RAID_DEV}" != "DONE" ]]; do
         _BCFS_DONE=""
         _RAIDNUMBER=$((_RAIDNUMBER + 1))
         # RAID5 needs 3 devices
@@ -69,9 +69,9 @@ _bcfs_select_raid_devices () {
         _BCFS_DEVS=${_BCFS_DEVS//${_BCFS_DEV}\ _/}
         # add more devices
         #shellcheck disable=SC2086
-        _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 ${_BCFS_DEVS} ${_BCFS_DONE} 2>"${_ANSWER}" || return 1
-        _BCFS_DEV=$(cat "${_ANSWER}")
-        [[ "${_BCFS_DEV}" == "DONE" ]] && break
+        _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 ${_BCFS_RAID_DEVS} ${_BCFS_DONE} 2>"${_ANSWER}" || return 1
+        _BCFS_RAID_DEV=$(cat "${_ANSWER}")
+        [[ "${_BCFS_RAID_DEV}" == "DONE" ]] && break
         _bcfs_raid_options || return 1
         _bcfs_options
      done
@@ -89,7 +89,6 @@ _bcfs_raid_level() {
         _BCFS_RAIDLEVELS="NONE - raid1 - raid5 - raid6 - raid10 -"
         _BCFS_RAID_FINISH=""
         _BCFS_LEVEL=""
-        _BCFS_DEV="${_DEV}"
         _DUR_COUNT="0"
         _BCFS_HDD_COUNT="0"
         _BCFS_HDD_OPTIONS=""
@@ -99,7 +98,7 @@ _bcfs_raid_level() {
         _dialog --no-cancel --title " Raid Data Level " --menu "" 11 30 7 ${_BCFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
         _BCFS_LEVEL=$(cat "${_ANSWER}")
         if [[ "${_BCFS_LEVEL}" == "NONE" ]]; then
-            _BCFS_DEVS="${_BCFS_DEV}"
+            _BCFS_DEVS="${_DEV}"
             _BCFS_DEVICE_FINISH="1"
         else
             # replicas
