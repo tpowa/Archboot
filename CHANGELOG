@@ -2,6 +2,7 @@ On the road to 2024.05:
 - kernel 6.9.x
 setup:
 - fixed BIOS/MBR dos and UEFI gpt device check
+- added bcachefs multi device support
 ---
 2024.04 Highlights:
 - fedora shim 15.8
