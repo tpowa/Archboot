@@ -134,7 +134,7 @@ _run_mkfs() {
             if [[ "${_BCFS_COMPRESS}" == "NONE" ]];then
                 _BCFS_COMPRESS=""
             else
-                _BCFS_COMPRESS="--compression=${_BCFS_COMPRESS} --background_compression=${_BCFS_COMPRESS}"
+                _BCFS_COMPRESS="--compression=${_BCFS_COMPRESS}"
             fi
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
                   "${_BCFS_DEVS}" "${_BCFS_COMPRESS}" || return 1
