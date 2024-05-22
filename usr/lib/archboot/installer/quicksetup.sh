@@ -84,9 +84,10 @@ _auto_create_filesystems() {
         _BTRFS_COMPRESS=""
         # bcachefs, btrfs and other parameters
         if [[ "${_FSTYPE}" == "bcachefs" ]]; then
-             _BCACHEFS_COMPRESS="--compression=zstd"
+            _BCFS_DEVS="${_DEV}"
+            _BCFS_COMPRESS="NONE"
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-                  "${_BCACHEFS_COMPRESS}" || return 1
+                   "${_BCFS_DEVS}" "${_BCFS_COMPRESS}" || return 1
         elif [[ "${_FSTYPE}" == "btrfs" ]]; then
             _BTRFS_DEVS="${_DEV}"
             [[ "${_MP}" == "/" ]] && _BTRFS_SUBVOLUME="root"
