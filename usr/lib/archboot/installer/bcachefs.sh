@@ -130,7 +130,7 @@ _bcfs_raid_level() {
 
 # ask for bcfs compress option
 _bcfs_compress() {
-    _BCFS_COMPRESSLEVELS="zstd - lz4 - gzip - NONE -"
+    _BCFS_COMPRESSLEVELS="NONE - zstd - lz4 - gzip -"
     #shellcheck disable=SC2086
     _dialog --no-cancel --title " Compression on ${_DEV} " --menu "" 10 50 4 ${_BCFS_COMPRESSLEVELS} 2>"${_ANSWER}" || return 1
     if [[ "$(cat "${_ANSWER}")" == "NONE" ]]; then

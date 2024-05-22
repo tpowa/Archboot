@@ -128,14 +128,16 @@ _run_mkfs() {
         [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
         # bcachefs, btrfs and other parameters
         if [[ ${_FSTYPE} == "bcachefs" ]]; then
-            _BCFS_COMPRESS=$(echo "${line}" | cut -d '|' -f 7)
+            _BCFS_DEVS="${_BCFS_DEVS//#/\ }"
+            _BCFS_DEVS=$(echo "${line}" | cut -d '|' -f 7)
+            _BCFS_COMPRESS=$(echo "${line}" | cut -d '|' -f 8)
             if [[ "${_BCFS_COMPRESS}" == "NONE" ]];then
                 _BCFS_COMPRESS=""
             else
-                _BCFS_COMPRESS="--compression=${_BCFS_COMPRESS}"
+                _BCFS_COMPRESS="--compression=${_BCFS_COMPRESS} --background_compression=${_BCFS_COMPRESS}"
             fi
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-                  "${_BCFS_COMPRESS}" || return 1
+                  "${_BCFS_DEVS}" "${_BCFS_COMPRESS}" || return 1
         elif [[ ${_FSTYPE} == "btrfs" ]]; then
             _BTRFS_DEVS=$(echo "${line}" | cut -d '|' -f 7)
             # remove # from array
@@ -449,7 +451,7 @@ _mkfs() {
             #shellcheck disable=SC2086
             case ${2} in
                 # don't handle anything else here, we will error later
-                bcachefs) mkfs.bcachefs -f ${7} -L "${6}" ${8} ${1} &>"${_LOG}"; ret=$? ;;
+                bcachefs) mkfs.bcachefs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}"; ret=$? ;;
                 btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} &>"${_LOG}"; ret=$? ;;
                 ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}"; ret=$? ;;
                 vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}"; ret=$? ;;
@@ -474,7 +476,7 @@ _mkfs() {
         # prepare btrfs mount options
         [[ -n "${10}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} subvol=${10}"
         [[ -n "${11}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} ${11}"
-        _MOUNTOPTIONS="${_MOUNTOPTIONS} ${_SSD_MOUNT_OPTIONS} ${_F2FS_MOUNTOPTIONS}"
+        _MOUNTOPTIONS="${_MOUNTOPTIONS} ${_SSD_MOUNT_OPTIONS}"
         # eleminate spaces at beginning and end, replace other spaces with ,
         _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
         # mount the bad boy
