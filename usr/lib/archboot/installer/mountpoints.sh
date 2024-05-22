@@ -8,7 +8,8 @@ _destdir_mounts(){
     _CREATE_MOUNTPOINTS=""
     _ROOTDEV=""
     # check if something is mounted on ${_DESTDIR}
-    _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d ' ' -f 1)"
+    # bcachefs uses : array for raid devices, kill this one
+    _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d ' ' -f 1 | sed -e 's#:.*##g')"
     # Run mountpoints, if nothing is mounted on ${_DESTDIR}
     if [[ -z "${_ROOTDEV}" ]]; then
         _dialog --msgbox "Setup couldn't detect mounted partition(s) in ${_DESTDIR}, please set mountpoints first." 0 0

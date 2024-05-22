@@ -217,8 +217,8 @@ _auto_hwdetect() {
         _HWDETECTHOOKS="$(hwdetect --root_directory="${_DESTDIR}" --rootdevice="${_ROOTDEV}")"
     fi
     # change mkinitcpio.conf
-    [[ -n "${_HWDETECTMODULES}" ]] && sed -i -e "s/^MODULES=.*/${_HWDETECTMODULES}/g" "${_DESTDIR}"/etc/mkinitcpio.conf
-    [[ -n "${_HWDETECTHOOKS}" ]] && sed -i -e "s/^HOOKS=.*/${_HWDETECTHOOKS}/g" "${_DESTDIR}"/etc/mkinitcpio.conf
+    [[ -n "${_HWDETECTMODULES}" ]] && sed -i -e "s#^MODULES=.*#${_HWDETECTMODULES}#g" "${_DESTDIR}"/etc/mkinitcpio.conf
+    [[ -n "${_HWDETECTHOOKS}" ]] && sed -i -e "s/#HOOKS=.*#${_HWDETECTHOOKS}#g" "${_DESTDIR}"/etc/mkinitcpio.conf
     _progress "100" "Preconfiguring mkinitcpio settings on installed system..."
 }
 
