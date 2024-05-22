@@ -85,7 +85,6 @@ _bcfs_select_raid_devices () {
 _bcfs_raid_level() {
     _BCFS_DEVICE_FINISH=""
     while [[ -z "${_BCFS_DEVICE_FINISH}" ]]; do
-        : >/tmp/.bcfs-device
         : >/tmp/.bcfs-raid-device
         _BCFS_RAIDLEVELS="NONE - raid1 - raid5 - raid6 - raid10 -"
         _BCFS_RAID_FINISH=""
@@ -100,7 +99,7 @@ _bcfs_raid_level() {
         _dialog --no-cancel --title " Raid Data Level " --menu "" 11 30 7 ${_BCFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
         _BCFS_LEVEL=$(cat "${_ANSWER}")
         if [[ "${_BCFS_LEVEL}" == "NONE" ]]; then
-            echo "${_BCFS_DEV}" >>/tmp/.bcfs-device
+            _BCFS_DEVS="${_BCFS_DEV}"
             _BCFS_DEVICE_FINISH="1"
         else
             # replicas
@@ -122,6 +121,9 @@ _bcfs_raid_level() {
             _dialog --title " Summary " --yesno \
                 "LEVEL:\n${_BCFS_LEVEL}\nDEVICES:\n$(while read -r i; do echo ""${i}"\n"; done </tmp/.bcfs-raid-device)" \
                 0 0 && _BCFS_DEVICE_FINISH="1"
+            while read -r i; do
+                _BCFS_DEVS="${_BCFS_DEVS} ${i}"
+            done </tmp/.bcfs-raid-device
         fi
     done
 }
