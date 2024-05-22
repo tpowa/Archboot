@@ -143,5 +143,6 @@ _bcfs_compress() {
 # prepare new btrfs device
 _prepare_bcfs() {
     _bcfs_raid_level || return 1
+    _bcfs_compress || return 1
     #_prepare_bcfs_subvolume || return 1
 }
