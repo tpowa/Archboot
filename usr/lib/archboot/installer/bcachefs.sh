@@ -65,12 +65,12 @@ _bcfs_select_raid_devices () {
         _BCFS_DEV=$(cat "${_ANSWER}")
         [[ "${_BCFS_DEV}" == "DONE" ]] && break
         _bcfs_raid_options || return 1
-        echo "${_DURABILITY}" "${_BCFS_LABEL}" "${_BCFS_DEV}" >>/tmp/.bcfs-raid-device-raw
-        echo "${_BCFS_SSD_OPTIONS}" >>/tmp/.bcfs-raid-device-raw
-        echo "${_BCFS_HDD_OPTIONS}" >>/tmp/.bcfs-raid-device-raw
+        echo "${_DURABILITY}" "${_BCFS_LABEL}" "${_BCFS_DEV}" >>/tmp/.bcfs-raid-device
+        echo "${_BCFS_SSD_OPTIONS}" >>/tmp/.bcfs-raid-device
+        echo "${_BCFS_HDD_OPTIONS}" >>/tmp/.bcfs-raid-device
      done
-    [[ -n "${_BCFS_SSD_OPTIONS}" ]] && echo "--foreground_target=ssd --promote_target=ssd" >> /tmp/.bcfs-raid-device-raw
-    [[ -n "${_BCFS_HDD_OPTIONS}" ]] && echo "--background_target=hdd" >> /tmp/.bcfs-raid-device-raw
+    [[ -n "${_BCFS_SSD_OPTIONS}" ]] && echo "--foreground_target=ssd --promote_target=ssd" >> /tmp/.bcfs-raid-device
+    [[ -n "${_BCFS_HDD_OPTIONS}" ]] && echo "--background_target=hdd" >> /tmp/.bcfs-raid-device
      #sort -u /tmp/.bcfs-raid-device-raw > /tmp/.bcfs-raid-device
      # final step ask if everything is ok?
      #shellcheck disable=SC2028
@@ -80,7 +80,6 @@ _bcfs_select_raid_devices () {
 # choose raid level to use on bcfs device
 _bcfs_raid_level() {
     : >/tmp/.bcfs-device
-    : >/tmp/.bcfs-raid-device-raw
     : >/tmp/.bcfs-raid-device
     _BCFS_RAIDLEVELS="NONE - raid1 - raid5 - raid6 - raid10 -"
     _BCFS_RAID_FINISH=""
@@ -110,12 +109,12 @@ _bcfs_raid_level() {
         while [[ "${_BCFS_RAID_FINISH}" != "DONE" ]]; do
             _bcfs_raid_options
             if [[ -n ${_DURABILITY} ]]; then
-                echo "${_DURABILITY} ${_BCFS_LABEL} ${_BCFS_DEV}" >>/tmp/.bcfs-raid-device-raw
+                echo "${_DURABILITY} ${_BCFS_LABEL} ${_BCFS_DEV}" >>/tmp/.bcfs-raid-device
             else
-                echo "${_BCFS_LABEL} ${_BCFS_DEV}" >>/tmp/.bcfs-raid-device-raw
+                echo "${_BCFS_LABEL} ${_BCFS_DEV}" >>/tmp/.bcfs-raid-device
             fi
-            echo "${_BCFS_SSD_OPTIONS}" >> /tmp/.bcfs-raid-device-raw
-            echo "${_BCFS_HDD_OPTIONS}" >> /tmp/.bcfs-raid-device-raw
+            echo "${_BCFS_SSD_OPTIONS}" >> /tmp/.bcfs-raid-device
+            echo "${_BCFS_HDD_OPTIONS}" >> /tmp/.bcfs-raid-device
             _bcfs_select_raid_devices
         done
     fi
