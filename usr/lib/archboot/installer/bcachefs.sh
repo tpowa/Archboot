@@ -27,11 +27,11 @@ _bcfs_raid_options() {
     if [[ "$(cat /sys/block/"$(basename "${_BCFS_DEV}")"/queue/rotational)" == 0 ]]; then
         _BCFS_SSD_COUNT=$((_BCFS_SSD_COUNT + 1))
         _BCFS_LABEL="--label ssd.ssd${_BCFS_SSD_COUNT}"
-        _BCFS_SSD_OPTIONS="--foreground_target=ssd --promote_target=ssd"
+        _BCFS_SSD_OPTIONS=1
     else
         _BCFS_HDD_COUNT=$((_BCFS_HDD_COUNT + 1))
         _BCFS_LABEL="--label hdd.hdd${_BCFS_HDD_COUNT}"
-        _BCFS_HDD_OPTIONS="--background_target=hdd"
+        _BCFS_HDD_OPTIONS=1
     fi
 }
 
@@ -69,7 +69,9 @@ _bcfs_select_raid_devices () {
         echo "${_BCFS_SSD_OPTIONS}" >>/tmp/.bcfs-raid-device-raw
         echo "${_BCFS_HDD_OPTIONS}" >>/tmp/.bcfs-raid-device-raw
      done
-     sort -u /tmp/.bcfs-raid-device-raw > /tmp/.bcfs-raid-device
+    [[ -n "${_BCFS_SSD_OPTIONS}" ]] && echo "--foreground_target=ssd --promote_target=ssd" >> /tmp/.bcfs-raid-device-raw
+    [[ -n "${_BCFS_HDD_OPTIONS}" ]] && echo "--background_target=hdd" >> /tmp/.bcfs-raid-device-raw
+     #sort -u /tmp/.bcfs-raid-device-raw > /tmp/.bcfs-raid-device
      # final step ask if everything is ok?
      #shellcheck disable=SC2028
      _dialog --title " Summary " --yesno "LEVEL:\n${_BCFS_LEVEL}\n\nDEVICES:\n$(while read -r i; do echo "${i}\n"; done </tmp/.bcfs-raid-device)" 0 0 && _BCFS_RAID_FINISH="DONE"
@@ -86,7 +88,10 @@ _bcfs_raid_level() {
     _BCFS_DEV="${_DEV}"
     _DUR_COUNT="0"
     _BCFS_HDD_COUNT="0"
+    _BCFS_HDD_OPTIONS=""
     _BCFS_SSD_COUNT="0"
+    _BCFS_SSD_OPTIONS=""
+
     #shellcheck disable=SC2086
     _dialog --no-cancel --title " Raid Data Level " --menu "" 11 30 7 ${_BCFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
     _BCFS_LEVEL=$(cat "${_ANSWER}")
@@ -104,9 +109,13 @@ _bcfs_raid_level() {
         fi
         while [[ "${_BCFS_RAID_FINISH}" != "DONE" ]]; do
             _bcfs_raid_options
-            echo "${_DURABILITY}" "${_BCFS_LABEL}" "${_BCFS_DEV}" >>/tmp/.bcfs-raid-device-raw
-            echo "${_BCFS_SSD_OPTIONS}" >>/tmp/.bcfs-raid-device-raw
-            echo "${_BCFS_HDD_OPTIONS}" >>/tmp/.bcfs-raid-device-raw
+            if [[ -n ${_DURABILITY} ]]; then
+                echo "${_DURABILITY} ${_BCFS_LABEL} ${_BCFS_DEV}" >>/tmp/.bcfs-raid-device-raw
+            else
+                echo "${_BCFS_LABEL} ${_BCFS_DEV}" >>/tmp/.bcfs-raid-device-raw
+            fi
+            echo "${_BCFS_SSD_OPTIONS}" >> /tmp/.bcfs-raid-device-raw
+            echo "${_BCFS_HDD_OPTIONS}" >> /tmp/.bcfs-raid-device-raw
             _bcfs_select_raid_devices
         done
     fi
