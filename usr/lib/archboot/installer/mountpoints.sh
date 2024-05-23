@@ -392,7 +392,7 @@ _mountpoints() {
     _COUNT=0
     _run_mkfs | _dialog --title " Mountpoints " --no-mouse --gauge "Mountpoints..." 6 75 0
     _printk on
-     _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d ' ' -f 1)"
+     _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d ' ' -f 1 | sed -e 's#:.*##g')"
     _NEXTITEM="5"
 }
 
