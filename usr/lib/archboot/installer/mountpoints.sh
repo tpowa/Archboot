@@ -356,9 +356,9 @@ _mountpoints() {
                     elif [[ "${_FSTYPE}" == "bcachefs" ]]; then
                         echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BCFS_DEVS}|${_BCFS_COMPRESS}" >>/tmp/.parts
                         # remove parts of multi devices
-                        if [[ -z "${_CREATE_MOUNTPOINTS}" ]]; then
+                        if [[ -n "${_SKIP_FILESYSTEM}" ]]; then
                             _BCFS_UUID="$(${_LSBLK} UUID -d "${_DEV}")"
-                            for i in $({_LSBLK} NAME,UUID | grep ${_BCFS_UUID} | cut -d ' ' -f1); do
+                            for i in $(${_LSBLK} NAME,UUID | grep ${_BCFS_UUID} | cut -d ' ' -f 1); do
                                 _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${i}" 2>"${_NO_LOG}")/}"
                             done
                         fi
