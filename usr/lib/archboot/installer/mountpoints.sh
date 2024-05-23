@@ -355,6 +355,13 @@ _mountpoints() {
                         echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BTRFS_DEVS}|${_BTRFS_LEVEL}|${_BTRFS_SUBVOLUME}|${_BTRFS_COMPRESS}" >>/tmp/.parts
                     elif [[ "${_FSTYPE}" == "bcachefs" ]]; then
                         echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BCFS_DEVS}|${_BCFS_COMPRESS}" >>/tmp/.parts
+                        # remove parts of multi devices
+                        if [[ -z ${_DOMKFS} ]]; then
+                            _BCFS_UUID="$(${_LSBLK} UUID -d "${_DEV}")"
+                            for i in $({_LSBLK} NAME,SIZE -d "${_DEV}" | grep ${_BCFS_UUID} | cut -d ' ' -f1); do
+                                _DEVS="${_DEVS//${i} _/}"
+                            done
+                        fi
                     else
                         echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}" >>/tmp/.parts
                     fi
