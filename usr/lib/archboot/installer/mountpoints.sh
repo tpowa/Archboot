@@ -358,8 +358,8 @@ _mountpoints() {
                         # remove parts of multi devices
                         if [[ -z ${_DOMKFS} ]]; then
                             _BCFS_UUID="$(${_LSBLK} UUID -d "${_DEV}")"
-                            for i in $({_LSBLK} NAME,SIZE -d "${_DEV}" | grep ${_BCFS_UUID} | cut -d ' ' -f1); do
-                                _DEVS="${_DEVS//${i} _/}"
+                            for i in $({_LSBLK} NAME,UUID -d "${_DEV}" | grep ${_BCFS_UUID} | cut -d ' ' -f1); do
+                                _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
                             done
                         fi
                     else
