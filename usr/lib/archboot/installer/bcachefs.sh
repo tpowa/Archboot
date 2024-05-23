@@ -56,6 +56,8 @@ _bcfs_select_raid_devices () {
     while [[ "${_BCFS_RAID_DEV}" != "DONE" ]]; do
         _BCFS_DONE=""
         _RAIDNUMBER=$((_RAIDNUMBER + 1))
+        ### RAID5/6 is not ready atm 23052024
+        # RAID5/6 need ec option!
         # RAID5 needs 3 devices
         # RAID6 and RAID10 need 4 devices!
         [[ "$((_RAIDNUMBER + _DUR_COUNT))" -ge "$((_BCFS_REP_COUNT + 1))" &&\
@@ -86,7 +88,7 @@ _bcfs_raid_level() {
     _BCFS_DEVICE_FINISH=""
     while [[ -z "${_BCFS_DEVICE_FINISH}" ]]; do
         : >/tmp/.bcfs-raid-device
-        _BCFS_RAIDLEVELS="NONE - raid1 - raid5 - raid6 - raid10 -"
+        _BCFS_RAIDLEVELS="NONE - raid1 - raid10 -"
         _BCFS_RAID_DEV="${_DEV}"
         _BCFS_RAID_FINISH=""
         _BCFS_LEVEL=""
