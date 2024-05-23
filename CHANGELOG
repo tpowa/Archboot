@@ -1,5 +1,6 @@
 On the road to 2024.05:
 - kernel 6.9.x
+- neovim 0.10.x
 setup:
 - fixed BIOS/MBR dos and UEFI gpt device check
 - added bcachefs multi device support
