@@ -3,7 +3,7 @@
 - neovim 0.10.x
 - OpenSSH public key support
 Environment:
-- removed OpenSSH password root login
+- removed OpenSSH empty password root login
 - implemented OpenSSH public key login
 setup:
 - fixed BIOS/MBR dos and UEFI gpt device check
