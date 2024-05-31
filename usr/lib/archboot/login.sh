@@ -100,7 +100,7 @@ _run_update_installer() {
                 _run_latest_install
             else
                 # latest image
-                if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4001000 ]]; then
+                if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4061000 ]]; then
                     _run_latest
                 else
                     _run_latest_install
