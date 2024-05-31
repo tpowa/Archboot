@@ -8,7 +8,7 @@ _run ()
                  rpc.{gssd,idmapd,mountd,nfsd,statd} rpcdebug rsync showmount \
                  scp screen sftp sm-notify ssh-{add,agent,copy-id,keygen,keyscan} \
                  sshd start-statd tmux ttyd
-    _map _file /etc/{screenrc,ssh/{ssh_config,sshd_config,/moduli},rsyncd.conf,exports,netconfig} \
+    _map _file /etc/{screenrc,ssh/{ssh_config,/moduli},rsyncd.conf,exports,netconfig} \
           /usr/lib/ssh/{sftp-server,ssh-keysign,ssh-pkcs11-helper}
     mkdir -p "${_ROOTFS}"/root/.ssh
     # add ssh key
@@ -19,6 +19,10 @@ _run ()
     fi
     _file_rename /etc/archboot/ssh/archboot-key.pub /root/.ssh/archboot-key.pub
     _file /etc/archboot/ssh/archboot-key.pub
+    # switch port to ARCH and disable password login
+    _file_rename /etc/ssh/sshd_config /etc/ssh/sshd_config
+    echo "Port 11838" >> ${_ROOTFS}/etc/ssh/sshd_config
+    echo "PasswordAuthentication no" >> ${_ROOTFS}/etc/ssh/sshd_config
     _full_dir /usr/lib/libnfsidmap
     _map _dir /var/lib/{nfs/{sm,sm.bak,v4recovery,rpc_pipefs},gssproxy/{clients,rcache}} \
               /var/log/gssproxy
