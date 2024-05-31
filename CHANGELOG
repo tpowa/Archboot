@@ -1,7 +1,10 @@
 2024.05 Highlights:
 - kernel 6.9.x
 - neovim 0.10.x
-- OpenSSH key support
+- OpenSSH public key support
+Environment:
+- removed OpenSSH password root login
+- implemented OpenSSH public key login
 setup:
 - fixed BIOS/MBR dos and UEFI gpt device check
 - added bcachefs multi device support
