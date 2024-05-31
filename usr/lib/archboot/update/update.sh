@@ -65,7 +65,7 @@ usage () {
                 echo -e " \e[1m-latest\e[m          Launch latest archboot environment (using kexec)."
             fi
         fi
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4001000 ]]; then
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 4061000 ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
                 echo -e " \e[1m-latest-install\e[m  Launch latest archboot environment with"
                 echo -e "                  package cache (using kexec)."
