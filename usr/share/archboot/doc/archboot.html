@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="https://archboot.com/gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2024 Fundraise: 0% <progress max="100" value="5">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2024 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 31.05.2024 09:45</strong></p>
+<strong>Last update: 31.05.2024 10:45</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -161,7 +161,7 @@
 <ul>
 <li>During boot, all <strong>ethernet</strong> network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Network_configuration#DHCP" title="DHCP"><strong>DHCP</strong></a>, <strong>except</strong> -local image files.</li>
 <li><strong>With</strong> a fast <strong>ethernet</strong> internet connection <strong>and</strong> a running <a href="https://wiki.archlinux.org/title/DHCP" title="DHCP"><strong>DHCP</strong></a> server, go for the <strong>latest</strong> image.<br>If your system holds at least 4G RAM the package cache will be preserved.</li>
-<li><strong>Without</strong> an internet connection or an <strong>insecure</strong> network environment (eg. setting up a remote server at a hosting company),<br>you should use the <strong>local</strong> image. It includes a <strong>local package repository</strong> for installation.<br>It will <strong>not</strong> use any network interfaces/services, until you explicitly switch to <strong>Online</strong> mode.</li>
+<li><strong>Without</strong> an internet connection you should use the <strong>local</strong> image. It includes a <strong>local package repository</strong> for installation.<br>It will <strong>not</strong> use any network interfaces/services, until you explicitly switch to <strong>Online</strong> mode.</li>
 </ul>
 <h3 data-number="2.2" id="boot-modes"><span class="header-section-number">2.2</span> <strong>ISO Boot Modes</strong></h3>
 <table>
@@ -347,10 +347,29 @@
 <p><a href="https://wiki.archlinux.org/title/Serial_console" title="Serial console"><strong>Serial console</strong></a> is enabled on <strong>ttyS0</strong>, <strong>ttyAMA0</strong> and <strong>ttyUSB0</strong>.</p>
 <h3 data-number="3.3" id="remote-terminal-access"><span class="header-section-number">3.3</span> <strong>Remote Terminal Access</strong></h3>
 <h4 data-number="3.3.1" id="remote-access-openssh"><span class="header-section-number">3.3.1</span> <strong>OpenSSH Terminal</strong></h4>
-<ul>
-<li>Access the terminal with <a href="https://wiki.archlinux.org/title/OpenSSH" title="Password"><strong>OpenSSH</strong></a>.</li>
-<li><strong>Attention:</strong> OpenSSH key is embedded in <strong>Release.txt</strong> <strong>Passphrase</strong></a> is <strong>Archboot</strong></li>
-</ul>
+<p>Access the terminal with <a href="https://wiki.archlinux.org/title/OpenSSH" title="Password"><strong>OpenSSH</strong></a>.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Key</strong></td>
+<td>embedded in<br>Release.txt</td>
+</tr>
+<tr class="even">
+<td><strong>Passphrase</strong></td>
+<td>Archboot</td>
+</tr>
+<tr class="odd">
+<td><strong>Port</strong></td>
+<td>11838</td>
+</tr>
+</tbody>
+</table>
 <table>
 <thead>
 <tr class="header">
@@ -359,7 +378,8 @@
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ ssh -i <yourkeyfile> -p 11838 -o StrictHostKeychecking=no -o UserKnownHostsFile=/dev/null root@archboot.local</code></td>
+<td><code>$ ssh -i &lt;yourkeyfile&gt; -p 11838 -o StrictHostKeychecking=no \
+-o UserKnownHostsFile=/dev/null root@archboot.local</code></td>
 </tr>
 </tbody>
 </table>
@@ -943,6 +963,7 @@ The calculated size to boot the image follows the formula:<br>
 <p>In order to build images you will need around <strong>3G</strong> free space on disk.</p>
 <h3 data-number="7.2.2" id="create-image-files-without-modifications"><span class="header-section-number">7.2.2</span> <strong>Create Image Files Without Modifications</strong></h3>
 <p>This script creates every installation media with latest available core/extra packages and boot/ directory with kernel and initrds.</p>
+<li><strong>Custom OpenSSH Key</strong>: Place your public key to <strong>/etc/archboot/ssh/archboot-key.pub</strong></li>
 <table>
 <thead>
 <tr class="header">
@@ -967,6 +988,8 @@ The calculated size to boot the image follows the formula:<br>
 </tr>
 </tbody>
 </table>
+<li>Add the used private OpenSSH key to /etc/archboot/archboot-key</li>
+<li>Add the used public OpenSSH key to /etc/archboot/archboot-key.pub</li>
 <h3 data-number="7.2.3" id="create-image-files-with-modifications"><span class="header-section-number">7.2.3</span> <strong>Create Image Files With Modifications:</strong></h3>
 <p>Explanation of the image tools / toolchain.</p>
 <h4 data-number="7.2.3.1" id="archboot-x86_64-create-container.sh"><span class="header-section-number">7.2.3.1</span> <strong>archboot-x86_64-create-container.sh</strong></h4>
