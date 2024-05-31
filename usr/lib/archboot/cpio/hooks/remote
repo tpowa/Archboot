@@ -11,11 +11,14 @@ _run ()
     _map _file /etc/{screenrc,ssh/{ssh_config,sshd_config,/moduli},rsyncd.conf,exports,netconfig} \
           /usr/lib/ssh/{sftp-server,ssh-keysign,ssh-pkcs11-helper}
     mkdir -p "${_ROOTFS}"/root/.ssh
+    # add ssh key
     _file_rename /etc/archboot/ssh/archboot-key.pub /root/.ssh/authorized_keys
     if [[ -f /etc/archboot/ssh/archboot-key ]]; then
         _file_rename /etc/archboot/ssh/archboot-key /root/.ssh/archboot-key
+        _file /etc/archboot/ssh/archboot-key
     fi
     _file_rename /etc/archboot/ssh/archboot-key.pub /root/.ssh/archboot-key.pub
+    _file /etc/archboot/ssh/archboot-key.pub
     _full_dir /usr/lib/libnfsidmap
     _map _dir /var/lib/{nfs/{sm,sm.bak,v4recovery,rpc_pipefs},gssproxy/{clients,rcache}} \
               /var/log/gssproxy

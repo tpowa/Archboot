@@ -195,7 +195,7 @@ _create_iso() {
          cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")"
     echo ""
     if [[ -f "${_W_DIR}"/etc/archboot/ssh/archboot-key ]]; then
-        ${_NSPAWN} "${_W_DIR}" cat /etc/archboot/ssh/archboot-key
+        ${_NSPAWN} "${_W_DIR}" cat /etc/archboot/ssh/archboot-key | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g"
     fi
     echo ""
     echo "---Complete Package List---"
