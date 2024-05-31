@@ -31,7 +31,7 @@ done
 for i in $(seq 0 3); do
     _SYMLINK=$(date -d "$(date +) - ${i} Months" +%Y.%m)
     for k in aarch64 riscv64 x86_64; do
-        if [[ -d ~/public_html/release/"${k}"/"${_SYMLINK}" ]]; then
+        if [[ -d ~/public_html/release/"${k}"/"${_SYMLINK}" && ! -L ~/release/"${k}"/"${_SYMLINK}" ]]; then
             ln -s ~/public_html/release/"${k}"/"${_SYMLINK}" \
                   ~/release/"${k}"/"${_SYMLINK}"
         fi
