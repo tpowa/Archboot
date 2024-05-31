@@ -129,6 +129,17 @@ _create_pacman_conf() {
     fi
 }
 
+_ssh_keys() {
+    mkdir "${1}"/ssh-keys
+    if [[ -f '/etc/archboot/ssh/archboot-key.pub' ]]; then
+        echo "Using custom OpenSSH Key..."
+        cp /etc/archboot/ssh/archboot-key.pub "${1}"/etc/archboot/ssh/
+    else
+        echo "Generating new Archboot OpenSSH Key..."
+        ssh-keygen -C Archboot -f "${1}"/etc/archboot/ssh/archboot-key -N 'Archboot' -q
+    fi
+}
+
 _change_pacman_conf() {
     # enable parallel downloads
     sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${1}"/etc/pacman.conf

@@ -194,6 +194,10 @@ _create_iso() {
     echo "Systemd:$(${_NSPAWN} "${_W_DIR}" pacman -Qi systemd | grep Version |\
          cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")"
     echo ""
+    if [[ -f "${_W_DIR}"/etc/archboot/ssh/archboot-key ]]; then
+        ${_NSPAWN} "${_W_DIR}" cat /etc/archboot/ssh/archboot-key
+    fi
+    echo ""
     echo "---Complete Package List---"
     ${_NSPAWN} "${_W_DIR}" pacman -Q | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g" \
          -e "s/\x1b\[.*[0-9][h;l]//g") >>Release.txt
