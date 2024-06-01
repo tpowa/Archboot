@@ -149,7 +149,7 @@ _user_management() {
             done
             _FN=""
             while [[ -z "${_FN}" ]]; do
-                _dialog --title " Setup ${_USER} " --no-cancel --inputbox "Enter a comment eg. your Full Name" 8 30 "" 2>"${_ANSWER}" || return 1
+                _dialog --title " Setup ${_USER} " --no-cancel --inputbox "Enter a comment eg. your Full Name" 8 40 "" 2>"${_ANSWER}" || return 1
                 _FN=$(cat "${_ANSWER}")
             done
             chroot "${_DESTDIR}" useradd -c "${_FN}" -m "${_USER}"
