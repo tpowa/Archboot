@@ -98,6 +98,7 @@ _set_password() {
 _user_management() {
     _NEXTITEM=1
     while true; do
+        _DEFAULT="--default-item ${_NEXTITEM}"
         _dialog --title " User Management " --no-cancel ${_DEFAULT} --menu "" 10 40 7 \
             "1" "Set Root Password" \
             "2" "Set Default Shell" \
