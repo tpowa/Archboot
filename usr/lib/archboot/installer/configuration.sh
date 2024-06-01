@@ -103,7 +103,7 @@ _user_management() {
             "1" "Set Root Password" \
             "2" "Set Default Shell" \
             "3" "Add User" \
-            "4" "Back to System Configuration" 2>"${_ANSWER}" || break
+            "4" "Return to System Configuration" 2>"${_ANSWER}" || break
         _FILE="$(cat "${_ANSWER}")"
         if [[ "${_FILE}" = "1" ]]; then
             _set_password Root root
