@@ -96,6 +96,7 @@ _set_password() {
 }
 
 _user_management() {
+    while true; do
         _dialog --title " User Management " --no-cancel ${_DEFAULT} --menu "" 14 40 8 \
             "1" "Set Root Password" \
             "2" "Set Default Shell" \
@@ -151,5 +152,6 @@ _user_management() {
         elif [[ "${_FILE}" = "4" ]]; then
             break
         fi
+    done
 }
 # vim: set ft=sh ts=4 sw=4 et:
