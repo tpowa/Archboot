@@ -96,6 +96,7 @@ _set_password() {
 }
 
 _user_management() {
+    _NEXTITEM=1
     while true; do
         _dialog --title " User Management " --no-cancel ${_DEFAULT} --menu "" 10 40 7 \
             "1" "Set Root Password" \
@@ -105,6 +106,7 @@ _user_management() {
         _FILE="$(cat "${_ANSWER}")"
         if [[ "${_FILE}" = "1" ]]; then
             _set_password Root root
+            _NEXTITEM=2
         elif [[ "${_FILE}" = "2" ]]; then
             _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
                 "BASH" "Standard Shell" \
@@ -132,6 +134,7 @@ _user_management() {
                 # change default shell
                 sed -i -e "s#^SHELL=.*#SHELL=/usr/bin/${_SHELL}#g" "${_DESTDIR}"/etc/default/useradd
             fi
+            _NEXTITEM=3
         elif [[ "${_FILE}" = "3" ]]; then
             _USER=""
             while [[ -z "${_USER}" ]]; do
@@ -150,7 +153,9 @@ _user_management() {
             done
             chroot "${_DESTDIR}" useradd -c "${_FN}" -m "${_USER}"
             _set_password User ${_USER}
+            _NEXTITEM=4
         elif [[ "${_FILE}" = "4" ]]; then
+            _NEXTITEM=3
             break
         fi
     done
