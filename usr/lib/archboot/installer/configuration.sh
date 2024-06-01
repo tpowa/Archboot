@@ -109,6 +109,7 @@ _user_management() {
             _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
                 "BASH" "Standard Shell" \
                 "ZSH"  "More features for experts" 2>"${_ANSWER}" || return 1
+            _SHELL=""
             case $(cat "${_ANSWER}") in
                 "BASH") _SHELL="bash"
                     if ! [[ -f "${_DESTDIR}/usr/share/bash-completion/completions/arch" ]]; then
@@ -127,7 +128,7 @@ _user_management() {
             esac
             if chroot "${_DESTDIR}" chsh -l | grep -q "/usr/bin/${_SHELL}"; then
                 # change root shell
-                chroot "${_DESTDIR}" chsh -s "/usr/bin/${_SHELL}" root
+                chroot "${_DESTDIR}" chsh -s "/usr/bin/${_SHELL}" root &>"${_LOG}"
                 # change default shell
                 sed -i -e "s#^SHELL=.*#SHELL=/usr/bin/${_SHELL}#g" "${_DESTDIR}"/etc/default/useradd
             fi
