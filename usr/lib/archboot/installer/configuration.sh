@@ -135,7 +135,7 @@ _user_management() {
         elif [[ "${_FILE}" = "3" ]]; then
             _USER=""
             while [[ -z "${_USER}" ]]; do
-                _dialog --title " Setup User " --no-cancel --inputbox "Enter Username" 8 65 "" 2>"${_ANSWER}" || return 1
+                _dialog --title " Setup User " --no-cancel --inputbox "Enter Username" 8 30 "" 2>"${_ANSWER}" || return 1
                 _USER=$(cat "${_ANSWER}")
                 if grep -q "^${_USER}:" ${_DESTDIR}/etc/passwd; then
                     _dialog --title " ERROR " --no-mouse --infobox "Username already exists! Choose an other one." 3 65
