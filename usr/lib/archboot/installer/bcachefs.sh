@@ -106,8 +106,9 @@ _bcfs_raid_level() {
         else
             # replicas
             _BCFS_REPLICATION="2 - 3 - Custom _"
+            #shellcheck disable=SC2086
             _dialog --no-cancel --title " Replication Level " --menu "" 9 30 5 ${_BCFS_REPLICATION} 2>"${_ANSWER}" || return 1
-            _BCFS_REP_COUNT="$(cat ${_ANSWER})"
+            _BCFS_REP_COUNT=$(cat "${_ANSWER}")
             if [[ ${_BCFS_REP_COUNT} == "Custom" ]]; then
                 _dialog  --inputbox "Enter custom replication level (number):" 8 65 \
                         "4" 2>"${_ANSWER}" || return 1
@@ -119,7 +120,7 @@ _bcfs_raid_level() {
                 _bcfs_select_raid_devices
             done
             # final step ask if everything is ok?
-            #shellcheck disable=SC2028
+            #shellcheck disable=SC2028,SC2027,SC2086
             _dialog --title " Summary " --yesno \
                 "LEVEL:\n${_BCFS_LEVEL}\nDEVICES:\n$(while read -r i; do echo ""${i}"\n"; done </tmp/.bcfs-raid-device)" \
                 0 0 && _BCFS_DEVICE_FINISH="1"

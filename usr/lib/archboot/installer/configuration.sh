@@ -91,7 +91,7 @@ _set_password() {
             _PASS2=""
         fi
     done
-    chroot "${_DESTDIR}" passwd ${2} < /tmp/.password &>"${_NO_LOG}"
+    chroot "${_DESTDIR}" passwd "${2}" < /tmp/.password &>"${_NO_LOG}"
     rm /tmp/.password
 }
 
@@ -99,7 +99,7 @@ _user_management() {
     _NEXTITEM=1
     while true; do
         _DEFAULT="--default-item ${_NEXTITEM}"
-        _dialog --title " User Management " --no-cancel ${_DEFAULT} --menu "" 10 40 7 \
+        _dialog --title " User Management " --no-cancel "${_DEFAULT}" --menu "" 10 40 7 \
             "1" "Set Root Password" \
             "2" "Set Default Shell" \
             "3" "Add User" \
@@ -141,7 +141,7 @@ _user_management() {
             while [[ -z "${_USER}" ]]; do
                 _dialog --title " Setup User " --no-cancel --inputbox "Enter Username" 8 30 "" 2>"${_ANSWER}" || return 1
                 _USER=$(cat "${_ANSWER}")
-                if grep -q "^${_USER}:" ${_DESTDIR}/etc/passwd; then
+                if grep -q "^${_USER}:" "${_DESTDIR}"/etc/passwd; then
                     _dialog --title " ERROR " --no-mouse --infobox "Username already exists! Please choose an other one." 3 60
                     sleep 3
                     _USER=""
@@ -153,7 +153,7 @@ _user_management() {
                 _FN=$(cat "${_ANSWER}")
             done
             chroot "${_DESTDIR}" useradd -c "${_FN}" -m "${_USER}"
-            _set_password User ${_USER}
+            _set_password User "${_USER}"
             _NEXTITEM=4
         elif [[ "${_FILE}" = "4" ]]; then
             _NEXTITEM=3
