@@ -188,7 +188,6 @@ _configure_system() {
             _run_locale_gen
         elif [[ "${_FILE}" = "Basic User Configuration" ]]; then
             _user_management
-            _set_password
         else
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
         fi

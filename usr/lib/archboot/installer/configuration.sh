@@ -56,12 +56,12 @@ _check_root_password() {
     if chroot "${_DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q NP; then
         _dialog --no-mouse --infobox "Setup detected no password set for root user,\nplease set new password now." 6 50
         sleep 3
-        _set_password || return 1
+        _set_password Root root || return 1
     fi
     # check if account is locked
     if chroot "${_DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q L; then
         _dialog --no-mouse --infobox "Setup detected locked account for root user,\nplease set new password to unlock account now." 6 50
-        _set_password || return 1
+        _set_password Root root || return 1
     fi
 }
 
