@@ -71,11 +71,11 @@ _set_password() {
     _PASS2=""
     while [[ -z "${_PASSWORD}" ]]; do
         while [[ -z "${_PASS}" ]]; do
-            _dialog --title " New Root Password " --insecure --passwordbox "" 7 50 2>"${_ANSWER}" || return 1
+            _dialog --title " New ${1} Password " --insecure --passwordbox "" 7 50 2>"${_ANSWER}" || return 1
             _PASS=$(cat "${_ANSWER}")
         done
         while [[ -z  "${_PASS2}" ]]; do
-            _dialog --title " Retype Root Password " --insecure --passwordbox "" 7 50 2>"${_ANSWER}" || return 1
+            _dialog --title " Retype ${1} Password " --insecure --passwordbox "" 7 50 2>"${_ANSWER}" || return 1
             _PASS2=$(cat "${_ANSWER}")
         done
         if [[ "${_PASS}" == "${_PASS2}" ]]; then
@@ -91,7 +91,65 @@ _set_password() {
             _PASS2=""
         fi
     done
-    chroot "${_DESTDIR}" passwd root < /tmp/.password &>"${_NO_LOG}"
+    chroot "${_DESTDIR}" passwd ${2} < /tmp/.password &>"${_NO_LOG}"
     rm /tmp/.password
+}
+
+_user_management() {
+        _dialog --title " User Management " --no-cancel ${_DEFAULT} --menu "" 14 40 8 \
+            "1" "Set Root Password" \
+            "2" "Set Default Shell" \
+            "3" "Add User" \
+            "4" "Back to System Configuration" 2>"${_ANSWER}" || break
+        _FILE="$(cat "${_ANSWER}")"
+        if [[ "${_FILE}" = "1" ]]; then
+            _set_password Root root
+        elif [[ "${_FILE}" = "2" ]]; then
+            _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
+                "BASH" "Standard Shell" \
+                "ZSH"  "More features for experts" 2>"${_ANSWER}" || return 1
+            case $(cat "${_ANSWER}") in
+                "BASH") _SHELL="bash"
+                    if ! [[ -f "${_DESTDIR}/usr/share/bash-completion/completions/arch" ]]; then
+                        _PACKAGES="bash-completion"
+                        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+                        _pacman_error
+                    fi
+                    ;;
+                "ZSH") _SHELL="zsh"
+                    if ! [[ -f "${_DESTDIR}/usr/bin/zsh" ]]; then
+                        _PACKAGES="grml-zsh-config"
+                        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+                        _pacman_error
+                    fi
+                    ;;
+            esac
+            if chroot "${_DESTDIR}" chsh -l | grep -q "/usr/bin/${_SHELL}"; then
+                # change root shell
+                chroot "${_DESTDIR}" chsh -s "/usr/bin/${_SHELL}" root
+                # change default shell
+                sed -i -e "s#^SHELL=.*#SHELL=/usr/bin/${_SHELL}#g" "${_DESTDIR}"/etc/default/useradd
+            fi
+        elif [[ "${_FILE}" = "3" ]]; then
+            _USER=""
+            while [[ -z "${_USER}" ]]; do
+                _dialog --title " Setup User " --no-cancel --inputbox "Enter Username" 8 65 "" 2>"${_ANSWER}" || return 1
+                _USER=$(cat "${_ANSWER}")
+                if grep -q "^${_USER}:" ${_DESTDIR}/etc/passwd; then
+                    _dialog --title " ERROR " --no-mouse --infobox "Username already exists! Choose an other one." 3 65
+                    sleep 3
+                    _USER=""
+                fi
+            done
+            _FN=""
+            while [[ -z "${_FN}" ]]; do
+                _dialog --title " Setup ${_USER} " --no-cancel --inputbox "Enter a comment eg. your Full Name" 8 65 "" 2>"${_ANSWER}" || return 1
+                _FN=$(cat "${_ANSWER}")
+            done
+            chroot "${_DESTDIR}" useradd -c "${_FN}" -m "${_USER}"
+            _set_password User ${_USER}
+        elif [[ "${_FILE}" = "4" ]]; then
+            break
+        fi
 }
 # vim: set ft=sh ts=4 sw=4 et:

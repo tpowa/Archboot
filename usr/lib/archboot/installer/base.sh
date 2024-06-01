@@ -162,22 +162,22 @@ _configure_system() {
             _DEFAULT=""
         fi
         #shellcheck disable=SC2086
-        _dialog --title " System Configuration " --no-cancel ${_DEFAULT} --menu "" 19 60 13 \
-            "/etc/hostname"                 "System Hostname" \
+        _dialog --title " System Configuration " --no-cancel ${_DEFAULT} --menu "" 20 60 14 \
+            "Basic User Configuration"      "User Management" \
             "/etc/vconsole.conf"            "Virtual Console" \
             "/etc/locale.conf"              "Locale Setting" \
+            "/etc/locale.gen"               "Glibc Locales" \
             "/etc/fstab"                    "Filesystem Mountpoints" \
             "/etc/mkinitcpio.conf"          "Initramfs Config" \
             "/etc/modprobe.d/modprobe.conf" "Kernel Modules" \
+            "/etc/hostname"                 "System Hostname" \
             "/etc/resolv.conf"              "DNS Servers" \
             "/etc/hosts"                    "Network Hosts" \
-            "/etc/locale.gen"               "Glibc Locales" \
             "/etc/pacman.d/mirrorlist"      "Pacman Mirrors" \
             "/etc/pacman.conf"              "Pacman Config" \
-            "Root-Password"                 "Set Root Password" \
-            "Return"                        "Return To Main Menu" 2>"${_ANSWER}" || break
+            "Back to Main Menu"             "Return" 2>"${_ANSWER}" || break
         _FILE="$(cat "${_ANSWER}")"
-        if [[ "${_FILE}" = "Return" || -z "${_FILE}" ]]; then
+        if [[ "${_FILE}" = "Back to Main Menu" || -z "${_FILE}" ]]; then
             _S_CONFIG=1
             break
         elif [[ "${_FILE}" = "/etc/mkinitcpio.conf" ]]; then
@@ -186,7 +186,8 @@ _configure_system() {
             _auto_set_locale
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
             _run_locale_gen
-        elif [[ "${_FILE}" = "Root-Password" ]]; then
+        elif [[ "${_FILE}" = "Basic User Configuration" ]]; then
+            _user_management
             _set_password
         else
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
