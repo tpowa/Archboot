@@ -135,8 +135,11 @@ _ssh_keys() {
         echo "Using custom OpenSSH Key..."
         cp /etc/archboot/ssh/archboot-key.pub "${1}"/etc/archboot/ssh/
     else
-        echo "Generating new Archboot OpenSSH Key..."
-        ssh-keygen -C Archboot -f "${1}"/etc/archboot/ssh/archboot-key -N 'Archboot' -q
+        # don't run on local image
+        if ! [[ -f "${_LOCAL_DB}" ]]; then
+            echo "Generating new Archboot OpenSSH Key..."
+            ssh-keygen -C Archboot -f "${1}"/etc/archboot/ssh/archboot-key -N 'Archboot' -q
+        fi
     fi
 }
 
