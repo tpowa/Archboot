@@ -177,7 +177,7 @@ _configure_system() {
             "/etc/pacman.conf"              "Pacman Config" \
             "Return to Main Menu"           "_" 2>"${_ANSWER}" || break
         _FILE="$(cat "${_ANSWER}")"
-        if [[ "${_FILE}" = "Back to Main Menu" || -z "${_FILE}" ]]; then
+        if [[ "${_FILE}" = "Return to Main Menu" || -z "${_FILE}" ]]; then
             _S_CONFIG=1
             break
         elif [[ "${_FILE}" = "/etc/mkinitcpio.conf" ]]; then
