@@ -138,7 +138,7 @@ _user_management() {
                 _dialog --title " Setup User " --no-cancel --inputbox "Enter Username" 8 30 "" 2>"${_ANSWER}" || return 1
                 _USER=$(cat "${_ANSWER}")
                 if grep -q "^${_USER}:" ${_DESTDIR}/etc/passwd; then
-                    _dialog --title " ERROR " --no-mouse --infobox "Username already exists! Choose an other one." 3 65
+                    _dialog --title " ERROR " --no-mouse --infobox "Username already exists! Please choose an other one." 3 50
                     sleep 3
                     _USER=""
                 fi
