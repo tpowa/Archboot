@@ -231,7 +231,7 @@ _auto_mkinitcpio() {
         if [[ "${_NAME_SCHEME_PARAMETER}" == "SD_GPT_AUTO_GENERATOR" ]]; then
             _SD_EARLY_USERSPACE=1
         else
-            _dialog --no-cancel --title " MKINITCPIO EARLY USERSPACE " --menu "" 8 50 2 "BUSYBOX" "Small and Fast" "SYSTEMD" "More Features" 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --title " MKINITCPIO EARLY USERSPACE " --menu "" 8 45 2 "BUSYBOX" "Small and Fast" "SYSTEMD" "More Features" 2>"${_ANSWER}" || return 1
             if [[ $(cat "${_ANSWER}") == "SYSTEMD" ]]; then
                 _SD_EARLY_USERSPACE=1
             fi
