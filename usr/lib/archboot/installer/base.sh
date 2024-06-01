@@ -175,7 +175,7 @@ _configure_system() {
             "/etc/hosts"                    "Network Hosts" \
             "/etc/pacman.d/mirrorlist"      "Pacman Mirrors" \
             "/etc/pacman.conf"              "Pacman Config" \
-            "Back to Main Menu"             "Return" 2>"${_ANSWER}" || break
+            "Back to Main Menu"             "_" 2>"${_ANSWER}" || break
         _FILE="$(cat "${_ANSWER}")"
         if [[ "${_FILE}" = "Back to Main Menu" || -z "${_FILE}" ]]; then
             _S_CONFIG=1
