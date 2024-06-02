@@ -156,10 +156,11 @@ _user_management() {
         elif [[ "${_FILE}" = "3" ]]; then
             # add normal users
             _USERS="Superuser root $(grep 'x:10[0-9][0-9]' ${_DESTDIR}/etc/passwd | cut -d : -f 3,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
-            while [[ -z "${_USERS}" ]]; do
-                _dialog --title " Modify Users " --menu "" 15 40 10 ${_USERS} 2>"${_ANSWER}" || return 1
+            #while [[ -z "${_USERS}" ]]; do
+                _dialog --menu " Modify Users " 15 40 10 ${_USERS} 2>"${_ANSWER}" || return 1
                 _USER=$(cat "${_ANSWER}")
-            done
+                exit 0
+            #done
             if [[ "${_FILE}" = "1" ]]; then
                 _set_password Root root
             fi
