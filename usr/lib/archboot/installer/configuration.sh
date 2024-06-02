@@ -135,9 +135,9 @@ _user_management() {
                     fi
                     ;;
             esac
-            # change default shell
+            # change default shell for root and all users >= UID 1000
             sed -i -e "s#^SHELL=.*#SHELL=/usr/bin/${_SHELL}#g" "${_DESTDIR}"/etc/default/useradd
-            for i in root $(grep 'x:10[0-9][0-9]' ${_DESTDIR}/etc/passwd | cut -d : -f 1; do
+            for i in root $(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1); do
                 usermod -R "${_DESTDIR}" -s "/usr/bin/${_SHELL}" "${i}" &>"${_LOG}"
             done
             _NEXTITEM=2
@@ -159,7 +159,9 @@ _user_management() {
         elif [[ "${_FILE}" = "3" ]]; then
             # add normal users
             while true; do
-                _USERS="root Superuser $(grep 'x:10[0-9][0-9]' ${_DESTDIR}/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
+                # root and all users with UID >= 1000
+                _USERS="root Superuser $(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
+                #shellcheck disable=SC2086
                 _dialog --no-cancel --menu " Modify User Selection " 15 40 10 ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || return 1
                 _USER=$(cat "${_ANSWER}")
                 if [[ "${_USER}" = "root" ]]; then
