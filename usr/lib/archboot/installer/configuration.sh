@@ -152,10 +152,9 @@ _user_management() {
                     sleep 3
                     _USER=""
                 fi
-                chroot "${_DESTDIR}" useradd -c "${_FN}" -m "${_USER}" &>"${_LOG}" || _USER=""
+                _set_comment
+                chroot "${_DESTDIR}" useradd -c "${_FN}" -m "${_USER}" &>"${_LOG}" || ${_USER}=""
             done
-            _set_comment
-
             _set_password User "${_USER}"
             _NEXTITEM=2
         elif [[ "${_FILE}" = "3" ]]; then
