@@ -112,7 +112,7 @@ _user_management() {
             "1" "Set Default Shell" \
             "2" "Add User" \
             "3" "Modify User" \
-            "4" "Return to System Configuration" 2>"${_ANSWER}" || break
+            "<" "Return to System Configuration" 2>"${_ANSWER}" || break
         _FILE="$(cat "${_ANSWER}")"
         if [[ "${_FILE}" = "1" ]]; then
             _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
@@ -172,7 +172,7 @@ _user_management() {
                     "1" "Change Password" \
                     "2" "Change Comment" \
                     "3" "Delete User" \
-                    "4" "Return To User Selection" 2>"${_ANSWER}" || return 1
+                    "<" "Return To User Selection" 2>"${_ANSWER}" || return 1
                     _USER_ACTION=$(cat "${_ANSWER}")
                     if [[ "${_USER_ACTION}" = 1 ]]; then
                         _set_password User "${_USER}"
@@ -186,7 +186,7 @@ _user_management() {
                 fi
             done
             _NEXTITEM=4
-        elif [[ "${_FILE}" = "4" ]]; then
+        elif [[ "${_FILE}" = "<" ]]; then
             _NEXTITEM=3
             break
         fi
