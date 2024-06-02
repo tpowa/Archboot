@@ -164,9 +164,9 @@ _user_management() {
             # add normal users
             while true; do
                 # root and all users with UID >= 1000
-                _USERS="root Superuser $(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
+                _USERS="$(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
                 #shellcheck disable=SC2086
-                _dialog --no-cancel --menu " Modify User Selection " 15 40 10 ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || return 1
+                _dialog --no-cancel --menu " Modify User Selection " 15 40 10 "root" "Super User" ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || return 1
                 _USER=$(cat "${_ANSWER}")
                 if [[ "${_USER}" = "root" ]]; then
                     _set_password Root root
