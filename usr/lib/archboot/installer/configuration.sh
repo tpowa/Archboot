@@ -98,7 +98,7 @@ _set_password() {
 _set_comment() {
     _FN=""
     while [[ -z "${_FN}" ]]; do
-        _dialog --title " Setup ${_USER} " --no-cancel --inputbox "Enter a comment eg. your Full Name" 8 40 "" 2>"${_ANSWER}" || return 1
+        _dialog --title " Create ${_USER} " --no-cancel --inputbox "Enter a comment eg. your Full Name" 8 40 "" 2>"${_ANSWER}" || return 1
         _FN=$(cat "${_ANSWER}")
     done
 }
@@ -110,7 +110,7 @@ _user_management() {
         #shellcheck disable=SC2086
         _dialog --title " User Management " --no-cancel ${_DEFAULT} --menu "" 10 40 7 \
             "1" "Set Default Shell" \
-            "2" "Add User" \
+            "2" "Create User" \
             "3" "Modify User" \
             "<" "Return to System Configuration" 2>"${_ANSWER}" || break
         _FILE="$(cat "${_ANSWER}")"
@@ -144,7 +144,7 @@ _user_management() {
         elif [[ "${_FILE}" = "2" ]]; then
             _USER=""
             while [[ -z "${_USER}" ]]; do
-                _dialog --title " Setup User " --no-cancel --inputbox "Enter Username" 8 30 "" 2>"${_ANSWER}" || return 1
+                _dialog --title " Create User " --no-cancel --inputbox "Enter Username" 8 30 "" 2>"${_ANSWER}" || return 1
                 _USER=$(cat "${_ANSWER}")
                 if grep -q "^${_USER}:" "${_DESTDIR}"/etc/passwd; then
                     _dialog --title " ERROR " --no-mouse --infobox "Username already exists! Please choose an other one." 3 60
