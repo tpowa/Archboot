@@ -163,7 +163,7 @@ _configure_system() {
         fi
         #shellcheck disable=SC2086
         _dialog --title " System Configuration " --no-cancel ${_DEFAULT} --menu "" 19 60 13 \
-            "Basic User Configuration"      "User Management" \
+            "User Configuration"            "User Management" \
             "/etc/vconsole.conf"            "Virtual Console" \
             "/etc/locale.conf"              "Locale Setting" \
             "/etc/locale.gen"               "Glibc Locales" \

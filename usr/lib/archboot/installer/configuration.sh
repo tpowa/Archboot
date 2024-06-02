@@ -161,18 +161,18 @@ _user_management() {
             # add normal users
             while true; do
                 _USERS="root Superuser $(grep 'x:10[0-9][0-9]' ${_DESTDIR}/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g') Done _"
-                _dialog --no-cancel --menu " Modify User " 15 40 10 ${_USERS} 2>"${_ANSWER}" || return 1
+                _dialog --no-cancel --menu " User Selection " 15 40 10 ${_USERS} 2>"${_ANSWER}" || return 1
                 _USER=$(cat "${_ANSWER}")
                 if [[ "${_USER}" = "root" ]]; then
                     _set_password Root root
                 elif [[ "${_USER}" = "Done" ]]; then
                     break
                 else
-                    _dialog --title " Modify ${_USER} " --no-cancel --menu "" 10 45 4 \
+                    _dialog --title " Modify User ${_USER} " --no-cancel --menu "" 10 45 4 \
                     "1" "Change Password" \
                     "2" "Change Comment" \
                     "3" "Delete User" \
-                    "4" "Done" 2>"${_ANSWER}" || return 1
+                    "4" "Return to User Selection" 2>"${_ANSWER}" || return 1
                     _USER_ACTION=$(cat "${_ANSWER}")
                     if [[ "${_USER_ACTION}" = 1 ]]; then
                         _set_password User "${_USER}"
