@@ -101,15 +101,12 @@ _user_management() {
         _DEFAULT="--default-item ${_NEXTITEM}"
         #shellcheck disable=SC2086
         _dialog --title " User Management " --no-cancel ${_DEFAULT} --menu "" 10 40 7 \
-            "1" "Set Root Password" \
-            "2" "Set Default Shell" \
-            "3" "Add User" \
+            "1" "Set Default Shell" \
+            "2" "Add User" \
+            "3" "Modify User" \
             "4" "Return to System Configuration" 2>"${_ANSWER}" || break
         _FILE="$(cat "${_ANSWER}")"
         if [[ "${_FILE}" = "1" ]]; then
-            _set_password Root root
-            _NEXTITEM=2
-        elif [[ "${_FILE}" = "2" ]]; then
             _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
                 "BASH" "Standard Shell" \
                 "ZSH"  "More features for experts" 2>"${_ANSWER}" || return 1
@@ -137,7 +134,7 @@ _user_management() {
                 sed -i -e "s#^SHELL=.*#SHELL=/usr/bin/${_SHELL}#g" "${_DESTDIR}"/etc/default/useradd
             fi
             _NEXTITEM=3
-        elif [[ "${_FILE}" = "3" ]]; then
+        elif [[ "${_FILE}" = "2" ]]; then
             _USER=""
             while [[ -z "${_USER}" ]]; do
                 _dialog --title " Setup User " --no-cancel --inputbox "Enter Username" 8 30 "" 2>"${_ANSWER}" || return 1
@@ -155,6 +152,17 @@ _user_management() {
             done
             chroot "${_DESTDIR}" useradd -c "${_FN}" -m "${_USER}"
             _set_password User "${_USER}"
+            _NEXTITEM=4
+        elif [[ "${_FILE}" = "3" ]]; then
+            # add normal users
+            _USERS="Superuser root $(grep 'x:10[0-9][0-9]' ${_DESTDIR}/etc/passwd | cut -d : -f 3,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
+            while [[ -z "${_USERS}" ]]; do
+                _dialog --title " Setup ${_USERS} " --no-cancel --inputbox "Enter a comment eg. your Full Name" 8 40 "" 2>"${_ANSWER}" || return 1
+                _USER=$(cat "${_ANSWER}")
+            done
+            if [[ "${_FILE}" = "1" ]]; then
+                _set_password Root root
+            fi
             _NEXTITEM=4
         elif [[ "${_FILE}" = "4" ]]; then
             _NEXTITEM=3
