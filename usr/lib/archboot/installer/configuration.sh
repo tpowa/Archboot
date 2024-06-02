@@ -181,7 +181,7 @@ _user_management() {
                         chroot "${_DESTDIR}" usermod -c "${_FN}" "${_USER}"
                     elif [[ "${_USER_ACTION}" = 3 ]]; then
                         _dialog --defaultno --yesno "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 || return 1
-                        chroot "${_DESTDIR}" userdel -r "${_USER}"
+                        chroot "${_DESTDIR}" userdel -r "${_USER}" &>"${_LOG}"
                     fi
                 fi
             done
