@@ -163,7 +163,7 @@ _configure_system() {
         fi
         #shellcheck disable=SC2086
         _dialog --title " System Configuration " --no-cancel ${_DEFAULT} --menu "" 19 60 13 \
-            "User Configuration"            "User Management" \
+            "==> User Management"           "User Configuration" \
             "/etc/vconsole.conf"            "Virtual Console" \
             "/etc/locale.conf"              "Locale Setting" \
             "/etc/locale.gen"               "Glibc Locales" \
@@ -175,9 +175,9 @@ _configure_system() {
             "/etc/hosts"                    "Network Hosts" \
             "/etc/pacman.d/mirrorlist"      "Pacman Mirrors" \
             "/etc/pacman.conf"              "Pacman Config" \
-            "Return to Main Menu"           "_" 2>"${_ANSWER}" || break
+            "<== Back"                      "Return to Main Menu" 2>"${_ANSWER}" || break
         _FILE="$(cat "${_ANSWER}")"
-        if [[ "${_FILE}" = "Return to Main Menu" || -z "${_FILE}" ]]; then
+        if [[ "${_FILE}" = "<== Back" || -z "${_FILE}" ]]; then
             _S_CONFIG=1
             break
         elif [[ "${_FILE}" = "/etc/mkinitcpio.conf" ]]; then
@@ -186,7 +186,7 @@ _configure_system() {
             _auto_set_locale
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
             _run_locale_gen
-        elif [[ "${_FILE}" = "User Configuration" ]]; then
+        elif [[ "${_FILE}" = "==> User Management" ]]; then
             _user_management
         else
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
