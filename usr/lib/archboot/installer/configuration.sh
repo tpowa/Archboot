@@ -152,7 +152,11 @@ _user_management() {
                     _USER=""
                 fi
                 _set_comment
-                useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}" || _USER=""
+                if ! useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
+                    _dialog --title " ERROR " --no-mouse --infobox "User creation failed! Please try again." 3 60
+                    sleep 3
+                    _USER=""
+                fi
             done
             _set_password User "${_USER}"
             _NEXTITEM=2
