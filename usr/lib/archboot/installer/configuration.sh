@@ -154,14 +154,14 @@ _user_management() {
                 fi
             done
             _set_comment
-            chroot "${_DESTDIR}" useradd -c "${_FN}" -m "${_USER}"
+            chroot "${_DESTDIR}" useradd -c "${_FN}" -m "${_USER}" &>"${_LOG}"
             _set_password User "${_USER}"
             _NEXTITEM=2
         elif [[ "${_FILE}" = "3" ]]; then
             # add normal users
             while true; do
                 _USERS="root Superuser $(grep 'x:10[0-9][0-9]' ${_DESTDIR}/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
-                _dialog --no-cancel --menu " User Selection Menu " 15 40 10 ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || return 1
+                _dialog --no-cancel --menu " Modify User Selection " 15 40 10 ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || return 1
                 _USER=$(cat "${_ANSWER}")
                 if [[ "${_USER}" = "root" ]]; then
                     _set_password Root root
