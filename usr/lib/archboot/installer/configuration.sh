@@ -178,10 +178,10 @@ _user_management() {
                         _set_password User "${_USER}"
                     elif [[ "${_USER_ACTION}" = 2 ]]; then
                         _set_comment
-                        usermod -c "${_FN}" "${_USER}"
+                        chroot "${_DESTDIR}" usermod -c "${_FN}" "${_USER}"
                     elif [[ "${_USER_ACTION}" = 3 ]]; then
                         _dialog --defaultno --yesno "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 || return 1
-                        chroot userdel -r "${_USER}"
+                        chroot "${_DESTDIR}" userdel -r "${_USER}"
                     fi
                 fi
             done
