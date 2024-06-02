@@ -160,8 +160,8 @@ _user_management() {
         elif [[ "${_FILE}" = "3" ]]; then
             # add normal users
             while true; do
-                _USERS="root Superuser $(grep 'x:10[0-9][0-9]' ${_DESTDIR}/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g') Done _"
-                _dialog --no-cancel --menu " User Selection " 15 40 10 ${_USERS} 2>"${_ANSWER}" || return 1
+                _USERS="root Superuser $(grep 'x:10[0-9][0-9]' ${_DESTDIR}/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g') _ 'Return To Previous Menu'"
+                _dialog --no-cancel --menu " User Selection Menu " 15 40 10 ${_USERS} 2>"${_ANSWER}" || return 1
                 _USER=$(cat "${_ANSWER}")
                 if [[ "${_USER}" = "root" ]]; then
                     _set_password Root root
@@ -172,7 +172,7 @@ _user_management() {
                     "1" "Change Password" \
                     "2" "Change Comment" \
                     "3" "Delete User" \
-                    "4" "Return to User Selection" 2>"${_ANSWER}" || return 1
+                    "4" "Return To User Selection" 2>"${_ANSWER}" || return 1
                     _USER_ACTION=$(cat "${_ANSWER}")
                     if [[ "${_USER_ACTION}" = 1 ]]; then
                         _set_password User "${_USER}"
