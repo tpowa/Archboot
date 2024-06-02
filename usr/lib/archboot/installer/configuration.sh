@@ -99,6 +99,7 @@ _user_management() {
     _NEXTITEM=1
     while true; do
         _DEFAULT="--default-item ${_NEXTITEM}"
+        #shellcheck disable=SC2086
         _dialog --title " User Management " --no-cancel ${_DEFAULT} --menu "" 10 40 7 \
             "1" "Set Root Password" \
             "2" "Set Default Shell" \
