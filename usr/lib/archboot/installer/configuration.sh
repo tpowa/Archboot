@@ -53,13 +53,13 @@ _set_mkinitcpio() {
 
 _check_root_password() {
     # check if empty password is set
-    if chroot "${_DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q NP; then
+    if passwd -R "${_DESTDIR}" -S root | cut -d ' ' -f2 | grep -q NP; then
         _dialog --no-mouse --infobox "Setup detected no password set for root user,\nplease set new password now." 6 50
         sleep 3
         _set_password Root root || return 1
     fi
     # check if account is locked
-    if chroot "${_DESTDIR}" passwd -S root | cut -d ' ' -f2 | grep -q L; then
+    if passwd -R "${_DESTDIR}" -S root | cut -d ' ' -f2 | grep -q L; then
         _dialog --no-mouse --infobox "Setup detected locked account for root user,\nplease set new password to unlock account now." 6 50
         _set_password Root root || return 1
     fi
@@ -91,7 +91,7 @@ _set_password() {
             _PASS2=""
         fi
     done
-    chroot "${_DESTDIR}" passwd "${2}" < /tmp/.password &>"${_NO_LOG}"
+    passwd -R "${_DESTDIR}" "${2}" < /tmp/.password &>"${_NO_LOG}"
     rm /tmp/.password
 }
 
@@ -135,12 +135,11 @@ _user_management() {
                     fi
                     ;;
             esac
-            if chroot "${_DESTDIR}" chsh -l | grep -q "/usr/bin/${_SHELL}"; then
-                # change root shell
-                chroot "${_DESTDIR}" chsh -s "/usr/bin/${_SHELL}" root &>"${_LOG}"
-                # change default shell
-                sed -i -e "s#^SHELL=.*#SHELL=/usr/bin/${_SHELL}#g" "${_DESTDIR}"/etc/default/useradd
-            fi
+            # change default shell
+            sed -i -e "s#^SHELL=.*#SHELL=/usr/bin/${_SHELL}#g" "${_DESTDIR}"/etc/default/useradd
+            for i in root $(grep 'x:10[0-9][0-9]' ${_DESTDIR}/etc/passwd | cut -d : -f 1; do
+                usermod -R "${_DESTDIR}" -s "/usr/bin/${_SHELL}" "${i}" &>"${_LOG}"
+            done
             _NEXTITEM=2
         elif [[ "${_FILE}" = "2" ]]; then
             _USER=""
@@ -153,7 +152,7 @@ _user_management() {
                     _USER=""
                 fi
                 _set_comment
-                useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}" || ${_USER}=""
+                useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}" || _USER=""
             done
             _set_password User "${_USER}"
             _NEXTITEM=2
@@ -178,10 +177,10 @@ _user_management() {
                         _set_password User "${_USER}"
                     elif [[ "${_USER_ACTION}" = 2 ]]; then
                         _set_comment
-                        chroot "${_DESTDIR}" usermod -c "${_FN}" "${_USER}"
+                        usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}"
                     elif [[ "${_USER_ACTION}" = 3 ]]; then
                         _dialog --defaultno --yesno "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
-                        chroot "${_DESTDIR}" userdel -r "${_USER}" &>"${_LOG}"
+                        userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}"
                     fi
                 fi
             done
