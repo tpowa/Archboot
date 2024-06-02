@@ -113,88 +113,82 @@ _user_management() {
             "2" "Create User" \
             "3" "Modify User" \
             "<" "Return to System Configuration" 2>"${_ANSWER}" || break
-        _FILE="$(cat "${_ANSWER}")"
-        if [[ "${_FILE}" = "1" ]]; then
-            _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
-                "BASH" "Standard Shell" \
-                "ZSH"  "More features for experts" 2>"${_ANSWER}" || return 1
-            _SHELL=""
-            case $(cat "${_ANSWER}") in
-                "BASH") _SHELL="bash"
-                    if ! [[ -f "${_DESTDIR}/usr/share/bash-completion/completions/arch" ]]; then
-                        _PACKAGES="bash-completion"
-                        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
-                        _pacman_error
+        case $(cat "${_ANSWER}") in
+            "1") _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
+                 "BASH" "Standard Shell" \
+                 "ZSH"  "More features for experts" 2>"${_ANSWER}" || return 1
+                 case $(cat "${_ANSWER}") in
+                    "BASH") _SHELL="bash"
+                            if ! [[ -f "${_DESTDIR}/usr/share/bash-completion/completions/arch" ]]; then
+                                _PACKAGES="bash-completion"
+                                _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " \
+                                    --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+                                _pacman_error
+                            fi ;;
+                    "ZSH") _SHELL="zsh"
+                           if ! [[ -f "${_DESTDIR}/usr/bin/zsh" ]]; then
+                                _PACKAGES="grml-zsh-config"
+                                _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " \
+                                    --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+                                _pacman_error
+                            fi ;;
+                 esac
+                 # change default shell for root and all users >= UID 1000
+                 sed -i -e "s#^SHELL=.*#SHELL=/usr/bin/${_SHELL}#g" "${_DESTDIR}"/etc/default/useradd
+                 for i in root $(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1); do
+                     usermod -R "${_DESTDIR}" -s "/usr/bin/${_SHELL}" "${i}" &>"${_LOG}"
+                 done
+                _NEXTITEM=2 ;;
+            "2") _USER=""
+                 while [[ -z "${_USER}" ]]; do
+                     _dialog --title " Create User " --no-cancel --inputbox "Enter Username" 8 30 "" 2>"${_ANSWER}" || return 1
+                     _USER=$(cat "${_ANSWER}")
+                     if grep -q "^${_USER}:" "${_DESTDIR}"/etc/passwd; then
+                         _dialog --title " ERROR " --no-mouse --infobox "Username already exists! Please choose an other one." 3 60
+                         sleep 3
+                         _USER=""
+                     fi
+                     _set_comment
+                     if ! useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
+                         _dialog --title " ERROR " --no-mouse --infobox "User creation failed! Please try again." 3 60
+                         sleep 3
+                         _USER=""
+                     fi
+                 done
+                 _set_password User "${_USER}"
+                 _NEXTITEM=2 ;;
+            "3") # add normal users
+                 while true; do
+                     # root and all users with UID >= 1000
+                     _USERS="$(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
+                     #shellcheck disable=SC2086
+                     _dialog --no-cancel --menu " Modify User Selection " 15 40 10 \
+                        "root" "Super User" ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || return 1
+                     _USER=$(cat "${_ANSWER}")
+                     if [[ "${_USER}" = "root" ]]; then
+                         _set_password Root root
+                     elif [[ "${_USER}" = "< Back" ]]; then
+                         break
+                     else
+                         _dialog --title " Modify User ${_USER} " --no-cancel --menu "" 10 45 4 \
+                         "1" "Change Password" \
+                         "2" "Change Comment" \
+                         "3" "Delete User" \
+                         "<" "Return To User Selection" 2>"${_ANSWER}" || return 1
+                         case $(cat "${_ANSWER}") in
+                             "1") _set_password User "${_USER}" ;;
+                             "2") _set_comment
+                                  usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}" ;;
+                             "3") _dialog --defaultno --yesno \
+                                  "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
+                                   userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}" ;;
+                         esac
                     fi
-                    ;;
-                "ZSH") _SHELL="zsh"
-                    if ! [[ -f "${_DESTDIR}/usr/bin/zsh" ]]; then
-                        _PACKAGES="grml-zsh-config"
-                        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
-                        _pacman_error
-                    fi
-                    ;;
-            esac
-            # change default shell for root and all users >= UID 1000
-            sed -i -e "s#^SHELL=.*#SHELL=/usr/bin/${_SHELL}#g" "${_DESTDIR}"/etc/default/useradd
-            for i in root $(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1); do
-                usermod -R "${_DESTDIR}" -s "/usr/bin/${_SHELL}" "${i}" &>"${_LOG}"
-            done
-            _NEXTITEM=2
-        elif [[ "${_FILE}" = "2" ]]; then
-            _USER=""
-            while [[ -z "${_USER}" ]]; do
-                _dialog --title " Create User " --no-cancel --inputbox "Enter Username" 8 30 "" 2>"${_ANSWER}" || return 1
-                _USER=$(cat "${_ANSWER}")
-                if grep -q "^${_USER}:" "${_DESTDIR}"/etc/passwd; then
-                    _dialog --title " ERROR " --no-mouse --infobox "Username already exists! Please choose an other one." 3 60
-                    sleep 3
-                    _USER=""
-                fi
-                _set_comment
-                if ! useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
-                    _dialog --title " ERROR " --no-mouse --infobox "User creation failed! Please try again." 3 60
-                    sleep 3
-                    _USER=""
-                fi
-            done
-            _set_password User "${_USER}"
-            _NEXTITEM=2
-        elif [[ "${_FILE}" = "3" ]]; then
-            # add normal users
-            while true; do
-                # root and all users with UID >= 1000
-                _USERS="$(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
-                #shellcheck disable=SC2086
-                _dialog --no-cancel --menu " Modify User Selection " 15 40 10 "root" "Super User" ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || return 1
-                _USER=$(cat "${_ANSWER}")
-                if [[ "${_USER}" = "root" ]]; then
-                    _set_password Root root
-                elif [[ "${_USER}" = "< Back" ]]; then
-                    break
-                else
-                    _dialog --title " Modify User ${_USER} " --no-cancel --menu "" 10 45 4 \
-                    "1" "Change Password" \
-                    "2" "Change Comment" \
-                    "3" "Delete User" \
-                    "<" "Return To User Selection" 2>"${_ANSWER}" || return 1
-                    _USER_ACTION=$(cat "${_ANSWER}")
-                    if [[ "${_USER_ACTION}" = 1 ]]; then
-                        _set_password User "${_USER}"
-                    elif [[ "${_USER_ACTION}" = 2 ]]; then
-                        _set_comment
-                        usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}"
-                    elif [[ "${_USER_ACTION}" = 3 ]]; then
-                        _dialog --defaultno --yesno "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
-                        userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}"
-                    fi
-                fi
-            done
-            _NEXTITEM="<"
-        elif [[ "${_FILE}" = "<" ]]; then
-            _NEXTITEM=3
-            break
-        fi
+                 done
+                 _NEXTITEM="<" ;;
+        *) _NEXTITEM=3
+            break ;;
+        esac
     done
 }
 # vim: set ft=sh ts=4 sw=4 et:

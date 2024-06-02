@@ -117,25 +117,20 @@ _prepare_storagedrive() {
             "2" "Partition Storage Device" \
             "3" "Manage Software Raid, LVM2 And LUKS Encryption" \
             "4" "Set Filesystem Mountpoints" \
-            "5" "Return To Main Menu" 2>"${_ANSWER}" || _CANCEL=1
+            "<" "Return To Main Menu" 2>"${_ANSWER}" || _CANCEL=1
         _NEXTITEM="$(cat "${_ANSWER}")"
         [[ "${_S_QUICK_SETUP}" = "1" ]] && _DONE=1
         case $(cat "${_ANSWER}") in
-            "1")
-                _CREATE_MOUNTPOINTS=1
-                _autoprepare
-                [[ "${_S_QUICK_SETUP}" = "1" ]] && _DONE=1
-                ;;
-            "2")
-                _partition ;;
-            "3")
-                _create_special ;;
-            "4")
-                _DEVFINISH=""
-                _CREATE_MOUNTPOINTS=1
-                _mountpoints ;;
-            *)
-                _DONE=1 ;;
+            "1") _CREATE_MOUNTPOINTS=1
+                 _autoprepare
+                 [[ "${_S_QUICK_SETUP}" = "1" ]] && _DONE=1
+                 ;;
+            "2") _partition ;;
+            "3") _create_special ;;
+            "4") _DEVFINISH=""
+                 _CREATE_MOUNTPOINTS=1
+                 _mountpoints ;;
+            *) _DONE=1 ;;
         esac
     done
     if [[ "${_CANCEL}" = "1" ]]; then
@@ -211,69 +206,60 @@ _mainmenu() {
     "5" "Exit" 2>"${_ANSWER}"
     _NEXTITEM="$(cat "${_ANSWER}")"
     case $(cat "${_ANSWER}") in
-        "1")
-            if [[ "${_DESTDIR}" == "/" ]]; then
-                _abort_running_system
-            else
-                _prepare_storagedrive
-            fi ;;
-        "2")
-            if [[ "${_DESTDIR}" == "/" ]]; then
-                _abort_running_system
-            else
-                _install_packages
-            fi ;;
-        "3")
-            _configure_system ;;
-        "4")
-            _install_bootloader ;;
-        "5")
-            #shellcheck disable=SC2086
-            _dialog --title " Exit Menu " --menu "" 9 30 5 \
-            "1" "Exit Program" \
-            "2" "Reboot System" \
-            "3" "Poweroff System" 2>"${_ANSWER}"
-            _EXIT="$(cat "${_ANSWER}")"
-            if [[ "${_EXIT}" == "1" ]]; then
-                [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
-                clear
-                if mountpoint -q /install; then
-                    echo ""
-                    echo "If the installation finished successfully:"
-                    echo "Remove the boot medium and type 'reboot'"
-                    echo "to restart the system."
-                    echo ""
-                fi
-                exit 0
-            elif [[ "${_EXIT}" == "2" ]]; then
-                _COUNT=0
-                while true; do
-                    sleep 1
-                    _COUNT=$((_COUNT+1))
-                    # abort after 10 seconds
-                    _progress "$((_COUNT*10))" "Rebooting in $((10-_COUNT)) second(s). Don't forget to remove the boot medium!"
-                    [[ "${_COUNT}" == 10 ]] && break
-                done | _dialog --title " System Reboot " --no-mouse --gauge "Rebooting in 10 seconds. Don't forget to remove the boot medium!" 6 75 0
-                reboot
-            elif [[ "${_EXIT}" == "3" ]]; then
-                _COUNT=0
-                while true; do
-                    sleep 1
-                    _COUNT=$((_COUNT+1))
-                    # abort after 10 seconds
-                    _progress "$((_COUNT*10))" "Powering off in $((10-_COUNT)) second(s). Don't forget to remove the boot medium!"
-                    [[ "${_COUNT}" == 10 ]] && break
-                done | _dialog --title " System Shutdown " --no-mouse --gauge "Powering off in 10 seconds. Don't forget to remove the boot medium!" 6 75 0
-                poweroff
-            fi
-            ;;
-        *)
-            if _dialog --yesno "Abort Program?" 6 40; then
-                [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
-                clear
-                exit 1
-            fi
-            ;;
+        "1") if [[ "${_DESTDIR}" == "/" ]]; then
+                 _abort_running_system
+             else
+                 _prepare_storagedrive
+             fi ;;
+        "2") if [[ "${_DESTDIR}" == "/" ]]; then
+                 _abort_running_system
+             else
+                 _install_packages
+             fi ;;
+        "3") _configure_system ;;
+        "4") _install_bootloader ;;
+        "5") #shellcheck disable=SC2086
+             _dialog --title " Exit Menu " --menu "" 9 30 5 \
+             "1" "Exit Program" \
+             "2" "Reboot System" \
+             "3" "Poweroff System" 2>"${_ANSWER}"
+            case $(cat "${_ANSWER}") in
+                "1") [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
+                     clear
+                     if mountpoint -q /install; then
+                         echo ""
+                         echo "If the installation finished successfully:"
+                         echo "Remove the boot medium and type 'reboot'"
+                         echo "to restart the system."
+                         echo ""
+                     fi
+                     exit 0 ;;
+                "2") _COUNT=0
+                     while true; do
+                         sleep 1
+                         _COUNT=$((_COUNT+1))
+                         # abort after 10 seconds
+                         _progress "$((_COUNT*10))" "Rebooting in $((10-_COUNT)) second(s). Don't forget to remove the boot medium!"
+                         [[ "${_COUNT}" == 10 ]] && break
+                     done | _dialog --title " System Reboot " --no-mouse --gauge \
+                            "Rebooting in 10 seconds. Don't forget to remove the boot medium!" 6 75 0
+                     reboot ;;
+                "3") _COUNT=0
+                     while true; do
+                         sleep 1
+                         _COUNT=$((_COUNT+1))
+                         # abort after 10 seconds
+                         _progress "$((_COUNT*10))" "Powering off in $((10-_COUNT)) second(s). Don't forget to remove the boot medium!"
+                         [[ "${_COUNT}" == 10 ]] && break
+                     done | _dialog --title " System Shutdown " --no-mouse --gauge \
+                            "Powering off in 10 seconds. Don't forget to remove the boot medium!" 6 75 0
+                     poweroff ;;
+            esac ;;
+        *) if _dialog --yesno "Abort Program?" 6 40; then
+              [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
+              clear
+              exit 1
+           fi ;;
     esac
 }
 # vim: set ft=sh ts=4 sw=4 et:
