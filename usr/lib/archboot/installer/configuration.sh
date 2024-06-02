@@ -168,11 +168,11 @@ _user_management() {
                 elif [[ "${_USER}" = "Done" ]]; then
                     break
                 else
-                    _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
+                    _dialog --title " Modify ${_USER} " --no-cancel --menu "" 10 45 4 \
                     "1" "Change Password" \
                     "2" "Change Comment" \
-                    "3" "Delete User" 2>"${_ANSWER}" || return 1
-                    "4" "Done"
+                    "3" "Delete User" \
+                    "4" "Done" 2>"${_ANSWER}" || return 1
                     _USER_ACTION=$(cat "${_ANSWER}")
                     if [[ "${_USER_ACTION}" = 1 ]]; then
                         _set_password User "${_USER}"
