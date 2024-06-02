@@ -155,15 +155,18 @@ _user_management() {
             _NEXTITEM=4
         elif [[ "${_FILE}" = "3" ]]; then
             # add normal users
-            _USERS="Superuser root $(grep 'x:10[0-9][0-9]' ${_DESTDIR}/etc/passwd | cut -d : -f 3,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
-            #while [[ -z "${_USERS}" ]]; do
-                _dialog --menu " Modify Users " 15 40 10 ${_USERS} 2>"${_ANSWER}" || return 1
+            _USERS="root Superuser $(grep 'x:10[0-9][0-9]' ${_DESTDIR}/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g') Back _"
+            while true; do
+                _dialog --no-cancel --menu " Modify User " 15 40 10 ${_USERS} 2>"${_ANSWER}" || return 1
                 _USER=$(cat "${_ANSWER}")
-                exit 0
-            #done
-            if [[ "${_FILE}" = "1" ]]; then
-                _set_password Root root
-            fi
+                if [[ "${_USER}" = "root" ]]; then
+                    _set_password Root root
+                elif [[ "${_USER}" = "Back" ]]; then
+                    break
+                else
+                    exit 0
+                fi
+            done
             _NEXTITEM=4
         elif [[ "${_FILE}" = "4" ]]; then
             _NEXTITEM=3
