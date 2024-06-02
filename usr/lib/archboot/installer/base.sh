@@ -186,7 +186,7 @@ _configure_system() {
             _auto_set_locale
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
             _run_locale_gen
-        elif [[ "${_FILE}" = "==> User Management" ]]; then
+        elif [[ "${_FILE}" = "> User Management" ]]; then
             _user_management
         else
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
