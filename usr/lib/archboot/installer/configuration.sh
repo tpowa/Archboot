@@ -153,7 +153,7 @@ _user_management() {
                     _USER=""
                 fi
                 _set_comment
-                chroot "${_DESTDIR}" useradd -c "${_FN}" -m "${_USER}" &>"${_LOG}" || ${_USER}=""
+                useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}" || ${_USER}=""
             done
             _set_password User "${_USER}"
             _NEXTITEM=2
