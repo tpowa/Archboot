@@ -95,6 +95,14 @@ _set_password() {
     rm /tmp/.password
 }
 
+_set_comment() {
+    _FN=""
+    while [[ -z "${_FN}" ]]; do
+        _dialog --title " Setup ${_USER} " --no-cancel --inputbox "Enter a comment eg. your Full Name" 8 40 "" 2>"${_ANSWER}" || return 1
+        _FN=$(cat "${_ANSWER}")
+    done
+}
+
 _user_management() {
     _NEXTITEM=1
     while true; do
@@ -145,26 +153,36 @@ _user_management() {
                     _USER=""
                 fi
             done
-            _FN=""
-            while [[ -z "${_FN}" ]]; do
-                _dialog --title " Setup ${_USER} " --no-cancel --inputbox "Enter a comment eg. your Full Name" 8 40 "" 2>"${_ANSWER}" || return 1
-                _FN=$(cat "${_ANSWER}")
-            done
+            _set_comment
             chroot "${_DESTDIR}" useradd -c "${_FN}" -m "${_USER}"
             _set_password User "${_USER}"
             _NEXTITEM=4
         elif [[ "${_FILE}" = "3" ]]; then
             # add normal users
-            _USERS="root Superuser $(grep 'x:10[0-9][0-9]' ${_DESTDIR}/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g') Back _"
             while true; do
+                _USERS="root Superuser $(grep 'x:10[0-9][0-9]' ${_DESTDIR}/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g') Done _"
                 _dialog --no-cancel --menu " Modify User " 15 40 10 ${_USERS} 2>"${_ANSWER}" || return 1
                 _USER=$(cat "${_ANSWER}")
                 if [[ "${_USER}" = "root" ]]; then
                     _set_password Root root
-                elif [[ "${_USER}" = "Back" ]]; then
+                elif [[ "${_USER}" = "Done" ]]; then
                     break
                 else
-                    exit 0
+                    _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
+                    "1" "Change Password" \
+                    "2" "Change Comment" \
+                    "3" "Delete User" 2>"${_ANSWER}" || return 1
+                    "4" "Done"
+                    _USER_ACTION=$(cat "${_ANSWER}")
+                    if [[ "${_USER_ACTION}" = 1 ]]; then
+                        _set_password User "${_USER}"
+                    elif [[ "${_USER_ACTION}" = 2 ]]; then
+                        _set_comment
+                        usermod -c "${_FN}" "${_USER}"
+                    elif [[ "${_USER_ACTION}" = 3 ]]; then
+                        _dialog --defaultno --yesno "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 || return 1
+                        chroot userdel -r "${_USER}"
+                    fi
                 fi
             done
             _NEXTITEM=4
