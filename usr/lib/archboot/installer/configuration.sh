@@ -141,7 +141,7 @@ _user_management() {
                 # change default shell
                 sed -i -e "s#^SHELL=.*#SHELL=/usr/bin/${_SHELL}#g" "${_DESTDIR}"/etc/default/useradd
             fi
-            _NEXTITEM=3
+            _NEXTITEM=2
         elif [[ "${_FILE}" = "2" ]]; then
             _USER=""
             while [[ -z "${_USER}" ]]; do
@@ -156,7 +156,7 @@ _user_management() {
             _set_comment
             chroot "${_DESTDIR}" useradd -c "${_FN}" -m "${_USER}"
             _set_password User "${_USER}"
-            _NEXTITEM=4
+            _NEXTITEM=2
         elif [[ "${_FILE}" = "3" ]]; then
             # add normal users
             while true; do
@@ -185,7 +185,7 @@ _user_management() {
                     fi
                 fi
             done
-            _NEXTITEM=4
+            _NEXTITEM="<"
         elif [[ "${_FILE}" = "<" ]]; then
             _NEXTITEM=3
             break
