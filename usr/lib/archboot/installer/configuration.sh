@@ -165,7 +165,7 @@ _user_management() {
                 _USER=$(cat "${_ANSWER}")
                 if [[ "${_USER}" = "root" ]]; then
                     _set_password Root root
-                elif [[ "${_USER}" = "_" ]]; then
+                elif [[ "${_USER}" = "<" ]]; then
                     break
                 else
                     _dialog --title " Modify User ${_USER} " --no-cancel --menu "" 10 45 4 \
