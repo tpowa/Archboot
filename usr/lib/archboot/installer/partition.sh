@@ -36,19 +36,19 @@ _partition() {
     _set_guid
     # Select disk to partition
     _DISKS=$(_finddisks)
-    _DISKS="${_DISKS} OTHER _ DONE +"
+    _DISKS="${_DISKS}"
     _DISK=""
     while true; do
         # Prompt the user with a list of known disks
         #shellcheck disable=SC2086
-        _dialog --title " Partition Device " --no-cancel --menu "" 13 45 6 ${_DISKS} 2>"${_ANSWER}" || return 1
+        _dialog --title " Partition Device " --no-cancel --menu "" 13 45 6 ${_DISKS} "OTHER" "_" "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || return 1
         _DISK=$(cat "${_ANSWER}")
         if [[ "${_DISK}" == "OTHER" ]]; then
             _dialog --inputbox "Enter the full path to the device you wish to partition" 8 65 "/dev/sda" 2>"${_ANSWER}" || _DISK=""
             _DISK=$(cat "${_ANSWER}")
         fi
         # Leave our loop if the user is done partitioning
-        [[ "${_DISK}" == "DONE" ]] && break
+        [[ "${_DISK}" == "< Back" ]] && break
         _MSDOS_DETECTED=""
         if [[ -n "${_DISK}" ]]; then
             if [[ -n "${_GUIDPARAMETER}" ]]; then
