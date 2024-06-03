@@ -231,7 +231,7 @@ _choose_btrfs_subvolume () {
     _subvolumes_in_use
     for i in ${_SUBVOLUME_IN_USE}; do
         #shellcheck disable=SC2001,SC2086
-        _SUBVOLUMES="${_SUBVOLUMES}//${i} _/}"
+        _SUBVOLUMES="${_SUBVOLUMES//${i} _/}"
     done
     if [[ -n "${_SUBVOLUMES}" ]]; then
         #shellcheck disable=SC2086
