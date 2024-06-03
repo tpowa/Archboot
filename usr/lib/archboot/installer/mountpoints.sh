@@ -233,10 +233,10 @@ _mountpoints() {
                 elif [[ -n "${_XBOOTLDR}" ]]; then
                     _dialog --title " Extended Boot Loader Partition (XBOOTLDR) " --no-cancel --menu "" 14 55 8 ${_DEVS} 2>"${_ANSWER}" || return 1
                 else
-                    _dialog --title " Additional Partitions " --no-cancel --menu "" 14 55 8 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
+                    _dialog --title " Additional Partitions " --no-cancel --menu "" 14 55 8 ${_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
                 fi
                 _DEV=$(cat "${_ANSWER}")
-                if [[ "${_DEV}" != "DONE" ]]; then
+                if [[ "${_DEV}" != "> DONE" ]]; then
                     # clear values first!
                     _clear_fs_values
                     _check_btrfs_filesystem_creation
@@ -336,7 +336,7 @@ _mountpoints() {
                     break
                 fi
             done
-            if [[ "${_DEV}" != "DONE" ]]; then
+            if [[ "${_DEV}" != "> DONE" ]]; then
                 # _CREATE_MOUNTPOINTS switch for create filesystem and only mounting filesystem
                 if [[ -n "${_CREATE_MOUNTPOINTS}" && -z "${_SKIP_FILESYSTEM}" ]]; then
                     _enter_mountpoint || return 1
