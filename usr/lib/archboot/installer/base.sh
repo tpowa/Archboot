@@ -203,7 +203,7 @@ _mainmenu() {
     "2" "Install Packages" \
     "3" "Configure System" \
     "4" "Install Bootloader" \
-    "5" "Exit" 2>"${_ANSWER}"
+    "<" "Exit" 2>"${_ANSWER}"
     _NEXTITEM="$(cat "${_ANSWER}")"
     case $(cat "${_ANSWER}") in
         "1") if [[ "${_DESTDIR}" == "/" ]]; then
@@ -218,7 +218,7 @@ _mainmenu() {
              fi ;;
         "3") _configure_system ;;
         "4") _install_bootloader ;;
-        "5") #shellcheck disable=SC2086
+        "<") #shellcheck disable=SC2086
              _dialog --title " Exit Menu " --menu "" 9 30 5 \
              "1" "Exit Program" \
              "2" "Reboot System" \
@@ -255,7 +255,7 @@ _mainmenu() {
                             "Powering off in 10 seconds. Don't forget to remove the boot medium!" 6 75 0
                      poweroff ;;
             esac ;;
-        *) if _dialog --yesno "Abort Program?" 6 40; then
+        *) if _dialog --yesno "Abort Program?" 5 20; then
               [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
               clear
               exit 1
