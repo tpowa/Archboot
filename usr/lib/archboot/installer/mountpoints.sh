@@ -220,7 +220,7 @@ _mountpoints() {
         else
             _UEFISYSDEV_DONE=1
         fi
-        while [[ "${_DEV}" != "DONE" ]]; do
+        while [[ "${_DEV}" != "> DONE" ]]; do
             _MP_DONE=""
             while [[ -z "${_MP_DONE}" ]]; do
                 #shellcheck disable=SC2086
