@@ -70,7 +70,7 @@ _find_btrfs_bootloader_subvolume() {
 _subvolumes_in_use() {
     _SUBVOLUME_IN_USE=""
     while read -r i; do
-        echo "${i}" | grep -q "\|btrfs\|" && _SUBVOLUME_IN_USE="${_SUBVOLUME_IN_USE} $(echo "${i}" | cut -d '|' -f 9)"
+        echo "${i}" | grep -q "|btrfs|" && _SUBVOLUME_IN_USE="${_SUBVOLUME_IN_USE} $(echo "${i}" | cut -d '|' -f 9)"
     done < /tmp/.parts
 }
 
@@ -231,7 +231,7 @@ _choose_btrfs_subvolume () {
     _subvolumes_in_use
     for i in ${_SUBVOLUME_IN_USE}; do
         #shellcheck disable=SC2001,SC2086
-        _SUBVOLUMES="${_SUBVOLUMES//${i} _/}"
+        _SUBVOLUMES="${_SUBVOLUMES//${i}\ _/}"
     done
     if [[ -n "${_SUBVOLUMES}" ]]; then
         #shellcheck disable=SC2086
