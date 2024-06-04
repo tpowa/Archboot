@@ -225,7 +225,7 @@ _mountpoints() {
             while [[ -z "${_MP_DONE}" ]]; do
                 #shellcheck disable=SC2086
                 if [[ -z "${_SWAP_DONE}" ]]; then
-                    _dialog --title " Swap Partition " --menu "" 14 55 8 "NONE" "No Swap" ${_DEVS} 2>"${_ANSWER}" || return 1
+                    _dialog --title " Swap Partition " --menu "" 14 55 8 "> NONE" "No Swap" ${_DEVS} 2>"${_ANSWER}" || return 1
                 elif [[ -z "${_ROOT_DONE}" ]]; then
                     _dialog --title " Root Partition " --no-cancel --menu "" 14 55 8 ${_DEVS} 2>"${_ANSWER}" || return 1
                 elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
@@ -240,8 +240,8 @@ _mountpoints() {
                     # clear values first!
                     _clear_fs_values
                     _check_btrfs_filesystem_creation
-                    [[ ! "${_DEV}" == "NONE" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}" 2>"${_NO_LOG}")"
-                    if [[ -z "${_SWAP_DONE}" && "${_FSTYPE}" == "swap" ]] || [[ "${_DEV}" == "NONE" ]]; then
+                    [[ ! "${_DEV}" == "> NONE" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}" 2>"${_NO_LOG}")"
+                    if [[ -z "${_SWAP_DONE}" && "${_FSTYPE}" == "swap" ]] || [[ "${_DEV}" == "> NONE" ]]; then
                         _SKIP_FILESYSTEM=1
                     fi
                     # _CREATE_MOUNTPOINTS switch for create filesystem and only mounting filesystem
@@ -288,7 +288,7 @@ _mountpoints() {
                         fi
                     else
                         if [[ -z "${_SWAP_DONE}" ]]; then
-                            if ! [[ "${_DEV}" == "NONE" ]]; then
+                            if ! [[ "${_DEV}" == "> NONE" ]]; then
                                 if ! [[ "${_FSTYPE}" == "swap" ]]; then
                                     _dialog --title " ERROR " --no-mouse --infobox "SWAP PARTITION has not a swap filesystem." 3 60
                                     sleep 5
