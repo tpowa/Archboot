@@ -462,7 +462,13 @@ _createmd()
             # clean loop from used partition and options
             _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
             # raid0 doesn't support missing devices
-            ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _MDEXTRA="\"> MISSING\" \"Degraded Raid Device\""
+            if [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]]; then
+                _dialog --no-cancel --menu "Select additional device ${_RAIDNUMBER}:" \
+                21 50 13 ${_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
+            else
+                _dialog --no-cancel --menu "Select additional device ${_RAIDNUMBER}:" \
+                21 50 13 ${_DEVS} "> MISSING" "Degraded Raid Device" "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
+            fi
             # add more devices
             #shellcheck disable=SC2086
             _dialog --no-cancel --menu "Select additional device ${_RAIDNUMBER}:" 21 50 13 ${_DEVS} ${_MDEXTRA} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
