@@ -462,7 +462,7 @@ _createmd()
             _RAIDNUMBER=$((_RAIDNUMBER + 1))
             if [[ -n "${_DEV}" ]]; then
                 # clean loop from used partition and options
-                _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")##g")"
+                _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
             fi
             # add more devices
             # raid0 doesn't support missing devices
@@ -569,11 +569,11 @@ _createpv()
         while [[ "${_DEV}" != "> DONE" ]]; do
             _DEVNUMBER="$((_DEVNUMBER + 1))"
             # clean loop from used partition and options
-            #shellcheck disable=SC2001
             _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
             # add more devices
             #shellcheck disable=SC2086
-            _dialog --no-cancel --menu "Select additional device number ${_DEVNUMBER} for physical volume:" 15 60 12 ${_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --menu "Select additional device number ${_DEVNUMBER} for physical volume:" 15 60 12 \
+                ${_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
             _DEV=$(cat "${_ANSWER}")
             [[ "${_DEV}" == "> DONE" ]] && break
             echo "${_DEV}" >>/tmp/.pvs-create
@@ -627,7 +627,7 @@ _findvg()
 _createvg()
 {
     _VGFINISH=""
-    while [[ "${_VGFINISH}" != "DONE" ]]; do
+    while [[ "${_VGFINISH}" != "> DONE" ]]; do
         : >/tmp/.pvs
         _VGDEV=""
         _PVS=$(_findpv)
@@ -656,11 +656,11 @@ _createvg()
         while [[ "${_PVS}" != "DONE" ]]; do
             _PVNUMBER=$((_PVNUMBER + 1))
             # clean loop from used partition and options
-            #shellcheck disable=SC2001
-            _PVS="$(echo "${_PVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")##g")"
+            _PVS="${_PVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
             # add more devices
             #shellcheck disable=SC2086
-            _dialog --no-cancel --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 ${_PVS} DONE _ 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 \
+                ${_PVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
             _PV=$(cat "${_ANSWER}")
             [[ "${_PV}" == "DONE" ]] && break
             echo "${_PV}" >>/tmp/.pvs
