@@ -96,10 +96,10 @@ _btrfs_parts() {
          while read -r i; do
              _BTRFS_DEVS="${_BTRFS_DEVS}#${i}"
              # remove device if no subvolume is used!
-             [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _DEVS="${_DEVS//${i}\ _/}"
+             [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _DEVS="${_DEVS//${i} _/}"
          done < /tmp/.btrfs-devices
      else
-         [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _DEVS="${_DEVS//${_DEV}\ _/}"
+         [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _DEVS="${_DEVS//${_DEV} _/}"
      fi
 }
 
@@ -138,7 +138,7 @@ _select_btrfsraid_devices () {
     for i in ${_DEVS}; do
         echo "${i}" | grep -q /dev && _BTRFS_DEVS="${_BTRFS_DEVS} ${i} _ "
     done
-    _BTRFS_DEVS=${_BTRFS_DEVS//${_BTRFS_DEV}\ _/}
+    _BTRFS_DEVS=${_BTRFS_DEVS//${_BTRFS_DEV} _/}
     _RAIDNUMBER=2
     #shellcheck disable=SC2086
     _dialog --title " Device ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 ${_BTRFS_DEVS} 2>"${_ANSWER}" || return 1
@@ -153,7 +153,7 @@ _select_btrfsraid_devices () {
         [[ "${_RAIDNUMBER}" -ge 4 && "${_BTRFS_LEVEL}" == "raid5" ]] && _BTRFS_DONE="DONE _"
         [[ "${_RAIDNUMBER}" -ge 5 && "${_BTRFS_LEVEL}" == "raid10" || "${_BTRFS_LEVEL}" == "raid6" ]] && _BTRFS_DONE="DONE _"
         # clean loop from used partition and options
-        _BTRFS_DEVS=${_BTRFS_DEVS//${_BTRFS_DEV}\ _/}
+        _BTRFS_DEVS=${_BTRFS_DEVS//${_BTRFS_DEV} _/}
         # add more devices
         #shellcheck disable=SC2086
         _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 ${_BTRFS_DEVS} ${_BTRFS_DONE} 2>"${_ANSWER}" || return 1

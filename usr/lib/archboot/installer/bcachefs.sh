@@ -51,7 +51,7 @@ _bcfs_select_raid_devices () {
     for i in ${_DEVS}; do
         echo "${i}" | grep -q /dev && _BCFS_RAID_DEVS="${_BCFS_RAID_DEVS} ${i} _ "
     done
-    _BCFS_RAID_DEVS=${_BCFS_RAID_DEVS//${_BCFS_RAID_DEV}\ _/}
+    _BCFS_RAID_DEVS=${_BCFS_RAID_DEVS//${_BCFS_RAID_DEV} _/}
     _RAIDNUMBER=1
     while [[ "${_BCFS_RAID_DEV}" != "DONE" ]]; do
         _BCFS_DONE=""
@@ -68,7 +68,7 @@ _bcfs_select_raid_devices () {
         [[ "$((_RAIDNUMBER + _DUR_COUNT))" -ge "$((_BCFS_REP_COUNT + 3))" &&\
             "${_BCFS_LEVEL}" == "raid10" || "${_BCFS_LEVEL}" == "raid6" ]] && _BCFS_DONE="DONE _"
         # clean loop from used partition and options
-        _BCFS_RAID_DEVS=${_BCFS_RAID_DEVS//${_BCFS_RAID_DEV}\ _/}
+        _BCFS_RAID_DEVS=${_BCFS_RAID_DEVS//${_BCFS_RAID_DEV} _/}
         # add more devices
         #shellcheck disable=SC2086
         _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 ${_BCFS_RAID_DEVS} ${_BCFS_DONE} 2>"${_ANSWER}" || return 1
