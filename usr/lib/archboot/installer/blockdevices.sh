@@ -408,8 +408,7 @@ _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/md.txt)" 0 0
 
 _createmd()
 {
-    _MDFINISH=""
-    while [[ "${_MDFINISH}" != "DONE" ]]; do
+    while true; do
         _activate_special_devices
         : >/tmp/.raid
         : >/tmp/.raid-spare
@@ -466,7 +465,7 @@ _createmd()
             fi
             # add more devices
             # raid0 doesn't support missing devices
-            if [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" || -n ${_DEGRADED} ]]; then
+            if [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" || -n "${_DEGRADED}" ]]; then
                 #shellcheck disable=SC2086
                 _dialog --no-cancel --menu "Select additional device ${_RAIDNUMBER}:" \
                 21 50 13 ${_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
@@ -477,7 +476,7 @@ _createmd()
             fi
             _DEV=$(cat "${_ANSWER}")
             [[ "${_DEV}" == "> DONE" ]] && break
-            if [[ "${_DEV}" == "> MISSING" && -z ${_DEGRADED} ]]; then
+            if [[ "${_DEV}" == "> MISSING" && -z "${_DEGRADED}" ]]; then
                 _DEGRADED="missing"
                 echo "${_DEGRADED}" >>/tmp/.raid
                 _DEV=""
@@ -493,7 +492,7 @@ _createmd()
         done
         # final step ask if everything is ok?
         # shellcheck disable=SC2028
-        _dialog --yesno "Would you like to create ${_RAIDDEV} like this?\n\nLEVEL:\n${_LEVEL}\n\nDEVICES:\n$(while read -r dev;do echo "${dev}\n"; done < /tmp/.raid)\nSPARES:\n$(while read -r dev;do echo "${dev}\n"; done < tmp/.raid-spare)" 0 0 && _MDFINISH="DONE"
+        _dialog --yesno "Would you like to create ${_RAIDDEV} like this?\n\nLEVEL:\n${_LEVEL}\n\nDEVICES:\n$(while read -r dev;do echo "${dev}\n"; done < /tmp/.raid)\nSPARES:\n$(while read -r dev;do echo "${dev}\n"; done < tmp/.raid-spare)" 0 0 && break
     done
     _umountall
     _DEVS="$(echo -n "$(cat /tmp/.raid)")"
@@ -539,8 +538,7 @@ _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/lvm2.txt)" 0 0
 
 _createpv()
 {
-    _PVFINISH=""
-    while [[ "${_PVFINISH}" != "> DONE" ]]; do
+    while true; do
         _activate_special_devices
         : >/tmp/.pvs-create
         _dialog --no-mouse --infobox "Scanning blockdevices... This may need some time." 3 60
@@ -579,7 +577,7 @@ _createpv()
             echo "${_DEV}" >>/tmp/.pvs-create
         done
         # final step ask if everything is ok?
-        _dialog --yesno "Would you like to create physical volume on devices below?\n$(sed -e 's#$#\\n#g' /tmp/.pvs-create)" 0 0 && _PVFINISH="DONE"
+        _dialog --yesno "Would you like to create physical volume on devices below?\n$(sed -e 's#$#\\n#g' /tmp/.pvs-create)" 0 0 && break
     done
     _DEV="$(echo -n "$(cat /tmp/.pvs-create)")"
     #shellcheck disable=SC2028,SC2086
