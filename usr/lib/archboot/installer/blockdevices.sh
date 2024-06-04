@@ -462,15 +462,15 @@ _createmd()
             # clean loop from used partition and options
             _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
             # raid0 doesn't support missing devices
-            ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _MDEXTRA="MISSING _"
+            ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _MDEXTRA=""> MISSING" "Degraded Raid Device""
             # add more devices
             #shellcheck disable=SC2086
-            _dialog --no-cancel --menu "Select additional device ${_RAIDNUMBER}:" 21 50 13 ${_DEVS} ${_MDEXTRA} DONE _ 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --menu "Select additional device ${_RAIDNUMBER}:" 21 50 13 ${_DEVS} ${_MDEXTRA} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
             _DEV=$(cat "${_ANSWER}")
             _SPARE=""
             ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _dialog --yesno --defaultno "Would you like to use ${_DEV} as spare device?" 0 0 && _SPARE=1
-            [[ "${_DEV}" == "DONE" ]] && break
-            if [[ "${_DEV}" == "MISSING" ]]; then
+            [[ "${_DEV}" == "> DONE" ]] && break
+            if [[ "${_DEV}" == "> MISSING" ]]; then
                 _dialog --yesno "Would you like to create a degraded raid on ${_RAIDDEV}?" 0 0 && _DEGRADED="missing"
                 echo "${_DEGRADED}" >>/tmp/.raid
             else
