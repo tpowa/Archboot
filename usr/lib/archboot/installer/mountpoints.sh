@@ -225,7 +225,7 @@ _mountpoints() {
             while [[ -z "${_MP_DONE}" ]]; do
                 #shellcheck disable=SC2086
                 if [[ -z "${_SWAP_DONE}" ]]; then
-                    _dialog --title " Swap Partition " --menu "" 14 55 8 NONE - ${_DEVS} 2>"${_ANSWER}" || return 1
+                    _dialog --title " Swap Partition " --menu "" 14 55 8 "NONE" "No Swap" ${_DEVS} 2>"${_ANSWER}" || return 1
                 elif [[ -z "${_ROOT_DONE}" ]]; then
                     _dialog --title " Root Partition " --no-cancel --menu "" 14 55 8 ${_DEVS} 2>"${_ANSWER}" || return 1
                 elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
