@@ -460,8 +460,10 @@ _createmd()
         echo "${_DEV}" >>/tmp/.raid
         while true; do
             _RAIDNUMBER=$((_RAIDNUMBER + 1))
-            # clean loop from used partition and options
-            _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")##g")"
+            if [[ -n ${_DEV} ]]; then
+                # clean loop from used partition and options
+                _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")##g")"
+            fi
             # add more devices
             # raid0 doesn't support missing devices
             if [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]]; then
