@@ -767,10 +767,9 @@ _enter_luks_name() {
 }
 
 _enter_luks_passphrase () {
-    _LUKSPASSPHRASE=""
     _LUKSPASS=""
     _LUKSPASS2=""
-    while [[ -z "${_LUKSPASSPHRASE}" ]]; do
+    while true; do
         while [[ -z "${_LUKSPASS}" ]]; do
             _dialog --no-cancel --insecure --passwordbox "Enter passphrase for luks encrypted device ${_LUKSDEV}:" 8 70 2>"${_ANSWER}" || return 1
             _LUKSPASS=$(cat "${_ANSWER}")
@@ -783,10 +782,10 @@ _enter_luks_passphrase () {
             _LUKSPASSPHRASE=${_LUKSPASS}
             echo "${_LUKSPASSPHRASE}" > "/tmp/passphrase-${_LUKSDEV}"
             _LUKSPASSPHRASE="/tmp/passphrase-${_LUKSDEV}"
+            break
         else
              _dialog --no-mouse --infobox "Passphrases didn't match, please enter again." 0 0
              sleep 3
-            _LUKSPASSPHRASE=""
             _LUKSPASS=""
             _LUKSPASS2=""
         fi
@@ -795,17 +794,15 @@ _enter_luks_passphrase () {
 
 _opening_luks() {
     _dialog --no-mouse --infobox "Opening encrypted ${_DEV}..." 0 0
-    _LUKSOPEN_SUCCESS=""
-    while [[ -z "${_LUKSOPEN_SUCCESS}" ]]; do
-        cryptsetup luksOpen "${_DEV}" "${_LUKSDEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}" && _LUKSOPEN_SUCCESS=1
-        if [[ -z "${_LUKSOPEN_SUCCESS}" ]]; then
-            _dialog --no-mouse --infobox "Error: Passphrase didn't match, please enter again." 0 0
-            sleep 5
-            _enter_luks_passphrase || return 1
-        fi
+    while true; do
+        cryptsetup luksOpen "${_DEV}" "${_LUKSDEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}" && break
+        _dialog --no-mouse --infobox "Error: Passphrase didn't match, please enter again" 0 0
+        sleep 5
+        _enter_luks_passphrase || return 1
     done
-    _dialog --yesno "Would you like to save the passphrase of luks device in /etc/$(basename "${_LUKSPASSPHRASE}")?\nName:${_LUKSDEV}" 0 0 || _LUKSPASSPHRASE="ASK"
-    echo "${_LUKSDEV}" "${_DEV}" "/etc/$(basename "${_LUKSPASSPHRASE}")" >> /tmp/.crypttab
+    if _dialog --yesno "Would you like to save the passphrase of luks device in /etc/$(basename "${_LUKSPASSPHRASE}")?\nName:${_LUKSDEV}" 0 0; then
+        echo "${_LUKSDEV}" "${_DEV}" "/etc/$(basename "${_LUKSPASSPHRASE}")" >> /tmp/.crypttab
+    fi
 }
 
 _helpluks()
@@ -815,9 +812,7 @@ _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/luks.txt)" 0 0
 
 _createluks()
 {
-    _NAME_SCHEME_PARAMETER_RUN=""
-    _LUKSFINISH=""
-    while [[ "${_LUKSFINISH}" != "DONE" ]]; do
+    while true; do
         _activate_special_devices
         _dialog --no-mouse --infobox "Scanning blockdevices... This may need some time." 3 60
         # Remove all crypt devices with children
@@ -845,7 +840,7 @@ _createluks()
         ### TODO: offer more options for encrypt!
         ###       defaults are used only
         # final step ask if everything is ok?
-        _dialog --yesno "Would you like to encrypt luks device below?\nName:${_LUKSDEV}\nDevice:${_DEV}\n" 0 0 && _LUKSFINISH="DONE"
+        _dialog --yesno "Would you like to encrypt luks device below?\nName:${_LUKSDEV}\nDevice:${_DEV}\n" 0 0 && break
     done
     _enter_luks_passphrase || return 1
     _umountall
