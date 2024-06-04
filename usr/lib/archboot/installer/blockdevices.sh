@@ -624,10 +624,8 @@ _findvg()
 
 _createvg()
 {
-    _VGFINISH=""
-    while [[ "${_VGFINISH}" != "> DONE" ]]; do
+    while true; do
         : >/tmp/.pvs
-        _VGDEV=""
         _PVS=$(_findpv)
         # break if all devices are in use
         if [[ -z "${_PVS}" ]]; then
@@ -651,7 +649,7 @@ _createvg()
         _dialog --no-cancel --menu "Select Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 ${_PVS} 2>"${_ANSWER}" || return 1
         _PV=$(cat "${_ANSWER}")
         echo "${_PV}" >>/tmp/.pvs
-        while [[ "${_PVS}" != "DONE" ]]; do
+        while [[ "${_PVS}" != "> DONE" ]]; do
             _PVNUMBER=$((_PVNUMBER + 1))
             # clean loop from used partition and options
             _PVS="${_PVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
@@ -664,7 +662,7 @@ _createvg()
             echo "${_PV}" >>/tmp/.pvs
         done
         # final step ask if everything is ok?
-        _dialog --yesno "Would you like to create Volume Group like this?\n\n${_VGDEV}\n\nPhysical Volumes:\n$(sed -e 's#$#\\n#g' /tmp/.pvs)" 0 0 && _VGFINISH="DONE"
+        _dialog --yesno "Would you like to create Volume Group like this?\n\n${_VGDEV}\n\nPhysical Volumes:\n$(sed -e 's#$#\\n#g' /tmp/.pvs)" 0 0 && break
     done
     _PV="$(echo -n "$(cat /tmp/.pvs)")"
     _umountall
@@ -680,10 +678,7 @@ _createvg()
 
 _createlv()
 {
-    _LVFINISH=""
-    while [[ "${_LVFINISH}" != "DONE" ]]; do
-        _LVDEV=""
-        _LV_SIZE_SET=""
+    while true; do
         _LVS=$(_findvg)
         # break if all devices are in use
         if [[ -z "${_LVS}" ]]; then
@@ -704,26 +699,28 @@ _createlv()
                 _LVDEV=""
             fi
         done
-        while [[ -z "${_LV_SIZE_SET}" ]]; do
+        while true; do
             _LV_ALL=""
             _dialog --no-cancel --inputbox "Enter the size (M/MiB) of your Logical Volume,\nMinimum value is > 0.\n\nVolume space left: $(vgs -o vg_free --noheading --units M "${_LV}")\n\nIf you enter no value, all free space left will be used." 12 65 "" 2>"${_ANSWER}" || return 1
                 _LV_SIZE=$(cat "${_ANSWER}")
                 if [[ -z "${_LV_SIZE}" ]]; then
                     _LV_ALL=1
-                    _LV_SIZE_SET=1
+                    break
                 elif [[ "${_LV_SIZE}" == 0 ]]; then
                     _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
                     if [[ "${_LV_SIZE}" -ge "$(vgs -o vg_free --noheading --units M | sed -e 's#m##g')" ]]; then
                         _dialog --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                     else
-                        _LV_SIZE_SET=1
+                        break
                     fi
                 fi
         done
         #Contiguous doesn't work with +100%FREE
         _LV_CONTIGUOUS=""
-        [[ -z "${_LV_ALL}" ]] && _dialog --defaultno --yesno "Would you like to create Logical Volume as a contiguous partition, that means that your space doesn't get partitioned over one or more disks nor over non-contiguous physical extents.\n(usefull for swap space etc.)?" 0 0 && _LV_CONTIGUOUS=1
+        if [[ -z "${_LV_ALL}" ]]; then
+            _dialog --defaultno --yesno "Would you like to create Logical Volume as a contiguous partition, that means that your space doesn't get partitioned over one or more disks nor over non-contiguous physical extents.\n(usefull for swap space etc.)?" 0 0 && _LV_CONTIGUOUS=1
+        fi
         if [[ -n "${_LV_CONTIGUOUS}" ]]; then
             _CONTIGUOUS=yes
             _LV_EXTRA="-W y -C y -y"
@@ -733,7 +730,7 @@ _createlv()
         fi
         [[ -z "${_LV_SIZE}" ]] && _LV_SIZE="All free space left"
         # final step ask if everything is ok?
-        _dialog --yesno "Would you like to create Logical Volume ${_LVDEV} like this?\nVolume Group: ${_LV}\nVolume Size: ${_LV_SIZE}\nContiguous Volume: ${_CONTIGUOUS}" 0 0 && _LVFINISH="DONE"
+        _dialog --yesno "Would you like to create Logical Volume ${_LVDEV} like this?\nVolume Group: ${_LV}\nVolume Size: ${_LV_SIZE}\nContiguous Volume: ${_CONTIGUOUS}" 0 0 && break
     done
     _umountall
     if [[ -n "${_LV_ALL}" ]]; then
