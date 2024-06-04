@@ -478,7 +478,7 @@ _createmd()
             _DEV=$(cat "${_ANSWER}")
             [[ "${_DEV}" == "> DONE" ]] && break
             if [[ "${_DEV}" == "> MISSING" && -z ${_DEGRADED} ]]; then
-                _dialog --yesno "Would you like to create a degraded raid on ${_RAIDDEV}?" 0 0 && _DEGRADED="missing"
+                _DEGRADED="missing"
                 echo "${_DEGRADED}" >>/tmp/.raid
                 _DEV=""
             else
