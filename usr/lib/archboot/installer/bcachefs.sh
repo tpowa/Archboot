@@ -112,15 +112,9 @@ _bcfs_raid_level() {
                         "4" 2>"${_ANSWER}" || return 1
                     _BCFS_REP_COUNT="$(cat "${_ANSWER}")"
             fi
-            while true; do
-                _bcfs_raid_options || return 1
-                _bcfs_options
-                if _bcfs_select_raid_devices; then
-                    break
-                else
-                    return 1
-                fi
-            done
+            _bcfs_raid_options || return 1
+            _bcfs_options
+            _bcfs_select_raid_devices || return 1
             # final step ask if everything is ok?
             #shellcheck disable=SC2028,SC2027,SC2086
             _dialog --title " Summary " --yesno \
