@@ -652,7 +652,7 @@ _createvg()
         while [[ "${_PVS}" != "> DONE" ]]; do
             _PVNUMBER=$((_PVNUMBER + 1))
             # clean loop from used partition and options
-            _PVS="${_PVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
+            _PVS="${_PVS//$(${_LSBLK} NAME,SIZE -d "${_PV}" 2>"${_NO_LOG}")/}"
             # add more devices
             #shellcheck disable=SC2086
             _dialog --no-cancel --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 \
