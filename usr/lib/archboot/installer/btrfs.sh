@@ -242,7 +242,7 @@ _choose_btrfs_subvolume () {
         _btrfs_compress || return 1
     else
         if [[ -n "${_SUBVOLUMES_DETECTED}" ]]; then
-            _dialog --title " ERROR " --no-mouse --infobox "All subvolumes of the device are already in use.\nSwitching to create a new one now." 4 50
+            _dialog --title " ERROR " --no-mouse --infobox "All subvolumes of the device are already in use.\nSwitching to create a new one now." 4 60
             sleep 5
             _prepare_btrfs_subvolume || return 1
         fi
