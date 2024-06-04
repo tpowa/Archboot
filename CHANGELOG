@@ -5,6 +5,7 @@ setup:
 - fixed bcachefs menu cancellation
 - added more description to menu points
 - added < and > menu points to show direction of navigation
+- disabled dangerous Raid5/6 in btrfs menu
 ---
 2024.05 Highlights:
 - kernel 6.9.x
