@@ -482,14 +482,12 @@ _createmd()
                 echo "${_DEGRADED}" >>/tmp/.raid
                 _DEV=""
             else
-                _SPARE=""
                 if ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]]; then
-                    _dialog --yesno --defaultno "Would you like to use ${_DEV} as spare device?" 0 0 && _SPARE=1
-                fi
-                if [[ -n "${_SPARE}" ]]; then
-                    echo "${_DEV}" >>/tmp/.raid-spare
-                else
-                    echo "${_DEV}" >>/tmp/.raid
+                    if _dialog --yesno --defaultno "Would you like to use ${_DEV} as spare device?" 0 0; then
+                         echo "${_DEV}" >>/tmp/.raid-spare
+                    else
+                        echo "${_DEV}" >>/tmp/.raid
+                    fi
                 fi
             fi
         done
