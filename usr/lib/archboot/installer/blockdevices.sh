@@ -471,6 +471,7 @@ _createmd()
                 #shellcheck disable=SC2086
                 _dialog --no-cancel --menu "Select additional device ${_RAIDNUMBER}:" \
                 21 50 13 ${_DEVS} "> MISSING" "Degraded Raid Device" "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
+                _DEV=$(cat "${_ANSWER}")
             fi
             _SPARE=""
             ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _dialog --yesno --defaultno "Would you like to use ${_DEV} as spare device?" 0 0 && _SPARE=1
