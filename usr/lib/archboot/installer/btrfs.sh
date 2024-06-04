@@ -47,7 +47,9 @@ _find_btrfs_subvolume() {
         # existing btrfs subvolumes
         _mount_btrfs
         for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d ' ' -f 9 | grep -v 'var/lib/machines' | grep -v 'var/lib/portables'); do
-            echo "${i}"
+            # add echo without "" to kill hidden escapes from btrfs call
+            #shellcheck disable=SC2116,2086
+            echo ${i}
             [[ "${1}" ]] && echo "${1}"
         done
         _umount_btrfs
@@ -231,7 +233,6 @@ _choose_btrfs_subvolume () {
     _subvolumes_in_use
     # add echo to kill hidden escapes from btrfs call
     #shellcheck disable=SC2116,2086
-    _SUBVOLUMES="$(echo ${_SUBVOLUMES})"
     for i in ${_SUBVOLUME_IN_USE}; do
         _SUBVOLUMES="${_SUBVOLUMES//${i} _/}"
     done
