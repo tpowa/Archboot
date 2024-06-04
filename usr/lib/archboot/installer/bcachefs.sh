@@ -8,7 +8,7 @@ _bcfs_raid_options() {
     _dialog --no-cancel --title " Durability " --menu "" 9 30 5 \
         "1" "Normal Device" \
         "0" "Cache Device" \
-        "Custom" "_" 2>"${_ANSWER}" || return 1
+        "> CUSTOM" "Custom Durability" 2>"${_ANSWER}" || return 1
     _BCFS_DURABILITY=$(cat "${_ANSWER}")
     if [[ ${_BCFS_DURABILITY} == 1 ]]; then
         _DURABILITY=""
@@ -16,7 +16,7 @@ _bcfs_raid_options() {
         _DURABILITY="--durability=0"
         _DUR_COUNT=$((_DUR_COUNT - 1))
     else
-        if [[ ${_BCFS_DURABILITY} == "Custom" ]]; then
+        if [[ ${_BCFS_DURABILITY} == "> CUSTOM" ]]; then
             _dialog  --inputbox "Enter custom durability level (number):" 8 65 \
                 "2" 2>"${_ANSWER}" || return 1
                 _BCFS_DURABILITY="$(cat "${_ANSWER}")"
@@ -105,11 +105,11 @@ _bcfs_raid_level() {
             _BCFS_DEVICE_FINISH="1"
         else
             # replicas
-            _BCFS_REPLICATION="2 - 3 - Custom _"
+            _BCFS_REPLICATION="2 - 3 -"
             #shellcheck disable=SC2086
-            _dialog --no-cancel --title " Replication Level " --menu "" 9 30 5 ${_BCFS_REPLICATION} 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --title " Replication Level " --menu "" 9 30 5 ${_BCFS_REPLICATION} "> CUSTOM" "Custom Level" >"${_ANSWER}" || return 1
             _BCFS_REP_COUNT=$(cat "${_ANSWER}")
-            if [[ ${_BCFS_REP_COUNT} == "Custom" ]]; then
+            if [[ ${_BCFS_REP_COUNT} == "> CUSTOM" ]]; then
                 _dialog  --inputbox "Enter custom replication level (number):" 8 65 \
                         "4" 2>"${_ANSWER}" || return 1
                     _BCFS_REP_COUNT="$(cat "${_ANSWER}")"
