@@ -76,21 +76,19 @@ _bcfs_select_raid_devices () {
         [[ "${_BCFS_RAID_DEV}" == "> DONE" ]] && break
         _bcfs_raid_options || return 1
         _bcfs_options
-     done
+    done
     echo "--replicas=${_BCFS_REP_COUNT}" >> /tmp/.bcfs-raid-device
     [[ -n "${_BCFS_SSD_OPTIONS}" ]] && echo "--foreground_target=ssd --promote_target=ssd" >> /tmp/.bcfs-raid-device
     [[ -n "${_BCFS_HDD_OPTIONS}" ]] && echo "--background_target=hdd" >> /tmp/.bcfs-raid-device
-    break
+    return 0
 }
 
 # choose raid level to use on bcfs device
 _bcfs_raid_level() {
-    _BCFS_DEVICE_FINISH=""
     while true ; do
         : >/tmp/.bcfs-raid-device
         _BCFS_RAIDLEVELS="raid1 - raid10 -"
         _BCFS_RAID_DEV="${_DEV}"
-        _BCFS_RAID_FINISH=""
         _BCFS_LEVEL=""
         _DUR_COUNT="0"
         _BCFS_HDD_COUNT="0"
@@ -117,7 +115,11 @@ _bcfs_raid_level() {
             while true; do
                 _bcfs_raid_options || return 1
                 _bcfs_options
-                _bcfs_select_raid_devices || return 1
+                if _bcfs_select_raid_devices; then
+                    break
+                else
+                    return 1
+                fi
             done
             # final step ask if everything is ok?
             #shellcheck disable=SC2028,SC2027,SC2086
