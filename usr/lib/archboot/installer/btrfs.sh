@@ -105,7 +105,7 @@ _btrfs_parts() {
 
 # choose raid level to use on btrfs device
 _btrfsraid_level() {
-    _BTRFS_RAIDLEVELS="NONE - raid0 - raid1 - raid5 - raid6 - raid10 - single -"
+    _BTRFS_RAIDLEVELS="NONE - raid0 - raid1 - raid10 - single -"
     _BTRFS_RAID_FINISH=""
     _BTRFS_LEVEL=""
     _BTRFS_DEV="${_DEV}"
@@ -118,10 +118,6 @@ _btrfsraid_level() {
             echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
             break
         else
-            if [[ "${_BTRFS_LEVEL}" == "raid5" || "${_BTRFS_LEVEL}" == "raid6" ]]; then
-                _dialog --no-mouse --infobox "BTRFS DATA RAID OPTIONS:\n\nRAID5/6 are for testing purpose. Use with extreme care!" 0 0
-                sleep 5
-            fi
             # take selected device as 1st device, add additional devices in part below.
             _select_btrfsraid_devices
         fi
