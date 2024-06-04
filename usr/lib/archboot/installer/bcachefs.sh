@@ -5,7 +5,7 @@
 _bcfs_raid_options() {
     # add durability
     _DURABILITY=""
-    _dialog --no-cancel --title " Durability " --menu "" 9 30 5 \
+    _dialog --no-cancel --title " Durability " --menu "" 9 40 5 \
         "1" "Normal Device" \
         "0" "Cache Device" \
         "> CUSTOM" "Custom Durability" 2>"${_ANSWER}" || return 1
@@ -115,7 +115,7 @@ _bcfs_raid_level() {
                     _BCFS_REP_COUNT="$(cat "${_ANSWER}")"
             fi
             while [[ -z "${_BCFS_RAID_FINISH}" ]]; do
-                _bcfs_raid_options
+                _bcfs_raid_options || return 1
                 _bcfs_options
                 _bcfs_select_raid_devices
             done
