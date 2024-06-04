@@ -1,5 +1,7 @@
 On the road to 2024.06:
+setup:
 - added user management
+- fixed btrfs subvolume selection
 ---
 2024.05 Highlights:
 - kernel 6.9.x
