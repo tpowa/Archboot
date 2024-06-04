@@ -453,6 +453,7 @@ _createmd()
         fi
         # select the first device to use, no missing option available!
         _RAIDNUMBER=1
+        _DEGRADED=""
         #shellcheck disable=SC2086
         _dialog --no-cancel --menu "Select device ${_RAIDNUMBER}:" 21 50 13 ${_DEVS} 2>"${_ANSWER}" || return 1
         _DEV=$(cat "${_ANSWER}")
@@ -473,7 +474,7 @@ _createmd()
                 21 50 13 ${_DEVS} "> MISSING" "Degraded Raid Device" "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
             fi
             _DEV=$(cat "${_ANSWER}")
-            if [[ "${_DEV}" == "> MISSING" ]]; then
+            if [[ "${_DEV}" == "> MISSING" && -z ${_DEGRADED} ]]; then
                 _dialog --yesno "Would you like to create a degraded raid on ${_RAIDDEV}?" 0 0 && _DEGRADED="missing"
                 echo "${_DEGRADED}" >>/tmp/.raid
                 _DEV=""
