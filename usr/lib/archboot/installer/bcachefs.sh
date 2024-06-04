@@ -117,7 +117,7 @@ _bcfs_raid_level() {
             while [[ -z "${_BCFS_RAID_FINISH}" ]]; do
                 _bcfs_raid_options || return 1
                 _bcfs_options
-                _bcfs_select_raid_devices
+                _bcfs_select_raid_devices || return 1
             done
             # final step ask if everything is ok?
             #shellcheck disable=SC2028,SC2027,SC2086
