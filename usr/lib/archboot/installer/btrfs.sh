@@ -229,9 +229,10 @@ _choose_btrfs_subvolume () {
     # check if subvolumes are present
     [[ -n "${_SUBVOLUMES}" ]] && _SUBVOLUMES_DETECTED=1
     _subvolumes_in_use
+    # add echo to kill hidden escapes from btrfs call
+    _SUBVOLUMES="$(echo ${_SUBVOLUMES})"
     for i in ${_SUBVOLUME_IN_USE}; do
-        #shellcheck disable=SC2001,SC2086
-        _SUBVOLUMES="${_SUBVOLUMES//${i}\ _/}"
+        _SUBVOLUMES="${_SUBVOLUMES//${i} _/}"
     done
     if [[ -n "${_SUBVOLUMES}" ]]; then
         #shellcheck disable=SC2086
@@ -240,7 +241,7 @@ _choose_btrfs_subvolume () {
         _btrfs_compress || return 1
     else
         if [[ -n "${_SUBVOLUMES_DETECTED}" ]]; then
-            _dialog --title " ERROR " --no-mouse --infobox "All subvolumes of the device are already in use. Switching to create a new one now." 3 65
+            _dialog --title " ERROR " --no-mouse --infobox "All subvolumes of the device are already in use.\nSwitching to create a new one now." 4 65
             sleep 5
             _prepare_btrfs_subvolume || return 1
         fi

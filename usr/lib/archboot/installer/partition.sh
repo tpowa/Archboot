@@ -36,7 +36,6 @@ _partition() {
     _set_guid
     # Select disk to partition
     _DISKS=$(_finddisks)
-    _DISKS="${_DISKS}"
     _DISK=""
     while true; do
         # Prompt the user with a list of known disks
