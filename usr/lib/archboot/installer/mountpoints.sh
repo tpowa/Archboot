@@ -129,7 +129,7 @@ _run_mkfs() {
         [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
         # bcachefs, btrfs and other parameters
         if [[ ${_FSTYPE} == "bcachefs" ]]; then
-            _BCFS_DEVS="${_BCFS_DEVS//#/\ }"
+            _BCFS_DEVS="${_BCFS_DEVS//#/ }"
             _BCFS_DEVS=$(echo "${line}" | cut -d '|' -f 7)
             _BCFS_COMPRESS=$(echo "${line}" | cut -d '|' -f 8)
             if [[ "${_BCFS_COMPRESS}" == "NONE" ]];then
@@ -142,7 +142,7 @@ _run_mkfs() {
         elif [[ ${_FSTYPE} == "btrfs" ]]; then
             _BTRFS_DEVS=$(echo "${line}" | cut -d '|' -f 7)
             # remove # from array
-            _BTRFS_DEVS="${_BTRFS_DEVS//#/\ }"
+            _BTRFS_DEVS="${_BTRFS_DEVS//#/ }"
             _BTRFS_LEVEL=$(echo "${line}" | cut -d '|' -f 8)
             [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _BTRFS_LEVEL="-m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
             _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d '|' -f 9)
