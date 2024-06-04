@@ -53,7 +53,7 @@ _bcfs_select_raid_devices () {
     done
     _BCFS_RAID_DEVS=${_BCFS_RAID_DEVS//${_BCFS_RAID_DEV} _/}
     _RAIDNUMBER=1
-    while [[ "${_BCFS_RAID_DEV}" != "DONE" ]]; do
+    while [[ "${_BCFS_RAID_DEV}" != "> DONE" ]]; do
         _BCFS_DONE=""
         _RAIDNUMBER=$((_RAIDNUMBER + 1))
         ### RAID5/6 is not ready atm 23052024
@@ -73,22 +73,22 @@ _bcfs_select_raid_devices () {
         #shellcheck disable=SC2086
         _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 ${_BCFS_RAID_DEVS} ${_BCFS_DONE} 2>"${_ANSWER}" || return 1
         _BCFS_RAID_DEV=$(cat "${_ANSWER}")
-        [[ "${_BCFS_RAID_DEV}" == "DONE" ]] && break
+        [[ "${_BCFS_RAID_DEV}" == "> DONE" ]] && break
         _bcfs_raid_options || return 1
         _bcfs_options
      done
     echo "--replicas=${_BCFS_REP_COUNT}" >> /tmp/.bcfs-raid-device
     [[ -n "${_BCFS_SSD_OPTIONS}" ]] && echo "--foreground_target=ssd --promote_target=ssd" >> /tmp/.bcfs-raid-device
     [[ -n "${_BCFS_HDD_OPTIONS}" ]] && echo "--background_target=hdd" >> /tmp/.bcfs-raid-device
-    _BCFS_RAID_FINISH="1"
+    break
 }
 
 # choose raid level to use on bcfs device
 _bcfs_raid_level() {
     _BCFS_DEVICE_FINISH=""
-    while [[ -z "${_BCFS_DEVICE_FINISH}" ]]; do
+    while true ; do
         : >/tmp/.bcfs-raid-device
-        _BCFS_RAIDLEVELS="NONE - raid1 - raid10 -"
+        _BCFS_RAIDLEVELS="raid1 - raid10 -"
         _BCFS_RAID_DEV="${_DEV}"
         _BCFS_RAID_FINISH=""
         _BCFS_LEVEL=""
@@ -98,11 +98,11 @@ _bcfs_raid_level() {
         _BCFS_SSD_COUNT="0"
         _BCFS_SSD_OPTIONS=""
         #shellcheck disable=SC2086
-        _dialog --no-cancel --title " Raid Data Level " --menu "" 11 30 7 ${_BCFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --title " Raid Data Level " --menu "" 11 30 7 "> NONE" "No Raid Setup" ${_BCFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
         _BCFS_LEVEL=$(cat "${_ANSWER}")
         if [[ "${_BCFS_LEVEL}" == "NONE" ]]; then
             _BCFS_DEVS="${_DEV}"
-            _BCFS_DEVICE_FINISH="1"
+            break
         else
             # replicas
             _BCFS_REPLICATION="2 - 3 -"
@@ -123,7 +123,7 @@ _bcfs_raid_level() {
             #shellcheck disable=SC2028,SC2027,SC2086
             _dialog --title " Summary " --yesno \
                 "LEVEL:\n${_BCFS_LEVEL}\nDEVICES:\n$(while read -r i; do echo ""${i}"\n"; done </tmp/.bcfs-raid-device)" \
-                0 0 && _BCFS_DEVICE_FINISH="1"
+                0 0 && break
             while read -r i; do
                 _BCFS_DEVS="${_BCFS_DEVS} ${i}"
             done </tmp/.bcfs-raid-device
