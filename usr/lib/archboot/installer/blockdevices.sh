@@ -658,7 +658,7 @@ _createvg()
             _dialog --no-cancel --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 \
                 ${_PVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
             _PV=$(cat "${_ANSWER}")
-            [[ "${_PV}" == "DONE" ]] && break
+            [[ "${_PV}" == "> DONE" ]] && break
             echo "${_PV}" >>/tmp/.pvs
         done
         # final step ask if everything is ok?
