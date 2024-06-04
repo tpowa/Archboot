@@ -540,7 +540,7 @@ _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/lvm2.txt)" 0 0
 _createpv()
 {
     _PVFINISH=""
-    while [[ "${_PVFINISH}" != "DONE" ]]; do
+    while [[ "${_PVFINISH}" != "> DONE" ]]; do
         _activate_special_devices
         : >/tmp/.pvs-create
         _dialog --no-mouse --infobox "Scanning blockdevices... This may need some time." 3 60
@@ -566,16 +566,16 @@ _createpv()
         _dialog --menu "Select device number ${_DEVNUMBER} for physical volume:" 15 50 12 ${_DEVS} 2>"${_ANSWER}" || return 1
         _DEV=$(cat "${_ANSWER}")
         echo "${_DEV}" >>/tmp/.pvs-create
-        while [[ "${_DEV}" != "DONE" ]]; do
+        while [[ "${_DEV}" != "> DONE" ]]; do
             _DEVNUMBER="$((_DEVNUMBER + 1))"
             # clean loop from used partition and options
             #shellcheck disable=SC2001
-            _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")##g")"
+            _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
             # add more devices
             #shellcheck disable=SC2086
-            _dialog --no-cancel --menu "Select additional device number ${_DEVNUMBER} for physical volume:" 15 60 12 ${_DEVS} DONE _ 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --menu "Select additional device number ${_DEVNUMBER} for physical volume:" 15 60 12 ${_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
             _DEV=$(cat "${_ANSWER}")
-            [[ "${_DEV}" == "DONE" ]] && break
+            [[ "${_DEV}" == "> DONE" ]] && break
             echo "${_DEV}" >>/tmp/.pvs-create
         done
         # final step ask if everything is ok?
