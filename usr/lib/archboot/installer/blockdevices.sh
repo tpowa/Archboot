@@ -475,7 +475,6 @@ _createmd()
             _DEV=$(cat "${_ANSWER}")
             _SPARE=""
             ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _dialog --yesno --defaultno "Would you like to use ${_DEV} as spare device?" 0 0 && _SPARE=1
-            [[ "${_DEV}" == "> DONE" ]] && break
             if [[ "${_DEV}" == "> MISSING" ]]; then
                 _dialog --yesno "Would you like to create a degraded raid on ${_RAIDDEV}?" 0 0 && _DEGRADED="missing"
                 echo "${_DEGRADED}" >>/tmp/.raid
@@ -486,6 +485,7 @@ _createmd()
                     echo "${_DEV}" >>/tmp/.raid
                 fi
             fi
+            [[ "${_DEV}" == "> DONE" ]] && break
         done
         # final step ask if everything is ok?
         # shellcheck disable=SC2028
