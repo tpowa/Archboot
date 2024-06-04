@@ -605,7 +605,7 @@ _findpv()
         # ! "$(${_LSBLK} TYPE ${dev} 2>"${_NO_LOG}" | grep "lvm")"
         #- not part of volume group
         # $(pvs -o vg_name --noheading ${dev} | grep " $")
-        if ! ${_LSBLK} TYPE "${dev}" 2>"${_NO_LOG}" | grep "lvm" && pvs -o vg_name --noheading "${dev}" | grep -q " $"; then
+        if ! ${_LSBLK} TYPE "${dev}" 2>"${_NO_LOG}" | grep -q "lvm" && pvs -o vg_name --noheading "${dev}" | grep -q " $"; then
             ${_LSBLK} NAME,SIZE "${dev}"
         fi
     done
