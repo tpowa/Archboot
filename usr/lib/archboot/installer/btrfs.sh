@@ -230,7 +230,8 @@ _choose_btrfs_subvolume () {
     [[ -n "${_SUBVOLUMES}" ]] && _SUBVOLUMES_DETECTED=1
     _subvolumes_in_use
     # add echo to kill hidden escapes from btrfs call
-    _SUBVOLUMES="$(echo ${_SUBVOLUMES})"
+    #shellcheck disable=SC2116
+    _SUBVOLUMES="$(echo "${_SUBVOLUMES}")"
     for i in ${_SUBVOLUME_IN_USE}; do
         _SUBVOLUMES="${_SUBVOLUMES//${i} _/}"
     done
