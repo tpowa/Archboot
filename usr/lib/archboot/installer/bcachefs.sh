@@ -100,7 +100,7 @@ _bcfs_raid_level() {
         #shellcheck disable=SC2086
         _dialog --no-cancel --title " Raid Data Level " --menu "" 11 30 7 "> NONE" "No Raid Setup" ${_BCFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
         _BCFS_LEVEL=$(cat "${_ANSWER}")
-        if [[ "${_BCFS_LEVEL}" == "NONE" ]]; then
+        if [[ "${_BCFS_LEVEL}" == "> NONE" ]]; then
             _BCFS_DEVS="${_DEV}"
             break
         else
@@ -114,7 +114,7 @@ _bcfs_raid_level() {
                         "4" 2>"${_ANSWER}" || return 1
                     _BCFS_REP_COUNT="$(cat "${_ANSWER}")"
             fi
-            while [[ -z "${_BCFS_RAID_FINISH}" ]]; do
+            while true; do
                 _bcfs_raid_options || return 1
                 _bcfs_options
                 _bcfs_select_raid_devices || return 1
