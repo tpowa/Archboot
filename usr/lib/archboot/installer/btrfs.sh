@@ -112,7 +112,7 @@ _btrfsraid_level() {
     : >/tmp/.btrfs-devices
     while [[ "${_BTRFS_RAID_FINISH}" != "DONE" ]]; do
         #shellcheck disable=SC2086
-        _dialog --no-cancel --title " Raid Data Level  " --menu "" 13 50 7 ${_BTRFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --title " Raid Data Level " --menu "" 11 50 5 ${_BTRFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
         _BTRFS_LEVEL=$(cat "${_ANSWER}")
         if [[ "${_BTRFS_LEVEL}" == "NONE" ]]; then
             echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
