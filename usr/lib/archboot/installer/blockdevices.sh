@@ -460,7 +460,7 @@ _createmd()
         while true; do
             _RAIDNUMBER=$((_RAIDNUMBER + 1))
             # clean loop from used partition and options
-            _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
+            _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")##g")"
             # add more devices
             # raid0 doesn't support missing devices
             if [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]]; then
@@ -476,6 +476,7 @@ _createmd()
             if [[ "${_DEV}" == "> MISSING" ]]; then
                 _dialog --yesno "Would you like to create a degraded raid on ${_RAIDDEV}?" 0 0 && _DEGRADED="missing"
                 echo "${_DEGRADED}" >>/tmp/.raid
+                _DEV=""
             else
                 _SPARE=""
                 if ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]]; then
