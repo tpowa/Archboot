@@ -147,7 +147,7 @@ _select_btrfsraid_devices () {
         _BTRFS_DEVS=${_BTRFS_DEVS//${_BTRFS_DEV} _/}
         # add more devices
         # RAID5 needs 3 devices
-        # RAID6, RAID10 need 4 devices!
+        # RAID6, RAID10 needs 4 devices!
         if [[ "${_RAIDNUMBER}" -ge 3 && ! "${_BTRFS_LEVEL}" == "raid10" && ! "${_BTRFS_LEVEL}" == "raid6" && ! "${_BTRFS_LEVEL}" == "raid5" ]] ||\
             [[ "${_RAIDNUMBER}" -ge 4 && "${_BTRFS_LEVEL}" == "raid5" ]] ||\
             [[ "${_RAIDNUMBER}" -ge 5 && "${_BTRFS_LEVEL}" == "raid10" || "${_BTRFS_LEVEL}" == "raid6" ]]; then
@@ -156,7 +156,7 @@ _select_btrfsraid_devices () {
                     ${_BTRFS_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
         else
                 _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
-                    ${_BTRFS_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
+                    ${_BTRFS_DEVS} 2>"${_ANSWER}" || return 1
         fi
         _BTRFS_DEV=$(cat "${_ANSWER}")
         [[ "${_BTRFS_DEV}" == "> DONE" ]] && break
