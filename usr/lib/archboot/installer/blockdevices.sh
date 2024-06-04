@@ -457,7 +457,7 @@ _createmd()
         _dialog --no-cancel --menu "Select device ${_RAIDNUMBER}:" 21 50 13 ${_DEVS} 2>"${_ANSWER}" || return 1
         _DEV=$(cat "${_ANSWER}")
         echo "${_DEV}" >>/tmp/.raid
-        while [[ "${_DEV}" != "DONE" ]]; do
+        while true; do
             _RAIDNUMBER=$((_RAIDNUMBER + 1))
             # clean loop from used partition and options
             _DEVS="$(echo "${_DEVS}" | sed -e "s#$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")##g" -e 's#MISSING\ _##g' -e 's#SPARE\ _##g')"
@@ -471,8 +471,8 @@ _createmd()
                 #shellcheck disable=SC2086
                 _dialog --no-cancel --menu "Select additional device ${_RAIDNUMBER}:" \
                 21 50 13 ${_DEVS} "> MISSING" "Degraded Raid Device" "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
-                _DEV=$(cat "${_ANSWER}")
             fi
+            _DEV=$(cat "${_ANSWER}")
             _SPARE=""
             ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _dialog --yesno --defaultno "Would you like to use ${_DEV} as spare device?" 0 0 && _SPARE=1
             if [[ "${_DEV}" == "> MISSING" ]]; then
