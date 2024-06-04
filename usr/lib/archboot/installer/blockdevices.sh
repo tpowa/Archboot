@@ -466,7 +466,7 @@ _createmd()
             fi
             # add more devices
             # raid0 doesn't support missing devices
-            if [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" || -n "${_DEGRADED}" ]]; then
+            if [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" || -n ${_DEGRADED} ]]; then
                 #shellcheck disable=SC2086
                 _dialog --no-cancel --menu "Select additional device ${_RAIDNUMBER}:" \
                 21 50 13 ${_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
@@ -476,6 +476,7 @@ _createmd()
                 21 50 13 ${_DEVS} "> MISSING" "Degraded Raid Device" "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
             fi
             _DEV=$(cat "${_ANSWER}")
+            [[ "${_DEV}" == "> DONE" ]] && break
             if [[ "${_DEV}" == "> MISSING" && -z ${_DEGRADED} ]]; then
                 _dialog --yesno "Would you like to create a degraded raid on ${_RAIDDEV}?" 0 0 && _DEGRADED="missing"
                 echo "${_DEGRADED}" >>/tmp/.raid
@@ -491,7 +492,6 @@ _createmd()
                     echo "${_DEV}" >>/tmp/.raid
                 fi
             fi
-            [[ "${_DEV}" == "> DONE" ]] && break
         done
         # final step ask if everything is ok?
         # shellcheck disable=SC2028
