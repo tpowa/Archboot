@@ -473,12 +473,14 @@ _createmd()
                 21 50 13 ${_DEVS} "> MISSING" "Degraded Raid Device" "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
             fi
             _DEV=$(cat "${_ANSWER}")
-            _SPARE=""
-            ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]] && _dialog --yesno --defaultno "Would you like to use ${_DEV} as spare device?" 0 0 && _SPARE=1
             if [[ "${_DEV}" == "> MISSING" ]]; then
                 _dialog --yesno "Would you like to create a degraded raid on ${_RAIDDEV}?" 0 0 && _DEGRADED="missing"
                 echo "${_DEGRADED}" >>/tmp/.raid
             else
+                _SPARE=""
+                if ! [[ "${_LEVEL}" == "raid0" || "${_LEVEL}" == "linear" ]]; then
+                    _dialog --yesno --defaultno "Would you like to use ${_DEV} as spare device?" 0 0 && _SPARE=1
+                fi
                 if [[ -n "${_SPARE}" ]]; then
                     echo "${_DEV}" >>/tmp/.raid-spare
                 else
