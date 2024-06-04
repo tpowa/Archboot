@@ -56,22 +56,27 @@ _bcfs_select_raid_devices () {
     while [[ "${_BCFS_RAID_DEV}" != "> DONE" ]]; do
         _BCFS_DONE=""
         _RAIDNUMBER=$((_RAIDNUMBER + 1))
+        # clean loop from used partition and options
+        _BCFS_RAID_DEVS=${_BCFS_RAID_DEVS//${_BCFS_RAID_DEV} _/}
         ### RAID5/6 is not ready atm 23052024
         # RAID5/6 need ec option!
         # RAID5 needs 3 devices
         # RAID6 and RAID10 need 4 devices!
-        [[ "$((_RAIDNUMBER + _DUR_COUNT))" -ge "$((_BCFS_REP_COUNT + 1))" &&\
-            ! "${_BCFS_LEVEL}" == "raid10" && ! "${_BCFS_LEVEL}" == "raid6" &&\
-            ! "${_BCFS_LEVEL}" == "raid5" ]] && _BCFS_DONE="DONE _"
-        [[ "$((_RAIDNUMBER + _DUR_COUNT))" -ge "$((_BCFS_REP_COUNT + 2))" &&\
-            "${_BCFS_LEVEL}" == "raid5" ]] && _BCFS_DONE="DONE _"
-        [[ "$((_RAIDNUMBER + _DUR_COUNT))" -ge "$((_BCFS_REP_COUNT + 3))" &&\
-            "${_BCFS_LEVEL}" == "raid10" || "${_BCFS_LEVEL}" == "raid6" ]] && _BCFS_DONE="DONE _"
-        # clean loop from used partition and options
-        _BCFS_RAID_DEVS=${_BCFS_RAID_DEVS//${_BCFS_RAID_DEV} _/}
-        # add more devices
-        #shellcheck disable=SC2086
-        _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 ${_BCFS_RAID_DEVS} ${_BCFS_DONE} 2>"${_ANSWER}" || return 1
+        if [[ "$((_RAIDNUMBER + _DUR_COUNT))" -ge "$((_BCFS_REP_COUNT + 1))" &&\
+                ! "${_BCFS_LEVEL}" == "raid10" && ! "${_BCFS_LEVEL}" == "raid6" &&\
+                ! "${_BCFS_LEVEL}" == "raid5" ]] ||\
+            [[ "$((_RAIDNUMBER + _DUR_COUNT))" -ge "$((_BCFS_REP_COUNT + 2))" &&\
+                "${_BCFS_LEVEL}" == "raid5" ]] ||\
+            [[ "$((_RAIDNUMBER + _DUR_COUNT))" -ge "$((_BCFS_REP_COUNT + 3))" &&\
+                "${_BCFS_LEVEL}" == "raid10" || "${_BCFS_LEVEL}" == "raid6" ]]; then
+            # add more devices
+            #shellcheck disable=SC2086
+            _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
+                ${_BCFS_RAID_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
+        else
+            _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
+                ${_BCFS_RAID_DEVS} 2>"${_ANSWER}" || return 1
+        fi
         _BCFS_RAID_DEV=$(cat "${_ANSWER}")
         [[ "${_BCFS_RAID_DEV}" == "> DONE" ]] && break
         _bcfs_raid_options || return 1
@@ -117,12 +122,14 @@ _bcfs_raid_level() {
             _bcfs_select_raid_devices || return 1
             # final step ask if everything is ok?
             #shellcheck disable=SC2028,SC2027,SC2086
-            _dialog --title " Summary " --yesno \
+            if _dialog --title " Summary " --yesno \
                 "LEVEL:\n${_BCFS_LEVEL}\nDEVICES:\n$(while read -r i; do echo ""${i}"\n"; done </tmp/.bcfs-raid-device)" \
-                0 0 && break
-            while read -r i; do
-                _BCFS_DEVS="${_BCFS_DEVS} ${i}"
-            done </tmp/.bcfs-raid-device
+                0 0; then
+                while read -r i; do
+                    _BCFS_DEVS="${_BCFS_DEVS} ${i}"
+                done </tmp/.bcfs-raid-device
+                break
+            fi
         fi
     done
 }
