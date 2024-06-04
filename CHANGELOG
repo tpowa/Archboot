@@ -3,6 +3,7 @@ setup:
 - added user management
 - fixed btrfs subvolume selection
 - fixed bcachefs menu cancellation
+- added < and > menu points to show direction of navigation
 ---
 2024.05 Highlights:
 - kernel 6.9.x
