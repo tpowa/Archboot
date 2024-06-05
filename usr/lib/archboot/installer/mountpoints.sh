@@ -248,7 +248,7 @@ _mountpoints() {
                     if [[  -n "${_CREATE_MOUNTPOINTS}" ]]; then
                         _MP_DONE=1
                         # reformat device, if already swap partition format
-                        if [[  "${_FSTYPE}" == "swap" && -n "${_SWAP_DONE}" ]]; then
+                        if [[ "${_FSTYPE}" == "swap" && -n "${_SWAP_DONE}" ]]; then
                             _FSTYPE=""
                             _LABEL_NAME="SWAP"
                             _DOMKFS=1
@@ -347,7 +347,7 @@ _mountpoints() {
                         _btrfs_subvolume || return 1
                     fi
                 fi
-                if ! [[ "${_DEV}" == "NONE" ]]; then
+                if ! [[ "${_DEV}" == "> NONE" ]]; then
                     _find_btrfsraid_devices
                     _btrfs_parts
                     _check_mkfs_values
