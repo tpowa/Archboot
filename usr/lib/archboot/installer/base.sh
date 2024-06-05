@@ -120,7 +120,12 @@ _prepare_storagedrive() {
             "3") _create_special ;;
             "4") _DEVFINISH=""
                  _CREATE_MOUNTPOINTS=1
-                 _mountpoints ;;
+                 if _mountpoints; then
+                    _NEXTITEM=2
+                    break
+                 else
+                    _NEXTITEM=4
+                 fi
             *)  _NEXTITEM="2"
                 break
         esac
