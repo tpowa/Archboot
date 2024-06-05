@@ -61,7 +61,11 @@ _select_filesystem() {
 
 _enter_mountpoint() {
     if [[ -z "${_SWAP_DONE}" ]]; then
-        _MP="swap"
+        if [[ "${_DEV}" == "> FILE" ]]; then
+            _MP="file"
+        else
+            _MP="swap"
+        fi
         # create swap if not already swap formatted
         if [[ -n "${_CREATE_MOUNTPOINTS}" && ! "${_FSTYPE}" == "swap" ]]; then
             _DOMKFS=1
@@ -112,7 +116,6 @@ _check_mkfs_values() {
     [[ -z "${_FS_OPTIONS}" ]] && _FS_OPTIONS="NONE"
     [[ -z "${_BTRFS_DEVS}" ]] && _BTRFS_DEVS="NONE"
     [[ -z "${_BTRFS_LEVEL}" ]] && _BTRFS_LEVEL="NONE"
-    [[ -z "${_BTRFS_SUBVOLUME}" ]] && _BTRFS_SUBVOLUME="NONE"
     [[ -z "${_LABEL_NAME}" && -n "$(${_LSBLK} LABEL "${_DEV}")" ]] && _LABEL_NAME="$(${_LSBLK} LABEL "${_DEV}" 2>"${_NO_LOG}")"
     [[ -z "${_LABEL_NAME}" ]] && _LABEL_NAME="NONE"
 }
@@ -146,7 +149,6 @@ _run_mkfs() {
             _BTRFS_LEVEL=$(echo "${line}" | cut -d '|' -f 8)
             [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _BTRFS_LEVEL="-m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
             _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d '|' -f 9)
-            [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _BTRFS_SUBVOLUME=""
             _BTRFS_COMPRESS=$(echo "${line}" | cut -d '|' -f 10)
             [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
@@ -225,7 +227,7 @@ _mountpoints() {
             while [[ -z "${_MP_DONE}" ]]; do
                 #shellcheck disable=SC2086
                 if [[ -z "${_SWAP_DONE}" ]]; then
-                    _dialog --title " Swap Partition " --menu "" 14 55 8 "> NONE" "No Swap" ${_DEVS} 2>"${_ANSWER}" || return 1
+                    _dialog --title " Swap " --menu "" 14 55 8 "> NONE" "No Swap" "> FILE" "Swap File" ${_DEVS} 2>"${_ANSWER}" || return 1
                 elif [[ -z "${_ROOT_DONE}" ]]; then
                     _dialog --title " Root Partition " --no-cancel --menu "" 14 55 8 ${_DEVS} 2>"${_ANSWER}" || return 1
                 elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
@@ -240,7 +242,7 @@ _mountpoints() {
                     # clear values first!
                     _clear_fs_values
                     _check_btrfs_filesystem_creation
-                    [[ ! "${_DEV}" == "> NONE" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}" 2>"${_NO_LOG}")"
+                    ! [[ "${_DEV}" == "> NONE" || "${_DEV}" == "> FILE" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}" 2>"${_NO_LOG}")"
                     if [[ -z "${_SWAP_DONE}" && "${_FSTYPE}" == "swap" ]] || [[ "${_DEV}" == "> NONE" ]]; then
                         _SKIP_FILESYSTEM=1
                     fi

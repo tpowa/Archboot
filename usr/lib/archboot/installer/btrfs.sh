@@ -111,7 +111,8 @@ _btrfsraid_level() {
     : >/tmp/.btrfs-devices
     while [[ "${_BTRFS_RAID_FINISH}" != "DONE" ]]; do
         #shellcheck disable=SC2086
-        _dialog --no-cancel --title " Raid Data Level " --menu "" 11 50 5 "> NONE" "No Raid Device" \
+        _dialog --no-cancel --title " Raid Data Level " --menu "" 11 50 5 \
+            "> NONE" "No Raid Device" \
             "raid0" "Raid 0 Device" \
             "raid1" "Raid 1 Device" \
             "raid10" "Raid 10 Device" \
