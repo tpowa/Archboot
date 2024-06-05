@@ -172,7 +172,7 @@ _user_management() {
                          if useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
                             passwd -R "${_DESTDIR}" "${_USER}" < /tmp/.password &>"${_NO_LOG}"
                             rm /tmp/.password
-                            _dialog --title " Success " --no-mouse --infobox "${_USER} created succesfully." 3 50
+                            _dialog --title " Success " --no-mouse --infobox "User ${_USER} created succesfully." 3 50
                             sleep 3
                             _NEXTITEM="2"
                             break
@@ -219,7 +219,7 @@ _user_management() {
                              "3") if _dialog --defaultno --yesno \
                                       "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
                                       userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}"; then
-                                          _dialog --title " Success " --no-mouse --infobox "${_USER} deleted succesfully." 3 50
+                                          _dialog --title " Success " --no-mouse --infobox "User ${_USER} deleted succesfully." 3 50
                                           sleep 3
                                   fi ;;
                          esac
