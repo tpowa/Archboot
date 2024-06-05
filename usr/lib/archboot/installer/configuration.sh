@@ -162,8 +162,8 @@ _user_management() {
                              _dialog --title " ERROR " --no-mouse --infobox "User creation failed! Please try again." 3 60
                              sleep 3
                          fi
-                     fi ;;
-                 done
+                     fi
+                 done ;;
             "3") while true; do
                      # root and all users with UID >= 1000
                      _USERS="$(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
