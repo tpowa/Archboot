@@ -62,10 +62,14 @@ _select_filesystem() {
 _enter_mountpoint() {
     if [[ -z "${_SWAP_DONE}" ]]; then
         if [[ "${_DEV}" == "> FILE" ]]; then
-            _MP="file"
-        else
-            _MP="swap"
+            while [[ -z "${_SWAPFILE}" ]]; do
+                _dialog --no-cancel --title " Enter Full Path Filename For Swap " --inputbox "" 7 65 "/archlinux.swap" 2>"${_ANSWER}" || return 1
+                _SWAPFILE=$(cat "${_ANSWER}")
+            done
+            _DEV="${_SWAPFILE}"
         fi
+        _MP="swap"
+        _FSTYPE="swap"
         # create swap if not already swap formatted
         if [[ -n "${_CREATE_MOUNTPOINTS}" && ! "${_FSTYPE}" == "swap" ]]; then
             _DOMKFS=1
