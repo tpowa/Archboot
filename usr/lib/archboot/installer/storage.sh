@@ -29,7 +29,7 @@ _create_raid_menu() {
               *) _MDDONE=1 ;;
         esac
     done
-    _NEXTITEM=1
+    _NEXTITEM="1"
 }
 
 _create_lvm_menu() {

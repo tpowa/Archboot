@@ -104,7 +104,7 @@ _set_comment() {
 }
 
 _user_management() {
-    _NEXTITEM=1
+    _NEXTITEM="1"
     while true; do
         _DEFAULT="--default-item ${_NEXTITEM}"
         #shellcheck disable=SC2086
@@ -138,7 +138,7 @@ _user_management() {
                  for i in root $(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1); do
                      usermod -R "${_DESTDIR}" -s "/usr/bin/${_SHELL}" "${i}" &>"${_LOG}"
                  done
-                _NEXTITEM=2 ;;
+                _NEXTITEM="2" ;;
             "2") while true; do
                      _dialog --title " Create User " --no-cancel --inputbox "Enter Username" 8 30 "" 2>"${_ANSWER}" || return 1
                      _USER=$(cat "${_ANSWER}")
@@ -156,7 +156,7 @@ _user_management() {
                      fi
                  done
                  _set_password User "${_USER}"
-                 _NEXTITEM=2 ;;
+                 _NEXTITEM="2" ;;
             "3") while true; do
                      # root and all users with UID >= 1000
                      _USERS="$(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
@@ -185,7 +185,7 @@ _user_management() {
                     fi
                  done
                  _NEXTITEM="3" ;;
-        *) _NEXTITEM=3
+        *) _NEXTITEM="3"
             break ;;
         esac
     done

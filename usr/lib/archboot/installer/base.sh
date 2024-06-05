@@ -111,7 +111,7 @@ _prepare_storagedrive() {
             "3" "Manage Software Raid, LVM2 And LUKS Encryption" \
             "4" "Set Filesystem Mountpoints" \
             "<" "Return To Main Menu" 2>"${_ANSWER}"; then
-                _NEXTITEM=1
+                _NEXTITEM="1"
                 return 1
         fi
         _NEXTITEM="$(cat "${_ANSWER}")"
@@ -124,10 +124,10 @@ _prepare_storagedrive() {
             "4") _DEVFINISH=""
                  _CREATE_MOUNTPOINTS=1
                  if _mountpoints; then
-                    _NEXTITEM=2
+                    _NEXTITEM="2"
                     break
                  else
-                    _NEXTITEM=4
+                    _NEXTITEM="4"
                  fi ;;
               *) _NEXTITEM="1"
                  break ;;
@@ -161,7 +161,7 @@ _configure_system() {
                 "/etc/pacman.d/mirrorlist"      "Pacman Mirrors" \
                 "/etc/pacman.conf"              "Pacman Config" \
                 "< Back"                        "Return to Main Menu" 2>"${_ANSWER}"; then
-                    _NEXTITEM=3
+                    _NEXTITEM="3"
                     return 1
         fi
         _FILE="$(cat "${_ANSWER}")"
