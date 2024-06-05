@@ -159,7 +159,7 @@ _select_btrfsraid_devices () {
                     ${_BTRFS_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
         else
                 #shellcheck disable=SC2086
-                _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
+                _dialog --title " Device ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
                     ${_BTRFS_DEVS} 2>"${_ANSWER}" || return 1
         fi
         _BTRFS_DEV=$(cat "${_ANSWER}")
