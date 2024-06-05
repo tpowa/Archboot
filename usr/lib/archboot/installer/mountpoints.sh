@@ -78,7 +78,7 @@ _enter_mountpoint() {
                 _SWAPFILE_SIZE=$(cat "${_ANSWER}")
             done
             _FS_OPTIONS="${_SWAPFILE_SIZE}"
-            _DOMKFS=1
+            [[ "${_FSTYPE}" == "swap" ]] || _DOMKFS=1
             _FSTYPE="swap"
         fi
         _SWAP_DONE=1
