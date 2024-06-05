@@ -104,7 +104,7 @@ _prepare_password() {
 _set_password() {
     passwd -R "${_DESTDIR}" "${_USER}" < /tmp/.password &>"${_NO_LOG}"
     rm /tmp/.password
-    _dialog --title " Success " --no-mouse --infobox "New password set for root." 3 50
+    _dialog --title " Success " --no-mouse --infobox "New password set for ${_USER}." 3 50
     sleep 3
 }
 
