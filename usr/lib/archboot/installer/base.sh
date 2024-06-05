@@ -101,22 +101,20 @@ _set_guid() {
 }
 
 _prepare_storagedrive() {
-    _DONE=""
-    _NEXTITEM=""
+    _NEXTITEM="1"
     while true; do
         if [[ -n "${_NEXTITEM}" ]]; then
             _DEFAULT="--default-item ${_NEXTITEM}"
         else
             _DEFAULT=""
         fi
-        _CANCEL=""
         #shellcheck disable=SC2086
         _dialog --title " Prepare Storage Device " --no-cancel ${_DEFAULT} --menu "" 11 60 5 \
             "1" "Quick Setup (erases the ENTIRE storage device)" \
             "2" "Partition Storage Device" \
             "3" "Manage Software Raid, LVM2 And LUKS Encryption" \
             "4" "Set Filesystem Mountpoints" \
-            "<" "Return To Main Menu" 2>"${_ANSWER}" || _CANCEL=1
+            "<" "Return To Main Menu" 2>"${_ANSWER}" || return 1
         _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1") _CREATE_MOUNTPOINTS=1
@@ -146,14 +144,9 @@ _configure_system() {
     _auto_mkinitcpio
     ## END PREPROCESS ##
     _FILE=""
-    _S_CONFIG=""
     # main menu loop
     while true; do
-        if [[ -n "${_FILE}" ]]; then
-            _DEFAULT="--default-item ${_FILE}"
-        else
-            _DEFAULT=""
-        fi
+        [[ -n "${_FILE}" ]] && _DEFAULT="--default-item ${_FILE}"
         #shellcheck disable=SC2086
         _dialog --title " System Configuration " --no-cancel ${_DEFAULT} --menu "" 19 60 13 \
             "> User Management"             "User Configuration" \
