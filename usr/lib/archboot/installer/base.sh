@@ -141,7 +141,7 @@ _configure_system() {
     _check_root_password || return 1
     _geteditor || return 1
     ## PREPROCESSING ##
-    _auto_mkinitcpio
+    _auto_mkinitcpio || return 1
     ## END PREPROCESS ##
     _FILE=""
     _NEXTITEM=""
