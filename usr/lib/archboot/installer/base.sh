@@ -110,7 +110,7 @@ _prepare_storagedrive() {
             "2" "Partition Storage Device" \
             "3" "Manage Software Raid, LVM2 And LUKS Encryption" \
             "4" "Set Filesystem Mountpoints" \
-            "<" "Return To Main Menu" 2>"${_ANSWER}";; then
+            "<" "Return To Main Menu" 2>"${_ANSWER}"; then
                 _NEXTITEM=1
                 return 1
         fi
