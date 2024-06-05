@@ -126,8 +126,9 @@ _prepare_storagedrive() {
                  else
                     _NEXTITEM=4
                  fi
-            *)  _NEXTITEM="2"
-                break
+                 ;;
+              *) _NEXTITEM="2"
+                 break ;;
         esac
     done
 }
