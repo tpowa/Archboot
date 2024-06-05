@@ -184,7 +184,7 @@ _user_management() {
                          esac
                     fi
                  done
-                 _NEXTITEM="<" ;;
+                 _NEXTITEM="3" ;;
         *) _NEXTITEM=3
             break ;;
         esac
