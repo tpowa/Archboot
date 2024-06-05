@@ -186,13 +186,16 @@ _user_management() {
                          fi
                      fi
                  done ;;
-            "3") while true; do
+            "3") _NEXTITEM="root"
+                 while true; do
+                    _DEFAULT="--default-item ${_NEXTITEM}"
                      # root and all users with UID >= 1000
                      _USERS="$(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
                      #shellcheck disable=SC2086
-                     _dialog --no-cancel --menu " User Account Selection " 15 40 10 \
+                     _dialog --no-cancel ${_DEFAULT} --menu " User Account Selection " 15 40 10 \
                         "root" "Super User" ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || break
                      _USER=$(cat "${_ANSWER}")
+                     _NEXTITEM="${_USER}"
                      if [[ "${_USER}" = "root" ]]; then
                          if _prepare_password Root; then
                             _set_password
@@ -232,8 +235,7 @@ _user_management() {
                      fi
                  done
                  _NEXTITEM="3" ;;
-            *) _NEXTITEM="3"
-               break ;;
+            *) break ;;
         esac
     done
 }
