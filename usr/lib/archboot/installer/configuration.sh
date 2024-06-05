@@ -138,7 +138,7 @@ _user_management() {
         case $(cat "${_ANSWER}") in
             "1") _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
                  "BASH" "Standard Base Shell" \
-                 "ZSH"  "More features for experts" 2>"${_ANSWER}" || return 1
+                 "ZSH"  "More features for experts" 2>"${_ANSWER}" || break
                  case $(cat "${_ANSWER}") in
                     "BASH") _SHELL="bash"
                             if ! [[ -f "${_DESTDIR}/usr/share/bash-completion/completions/arch" ]]; then
@@ -188,7 +188,7 @@ _user_management() {
                      _USERS="$(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
                      #shellcheck disable=SC2086
                      _dialog --no-cancel --menu " User Account Selection " 15 40 10 \
-                        "root" "Super User" ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || return 1
+                        "root" "Super User" ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || break
                      _USER=$(cat "${_ANSWER}")
                      if [[ "${_USER}" = "root" ]]; then
                          if _prepare_password Root; then
