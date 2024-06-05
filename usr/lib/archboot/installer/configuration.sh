@@ -196,8 +196,9 @@ _user_management() {
                                       passwd -R "${_DESTDIR}" "${_USER}" < /tmp/.password &>"${_NO_LOG}"
                                       rm /tmp/.password
                                   fi ;;
-                             "2") _set_comment
-                                  usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}" ;;
+                             "2") if _set_comment; then
+                                      usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}"
+                                  fi ;;
                              "3") _dialog --defaultno --yesno \
                                   "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
                                    userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}" ;;
