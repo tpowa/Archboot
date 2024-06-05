@@ -70,7 +70,7 @@ _enter_mountpoint() {
             done
             _DEV="${_SWAPFILE}"
             while [[ -z "${_SWAPFILE_SIZE}" ]]; do
-                _dialog --no-cancel --title " Enter Size in MiB " --inputbox "16000" 7 65 "/archlinux.swap" 2>"${_ANSWER}" || return 1
+                _dialog --no-cancel --title " Enter Swap Size in MiB " --inputbox "" 7 65 "16000" 2>"${_ANSWER}" || return 1
                 _SWAPFILE_SIZE=$(cat "${_ANSWER}")
             done
             _FSOPTS="${_SWAPFILE_SIZE}"
