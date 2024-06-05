@@ -136,6 +136,7 @@ _prepare_storagedrive() {
 }
 
 _configure_system() {
+    _NEXTITEM="3"
     _destdir_mounts || return 1
     _check_root_password || return 1
     _geteditor || return 1
@@ -143,6 +144,7 @@ _configure_system() {
     _auto_mkinitcpio
     ## END PREPROCESS ##
     _FILE=""
+    _NEXTITEM=""
     # main menu loop
     while true; do
         [[ -n "${_FILE}" ]] && _DEFAULT="--default-item ${_FILE}"
