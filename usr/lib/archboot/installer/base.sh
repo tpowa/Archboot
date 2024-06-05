@@ -165,7 +165,7 @@ _configure_system() {
             _run_locale_gen
         elif [[ "${_FILE}" = "> User Management" ]]; then
             _user_management
-            _FILE="> User Management"
+            _FILE=""
         else
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
         fi
