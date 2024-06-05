@@ -179,8 +179,8 @@ _prepare_btrfs() {
 
 # prepare btrfs subvolume
 _prepare_btrfs_subvolume() {
-    _BTRFS_SUBVOLUME="NONE"
-    while [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]]; do
+    _BTRFS_SUBVOLUME=""
+    while [[ -z "${_BTRFS_SUBVOLUME}" ]]; do
         _dialog --title " Subvolume Name on ${_DEV} " --no-cancel --inputbox "Keep it short and use no spaces or special characters." 8 60 2>"${_ANSWER}" || return 1
         _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
         _check_btrfs_subvolume
@@ -191,18 +191,13 @@ _prepare_btrfs_subvolume() {
 # check btrfs subvolume
 _check_btrfs_subvolume(){
     [[ -n "${_DOMKFS}" && "${_FSTYPE}" == "btrfs" ]] && _DETECT_CREATE_FILESYSTEM=1
-    if [[ -z "$(cat "${_ANSWER}")" ]]; then
-        _dialog --title " ERROR " --no-mouse --infobox "You have defined an empty name! Please enter another name." 3 70
-        sleep 3
-        _BTRFS_SUBVOLUME="NONE"
-    fi
     if [[ -z "${_DETECT_CREATE_FILESYSTEM}" && -z "${_CREATE_MOUNTPOINTS}" ]]; then
         _mount_btrfs
         for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d ' ' -f 9); do
             if echo "${i}" | grep -q "${_BTRFS_SUBVOLUME}"; then
                 _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical SUBVOLUMES! Please enter another name." 3 75
                 sleep 3
-                _BTRFS_SUBVOLUME="NONE"
+                _BTRFS_SUBVOLUME=""
             fi
         done
         _umount_btrfs
@@ -212,7 +207,7 @@ _check_btrfs_subvolume(){
         if echo "${_SUBVOLUME_IN_USE}" | grep -Eq "${_BTRFS_SUBVOLUME}"; then
             _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical SUBVOLUMES! Please enter another name." 3 75
             sleep 3
-            _BTRFS_SUBVOLUME="NONE"
+            _BTRFS_SUBVOLUME=""
         fi
     fi
 }
@@ -228,7 +223,6 @@ _create_btrfs_subvolume() {
 
 # choose btrfs subvolume from list
 _choose_btrfs_subvolume () {
-    _BTRFS_SUBVOLUME="NONE"
     _SUBVOLUMES_DETECTED=""
     _SUBVOLUMES=$(_find_btrfs_subvolume _)
     # check if subvolumes are present
