@@ -262,7 +262,7 @@ _install_bootloader() {
     if [[ -z "${_S_BOOTLOADER}" ]]; then
         _NEXTITEM="4"
     else
-        _NEXTITEM=\<"
+        _NEXTITEM="\<"
     fi
 }
 # vim: set ft=sh ts=4 sw=4 et:
