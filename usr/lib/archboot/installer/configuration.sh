@@ -56,12 +56,19 @@ _check_root_password() {
     if passwd -R "${_DESTDIR}" -S root | cut -d ' ' -f2 | grep -q NP; then
         _dialog --no-mouse --infobox "Setup detected no password set for root user,\nplease set new password now." 6 50
         sleep 3
-        _set_password Root root || return 1
+        if _set_password Root root; then
+            passwd -R "${_DESTDIR}" "root" < /tmp/.password &>"${_NO_LOG}"
+            rm /tmp/.password
+        fi
     fi
     # check if account is locked
     if passwd -R "${_DESTDIR}" -S root | cut -d ' ' -f2 | grep -q L; then
         _dialog --no-mouse --infobox "Setup detected locked account for root user,\nplease set new password to unlock account now." 6 50
         _set_password Root root || return 1
+        if _set_password Root root; then
+            passwd -R "${_DESTDIR}" "root" < /tmp/.password &>"${_NO_LOG}"
+            rm /tmp/.password
+        fi
     fi
 }
 
@@ -91,8 +98,6 @@ _set_password() {
             _PASS2=""
         fi
     done
-    passwd -R "${_DESTDIR}" "${2}" < /tmp/.password &>"${_NO_LOG}"
-    rm /tmp/.password
 }
 
 _set_user() {
@@ -155,8 +160,10 @@ _user_management() {
                          sleep 3
                      else
                          _set_comment || break
+                         _set_password User "${_USER}" || break
                          if useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
-                            _set_password User "${_USER}"
+                            passwd -R "${_DESTDIR}" "${_USER}" < /tmp/.password &>"${_NO_LOG}"
+                            rm /tmp/.password
                             _NEXTITEM="2"
                             break
                          else
@@ -173,7 +180,10 @@ _user_management() {
                         "root" "Super User" ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || return 1
                      _USER=$(cat "${_ANSWER}")
                      if [[ "${_USER}" = "root" ]]; then
-                         _set_password Root root
+                         if _set_password Root root; then
+                            passwd -R "${_DESTDIR}" "root" < /tmp/.password &>"${_NO_LOG}"
+                            rm /tmp/.password
+                         fi
                      elif [[ "${_USER}" = "< Back" ]]; then
                          break
                      else
@@ -183,7 +193,9 @@ _user_management() {
                          "3" "Delete User" \
                          "<" "Return To User Selection" 2>"${_ANSWER}" || return 1
                          case $(cat "${_ANSWER}") in
-                             "1") _set_password User "${_USER}" ;;
+                             "1") if _set_password User "${_USER}"; then
+                                      passwd -R "${_DESTDIR}" "${_USER}" < /tmp/.password &>"${_NO_LOG}"
+                                      rm /tmp/.password ;;
                              "2") _set_comment
                                   usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}" ;;
                              "3") _dialog --defaultno --yesno \
