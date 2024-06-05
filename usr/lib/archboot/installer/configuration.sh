@@ -136,25 +136,27 @@ _user_management() {
             "<" "Return to System Configuration" 2>"${_ANSWER}" || break
         _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
-            "1") _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
-                 "BASH" "Standard Base Shell" \
-                 "ZSH"  "More features for experts" 2>"${_ANSWER}" || break
-                 case $(cat "${_ANSWER}") in
-                    "BASH") _SHELL="bash"
-                            if ! [[ -f "${_DESTDIR}/usr/share/bash-completion/completions/arch" ]]; then
-                                _PACKAGES="bash-completion"
-                                _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " \
-                                    --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
-                                _pacman_error
-                            fi ;;
-                    "ZSH") _SHELL="zsh"
-                           if ! [[ -f "${_DESTDIR}/usr/bin/zsh" ]]; then
-                                _PACKAGES="grml-zsh-config"
-                                _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " \
-                                    --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
-                                _pacman_error
-                            fi ;;
-                 esac
+            "1") while true; do
+                    _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
+                        "BASH" "Standard Base Shell" \
+                        "ZSH"  "More features for experts" 2>"${_ANSWER}" || break
+                    case $(cat "${_ANSWER}") in
+                        "BASH") _SHELL="bash"
+                                if ! [[ -f "${_DESTDIR}/usr/share/bash-completion/completions/arch" ]]; then
+                                    _PACKAGES="bash-completion"
+                                    _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " \
+                                        --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+                                    _pacman_error && break
+                                fi ;;
+                        "ZSH") _SHELL="zsh"
+                                if ! [[ -f "${_DESTDIR}/usr/bin/zsh" ]]; then
+                                    _PACKAGES="grml-zsh-config"
+                                    _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " \
+                                        --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+                                    _pacman_error && break
+                                fi ;;
+                    esac
+                do
                  # change default shell for root and all users >= UID 1000
                  sed -i -e "s#^SHELL=.*#SHELL=/usr/bin/${_SHELL}#g" "${_DESTDIR}"/etc/default/useradd
                  for i in root $(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1); do
@@ -224,8 +226,8 @@ _user_management() {
                      fi
                  done
                  _NEXTITEM="3" ;;
-        *) _NEXTITEM="3"
-            break ;;
+            *) _NEXTITEM="3"
+               break ;;
         esac
     done
 }
