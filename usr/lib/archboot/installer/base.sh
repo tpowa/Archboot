@@ -128,8 +128,7 @@ _prepare_storagedrive() {
                     break
                  else
                     _NEXTITEM=4
-                 fi
-                 ;;
+                 fi ;;
               *) _NEXTITEM="2"
                  break ;;
         esac
@@ -194,7 +193,6 @@ _mainmenu() {
     "3" "Configure System" \
     "4" "Install Bootloader" \
     "<" "Exit" 2>"${_ANSWER}"
-    _NEXTITEM="$(cat "${_ANSWER}")"
     case $(cat "${_ANSWER}") in
         "1") if [[ "${_DESTDIR}" == "/" ]]; then
                  _abort_running_system
