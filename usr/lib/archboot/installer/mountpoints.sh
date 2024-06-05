@@ -78,10 +78,6 @@ _enter_mountpoint() {
                 _SWAPFILE_SIZE=$(cat "${_ANSWER}")
                 _FS_OPTIONS="-U clear --size ${_SWAPFILE_SIZE}M --file"
             done
-            if ! [[ "${_FSTYPE}" == "swap" ]]; then
-                _DOMKFS=1
-                _LABEL_NAME="SWAP"
-            fi
             _FSTYPE="swap"
         fi
         _SWAP_DONE=1
