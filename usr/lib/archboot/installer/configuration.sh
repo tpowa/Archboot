@@ -95,6 +95,14 @@ _set_password() {
     rm /tmp/.password
 }
 
+_set_user() {
+    _USER=""
+    while [[ -z "${_USER}" ]]; do
+        _dialog --title " Create User " --no-cancel --inputbox "Enter Username" 8 30 "" 2>"${_ANSWER}" || return 1
+        _USER=$(cat "${_ANSWER}")
+    done
+}
+
 _set_comment() {
     while true; do
         _dialog --title " Create ${_USER} " --no-cancel --inputbox "Enter a comment eg. your Full Name" 8 40 "" 2>"${_ANSWER}" || return 1
@@ -140,23 +148,22 @@ _user_management() {
                  done
                 _NEXTITEM="2" ;;
             "2") while true; do
-                     _dialog --title " Create User " --no-cancel --inputbox "Enter Username" 8 30 "" 2>"${_ANSWER}" || return 1
-                     _USER=$(cat "${_ANSWER}")
+                     _set_user || break
                      if grep -q "^${_USER}:" "${_DESTDIR}"/etc/passwd; then
                          _dialog --title " ERROR " --no-mouse --infobox "Username already exists! Please choose an other one." 3 60
                          sleep 3
                      else
-                         _set_comment
+                         _set_comment || break
                          if useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
-                             break
+                            _set_password User "${_USER}"
+                            _NEXTITEM="2"
+                            break
                          else
                              _dialog --title " ERROR " --no-mouse --infobox "User creation failed! Please try again." 3 60
                              sleep 3
                          fi
-                     fi
+                     fi ;;
                  done
-                 _set_password User "${_USER}"
-                 _NEXTITEM="2" ;;
             "3") while true; do
                      # root and all users with UID >= 1000
                      _USERS="$(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
