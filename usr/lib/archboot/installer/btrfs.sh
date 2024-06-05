@@ -105,14 +105,17 @@ _btrfs_parts() {
 
 # choose raid level to use on btrfs device
 _btrfsraid_level() {
-    _BTRFS_RAIDLEVELS="raid0 - raid1 - raid10 - single -"
     _BTRFS_RAID_FINISH=""
     _BTRFS_LEVEL=""
     _BTRFS_DEV="${_DEV}"
     : >/tmp/.btrfs-devices
     while [[ "${_BTRFS_RAID_FINISH}" != "DONE" ]]; do
         #shellcheck disable=SC2086
-        _dialog --no-cancel --title " Raid Data Level " --menu "" 11 50 5 "> NONE" "No Raid Setup" ${_BTRFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --title " Raid Data Level " --menu "" 11 50 5 "> NONE" "No Raid Device" \
+            "raid0" "Raid 0 Device" \
+            "raid1" "Raid 1 Device" \
+            "raid10" "Raid 10 Device" \
+            "single" "Single Device" 2>"${_ANSWER}" || return 1
         _BTRFS_LEVEL=$(cat "${_ANSWER}")
         if [[ "${_BTRFS_LEVEL}" == "> NONE" ]]; then
             echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
