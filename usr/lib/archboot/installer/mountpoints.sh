@@ -441,9 +441,9 @@ _mkfs() {
         swapoff -a &>"${_NO_LOG}"
         if [[ -n "${4}" ]]; then
             if _LSBLK NAME | grep -q "${1}"; then
-                mkswap -L "${5}" "${1}" &>"${_LOG}"
+                mkswap -L "${6}" "${1}" &>"${_LOG}"
             else
-                mkswap -U clear --size "${6}M" --file "${1}" &>"${_LOG}"
+                mkswap -U clear --size "${7}M" --file "${1}" &>"${_LOG}"
             fi
             sleep 2
             #shellcheck disable=SC2181
