@@ -135,7 +135,7 @@ _user_management() {
         _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1") _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
-                 "BASH" "Standard Shell" \
+                 "BASH" "Standard Base Shell" \
                  "ZSH"  "More features for experts" 2>"${_ANSWER}" || return 1
                  case $(cat "${_ANSWER}") in
                     "BASH") _SHELL="bash"
@@ -158,7 +158,7 @@ _user_management() {
                  for i in root $(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1); do
                      usermod -R "${_DESTDIR}" -s "/usr/bin/${_SHELL}" "${i}" &>"${_LOG}"
                  done
-                 _dialog --title " Success " --no-mouse --infobox "Default Shell set to ${_SHELL}." 3 50
+                 _dialog --title " Success " --no-mouse --infobox "Default shell set to ${_SHELL}." 3 50
                  sleep 3
                 _NEXTITEM="2" ;;
             "2") while true; do
