@@ -197,28 +197,31 @@ _user_management() {
                      elif [[ "${_USER}" = "< Back" ]]; then
                          break
                      else
-                         _dialog --title " Modify User Account ${_USER} " --no-cancel --menu "" 10 45 4 \
-                         "1" "Change Password" \
-                         "2" "Change Comment" \
-                         "3" "Delete User" \
-                         "<" "Return To User Selection" 2>"${_ANSWER}" || return 1
-                         case $(cat "${_ANSWER}") in
-                             "1") if _prepare_password User; then
-                                     _set_password
-                                  fi ;;
-                             "2") if _set_comment; then
-                                      usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}"
-                                      _dialog --title " Success " --no-mouse --infobox "New comment set for ${_USER}." 3 50
-                                      sleep 3
-                                  fi ;;
-                             "3") if _dialog --defaultno --yesno \
-                                      "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
-                                      userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}"; then
-                                          _dialog --title " Success " --no-mouse --infobox "User ${_USER} deleted succesfully." 3 50
-                                          sleep 3
-                                  fi ;;
-                         esac
-                    fi
+                        while true; do
+                            _dialog --title " Modify User Account ${_USER} " --no-cancel --menu "" 10 45 4 \
+                                "1" "Change Password" \
+                                "2" "Change Comment" \
+                                "3" "Delete User" \
+                                "<" "Return To User Selection" 2>"${_ANSWER}" || break
+                                case $(cat "${_ANSWER}") in
+                                "1") if _prepare_password User; then
+                                        _set_password
+                                     fi ;;
+                                "2") if _set_comment; then
+                                         usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}"
+                                         _dialog --title " Success " --no-mouse --infobox "New comment set for ${_USER}." 3 50
+                                         sleep 3
+                                     fi ;;
+                                "3") if _dialog --defaultno --yesno \
+                                         "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
+                                         userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}"; then
+                                        _dialog --title " Success " --no-mouse --infobox "User ${_USER} deleted succesfully." 3 50
+                                        sleep 3
+                                     fi ;;
+                                 *) break ;;
+                                esac
+                            done
+                     fi
                  done
                  _NEXTITEM="3" ;;
         *) _NEXTITEM="3"
