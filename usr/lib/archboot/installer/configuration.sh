@@ -203,7 +203,7 @@ _user_management() {
                                 "2" "Change Comment" \
                                 "3" "Delete User" \
                                 "<" "Return To User Selection" 2>"${_ANSWER}" || break
-                                case $(cat "${_ANSWER}") in
+                            case $(cat "${_ANSWER}") in
                                 "1") if _prepare_password User; then
                                         _set_password
                                      fi ;;
@@ -219,8 +219,8 @@ _user_management() {
                                         sleep 3
                                      fi ;;
                                  *) break ;;
-                                esac
-                            done
+                            esac
+                        done
                      fi
                  done
                  _NEXTITEM="3" ;;
