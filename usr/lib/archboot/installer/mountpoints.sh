@@ -62,11 +62,18 @@ _select_filesystem() {
 _enter_mountpoint() {
     if [[ -z "${_SWAP_DONE}" ]]; then
         if [[ "${_DEV}" == "> FILE" ]]; then
+            _SWAPFILE=""
+            _SWAPFILE_SIZE=""
             while [[ -z "${_SWAPFILE}" ]]; do
                 _dialog --no-cancel --title " Enter Full Path Filename For Swap " --inputbox "" 7 65 "/archlinux.swap" 2>"${_ANSWER}" || return 1
                 _SWAPFILE=$(cat "${_ANSWER}")
             done
             _DEV="${_SWAPFILE}"
+            while [[ -z "${_SWAPFILE_SIZE}" ]]; do
+                _dialog --no-cancel --title " Enter Size in MiB " --inputbox "16000" 7 65 "/archlinux.swap" 2>"${_ANSWER}" || return 1
+                _SWAPFILE_SIZE=$(cat "${_ANSWER}")
+            done
+            _FSOPTS="${_SWAPFILE_SIZE}"
         fi
         _MP="swap"
         _FSTYPE="swap"
@@ -433,7 +440,11 @@ _mkfs() {
     if [[ "${2}" == "swap" ]]; then
         swapoff -a &>"${_NO_LOG}"
         if [[ -n "${4}" ]]; then
-            mkswap -L "${6}" "${1}" &>"${_LOG}"
+            if _LSBLK NAME | grep -q "${1}"; then
+                mkswap -L "${6}" "${1}" &>"${_LOG}"
+            else
+                mkswap -U clear --size ${}M --file "${1}" &>"${_LOG}"
+            fi
             sleep 2
             #shellcheck disable=SC2181
             if [[ $? != 0 ]]; then
