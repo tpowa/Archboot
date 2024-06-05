@@ -121,6 +121,7 @@ _user_management() {
             "2" "Create User" \
             "3" "Modify User" \
             "<" "Return to System Configuration" 2>"${_ANSWER}" || break
+        _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1") _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
                  "BASH" "Standard Shell" \
