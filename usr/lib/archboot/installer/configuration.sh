@@ -52,15 +52,13 @@ _set_mkinitcpio() {
 }
 
 _check_root_password() {
+    _USER="root"
     # check if empty password is set
     if passwd -R "${_DESTDIR}" -S root | cut -d ' ' -f2 | grep -q NP; then
         _dialog --title " Root Account " --no-mouse --infobox "Setup detected no password set for root user.\nPlease set new password now." 4 50
         sleep 3
-        if _set_password Root; then
-            passwd -R "${_DESTDIR}" "root" < /tmp/.password &>"${_NO_LOG}"
-            rm /tmp/.password
-            _dialog --title " Success " --no-mouse --infobox "New password set for root." 3 50
-            sleep 3
+        if _prepare_password Root; then
+            _set_password
         else
             return 1
         fi
@@ -68,18 +66,15 @@ _check_root_password() {
     # check if account is locked
     if passwd -R "${_DESTDIR}" -S root | cut -d ' ' -f2 | grep -q L; then
         _dialog --title " Root Account " --no-mouse --infobox "Setup detected locked account for root user.\nPlease set new password to unlock account now." 4 50
-        if _set_password Root; then
-            passwd -R "${_DESTDIR}" "root" < /tmp/.password &>"${_NO_LOG}"
-            rm /tmp/.password
-            _dialog --title " Success " --no-mouse --infobox "New password set for root." 3 50
-            sleep 3
+        if _prepare_password Root; then
+            _set_password
         else
             return 1
         fi
     fi
 }
 
-_set_password() {
+_prepare_password() {
     while true; do
         _PASS=""
         _PASS2=""
@@ -104,6 +99,13 @@ _set_password() {
             sleep 3
         fi
     done
+}
+
+_set_password() {
+    passwd -R "${_DESTDIR}" "${_USER}" < /tmp/.password &>"${_NO_LOG}"
+    rm /tmp/.password
+    _dialog --title " Success " --no-mouse --infobox "New password set for root." 3 50
+    sleep 3
 }
 
 _set_user() {
@@ -168,12 +170,9 @@ _user_management() {
                          sleep 3
                      else
                          _set_comment || break
-                         _set_password User || break
+                         _prepare_password User || break
                          if useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
-                            passwd -R "${_DESTDIR}" "${_USER}" < /tmp/.password &>"${_NO_LOG}"
-                            rm /tmp/.password
-                            _dialog --title " Success " --no-mouse --infobox "User ${_USER} created succesfully." 3 50
-                            sleep 3
+                            _set_password
                             _NEXTITEM="2"
                             break
                          else
@@ -190,11 +189,8 @@ _user_management() {
                         "root" "Super User" ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || return 1
                      _USER=$(cat "${_ANSWER}")
                      if [[ "${_USER}" = "root" ]]; then
-                         if _set_password Root; then
-                            passwd -R "${_DESTDIR}" "root" < /tmp/.password &>"${_NO_LOG}"
-                            rm /tmp/.password
-                            _dialog --title " Success " --no-mouse --infobox "New password set for ${_USER}." 3 50
-                            sleep 3
+                         if _prepare_password Root; then
+                            _set_password
                          fi
                      elif [[ "${_USER}" = "< Back" ]]; then
                          break
@@ -205,11 +201,8 @@ _user_management() {
                          "3" "Delete User" \
                          "<" "Return To User Selection" 2>"${_ANSWER}" || return 1
                          case $(cat "${_ANSWER}") in
-                             "1") if _set_password User; then
-                                      passwd -R "${_DESTDIR}" "${_USER}" < /tmp/.password &>"${_NO_LOG}"
-                                      rm /tmp/.password
-                                      _dialog --title " Success " --no-mouse --infobox "New password set for ${_USER}." 3 50
-                                      sleep 3
+                             "1") if _prepare_password User; then
+                                     _set_password
                                   fi ;;
                              "2") if _set_comment; then
                                       usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}"
