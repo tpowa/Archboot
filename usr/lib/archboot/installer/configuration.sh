@@ -61,6 +61,8 @@ _check_root_password() {
             rm /tmp/.password
             _dialog --title " Success " --no-mouse --infobox "New password set for root." 3 50
             sleep 3
+        else
+            return 1
         fi
     fi
     # check if account is locked
@@ -71,6 +73,8 @@ _check_root_password() {
             rm /tmp/.password
             _dialog --title " Success " --no-mouse --infobox "New password set for root." 3 50
             sleep 3
+        else
+            return 1
         fi
     fi
 }
