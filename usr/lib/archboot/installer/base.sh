@@ -129,7 +129,7 @@ _prepare_storagedrive() {
                  else
                     _NEXTITEM=4
                  fi ;;
-              *) _NEXTITEM="2"
+              *) _NEXTITEM="1"
                  break ;;
         esac
     done
