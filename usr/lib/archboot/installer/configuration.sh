@@ -56,31 +56,34 @@ _check_root_password() {
     if passwd -R "${_DESTDIR}" -S root | cut -d ' ' -f2 | grep -q NP; then
         _dialog --title " Root Account " --no-mouse --infobox "Setup detected no password set for root user.\nPlease set new password now." 4 50
         sleep 3
-        if _set_password Root root; then
+        if _set_password Root; then
             passwd -R "${_DESTDIR}" "root" < /tmp/.password &>"${_NO_LOG}"
             rm /tmp/.password
+            _dialog --title " Success " --no-mouse --infobox "New password set for root." 3 50
+            sleep 3
         fi
     fi
     # check if account is locked
     if passwd -R "${_DESTDIR}" -S root | cut -d ' ' -f2 | grep -q L; then
         _dialog --title " Root Account " --no-mouse --infobox "Setup detected locked account for root user.\nPlease set new password to unlock account now." 4 50
-        if _set_password Root root; then
+        if _set_password Root; then
             passwd -R "${_DESTDIR}" "root" < /tmp/.password &>"${_NO_LOG}"
             rm /tmp/.password
+            _dialog --title " Success " --no-mouse --infobox "New password set for root." 3 50
+            sleep 3
         fi
     fi
 }
 
 _set_password() {
-    _PASSWORD=""
-    _PASS=""
-    _PASS2=""
-    while [[ -z "${_PASSWORD}" ]]; do
+    while true; do
+        _PASS=""
+        _PASS2=""
         while [[ -z "${_PASS}" ]]; do
             _dialog --no-cancel --title " New ${1} Password " --insecure --passwordbox "" 7 50 2>"${_ANSWER}" || return 1
             _PASS=$(cat "${_ANSWER}")
         done
-        while [[ -z  "${_PASS2}" ]]; do
+        while [[ -z "${_PASS2}" ]]; do
             _dialog --no-cancel --title " Retype ${1} Password " --insecure --passwordbox "" 7 50 2>"${_ANSWER}" || return 1
             _PASS2=$(cat "${_ANSWER}")
         done
@@ -89,27 +92,27 @@ _set_password() {
             echo "${_PASSWORD}" > /tmp/.password
             echo "${_PASSWORD}" >> /tmp/.password
             _PASSWORD=/tmp/.password
+            _dialog --title " Success " --no-mouse --infobox "Password entered correct." 5 50
+            sleep 3
+            break
         else
             _dialog --title " ERROR " --no-mouse --infobox "Password didn't match, please enter again." 5 50
             sleep 3
-            _PASSWORD=""
-            _PASS=""
-            _PASS2=""
         fi
     done
 }
 
 _set_user() {
-    _USER=""
-    while [[ -z "${_USER}" ]]; do
-        _dialog --title " Create User " --no-cancel --inputbox "Enter Username" 8 30 "" 2>"${_ANSWER}" || return 1
+    while true; do
+        _dialog --title " Create User Account " --no-cancel --inputbox "Enter Username" 8 30 "" 2>"${_ANSWER}" || return 1
         _USER=$(cat "${_ANSWER}")
+        [[ -n "${_USER}" ]] && break
     done
 }
 
 _set_comment() {
     while true; do
-        _dialog --title " Create ${_USER} " --no-cancel --inputbox "Enter a comment eg. your Full Name" 8 40 "" 2>"${_ANSWER}" || return 1
+        _dialog --title " ${_USER} Account " --no-cancel --inputbox "Enter a comment eg. your Full Name" 8 40 "" 2>"${_ANSWER}" || return 1
         _FN=$(cat "${_ANSWER}")
         [[ -n "${_FN}" ]] && break
     done
@@ -151,6 +154,8 @@ _user_management() {
                  for i in root $(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1); do
                      usermod -R "${_DESTDIR}" -s "/usr/bin/${_SHELL}" "${i}" &>"${_LOG}"
                  done
+                 _dialog --title " Success " --no-mouse --infobox "Default Shell set to ${_SHELL}." 3 50
+                 sleep 3
                 _NEXTITEM="2" ;;
             "2") while true; do
                      _set_user || break
@@ -159,10 +164,12 @@ _user_management() {
                          sleep 3
                      else
                          _set_comment || break
-                         _set_password User "${_USER}" || break
+                         _set_password User || break
                          if useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
                             passwd -R "${_DESTDIR}" "${_USER}" < /tmp/.password &>"${_NO_LOG}"
                             rm /tmp/.password
+                            _dialog --title " Success " --no-mouse --infobox "${_USER} created succesfully." 3 50
+                            sleep 3
                             _NEXTITEM="2"
                             break
                          else
@@ -179,9 +186,11 @@ _user_management() {
                         "root" "Super User" ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || return 1
                      _USER=$(cat "${_ANSWER}")
                      if [[ "${_USER}" = "root" ]]; then
-                         if _set_password Root root; then
+                         if _set_password Root; then
                             passwd -R "${_DESTDIR}" "root" < /tmp/.password &>"${_NO_LOG}"
                             rm /tmp/.password
+                            _dialog --title " Success " --no-mouse --infobox "New password set for ${_USER}." 3 50
+                            sleep 3
                          fi
                      elif [[ "${_USER}" = "< Back" ]]; then
                          break
@@ -192,16 +201,23 @@ _user_management() {
                          "3" "Delete User" \
                          "<" "Return To User Selection" 2>"${_ANSWER}" || return 1
                          case $(cat "${_ANSWER}") in
-                             "1") if _set_password User "${_USER}"; then
+                             "1") if _set_password User; then
                                       passwd -R "${_DESTDIR}" "${_USER}" < /tmp/.password &>"${_NO_LOG}"
                                       rm /tmp/.password
+                                      _dialog --title " Success " --no-mouse --infobox "New password set for ${_USER}." 3 50
+                                      sleep 3
                                   fi ;;
                              "2") if _set_comment; then
                                       usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}"
+                                      _dialog --title " Success " --no-mouse --infobox "New comment set for ${_USER}." 3 50
+                                      sleep 3
                                   fi ;;
-                             "3") _dialog --defaultno --yesno \
-                                  "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
-                                   userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}" ;;
+                             "3") if _dialog --defaultno --yesno \
+                                      "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
+                                      userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}"; then
+                                          _dialog --title " Success " --no-mouse --infobox "${_USER} deleted succesfully." 3 50
+                                          sleep 3
+                                  fi ;;
                          esac
                     fi
                  done
