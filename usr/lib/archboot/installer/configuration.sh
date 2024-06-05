@@ -136,10 +136,9 @@ _user_management() {
             "<" "Return to System Configuration" 2>"${_ANSWER}" || break
         _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
-            "1") while true; do
-                    _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
+            "1") if _dialog --title " Default Shell " --no-cancel --menu "" 8 45 2 \
                         "BASH" "Standard Base Shell" \
-                        "ZSH"  "More features for experts" 2>"${_ANSWER}" || break
+                        "ZSH"  "More features for experts" 2>"${_ANSWER}"; then
                     case $(cat "${_ANSWER}") in
                         "BASH") _SHELL="bash"
                                 if ! [[ -f "${_DESTDIR}/usr/share/bash-completion/completions/arch" ]]; then
@@ -164,7 +163,9 @@ _user_management() {
                     _dialog --title " Success " --no-mouse --infobox "Default shell set to ${_SHELL}." 3 50
                     sleep 3
                     _NEXTITEM="2"
-                  done ;;
+                else
+                    _NEXTITEM="1"
+                fi ;;
             "2") while true; do
                      _set_user || break
                      if grep -q "^${_USER}:" "${_DESTDIR}"/etc/passwd; then
