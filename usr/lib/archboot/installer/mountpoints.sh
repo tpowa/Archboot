@@ -61,6 +61,7 @@ _select_filesystem() {
 
 _enter_mountpoint() {
     if [[ -z "${_SWAP_DONE}" ]]; then
+        _MP="swap"
         if [[ "${_DEV}" == "> FILE" ]]; then
             _SWAPFILE=""
             _SWAPFILE_SIZE=""
@@ -69,16 +70,14 @@ _enter_mountpoint() {
                 _SWAPFILE=$(cat "${_ANSWER}")
             done
             _DEV="${_SWAPFILE}"
-            while [[ -z "${_SWAPFILE_SIZE}" ]]; do
+        fi
+        # create swap if not already swap formatted
+        if [[ -n "${_CREATE_MOUNTPOINTS}" ]]; then
+            while [[ -z "${_SWAPFILE_SIZE}" && -n "${_SWAPFILE}" ]]; do
                 _dialog --no-cancel --title " Enter Swap Size in MiB " --inputbox "" 7 65 "16000" 2>"${_ANSWER}" || return 1
                 _SWAPFILE_SIZE=$(cat "${_ANSWER}")
             done
             _FS_OPTIONS="${_SWAPFILE_SIZE}"
-        fi
-        _MP="swap"
-        _FSTYPE="swap"
-        # create swap if not already swap formatted
-        if [[ -n "${_CREATE_MOUNTPOINTS}" && ! "${_FSTYPE}" == "swap" ]]; then
             _DOMKFS=1
             _FSTYPE="swap"
         fi
