@@ -54,7 +54,7 @@ _set_mkinitcpio() {
 _check_root_password() {
     # check if empty password is set
     if passwd -R "${_DESTDIR}" -S root | cut -d ' ' -f2 | grep -q NP; then
-        _dialog --no-mouse --infobox "Setup detected no password set for root user,\nplease set new password now." 6 50
+        _dialog --title " ERROR " --no-mouse --infobox "Setup detected no password set for root user.\nPlease set new password now." 5 50
         sleep 3
         if _set_password Root root; then
             passwd -R "${_DESTDIR}" "root" < /tmp/.password &>"${_NO_LOG}"
@@ -63,7 +63,7 @@ _check_root_password() {
     fi
     # check if account is locked
     if passwd -R "${_DESTDIR}" -S root | cut -d ' ' -f2 | grep -q L; then
-        _dialog --no-mouse --infobox "Setup detected locked account for root user,\nplease set new password to unlock account now." 6 50
+        _dialog --title " ERROR " --no-mouse --infobox "Setup detected locked account for root user.\nPlease set new password to unlock account now." 5 50
         if _set_password Root root; then
             passwd -R "${_DESTDIR}" "root" < /tmp/.password &>"${_NO_LOG}"
             rm /tmp/.password
