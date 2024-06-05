@@ -156,7 +156,7 @@ _user_management() {
                                     _pacman_error && break
                                 fi ;;
                     esac
-                do
+                done
                  # change default shell for root and all users >= UID 1000
                  sed -i -e "s#^SHELL=.*#SHELL=/usr/bin/${_SHELL}#g" "${_DESTDIR}"/etc/default/useradd
                  for i in root $(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1); do
