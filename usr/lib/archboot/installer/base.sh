@@ -101,10 +101,9 @@ _set_guid() {
 }
 
 _prepare_storagedrive() {
-    _S_QUICK_SETUP=""
     _DONE=""
     _NEXTITEM=""
-    while [[ -z "${_DONE}" ]]; do
+    while true; do
         if [[ -n "${_NEXTITEM}" ]]; then
             _DEFAULT="--default-item ${_NEXTITEM}"
         else
@@ -119,25 +118,24 @@ _prepare_storagedrive() {
             "4" "Set Filesystem Mountpoints" \
             "<" "Return To Main Menu" 2>"${_ANSWER}" || _CANCEL=1
         _NEXTITEM="$(cat "${_ANSWER}")"
-        [[ "${_S_QUICK_SETUP}" = "1" ]] && _DONE=1
         case $(cat "${_ANSWER}") in
             "1") _CREATE_MOUNTPOINTS=1
                  _autoprepare
-                 [[ "${_S_QUICK_SETUP}" = "1" ]] && _DONE=1
+                 break
                  ;;
             "2") _partition ;;
             "3") _create_special ;;
             "4") _DEVFINISH=""
                  _CREATE_MOUNTPOINTS=1
                  _mountpoints ;;
-            *) _DONE=1 ;;
+            *) if [[ "${_CANCEL}" = "1" ]]; then
+                   _NEXTITEM="1"
+               else
+                   _NEXTITEM="2"
+               fi
+               break ;;
         esac
     done
-    if [[ "${_CANCEL}" = "1" ]]; then
-        _NEXTITEM="1"
-    else
-        _NEXTITEM="2"
-    fi
 }
 
 _configure_system() {
@@ -170,10 +168,10 @@ _configure_system() {
             "/etc/hosts"                    "Network Hosts" \
             "/etc/pacman.d/mirrorlist"      "Pacman Mirrors" \
             "/etc/pacman.conf"              "Pacman Config" \
-            "< Back"                        "Return to Main Menu" 2>"${_ANSWER}" || break
+            "< Back"                        "Return to Main Menu" 2>"${_ANSWER}" || return 1
         _FILE="$(cat "${_ANSWER}")"
         if [[ "${_FILE}" = "< Back" || -z "${_FILE}" ]]; then
-            _S_CONFIG=1
+            _NEXTITEM="4"
             break
         elif [[ "${_FILE}" = "/etc/mkinitcpio.conf" ]]; then
             _set_mkinitcpio
@@ -187,9 +185,6 @@ _configure_system() {
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
         fi
     done
-    if [[ ${_S_CONFIG} -eq 1 ]]; then
-        _NEXTITEM="4"
-    fi
 }
 
 _mainmenu() {

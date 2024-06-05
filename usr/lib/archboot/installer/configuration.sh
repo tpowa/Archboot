@@ -96,10 +96,10 @@ _set_password() {
 }
 
 _set_comment() {
-    _FN=""
-    while [[ -z "${_FN}" ]]; do
+    while true; do
         _dialog --title " Create ${_USER} " --no-cancel --inputbox "Enter a comment eg. your Full Name" 8 40 "" 2>"${_ANSWER}" || return 1
         _FN=$(cat "${_ANSWER}")
+        [[ -n "${_FN}" ]] && break
     done
 }
 
@@ -139,26 +139,25 @@ _user_management() {
                      usermod -R "${_DESTDIR}" -s "/usr/bin/${_SHELL}" "${i}" &>"${_LOG}"
                  done
                 _NEXTITEM=2 ;;
-            "2") _USER=""
-                 while [[ -z "${_USER}" ]]; do
+            "2") while true; do
                      _dialog --title " Create User " --no-cancel --inputbox "Enter Username" 8 30 "" 2>"${_ANSWER}" || return 1
                      _USER=$(cat "${_ANSWER}")
                      if grep -q "^${_USER}:" "${_DESTDIR}"/etc/passwd; then
                          _dialog --title " ERROR " --no-mouse --infobox "Username already exists! Please choose an other one." 3 60
                          sleep 3
-                         _USER=""
-                     fi
-                     _set_comment
-                     if ! useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
-                         _dialog --title " ERROR " --no-mouse --infobox "User creation failed! Please try again." 3 60
-                         sleep 3
-                         _USER=""
+                     else
+                         _set_comment
+                         if useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
+                             break
+                         else
+                             _dialog --title " ERROR " --no-mouse --infobox "User creation failed! Please try again." 3 60
+                             sleep 3
+                         fi
                      fi
                  done
                  _set_password User "${_USER}"
                  _NEXTITEM=2 ;;
-            "3") # add normal users
-                 while true; do
+            "3") while true; do
                      # root and all users with UID >= 1000
                      _USERS="$(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
                      #shellcheck disable=SC2086

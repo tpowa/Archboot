@@ -342,6 +342,5 @@ _autoprepare() {
     _auto_create_filesystems | _dialog --title " Filesystems " --no-mouse --gauge "Creating Filesystems on ${_DISK}..." 6 75 0
     _dialog --title " Success " --no-mouse --infobox "Quick Setup was successful." 3 40
     sleep 3
-    _S_QUICK_SETUP=1
 }
 # vim: set ft=sh ts=4 sw=4 et:
