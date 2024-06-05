@@ -174,6 +174,7 @@ _user_management() {
                          if useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
                             _set_password
                             _dialog --title " Success " --no-mouse --infobox "User Account ${_USER} created succesfully." 3 60
+                            sleep 3
                             _NEXTITEM="2"
                             break
                          else
