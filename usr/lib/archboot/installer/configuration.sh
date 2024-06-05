@@ -131,8 +131,8 @@ _user_management() {
         #shellcheck disable=SC2086
         _dialog --title " User Management " --no-cancel ${_DEFAULT} --menu "" 10 40 7 \
             "1" "Set Default Shell" \
-            "2" "Create User" \
-            "3" "Modify User" \
+            "2" "Create User Account" \
+            "3" "Modify User Account" \
             "<" "Return to System Configuration" 2>"${_ANSWER}" || break
         _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
@@ -173,6 +173,7 @@ _user_management() {
                          _prepare_password User || break
                          if useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
                             _set_password
+                            _dialog --title " Success " --no-mouse --infobox "User Account ${_USER} created succesfully." 3 60
                             _NEXTITEM="2"
                             break
                          else
@@ -185,7 +186,7 @@ _user_management() {
                      # root and all users with UID >= 1000
                      _USERS="$(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
                      #shellcheck disable=SC2086
-                     _dialog --no-cancel --menu " Modify User Selection " 15 40 10 \
+                     _dialog --no-cancel --menu " User Account Selection " 15 40 10 \
                         "root" "Super User" ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || return 1
                      _USER=$(cat "${_ANSWER}")
                      if [[ "${_USER}" = "root" ]]; then
@@ -195,7 +196,7 @@ _user_management() {
                      elif [[ "${_USER}" = "< Back" ]]; then
                          break
                      else
-                         _dialog --title " Modify User ${_USER} " --no-cancel --menu "" 10 45 4 \
+                         _dialog --title " Modify User Account ${_USER} " --no-cancel --menu "" 10 45 4 \
                          "1" "Change Password" \
                          "2" "Change Comment" \
                          "3" "Delete User" \
