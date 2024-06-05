@@ -103,11 +103,7 @@ _set_guid() {
 _prepare_storagedrive() {
     _NEXTITEM="1"
     while true; do
-        if [[ -n "${_NEXTITEM}" ]]; then
-            _DEFAULT="--default-item ${_NEXTITEM}"
-        else
-            _DEFAULT=""
-        fi
+        [[ -n "${_NEXTITEM}" ]] && _DEFAULT="--default-item ${_NEXTITEM}"
         #shellcheck disable=SC2086
         _dialog --title " Prepare Storage Device " --no-cancel ${_DEFAULT} --menu "" 11 60 5 \
             "1" "Quick Setup (erases the ENTIRE storage device)" \
@@ -118,20 +114,15 @@ _prepare_storagedrive() {
         _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1") _CREATE_MOUNTPOINTS=1
-                 _autoprepare
-                 break
+                 _autoprepare && break
                  ;;
             "2") _partition ;;
             "3") _create_special ;;
             "4") _DEVFINISH=""
                  _CREATE_MOUNTPOINTS=1
                  _mountpoints ;;
-            *) if [[ "${_CANCEL}" = "1" ]]; then
-                   _NEXTITEM="1"
-               else
-                   _NEXTITEM="2"
-               fi
-               break ;;
+            *)  _NEXTITEM="2"
+                break
         esac
     done
 }
