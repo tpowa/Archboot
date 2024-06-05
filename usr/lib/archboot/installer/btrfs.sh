@@ -183,7 +183,7 @@ _prepare_btrfs_subvolume() {
     while [[ -z "${_BTRFS_SUBVOLUME}" ]]; do
         _dialog --title " Subvolume Name on ${_DEV} " --no-cancel --inputbox "Keep it short and use no spaces or special characters." 8 60 2>"${_ANSWER}" || return 1
         _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
-        _check_btrfs_subvolume
+        [[ -n "${_BTRFS_SUBVOLUME}" ]] && _check_btrfs_subvolume
     done
     _btrfs_compress || return 1
 }
