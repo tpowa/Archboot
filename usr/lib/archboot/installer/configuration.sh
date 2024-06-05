@@ -64,7 +64,6 @@ _check_root_password() {
     # check if account is locked
     if passwd -R "${_DESTDIR}" -S root | cut -d ' ' -f2 | grep -q L; then
         _dialog --no-mouse --infobox "Setup detected locked account for root user,\nplease set new password to unlock account now." 6 50
-        _set_password Root root || return 1
         if _set_password Root root; then
             passwd -R "${_DESTDIR}" "root" < /tmp/.password &>"${_NO_LOG}"
             rm /tmp/.password
@@ -195,7 +194,8 @@ _user_management() {
                          case $(cat "${_ANSWER}") in
                              "1") if _set_password User "${_USER}"; then
                                       passwd -R "${_DESTDIR}" "${_USER}" < /tmp/.password &>"${_NO_LOG}"
-                                      rm /tmp/.password ;;
+                                      rm /tmp/.password
+                                  fi ;;
                              "2") _set_comment
                                   usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}" ;;
                              "3") _dialog --defaultno --yesno \
