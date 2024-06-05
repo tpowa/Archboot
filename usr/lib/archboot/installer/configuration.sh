@@ -200,8 +200,10 @@ _user_management() {
                      elif [[ "${_USER}" = "< Back" ]]; then
                          break
                      else
+                        _NEXTITEM="1"
                         while true; do
-                            _dialog --title " Modify User Account ${_USER} " --no-cancel --menu "" 10 45 4 \
+                            _DEFAULT="--default-item ${_NEXTITEM}"
+                            _dialog --title " Modify User Account ${_USER} " --no-cancel --${_DEFAULT} --menu "" 10 45 4 \
                                 "1" "Change Password" \
                                 "2" "Change Comment" \
                                 "3" "Delete User" \
