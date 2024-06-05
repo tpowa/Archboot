@@ -73,7 +73,7 @@ _enter_mountpoint() {
                 _dialog --no-cancel --title " Enter Swap Size in MiB " --inputbox "" 7 65 "16000" 2>"${_ANSWER}" || return 1
                 _SWAPFILE_SIZE=$(cat "${_ANSWER}")
             done
-            _FSOPTS="${_SWAPFILE_SIZE}"
+            _FS_OPTIONS="${_SWAPFILE_SIZE}"
         fi
         _MP="swap"
         _FSTYPE="swap"
@@ -441,9 +441,9 @@ _mkfs() {
         swapoff -a &>"${_NO_LOG}"
         if [[ -n "${4}" ]]; then
             if _LSBLK NAME | grep -q "${1}"; then
-                mkswap -L "${6}" "${1}" &>"${_LOG}"
+                mkswap -L "${5}" "${1}" &>"${_LOG}"
             else
-                mkswap -U clear --size ${}M --file "${1}" &>"${_LOG}"
+                mkswap -U clear --size "${6}M" --file "${1}" &>"${_LOG}"
             fi
             sleep 2
             #shellcheck disable=SC2181
