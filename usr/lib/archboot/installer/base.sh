@@ -105,12 +105,15 @@ _prepare_storagedrive() {
     while true; do
         [[ -n "${_NEXTITEM}" ]] && _DEFAULT="--default-item ${_NEXTITEM}"
         #shellcheck disable=SC2086
-        _dialog --title " Prepare Storage Device " --no-cancel ${_DEFAULT} --menu "" 11 60 5 \
+        if ! _dialog --title " Prepare Storage Device " --no-cancel ${_DEFAULT} --menu "" 11 60 5 \
             "1" "Quick Setup (erases the ENTIRE storage device)" \
             "2" "Partition Storage Device" \
             "3" "Manage Software Raid, LVM2 And LUKS Encryption" \
             "4" "Set Filesystem Mountpoints" \
-            "<" "Return To Main Menu" 2>"${_ANSWER}" || return 1
+            "<" "Return To Main Menu" 2>"${_ANSWER}";; then
+                _NEXTITEM=1
+                return 1
+        fi
         _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1") _CREATE_MOUNTPOINTS=1
@@ -145,20 +148,23 @@ _configure_system() {
     while true; do
         [[ -n "${_FILE}" ]] && _DEFAULT="--default-item ${_FILE}"
         #shellcheck disable=SC2086
-        _dialog --title " System Configuration " --no-cancel ${_DEFAULT} --menu "" 19 60 13 \
-            "> User Management"             "User Configuration" \
-            "/etc/vconsole.conf"            "Virtual Console" \
-            "/etc/locale.conf"              "Locale Setting" \
-            "/etc/locale.gen"               "Glibc Locales" \
-            "/etc/fstab"                    "Filesystem Mountpoints" \
-            "/etc/mkinitcpio.conf"          "Initramfs Config" \
-            "/etc/modprobe.d/modprobe.conf" "Kernel Modules" \
-            "/etc/hostname"                 "System Hostname" \
-            "/etc/resolv.conf"              "DNS Servers" \
-            "/etc/hosts"                    "Network Hosts" \
-            "/etc/pacman.d/mirrorlist"      "Pacman Mirrors" \
-            "/etc/pacman.conf"              "Pacman Config" \
-            "< Back"                        "Return to Main Menu" 2>"${_ANSWER}" || return 1
+        if ! _dialog --title " System Configuration " --no-cancel ${_DEFAULT} --menu "" 19 60 13 \
+                "> User Management"             "User Configuration" \
+                "/etc/vconsole.conf"            "Virtual Console" \
+                "/etc/locale.conf"              "Locale Setting" \
+                "/etc/locale.gen"               "Glibc Locales" \
+                "/etc/fstab"                    "Filesystem Mountpoints" \
+                "/etc/mkinitcpio.conf"          "Initramfs Config" \
+                "/etc/modprobe.d/modprobe.conf" "Kernel Modules" \
+                "/etc/hostname"                 "System Hostname" \
+                "/etc/resolv.conf"              "DNS Servers" \
+                "/etc/hosts"                    "Network Hosts" \
+                "/etc/pacman.d/mirrorlist"      "Pacman Mirrors" \
+                "/etc/pacman.conf"              "Pacman Config" \
+                "< Back"                        "Return to Main Menu" 2>"${_ANSWER}"; then
+                    _NEXTITEM=3
+                    return 1
+        fi
         _FILE="$(cat "${_ANSWER}")"
         if [[ "${_FILE}" = "< Back" || -z "${_FILE}" ]]; then
             _NEXTITEM="4"
