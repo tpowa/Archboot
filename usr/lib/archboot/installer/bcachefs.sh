@@ -74,6 +74,7 @@ _bcfs_select_raid_devices () {
             _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
                 ${_BCFS_RAID_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
         else
+            #shellcheck disable=SC2086
             _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
                 ${_BCFS_RAID_DEVS} 2>"${_ANSWER}" || return 1
         fi
