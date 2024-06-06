@@ -417,7 +417,9 @@ _mountpoints() {
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     _COUNT=0
     _run_mkfs | _dialog --title " Mountpoints " --no-mouse --gauge "Mountpoints..." 6 75 0
-    [[ -n "${_MP_ERROR}" ]] && return 1
+    if [[ -n "${_MP_ERROR}" ]];
+        return 1
+    fi
     _printk on
     # bcachefs uses : array for raid devices, kill this one
      _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d ' ' -f 1 | sed -e 's#:.*##g')"
