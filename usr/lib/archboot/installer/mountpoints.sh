@@ -466,10 +466,10 @@ _mkfs() {
                 return 1
             fi
         fi
-         if echo "${1}" | grep -q '^/dev'; then
+        if echo "${1}" | grep -q '^/dev'; then
             swapon "${1}" &>"${_LOG}" || : >/tmp/.mp-error
         else
-            swapon "${3}""${1}" &>"${_LOG}" || : >/tmp/.mp-error
+            swapon "${3}${1}" &>"${_LOG}" || : >/tmp/.mp-error
         fi
         if [[ -f "/tmp/.mp-error" ]]; then
             _progress "100" "ERROR: Activating swap ${1}"
