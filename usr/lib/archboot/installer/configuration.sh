@@ -105,7 +105,7 @@ _set_password() {
     passwd -R "${_DESTDIR}" "${_USER}" < /tmp/.password &>"${_NO_LOG}"
     rm /tmp/.password
     _dialog --title " Success " --no-mouse --infobox "New password set for ${_USER}." 3 50
-    sleep 1
+    sleep 2
 }
 
 _set_user() {
