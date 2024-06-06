@@ -602,7 +602,7 @@ _mkfs() {
     # /home: 933ac7e1-2eb4-4f13-b844-0e14e2aef915
     # Complex devices, like mdadm, encrypt or lvm are not supported
     if [[ -z "${_MOUNTOPTIONS}" ]]; then
-        _GUID_VALUE="$(${_LSBLK} PARTTYPE "${1} 2>"${_NO_LOG}")"
+        _GUID_VALUE="$(${_LSBLK} PARTTYPE "${1}" 2>"${_NO_LOG}")"
         if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" && "${5}" == "/home" ||\
                 "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${5}" == "swap" ||\
                 "${5}" == "/" ]]; then
