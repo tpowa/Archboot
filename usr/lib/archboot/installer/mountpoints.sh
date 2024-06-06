@@ -457,7 +457,7 @@ _mkfs() {
             else
                 mkswap "${7}" -U clear -L "${6}" -F "${3}${1}" &>"${_LOG}" || : >/tmp/.mp-error
                 # btrfs needs NO_COW attribute
-                chattr +C "${1}" &>"${_LOG}"
+                chattr +C "${3}${1}" &>"${_LOG}"
             fi
             #shellcheck disable=SC2181
             if [[ -f "/tmp/.mp-error" ]]; then
