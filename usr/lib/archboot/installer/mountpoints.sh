@@ -454,6 +454,7 @@ _mkfs() {
                 mkswap -L "${6}" ${1} &>"${_LOG}" || : >/tmp/.mp-error
             else
                 # btrfs swap needs to be NO_COW
+                [[ -f "${1}" ]] && rm "${1}"
                 if ! btrfs filesystem mkswapfile ${7} ${1} &>"${_LOG}"; then
                     mkswap "${7}" -U clear -L "${6}" -F "${1}" &>"${_LOG}" || : >/tmp/.mp-error
                 fi
