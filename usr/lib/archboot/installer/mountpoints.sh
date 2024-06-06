@@ -455,6 +455,7 @@ _mkfs() {
             if echo "${1}" | grep -q '^/dev'; then
                 mkswap -L "${6}" "${1}" &>"${_LOG}" || : >/tmp/.mp-error
             else
+                [[ -d $(dirname "${3}${1}") ]] || mkdir -p $(dirname "${3}${1}")
                 # remove existing swap file
                 [[ -f "${3}${1}" ]] && rm "${3}${1}"
                 # btrfs needs NO_COW attribute
