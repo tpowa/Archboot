@@ -171,7 +171,7 @@ _run_mkfs() {
         fi
         sleep 1
         _COUNT=$((_COUNT+_PROGRESS_COUNT))
-    done < /tmp/.parts
+    done < /tmp/.parts || return 1
     _progress "100" "Mountpoints finished successfully."
     sleep 2
 }
@@ -416,7 +416,7 @@ _mountpoints() {
     _MAX_COUNT=$(wc -l < /tmp/.parts)
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     _COUNT=0
-    _run_mkfs | _dialog --title " Mountpoints " --no-mouse --gauge "Mountpoints..." 6 75 0 || return 1
+    _run_mkfs | _dialog --title " Mountpoints " --no-mouse --gauge "Mountpoints..." 6 75 0
     _printk on
     # bcachefs uses : array for raid devices, kill this one
      _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d ' ' -f 1 | sed -e 's#:.*##g')"
