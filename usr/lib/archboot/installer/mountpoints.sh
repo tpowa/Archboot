@@ -21,6 +21,7 @@ _destdir_mounts(){
 _clear_fs_values() {
     : >/tmp/.btrfs-devices
     _SKIP_FILESYSTEM=""
+    _FS_TYPE=""
     _DOMKFS=""
     _LABEL_NAME=""
     _FS_OPTIONS=""
