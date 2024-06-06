@@ -306,7 +306,7 @@ _mountpoints() {
                         fi
                     else
                         if [[ -z "${_SWAP_DONE}" ]]; then
-                            if ! [[ "${_DEV}" == "> NONE" ]]; then
+                            if ! [[ "${_DEV}" == "> NONE" || "${_DEV}" == "> FILE" ]]; then
                                 if ! [[ "${_FSTYPE}" == "swap" ]]; then
                                     _dialog --title " ERROR " --no-mouse --infobox "SWAP PARTITION has not a swap filesystem." 3 60
                                     sleep 5
