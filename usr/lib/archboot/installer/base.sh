@@ -117,17 +117,20 @@ _prepare_storagedrive() {
         _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1") _CREATE_MOUNTPOINTS=1
-                 _autoprepare && break
+                 if _autoprepare; then
+                     _NEXTITEM="2"
+                     break
+                 fi
                  ;;
             "2") _partition ;;
             "3") _create_special ;;
             "4") _DEVFINISH=""
                  _CREATE_MOUNTPOINTS=1
                  if _mountpoints; then
-                    _NEXTITEM="2"
-                    break
+                     _NEXTITEM="2"
+                     break
                  else
-                    _NEXTITEM="4"
+                     _NEXTITEM="4"
                  fi ;;
               *) _NEXTITEM="1"
                  break ;;
