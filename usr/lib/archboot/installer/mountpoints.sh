@@ -76,7 +76,7 @@ _enter_mountpoint() {
             while [[ -z "${_SWAPFILE_SIZE}" && -n "${_SWAPFILE}" ]]; do
                 _dialog --no-cancel --title " Enter Swap Size in MiB " --inputbox "" 7 65 "16000" 2>"${_ANSWER}" || return 1
                 _SWAPFILE_SIZE=$(cat "${_ANSWER}")
-                _FS_OPTIONS="-U clear --size ${_SWAPFILE_SIZE}M --file"
+                _FS_OPTIONS="-s ${_SWAPFILE_SIZE}M -F"
             done
             if ! [[ "${_FSTYPE}" == "swap" ]]; then
                 _DOMKFS=1
