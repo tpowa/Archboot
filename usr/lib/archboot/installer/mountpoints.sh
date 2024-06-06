@@ -66,7 +66,7 @@ _enter_mountpoint() {
             _SWAPFILE=""
             _SWAPFILE_SIZE=""
             while [[ -z "${_SWAPFILE}" ]]; do
-                _dialog --no-cancel --title " Enter Full Path Filename For Swap " --inputbox "Attention: Swap on BCACHEFS is not supported!" 8 65 "/archlinux.swap" 2>"${_ANSWER}" || return 1
+                _dialog --no-cancel --title " Enter Full Path Filename For Swap " --inputbox "Attention: Swap file on BCACHEFS is NOT supported!" 8 65 "/archlinux.swap" 2>"${_ANSWER}" || return 1
                 _SWAPFILE=$(cat "${_ANSWER}")
             done
             _DEV="${_SWAPFILE}"
@@ -77,7 +77,7 @@ _enter_mountpoint() {
         # create swap if not already swap formatted
         if [[ -n "${_CREATE_MOUNTPOINTS}" ]]; then
             while [[ -z "${_SWAPFILE_SIZE}" && -n "${_SWAPFILE}" ]]; do
-                _dialog --no-cancel --title " Enter Swap Size in MiB " --inputbox "Attention: Size is not checked!" 8 65 "16000" 2>"${_ANSWER}" || return 1
+                _dialog --no-cancel --title " Enter Swap Size in MiB " --inputbox "Attention: Swap file size is NOT checked!" 8 65 "16000" 2>"${_ANSWER}" || return 1
                 _SWAPFILE_SIZE=$(cat "${_ANSWER}")
                 _FS_OPTIONS="-l ${_SWAPFILE_SIZE}M"
             done
