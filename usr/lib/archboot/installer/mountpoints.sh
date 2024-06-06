@@ -420,7 +420,6 @@ _mountpoints() {
     _printk on
     # bcachefs uses : array for raid devices, kill this one
      _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d ' ' -f 1 | sed -e 's#:.*##g')"
-    _NEXTITEM="5"
 }
 
 # _mkfs()
