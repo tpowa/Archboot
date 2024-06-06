@@ -417,7 +417,7 @@ _mountpoints() {
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     _COUNT=0
     _run_mkfs | _dialog --title " Mountpoints " --no-mouse --gauge "Mountpoints..." 6 75 0
-    if [[ -n "${_MP_ERROR}" ]]; then
+    if [[ -f "/tmp/.mp-error" ]]; then
         return 1
     fi
     _printk on
@@ -449,19 +449,19 @@ _mkfs() {
         swapoff -a &>"${_NO_LOG}"
         if [[ -n "${4}" ]]; then
             if echo "${1}" | grep -q '^/dev'; then
-                mkswap -L "${6}" ${1} &>"${_LOG}" || _MP_ERROR=1
+                mkswap -L "${6}" ${1} &>"${_LOG}" || : >/tmp/.mp-error
             else
-                mkswap "${7}" -U clear -L "${6}" -F "${1}" &>"${_LOG}" || _MP_ERROR=1
+                mkswap "${7}" -U clear -L "${6}" -F "${1}" &>"${_LOG}" || : >/tmp/.mp-error
             fi
             #shellcheck disable=SC2181
-            if [[ -n "${_MP_ERROR}" ]]; then
+            if [[ -f "/tmp/.mp-error" ]]; then
                 _progress "100" "ERROR: Creating swap ${1}"
                 sleep 5
                 return 1
             fi
         fi
-        swapon "${1}" &>"${_LOG}" || _MP_ERROR=1
-        if [[ -n "${_MP_ERROR}" ]]; then
+        swapon "${1}" &>"${_LOG}" || : >/tmp/.mp-error
+        if [[ -f "/tmp/.mp-error" ]]; then
             _progress "100" "ERROR: Activating swap ${1}"
             sleep 5
             return 1
@@ -473,13 +473,13 @@ _mkfs() {
             #shellcheck disable=SC2086
             case ${2} in
                 # don't handle anything else here, we will error later
-                bcachefs) mkfs.bcachefs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}" || _MP_ERROR=1 ;;
-                btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} &>"${_LOG}" || _MP_ERROR=1 ;;
-                ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}" || _MP_ERROR=1 ;;
-                vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}" || _MP_ERROR=1 ;;
-                xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"|| _MP_ERROR=1 ;;
+                bcachefs) mkfs.bcachefs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}" || : >/tmp/.mp-error ;;
+                btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} &>"${_LOG}" || : >/tmp/.mp-error ;;
+                ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}" || : >/tmp/.mp-error ;;
+                vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}" || : >/tmp/.mp-error ;;
+                xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"|| : >/tmp/.mp-error ;;
             esac
-            if [[ -n "${_MP_ERROR}" ]]; then
+            if [[ -f "/tmp/.mp-error" ]]; then
                 _progress "100" "ERROR: Creating filesystem ${2} on ${1}" 0 0
                 sleep 5
                 return 1
@@ -502,9 +502,9 @@ _mkfs() {
         # eleminate spaces at beginning and end, replace other spaces with ,
         _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
         # mount the bad boy
-        mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" &>"${_LOG}" || _MP_ERROR=1
+        mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" &>"${_LOG}" || : >/tmp/.mp-error
         #shellcheck disable=SC2181
-        if [[ -n "${_MP_ERROR}" ]]; then
+        if [[ -f "/tmp/.mp-error" ]]; then
             _progress "100" "ERROR: Mounting ${3}${5}"
             sleep 5
             return 1
