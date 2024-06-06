@@ -105,7 +105,7 @@ _set_password() {
     passwd -R "${_DESTDIR}" "${_USER}" < /tmp/.password &>"${_NO_LOG}"
     rm /tmp/.password
     _dialog --title " Success " --no-mouse --infobox "New password set for ${_USER}." 3 50
-    sleep 3
+    sleep 1
 }
 
 _set_user() {
@@ -177,7 +177,7 @@ _user_management() {
                          if useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
                             _set_password
                             _dialog --title " Success " --no-mouse --infobox "User Account ${_USER} created succesfully." 3 60
-                            sleep 3
+                            sleep 1
                             _NEXTITEM="2"
                             break
                          else
