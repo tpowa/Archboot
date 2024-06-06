@@ -453,7 +453,7 @@ _mkfs() {
         swapoff -a &>"${_NO_LOG}"
         if [[ -n "${4}" ]]; then
             if echo "${1}" | grep -q '^/dev'; then
-                mkswap -L "${6}" ${1} &>"${_LOG}" || : >/tmp/.mp-error
+                mkswap -L "${6}" "${1}" &>"${_LOG}" || : >/tmp/.mp-error
             else
                 mkswap "${7}" -U clear -L "${6}" -F "${3}${1}" &>"${_LOG}" || : >/tmp/.mp-error
                 # btrfs needs NO_COW attribute
@@ -479,7 +479,6 @@ _mkfs() {
     else
         # if we were tasked to create the filesystem, do so
         if [[ -n "${4}" ]]; then
-            local ret
             #shellcheck disable=SC2086
             case ${2} in
                 # don't handle anything else here, we will error later
