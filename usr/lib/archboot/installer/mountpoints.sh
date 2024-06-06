@@ -453,14 +453,14 @@ _mkfs() {
             fi
             #shellcheck disable=SC2181
             if [[ -n "${_SWAP_ERROR}" ]]; then
-                _dialog --title " ERROR " --no-mouse --infobox "Creating swap: mkswap ${1}" 0 0
+                _dialog --title " ERROR " --no-mouse --infobox "Creating swap: mkswap ${1}" 3 60
                 sleep 5
                 return 1
             fi
         fi
         swapon "${1}" &>"${_LOG}" || _SWAP_ERROR=1
         if [[ -n "${_SWAP_ERROR}" ]]; then
-            _dialog --title " ERROR " --no-mouse --infobox "Activating swap: swapon ${1}" 0 0
+            _dialog --title " ERROR " --no-mouse --infobox "Activating swap: swapon ${1}" 3 60
             sleep 5
             return 1
         fi
@@ -471,7 +471,7 @@ _mkfs() {
             [[ "${2}" == "${fs}" ]] && _KNOWNFS=1 && break
         done
         if [[ ${_KNOWNFS} -eq 0 ]]; then
-            _dialog --title " ERROR " --no-mouse --infobox "Unknown fstype ${2} for ${1}" 0 0
+            _dialog --title " ERROR " --no-mouse --infobox "Unknown fstype ${2} for ${1}" 3 60
             sleep 5
             return 1
         fi
