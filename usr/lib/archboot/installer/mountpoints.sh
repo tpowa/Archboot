@@ -449,7 +449,8 @@ _mkfs() {
             if echo "${1}" | grep -q '^/dev'; then
                 mkswap -L "${6}" ${1} &>"${_LOG}"
             else
-                mkswap "${7}" -F "${1}" &>"${_LOG}"
+                mkswap "${7}" -U clear -L "${6}" -F "${1}" &>"${_LOG}"
+                sleep 2
             fi
             sleep 2
             #shellcheck disable=SC2181
@@ -459,7 +460,7 @@ _mkfs() {
                 return 1
             fi
         fi
-        if ! swapon "${_SWAP}" &>"${_LOG}"; then
+        if ! swapon "${1}" &>"${_LOG}"; then
             _dialog --title " ERROR " --no-mouse --infobox "Activating swap: swapon ${1}" 0 0
             sleep 5
             return 1
