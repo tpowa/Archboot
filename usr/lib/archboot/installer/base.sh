@@ -158,8 +158,8 @@ _configure_system() {
                 "/etc/locale.conf"              "Locale Setting" \
                 "/etc/locale.gen"               "Glibc Locales" \
                 "/etc/fstab"                    "Filesystem Mountpoints" \
-                "/etc/mkinitcpio.conf"          "Initramfs Config" \
                 "/etc/modprobe.d/modprobe.conf" "Kernel Modules" \
+                "/etc/mkinitcpio.conf"          "Initramfs Config" \
                 "/etc/hostname"                 "System Hostname" \
                 "/etc/resolv.conf"              "DNS Servers" \
                 "/etc/hosts"                    "Network Hosts" \
