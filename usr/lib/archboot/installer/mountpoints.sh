@@ -523,7 +523,7 @@ _mkfs() {
             _progress "100" "ERROR: ROOT DEVICE ${3}${5} does not contain /boot directory."
             sleep 5
             _umountall
-            _MP_ERROR=1
+            : > /tmp/.mp-error
             return 1
         fi
         # check on /EFI on /efi mountpoint
@@ -531,7 +531,7 @@ _mkfs() {
             _progress "100" "ERROR: EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory."
             sleep 5
             _umountall
-            _MP_ERROR=1
+            : > /tmp/.mp-error
             return 1
         fi
         # check on /EFI on /boot
@@ -540,7 +540,7 @@ _mkfs() {
                 _progress "100" "ERROR: EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory."
                 sleep 5
                 _umountall
-                _MP_ERROR=1
+                : > /tmp/.mp-error
                 return 1
             fi
         fi
