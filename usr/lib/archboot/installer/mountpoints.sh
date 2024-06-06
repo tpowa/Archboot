@@ -448,7 +448,7 @@ _mkfs() {
         if echo "${1}" | grep -q '^/dev'; then
             _SWAP="${1}"
         else
-            _SWAP="${3}"/"${1}"
+            _SWAP="${3}""${1}"
         fi
         if [[ -n "${4}" ]]; then
 
