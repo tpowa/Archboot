@@ -93,7 +93,6 @@ _bcfs_select_raid_devices () {
 _bcfs_raid_level() {
     while true ; do
         : >/tmp/.bcfs-raid-device
-        _BCFS_RAIDLEVELS="raid1 - raid10 -"
         _BCFS_RAID_DEV="${_DEV}"
         _BCFS_LEVEL=""
         _DUR_COUNT="0"
@@ -102,16 +101,18 @@ _bcfs_raid_level() {
         _BCFS_SSD_COUNT="0"
         _BCFS_SSD_OPTIONS=""
         #shellcheck disable=SC2086
-        _dialog --no-cancel --title " Raid Data Level " --menu "" 11 30 7 "> NONE" "No Raid Setup" ${_BCFS_RAIDLEVELS} 2>"${_ANSWER}" || return 1
+        _dialog --no-cancel --title " Raid Data Level " --menu "" 11 30 7 \
+            "> NONE" "No Raid Setup" \
+            "raid1" "Raid 1 Device" \
+            "raid10" "Raid 10 Device" 2>"${_ANSWER}" || return 1
         _BCFS_LEVEL=$(cat "${_ANSWER}")
         if [[ "${_BCFS_LEVEL}" == "> NONE" ]]; then
             _BCFS_DEVS="${_DEV}"
             break
         else
             # replicas
-            _BCFS_REPLICATION="2 - 3 -"
             #shellcheck disable=SC2086
-            _dialog --no-cancel --title " Replication Level " --menu "" 9 30 5 ${_BCFS_REPLICATION} "> CUSTOM" "Custom Level" 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --title " Replication Level " --menu "" 9 30 5 "2" "Level 2" "3" "Level 3" "> CUSTOM" "Custom Level" 2>"${_ANSWER}" || return 1
             _BCFS_REP_COUNT=$(cat "${_ANSWER}")
             if [[ ${_BCFS_REP_COUNT} == "> CUSTOM" ]]; then
                 _dialog  --inputbox "Enter custom replication level (number):" 8 65 \
@@ -139,7 +140,11 @@ _bcfs_raid_level() {
 _bcfs_compress() {
     _BCFS_COMPRESSLEVELS="NONE - zstd - lz4 - gzip -"
     #shellcheck disable=SC2086
-    _dialog --no-cancel --title " Compression on ${_DEV} " --menu "" 10 50 4 ${_BCFS_COMPRESSLEVELS} 2>"${_ANSWER}" || return 1
+    _dialog --no-cancel --title " Compression on ${_DEV} " --menu "" 10 50 4 \
+        "> NONE" "No Compression" \
+        "zstd" "Use ZSTD Compression" \
+        "lz4" "Use LZ4 Compression" \
+        "gzip" "Use GZIP Compression" 2>"${_ANSWER}" || return 1
     if [[ "$(cat "${_ANSWER}")" == "NONE" ]]; then
         _BCFS_COMPRESS="NONE"
     else
