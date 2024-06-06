@@ -403,6 +403,10 @@ _mountpoints() {
         else
             _MOUNT_TEXT="mount"
         fi
+        # create swap as last device
+        grep '/dev' /tmp/.parts >/tmp/.parts.tmp
+        grep -v '/dev' /tmp/.parts >>/tmp/.parts.tmp
+        mv /tmp/.parts.tmp /tmp/.parts
         #shellcheck disable=SC2028
         _dialog --title " Summary " --yesno "Syntax\n------\nDEVICE|FSTYPE|MOUNTPOINT|FORMAT|LABEL|FSOPTIONS|FS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _DEVFINISH="DONE"
     done
@@ -445,7 +449,7 @@ _mkfs() {
             if _LSBLK NAME | grep -q "${1}"; then
                 mkswap -L "${6}" "${1}" &>"${_LOG}"
             else
-                mkswap "${7}" "${1}" &>"${_LOG}"
+                mkswap "${7}" ${3}/"${1}" &>"${_LOG}"
             fi
             sleep 2
             #shellcheck disable=SC2181
