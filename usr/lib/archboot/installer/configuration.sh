@@ -228,6 +228,7 @@ _user_management() {
                                         userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}"; then
                                         _dialog --title " Success " --no-mouse --infobox "User ${_USER} deleted succesfully." 3 50
                                         sleep 3
+                                        break
                                      fi ;;
                                  *) break ;;
                             esac
