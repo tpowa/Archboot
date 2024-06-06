@@ -453,14 +453,14 @@ _mkfs() {
             fi
             #shellcheck disable=SC2181
             if [[ -n "${_SWAP_ERROR}" ]]; then
-                _dialog --title " ERROR " --no-mouse --infobox "Creating swap: mkswap ${1}" 3 60
+                _progress "100" "ERROR: Creating swap: mkswap ${1}"
                 sleep 5
                 return 1
             fi
         fi
         swapon "${1}" &>"${_LOG}" || _SWAP_ERROR=1
         if [[ -n "${_SWAP_ERROR}" ]]; then
-            _dialog --title " ERROR " --no-mouse --infobox "Activating swap: swapon ${1}" 3 60
+            _progress "100" "ERROR: Activating swap: swapon ${1}"
             sleep 5
             return 1
         fi
@@ -471,7 +471,7 @@ _mkfs() {
             [[ "${2}" == "${fs}" ]] && _KNOWNFS=1 && break
         done
         if [[ ${_KNOWNFS} -eq 0 ]]; then
-            _dialog --title " ERROR " --no-mouse --infobox "Unknown fstype ${2} for ${1}" 3 60
+            _progress "100" "ERROR: Unknown fstype ${2} for ${1}"
             sleep 5
             return 1
         fi
@@ -513,7 +513,7 @@ _mkfs() {
         mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" &>"${_LOG}"
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
-            _dialog --title " ERROR " --no-mouse --infobox "Mounting ${3}${5}" 0 0
+            _progress "100" "ERROR: Mounting ${3}${5}"
             sleep 5
             return 1
         fi
@@ -526,14 +526,14 @@ _mkfs() {
         fi
         # check if /boot exists on ROOT DEVICE
         if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/" && ! -d "${3}${5}/boot" ]]; then
-            _dialog --title " ERROR " --no-mouse --infobox "ROOT DEVICE ${3}${5} does not contain /boot directory." 0 0
+            _progress "100" "ERROR: ROOT DEVICE ${3}${5} does not contain /boot directory."
             sleep 5
             _umountall
             return 1
         fi
         # check on /EFI on /efi mountpoint
         if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/efi" && ! -d "${3}${5}/EFI" ]]; then
-            _dialog --title " ERROR " --no-mouse --infobox "EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory." 0 0
+            _progress "100" "ERROR: EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory."
             sleep 5
             _umountall
             return 1
@@ -541,7 +541,7 @@ _mkfs() {
         # check on /EFI on /boot
         if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/boot" && -n "${_UEFI_BOOT}" && ! -d "${3}${5}/EFI" ]]; then
             if ! mountpoint -q "${3}/efi"; then
-                _dialog --title " ERROR " --no-mouse --infobox "EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory." 0 0
+                _progress "100" "ERROR: EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory."
                 sleep 5
                 _umountall
                 return 1
