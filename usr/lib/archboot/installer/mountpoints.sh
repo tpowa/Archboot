@@ -429,6 +429,7 @@ _mountpoints() {
 # Create and mount filesystems in our destination system directory.
 # returns: 1 on failure
 _mkfs() {
+    [[ -f "/tmp/.mp-error" ]] && rm /tmp/.mp-error
     if [[ -n "${4}" ]]; then
         if [[ "${2}" == "swap" ]]; then
             _progress "${_COUNT}" "Creating and activating swapspace on ${1}..."
