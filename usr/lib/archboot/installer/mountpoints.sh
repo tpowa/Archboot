@@ -460,7 +460,8 @@ _mkfs() {
                 return 1
             fi
         fi
-        if ! swapon "${1}" &>"${_LOG}"; then
+        swapon "${1}" &>"${_LOG}"
+        if [[ $? != 0 ]]; then
             _dialog --title " ERROR " --no-mouse --infobox "Activating swap: swapon ${1}" 0 0
             sleep 5
             return 1
