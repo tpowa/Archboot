@@ -62,7 +62,6 @@ _select_filesystem() {
 
 _enter_mountpoint() {
     if [[ -z "${_SWAP_DONE}" ]]; then
-        _MP="swap"
         if [[ "${_DEV}" == "> FILE" ]]; then
             _SWAPFILE=""
             _SWAPFILE_SIZE=""
@@ -70,7 +69,10 @@ _enter_mountpoint() {
                 _dialog --no-cancel --title " Enter Full Path Filename For Swap " --inputbox "" 7 65 "/archlinux.swap" 2>"${_ANSWER}" || return 1
                 _SWAPFILE=$(cat "${_ANSWER}")
             done
-            _DEV="${_DESTDIR}${_SWAPFILE}"
+            _DEV="${_SWAPFILE}"
+            _MP="none"
+        else
+            _MP="swap"
         fi
         # create swap if not already swap formatted
         if [[ -n "${_CREATE_MOUNTPOINTS}" ]]; then
@@ -453,11 +455,9 @@ _mkfs() {
             if echo "${1}" | grep -q '^/dev'; then
                 mkswap -L "${6}" ${1} &>"${_LOG}" || : >/tmp/.mp-error
             else
-                # btrfs swap needs to be NO_COW
-                [[ -f "${1}" ]] && rm "${1}"
-                if ! btrfs filesystem mkswapfile ${7} ${1} &>"${_LOG}"; then
-                    mkswap "${7}" -U clear -L "${6}" -F "${1}" &>"${_LOG}" || : >/tmp/.mp-error
-                fi
+                mkswap "${7}" -U clear -L "${6}" -F "${3}${1}" &>"${_LOG}" || : >/tmp/.mp-error
+                # btrfs needs NO_COW attribute
+                chattr +C "${1}" &>"${_LOG}"
             fi
             #shellcheck disable=SC2181
             if [[ -f "/tmp/.mp-error" ]]; then
@@ -466,7 +466,11 @@ _mkfs() {
                 return 1
             fi
         fi
-        swapon "${1}" &>"${_LOG}" || : >/tmp/.mp-error
+         if echo "${1}" | grep -q '^/dev'; then
+            swapon "${1}" &>"${_LOG}" || : >/tmp/.mp-error
+        else
+            swapon "${3}""${1}" &>"${_LOG}" || : >/tmp/.mp-error
+        fi
         if [[ -f "/tmp/.mp-error" ]]; then
             _progress "100" "ERROR: Activating swap ${1}"
             sleep 5
@@ -598,7 +602,7 @@ _mkfs() {
     # /home: 933ac7e1-2eb4-4f13-b844-0e14e2aef915
     # Complex devices, like mdadm, encrypt or lvm are not supported
     if [[ -z "${_MOUNTOPTIONS}" ]]; then
-        _GUID_VALUE="$(${_LSBLK} PARTTYPE "${1}")"
+        _GUID_VALUE="$(${_LSBLK} PARTTYPE "${1} 2>"${_NO_LOG}")"
         if ! [[ "${_GUID_VALUE}" == "933ac7e1-2eb4-4f13-b844-0e14e2aef915" && "${5}" == "/home" ||\
                 "${_GUID_VALUE}" == "0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" && "${5}" == "swap" ||\
                 "${5}" == "/" ]]; then
