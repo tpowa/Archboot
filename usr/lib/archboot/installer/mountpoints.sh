@@ -85,8 +85,8 @@ _enter_mountpoint() {
                 _DOMKFS=1
                 _LABEL_NAME="SWAP"
             fi
-            _FSTYPE="swap"
         fi
+        _FSTYPE="swap"
         _SWAP_DONE=1
     elif [[ -z "${_ROOT_DONE}" ]]; then
         _MP="/"
