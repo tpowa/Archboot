@@ -453,7 +453,10 @@ _mkfs() {
             if echo "${1}" | grep -q '^/dev'; then
                 mkswap -L "${6}" ${1} &>"${_LOG}" || : >/tmp/.mp-error
             else
-                mkswap "${7}" -U clear -L "${6}" -F "${1}" &>"${_LOG}" || : >/tmp/.mp-error
+                # btrfs swap needs to be NO_COW
+                if ! btrfs filesystem mkswapfile ${7} ${1} &>"${_LOG}"; then
+                    mkswap "${7}" -U clear -L "${6}" -F "${1}" &>"${_LOG}" || : >/tmp/.mp-error
+                fi
             fi
             #shellcheck disable=SC2181
             if [[ -f "/tmp/.mp-error" ]]; then
