@@ -449,7 +449,7 @@ _mkfs() {
             if echo "${1}" | grep -q '^/dev'; then
                 mkswap -L "${6}" "${1}" &>"${_LOG}"
             else
-                mkswap "${7}" ${3}/"${1}" &>"${_LOG}"
+                mkswap "${7}" "${3}"/"${1}" &>"${_LOG}"
             fi
             sleep 2
             #shellcheck disable=SC2181
