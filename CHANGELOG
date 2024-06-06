@@ -1,11 +1,13 @@
 On the road to 2024.06:
 setup:
 - added user management
+- added Swap file support
 - fixed btrfs subvolume selection
 - fixed bcachefs menu cancellation
 - added more description to menu points
 - added < and > menu points to show direction of navigation
 - disabled dangerous Raid5/6 in btrfs menu
+- fixed error messages in mountpoints function
 ---
 2024.05 Highlights:
 - kernel 6.9.x
