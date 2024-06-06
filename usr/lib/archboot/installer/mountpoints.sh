@@ -447,9 +447,9 @@ _mkfs() {
         swapoff -a &>"${_NO_LOG}"
         if [[ -n "${4}" ]]; then
             if echo "${1}" | grep -q '^/dev'; then
-                mkswap -L "${6}" ${1} &>"${_LOG}" || _SWAP_ERROR=1
+                mkswap -L "${6}" ${1} &>"${_LOG}" || _MP_ERROR=1
             else
-                mkswap "${7}" -U clear -L "${6}" -F "${1}" &>"${_LOG}" || _SWAP_ERROR=1
+                mkswap "${7}" -U clear -L "${6}" -F "${1}" &>"${_LOG}" || _MP_ERROR=1
             fi
             #shellcheck disable=SC2181
             if [[ -n "${_MP_ERROR}" ]]; then
@@ -458,7 +458,7 @@ _mkfs() {
                 return 1
             fi
         fi
-        swapon "${1}" &>"${_LOG}" || _SWAP_ERROR=1
+        swapon "${1}" &>"${_LOG}" || _MP_ERROR=1
         if [[ -n "${_MP_ERROR}" ]]; then
             _progress "100" "ERROR: Activating swap ${1}"
             sleep 5
