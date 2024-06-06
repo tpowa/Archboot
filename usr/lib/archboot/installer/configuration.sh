@@ -220,7 +220,7 @@ _user_management() {
                                      if _set_comment; then
                                          usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "New comment set for ${_USER}." 3 50
-                                         sleep 3
+                                         sleep 2
                                      fi ;;
                                 "3") if _NEXTITEM="3"
                                         _dialog --defaultno --yesno \
