@@ -79,7 +79,7 @@ _enter_mountpoint() {
             while [[ -z "${_SWAPFILE_SIZE}" && -n "${_SWAPFILE}" ]]; do
                 _dialog --no-cancel --title " Enter Swap Size in MiB " --inputbox "" 7 65 "16000" 2>"${_ANSWER}" || return 1
                 _SWAPFILE_SIZE=$(cat "${_ANSWER}")
-                _FS_OPTIONS="-s ${_SWAPFILE_SIZE}M"
+                _FS_OPTIONS="-l ${_SWAPFILE_SIZE}M"
             done
             if ! [[ "${_FSTYPE}" == "swap" ]]; then
                 _DOMKFS=1
@@ -457,9 +457,13 @@ _mkfs() {
             else
                 # remove existing swap file
                 [[ -f "${3}${1}" ]] && rm "${3}${1}"
-                mkswap "${7}" -U clear -L "${6}" -F "${3}${1}" &>"${_LOG}" || : >/tmp/.mp-error
                 # btrfs needs NO_COW attribute
+                truncate -s 0 "${3}${1}" &>"${_LOG}"
                 chattr +C "${3}${1}" &>"${_LOG}"
+                fallocate "${7}" "${3}${1}" &>"${_LOG}"
+                chmod 0600 "${3}${1}" &>"${_LOG}"
+                mkswap -U clear -L "${6}" -F "${3}${1}" &>"${_LOG}" || : >/tmp/.mp-error
+
             fi
             #shellcheck disable=SC2181
             if [[ -f "/tmp/.mp-error" ]]; then
