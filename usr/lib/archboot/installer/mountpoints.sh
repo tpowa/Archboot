@@ -445,28 +445,30 @@ _mkfs() {
     _MOUNTOPTIONS=""
     if [[ "${2}" == "swap" ]]; then
         swapoff -a &>"${_NO_LOG}"
+        if echo "${1}" | grep -q '^/dev'; then
+            _SWAP="${1}"
+        else
+            _SWAP="${3}"/"${1}"
+        fi
         if [[ -n "${4}" ]]; then
+
             if echo "${1}" | grep -q '^/dev'; then
-                mkswap -L "${6}" "${1}" &>"${_LOG}"
+                mkswap -L "${6}" ${_SWAP} &>"${_LOG}"
             else
-                mkswap "${7}" "${3}"/"${1}" &>"${_LOG}"
+                mkswap "${7}" "${_SWAP}" &>"${_LOG}"
             fi
             sleep 2
             #shellcheck disable=SC2181
             if [[ $? != 0 ]]; then
-                _dialog --title " ERROR " --no-mouse --infobox "Creating swap: mkswap ${1}" 0 0
+                _dialog --title " ERROR " --no-mouse --infobox "Creating swap: mkswap ${_SWAP}" 0 0
                 sleep 5
                 return 1
             fi
         fi
-        if echo "${1}" | grep -q '^/dev'; then
-            swapon "${1}" &>"${_LOG}"
-        else
-            swapon "${3}"/"${1}" &>"${_LOG}"
-        fi
+        swapon "${_SWAP}" &>"${_LOG}"
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
-            _dialog --title " ERROR " --no-mouse --infobox "Activating swap: swapon ${1}" 0 0
+            _dialog --title " ERROR " --no-mouse --infobox "Activating swap: swapon ${_SWAP}" 0 0
             sleep 5
             return 1
         fi
