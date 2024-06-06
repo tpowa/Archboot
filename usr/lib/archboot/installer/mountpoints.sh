@@ -171,7 +171,7 @@ _run_mkfs() {
         fi
         sleep 1
         _COUNT=$((_COUNT+_PROGRESS_COUNT))
-    done < /tmp/.parts || return 1
+    done < /tmp/.parts
     _progress "100" "Mountpoints finished successfully."
     sleep 2
 }
@@ -416,7 +416,8 @@ _mountpoints() {
     _MAX_COUNT=$(wc -l < /tmp/.parts)
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     _COUNT=0
-    _run_mkfs | _dialog --title " Mountpoints " --no-mouse --gauge "Mountpoints..." 6 75 0
+    _run_mkfs | _dialog --title " Mountpoints " --no-mouse --gauge "Mountpoints..." 6 75 0; then
+    [[ -n "${_MP_ERROR}" ]] && return 1
     _printk on
     # bcachefs uses : array for raid devices, kill this one
      _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d ' ' -f 1 | sed -e 's#:.*##g')"
@@ -451,43 +452,33 @@ _mkfs() {
                 mkswap "${7}" -U clear -L "${6}" -F "${1}" &>"${_LOG}" || _SWAP_ERROR=1
             fi
             #shellcheck disable=SC2181
-            if [[ -n "${_SWAP_ERROR}" ]]; then
+            if [[ -n "${_MP_ERROR}" ]]; then
                 _progress "100" "ERROR: Creating swap ${1}"
                 sleep 5
                 return 1
             fi
         fi
         swapon "${1}" &>"${_LOG}" || _SWAP_ERROR=1
-        if [[ -n "${_SWAP_ERROR}" ]]; then
+        if [[ -n "${_MP_ERROR}" ]]; then
             _progress "100" "ERROR: Activating swap ${1}"
             sleep 5
             return 1
         fi
     else
-        # make sure the fstype is one we can handle
-        local _KNOWNFS=0
-        for fs in bcachefs btrfs ext4 vfat xfs; do
-            [[ "${2}" == "${fs}" ]] && _KNOWNFS=1 && break
-        done
-        if [[ ${_KNOWNFS} -eq 0 ]]; then
-            _progress "100" "ERROR: Unknown fstype ${2} for ${1}"
-            sleep 5
-            return 1
-        fi
         # if we were tasked to create the filesystem, do so
         if [[ -n "${4}" ]]; then
             local ret
             #shellcheck disable=SC2086
             case ${2} in
                 # don't handle anything else here, we will error later
-                bcachefs) mkfs.bcachefs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}"; ret=$? ;;
-                btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} &>"${_LOG}"; ret=$? ;;
-                ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}"; ret=$? ;;
-                vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}"; ret=$? ;;
-                xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"; ret=$? ;;
+                bcachefs) mkfs.bcachefs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}" || _MP_ERROR=1 ;;
+                btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} &>"${_LOG}" || _MP_ERROR=1 ;;
+                ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}" || _MP_ERROR=1 ;;
+                vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}" || _MP_ERROR=1 ;;
+                xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"|| _MP_ERROR=1 ;;
             esac
-            if [[ ${ret} != 0 ]]; then
-                _dialog --title " ERROR " --no-mouse --infobox "Creating filesystem ${2} on ${1}" 0 0
+            if [[ .n "${_MP_ERROR}" ]]; then
+                _progress "100" "ERROR: Creating filesystem ${2} on ${1}" 0 0
                 sleep 5
                 return 1
             fi
@@ -509,9 +500,9 @@ _mkfs() {
         # eleminate spaces at beginning and end, replace other spaces with ,
         _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
         # mount the bad boy
-        mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" &>"${_LOG}"
+        mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" &>"${_LOG}" || _MP_ERROR=1
         #shellcheck disable=SC2181
-        if [[ $? != 0 ]]; then
+        if [[ -n "${_MP_ERROR}" ]]; then
             _progress "100" "ERROR: Mounting ${3}${5}"
             sleep 5
             return 1
@@ -528,6 +519,7 @@ _mkfs() {
             _progress "100" "ERROR: ROOT DEVICE ${3}${5} does not contain /boot directory."
             sleep 5
             _umountall
+            _MP_ERROR=1
             return 1
         fi
         # check on /EFI on /efi mountpoint
@@ -535,6 +527,7 @@ _mkfs() {
             _progress "100" "ERROR: EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory."
             sleep 5
             _umountall
+            _MP_ERROR=1
             return 1
         fi
         # check on /EFI on /boot
@@ -543,6 +536,7 @@ _mkfs() {
                 _progress "100" "ERROR: EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory."
                 sleep 5
                 _umountall
+                _MP_ERROR=1
                 return 1
             fi
         fi
