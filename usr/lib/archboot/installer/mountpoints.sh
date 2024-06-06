@@ -477,7 +477,7 @@ _mkfs() {
                 vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}" || _MP_ERROR=1 ;;
                 xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"|| _MP_ERROR=1 ;;
             esac
-            if [[ .n "${_MP_ERROR}" ]]; then
+            if [[ -n "${_MP_ERROR}" ]]; then
                 _progress "100" "ERROR: Creating filesystem ${2} on ${1}" 0 0
                 sleep 5
                 return 1
