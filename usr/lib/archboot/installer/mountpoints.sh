@@ -69,7 +69,7 @@ _enter_mountpoint() {
                 _dialog --no-cancel --title " Enter Full Path Filename For Swap " --inputbox "" 7 65 "/archlinux.swap" 2>"${_ANSWER}" || return 1
                 _SWAPFILE=$(cat "${_ANSWER}")
             done
-            _DEV="${_SWAPFILE}"
+            _DEV="${_DESTDIR}${_SWAPFILE}"
         fi
         # create swap if not already swap formatted
         if [[ -n "${_CREATE_MOUNTPOINTS}" ]]; then
@@ -445,22 +445,16 @@ _mkfs() {
     _MOUNTOPTIONS=""
     if [[ "${2}" == "swap" ]]; then
         swapoff -a &>"${_NO_LOG}"
-        if echo "${1}" | grep -q '^/dev'; then
-            _SWAP="${1}"
-        else
-            _SWAP="${3}""${1}"
-        fi
         if [[ -n "${4}" ]]; then
-
             if echo "${1}" | grep -q '^/dev'; then
-                mkswap -L "${6}" ${_SWAP} &>"${_LOG}"
+                mkswap -L "${6}" ${1} &>"${_LOG}"
             else
-                mkswap "${7}" "${_SWAP}" &>"${_LOG}"
+                mkswap "${7}" "${1}" &>"${_LOG}"
             fi
             sleep 2
             #shellcheck disable=SC2181
             if [[ $? != 0 ]]; then
-                _dialog --title " ERROR " --no-mouse --infobox "Creating swap: mkswap ${_SWAP}" 0 0
+                _dialog --title " ERROR " --no-mouse --infobox "Creating swap: mkswap ${1}" 0 0
                 sleep 5
                 return 1
             fi
@@ -468,7 +462,7 @@ _mkfs() {
         swapon "${_SWAP}" &>"${_LOG}"
         #shellcheck disable=SC2181
         if [[ $? != 0 ]]; then
-            _dialog --title " ERROR " --no-mouse --infobox "Activating swap: swapon ${_SWAP}" 0 0
+            _dialog --title " ERROR " --no-mouse --infobox "Activating swap: swapon ${1}" 0 0
             sleep 5
             return 1
         fi
