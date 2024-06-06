@@ -459,9 +459,7 @@ _mkfs() {
                 return 1
             fi
         fi
-        swapon "${_SWAP}" &>"${_LOG}"
-        #shellcheck disable=SC2181
-        if [[ $? != 0 ]]; then
+        if ! swapon "${_SWAP}" &>"${_LOG}"; then
             _dialog --title " ERROR " --no-mouse --infobox "Activating swap: swapon ${1}" 0 0
             sleep 5
             return 1
