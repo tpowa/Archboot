@@ -447,21 +447,21 @@ _mkfs() {
         swapoff -a &>"${_NO_LOG}"
         if [[ -n "${4}" ]]; then
             if echo "${1}" | grep -q '^/dev'; then
-                mkswap -L "${6}" ${1} &>"${_LOG}"
+                mkswap -L "${6}" ${1} &>"${_LOG}" || _SWAP_ERROR=1
             else
-                mkswap "${7}" -U clear -L "${6}" -F "${1}" &>"${_LOG}"
+                mkswap "${7}" -U clear -L "${6}" -F "${1}" &>"${_LOG}" || _SWAP_ERROR=1
                 sleep 2
             fi
             sleep 2
             #shellcheck disable=SC2181
-            if [[ $? != 0 ]]; then
+            if [[ -n "${_SWAP_ERROR}" ]]; then
                 _dialog --title " ERROR " --no-mouse --infobox "Creating swap: mkswap ${1}" 0 0
                 sleep 5
                 return 1
             fi
         fi
-        swapon "${1}" &>"${_LOG}"
-        if [[ $? != 0 ]]; then
+        swapon "${1}" &>"${_LOG}" || _SWAP_ERROR=1
+        if [[ -n "${_SWAP_ERROR}" ]]; then
             _dialog --title " ERROR " --no-mouse --infobox "Activating swap: swapon ${1}" 0 0
             sleep 5
             return 1
