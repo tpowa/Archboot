@@ -450,9 +450,7 @@ _mkfs() {
                 mkswap -L "${6}" ${1} &>"${_LOG}" || _SWAP_ERROR=1
             else
                 mkswap "${7}" -U clear -L "${6}" -F "${1}" &>"${_LOG}" || _SWAP_ERROR=1
-                sleep 2
             fi
-            sleep 2
             #shellcheck disable=SC2181
             if [[ -n "${_SWAP_ERROR}" ]]; then
                 _dialog --title " ERROR " --no-mouse --infobox "Creating swap: mkswap ${1}" 0 0
