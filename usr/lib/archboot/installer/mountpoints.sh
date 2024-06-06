@@ -417,7 +417,7 @@ _mountpoints() {
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     _COUNT=0
     _run_mkfs | _dialog --title " Mountpoints " --no-mouse --gauge "Mountpoints..." 6 75 0
-    if [[ -n "${_MP_ERROR}" ]];
+    if [[ -n "${_MP_ERROR}" ]]; then
         return 1
     fi
     _printk on
