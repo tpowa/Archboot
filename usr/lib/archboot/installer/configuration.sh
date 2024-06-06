@@ -205,6 +205,7 @@ _user_management() {
                         _NEXTITEM="1"
                         while true; do
                             _DEFAULT="--default-item ${_NEXTITEM}"
+                            #shellcheck disable=SC2086
                             _dialog --title " Modify User Account ${_USER} " --no-cancel ${_DEFAULT} --menu "" 10 45 4 \
                                 "1" "Change Password" \
                                 "2" "Change Comment" \
