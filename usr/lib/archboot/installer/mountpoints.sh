@@ -446,7 +446,7 @@ _mkfs() {
     if [[ "${2}" == "swap" ]]; then
         swapoff -a &>"${_NO_LOG}"
         if [[ -n "${4}" ]]; then
-            if _LSBLK NAME | grep -q "${1}"; then
+            if echo "${1}" | grep -q '^/dev'; then
                 mkswap -L "${6}" "${1}" &>"${_LOG}"
             else
                 mkswap "${7}" ${3}/"${1}" &>"${_LOG}"
