@@ -416,7 +416,7 @@ _mountpoints() {
     _MAX_COUNT=$(wc -l < /tmp/.parts)
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     _COUNT=0
-    _run_mkfs | _dialog --title " Mountpoints " --no-mouse --gauge "Mountpoints..." 6 75 0; then
+    _run_mkfs | _dialog --title " Mountpoints " --no-mouse --gauge "Mountpoints..." 6 75 0
     [[ -n "${_MP_ERROR}" ]] && return 1
     _printk on
     # bcachefs uses : array for raid devices, kill this one
