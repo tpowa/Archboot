@@ -462,7 +462,7 @@ _mkfs() {
                 chattr +C "${3}${1}" &>"${_LOG}"
                 fallocate "${7}" "${3}${1}" &>"${_LOG}"
                 chmod 0600 "${3}${1}" &>"${_LOG}"
-                mkswap -U clear -L "${6}" -F "${3}${1}" &>"${_LOG}" || : >/tmp/.mp-error
+                mkswap -U clear -L "${6}" "${3}${1}" &>"${_LOG}" || : >/tmp/.mp-error
 
             fi
             #shellcheck disable=SC2181
