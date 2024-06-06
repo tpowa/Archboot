@@ -453,14 +453,14 @@ _mkfs() {
             fi
             #shellcheck disable=SC2181
             if [[ -n "${_SWAP_ERROR}" ]]; then
-                _progress "100" "ERROR: Creating swap: mkswap ${1}"
+                _progress "100" "ERROR: Creating swap ${1}"
                 sleep 5
                 return 1
             fi
         fi
         swapon "${1}" &>"${_LOG}" || _SWAP_ERROR=1
         if [[ -n "${_SWAP_ERROR}" ]]; then
-            _progress "100" "ERROR: Activating swap: swapon ${1}"
+            _progress "100" "ERROR: Activating swap ${1}"
             sleep 5
             return 1
         fi
