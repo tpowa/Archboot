@@ -211,7 +211,7 @@ _user_management() {
                             else
                                 _USER_ATTR="(User | no wheel group)"
                             fi
-                            _dialog --title " User Account ${_USER} ${_ADMIN} " --no-cancel ${_DEFAULT} --menu "" 10 60 4 \
+                            _dialog --title " User Account ${_USER} ${_USER_ATTR} " --no-cancel ${_DEFAULT} --menu "" 11 60 5 \
                                 "1" "Change Password" \
                                 "2" "Change Comment" \
                                 "3" "Switch User/Administrator" \
