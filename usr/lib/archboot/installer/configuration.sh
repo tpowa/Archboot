@@ -179,7 +179,7 @@ _user_management() {
                          fi
                          _set_comment || break
                          _prepare_password User || break
-                         if ${_USER_CMD}; then
+                         if $(${_USER_CMD}); then
                             _set_password
                             _dialog --title " Success " --no-mouse --infobox "User Account ${_USER} created succesfully." 3 60
                             sleep 2
