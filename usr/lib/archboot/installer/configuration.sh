@@ -206,12 +206,12 @@ _user_management() {
                         while true; do
                             _DEFAULT="--default-item ${_NEXTITEM}"
                             #shellcheck disable=SC2086
-                            if grep wheel "${_DESTDIR}"/etc/group | grep -q ${_USER}; then
-                                _USER_ATTR="(Administrator | wheel group)"
+                            if grep wheel "${_DESTDIR}"/etc/group | grep -q "${_USER}"; then
+                                _USER_ATTR="| Administrator | wheel group"
                             else
-                                _USER_ATTR="(User | no wheel group)"
+                                _USER_ATTR="| User | no wheel group"
                             fi
-                            _dialog --title " User Account ${_USER} ${_USER_ATTR} " --no-cancel ${_DEFAULT} --menu "" 11 60 5 \
+                            _dialog --title " Account ${_USER} ${_USER_ATTR} " --no-cancel ${_DEFAULT} --menu "" 11 60 5 \
                                 "1" "Change Password" \
                                 "2" "Change Comment" \
                                 "3" "Switch User/Administrator" \
@@ -229,7 +229,7 @@ _user_management() {
                                          sleep 2
                                      fi ;;
                                 "3") _NEXTITEM="3"
-                                     if [[ "${_USER_ATTR}" == "(Administrator | wheel group)" ]]; then
+                                     if [[ "${_USER_ATTR}" == "| Administrator | wheel group" ]]; then
                                          usermod -R "${_DESTDIR}" -aG wheel "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "User ${_USER} removed as Administrator and from wheel group." 3 60
                                          sleep 2
