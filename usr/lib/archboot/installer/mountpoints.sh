@@ -66,7 +66,7 @@ _enter_mountpoint() {
             _SWAPFILE=""
             _SWAPFILE_SIZE=""
             while [[ -z "${_SWAPFILE}" ]]; do
-                _dialog --no-cancel --title " Enter Full Path Filename For Swap " --inputbox "Attention: Swap file on BCACHEFS is NOT supported!" 8 65 "/archlinux.swap" 2>"${_ANSWER}" || return 1
+                _dialog --no-cancel --title " Enter Full Path Filename For Swap " --inputbox "Attention: Swap file on BCACHEFS is NOT supported!" 8 65 "/swap/archlinux.swap" 2>"${_ANSWER}" || return 1
                 _SWAPFILE=$(cat "${_ANSWER}")
             done
             _DEV="${_SWAPFILE}"
