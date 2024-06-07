@@ -177,8 +177,8 @@ _user_management() {
                                 && _ADMIN_FLAG=1
                          _set_comment || break
                          _prepare_password User || break
-                         if [[ -n "${_ADMIN_FLAG}" && $(useradd -R "${_DESTDIR}" -aG wheel -c "${_FN}" "${_USER_FLAG}" -m "${_USER}" &>"${_LOG}") ]] ||\
-                            [[ -z "${_ADMIN_FLAG}" && $(useradd -R "${_DESTDIR}" -c "${_FN}" "${_USER_FLAG}" -m "${_USER}" &>"${_LOG}") ]]; then
+                         if [[ -n "${_ADMIN_FLAG}" && $(useradd -R "${_DESTDIR}" -aG wheel -c "${_FN}" -m "${_USER}" &>"${_LOG}") ]] ||\
+                            [[ -z "${_ADMIN_FLAG}" && $(useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}") ]]; then
                             _set_password
                             _dialog --title " Success " --no-mouse --infobox "User Account ${_USER} created succesfully." 3 60
                             sleep 2
