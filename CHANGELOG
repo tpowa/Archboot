@@ -2,6 +2,7 @@ On the road to 2024.06:
 setup:
 - added user management
 - added Swap file support
+- added Bash / ZSH switch
 - fixed btrfs subvolume selection
 - fixed bcachefs menu cancellation
 - added more description to menu points
