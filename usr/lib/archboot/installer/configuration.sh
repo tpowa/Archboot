@@ -206,10 +206,16 @@ _user_management() {
                         while true; do
                             _DEFAULT="--default-item ${_NEXTITEM}"
                             #shellcheck disable=SC2086
-                            _dialog --title " Modify User Account ${_USER} " --no-cancel ${_DEFAULT} --menu "" 10 45 4 \
+                            if grep wheel "${_DESTDIR}"/etc/group | grep -q ${_USER}; then
+                                _USER_ATTR="(Administrator | wheel group)"
+                            else
+                                _USER_ATTR="(User | no wheel group)"
+                            fi
+                            _dialog --title " User Account ${_USER} ${_ADMIN} " --no-cancel ${_DEFAULT} --menu "" 10 60 4 \
                                 "1" "Change Password" \
                                 "2" "Change Comment" \
-                                "3" "Delete User" \
+                                "3" "Switch User/Administrator" \
+                                "4" "Delete User" \
                                 "<" "Return To User Selection" 2>"${_ANSWER}" || break
                             case $(cat "${_ANSWER}") in
                                 "1") _NEXTITEM="1"
@@ -222,7 +228,17 @@ _user_management() {
                                          _dialog --title " Success " --no-mouse --infobox "New comment set for ${_USER}." 3 50
                                          sleep 2
                                      fi ;;
-                                "3") if _NEXTITEM="3"
+                                "3") _NEXTITEM="3"
+                                     if [[ "${_USER_ATTR}" == "(Administrator | wheel group)" ]]; then
+                                         usermod -R "${_DESTDIR}" -aG wheel "${_USER}"
+                                         _dialog --title " Success " --no-mouse --infobox "User ${_USER} removed as Administrator and from wheel group." 3 60
+                                         sleep 2
+                                     else
+                                        usermod -R "${_DESTDIR}" -rG wheel "${_USER}"
+                                         _dialog --title " Success " --no-mouse --infobox "User ${_USER} added as Administrator and added to wheel group." 3 60
+                                         sleep 2
+                                     fi
+                                "4") if _NEXTITEM="4"
                                         _dialog --defaultno --yesno \
                                             "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
                                         userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}"; then
