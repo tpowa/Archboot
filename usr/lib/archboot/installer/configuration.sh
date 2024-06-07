@@ -175,12 +175,10 @@ _user_management() {
                          _ADMIN_FLAG=""
                          if _dialog --defaultno --yesno "Enable ${_USER} as Administrator and part of wheel group?" 5 60; then
                              _ADMIN_FLAG=1
-                         else
-                             break
                          fi
                          _set_comment || break
                          _prepare_password User || break
-                         if [[ -n "${_ADMIN_FLAG}" && "$(useradd -R "${_DESTDIR}" -aG wheel -c "${_FN}" -m "${_USER}" &>"${_LOG}")" ]] ||\
+                         if [[ -n "${_ADMIN_FLAG}" && "$(useradd -R "${_DESTDIR}" -G wheel -c "${_FN}" -m "${_USER}" &>"${_LOG}")" ]] ||\
                             [[ -z "${_ADMIN_FLAG}" && "$(useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}")" ]]; then
                             _set_password
                             _dialog --title " Success " --no-mouse --infobox "User Account ${_USER} created succesfully." 3 60
