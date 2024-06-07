@@ -237,7 +237,7 @@ _user_management() {
                                         usermod -R "${_DESTDIR}" -rG wheel "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "User ${_USER} added as Administrator and added to wheel group." 3 60
                                          sleep 2
-                                     fi
+                                     fi ;;
                                 "4") if _NEXTITEM="4"
                                         _dialog --defaultno --yesno \
                                             "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
