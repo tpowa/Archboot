@@ -213,24 +213,15 @@ _user_management() {
                                 _ADMIN_ATTR=""
                                 _USER_ATTR="| User | no wheel group"
                             fi
+                            #shellcheck disable=SC2086
                             _dialog --title " Account ${_USER} ${_USER_ATTR} " --no-cancel ${_DEFAULT} --menu "" 11 60 5 \
-                                "1" "Change Password" \
-                                "2" "Change Comment" \
-                                "3" "Switch User/Administrator" \
+                                "1" "Switch User/Administrator" \
+                                "2" "Change Password" \
+                                "3" "Change Comment" \
                                 "4" "Delete User" \
                                 "<" "Return To User Selection" 2>"${_ANSWER}" || break
                             case $(cat "${_ANSWER}") in
                                 "1") _NEXTITEM="1"
-                                     if _prepare_password User; then
-                                        _set_password
-                                     fi ;;
-                                "2") _NEXTITEM="2"
-                                     if _set_comment; then
-                                         usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}"
-                                         _dialog --title " Success " --no-mouse --infobox "New comment set for ${_USER}." 3 50
-                                         sleep 2
-                                     fi ;;
-                                "3") _NEXTITEM="3"
                                      if [[ -n "${_ADMIN_ATTR}" ]]; then
                                          usermod -R "${_DESTDIR}" -rG wheel "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "User ${_USER} removed as Administrator and removed from wheel group." 3 70
@@ -238,6 +229,16 @@ _user_management() {
                                      else
                                          usermod -R "${_DESTDIR}" -aG wheel "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "User ${_USER} switched to Administrator and added to wheel group." 3 70
+                                         sleep 2
+                                     fi ;;
+                                "2") _NEXTITEM="2"
+                                     if _prepare_password User; then
+                                        _set_password
+                                     fi ;;
+                                "3") _NEXTITEM="3"
+                                     if _set_comment; then
+                                         usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}"
+                                         _dialog --title " Success " --no-mouse --infobox "New comment set for ${_USER}." 3 50
                                          sleep 2
                                      fi ;;
                                 "4") if _NEXTITEM="4"
