@@ -174,7 +174,12 @@ _user_management() {
                      else
                          _set_comment || break
                          _prepare_password User || break
-                         if useradd -R "${_DESTDIR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
+                         if _dialog --defaultno --yesno "Set ${_USER} as Administrator and part of wheel group?" 3 60; then
+                            _USER_FLAG="-aG wheel"
+                         else
+                            _USER_FLAG=""
+                         fi
+                         if useradd -R "${_DESTDIR}" -c "${_FN}" "${_USER_FLAG}" -m "${_USER}" &>"${_LOG}"; then
                             _set_password
                             _dialog --title " Success " --no-mouse --infobox "User Account ${_USER} created succesfully." 3 60
                             sleep 2
