@@ -172,14 +172,13 @@ _user_management() {
                          _dialog --title " ERROR " --no-mouse --infobox "Username already exists! Please choose an other one." 3 60
                          sleep 3
                      else
-                         if _dialog --defaultno --yesno "Set ${_USER} as Administrator and part of wheel group?" 5 60; then
-                            _USER_CMD="useradd -R "${_DESTDIR}" -aG wheel -c "${_FN}" "${_USER_FLAG}" -m "${_USER}" &>"${_LOG}""
-                         else
-                            _USER_CMD="useradd -R "${_DESTDIR}" -c "${_FN}" "${_USER_FLAG}" -m "${_USER}" &>"${_LOG}""
-                         fi
+                         _ADMIN_FLAG=""
+                         _dialog --defaultno --yesno "Enable ${_USER} as Administrator and part of wheel group?" 5 60 \
+                                && _ADMIN_FLAG=1
                          _set_comment || break
                          _prepare_password User || break
-                         if $(${_USER_CMD}); then
+                         if [[ -n "${_ADMIN_FLAG}" && $(useradd -R "${_DESTDIR}" -aG wheel -c "${_FN}" "${_USER_FLAG}" -m "${_USER}" &>"${_LOG}") ]] ||\
+                            [[ -z "${_ADMIN_FLAG}" && $(useradd -R "${_DESTDIR}" -c "${_FN}" "${_USER_FLAG}" -m "${_USER}" &>"${_LOG}") ]]; then
                             _set_password
                             _dialog --title " Success " --no-mouse --infobox "User Account ${_USER} created succesfully." 3 60
                             sleep 2
