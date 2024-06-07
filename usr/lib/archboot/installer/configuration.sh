@@ -233,11 +233,11 @@ _user_management() {
                                 "3") _NEXTITEM="3"
                                      if [[ -n "${_ADMIN_ATTR}" ]]; then
                                          usermod -R "${_DESTDIR}" -rG wheel "${_USER}"
-                                         _dialog --title " Success " --no-mouse --infobox "User ${_USER} removed as Administrator and from wheel group." 3 70
+                                         _dialog --title " Success " --no-mouse --infobox "User ${_USER} removed as Administrator and removed from wheel group." 3 70
                                          sleep 2
                                      else
                                          usermod -R "${_DESTDIR}" -aG wheel "${_USER}"
-                                         _dialog --title " Success " --no-mouse --infobox "User ${_USER} added as Administrator and added to wheel group." 3 70
+                                         _dialog --title " Success " --no-mouse --infobox "User ${_USER} switched to Administrator and added to wheel group." 3 70
                                          sleep 2
                                      fi ;;
                                 "4") if _NEXTITEM="4"
