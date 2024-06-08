@@ -123,7 +123,7 @@ _set_comment() {
 }
 
 _user_management() {
-    _NEXTITEM="1"
+    _NEXTITEM=1
     while true; do
         _DEFAULT="--default-item ${_NEXTITEM}"
         #shellcheck disable=SC2086
@@ -160,9 +160,9 @@ _user_management() {
                     done
                     _dialog --title " Success " --no-mouse --infobox "Default shell set to ${_SHELL}." 3 50
                     sleep 3
-                    _NEXTITEM="2"
+                    _NEXTITEM=2
                 else
-                    _NEXTITEM="1"
+                    _NEXTITEM=1
                 fi ;;
             "2") while true; do
                      _set_user || break
@@ -181,7 +181,7 @@ _user_management() {
                             _set_password
                             _dialog --title " Success " --no-mouse --infobox "User Account ${_USER} created succesfully." 3 50
                             sleep 2
-                            _NEXTITEM="2"
+                            _NEXTITEM=2
                             break
                          else
                              _dialog --title " ERROR " --no-mouse --infobox "User creation failed! Please try again." 3 50
@@ -205,7 +205,7 @@ _user_management() {
                      elif [[ "${_USER}" = "< Back" ]]; then
                          break
                      else
-                        _NEXTITEM="1"
+                        _NEXTITEM=1
                         while true; do
                             _DEFAULT="--default-item ${_NEXTITEM}"
                             #shellcheck disable=SC2086
@@ -226,7 +226,7 @@ _user_management() {
                                 "4" "Delete User" \
                                 "<" "Return To User Selection" 2>"${_ANSWER}" || break
                             case $(cat "${_ANSWER}") in
-                                "1") _NEXTITEM="1"
+                                "1") _NEXTITEM=1
                                      if [[ -n "${_ADMIN_ATTR}" ]]; then
                                          usermod -R "${_DESTDIR}" -rG wheel "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "User ${_USER} removed as Administrator and removed from wheel group." 3 70
@@ -236,17 +236,17 @@ _user_management() {
                                          _dialog --title " Success " --no-mouse --infobox "User ${_USER} switched to Administrator and added to wheel group." 3 70
                                          sleep 2
                                      fi ;;
-                                "2") _NEXTITEM="2"
+                                "2") _NEXTITEM=2
                                      if _prepare_password User; then
                                         _set_password
                                      fi ;;
-                                "3") _NEXTITEM="3"
+                                "3") _NEXTITEM=3
                                      if _set_comment; then
                                          usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "New comment set for ${_USER}." 3 50
                                          sleep 2
                                      fi ;;
-                                "4") if _NEXTITEM="4"
+                                "4") if _NEXTITEM=4
                                         _dialog --defaultno --yesno \
                                             "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
                                         userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}"; then
@@ -259,7 +259,7 @@ _user_management() {
                         done
                      fi
                  done
-                 _NEXTITEM="3" ;;
+                 _NEXTITEM=3 ;;
             *) break ;;
         esac
     done
