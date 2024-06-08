@@ -68,6 +68,6 @@ _partition() {
             fi
         fi
     done
-    _NEXTITEM="3"
+    _NEXTITEM=3
 }
 # vim: set ft=sh ts=4 sw=4 et:
