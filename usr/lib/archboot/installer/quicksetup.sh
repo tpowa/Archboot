@@ -160,7 +160,7 @@ _autoprepare() {
         _DEV_NUM=0
         # create 2M bios_grub partition for grub BIOS GPT support
         if [[ -n "${_GUIDPARAMETER}" ]]; then
-            _GPT_BIOS_GRUB_DEV_SIZE="2"
+            _GPT_BIOS_GRUB_DEV_SIZE=2
             _GPT_BIOS_GRUB_DEV_NUM="$((_DEV_NUM+1))"
             _DISK_SIZE="$((_DISK_SIZE-_GPT_BIOS_GRUB_DEV_SIZE))"
             _DEV_NUM="${_GPT_BIOS_GRUB_DEV_NUM}"
@@ -248,7 +248,7 @@ _autoprepare() {
                 fi
             done
         fi
-        _SWAP_SIZE="256"
+        _SWAP_SIZE=256
         [[ "${_DISK_SIZE}" -lt "256" ]] && _SWAP_SIZE="${_DISK_SIZE}"
         while [[ -z "${_SWAPDEV_SET}" ]]; do
             _dialog --title " Swap in MiB " --no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | Value 0 skips Swap" 8 65 "${_SWAP_SIZE}" 2>"${_ANSWER}" || return 1
@@ -277,7 +277,7 @@ _autoprepare() {
             _dialog --title " Confirmation " --yesno " Filesystem ${_FSTYPE} will be used for / and /home?" 5 65 && _CHOSENFS=1
         done
         _DISK_SIZE="$((_DISK_SIZE-_SWAPDEV_SIZE))"
-        _ROOT_SIZE="7500"
+        _ROOT_SIZE=7500
         # xfs minimum size is around 300M
         # btrfs minimum size is around 120M
         [[ "${_DISK_SIZE}" -lt "7500" ]] && _ROOT_SIZE="$((_DISK_SIZE-350))"
