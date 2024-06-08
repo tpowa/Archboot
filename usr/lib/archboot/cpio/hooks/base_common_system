@@ -10,7 +10,7 @@ _run ()
 --exclude=usr/lib/{modules-load.d/cdrecord.conf,systemd/{system/{blk-availability.service,lvm2*,\
 rpcbind*,sysinit.target.wants/lvm2*},ukify},sysusers.d/rpcbind*,tmpfiles.d/rpcbind*} \
 --hard-dereference -cpf - \
-etc/{ca-certificates/extracted,default,pam.d,pinentry,profile.d,security,skel,ssl/certs,sysctl.d,systemd,tpm2-tss,xdg} \
+etc/{bash_completion.d,ca-certificates/extracted,default,pam.d,pinentry,profile.d,security,skel,ssl/certs,sysctl.d,systemd,tpm2-tss,xdg} \
 usr/lib/{coreutils,cryptsetup,gconv,modules-load.d,p11-kit,pam.d,pkcs11,security,sysctl.d,systemd,sysusers.d,tmpfiles.d,udev} \
 usr/share/{bash-completion,dbus-1,factory,hwdata,i18n/locales,makepkg,nano,pacman/keyrings,polkit-1,readline,systemd,terminfo} \
 | tar -C "${_ROOTFS}" -xpf -
