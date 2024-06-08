@@ -240,13 +240,13 @@ _activate_luks()
                     _RUN_LUKS=""
                     _dialog --yesno "Setup detected luks encrypted device, do you want to activate ${part} ?" 0 0 && _RUN_LUKS=1
                     [[ -n "${_RUN_LUKS}" ]] && _enter_luks_name && _enter_luks_passphrase && _opening_luks
-                    [[ -z "${_RUN_LUKS}" ]] && _LUKS_READY="1"
+                    [[ -z "${_RUN_LUKS}" ]] && _LUKS_READY=1
                 else
-                    _LUKS_READY="1"
+                    _LUKS_READY=1
                 fi
             done
         else
-            _LUKS_READY="1"
+            _LUKS_READY=1
         fi
     fi
 }
