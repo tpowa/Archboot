@@ -29,7 +29,7 @@ _create_raid_menu() {
               *) _MDDONE=1 ;;
         esac
     done
-    _NEXTITEM="1"
+    _NEXTITEM=1
 }
 
 _create_lvm_menu() {
@@ -60,7 +60,7 @@ _create_lvm_menu() {
               *) _LVMDONE=1 ;;
         esac
     done
-    _NEXTITEM="2"
+    _NEXTITEM=2
 }
 
 _create_luks_menu() {
@@ -87,7 +87,7 @@ _create_luks_menu() {
               *) _LUKSDONE=1 ;;
         esac
     done
-    _NEXTITEM="3"
+    _NEXTITEM=3
 }
 
 _create_special() {
@@ -115,9 +115,9 @@ _create_special() {
         esac
     done
     if [[ -n "${_CANCEL}" ]]; then
-        _NEXTITEM="3"
+        _NEXTITEM=3
     else
-        _NEXTITEM="4"
+        _NEXTITEM=4
     fi
 }
 # vim: set ft=sh ts=4 sw=4 et:
