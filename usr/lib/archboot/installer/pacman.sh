@@ -72,7 +72,7 @@ _install_packages() {
     _dialog --title " Summary " --yesno "Next step will install the following packages for a minimal system:\n${_PACKAGES}\n\nYou can watch the progress on your ${_VC} console." 9 75 || return 1
     _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 8 75 0
     _pacman_error
-    _NEXTITEM="3"
+    _NEXTITEM=3
     _chroot_mount
     # automagic time!
     _run_autoconfig | _dialog --title " Autoconfiguration " --no-mouse --gauge "Writing base configuration..." 6 75 0
