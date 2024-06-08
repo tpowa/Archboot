@@ -215,7 +215,7 @@ _activate_lvm2()
         lvm vgchange --ignorelockingfailure --ignoremonitoring -ay &>"${_NO_LOG}"
         _LVM2_GROUPS="$(vgs -o vg_name --noheading 2>"${_NO_LOG}")"
         _LVM2_VOLUMES="$(lvs -o vg_name,lv_name --noheading --separator - 2>"${_NO_LOG}")"
-        [[ "${_OLD_LVM2_GROUPS}" == "${_LVM2_GROUPS}" && "${_OLD_LVM2_VOLUMES}" == "${_LVM2_VOLUMES}" ]] && _LVM2_READY="1"
+        [[ "${_OLD_LVM2_GROUPS}" == "${_LVM2_GROUPS}" && "${_OLD_LVM2_VOLUMES}" == "${_LVM2_VOLUMES}" ]] && _LVM2_READY=1
     fi
 }
 
@@ -224,7 +224,7 @@ _activate_md()
     _RAID_READY=""
     if [[ -e /usr/bin/mdadm ]]; then
         _dialog --no-mouse --infobox "Activating RAID arrays..." 0 0
-        mdadm --assemble --scan &>"${_NO_LOG}" || _RAID_READY="1"
+        mdadm --assemble --scan &>"${_NO_LOG}" || _RAID_READY=1
     fi
 }
 
