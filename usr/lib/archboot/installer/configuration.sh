@@ -209,7 +209,7 @@ _user_management() {
                         while true; do
                             _DEFAULT="--default-item ${_NEXTITEM}"
                             #shellcheck disable=SC2086
-                            if grep wheel "${_DESTDIR}"/etc/group | grep -q "${_USER}"; then
+                            if grep wheel "${_DESTDIR}"/etc/group | grep -qw "${_USER}"; then
                                 _ADMIN_ATTR=1
                                 _USER_TITLE="${_USER} | Administrator | wheel group"
                                 _USER_MENU="Change To Normal User"
