@@ -181,12 +181,12 @@ _user_management() {
                          #shellcheck disable=SC2086
                          if useradd -R "${_DESTDIR}" ${_ADMIN_ATTR} -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
                             _set_password
-                            _dialog --title " Success " --no-mouse --infobox "User Account ${_USER} created succesfully." 3 60
+                            _dialog --title " Success " --no-mouse --infobox "User Account ${_USER} created succesfully." 3 50
                             sleep 2
                             _NEXTITEM="2"
                             break
                          else
-                             _dialog --title " ERROR " --no-mouse --infobox "User creation failed! Please try again." 3 60
+                             _dialog --title " ERROR " --no-mouse --infobox "User creation failed! Please try again." 3 50
                              sleep 3
                          fi
                      fi
