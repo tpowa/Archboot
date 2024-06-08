@@ -101,7 +101,7 @@ _set_guid() {
 }
 
 _prepare_storagedrive() {
-    _NEXTITEM="1"
+    _NEXTITEM=1
     while true; do
         [[ -n "${_NEXTITEM}" ]] && _DEFAULT="--default-item ${_NEXTITEM}"
         #shellcheck disable=SC2086
@@ -111,14 +111,14 @@ _prepare_storagedrive() {
             "3" "Manage Software Raid, LVM2 And LUKS Encryption" \
             "4" "Set Filesystem Mountpoints" \
             "<" "Return To Main Menu" 2>"${_ANSWER}"; then
-                _NEXTITEM="1"
+                _NEXTITEM=1
                 return 1
         fi
         _NEXTITEM="$(cat "${_ANSWER}")"
         case $(cat "${_ANSWER}") in
             "1") _CREATE_MOUNTPOINTS=1
                  if _autoprepare; then
-                     _NEXTITEM="2"
+                     _NEXTITEM=2
                      break
                  fi
                  ;;
@@ -127,19 +127,19 @@ _prepare_storagedrive() {
             "4") _DEVFINISH=""
                  _CREATE_MOUNTPOINTS=1
                  if _mountpoints; then
-                     _NEXTITEM="2"
+                     _NEXTITEM=2
                      break
                  else
-                     _NEXTITEM="4"
+                     _NEXTITEM=4
                  fi ;;
-              *) _NEXTITEM="1"
+              *) _NEXTITEM=1
                  break ;;
         esac
     done
 }
 
 _configure_system() {
-    _NEXTITEM="3"
+    _NEXTITEM=3
     _destdir_mounts || return 1
     _check_root_password || return 1
     _geteditor || return 1
@@ -166,12 +166,12 @@ _configure_system() {
                 "/etc/pacman.d/mirrorlist"      "Pacman Mirrors" \
                 "/etc/pacman.conf"              "Pacman Config" \
                 "< Back"                        "Return to Main Menu" 2>"${_ANSWER}"; then
-                    _NEXTITEM="3"
+                    _NEXTITEM=3
                     return 1
         fi
         _FILE="$(cat "${_ANSWER}")"
         if [[ "${_FILE}" = "< Back" || -z "${_FILE}" ]]; then
-            _NEXTITEM="4"
+            _NEXTITEM=4
             break
         elif [[ "${_FILE}" = "/etc/mkinitcpio.conf" ]]; then
             _set_mkinitcpio
