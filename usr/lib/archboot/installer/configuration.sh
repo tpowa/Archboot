@@ -91,8 +91,6 @@ _prepare_password() {
             echo "${_PASSWORD}" > /tmp/.password
             echo "${_PASSWORD}" >> /tmp/.password
             _PASSWORD=/tmp/.password
-            _dialog --title " Success " --no-mouse --infobox "Password entered correct." 3 50
-            sleep 1
             break
         else
             _dialog --title " ERROR " --no-mouse --infobox "Password didn't match, please enter again." 3 50
