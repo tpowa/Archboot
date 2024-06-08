@@ -212,7 +212,7 @@ _user_management() {
                             if grep wheel "${_DESTDIR}"/etc/group | grep -q "${_USER}"; then
                                 _ADMIN_ATTR=1
                                 _USER_ATTR="| Administrator | wheel group"
-                                _USER_MENU="Change To User"
+                                _USER_MENU="Change To Normal User"
                             else
                                 _ADMIN_ATTR=""
                                 _USER_ATTR="| User | no wheel group"
