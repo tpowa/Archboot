@@ -231,7 +231,7 @@ _install_bootloader_uefi() {
 
 _install_bootloader() {
     _S_BOOTLOADER=""
-    _NEXTITEM="4"
+    _NEXTITEM=4
     _destdir_mounts || return 1
     # switch for mbr usage
     if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
@@ -261,7 +261,7 @@ _install_bootloader() {
         fi
     fi
     if [[ -z "${_S_BOOTLOADER}" ]]; then
-        _NEXTITEM="4"
+        _NEXTITEM=4
     else
         _NEXTITEM="<"
     fi
