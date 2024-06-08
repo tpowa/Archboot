@@ -95,10 +95,10 @@ _bcfs_raid_level() {
         : >/tmp/.bcfs-raid-device
         _BCFS_RAID_DEV="${_DEV}"
         _BCFS_LEVEL=""
-        _DUR_COUNT="0"
-        _BCFS_HDD_COUNT="0"
+        _DUR_COUNT=0
+        _BCFS_HDD_COUNT=0
         _BCFS_HDD_OPTIONS=""
-        _BCFS_SSD_COUNT="0"
+        _BCFS_SSD_COUNT=0
         _BCFS_SSD_OPTIONS=""
         #shellcheck disable=SC2086
         _dialog --no-cancel --title " Raid Data Level " --menu "" 11 30 7 \
