@@ -400,12 +400,6 @@ _mountpoints() {
                 fi
             fi
         done
-        #shellcheck disable=SC2028
-        if [[  -n "${_CREATE_MOUNTPOINTS}" ]]; then
-            _MOUNT_TEXT="create and mount"
-        else
-            _MOUNT_TEXT="mount"
-        fi
         # create swap as last device
         grep '/dev' /tmp/.parts >/tmp/.parts.tmp
         grep -v '/dev' /tmp/.parts >>/tmp/.parts.tmp
