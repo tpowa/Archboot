@@ -178,6 +178,7 @@ _user_management() {
                          fi
                          _set_comment || break
                          _prepare_password User || break
+                         #shellcheck disable=SC2086
                          if useradd -R "${_DESTDIR}" ${_ADMIN_ATTR} -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
                             _set_password
                             _dialog --title " Success " --no-mouse --infobox "User Account ${_USER} created succesfully." 3 60
