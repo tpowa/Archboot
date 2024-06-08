@@ -212,13 +212,15 @@ _user_management() {
                             if grep wheel "${_DESTDIR}"/etc/group | grep -q "${_USER}"; then
                                 _ADMIN_ATTR=1
                                 _USER_ATTR="| Administrator | wheel group"
+                                _USER_MENU="Change To User"
                             else
                                 _ADMIN_ATTR=""
                                 _USER_ATTR="| User | no wheel group"
+                                _USER_MENU="Change To Administrator"
                             fi
                             #shellcheck disable=SC2086
                             _dialog --title " Account ${_USER} ${_USER_ATTR} " --no-cancel ${_DEFAULT} --menu "" 11 60 5 \
-                                "1" "Switch User/Administrator" \
+                                "1" "${_USER_MENU}" \
                                 "2" "Change Password" \
                                 "3" "Change Comment" \
                                 "4" "Delete User" \
