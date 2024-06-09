@@ -95,11 +95,11 @@ _upload_efi_files() {
     for i in *.efi; do
         #shellcheck disable=SC2086
         if [[ -f "${i}" ]]; then
-            su -u "{_USER}" -c gpg ${_GPG} "${i}" || exit 1
+            su -u "${_USER}" -c gpg ${_GPG} "${i}" || exit 1
         fi
     done
     #shellcheck disable=SC2086
-    su -u "{_USER}" -c ${_RSYNC} ./* "${_SERVER}:.${_ARCH_SERVERDIR}/" || exit 1
+    su -u "${_USER}" -c ${_RSYNC} ./* "${_SERVER}:.${_ARCH_SERVERDIR}/" || exit 1
     cd ..
 }
 
