@@ -26,7 +26,7 @@ _update_pacman_chroot() {
     ${_DLPROG} -O "${_ARCH_CHROOT_PUBLIC}"/"${_PACMAN_CHROOT}".sig
     # verify download
     #shellcheck disable=SC2024
-    su -u "${_USER}" -c gpg --verify "${_PACMAN_CHROOT}.sig" &>"${_NO_LOG}" || exit 1
+    su -m "${_USER}" -c gpg --verify "${_PACMAN_CHROOT}.sig" &>"${_NO_LOG}" || exit 1
     bsdtar -C "${_ARCH_DIR}" -xf "${_PACMAN_CHROOT}" &>"${_NO_LOG}"
     echo "Removing installation tarball..."
     rm "${_PACMAN_CHROOT}"{,.sig} &>"${_NO_LOG}"
@@ -46,22 +46,22 @@ _update_pacman_chroot() {
     echo "Finished container tarball."
     echo "Sign tarball..."
     #shellcheck disable=SC2086
-    su -u "${_USER}" -c gpg ${_GPG} "${_PACMAN_CHROOT}" || exit 1
+    su -m "${_USER}" -c gpg ${_GPG} "${_PACMAN_CHROOT}" || exit 1
     chown "${_USER}:${_GROUP}" "${_PACMAN_CHROOT}"{,.sig} || exit 1
     echo "Syncing files to ${_SERVER}:${_PUB}/.${_SERVER_PACMAN}..."
     #shellcheck disable=SC2086
-    su -u "${_USER}" -c ${_RSYNC} "${_PACMAN_CHROOT}"{,.sig} "${_SERVER}:${_PUB}/.${_SERVER_PACMAN}/" || exit 1
+    su -m "${_USER}" -c ${_RSYNC} "${_PACMAN_CHROOT}"{,.sig} "${_SERVER}:${_PUB}/.${_SERVER_PACMAN}/" || exit 1
 }
 
 _server_upload() {
     # copy files to server
     echo "Syncing files to ${_SERVER}:${_PUB}/.${1}/${_ARCH}..."
     #shellcheck disable=SC2086
-    su -u "${_USER}" -c ssh "${_SERVER}" [[ -d "${_PUB}/.${1}/${_ARCH}" ]] || mkdir -p "${_PUB}/.${1}/${_ARCH}"
+    su -m "${_USER}" -c ssh "${_SERVER}" [[ -d "${_PUB}/.${1}/${_ARCH}" ]] || mkdir -p "${_PUB}/.${1}/${_ARCH}"
     #shellcheck disable=SC2086
-    su -u "${_USER}" -c ${_RSYNC} "${_DIR}" "${_SERVER}":"${_PUB}/.${1}/${_ARCH}/" || exit 1
+    su -m "${_USER}" -c ${_RSYNC} "${_DIR}" "${_SERVER}":"${_PUB}/.${1}/${_ARCH}/" || exit 1
     # move files on server, create symlink and removing ${_PURGE_DATE} old release
-    su -u "${_USER}" -c ssh "${_SERVER}" <<EOF
+    su -m "${_USER}" -c ssh "${_SERVER}" <<EOF
 echo "Removing old purge date reached ${_PUB}/.${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory..."
 rm -r ${_PUB}/".${1}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>"${_NO_LOG}"
 cd ${_PUB}/".${1}"/"${_ARCH}"
@@ -70,7 +70,7 @@ rm latest
 ln -s "${_DIR}" latest
 EOF
     # create autoindex HEADER.html
-    su -u "${_USER}" -c ssh "${_SERVER}" "[[ -e ~/lsws-autoindex.sh ]] && ~/./lsws-autoindex.sh"
+    su -m "${_USER}" -c ssh "${_SERVER}" "[[ -e ~/lsws-autoindex.sh ]] && ~/./lsws-autoindex.sh"
 }
 
 _create_archive() {
@@ -84,7 +84,7 @@ _sign_b2sum() {
     for i in $1; do
         #shellcheck disable=SC2086
         if [[ -f "${i}" ]]; then
-            su -u "${_USER}" -c gpg ${_GPG} "${i}"
+            su -m "${_USER}" -c gpg ${_GPG} "${i}"
             cksum -a blake2b "${i}" >> b2sum.txt
         fi
         if [[ -f "${i}.sig" ]]; then
