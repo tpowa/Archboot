@@ -201,11 +201,13 @@ _mainmenu() {
     case $(cat "${_ANSWER}") in
         "1") if [[ "${_DESTDIR}" == "/" ]]; then
                  _abort_running_system
+                 _NEXTITEM=1
              else
                  _prepare_storagedrive
              fi ;;
         "2") if [[ "${_DESTDIR}" == "/" ]]; then
                  _abort_running_system
+                 _NEXTITEM=2
              else
                  _install_packages
              fi ;;

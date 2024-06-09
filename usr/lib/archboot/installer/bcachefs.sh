@@ -112,7 +112,10 @@ _bcfs_raid_level() {
         else
             # replicas
             #shellcheck disable=SC2086
-            _dialog --no-cancel --title " Replication Level " --menu "" 9 30 5 "2" "Level 2" "3" "Level 3" "> CUSTOM" "Custom Level" 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --title " Replication Level " --menu "" 9 30 5 \
+                "2" "Level 2" \
+                "3" "Level 3" \
+                "> CUSTOM" "Custom Level" 2>"${_ANSWER}" || return 1
             _BCFS_REP_COUNT=$(cat "${_ANSWER}")
             if [[ ${_BCFS_REP_COUNT} == "> CUSTOM" ]]; then
                 _dialog  --inputbox "Enter custom replication level (number):" 8 65 \
