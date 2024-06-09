@@ -7,7 +7,7 @@ _run ()
     ! grep -qw 'archboot' /etc/hostname && return
     _install_files
     rm /usr/bin/{arping,clockdiff,tracepath,ssh,arpd,genl,ifstat,ctstat,rtstat,lnstat,\
-nstat,rtacct,rtmon,ss,tc,bridge,dcb,devlink,rdma,tipc,vdpa,ethtool,elinks,brctl}
+nstat,rtacct,rtmon,ss,tc,bridge,dcb,devlink,rdma,tipc,vdpa,ethtool,elinks}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
