@@ -1,4 +1,6 @@
 On the road to 2024.06:
+Environment:
+- removed bridge-utils
 setup:
 - added user management
 - added Swap file support
