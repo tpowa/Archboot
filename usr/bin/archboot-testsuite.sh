@@ -47,6 +47,7 @@ memusage memusagestat mkfs.bfs mkfs.cramfs mkfs.minix mtrace newgidmap newuidmap
 pldd pstree.x11 restore routel run0 setpgid sln sotruss sprof systemd-confext systemd-cryptsetup \
 systemd-delta systemd-repart systemd-run systemd-vmspawn varlinkctl xtrace"
 archboot-binary-check.sh base &>>"${_LOG}"
+#shellcheck disable=SC2013
 for i in $(grep '/usr/bin/' binary.txt | sed -e 's#^/usr/bin/##g'); do
     if ! echo "${_BASE_BLACKLIST}" | grep -qw "${i}"; then
         echo "${i}" >> base-binary-error.txt
@@ -60,7 +61,7 @@ else
     echo "Test run succesfully."
 fi
 # uninstall base again!
-pacman --noconfirm -Rdd base
+pacman --noconfirm -Rdd base &>>"${_LOG}"
 echo "Pacman Package Database Test running..."
 archboot-not-installed.sh &>>"${_LOG}"
 if [[ -s not-installed.txt ]]; then
