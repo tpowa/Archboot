@@ -60,9 +60,11 @@ else
     echo "Test run succesfully."
 fi
 echo "Pacman Package Database Test running..."
-if ! archboot-not-installed.sh &>>"${_LOG}"; then
+archboot-not-installed.sh &>>"${_LOG}"
+grep -v base uninstalled.txt > uninstalled-error.txt
+if [[ -f uninstalled-error.txt ]]; then
     echo "Test failed!"
-    cat uninstalled.txt
+    cat uninstalled-error.txt
     _TEST_FAIL=1
 fi
 [[ -n "${_TEST_FAIL}" ]] && exit 1
