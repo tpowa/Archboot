@@ -25,6 +25,6 @@ fi
 echo "${_PACKAGE}" >binary.txt
 #shellcheck disable=SC2086
 for i in $(pacman -Ql ${_PACKAGE} | grep "/usr/bin/..*"$ | cut -d' ' -f2); do
-	command -v "${i}" &>/dev/null || echo "${i}" >>binary.txt
+	command -v "${i}" &>"${_NO_LOG}" || echo "${i}" >>binary.txt
 done
 # vim: set ft=sh ts=4 sw=4 et:
