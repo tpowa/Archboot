@@ -13,6 +13,8 @@ _run ()
     # rdinit= kernel parameter defaults to /init
     # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/init/main.c
     _symlink /init bin/init
+    # add libkmod for udev, else modules are not loaded!
+    _file /usr/lib/libkmod.so
     ### adding needed files from running system
     _map _file /etc/{bash.bash_logout,bash.bashrc,profile,shells}
     # add kmod related config file(s)
