@@ -15,9 +15,9 @@ _usage () {
 [[ -z "${1}" ]] && _usage
 _archboot_check
 # update pacman db first
-pacman -Sy
+pacman --noconfirm -Sy
 if [[ "${1}" == "base" ]]; then
-    pacman -S base
+    pacman --noconfirm -S base
     _PACKAGE="$(pacman -Qi base | grep Depends | cut -d ":" -f2)"
 else
     _PACKAGE="${1}"

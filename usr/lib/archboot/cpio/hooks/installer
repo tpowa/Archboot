@@ -6,7 +6,7 @@ _run ()
 {
     _dir /mnt/install
     _map _binary genfstab arch-chroot pacstrap \
-    archboot-binary-check.sh archboot-not-installed.sh hwdetect
+    archboot-{binary-check.sh,not-installed.sh,testsuite.sh} hwdetect
     _file_rename /usr/bin/archboot-setup.sh /usr/bin/setup
     _file_rename /usr/bin/archboot-launcher.sh /usr/bin/launcher
     _file_rename /usr/bin/archboot-quickinst.sh /usr/bin/quickinst
