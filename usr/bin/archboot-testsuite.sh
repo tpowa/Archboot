@@ -17,7 +17,7 @@ _run_test () {
 _result() {
     if [[ -s ${1} ]]; then
         echo -e "\e[1;94m=> \e[1;91mFAILED\e[m"
-        cat ${1}
+        cat "${1}"
     else
         echo -e "\e[1;94m=> \e[1;92mOK\e[m"
     fi
