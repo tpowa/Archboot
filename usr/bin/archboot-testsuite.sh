@@ -59,12 +59,13 @@ if [[ -f base-binary-error.txt ]]; then
 else
     echo "Test run succesfully."
 fi
+# uninstall base again!
+pacman --noconfirm -Rdd base
 echo "Pacman Package Database Test running..."
 archboot-not-installed.sh &>>"${_LOG}"
-grep -v base uninstalled.txt > uninstalled-error.txt
-if [[ -f uninstalled-error.txt ]]; then
+if [[ -s not-installed.txt ]]; then
     echo "Test failed!"
-    cat uninstalled-error.txt
+    cat not-installed.txt
     _TEST_FAIL=1
 fi
 [[ -n "${_TEST_FAIL}" ]] && exit 1
