@@ -50,18 +50,18 @@ _update_pacman_chroot() {
     chown "${_USER}:${_GROUP}" "${_PACMAN_CHROOT}"{,.sig} || exit 1
     echo "Syncing files to ${_SERVER}:${_PUB}/.${_SERVER_PACMAN}..."
     #shellcheck disable=SC2086
-    su -m "${_USER}" -c bash -c "${_RSYNC} "${_PACMAN_CHROOT}"{,.sig} "${_SERVER}:${_PUB}/.${_SERVER_PACMAN}/" || exit 1 "
+    run0 -u "${_USER}" ${_RSYNC} "${_PACMAN_CHROOT}"{,.sig} "${_SERVER}:${_PUB}/.${_SERVER_PACMAN}/" || exit 1
 }
 
 _server_upload() {
     # copy files to server
     echo "Syncing files to ${_SERVER}:${_PUB}/.${1}/${_ARCH}..."
     #shellcheck disable=SC2086
-    su -m "${_USER}" -c ssh "${_SERVER}" bash -c "[[ -d "${_PUB}/.${1}/${_ARCH}" ]] || mkdir -p "${_PUB}/.${1}/${_ARCH}""
+    run0 -u "${_USER}" ssh "${_SERVER}" "[[ -d "${_PUB}/.${1}/${_ARCH}" ]] || mkdir -p "${_PUB}/.${1}/${_ARCH}""
     #shellcheck disable=SC2086
-    su -m "${_USER}" -c bash -c "${_RSYNC} "${_DIR}" "${_SERVER}":"${_PUB}/.${1}/${_ARCH}/" || exit 1"
+    run0 -u "${_USER}" ${_RSYNC} "${_DIR}" "${_SERVER}":"${_PUB}/.${1}/${_ARCH}/" || exit 1
     # move files on server, create symlink and removing ${_PURGE_DATE} old release
-    su -m "${_USER}" -c ssh "${_SERVER}" bash -c "<<EOF
+    run0 -u "${_USER}" ssh "${_SERVER}" "<<EOF
 echo "Removing old purge date reached ${_PUB}/.${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory..."
 rm -r ${_PUB}/".${1}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>"${_NO_LOG}"
 cd ${_PUB}/".${1}"/"${_ARCH}"
@@ -70,7 +70,7 @@ rm latest
 ln -s "${_DIR}" latest
 EOF"
     # create autoindex HEADER.html
-    su -m "${_USER}" -c ssh "${_SERVER}" bash -c "[[ -e ~/lsws-autoindex.sh ]] && ~/./lsws-autoindex.sh"
+    run0 -u "${_USER}" ssh "${_SERVER}" "[[ -e ~/lsws-autoindex.sh ]] && ~/./lsws-autoindex.sh"
 }
 
 _create_archive() {
