@@ -31,7 +31,7 @@ done
 echo "Base Binary Test..."
 _BASE_BLACKLIST="arpd backup bashbug enosys exch fsck.cramfs fsck.minix gawk-5.3.0 gawkbug gencat getconf iconv iconvconfig lastlog2 ld.so locale lsclocks makedb makepkg-template memusage memusagestat mkfs.bfs mkfs.cramfs mkfs.minix mtrace newgidmap newuidmap pcprofiledump pldd pstree.x11 restore routel run0 setpgid sln sotruss sprof systemd-confext systemd-cryptsetup systemd-delta systemd-repart systemd-run systemd-vmspawn varlinkctl xtrace"
 archboot-binary-check.sh base
-for i in grep '/usr/bin/' binary.txt | sed -e 's#^/usr/bin/##g'; do
+for i in $(grep '/usr/bin/' binary.txt | sed -e 's#^/usr/bin/##g'); do
     if ! echo "${_BASE_BLACKLIST}" | grep -qw "${i}"; then
         echo "Test failed!"
         echo "${i}" >> base-binary.txt
