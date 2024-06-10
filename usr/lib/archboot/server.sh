@@ -50,7 +50,7 @@ _update_pacman_chroot() {
     chown "${_USER}:${_GROUP}" "${_PACMAN_CHROOT}"{,.sig} || exit 1
     echo "Syncing files to ${_SERVER}:${_PUB}/.${_SERVER_PACMAN}..."
     #shellcheck disable=SC2086
-    run0 -u "${_USER}" ${_RSYNC} "${_PACMAN_CHROOT}"{,.sig} "${_SERVER}:${_PUB}/.${_SERVER_PACMAN}/" || exit 1
+    run0 -u "${_USER}" -D "${_ISO_HOME}" ${_RSYNC} "${_PACMAN_CHROOT}"{,.sig} "${_SERVER}:${_PUB}/.${_SERVER_PACMAN}/" || exit 1
 }
 
 _server_upload() {
@@ -59,7 +59,7 @@ _server_upload() {
     #shellcheck disable=SC2086
     run0 -u "${_USER}" ssh "${_SERVER}" "[[ -d "${_PUB}/.${1}/${_ARCH}" ]] || mkdir -p "${_PUB}/.${1}/${_ARCH}""
     #shellcheck disable=SC2086
-    run0 -u "${_USER}" ${_RSYNC} "${_DIR}" "${_SERVER}":"${_PUB}/.${1}/${_ARCH}/" || exit 1
+    run0 -u "${_USER}" -D "${2}" ${_RSYNC} "${_DIR}" "${_SERVER}":"${_PUB}/.${1}/${_ARCH}/" || exit 1
     # move files on server, create symlink and removing ${_PURGE_DATE} old release
     run0 -u "${_USER}" ssh "${_SERVER}" "<<EOF
 echo "Removing old purge date reached ${_PUB}/.${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory..."
@@ -99,7 +99,7 @@ _update_source() {
     echo "Creating ${_ARCH} archboot repository..."
     "archboot-${_ARCH}-create-repository.sh" "${_DIR}" || exit 1
     chown -R "${_USER}:${_GROUP}" "${_DIR}"
-    _server_upload "${_SERVER_SOURCE_DIR}"
+    _server_upload "${_SERVER_SOURCE_DIR}" "${_ISO_HOME_SOURCE}"
 }
 
 _server_release() {
@@ -120,6 +120,6 @@ _server_release() {
     cd ..
     _create_archive
     mv "${_ISO_BUILD_DIR}" "${_DIR}"
-    _server_upload "${_SERVER_IMAGE_DIR}"
+    _server_upload "${_SERVER_IMAGE_DIR}" "${_ISO_HOME_ARCH}"
 }
 # vim: set ft=sh ts=4 sw=4 et:
