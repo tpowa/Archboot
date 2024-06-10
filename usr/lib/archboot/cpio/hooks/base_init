@@ -8,7 +8,8 @@ _run ()
     : > "${_ROOTFS}"/etc/initrd-release
     _map _dir /mnt/{cdrom,ventoy,efi}
     # systemd
-    _map _binary /usr/lib/systemd/systemd{,-battery-check,-executor,-bsod,-journald,-shutdown,-sulogin-shell,-sysctl,-udevd}
+    _map _binary /usr/lib/systemd/systemd{,-battery-check,-executor,-bsod,-journald,\
+-shutdown,-sulogin-shell,-sysctl,sysroot-fstab-check,-udevd}
     _map _file /usr/lib/systemd/{lib*,system-generators/systemd-fstab-generator}
     # only take services from systemd package
     pacman -Sy &>"${_NO_LOG}"
