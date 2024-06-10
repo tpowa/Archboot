@@ -61,14 +61,14 @@ _server_upload() {
     #shellcheck disable=SC2086
     run0 -u "${_USER}" -D "${2}" ${_RSYNC} "${_DIR}" "${_SERVER}":"${_PUB}/.${1}/${_ARCH}/" || exit 1
     # move files on server, create symlink and removing ${_PURGE_DATE} old release
-    run0 -u "${_USER}" ssh "${_SERVER}" "<<EOF
+    run0 -u "${_USER}" ssh "${_SERVER}" <<EOF
 echo "Removing old purge date reached ${_PUB}/.${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory..."
 rm -r ${_PUB}/".${1}"/"${_ARCH}"/"$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m)" 2>"${_NO_LOG}"
 cd ${_PUB}/".${1}"/"${_ARCH}"
 echo "Creating new latest symlink in ${_PUB}/.${1}/${_ARCH}..."
 rm latest
 ln -s "${_DIR}" latest
-EOF"
+EOF
     # create autoindex HEADER.html
     run0 -u "${_USER}" ssh "${_SERVER}" "[[ -e ~/lsws-autoindex.sh ]] && ~/./lsws-autoindex.sh"
 }
