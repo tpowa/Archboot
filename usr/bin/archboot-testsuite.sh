@@ -43,7 +43,7 @@ if dmesg | grep -q error; then
     _TEST_FAIL=1
 fi
 _result dmesg-error.txt
-_run_test "Binary Test /bin"
+_run_test "Binary Linking Test /usr/bin"
 for i in /usr/bin/*; do
     if ldd "${i}" 2>"${_NO_LOG}" | grep -q 'not found'; then
         echo "${i}" >>bin-binary-error.txt
@@ -52,7 +52,7 @@ for i in /usr/bin/*; do
     fi
 done
 _result bin-binary-error.txt
-_run_test "Binary Test /usr/lib/systemd"
+_run_test "Binary Linking Test /usr/lib/systemd"
 for i in /usr/lib/systemd*; do
     if ldd "${i}" 2>"${_NO_LOG}" | grep -q 'not found'; then
         echo "${i}" >>systemd-binary-error.txt
@@ -61,7 +61,7 @@ for i in /usr/lib/systemd*; do
     fi
 done
 _result systemd-binary-error.txt
-_run_test "Lib Test /usr/lib"
+_run_test "Library Linking Test /usr/lib"
 # ignore wrong reported libsystemd-shared by libsystemd-core
 for i in $(find /usr/lib | grep '.so$'); do
     if ldd "${i}" 2>"${_NO_LOG}" | grep -v -E 'tree_sitter|libsystemd-shared' | grep -q 'not found'; then
