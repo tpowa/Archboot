@@ -126,6 +126,8 @@ _initrd_stage() {
 for i in cdrom i8042 usb-storage zram zstd; do
     modprobe -q "${i}"
 done
+# systemd >= 256 mounts /usr ro by default
+mount -o remount,rw /usr
 # take care of builtin drm modules, timeout after 10 seconds to avoid hang on some systems
 udevadm wait --settle /dev/fb0 -t 10
 _SIZE="16"

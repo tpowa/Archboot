@@ -53,6 +53,10 @@ _run ()
 ,pcrphase{,-initrd,-sysinit},repart}; do
         _symlink "/etc/systemd/system/${i}.service" /dev/null
     done
+    # disable systemd mounts
+    for i in sys-kernel-debug sys-kernel-tracing; do
+         _symlink "/etc/systemd/system/sysinit.target.wants/${i}.mount" /dev/null
+    done
     # disable systemd automount:
     _symlink /etc/systemd/system/proc-sys-fs-binfmt_misc.automount /dev/null
     # vconsole terminus font
