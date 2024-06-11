@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
-_MODULE_DIR="/usr/lib/modules/${_RUNNING_ARCH}"
+_APPNAME=${0##*/}
+_MODULE_DIR="/usr/lib/modules/${_RUNNING_KERNEL}"
 _FIRMWARE="/lib/firmware"
 _usage () {
     echo " Check Firmware And Modules Archboot Environment"
