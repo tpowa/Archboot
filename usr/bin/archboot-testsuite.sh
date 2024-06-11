@@ -47,7 +47,7 @@ _run_test "Binary Test /bin"
 for i in /usr/bin/*; do
     if ldd "${i}" 2>"${_NO_LOG}" | grep -q 'not found'; then
         echo "${i}" >>bin-binary-error.txt
-        echo ldd "${i}" | grep 'not found' >>bin-binary-error.txt
+        ldd "${i}" | grep 'not found' >>bin-binary-error.txt
         _TEST_FAIL=1
     fi
 done
@@ -56,7 +56,7 @@ _run_test "Binary Test /usr/lib/systemd"
 for i in /usr/lib/systemd*; do
     if ldd "${i}" 2>"${_NO_LOG}" | grep -q 'not found'; then
         echo "${i}" >>systemd-binary-error.txt
-        echo ldd "${i}" | grep 'not found' >>systemd-binary-error.txt
+        ldd "${i}" | grep 'not found' >>systemd-binary-error.txt
         _TEST_FAIL=1
     fi
 done
@@ -66,7 +66,7 @@ _run_test "Lib Test /usr/lib"
 for i in $(find /usr/lib | grep '.so$'); do
     if ldd "${i}" 2>"${_NO_LOG}" | grep -v -E 'tree_sitter|libsystemd-shared' | grep -q 'not found'; then
         echo "${i}" >>lib-error.txt
-        echo ldd "${i}" | grep 'not found' >>lib-error.txt
+        ldd "${i}" | grep 'not found' >>lib-error.txt
         _TEST_FAIL=1
     fi
 done
