@@ -2,6 +2,7 @@ On the road to 2024.06:
 Environment:
 - removed bridge-utils
 - added archboot-testsuite.sh
+- added systemd 256.x support
 setup:
 - added user management
 - added Swap file support
