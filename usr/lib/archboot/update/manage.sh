@@ -151,7 +151,7 @@ _download_latest_task() {
     for i in ${_SCRIPTS}; do
         [[ -e "${_BIN}/${i}" ]] && ${_DLPROG} -o "${_BIN}/${i}" "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false"
     done
-    _SCRIPTS="binary-check.sh firmware-check.sh not-installed.sh secureboot-keys.sh testsuite.sh mkkeys.sh hwsim.sh"
+    _SCRIPTS="binary-check.sh fw-check.sh not-installed.sh secureboot-keys.sh testsuite.sh mkkeys.sh hwsim.sh"
     for i in ${_SCRIPTS}; do
         [[ -e "${_BIN}/${i}" ]] && ${_DLPROG} -o "${_BIN}/${i}" "${_SOURCE}${_BIN}/archboot-${i}?inline=false"
         [[ -e "${_BIN}/archboot-${i}" ]] && ${_DLPROG} -o "${_BIN}/archboot-${i}" "${_SOURCE}${_BIN}/archboot-${i}?inline=false"

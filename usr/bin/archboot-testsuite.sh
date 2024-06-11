@@ -5,8 +5,8 @@
 _LOG=testsuite.log
 _APPNAME=${0##*/}
 _usage () {
-    echo "Tests for Archboot Environment"
-    echo "------------------------------"
+    echo "Testsuite for Archboot Environment"
+    echo "----------------------------------"
     echo "usage: ${_APPNAME} run"
     exit 0
 }
@@ -76,6 +76,11 @@ for i in $(grep '/usr/bin/' binary.txt | sed -e 's#^/usr/bin/##g'); do
     fi
 done
 _result base-binary-error.txt
+_run_test "Firmware Check"
+if ! archboot-fw-check.sh; then
+    TEST_FAIL=1
+fi
+_result fw-error.txt
 # uninstall base again!
 pacman --noconfirm -Rdd base &>>"${_LOG}"
 _run_test "Pacman Package Database Test"
