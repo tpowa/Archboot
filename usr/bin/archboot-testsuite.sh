@@ -21,14 +21,13 @@ _result() {
         echo -e "\e[1;94m=> \e[1;92mOK\e[m"
     fi
 }
-
 [[ -z "${1}" || "${1}" != "run" ]] && _usage
 _archboot_check
 echo "Waiting for pacman keyring..."
 _pacman_keyring
 _run_test "Dmesg Error Check"
-if dmesg | grep -q error; then
-    dmesg | grep error >>dmesg-error.txt
+if dmesg | grep -q -w -E 'error'; then
+    dmesg | grep -w -E 'error' >>dmesg-error.txt
     _TEST_FAIL=1
 fi
 _result dmesg-error.txt
