@@ -11,7 +11,7 @@ _usage () {
     exit 0
 }
 _run_test () {
-    echo -e "\e[1mChecking ${1} running...\e[m"
+    echo -e "\e[1mTestsuite checking ${1} ...\e[m"
 }
 _result() {
     if [[ -s ${1} ]]; then
@@ -25,7 +25,7 @@ _result() {
 _archboot_check
 echo "Waiting for pacman keyring..."
 _pacman_keyring
-_run_test "CHecking dmesg"
+_run_test "dmesg"
 if dmesg | grep -q -w -E 'error'; then
     dmesg | grep -w -E 'error' >>dmesg-error.txt
     _TEST_FAIL=1
