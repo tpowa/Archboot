@@ -35,6 +35,7 @@ _gpg_check() {
 }
 
 [[ -z "${1}" || "${1}" != "run" ]] && _usage
+_archboot_check
 echo "Waiting for pacman keyring..."
 _gpg_check
 _run_test "Boot Test"
