@@ -11,7 +11,7 @@ _usage () {
     exit 0
 }
 _run_test () {
-    echo -e "\e[1m${1} running...\e[m"
+    echo -e "\e[1m${1} Check running...\e[m"
 }
 _result() {
     if [[ -s ${1} ]]; then
@@ -25,13 +25,13 @@ _result() {
 _archboot_check
 echo "Waiting for pacman keyring..."
 _pacman_keyring
-_run_test "Dmesg Error Check"
+_run_test "Dmesg Error"
 if dmesg | grep -q -w -E 'error'; then
     dmesg | grep -w -E 'error' >>dmesg-error.txt
     _TEST_FAIL=1
 fi
 _result dmesg-error.txt
-_run_test "Binary Linking Test /usr/bin"
+_run_test "Binary Linking /usr/bin"
 for i in /usr/bin/*; do
     if ldd "${i}" 2>"${_NO_LOG}" | grep -q 'not found'; then
         echo "${i}" >>bin-binary-error.txt
@@ -40,7 +40,7 @@ for i in /usr/bin/*; do
     fi
 done
 _result bin-binary-error.txt
-_run_test "Binary Linking Test /usr/lib/systemd"
+_run_test "Binary Linking /usr/lib/systemd"
 for i in /usr/lib/systemd*; do
     if ldd "${i}" 2>"${_NO_LOG}" | grep -q 'not found'; then
         echo "${i}" >>systemd-binary-error.txt
@@ -49,7 +49,7 @@ for i in /usr/lib/systemd*; do
     fi
 done
 _result systemd-binary-error.txt
-_run_test "Library Linking Test /usr/lib"
+_run_test "Library Linking /usr/lib"
 # ignore wrong reported libsystemd-shared by libsystemd-core
 for i in $(find /usr/lib | grep '.so$'); do
     if ldd "${i}" 2>"${_NO_LOG}" | grep -v -E 'tree_sitter|libsystemd-shared' | grep -q 'not found'; then
@@ -59,7 +59,7 @@ for i in $(find /usr/lib | grep '.so$'); do
     fi
 done
 _result lib-error.txt
-_run_test "Base Binary Test"
+_run_test "Base Binary"
 # not needed binaries, that are tolerated
 _BASE_BLACKLIST="arpd backup bashbug enosys exch fsck.cramfs fsck.minix gawk-5.3.0 \
 gawkbug gencat getconf iconv iconvconfig importctl lastlog2 ld.so locale lsclocks makedb \
@@ -76,14 +76,14 @@ for i in $(grep '/usr/bin/' binary.txt | sed -e 's#^/usr/bin/##g'); do
     fi
 done
 _result base-binary-error.txt
-_run_test "Firmware Check"
+_run_test "Firmware"
 if ! archboot-fw-check.sh run; then
     TEST_FAIL=1
 fi
 _result fw-error.txt
 # uninstall base again!
 pacman --noconfirm -Rdd base &>>"${_LOG}"
-_run_test "Pacman Package Database Test"
+_run_test "Pacman Package Database"
 archboot-not-installed.sh &>>"${_LOG}"
 _result not-installed.txt
 [[ -n "${_TEST_FAIL}" ]] && exit 1
