@@ -20,9 +20,9 @@ usr/share/{bash-completion,dbus-1,factory,hwdata,i18n/locales,makepkg,nano,pacma
         _map _file /etc/locale.gen /usr/share/locale/locale.alias
         # only support UTF-8
         _file /usr/share/i18n/charmaps/UTF-8.gz
-        tar -C / --exclude=var/lib/pacman/local/{base-*-[0-9]*,binutils-*-[0-9]*,\
+        tar -C / --exclude=var/lib/pacman/local/{amd-ucode-*-[0-9]*,base-*-[0-9]*,binutils-*-[0-9]*,\
 cdrtools-*-[0-9]*,db5.3-*-[0-9]*,db-*-[0-9]*,duktape-*-[0-9]*,edk2-shell-*-[0-9]*,fuse-common-*-[0-9]*,gc-*-[0-9]*,\
-gdbm-*-[0-9]*,gettext-*-[0-9]*,grml-zsh-config-*-[0-9]*,groff-*-[0-9]*,grub-*-[0-9]*,jansson-*-[0-9]*,\
+gdbm-*-[0-9]*,gettext-*-[0-9]*,grml-zsh-config-*-[0-9]*,groff-*-[0-9]*,grub-*-[0-9]*,intel-ucode-*-[0-9]*,jansson-*-[0-9]*,\
 libbsd-*-[0-9]*,libburn-*-[0-9]*,libev-*-[0-9]*,libisoburn-*-[0-9]*,libisofs-*-[0-9]*,\
 libksba-*-[0-9]*,libmd-*-[0-9]*,libnfnetlink-*-[0-9]*,libnetfilter_conntrack-*-[0-9]*,\
 libnftnl-*-[0-9]*,libpcap-*-[0-9]*,libpipeline-*-[0-9]*,libsasl-*-[0-9]*,libsysprof-capture-*-[0-9]*,\
