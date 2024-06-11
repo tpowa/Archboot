@@ -43,15 +43,34 @@ if dmesg | grep -q error; then
     _TEST_FAIL=1
 fi
 _result dmesg-error.txt
-_run_test "Binary Test"
+_run_test "Binary Test /bin"
 for i in /usr/bin/*; do
     if ldd "${i}" 2>"${_NO_LOG}" | grep -q 'not found'; then
-        echo "${i}" >>binary-error.txt
-        echo ldd "${i}" | grep 'not found' >>binary-error.txt
+        echo "${i}" >>bin-binary-error.txt
+        echo ldd "${i}" | grep 'not found' >>bin-binary-error.txt
         _TEST_FAIL=1
     fi
 done
-_result binary-error.txt
+_result bin-binary-error.txt
+_run_test "Binary Test /usr/lib/systemd"
+for i in /usr/lib/systemd*; do
+    if ldd "${i}" 2>"${_NO_LOG}" | grep -q 'not found'; then
+        echo "${i}" >>systemd-binary-error.txt
+        echo ldd "${i}" | grep 'not found' >>systemd-binary-error.txt
+        _TEST_FAIL=1
+    fi
+done
+_result systemd-binary-error.txt
+_run_test "Lib Test /usr/lib"
+# ignore wrong reported libsystemd-shared by libsystemd-core
+for i in $(find /usr/lib | grep '.so$'); do
+    if ldd "${i}" 2>"${_NO_LOG}" | grep -v tree_sitter -v libsystemd-shared | grep -q 'not found'; then
+        echo "${i}" >>lib-error.txt
+        echo ldd "${i}" | grep 'not found' >>lib-error.txt
+        _TEST_FAIL=1
+    fi
+done
+_result lib-error.txt
 _run_test "Base Binary Test"
 # not needed binaries, that are tolerated
 _BASE_BLACKLIST="arpd backup bashbug enosys exch fsck.cramfs fsck.minix gawk-5.3.0 \
