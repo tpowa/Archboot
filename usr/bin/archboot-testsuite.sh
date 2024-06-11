@@ -64,7 +64,7 @@ _result systemd-binary-error.txt
 _run_test "Lib Test /usr/lib"
 # ignore wrong reported libsystemd-shared by libsystemd-core
 for i in $(find /usr/lib | grep '.so$'); do
-    if ldd "${i}" 2>"${_NO_LOG}" | grep -v 'tree_sitter|libsystemd-shared' | grep -q 'not found'; then
+    if ldd "${i}" 2>"${_NO_LOG}" | grep -v -E 'tree_sitter|libsystemd-shared' | grep -q 'not found'; then
         echo "${i}" >>lib-error.txt
         echo ldd "${i}" | grep 'not found' >>lib-error.txt
         _TEST_FAIL=1
