@@ -19,4 +19,4 @@ find "${_FIRMWARE}" | grep '.zst$' >firmware.txt
 while read -r i; do
     sed -i -e "s#${i}##g" firmware.txt
 done < modules.txt
-grep -v -E 'amd|atmel|ath[0-9]|brcm|htc_*|i915|imx|intel|iwlwifi|libertas|mediatek|mrvl|mwl.*|nvidia|radeon|rsi|rt[0-9][0-9]*|rtl|rtw8[8-9]|slicoss|ti-connect|ti_*|vpu_*|/.zst' firmware.txt > error-firmware.txt
+grep -v -E 'amd|amms|atmel|ath[0-9]|board-2|brcm|cs42l43|htc_*|i915|imx|intel|iwlwifi|libertas|m3\.bin|mediatek|mrvl|mwl.*|mt7650|nvidia|radeon|regdb|rsi|rt[0-9][0-9]*|rtl|rtw8[8-9]|slicoss|ti-connect|ti_*|vpu_*|/.zst' firmware.txt > error-firmware.txt
