@@ -1,4 +1,6 @@
 On the road to 2024.06:
+Early Userspace:
+- always load i8042 and atkbd module
 Environment:
 - removed bridge-utils
 - added archboot-testsuite.sh
