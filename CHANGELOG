@@ -6,6 +6,7 @@ Environment:
 - added archboot-testsuite.sh
 - added systemd 256.x support
 - cleaned up firmware files
+- added archboot-fw-check.sh
 setup:
 - added user management
 - added Swap file support
