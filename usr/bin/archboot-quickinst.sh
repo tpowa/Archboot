@@ -39,15 +39,7 @@ _prepare_pacman() {
     if [[ ! -d "${_DESTDIR}${_PACMAN_LIB}" ]]; then
         mkdir -p "${_DESTDIR}${_PACMAN_LIB}"
     fi
-    # pacman-key process itself
-    while pgrep -x pacman-key &>"${_NO_LOG}"; do
-        sleep 1
-    done
-    # gpg finished in background
-    while pgrep -x gpg &>"${_NO_LOG}"; do
-        sleep 1
-    done
-    [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
+    _pacman_keyring
     ${_PACMAN} -Sy
     _KEYRING="archlinux-keyring"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"

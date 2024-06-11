@@ -309,4 +309,17 @@ _cachedir_check() {
     fi
 }
 
+_pacman_keyring() {
+    # pacman-key process itself
+    while pgrep -x pacman-key &>"${_NO_LOG}"; do
+        sleep 1
+    done
+    # gpg finished in background
+    while pgrep -x gpg &>"${_NO_LOG}"; do
+        sleep 1
+    done
+    if [[ -e /etc/systemd/system/pacman-init.service ]]; then
+        systemctl stop pacman-init.service
+    fi
+}
 # vim: set ft=sh ts=4 sw=4 et:

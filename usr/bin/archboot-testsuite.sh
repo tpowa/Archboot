@@ -22,21 +22,10 @@ _result() {
     fi
 }
 
-_gpg_check() {
-    # pacman-key process itself
-    while pgrep -x pacman-key &>"${_NO_LOG}"; do
-        sleep 1
-    done
-    # gpg finished in background
-    while pgrep -x gpg &>"${_NO_LOG}"; do
-        sleep 1
-    done
-}
-
 [[ -z "${1}" || "${1}" != "run" ]] && _usage
 _archboot_check
 echo "Waiting for pacman keyring..."
-_gpg_check
+_pacman_keyring
 _run_test "Boot Test"
 if dmesg | grep -q error; then
     dmesg | grep error >>dmesg-error.txt

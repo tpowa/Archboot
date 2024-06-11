@@ -74,15 +74,7 @@ _enable_testing() {
 }
 
 _task_pacman_keyring_install() {
-    # pacman-key process itself
-    while pgrep -x pacman-key &>"${_NO_LOG}"; do
-        sleep 1
-    done
-    # gpg finished in background
-    while pgrep -x gpg &>"${_NO_LOG}"; do
-        sleep 1
-    done
-    [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl stop pacman-init.service
+    _pacman_keyring
     _KEYRING="archlinux-keyring"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086

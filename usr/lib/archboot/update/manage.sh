@@ -101,17 +101,7 @@ _full_system_check() {
 }
 
 _gpg_check() {
-    # pacman-key process itself
-    while pgrep -x pacman-key &>"${_NO_LOG}"; do
-        sleep 1
-    done
-    # gpg finished in background
-    while pgrep -x gpg &>"${_NO_LOG}"; do
-        sleep 1
-    done
-    if [[ -e /etc/systemd/system/pacman-init.service ]]; then
-        systemctl stop pacman-init.service
-    fi
+    _pacman_keyring
     rm /.archboot
 }
 
