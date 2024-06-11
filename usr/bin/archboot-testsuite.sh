@@ -77,7 +77,7 @@ for i in $(grep '/usr/bin/' binary.txt | sed -e 's#^/usr/bin/##g'); do
 done
 _result base-binary-error.txt
 _run_test "Firmware Check"
-if ! archboot-fw-check.sh; then
+if ! archboot-fw-check.sh run; then
     TEST_FAIL=1
 fi
 _result fw-error.txt
