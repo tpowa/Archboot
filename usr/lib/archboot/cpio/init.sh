@@ -123,7 +123,7 @@ _initrd_stage() {
     _progress "100" "The boot medium can be safely removed now."
 }
 # not all devices trigger autoload!
-for i in cdrom usb-storage zram zstd; do
+for i in cdrom i8042 usb-storage zram zstd; do
     modprobe -q "${i}"
 done
 # take care of builtin drm modules, timeout after 10 seconds to avoid hang on some systems
