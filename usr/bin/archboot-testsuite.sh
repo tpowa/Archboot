@@ -42,10 +42,11 @@ _result binary-error.txt
 _run_test "Base Binary Test"
 # not needed binaries, that are tolerated
 _BASE_BLACKLIST="arpd backup bashbug enosys exch fsck.cramfs fsck.minix gawk-5.3.0 \
-gawkbug gencat getconf iconv iconvconfig lastlog2 ld.so locale lsclocks makedb makepkg-template \
-memusage memusagestat mkfs.bfs mkfs.cramfs mkfs.minix mtrace newgidmap newuidmap pcprofiledump \
-pldd pstree.x11 restore routel run0 setpgid sln sotruss sprof systemd-confext systemd-cryptsetup \
-systemd-delta systemd-repart systemd-run systemd-vmspawn varlinkctl xtrace"
+gawkbug gencat getconf iconv iconvconfig importctl lastlog2 ld.so locale lsclocks makedb \
+makepkg-template memusage memusagestat mkfs.bfs mkfs.cramfs mkfs.minix mtrace newgidmap \
+newuidmap pcprofiledump pldd pstree.x11 restore routel run0 setpgid sln sotruss sprof \
+systemd-confext systemd-cryptsetup systemd-delta systemd-home-fallback-shell systemd-repart \
+systemd-run systemd-vmspawn systemd-vpick varlinkctl xtrace"
 archboot-binary-check.sh base &>>"${_LOG}"
 #shellcheck disable=SC2013
 for i in $(grep '/usr/bin/' binary.txt | sed -e 's#^/usr/bin/##g'); do
