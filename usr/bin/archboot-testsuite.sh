@@ -83,7 +83,7 @@ fi
 _result fw-error.txt
 # uninstall base again!
 pacman --noconfirm -Rdd base &>>"${_LOG}"
-_run_test "pacman database"
+_run_test "pacman database ... this takes a while"
 archboot-not-installed.sh &>>"${_LOG}"
 _result not-installed.txt
 [[ -n "${_TEST_FAIL}" ]] && exit 1
