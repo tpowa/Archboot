@@ -26,7 +26,7 @@ _result() {
 _archboot_check
 echo "Waiting for pacman keyring..."
 _pacman_keyring
-_run_test "Boot Test"
+_run_test "Dmesg Error Check"
 if dmesg | grep -q error; then
     dmesg | grep error >>dmesg-error.txt
     _TEST_FAIL=1
