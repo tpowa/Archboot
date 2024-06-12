@@ -5,9 +5,11 @@
 _LOG=testsuite.log
 _APPNAME=${0##*/}
 _usage () {
-    echo "Testsuite for Archboot Environment"
-    echo "----------------------------------"
-    echo "usage: ${_APPNAME} run"
+    echo -e "\e[1mTestsuite for Archboot Environment\e[m"
+    echo -e "\e[1m---------------------------------------------\e[m"
+    echo "Run automatic tests to detect errors/changes."
+    echo ""
+    echo -e "usage: \e[1m${_APPNAME} run\e[m"
     exit 0
 }
 _run_test () {

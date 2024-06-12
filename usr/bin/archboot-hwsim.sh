@@ -20,6 +20,9 @@ _usage()
     exit 0
 }
 [[ -z "${1}" ]] && _usage
+_archboot_check
+echo "Waiting for pacman keyring..."
+_pacman_keyring
 echo "Installing kernel..."
 pacman -Sydd --noconfirm --noscriptlet linux &>"${_LOG}"
 depmod -a
