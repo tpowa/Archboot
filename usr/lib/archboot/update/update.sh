@@ -60,7 +60,7 @@ usage () {
         fi
     fi
     if ! [[ -e "${_LOCAL_DB}" ]] || [[ -e "${_LOCAL_DB}" && ! -e "/usr/bin/setup" ]]; then
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 1970000 ]]; then
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt 2270000 ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
                 echo -e " \e[1m-latest\e[m          Launch latest archboot environment (using kexec)."
             fi

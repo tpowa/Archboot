@@ -92,7 +92,7 @@ _run_latest_install() {
 _run_update_installer() {
     cd /
     if [[ "${TTY}" == "tty1" ]]; then
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 ]]; then
+        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2971000 ]]; then
             _run_latest
         else
             # local image
@@ -149,16 +149,16 @@ if [[ -e /usr/bin/setup ]]; then
     if ! [[ -e /.launcher ]]; then
         launcher
     fi
-# latest image, fail if less than 2GB RAM available
-elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 1970000 ]]; then
+# latest image, fail if less than 2.3GB RAM available
+elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2270000 ]]; then
     _welcome
-    _memory_error "2.0GB"
+    _memory_error "2.3GB"
     _enter_shell
-# local image, fail if less than 2.6GB  RAM available
-elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2571000 &&\
+# local image, fail if less than 3.0GB  RAM available
+elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2971000 &&\
 -e "${_LOCAL_DB}" ]]; then
     _welcome
-    _memory_error "2.6GB"
+    _memory_error "2.9GB"
     _enter_shell
 else
     _welcome
