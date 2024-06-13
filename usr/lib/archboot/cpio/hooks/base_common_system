@@ -11,7 +11,7 @@ _run ()
 rpcbind*,sysinit.target.wants/lvm2*},ukify},sysusers.d/rpcbind*,tmpfiles.d/rpcbind*} \
 --hard-dereference -cpf - \
 etc/{bash_completion.d,ca-certificates/extracted,default,pam.d,pinentry,profile.d,security,skel,ssl/certs,sysctl.d,systemd,tpm2-tss,xdg} \
-usr/lib/{coreutils,cryptsetup,gconv,modules-load.d,p11-kit,pam.d,pkcs11,security,sysctl.d,systemd,sysusers.d,tmpfiles.d,udev} \
+usr/lib/{coreutils,cryptsetup,gconv,modules-load.d,p11-kit,pam.d,pkcs11,polkit-1,security,sysctl.d,systemd,sysusers.d,tmpfiles.d,udev} \
 usr/share/{bash-completion,dbus-1,factory,hwdata,i18n/locales,makepkg,nano,pacman/keyrings,polkit-1,readline,systemd,terminfo} \
 | tar -C "${_ROOTFS}" -xpf -
     # only run on archboot container
@@ -22,7 +22,7 @@ usr/share/{bash-completion,dbus-1,factory,hwdata,i18n/locales,makepkg,nano,pacma
         _file /usr/share/i18n/charmaps/UTF-8.gz
         tar -C / --exclude=var/lib/pacman/local/{amd-ucode-*-[0-9]*,base-*-[0-9]*,binutils-*-[0-9]*,\
 cdrtools-*-[0-9]*,db5.3-*-[0-9]*,db-*-[0-9]*,duktape-*-[0-9]*,edk2-shell-*-[0-9]*,fuse-common-*-[0-9]*,gc-*-[0-9]*,\
-gdbm-*-[0-9]*,gettext-*-[0-9]*,grml-zsh-config-*-[0-9]*,groff-*-[0-9]*,grub-*-[0-9]*,intel-ucode-*-[0-9]*,jansson-*-[0-9]*,\
+gettext-*-[0-9]*,grml-zsh-config-*-[0-9]*,groff-*-[0-9]*,grub-*-[0-9]*,intel-ucode-*-[0-9]*,jansson-*-[0-9]*,\
 libbsd-*-[0-9]*,libburn-*-[0-9]*,libev-*-[0-9]*,libisoburn-*-[0-9]*,libisofs-*-[0-9]*,\
 libksba-*-[0-9]*,libmd-*-[0-9]*,libnfnetlink-*-[0-9]*,libnetfilter_conntrack-*-[0-9]*,\
 libnftnl-*-[0-9]*,libpcap-*-[0-9]*,libpipeline-*-[0-9]*,libsysprof-capture-*-[0-9]*,\
