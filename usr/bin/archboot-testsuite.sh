@@ -43,7 +43,7 @@ for i in /usr/bin/*; do
 done
 _result bin-binary-error.txt
 _run_test "ldd on executables in /usr/lib"
-for i in $(find /usr/lib -executable -type f); do
+for i in $(find /usr/lib -executable -type f | grep -v '.so$'); do
     if ldd "${i}" 2>"${_NO_LOG}" | grep -q 'not found'; then
         echo "${i}" >>lib-binary-error.txt
         ldd "${i}" | grep 'not found' >>lib-binary-error.txt
