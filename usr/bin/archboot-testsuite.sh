@@ -85,8 +85,8 @@ fi
 _result fw-error.txt
 # uninstall base again!
 pacman --noconfirm -Rdd base gettext &>>"${_LOG}"
-echo -e "Starting pacman database check in \e[1m5\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
-read -t 5
+echo -e "Starting pacman database check in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
+read -t 10
 _run_test "pacman database ... this takes a while"
 archboot-not-installed.sh &>>"${_LOG}"
 _result not-installed.txt
