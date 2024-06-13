@@ -27,12 +27,12 @@ _result() {
 _archboot_check
 echo "Waiting for pacman keyring..."
 _pacman_keyring
-_run_test "dmesg"
-if dmesg | grep -q -w -E 'error'; then
-    dmesg | grep -w -E 'error' >>dmesg-error.txt
+_run_test "journal"
+if ! journalctl -p3 -xb | grep -q -w -E '-- No Entries --'; then
+    journalctl -p3 -xb >>journal-error.txt
     _TEST_FAIL=1
 fi
-_result dmesg-error.txt
+_result journal-error.txt
 _run_test "ldd on /usr/bin"
 for i in /usr/bin/*; do
     if ldd "${i}" 2>"${_NO_LOG}" | grep -q 'not found'; then
