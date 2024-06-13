@@ -84,7 +84,7 @@ if ! archboot-fw-check.sh run; then
 fi
 _result fw-error.txt
 # uninstall base again!
-pacman --noconfirm -Rdd base &>>"${_LOG}"
+pacman --noconfirm -Rdd base gettext &>>"${_LOG}"
 echo "Starting pacman database check in 5 seconds... CTRL-C to stop now."
 read -t 5
 _run_test "pacman database ... this takes a while"
