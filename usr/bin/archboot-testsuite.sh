@@ -28,7 +28,7 @@ _archboot_check
 echo "Waiting for pacman keyring..."
 _pacman_keyring
 _run_test "journal"
-if ! journalctl -p3 -xb | grep -q -w -E '-- No Entries --'; then
+if ! journalctl -p3 -xb | grep -q -w 'No Entries'; then
     journalctl -p3 -xb >>journal-error.txt
     _TEST_FAIL=1
 fi
