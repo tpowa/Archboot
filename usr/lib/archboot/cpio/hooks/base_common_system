@@ -57,7 +57,7 @@ id128,sysext} tar tee testpkg top touch trust tty unix_{chkpwd,update} /usr/lib/
         _file_rename "/usr/share/archboot/patches/pacman-key-aarch64" "/usr/bin/pacman-key"
     fi
     # add libsasl
-    map _full_dir /usr/lib/{sasl2,girepository-1.0}
+    _map _full_dir /usr/lib/{sasl2,girepository-1.0}
     # add duktape, needed by polkit
     _map _file /usr/lib/libduktape*
     _dir /etc/polkit-1/rules.d
