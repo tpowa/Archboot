@@ -42,15 +42,15 @@ for i in /usr/bin/*; do
     fi
 done
 _result bin-binary-error.txt
-_run_test "ldd on /usr/lib/systemd"
-for i in /usr/lib/systemd*; do
+_run_test "ldd on executables in /usr/lib"
+for i in find /usr/lib -executable -type f; do
     if ldd "${i}" 2>"${_NO_LOG}" | grep -q 'not found'; then
-        echo "${i}" >>systemd-binary-error.txt
-        ldd "${i}" | grep 'not found' >>systemd-binary-error.txt
+        echo "${i}" >>lib-binary-error.txt
+        ldd "${i}" | grep 'not found' >>lib-binary-error.txt
         _TEST_FAIL=1
     fi
 done
-_result systemd-binary-error.txt
+_result lib-binary-error.txt
 _run_test "ldd on /usr/lib"
 # ignore wrong reported libsystemd-shared by libsystemd-core
 for i in $(find /usr/lib | grep '.so$'); do
