@@ -21,7 +21,7 @@ usr/share/{bash-completion,dbus-1,factory,hwdata,i18n/locales,makepkg,nano,pacma
         # only support UTF-8
         _file /usr/share/i18n/charmaps/UTF-8.gz
         tar -C / --exclude=var/lib/pacman/local/{amd-ucode-*-[0-9]*,base-*-[0-9]*,binutils-*-[0-9]*,\
-cdrtools-*-[0-9]*,db5.3-*-[0-9]*,db-*-[0-9]*,duktape-*-[0-9]*,edk2-shell-*-[0-9]*,fuse-common-*-[0-9]*,gc-*-[0-9]*,\
+cdrtools-*-[0-9]*,db5.3-*-[0-9]*,db-*-[0-9]*,edk2-shell-*-[0-9]*,fuse-common-*-[0-9]*,gc-*-[0-9]*,\
 gettext-*-[0-9]*,grml-zsh-config-*-[0-9]*,groff-*-[0-9]*,grub-*-[0-9]*,intel-ucode-*-[0-9]*,jansson-*-[0-9]*,\
 libbsd-*-[0-9]*,libburn-*-[0-9]*,libev-*-[0-9]*,libisoburn-*-[0-9]*,libisofs-*-[0-9]*,\
 libksba-*-[0-9]*,libmd-*-[0-9]*,libnfnetlink-*-[0-9]*,libnetfilter_conntrack-*-[0-9]*,\
@@ -58,6 +58,8 @@ id128,sysext} tar tee testpkg top touch trust tty unix_{chkpwd,update} /usr/lib/
     fi
     # add libsasl
     _full_dir /usr/lib/sasl2
+    # add duktape, needed by polkit
+    _map _file /usr/lib/libduktape*
     # add nano
     _file_rename /etc/nanorc /etc/nanorc
     # add syntax highlighting
@@ -136,7 +138,7 @@ linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz} \
     _symlink "/etc/ssl/certs/ca-certificates.crt" "../../ca-certificates/extracted/tls-ca-bundle.pem"
     _map _file /usr/share/{ca-certificates/trust-source/mozilla.trust.p11-kit,p11-kit/modules/p11-kit-trust.module}
     # fix licenses
-    _map _file /usr/share/licenses/{shadow/COPYING,iana-etc/LICENSE,dbus/COPYING,p11-kit/COPYING}
+    _map _file /usr/share/licenses/{duktape/LICENSE.txt,shadow/COPYING,iana-etc/LICENSE,dbus/COPYING,p11-kit/COPYING}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
