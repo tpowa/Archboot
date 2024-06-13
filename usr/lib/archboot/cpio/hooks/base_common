@@ -7,9 +7,9 @@ _run ()
     # add basic apps
     _map _binary bash blkid bsdcpio cat cp cut dialog echo env find grep \
                  gzip halt head init journalctl kmod ln loadkeys logger ls{,blk,mod} \
-                 mkdir mkfs.btrfs modprobe less mount mountpoint mv \
-                 poweroff realpath reboot rm sed setfont sh shutdown sleep sulogin \
-                 systemctl systemd-tmpfiles udevadm umount uname
+                 mkdir mkfs.btrfs modprobe less mount mountpoint mv poweroff \
+                 realpath reboot rm sed setfont sh shutdown sleep sulogin systemctl \
+                 systemd-tmpfiles udevadm umount uname
     # rdinit= kernel parameter defaults to /init
     # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/init/main.c
     _symlink /init bin/init
