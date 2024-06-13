@@ -65,7 +65,7 @@ _clean_container() {
         echo "Cleaning container, delete not needed files from ${1}..."
         rm -r "${1}"/usr/include
         rm -r "${1}"/usr/share/{aclocal,applications,audit-rules,awk,common-lisp,emacs,et,fish,gettext,gettext-[0-9]*,glib-[0-9]*,gnupg,gtk-doc,iana-etc,icons,icu,keyutils,libalpm,libgpg-error,makepkg-template,misc,pixmaps,pkgconfig,screen,smartmontools,ss,tabset,vala,xml,man,doc,info,xtables}
-        rm -r "${1}"/usr/lib/{audit,awk,binfmt.d,cmake,dracut,e2fsprogs,environment.d,gawk,getconf,gettext,girepository-[0-9]*,glib-[0-9]*,gnupg,gssproxy,icu,krb5,ldscripts,libnl,pkgconfig,sasl2,siconv,tar,xfsprogs,xtables}
+        rm -r "${1}"/usr/lib/{audit,awk,binfmt.d,cmake,dracut,e2fsprogs,environment.d,gawk,getconf,gettext,glib-[0-9]*,gnupg,gssproxy,icu,krb5,ldscripts,libnl,pkgconfig,siconv,tar,xfsprogs,xtables}
         # locale cleaning
         find "${1}"/usr/share/locale/ -mindepth 2 ! -path '*/be/*' ! -path '*/bg/*' \
              ! -path '*/cs/*' ! -path '*/da/*' ! -path '*/de/*' ! -path '*/en/*' \
