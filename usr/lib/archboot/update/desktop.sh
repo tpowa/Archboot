@@ -104,7 +104,7 @@ _prepare_graphic() {
     systemd-sysusers >"${_LOG}" 2>&1
     systemd-tmpfiles --create >"${_LOG}" 2>&1
     # fixing dbus requirements
-    for i in dbus dbus-org.freedesktop.login1.service
+    for i in dbus dbus-org.freedesktop.login1.service; do
         systemctl reload ${i}
         sleep 1
     done
