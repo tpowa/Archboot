@@ -22,10 +22,8 @@ _MENU_TITLE=" Logging to ${_VC} | ${_LOG} "
 
 _graphic_options() {
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-        echo -e " \e[1m-gnome\e[m           Launch Gnome desktop with VNC sharing enabled."
-        echo -e " \e[1m-gnome-wayland\e[m   Launch Gnome desktop with Wayland backend."
-        echo -e " \e[1m-plasma\e[m          Launch KDE Plasma desktop with VNC sharing enabled."
-        echo -e " \e[1m-plasma-wayland\e[m  Launch KDE Plasma desktop with Wayland backend."
+        echo -e " \e[1m-gnome\e[m   Launch Gnome desktop with Wayland backend."
+        echo -e " \e[1m-plasma\e[m  Launch KDE Plasma desktop with Wayland backend."
     fi
 }
 

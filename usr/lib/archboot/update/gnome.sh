@@ -33,31 +33,16 @@ _prepare_gnome() {
     fi
 }
 
-_install_gnome_wayland() {
+_install_gnome() {
     _PACKAGES="${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_GNOME_PACKAGES}"
     _prepare_gnome
 }
 
-_install_gnome() {
-    _PACKAGES="${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_GNOME_PACKAGES}"
-    _prepare_gnome
-}
-
-_start_gnome_wayland() {
+_start_gnome() {
     _progress "100" "Launching GNOME Wayland now, logging is done on ${_LOG}..."
     sleep 2
     echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session gnome-session >${_LOG} 2>&1" > /usr/bin/gnome-wayland
     chmod 755 /usr/bin/gnome-wayland
     gnome-wayland
-}
-
-_start_gnome() {
-    _progress "100" "Launching GNOME now, logging is done on ${_LOG}..."
-    sleep 2
-    echo "export XDG_SESSION_TYPE=x11" > /root/.xinitrc
-    #shellcheck disable=SC2129
-    echo "export GDK_BACKEND=x11" >> /root/.xinitrc
-    echo "exec dbus-launch gnome-session" >> /root/.xinitrc
-    startx >"${_LOG}" 2>&1
 }
 # vim: set ft=sh ts=4 sw=4 et:

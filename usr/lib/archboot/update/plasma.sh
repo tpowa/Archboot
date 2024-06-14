@@ -67,29 +67,17 @@ _prepare_plasma() {
     fi
 }
 
-_install_plasma_wayland() {
+_install_plasma() {
     _PACKAGES="${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_PLASMA_PACKAGES}"
     _prepare_plasma
 }
 
-_install_plasma() {
-    _PACKAGES="${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_PLASMA_PACKAGES}"
-    _prepare_plasma
-}
 
-_start_plasma_wayland() {
+_start_plasma() {
     _progress "100" "Launching Plasma/KDE Wayland now, logging is done on ${_LOG}..."
     sleep 2
     echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session startplasma-wayland >${_LOG} 2>&1" > /usr/bin/plasma-wayland
     chmod 755 /usr/bin/plasma-wayland
     plasma-wayland
-}
-
-_start_plasma() {
-    _progress "100" "Launching Plasma/KDE now, logging is done on ${_LOG}..."
-    sleep 2
-    echo "export DESKTOP_SESSION=plasma" > /root/.xinitrc
-    echo "exec startplasma-x11" >> /root/.xinitrc
-    startx >"${_LOG}" 2>&1
 }
 # vim: set ft=sh ts=4 sw=4 et:

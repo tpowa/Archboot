@@ -25,21 +25,11 @@ _desktop () {
     _EXIT=$(cat "${_ANSWER}")
     source /etc/locale.conf
     if [[ "${_EXIT}" == "GNOME" ]]; then
-        if _dialog --defaultno --yesno "Gnome Desktop:\nDo you want to use the Wayland Backend?" 6 45; then
-            clear
-            update -gnome-wayland
-        else
             clear
             update -gnome
-        fi
     elif [[ "${_EXIT}" == "PLASMA" ]]; then
-        if _dialog --defaultno --yesno "KDE/Plasma Desktop:\nDo you want to use the Wayland Backend?" 6 45; then
-            clear
-            update -plasma-wayland
-        else
             clear
             update -plasma
-        fi
     elif [[ "${_EXIT}" == "SWAY" ]]; then
         clear
         update -sway
