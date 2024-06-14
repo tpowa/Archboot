@@ -78,6 +78,8 @@ _localize_task() {
     echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
     echo FONT="${_FONT}" >> /etc/vconsole.conf
     systemctl restart systemd-vconsole-setup
+    # set running VC too
+    export LANG="${_LOCALE}.UTF-8"
     rm /.archboot
 }
 
