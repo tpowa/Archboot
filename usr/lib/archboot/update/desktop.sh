@@ -3,7 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 _cleanup_install() {
-    rm -rf /usr/share/{man,help,gir-[0-9]*,info,doc,gtk-doc,ibus,perl[0-9]*}
+    rm -rf /usr/share/{man,help,info,doc,gtk-doc}
     rm -rf /usr/include
     rm -rf /usr/lib/libgo.*
 }
@@ -104,8 +104,14 @@ _prepare_graphic() {
     systemd-sysusers >"${_LOG}" 2>&1
     systemd-tmpfiles --create >"${_LOG}" 2>&1
     # fixing dbus requirements
-    systemctl reload dbus
-    systemctl reload dbus-org.freedesktop.login1.service
+    for i in dbus dbus-org.freedesktop.login1.service
+        systemctl reload ${i}
+        sleep 1
+    done
+    for i in avahi-daemon polkit; do
+        systemctl restart "${i}"
+        sleep 1
+    done
 }
 
 _custom_wayland_xorg() {

@@ -45,7 +45,7 @@ _start_gnome() {
     chmod 755 /usr/bin/gnome-wayland
     systemctl restart dbus
     systemctl restart polkit
-    systemctl restart avahi
+    systemctl restart avahi-daemon
     systemctl restart ibus
     systemctl restart usbguard
     gnome-wayland
