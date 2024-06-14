@@ -76,7 +76,7 @@ _install_plasma() {
 _start_plasma() {
     _progress "100" "Launching Plasma/KDE Wayland now, logging is done on ${_LOG}..."
     sleep 2
-    echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session startplasma-wayland >${_LOG} 2>&1" > /usr/bin/plasma-wayland
+    echo "/usr/lib/plasma-dbus-run-session-if-needed /usr/bin/startplasma-wayland >${_LOG} 2>&1" > /usr/bin/plasma-wayland
     chmod 755 /usr/bin/plasma-wayland
     plasma-wayland
 }
