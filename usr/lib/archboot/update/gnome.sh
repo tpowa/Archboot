@@ -43,6 +43,11 @@ _start_gnome() {
     sleep 2
     echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session gnome-session >${_LOG} 2>&1" > /usr/bin/gnome-wayland
     chmod 755 /usr/bin/gnome-wayland
+    systemctl restart dbus
+    systemctl restart polkit
+    systemctl restart avahi
+    systemctl restart ibus
+    systemctl restart usbguard
     gnome-wayland
 }
 # vim: set ft=sh ts=4 sw=4 et:

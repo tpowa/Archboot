@@ -14,7 +14,7 @@ _VNC_PW="archboot"
 _STANDARD_BROWSER="firefox"
 ### GNOME defaults
 # GNOME packages
-_GNOME_PACKAGES="gnome-desktop-4 gnome-shell gnome-terminal gnome-control-center nautilus gvfs-smb gthumb file-roller gnome-keyring gedit"
+_GNOME_PACKAGES="gnome-desktop-4 gnome-shell gnome-terminal gnome-control-center nautilus gvfs-smb gthumb file-roller gnome-keyring gedit ibus usbguard"
 ### KDE/Plasma defaults
 # KDE/Plasma packages
 _PLASMA_PACKAGES="plasma-wayland-session plasma-desktop konsole kscreen kate dolphin powerdevil ark gwenview"
