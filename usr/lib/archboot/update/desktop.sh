@@ -103,15 +103,13 @@ _prepare_graphic() {
     _progress "98" "Restart dbus..."
     systemd-sysusers >"${_LOG}" 2>&1
     systemd-tmpfiles --create >"${_LOG}" 2>&1
-    # fixing dbus requirements
+    # fixing dbus requirementsFava
     for i in dbus dbus-org.freedesktop.login1.service; do
         systemctl reload ${i}
         sleep 1
     done
-    for i in avahi-daemon polkit; do
-        systemctl restart "${i}"
-        sleep 1
-    done
+    systemctl restart polkit
+    sleep 1
 }
 
 _custom_wayland_xorg() {
