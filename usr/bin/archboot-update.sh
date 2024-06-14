@@ -84,7 +84,7 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
     rm /.update
     # only start vnc on xorg environment
     echo "Setting up VNC and browser..." >"${_LOG}"
-    [[ -n "${_L_XFCE}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]] && _autostart_vnc
+    [[ -n "${_L_XFCE}" ]] && _autostart_vnc
     command -v firefox &>"${_NO_LOG}"  && _firefox_flags
     command -v chromium &>"${_NO_LOG}" && _chromium_flags
     if [[ -n "${_L_XFCE}" ]]; then
