@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
-LANG=C
+LANG=C.UTF-8
 . /etc/archboot/defaults
 _BASENAME=${0##*/}
 _RUNNING_ARCH="$(uname -m)"
