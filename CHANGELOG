@@ -7,6 +7,8 @@ Environment:
 - added systemd 256.x support
 - cleaned up firmware files
 - added archboot-fw-check.sh
+update:
+- removed Xorg plasma and gnome support
 setup:
 - added user management
 - added Swap file support
