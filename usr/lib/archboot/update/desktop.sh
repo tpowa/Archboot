@@ -24,7 +24,7 @@ _IGNORE=""
         done
     fi
     #shellcheck disable=SC2086
-    pacman -Syu ${_IGNORE} --noconfirm &>"${_LOG}" || exit 1
+    pacman -Syu ${_IGNORE} --noconfirm &>"${_LOG}"
     [[ ! -e "/.full_system" ]] && _cleanup_install
     rm /.archboot
 }
@@ -36,7 +36,7 @@ _install_graphic() {
     fi
     for i in ${_GRAPHIC}; do
         #shellcheck disable=SC2086
-        pacman -S ${i} --noconfirm &>"${_LOG}" || exit 1
+        pacman -S ${i} --noconfirm &>"${_LOG}"
         [[ ! -e "/.full_system" ]] && _cleanup_install
         [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
         rm -f /var/log/pacman.log
@@ -79,7 +79,7 @@ _prepare_graphic() {
     for i in ${_FIX_PACKAGES}; do
         _progress "${_COUNT}" "Installing basic packages: ${i}..."
         #shellcheck disable=SC2086
-        pacman -S ${i} --noconfirm &>"${_LOG}" || exit 1
+        pacman -S ${i} --noconfirm &>"${_LOG}"
         [[ ! -e "/.full_system" ]] && _cleanup_install
         [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
         rm -f /var/log/pacman.log
