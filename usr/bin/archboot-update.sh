@@ -85,8 +85,33 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
     # only start vnc on xorg environment
     echo "Setting up VNC and browser..." >"${_LOG}"
     [[ -n "${_L_XFCE}" ]] && _autostart_vnc
-    command -v firefox &>"${_NO_LOG}"  && _firefox_flags
-    command -v chromium &>"${_NO_LOG}" && _chromium_flags
+    if [[ "${_STANDARD_BROWSER}" == "firefox" ]]; then
+        pacman -Q chromium 2>"${_NO_LOG}" && pacman -Rss --noconfirm chromium
+        pacman -Q firefox 2>"${_NO_LOG}" || _run_pacman firefox
+        # install firefox langpacks
+        _LANG="be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr tr uk"
+        for i in ${_LANG}; do
+            if grep -q "${i}" /etc/locale.conf; then
+                _run_pacman firefox-i18n-"${i}"
+            fi
+        done
+        if grep -q en_US /etc/locale.conf; then
+            _run_pacman firefox-i18n-en-us
+        elif grep -q 'C.UTF-8' /etc/locale.conf; then
+            _run_pacman firefox-i18n-en-us
+        elif grep -q es_ES /etc/locale.conf; then
+            _run_pacman firefox-i18n-es-es
+        elif grep -q pt_PT /etc/locale.conf; then
+            _run_pacman firefox-i18n-pt-pt
+        elif grep -q sv_SE /etc/locale.conf; then
+            _run_pacman firefox-i18n-sv-se
+        fi
+        _firefox_flags
+    else
+        pacman -Q firefox 2>"${_NO_LOG}" && pacman -Rss --noconfirm firefox
+        pacman -Q chromium 2>"${_NO_LOG}" || _run_pacman chromium
+        _chromium_flags
+    fi
     if [[ -n "${_L_XFCE}" ]]; then
         _start_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
         clear

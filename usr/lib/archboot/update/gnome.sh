@@ -34,7 +34,7 @@ _prepare_gnome() {
 }
 
 _install_gnome() {
-    _PACKAGES="${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_GNOME_PACKAGES}"
+    _PACKAGES="${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES} ${_GNOME_PACKAGES}"
     _prepare_gnome
 }
 

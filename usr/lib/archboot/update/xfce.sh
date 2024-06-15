@@ -3,7 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _install_xfce() {
     if ! [[ -e /usr/bin/startxfce4 ]]; then
-        _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_STANDARD_BROWSER} ${_XFCE_PACKAGES}"
+        _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES} ${_XFCE_PACKAGES}"
         _configure_xfce  >"${_LOG}" 2>&1
     fi
 }

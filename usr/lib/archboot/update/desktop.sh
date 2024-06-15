@@ -57,28 +57,9 @@ _install_graphic() {
         _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
     fi
     _run_pacman "${_GRAPHIC}"
-    # install firefox langpacks
-    if [[ "${_STANDARD_BROWSER}" == "firefox" ]]; then
-        _LANG="be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr tr uk"
-        for i in ${_LANG}; do
-            if grep -q "${i}" /etc/locale.conf; then
-                _run_pacman firefox-i18n-"${i}"
-            fi
-        done
-        if grep -q en_US /etc/locale.conf; then
-            _run_pacman firefox-i18n-en-us
-        elif grep -q 'C.UTF-8' /etc/locale.conf; then
-            _run_pacman firefox-i18n-en-us
-        elif grep -q es_ES /etc/locale.conf; then
-            _run_pacman firefox-i18n-es-es
-        elif grep -q pt_PT /etc/locale.conf; then
-            _run_pacman firefox-i18n-pt-pt
-        elif grep -q sv_SE /etc/locale.conf; then
-            _run_pacman firefox-i18n-sv-se
-        fi
-    fi
     rm /.archboot
 }
+
 
 _prepare_graphic() {
     # fix libs first, then install packages from defaults
