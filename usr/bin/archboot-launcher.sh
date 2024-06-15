@@ -26,7 +26,7 @@ _desktop () {
     #shellcheck disable=SC2086
     _dialog  --title " Internet Browser " --menu "" 9 30 5 \
     "chromium" "Chromium" \
-    "firefox" "Firefox" >${_ANSWER} || return 1
+    "firefox" "Firefox" 2>${_ANSWER} || return 1
     _BROWSER="$(cat ${_BROWSER})"
     sed -i -e "s#STANDARD_BROWSER=.*#STANDARD_BROWSER=${_BROWSER}#g" /etc/archboot/defaults
     source /etc/locale.conf
