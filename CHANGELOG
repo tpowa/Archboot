@@ -8,8 +8,8 @@ Environment:
 - cleaned up firmware files
 - added archboot-fw-check.sh
 update:
-- removed Xorg plasma and gnome support
-- more robust desktop installation and startup routine
+- removed Xorg Gnome and KDE/Plasma support
+- more robust desktop installation routine
 setup:
 - added user management
 - added Swap file support
