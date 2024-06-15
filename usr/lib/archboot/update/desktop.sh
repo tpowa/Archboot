@@ -99,6 +99,7 @@ _prepare_graphic() {
     _progress "98" "Restart dbus..."
     systemd-sysusers >"${_LOG}" 2>&1
     # add --boot to really create all tmpfiles!
+    # Check: /tmp/.X11-unix, may have wrong permission on startup error!
     systemd-tmpfiles --boot --create >"${_LOG}" 2>&1
     # fixing dbus requirements
     for i in dbus dbus-org.freedesktop.login1.service; do
