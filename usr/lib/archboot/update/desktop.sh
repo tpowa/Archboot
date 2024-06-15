@@ -5,14 +5,33 @@
 _cleanup_install() {
     rm -rf /usr/share/{man,help,info,doc,gtk-doc}
     rm -rf /usr/include
-    rm -rf /usr/lib/libgo.*
+    rm -rf /usr/share/icons/breeze-dark
+    find /usr/share/locale/ -mindepth 2 ! -path '*/be/*' ! -path '*/bg/*' ! -path '*/cs/*' \
+        ! -path '*/da/*' ! -path '*/de/*' ! -path '*/en/*' ! -path '*/el/*' ! -path '*/es/*' \
+        ! -path '*/fi/*' ! -path '*/fr/*' ! -path '*/hu/*' ! -path '*/it/*' ! -path '*/lt/*' \
+        ! -path '*/lv/*' ! -path '*/mk/*' ! -path '*/nl/*' ! -path '*/nn/*' ! -path '*/pl/*' \
+        ! -path '*/pt/*' ! -path '*/ro/*' ! -path '*/ru/*' ! -path '*/sk/*' ! -path '*/sr/*' \
+        ! -path '*/sv/*' ! -path '*/tr/*' ! -path '*/uk/*' -delete &>"${_NO_LOG}"
+    find /usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>"${_NO_LOG}"
 }
 
 _cleanup_cache() {
     # remove packages from cache
     #shellcheck disable=SC2013
-    for i in $(grep 'installed' /var/log/pacman.log | cut -d ' ' -f 4); do
+    for i in $(grep -w 'installed' /var/log/pacman.log | cut -d ' ' -f 4); do
         rm -rf "${_CACHEDIR}/${i}"-[0-9]*
+    done
+}
+
+_run_pacman() {
+    for i in ${1}; do
+        #shellcheck disable=SC2086
+        LANG=C pacman -Sy ${i} --noconfirm &>"${_LOG}"
+        if [[ ! -e "/.full_system" ]]; then
+            _cleanup_install
+            _cleanup_cache
+        fi
+        rm -f /var/log/pacman.log
     done
 }
 
@@ -29,87 +48,64 @@ _IGNORE=""
     rm /.archboot
 }
 
+_install_fix_packages() {
+    _run_pacman "${_FIX_PACKAGES}"
+    rm /.archboot
+}
+
 _install_graphic() {
     # check for qxl module
     if grep -q qxl /proc/modules; then
         _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
     fi
-    for i in ${_GRAPHIC}; do
-        #shellcheck disable=SC2086
-        pacman -S ${i} --noconfirm &>"${_LOG}"
-        [[ ! -e "/.full_system" ]] && _cleanup_install
-        [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
-        rm -f /var/log/pacman.log
-    done
+    _run_pacman "${_GRAPHIC}"
     # install firefox langpacks
     if [[ "${_STANDARD_BROWSER}" == "firefox" ]]; then
         _LANG="be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr tr uk"
         for i in ${_LANG}; do
             if grep -q "${i}" /etc/locale.conf; then
-                pacman -S firefox-i18n-"${i}" --noconfirm &>"${_LOG}"
+                _run_pacman firefox-i18n-"${i}"
             fi
         done
         if grep -q en_US /etc/locale.conf; then
-            pacman -S firefox-i18n-en-us --noconfirm &>"${_LOG}"
+            _run_pacman firefox-i18n-en-us
         elif grep -q 'C.UTF-8' /etc/locale.conf; then
-            pacman -S firefox-i18n-en-us --noconfirm &>"${_LOG}"
+            _run_pacman firefox-i18n-en-us
         elif grep -q es_ES /etc/locale.conf; then
-            pacman -S firefox-i18n-es-es --noconfirm &>"${_LOG}"
+            _run_pacman firefox-i18n-es-es
         elif grep -q pt_PT /etc/locale.conf; then
-            pacman -S firefox-i18n-pt-pt --noconfirm &>"${_LOG}"
+            _run_pacman firefox-i18n-pt-pt
         elif grep -q sv_SE /etc/locale.conf; then
-            pacman -S firefox-i18n-sv-se --noconfirm &>"${_LOG}"
+            _run_pacman firefox-i18n-sv-se
         fi
     fi
     rm /.archboot
 }
 
 _prepare_graphic() {
+    # fix libs first, then install packages from defaults
     _GRAPHIC="${1}"
     if [[ ! -e "/.full_system" ]]; then
         _progress "1" "Removing firmware files..."
         rm -rf /usr/lib/firmware
-        # fix libs first, then install packages from defaults
-        _GRAPHIC="${1}"
     fi
     : > /.archboot
     _update_packages &
     _progress_wait "2" "10" "Updating environment to latest packages..." "5"
-    _COUNT=11
-    for i in ${_FIX_PACKAGES}; do
-        _progress "${_COUNT}" "Installing basic packages: ${i}..."
-        #shellcheck disable=SC2086
-        pacman -S ${i} --noconfirm &>"${_LOG}"
-        [[ ! -e "/.full_system" ]] && _cleanup_install
-        [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 4413000 ]] && _cleanup_cache
-        rm -f /var/log/pacman.log
-        _COUNT="$((_COUNT+1))"
-    done
+    : > /.archboot
+    _install_fix_packages &
+    _progress_wait "${_COUNT}" "20" "Installing basic packages..." "3"
     : > /.archboot
     _install_graphic &
-    _progress_wait "${_COUNT}" "97" "Installing ${_ENVIRONMENT}..." "2"
-    if [[ ! -e "/.full_system" ]]; then
-        echo "Removing not used icons..."  >"${_LOG}"
-        rm -rf /usr/share/icons/breeze-dark
-        echo "Cleanup locale and i18n..."  >"${_LOG}"
-        find /usr/share/locale/ -mindepth 2 ! -path '*/be/*' ! -path '*/bg/*' ! -path '*/cs/*' \
-        ! -path '*/da/*' ! -path '*/de/*' ! -path '*/en/*' ! -path '*/el/*' ! -path '*/es/*' \
-        ! -path '*/fi/*' ! -path '*/fr/*' ! -path '*/hu/*' ! -path '*/it/*' ! -path '*/lt/*' \
-        ! -path '*/lv/*' ! -path '*/mk/*' ! -path '*/nl/*' ! -path '*/nn/*' ! -path '*/pl/*' \
-        ! -path '*/pt/*' ! -path '*/ro/*' ! -path '*/ru/*' ! -path '*/sk/*' ! -path '*/sr/*' \
-        ! -path '*/sv/*' ! -path '*/tr/*' ! -path '*/uk/*' -delete &>"${_NO_LOG}"
-        find /usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>"${_NO_LOG}"
-    fi
+    _progress_wait "${_COUNT}" "97" "Installing ${_ENVIRONMENT}..." "3"
     _progress "98" "Restart dbus..."
     systemd-sysusers >"${_LOG}" 2>&1
     systemd-tmpfiles --create >"${_LOG}" 2>&1
     # fixing dbus requirementsFava
     for i in dbus dbus-org.freedesktop.login1.service; do
         systemctl reload ${i}
-        sleep 1
     done
     systemctl restart polkit
-    sleep 1
 }
 
 _custom_wayland_xorg() {
@@ -124,8 +120,8 @@ _custom_wayland_xorg() {
         _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > "${_LOG}" 2>&1
     fi
     echo -e "\e[1mStep 2/2:\e[m Setting up browser...\e[m"
-    which firefox &>"${_NO_LOG}"  && _firefox_flags
-    which chromium &>"${_NO_LOG}" && _chromium_flags
+    command -v firefox &>"${_NO_LOG}"  && _firefox_flags
+    command -v chromium &>"${_NO_LOG}" && _chromium_flags
 }
 
 _chromium_flags() {
