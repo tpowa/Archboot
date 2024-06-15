@@ -39,7 +39,7 @@ _IGNORE=""
         done
     fi
     #shellcheck disable=SC2086
-    pacman -Syu ${_IGNORE} --noconfirm &>"${_LOG}"
+    LANG=C pacman -Syu ${_IGNORE} --noconfirm &>"${_LOG}"
     if [[ ! -e "/.full_system" ]]; then
         _cleanup
     fi
@@ -105,6 +105,7 @@ _prepare_graphic() {
     for i in dbus dbus-org.freedesktop.login1.service; do
         systemctl reload ${i}
     done
+    # start polkit, most desktop environments expect it running!
     systemctl restart polkit
 }
 

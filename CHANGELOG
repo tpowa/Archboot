@@ -9,6 +9,7 @@ Environment:
 - added archboot-fw-check.sh
 update:
 - removed Xorg plasma and gnome support
+- more robust desktop installation and startup routine
 setup:
 - added user management
 - added Swap file support
