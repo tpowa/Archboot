@@ -85,19 +85,8 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
     # only start vnc on xorg environment
     echo "Setting up VNC and browser..." >"${_LOG}"
     [[ -n "${_L_XFCE}" ]] && _autostart_vnc
-    # install standard browser
-    _BROWSER="$(grep '_STANDARD_BROWSER' /etc/archboot/defaults | cut -d '=' -f2)"
-    if ! pacman -Q ${_BROWSER} &>"${_NO_LOG}"; then
-        if [[ "${_BROWSER}" == "firefox" ]]; then
-            pacman -Rss --noconfirm chromium &>"${_LOG}"
-        else
-            pacman -Rss --noconfirm firefox &>"${_LOG}"
-        fi
-        pacman --noconfirm -Sy ${_BROWSER} &>"${_LOG}"
-    fi
-
-
-    _${_BROWSER}_flags
+    command -v firefox &>"${_NO_LOG}"  && _firefox_flags
+    command -v chromium &>"${_NO_LOG}" && _chromium_flags
     if [[ -n "${_L_XFCE}" ]]; then
         _start_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
         clear
