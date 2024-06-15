@@ -27,7 +27,7 @@ _desktop () {
     _dialog  --title " Internet Browser " --menu "" 9 30 5 \
     "chromium" "Chromium" \
     "firefox" "Firefox" 2>${_ANSWER} || return 1
-    _BROWSER="$(cat ${_BROWSER})"
+    _BROWSER="$(cat ${_ANSWER})"
     sed -i -e "s#STANDARD_BROWSER=.*#STANDARD_BROWSER=${_BROWSER}#g" /etc/archboot/defaults
     source /etc/locale.conf
     if [[ "${_EXIT}" == "GNOME" ]]; then
