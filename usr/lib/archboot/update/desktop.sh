@@ -98,6 +98,7 @@ _prepare_graphic() {
     _progress_wait "${_COUNT}" "97" "Installing ${_ENVIRONMENT}..." "3"
     _progress "98" "Restart dbus..."
     systemd-sysusers >"${_LOG}" 2>&1
+    # add --boot to really create all tmpfiles!
     systemd-tmpfiles --boot --create >"${_LOG}" 2>&1
     # fixing dbus requirements
     for i in dbus dbus-org.freedesktop.login1.service; do
