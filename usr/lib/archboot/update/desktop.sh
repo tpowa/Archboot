@@ -22,7 +22,6 @@ _cleanup() {
 
 _run_pacman() {
     for i in ${1}; do
-        _progress "${_COUNT}" "Installing ${i}..."
         #shellcheck disable=SC2086
         LANG=C pacman -Sy ${i} --noconfirm &>"${_LOG}"
         if [[ ! -e "/.full_system" ]]; then
