@@ -23,6 +23,12 @@ _desktop () {
     _dialog  --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>"${_ANSWER}" || return 1
     [[ -e /.launcher-running ]] && rm /.launcher-running
     _EXIT=$(cat "${_ANSWER}")
+    #shellcheck disable=SC2086
+    _dialog  --title " Internet Browser " --menu "" 9 30 5 \
+    "chromium" "Chromium" \
+    "firefox" "Firefox" >${_ANSWER} || return 1
+    _BROWSER="$(cat ${_BROWSER})"
+    sed -i -e "s#STANDARD_BROWSER=.*#STANDARD_BROWSER=${_BROWSER}#g" /etc/archboot/defaults
     source /etc/locale.conf
     if [[ "${_EXIT}" == "GNOME" ]]; then
             clear
