@@ -6,10 +6,10 @@ _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Lau
 
 _check_desktop() {
     _DESKTOP=()
-    update | grep -q Gnome && _DESKTOP+=( "GNOME" "Simple Beautiful Elegant" )
-    update | grep -q KDE && _DESKTOP+=( "PLASMA" "Simple By Default" )
-    update | grep -q Sway && _DESKTOP+=( "SWAY" "Tiling Wayland Compositor" )
-    update | grep -q Xfce && _DESKTOP+=( "XFCE" "Leightweight Desktop" )
+    update | grep -q Gnome && _DESKTOP+=( "gnome" "Simple Beautiful Elegant" )
+    update | grep -q KDE && _DESKTOP+=( "plasma" "Simple By Default" )
+    update | grep -q Sway && _DESKTOP+=( "sway" "Tiling Wayland Compositor" )
+    update | grep -q Xfce && _DESKTOP+=( "xfce" "Leightweight Desktop" )
 }
 
 _check_manage() {
@@ -30,19 +30,8 @@ _desktop () {
     _BROWSER="$(cat ${_ANSWER})"
     sed -i -e "s#STANDARD_BROWSER=.*#STANDARD_BROWSER=${_BROWSER}#g" /etc/archboot/defaults
     source /etc/locale.conf
-    if [[ "${_EXIT}" == "GNOME" ]]; then
-            clear
-            update -gnome
-    elif [[ "${_EXIT}" == "PLASMA" ]]; then
-            clear
-            update -plasma
-    elif [[ "${_EXIT}" == "SWAY" ]]; then
-        clear
-        update -sway
-    elif [[ "${_EXIT}" == "XFCE" ]]; then
-        clear
-        update -xfce
-    fi
+    clear
+    update -${_EXIT} || exit 1
     exit 0
 }
 
