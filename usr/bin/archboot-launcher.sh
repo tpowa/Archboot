@@ -95,21 +95,14 @@ _launcher() {
     _dialog  --default-item "${_DEFAULTITEM}" --cancel-label "${_LABEL}" --title " Launcher Menu " --menu "" 9 40 5 \
     "1" "Launch Archboot Setup" "${_MENU[@]}" 2>"${_ANSWER}"
     case $(cat "${_ANSWER}") in
-        "1")
-            [[ -e /.launcher-running ]] && rm /.launcher-running
-            setup
-            exit 0 ;;
-        "2")
-            _DEFAULTITEM=2
-            _desktop
-            ;;
-        "3")
-            _DEFAULTITEM=3
-            _manage
-            ;;
-        *)
-            _exit
-            ;;
+        "1") [[ -e /.launcher-running ]] && rm /.launcher-running
+             setup
+             exit 0 ;;
+        "2") _DEFAULTITEM=2
+             _desktop ;;
+        "3") _DEFAULTITEM=3
+             _manage ;;
+        *) _exit ;;
     esac
 }
 
