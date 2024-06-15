@@ -16,7 +16,7 @@ _cleanup() {
     # remove packages from cache
     #shellcheck disable=SC2013
     for i in $(grep -w -E 'reinstalled|installed|upgraded' /var/log/pacman.log | cut -d ' ' -f 4); do
-        rm -rf "${_CACHEDIR}/${i}"-[0-9]*
+        rm -rf "${_CACHEDIR}/${i}"-*
     done
 }
 
