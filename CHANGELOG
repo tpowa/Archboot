@@ -10,6 +10,8 @@ Environment:
 update:
 - removed Xorg Gnome and KDE/Plasma support
 - more robust desktop installation routine
+launcher:
+- added chromium / firefox switch
 setup:
 - added user management
 - added Swap file support
