@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
-_cleanup_install() {
+_cleanup() {
     rm -rf /usr/share/{man,help,info,doc,gtk-doc}
     rm -rf /usr/include
     rm -rf /usr/share/icons/breeze-dark
@@ -13,9 +13,6 @@ _cleanup_install() {
         ! -path '*/pt/*' ! -path '*/ro/*' ! -path '*/ru/*' ! -path '*/sk/*' ! -path '*/sr/*' \
         ! -path '*/sv/*' ! -path '*/tr/*' ! -path '*/uk/*' -delete &>"${_NO_LOG}"
     find /usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>"${_NO_LOG}"
-}
-
-_cleanup_cache() {
     # remove packages from cache
     #shellcheck disable=SC2013
     for i in $(grep -w 'installed' /var/log/pacman.log | cut -d ' ' -f 4); do
@@ -28,8 +25,7 @@ _run_pacman() {
         #shellcheck disable=SC2086
         LANG=C pacman -Sy ${i} --noconfirm &>"${_LOG}"
         if [[ ! -e "/.full_system" ]]; then
-            _cleanup_install
-            _cleanup_cache
+            _cleanup
         fi
         rm -f /var/log/pacman.log
     done
@@ -44,7 +40,9 @@ _IGNORE=""
     fi
     #shellcheck disable=SC2086
     pacman -Syu ${_IGNORE} --noconfirm &>"${_LOG}"
-    [[ ! -e "/.full_system" ]] && _cleanup_install
+    if [[ ! -e "/.full_system" ]]; then
+        _cleanup
+    fi
     rm /.archboot
 }
 
