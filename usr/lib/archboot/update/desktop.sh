@@ -90,6 +90,36 @@ _prepare_graphic() {
     systemctl restart polkit
 }
 
+_prepare_browser() {
+    if [[ "${_STANDARD_BROWSER}" == "firefox" ]]; then
+        pacman -Q chromium &>"${_NO_LOG}" && pacman -R --noconfirm chromium &>"${_LOG}"
+        pacman -Q firefox &>"${_NO_LOG}" || _run_pacman firefox
+        # install firefox langpacks
+        _LANG="be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr tr uk"
+        for i in ${_LANG}; do
+            if grep -q "${i}" /etc/locale.conf; then
+                _run_pacman firefox-i18n-"${i}"
+            fi
+        done
+        if grep -q en_US /etc/locale.conf; then
+            _run_pacman firefox-i18n-en-us
+        elif grep -q 'C.UTF-8' /etc/locale.conf; then
+            _run_pacman firefox-i18n-en-us
+        elif grep -q es_ES /etc/locale.conf; then
+            _run_pacman firefox-i18n-es-es
+        elif grep -q pt_PT /etc/locale.conf; then
+            _run_pacman firefox-i18n-pt-pt
+        elif grep -q sv_SE /etc/locale.conf; then
+            _run_pacman firefox-i18n-sv-se
+        fi
+        _firefox_flags
+    else
+        pacman -Q firefox &>"${_NO_LOG}" && pacman -Rdd --noconfirm firefox &>"${_LOG}"
+        pacman -Q chromium &>"${_NO_LOG}" || _run_pacman chromium
+        _chromium_flags
+    fi
+}
+
 _custom_wayland_xorg() {
     if [[ -n "${_CUSTOM_WAYLAND}" ]]; then
         echo -e "\e[1mStep 1/2:\e[m Installing custom wayland..."

@@ -68,34 +68,7 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
     : > /.update
     _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Desktop Environment"
     [[ -e /var/cache/pacman/pkg/archboot.db ]] && : > /.graphic_installed
-    _dialog --title "${_MENU_TITLE}" --gauge "Installing ${_STANDARD_BROWSER}..." 6 75 0
-    if [[ "${_STANDARD_BROWSER}" == "firefox" ]]; then
-        pacman -Q chromium &>"${_NO_LOG}" && pacman -R --noconfirm chromium &>"${_LOG}"
-        pacman -Q firefox &>"${_NO_LOG}" || _run_pacman firefox
-        # install firefox langpacks
-        _LANG="be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr tr uk"
-        for i in ${_LANG}; do
-            if grep -q "${i}" /etc/locale.conf; then
-                _run_pacman firefox-i18n-"${i}"
-            fi
-        done
-        if grep -q en_US /etc/locale.conf; then
-            _run_pacman firefox-i18n-en-us
-        elif grep -q 'C.UTF-8' /etc/locale.conf; then
-            _run_pacman firefox-i18n-en-us
-        elif grep -q es_ES /etc/locale.conf; then
-            _run_pacman firefox-i18n-es-es
-        elif grep -q pt_PT /etc/locale.conf; then
-            _run_pacman firefox-i18n-pt-pt
-        elif grep -q sv_SE /etc/locale.conf; then
-            _run_pacman firefox-i18n-sv-se
-        fi
-        _firefox_flags
-    else
-        pacman -Q firefox &>"${_NO_LOG}" && pacman -Rdd --noconfirm firefox &>"${_LOG}"
-        pacman -Q chromium &>"${_NO_LOG}" || _run_pacman chromium
-        _chromium_flags
-    fi
+    _prepare_browser | _dialog --title "${_MENU_TITLE}" --gauge "Installing ${_STANDARD_BROWSER}..." 6 75 0
     if [[ -n "${_L_XFCE}" ]]; then
         _ENVIRONMENT="XFCE"
         _install_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
