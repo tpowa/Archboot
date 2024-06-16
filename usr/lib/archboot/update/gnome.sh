@@ -30,7 +30,8 @@ _prepare_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
         _prepare_graphic "${_PACKAGES}"
     fi
-     _configure_gnome >"${_LOG}" 2>&1
+    _prepare_browser
+    _configure_gnome >"${_LOG}" 2>&1
 }
 
 _install_gnome() {

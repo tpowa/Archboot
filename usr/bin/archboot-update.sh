@@ -68,7 +68,6 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
     : > /.update
     _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Desktop Environment"
     [[ -e /var/cache/pacman/pkg/archboot.db ]] && : > /.graphic_installed
-    _prepare_browser | _dialog --title "${_MENU_TITLE}" --gauge "Installing ${_STANDARD_BROWSER}..." 6 75 0
     if [[ -n "${_L_XFCE}" ]]; then
         _ENVIRONMENT="XFCE"
         _install_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0

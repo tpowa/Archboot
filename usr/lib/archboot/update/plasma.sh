@@ -64,6 +64,7 @@ _prepare_plasma() {
     if ! [[ -e /usr/bin/startplasma-x11 ]]; then
         _prepare_graphic "${_PACKAGES}"
     fi
+    _prepare_browser >"${_LOG}" 2>&1
     _configure_plasma >"${_LOG}" 2>&1
 }
 
