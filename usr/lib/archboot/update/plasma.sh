@@ -63,8 +63,8 @@ EOF
 _prepare_plasma() {
     if ! [[ -e /usr/bin/startplasma-x11 ]]; then
         _prepare_graphic "${_PACKAGES}"
-        _configure_plasma >"${_LOG}" 2>&1
     fi
+    _configure_plasma >"${_LOG}" 2>&1
 }
 
 _install_plasma() {
