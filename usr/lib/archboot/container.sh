@@ -123,6 +123,7 @@ _create_pacman_conf() {
         echo "LocalFileSigLevel = Optional" >> "${_PACMAN_CONF}"
         echo "ParallelDownloads = 5" >> "${_PACMAN_CONF}"
         echo "Color" >> "${_PACMAN_CONF}"
+        echo "DisableDownloadTimeout" >> "${_PACMAN_CONF}"
         echo "[archboot]" >> "${_PACMAN_CONF}"
         echo "Server = ${_INSTALL_SOURCE}" >> "${_PACMAN_CONF}"
         [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(basename "${_PACMAN_CONF}")"
