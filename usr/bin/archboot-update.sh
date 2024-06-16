@@ -112,7 +112,7 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
         pacman -Q chromium &>"${_NO_LOG}" || _run_pacman chromium
         _chromium_flags
     fi
-    echo "Setting ${_STANDARD_BROWSER} as default browser..."
+    echo "Setting ${_STANDARD_BROWSER} as default browser..." >"${_LOG}"
     # gnome
     if command -v gsettings &>"${_NO_LOG}"; then
         [[ "${_STANDARD_BROWSER}" == "firefox" ]] && gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'firefox.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
