@@ -118,11 +118,13 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
         [[ "${_STANDARD_BROWSER}" == "firefox" ]] && gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'firefox.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
         [[ "${_STANDARD_BROWSER}" == "chromium" ]] && gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'chromium.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"
     fi
-    # plasma
-    sed -i -e "s#<default>applications:.*#<default>applications:systemsettings.desktop,applications:org.kde.konsole.desktop,preferred://filemanager,applications:${_STANDARD_BROWSER}.desktop,applications:gparted.desktop,applications:archboot.desktop</default>#g" /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml 2>"${_NO_LOG}"
-    # xfce
-    sed -i -e "s#firefox#${_STANDARD_BROWSER}#g" /etc/xdg/xfce4/helpers.rc 2>"${_NO_LOG}"
-    sed -i -e "s#chromium#${_STANDARD_BROWSER}#g" /etc/xdg/xfce4/helpers.rc 2>"${_NO_LOG}"
+    # plasma and xfce
+    sed -i -e "s#firefox#${_STANDARD_BROWSER}#g" /etc/xdg/xfce4/helpers.rc \
+        /etc/xdg/menus/plasma-applications.menu \
+        /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml 2>"${_NO_LOG}"
+    sed -i -e "s#chromium#${_STANDARD_BROWSER}#g" /etc/xdg/xfce4/helpers.rc \
+        /etc/xdg/menus/plasma-applications.menu \
+        /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml 2>"${_NO_LOG}"
     if [[ -n "${_L_XFCE}" ]]; then
         _start_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
         clear
