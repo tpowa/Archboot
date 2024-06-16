@@ -114,7 +114,7 @@ _prepare_browser() {
         fi
         _firefox_flags
     else
-        pacman -Q firefox &>"${_NO_LOG}" && pacman -R --noconfirm $(pacman -Q | grep firefox | cut -d ' ' -f 2) &>"${_LOG}"
+        pacman -Q firefox &>"${_NO_LOG}" && pacman -R --noconfirm $(pacman -Q | grep firefox | cut -d ' ' -f 1) &>"${_LOG}"
         pacman -Q chromium &>"${_NO_LOG}" || _run_pacman chromium
         _chromium_flags
     fi
