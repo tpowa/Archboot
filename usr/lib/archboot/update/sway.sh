@@ -82,6 +82,7 @@ EOF
         if [[ -f /usr/share/applications/"${i}".desktop ]]; then
             echo "[DESKTOP ENTRY]" > /usr/share/applications/"${i}".desktop
             echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
+        fi
         done
     done
     echo "Configuring waybar..."
