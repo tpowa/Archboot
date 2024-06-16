@@ -76,7 +76,7 @@ GenericName=Installer
 Exec=foot -- /usr/bin/setup
 Icon=system-software-install
 EOF
-    _HIDE_MENU="avahi-discover bssh bvnc org.codeberg.dnkl.foot-server org.codeberg.dnkl.footclient qvidcap qv4l2"
+    _HIDE_MENU="avahi-discover bssh bvnc fluid org.codeberg.dnkl.foot-server org.codeberg.dnkl.footclient  lstopo qvidcap qv4l2 vncviewer"
     echo "Hiding ${_HIDE_MENU} menu entries..."
     for i in ${_HIDE_MENU}; do
         if [[ -f /usr/share/applications/"${i}".desktop ]]; then
