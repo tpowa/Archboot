@@ -83,7 +83,6 @@ EOF
             echo "[DESKTOP ENTRY]" > /usr/share/applications/"${i}".desktop
             echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
         fi
-        done
     done
     echo "Configuring waybar..."
     if ! grep -q 'exec waybar' /etc/sway/config; then
