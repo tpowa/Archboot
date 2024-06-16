@@ -227,8 +227,9 @@ EOF
     _HIDE_MENU="xfce4-mail-reader xfce4-about"
     echo "Hiding ${_HIDE_MENU} menu entries..."
     for i in ${_HIDE_MENU}; do
-        [[ -f /usr/share/applications/"${i}".desktop ]] || break
-        echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
+        if [[ -f /usr/share/applications/"${i}".desktop ]]; then
+          echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
+        fi
     done
     echo "Autostarting setup..."
     cat << EOF > /etc/xdg/autostart/archboot.desktop

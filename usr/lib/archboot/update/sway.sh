@@ -79,9 +79,10 @@ EOF
     _HIDE_MENU="avahi-discover bssh bvnc org.codeberg.dnkl.foot-server org.codeberg.dnkl.footclient qvidcap qv4l2"
     echo "Hiding ${_HIDE_MENU} menu entries..."
     for i in ${_HIDE_MENU}; do
-        [[ -f /usr/share/applications/"${i}".desktop ]] || break
-        echo "[DESKTOP ENTRY]" > /usr/share/applications/"${i}".desktop
-        echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
+        if [[ -f /usr/share/applications/"${i}".desktop ]]; then
+            echo "[DESKTOP ENTRY]" > /usr/share/applications/"${i}".desktop
+            echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
+        done
     done
     echo "Configuring waybar..."
     if ! grep -q 'exec waybar' /etc/sway/config; then
