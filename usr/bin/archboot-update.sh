@@ -68,23 +68,6 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
     : > /.update
     _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Desktop Environment"
     [[ -e /var/cache/pacman/pkg/archboot.db ]] && : > /.graphic_installed
-    if [[ -n "${_L_XFCE}" ]]; then
-        _ENVIRONMENT="XFCE"
-        _install_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
-    elif [[ -n "${_L_GNOME}" ]]; then
-        _ENVIRONMENT="GNOME"
-        _install_gnome | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
-    elif [[ -n "${_L_PLASMA}" ]];then
-        _ENVIRONMENT="Plasma/KDE"
-        _install_plasma | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
-    elif [[ -n "${_L_SWAY}" ]]; then
-        _ENVIRONMENT="Sway"
-        _install_sway | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
-    fi
-    rm /.update
-    # only start vnc on xorg environment
-    echo "Setting up VNC and browser..." >"${_LOG}"
-    [[ -n "${_L_XFCE}" ]] && _autostart_vnc
     if [[ "${_STANDARD_BROWSER}" == "firefox" ]]; then
         pacman -Q chromium &>"${_NO_LOG}" && pacman -R --noconfirm chromium &>"${_LOG}"
         pacman -Q firefox &>"${_NO_LOG}" || _run_pacman firefox
@@ -112,6 +95,23 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
         pacman -Q chromium &>"${_NO_LOG}" || _run_pacman chromium
         _chromium_flags
     fi
+    if [[ -n "${_L_XFCE}" ]]; then
+        _ENVIRONMENT="XFCE"
+        _install_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
+    elif [[ -n "${_L_GNOME}" ]]; then
+        _ENVIRONMENT="GNOME"
+        _install_gnome | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
+    elif [[ -n "${_L_PLASMA}" ]];then
+        _ENVIRONMENT="Plasma/KDE"
+        _install_plasma | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
+    elif [[ -n "${_L_SWAY}" ]]; then
+        _ENVIRONMENT="Sway"
+        _install_sway | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
+    fi
+    rm /.update
+    # only start vnc on xorg environment
+    echo "Setting up VNC and browser..." >"${_LOG}"
+    [[ -n "${_L_XFCE}" ]] && _autostart_vnc
     echo "Setting ${_STANDARD_BROWSER} as default browser..." >"${_LOG}"
     # gnome
     if command -v gsettings &>"${_NO_LOG}"; then
