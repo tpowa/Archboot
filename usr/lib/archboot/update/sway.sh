@@ -79,6 +79,7 @@ EOF
     _HIDE_MENU="avahi-discover bssh bvnc org.codeberg.dnkl.foot-server org.codeberg.dnkl.footclient qvidcap qv4l2"
     echo "Hiding ${_HIDE_MENU} menu entries..."
     for i in ${_HIDE_MENU}; do
+        [[ -f /usr/share/applications/"${i}".desktop ]] || break
         echo "[DESKTOP ENTRY]" > /usr/share/applications/"${i}".desktop
         echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
     done

@@ -165,8 +165,6 @@ EOF
     sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
     echo "Replacing directory menu launcher with setup..."
     sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
-    echo "Setting ${_STANDARD_BROWSER} as default browser..."
-    sed -i -e "s#firefox#${_STANDARD_BROWSER}#g" /etc/xdg/xfce4/helpers.rc
     echo "Replacing menu structure..."
     cat << EOF >/etc/xdg/menus/xfce-applications.menu
 <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
@@ -229,6 +227,7 @@ EOF
     _HIDE_MENU="xfce4-mail-reader xfce4-about"
     echo "Hiding ${_HIDE_MENU} menu entries..."
     for i in ${_HIDE_MENU}; do
+        [[ -f /usr/share/applications/"${i}".desktop ]] || break
         echo 'NoDisplay=true' >> /usr/share/applications/"${i}".desktop
     done
     echo "Autostarting setup..."
