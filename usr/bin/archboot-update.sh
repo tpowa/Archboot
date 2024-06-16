@@ -68,6 +68,7 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
     : > /.update
     _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Desktop Environment"
     [[ -e /var/cache/pacman/pkg/archboot.db ]] && : > /.graphic_installed
+    _dialog --title "${_MENU_TITLE}" --gauge "Installing ${_STANDARD_BROWSER}..." 6 75 0
     if [[ "${_STANDARD_BROWSER}" == "firefox" ]]; then
         pacman -Q chromium &>"${_NO_LOG}" && pacman -R --noconfirm chromium &>"${_LOG}"
         pacman -Q firefox &>"${_NO_LOG}" || _run_pacman firefox
