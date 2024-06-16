@@ -112,6 +112,7 @@ _chromium_flags() {
 --no-sandbox
 --test-type
 --incognito
+--password-store=basic
 archboot.com
 wiki.archlinux.org
 wiki.archlinux.org/title/Installation_guide
