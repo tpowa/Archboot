@@ -95,7 +95,8 @@ _upload_efi_files() {
     for i in *.efi; do
         #shellcheck disable=SC2086
         if [[ -f "${i}" ]]; then
-            gpg --chuid "${_USER}" $(echo ${_GPG} "${i}" || exit 1
+            #shellcheck disable=SC2046,SC2086,SC2116
+            gpg --chuid "${_USER}" $(echo ${_GPG}) "${i}" || exit 1
         fi
     done
     #shellcheck disable=SC2086
