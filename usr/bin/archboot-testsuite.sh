@@ -89,7 +89,7 @@ pacman --noconfirm -Rdd base gettext &>>"${_LOG}"
 echo -e "Starting none tracked files in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
 read -t 10
 _run_test "none tracked files in /usr/lib... this takes a while"
-for i in $(find /usr/lib | grep -v -E '/modules|/udev'); do
+for i in $(find /usr/lib | grep -v -E '/modules|/udev|/gconv/gconv-modules.cache'); do
     pacman -Qo ${i} &>${_NO_LOG} || echo ${i} >> pacman-error.log
 done
 _result pacman-error.log
