@@ -7,6 +7,7 @@ Environment:
 - added systemd 256.x support
 - cleaned up firmware files
 - added archboot-fw-check.sh
+- added rustscan
 update:
 - removed Xorg Gnome and KDE/Plasma support
 - more robust desktop installation routine
