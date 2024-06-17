@@ -315,7 +315,7 @@ _pacman_keyring() {
     done
     # gpg finished in background
     while pgrep -x gpg &>"${_NO_LOG}"; do
-        read .r -t 1
+        read -r -t 1
     done
     if [[ -e /etc/systemd/system/pacman-init.service ]]; then
         systemctl stop pacman-init.service
