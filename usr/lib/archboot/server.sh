@@ -45,7 +45,7 @@ _update_pacman_chroot() {
     rm -r "${_ARCH_DIR}"
     echo "Finished container tarball."
     echo "Sign tarball..."
-    #shellcheck disable=SC2086
+    #shellcheck disable=SC2046,SC2086,SC2116
     gpg --chuid "${_USER}" $(echo ${_GPG}) "${_PACMAN_CHROOT}" || exit 1
     chown "${_USER}:${_GROUP}" "${_PACMAN_CHROOT}"{,.sig} || exit 1
     echo "Syncing files to ${_SERVER}:${_PUB}/.${_SERVER_PACMAN}..."
@@ -82,8 +82,8 @@ _create_archive() {
 # sign files and create new b2sum.txt
 _sign_b2sum() {
     for i in $1; do
-        #shellcheck disable=SC2086
         if [[ -f "${i}" ]]; then
+            #shellcheck disable=SC2046,SC2086,SC2116
             gpg --chuid "${_USER}" $(echo ${_GPG}) "${i}"
             cksum -a blake2b "${i}" >> b2sum.txt
         fi
