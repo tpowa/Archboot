@@ -8,8 +8,7 @@ _run ()
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         # add broadcom wl support
         _mod wl
-        _map _file /usr/lib/modprobe.d/broadcom-wl.conf \
-                     /usr/share/licenses/broadcom-wl/LICENSE
+        _file /usr/lib/modprobe.d/broadcom-wl.conf
     fi
 }
 

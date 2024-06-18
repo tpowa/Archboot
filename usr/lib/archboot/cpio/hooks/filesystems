@@ -16,8 +16,6 @@ growfs,info,io,logprint,metadump,mdrestore,mkfile,ncheck,quota,repair,rtcp,space
     _map _full_dir /etc/{cifs-utils,request-key.d,nvme}
     # fix libinih for plasma wallpaper
     _map _file /usr/lib/libINI*
-    # fix licenses
-    _file /usr/share/licenses/e2fsprogs/MIT-LICENSE
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

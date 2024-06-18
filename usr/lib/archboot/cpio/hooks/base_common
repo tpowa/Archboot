@@ -60,8 +60,7 @@ _run ()
     # disable systemd automount:
     _symlink /etc/systemd/system/proc-sys-fs-binfmt_misc.automount /dev/null
     # vconsole terminus font
-    _map _file /usr/share/{kbd/consolefonts/ter-v{16,32}n.psf.gz,terminfo/l/linux,\
-licenses/terminus-font/LICENSE}
+    _map _file /usr/share/{kbd/consolefonts/ter-v{16,32}n.psf.gz,terminfo/l/linux}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

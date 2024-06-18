@@ -40,9 +40,6 @@ _run ()
     _map _binary groups ch{age,fn,sh} expiry {fail,last}log \
           {chg,ch,g}passwd group{add,del,mems,mod} grp{ck,conv,unconv} \
           newusers pw{ck,conv,unconv} user{add,del,mod} sg getsubids
-    # fix licenses
-    _map _file /usr/share/licenses/{file/COPYING,bzip2/LICENSE,hdparm/LICENSE.TXT,\
-ncurses/COPYING,sdparm/LICENSE,zlib/LICENSE}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

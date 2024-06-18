@@ -48,8 +48,7 @@ _run ()
                  /etc/systemd/system/ttyd.service
     _symlink /etc/systemd/system/multi-user.target.wants/ttyd.service \
              /etc/systemd/system/ttyd.service
-    # fix licenses
-    _map _file /usr/share/licenses/{libldap/LICENSE,nfsidmap/LICENSE,tmux/LICENSE,ttyd/LICENSE}
+
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

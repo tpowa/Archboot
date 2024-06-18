@@ -4,7 +4,131 @@
 
 _run ()
 {
-    _full_dir /usr/share/licenses/spdx
+for i in
+terminus-font/LICENSE
+argon2/LICENSE
+brotli/LICENSE
+curl/COPYING
+dust/LICENSE
+gcc-libs/RUNTIME.LIBRARY.EXCEPTION
+gnupg/BSD-2-Clause.txt
+gnupg/BSD-3-Clause.txt
+gnupg/BSD-4-Clause.txt
+gnupg/MIT.txt
+gnupg/Unicode-TOU.txt
+gssproxy/COPYING
+icu/LICENSE
+iputils/LICENSE.BSD
+json-c/COPYING
+libarchive/COPYING
+libbpf/LICENSE
+libbpf/LICENSE.BSD-2-Clause
+libbpf/LICENSE.LGPL-2.1
+libbsd/LICENSE
+libcap/License
+libcss/COPYING
+libdom/COPYING
+libedit/COPYING
+libevent/LICENSE
+libffi/LICENSE
+libgpg-error/COPYING
+libgpg-error/COPYING.LIB
+libhubbub/COPYING
+libinih/LICENSE.txt
+libmd/COPYING
+libnghttp2/COPYING
+libnghttp3/COPYING
+libp11-kit/COPYING
+libparserutils/COPYING
+libpsl/COPYING
+libsasl/COPYING
+libsodium/LICENSE
+libssh2/LICENSE
+libtirpc/LICENSE
+libuv/LICENSE
+libverto/COPYING
+libvterm/LICENSE
+libwapcaplet/COPYING
+libwebsockets/LICENSE
+libxml2/Copyright
+known_spdx_license_exceptions.txt
+known_spdx_license_identifiers.txt
+linux-firmware-whence/WHENCE
+lua/LICENSE
+lua51-lpeg/LICENSE
+luajit/COPYRIGHT
+msgpack-c/LICENSE
+openssh/BSD-2-Clause.txt
+openssh/blowfish.BSD-3-Clause.txt
+openssh/openbsd-compat.BSD-3-Clause.txt
+openssh/openbsd-compat.ISC.txt
+openssh/openbsd-compat.MIT.txt
+openssh/replacement.BSD-2-Clause.txt
+openssh/rijndael.Public-Domain.txt
+openssh/snprintf.Public-Domain.txt
+openssh/ssh.BSD-3-Clause.txt
+pcre2/LICENSE
+popt/LICENSE
+tpm2-tss/LICENSE
+tre/LICENSE
+tree-sitter/LICENSE
+tree-sitter-bash/LICENSE
+tree-sitter-c/LICENSE
+tree-sitter-lua/LICENSE.md
+tree-sitter-markdown/LICENSE
+tree-sitter-python/LICENSE
+tree-sitter-query/LICENSE
+tree-sitter-vimdoc/LICENSE
+tzdata/LICENSE
+util-linux/COPYING.BSD-2-Clause
+util-linux/COPYING.BSD-3-Clause
+util-linux/COPYING.BSD-4-Clause-UC
+util-linux/COPYING.ISC
+util-linux/util-linux-BSD-2-Clause.txt
+util-linux-libs/COPYING.BSD-2-Clause
+util-linux-libs/COPYING.BSD-3-Clause
+util-linux-libs/COPYING.BSD-4-Clause-UC
+util-linux-libs/COPYING.ISC
+util-linux-libs/util-linux-BSD-2-Clause.txt
+xxhash/LICENSE
+xz/COPYING
+zstd/LICENSE
+bat/LICENSE-{APACHE,MIT}
+dbus/COPYING
+duktape/LICENSE.txt
+eza/LICENSE
+fd/LICENSE-MIT
+iana-etc/LICENSE
+p11-kit/COPYING
+procs/LICENSE
+ripgrep/{COPYING,LICENSE-MIT,UNLICENSE}
+sd/LICENSE
+shadow/COPYING
+file/COPYING
+bzip2/LICENSE
+hdparm/LICENSE.TXT
+ncurses/COPYING
+sdparm/LICENSE
+zlib/LICENSE
+neovim/LICENSE.txt
+sbctl/LICENSE
+expat/COPYING
+wireless-regdb/LICENSE
+libldap/LICENSE
+nfsidmap/LICENSE
+tmux/LICENSE
+ttyd/LICENSE
+krb5/LICENSE
+openssh/LICENCE
+openssl/LICENSE.txt
+sqlite/license.txt
+e2fsprogs/MIT-LICENSE; do
+    _file ${i}
+done
+    if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
+        _file /usr/share/licenses/broadcom-wl/LICENSE
+    fi
+    _full_dir /usr/share/licenses/{spdx,linux-firmware}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

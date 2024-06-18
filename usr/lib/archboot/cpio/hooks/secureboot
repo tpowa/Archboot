@@ -5,7 +5,7 @@
 _run ()
 {
     _map _binary mokutil openssl sb{attach,ctl,keysync,siglist,sign,varsign,verify}
-    _map _file /etc/ssl/openssl.cnf /usr/share/licenses/sbctl/LICENSE
+    _file /etc/ssl/openssl.cnf
     # add mkkeys.sh, 
     # curl -s -L -O https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh
     # modified to use uuidgen instead of python
