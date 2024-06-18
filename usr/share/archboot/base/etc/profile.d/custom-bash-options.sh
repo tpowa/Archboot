@@ -21,10 +21,6 @@ if command -v nvim >/dev/null; then
     alias vim='nvim'
     alias edit='nvim'
 fi
-# show MOTD on ttyd login
-if [[ -z "${TTY}" && -z "${SSH_TTY}" && -z "${TMUX}" && "$(grep -w 'archboot' /etc/hostname)" ]]; then
-    [[ "${SHLVL}" == "2" ]] && cat /etc/motd
-fi
 # run remote-login.sh on ssh connection
 if [[ -z "${STY}" && -n "${SSH_TTY}" && "$(grep -w 'archboot' /etc/hostname)" ]]; then
     /usr/bin/remote-login.sh
