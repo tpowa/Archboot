@@ -11,7 +11,7 @@ _run ()
     _map _full_dir /usr/lib/{tc,engines-3} /usr/share/tc
     # add config for rustmap, no nmap available
     echo "ulimit = 5000" >> ${_ROOTFS}/root/.rustscan.toml
-    echo "scripts = \"None\"" ${_ROOTFS}/root/.rustscan.toml
+    echo "scripts = \"None\"" >> ${_ROOTFS}/root/.rustscan.toml
     # add elinks defaults
     _file_rename /usr/share/archboot/net/etc/elinks/bookmarks /etc/elinks/bookmarks
     _file_rename /usr/share/archboot/net/etc/profile.d/elinks.sh /etc/profile.d/elinks.sh
