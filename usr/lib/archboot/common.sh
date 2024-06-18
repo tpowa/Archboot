@@ -264,7 +264,7 @@ _fix_network() {
 _create_archboot_db() {
     echo "Creating archboot repository db..."
     #shellcheck disable=SC2046
-    LANG=C repo-add -q "${1}"/archboot.db.tar.gz $(find "${1}"/ -type f ! -name '*.sig')
+    LANG=C repo-add -q "${1}"/archboot.db.tar.gz $(fd -t f -E '*.sig' . "${1}"/)
 }
 
 _pacman_parameters() {
