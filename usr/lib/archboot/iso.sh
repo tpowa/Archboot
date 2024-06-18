@@ -178,7 +178,7 @@ _prepare_background() {
 _reproducibility() {
     # Reproducibility: set all timestamps to 0
     # from /usr/bin/mkinitcpio
-    find "${_ISODIR}" -mindepth 1 -execdir touch -hcd "@0" "{}" +
+    fd . "${_ISODIR}" -u --min-depth 1 -X touch -hcd "@0"
 }
 
 _prepare_uefi_image() {
@@ -193,10 +193,10 @@ _prepare_uefi_image() {
     mcopy -m -i "${VFAT_IMAGE}" -s "${_ISODIR}"/EFI "${_ISODIR}"/boot ::/
     # leave EFI/ and /boot/kernel for virtualbox and other restricted VM emulators :(
     if [[ "${_ARCH}" == "x86_64" || "${_ARCH}" == "riscv64" ]]; then
-        find "${_ISODIR}"/boot/* ! -name "vmlinuz-${_ARCH}" -delete
+        fd -u -t f -E "vmlinuz-${_ARCH}" . "${_ISODIR}"/boot/ -X rm
     fi
     if [[ "${_ARCH}" == "aarch64" ]]; then
-        find "${_ISODIR}"/boot/* ! -name "Image-${_ARCH}.gz" -delete
+        fd -u -t f -E "Image-${_ARCH}.gz" . "${_ISODIR}"/boot/ -X rm
     fi
 }
 

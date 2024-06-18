@@ -249,9 +249,9 @@ _create_cpio() {
     echo "Creating zstd compressed image..."
     pushd "${_ROOTFS}" >"${_NO_LOG}" || return
     # Reproducibility: set all timestamps to 0
-    find . -mindepth 1 -execdir touch -hcd "@0" "{}" +
+    fd . -u --min-depth 1 -X touch -hcd "@0"
     # use zstd only it has best compression and decompression
-    find . -mindepth 1 -printf '%P\0' | sort -z |
+    fd . -u --min-depth 1 -0 | sort -z |
         LANG=C bsdtar --null -cnf - -T - |
         LANG=C bsdtar --null -cf - --format=newc @- |
         zstd -T0 -19 > "${_GENERATE_IMAGE}" || _abort "Image creation failed!"
