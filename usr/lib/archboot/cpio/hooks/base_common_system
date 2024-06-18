@@ -22,12 +22,12 @@ usr/share/{bash-completion,dbus-1,factory,hwdata,i18n/locales,makepkg,nano,pacma
         _file /usr/share/i18n/charmaps/UTF-8.gz
         tar -C / --exclude=var/lib/pacman/local/{amd-ucode-*-[0-9]*,base-*-[0-9]*,binutils-*-[0-9]*,\
 cdrtools-*-[0-9]*,db5.3-*-[0-9]*,db-*-[0-9]*,edk2-shell-*-[0-9]*,fuse-common-*-[0-9]*,gc-*-[0-9]*,\
-gettext-*-[0-9]*,gnutls-*-[0-9]*,grml-zsh-config-*-[0-9]*,groff-*-[0-9]*,grub-*-[0-9]*,intel-ucode-*-[0-9]*,\
-jansson-*-[0-9]*,libburn-*-[0-9]*,libev-*-[0-9]*,libisoburn-*-[0-9]*,libisofs-*-[0-9]*,\
-libksba-*-[0-9]*,libnfnetlink-*-[0-9]*,libnetfilter_conntrack-*-[0-9]*,libnftnl-*-[0-9]*,libpcap-*-[0-9]*,\
-libpipeline-*-[0-9]*,libsysprof-capture-*-[0-9]*,libwbclient-*-[0-9]*,limine-*-[0-9]*,\
+gettext-*-[0-9]*,gnutls-*-[0-9]*,grml-zsh-config-*-[0-9]*,groff-*-[0-9]*,grub-*-[0-9]*,http-parser-*-[0-9]*,\
+intel-ucode-*-[0-9]*,jansson-*-[0-9]*,libburn-*-[0-9]*,libev-*-[0-9]*,libisoburn-*-[0-9]*,libisofs-*-[0-9]*,\
+libksba-*-[0-9]*,libnfnetlink-*-[0-9]*,libgit2-*-[0-9]*,libnetfilter_conntrack-*-[0-9]*,libnftnl-*-[0-9]*,\
+libpcap-*-[0-9]*,libpipeline-*-[0-9]*,libsysprof-capture-*-[0-9]*,libwbclient-*-[0-9]*,limine-*-[0-9]*,\
 linux-api-headers-*-[0-9]*,memtest86+-*-[0-9]*,memtest86+-efi-*-[0-9]*,memtest-*-[0-9]*,\
-mpdecimal-*-[0-9]*,mtools-*-[0-9]*,nettle-*-[0-9]*,python-*-[0-9]*,python-pefile-*-[0-9]*,\
+mpdecimal-*-[0-9]*,mtools-*-[0-9]*,nettle-*-[0-9]*,nmap-*-[0-9]*,oniguruma-*-[0-9]*,python-*-[0-9]*,python-pefile-*-[0-9]*,\
 refind-*-[0-9]*,rpcbind-*-[0-9]*,systemd-ukify-*-[0-9]*,zsh-*-[0-9]*} \
 --exclude=usr/share/locale/*/{grub*,binutils*,gdbm*,bfd*,gettext*,gas*,gnutls*,gold*,gprof*,ld*,opcodes*} \
 --hard-dereference -cpf - \
@@ -39,7 +39,7 @@ var/lib/pacman/local \
                  {bus,boot,coredump,hostname,journal,locale,login,machine,network,\
 system,timedate,userdb,home,oom,portable}ctl certutil chmod clear cmsutil crlutil curl date \
                  dbus-{broker{,-launch},cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
-update-activation-environment,uuidgen} dd df dir du dust eza false fd gawk gpg{,-agent,conf,-connect-agent} \
+update-activation-environment,uuidgen} dd df dir du dust exa eza false fd gawk gpg{,-agent,conf,-connect-agent} \
                  gpgme-{tool,json} insmod install kernel-install kill{,all} loadkeys ldconfig \
                  login makepkg mktemp mkhomedir_helper modutil more mount.ddi mount.nfs{,4} \
                  nano nologin nss-config od p11-kit pk12util pam_timestamp_check pacman{,-conf,-key,-db-upgrade} \
@@ -139,7 +139,7 @@ linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz} \
     _symlink "/etc/ssl/certs/ca-certificates.crt" "../../ca-certificates/extracted/tls-ca-bundle.pem"
     _map _file /usr/share/{ca-certificates/trust-source/mozilla.trust.p11-kit,p11-kit/modules/p11-kit-trust.module}
     # fix licenses
-    _map _file /usr/share/licenses/{duktape/LICENSE.txt,shadow/COPYING,iana-etc/LICENSE,dbus/COPYING,p11-kit/COPYING}
+    _map _file /usr/share/licenses/{duktape/LICENSE.txt,eza/LICENSE,shadow/COPYING,iana-etc/LICENSE,dbus/COPYING,p11-kit/COPYING}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
