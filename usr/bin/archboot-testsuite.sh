@@ -86,15 +86,20 @@ fi
 _result fw-error.txt
 # uninstall base again!
 pacman --noconfirm -Rdd base gettext &>>"${_LOG}"
+_run_test "licenses"
+for i in $(pacman -Ql $(pacman -Q | cut -d ' ' -f 1) | cut -d ' ' -f2 | grep 'share/licenses'); do
+    [[ -e "${i}" ]] || echo "${i}" >>license-error.txt
+done
+_result license-error.txt
 echo -e "Starting none tracked files in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
-read -t 10
+read -r -t 10
 _run_test "none tracked files in /usr/lib... this takes a while"
 for i in $(find /usr/lib | grep -v -E '/modules|/udev|/gconv/gconv-modules.cache'); do
     pacman -Qo ${i} &>${_NO_LOG} || echo ${i} >> pacman-error.log
 done
 _result pacman-error.log
 echo -e "Starting pacman database check in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
-read -t 10
+read -r -t 10
 _run_test "pacman database... this takes a while"
 archboot-not-installed.sh &>>"${_LOG}"
 _result not-installed.txt
