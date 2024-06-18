@@ -94,7 +94,7 @@ _result license-error.txt
 echo -e "Starting none tracked files in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
 read -r -t 10
 _run_test "none tracked files in /usr/lib... this takes a while"
-for i in $(fd -u -E '/modules/' -E ' /udev/' -E 'gconv-modules.cache' . /usr/lib); do
+for i in $(fd -u -E '/modules/' -E '/udev/' -E 'gconv-modules.cache' . /usr/lib); do
     pacman -Qo ${i} &>${_NO_LOG} || echo ${i} >> pacman-error.log
 done
 _result pacman-error.log
