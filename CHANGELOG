@@ -9,6 +9,7 @@ Environment:
 - added archboot-fw-check.sh
 - added bat dust eza fd procs ripgrep rustscan sd 
 - removed marvell prestera firmware
+- force OpenSSH login through ttyd
 update:
 - removed Xorg Gnome and KDE/Plasma support
 - more robust desktop installation routine
