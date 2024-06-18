@@ -67,13 +67,13 @@ _clean_container() {
         rm -r "${1}"/usr/share/{aclocal,applications,audit-rules,awk,common-lisp,emacs,et,fish,gettext,gettext-[0-9]*,glib-[0-9]*,gnupg,gtk-doc,iana-etc,icons,icu,keyutils,libalpm,libgpg-error,makepkg-template,misc,pixmaps,pkgconfig,screen,smartmontools,ss,tabset,vala,xml,man,doc,info,xtables}
         rm -r "${1}"/usr/lib/{audit,awk,binfmt.d,cmake,dracut,e2fsprogs,environment.d,gawk,getconf,gettext,glib-[0-9]*,gnupg,gssproxy,icu,krb5,ldscripts,libnl,pkgconfig,siconv,tar,xfsprogs,xtables}
         # locale cleaning
-        fd -u --min-depth 2 -E '*/be/*' -E '*/bg/*' \
-             -E '*/cs/*' -E '*/da/*' -E '*/de/*' -E '*/en/*' \
-             -E '*/el/*' -E '*/es/*' -E '*/fi/*' -E '*/fr/*' \
-             -E '*/hu/*' -E '*/it/*' -E '*/lt/*' -E '*/lv/*' \
-             -E '*/mk/*' -E '*/nl/*' -E '*/nn/*' -E '*/pl/*' \
-             -E '*/pt/*' -E '*/ro/*' -E '*/ru/*' -E '*/sk/*' \
-             -E '*/sr/*' -E '*/sv/*' -E '*/tr/*' -E '*/uk/*' \
+        fd -u --min-depth 2 -E '/be/' -E '/bg/' \
+             -E '/cs/' -E '/da/' -E '/de/' -E '/en/' \
+             -E '/el/' -E '/es/' -E '/fi/' -E '/fr/' \
+             -E '/hu/' -E '/it/' -E '/lt/' -E '/lv/' \
+             -E '/mk/' -E '/nl/' -E '/nn/' -E '/pl/' \
+             -E '/pt/' -E '/ro/' -E '/ru/' -E '/sk/' \
+             -E '/sr/' -E '/sv/' -E '/tr/' -E '/uk/' \
              . "${1}"/usr/share/locale/ -X rm &>"${_NO_LOG}"
         fd -u -t f -E 'UTF-8.gz' . "${1}"/usr/share/i18n/charmaps -X rm &>"${_NO_LOG}"
     fi

@@ -129,7 +129,7 @@ _create_initramfs() {
     # https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt
     # compress image with zstd
     cd "${_ROOTFS_DIR}" || exit 1
-    find . -mindepth 1 -printf '%P\0' |
+    fd . -u --min-depth 1 -0 |
             sort -z |
             LANG=C bsdtar --null -cnf - -T - |
             LANG=C bsdtar --null -cf - --format=newc @- |
@@ -226,7 +226,7 @@ _new_environment() {
     _collect_files &
     _progress_wait "42" "84" "Collecting rootfs files in ${_W_DIR}..." "3.75"
     _progress "85" "Cleanup ${_W_DIR}..."
-    find "${_W_DIR}"/. -mindepth 1 -maxdepth 1 ! -name 'tmp' -exec rm -rf {} \;
+    fd -u -mindepth 1 -maxdepth 1 -E 'tmp' . "${_W_DIR}"/. -X rm -rf
     _clean_kernel_cache
     _ram_check
     # local switch, don't kexec on local image

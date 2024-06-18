@@ -6,13 +6,15 @@ _cleanup() {
     rm -rf /usr/share/{man,help,info,doc,gtk-doc}
     rm -rf /usr/include
     rm -rf /usr/share/icons/breeze-dark
-    find /usr/share/locale/ -mindepth 2 ! -path '*/be/*' ! -path '*/bg/*' ! -path '*/cs/*' \
-        ! -path '*/da/*' ! -path '*/de/*' ! -path '*/en/*' ! -path '*/el/*' ! -path '*/es/*' \
-        ! -path '*/fi/*' ! -path '*/fr/*' ! -path '*/hu/*' ! -path '*/it/*' ! -path '*/lt/*' \
-        ! -path '*/lv/*' ! -path '*/mk/*' ! -path '*/nl/*' ! -path '*/nn/*' ! -path '*/pl/*' \
-        ! -path '*/pt/*' ! -path '*/ro/*' ! -path '*/ru/*' ! -path '*/sk/*' ! -path '*/sr/*' \
-        ! -path '*/sv/*' ! -path '*/tr/*' ! -path '*/uk/*' -delete &>"${_NO_LOG}"
-    find /usr/share/i18n/charmaps ! -name 'UTF-8.gz' -delete &>"${_NO_LOG}"
+        fd -u --min-depth 2 -E '/be/' -E '/bg/' \
+             -E '/cs/' -E '/da/' -E '/de/' -E '/en/' \
+             -E '/el/' -E '/es/' -E '/fi/' -E '/fr/' \
+             -E '/hu/' -E '/it/' -E '/lt/' -E '/lv/' \
+             -E '/mk/' -E '/nl/' -E '/nn/' -E '/pl/' \
+             -E '/pt/' -E '/ro/' -E '/ru/' -E '/sk/' \
+             -E '/sr/' -E '/sv/' -E '/tr/' -E '/uk/' \
+             . /usr/share/locale/ -X rm &>"${_NO_LOG}"
+    fd -u -t f -E 'UTF-8.gz' . /usr/share/i18n/charmaps -X rm &>"${_NO_LOG}"
     # remove packages from cache
     #shellcheck disable=SC2013
     for i in $(grep -w -E 'reinstalled|installed|upgraded' /var/log/pacman.log | cut -d ' ' -f 4); do
