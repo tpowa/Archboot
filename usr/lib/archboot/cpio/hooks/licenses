@@ -18,7 +18,7 @@ gnupg/MIT.txt
 gnupg/Unicode-TOU.txt
 gssproxy/COPYING
 icu/LICENSE
-iputils/LICENSE.BSD
+iputils/LICENSE.BSD3
 json-c/COPYING
 libarchive/COPYING
 libbpf/LICENSE
@@ -91,7 +91,6 @@ util-linux-libs/COPYING.BSD-4-Clause-UC
 util-linux-libs/COPYING.ISC
 util-linux-libs/util-linux-BSD-2-Clause.txt
 xxhash/LICENSE
-xz/COPYING
 zstd/LICENSE
 bat/LICENSE-{APACHE,MIT}
 dbus/COPYING
