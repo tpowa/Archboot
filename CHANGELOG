@@ -10,6 +10,8 @@ Environment:
 - added bat dust eza fd procs ripgrep rustscan sd 
 - removed marvell prestera firmware
 - force OpenSSH login through ttyd
+cpio:
+- replaced find with fd calls
 update:
 - removed Xorg Gnome and KDE/Plasma support
 - more robust desktop installation routine
