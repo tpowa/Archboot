@@ -8,7 +8,7 @@ After=network.target
 After=multi-user.target
 
 [Service]
-ExecStart=/usr/bin/ttyd -W remote-login.sh
+ExecStart=/usr/bin/ssh -o StrictHostKeychecking=no -o UserKnownHostsFile=/dev/null -i /root/.ssh/archboot-key -p 11838 localhost
 Type=simple
 Restart=always
 
