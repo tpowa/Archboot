@@ -129,7 +129,7 @@ done
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _file /usr/share/licenses/broadcom-wl/LICENSE
     fi
-    _full_dir /usr/share/licenses/{spdx,linux-firmware}
+    _map _full_dir /usr/share/licenses/{spdx,linux-firmware}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
