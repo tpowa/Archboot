@@ -4,7 +4,7 @@
 
 _run ()
 {
-for i in
+_LICENSES=(
 terminus-font/LICENSE
 argon2/LICENSE
 brotli/LICENSE
@@ -122,8 +122,9 @@ krb5/LICENSE
 openssh/LICENCE
 openssl/LICENSE.txt
 sqlite/license.txt
-e2fsprogs/MIT-LICENSE; do
-    _file ${i}
+e2fsprogs/MIT-LICENSE)
+for i in ${_LICENSES[@]};do
+    _file /usr/share/licenses/"${i}"
 done
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _file /usr/share/licenses/broadcom-wl/LICENSE
