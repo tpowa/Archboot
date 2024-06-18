@@ -88,7 +88,7 @@ _result fw-error.txt
 pacman --noconfirm -Rdd base gettext &>>"${_LOG}"
 _run_test "licenses"
 for i in $(pacman -Ql $(pacman -Q | cut -d ' ' -f 1) | cut -d ' ' -f2 | grep 'share/licenses'); do
-    [[ -e "${i}" ]] || echo "${i}" | grep -v '/xz$' >>license-error.txt
+    [[ -e "${i}" ]] || echo "${i}" | grep -v '/xz/' >>license-error.txt
 done
 _result license-error.txt
 echo -e "Starting none tracked files in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
