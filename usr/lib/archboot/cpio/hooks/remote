@@ -23,8 +23,8 @@ _run ()
     fi
     # switch port to ARCH and disable password login
     _file_rename /etc/ssh/sshd_config /etc/ssh/sshd_config
-    echo "Port 11838" >> ${_ROOTFS}/etc/ssh/sshd_config
-    echo "PasswordAuthentication no" >> ${_ROOTFS}/etc/ssh/sshd_config
+    echo "Port 11838" >> "${_ROOTFS}"/etc/ssh/sshd_config
+    echo "PasswordAuthentication no" >> "${_ROOTFS}"/etc/ssh/sshd_config
     _full_dir /usr/lib/libnfsidmap
     # fix libldap for /usr/lib/nfsidmap/umich_ldap.so
     _file /usr/lib/libldap.so{,.2}
@@ -48,7 +48,6 @@ _run ()
                  /etc/systemd/system/ttyd.service
     _symlink /etc/systemd/system/multi-user.target.wants/ttyd.service \
              /etc/systemd/system/ttyd.service
-
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

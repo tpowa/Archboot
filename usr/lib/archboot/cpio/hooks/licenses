@@ -123,6 +123,7 @@ openssh/LICENCE
 openssl/LICENSE.txt
 sqlite/license.txt
 e2fsprogs/MIT-LICENSE)
+#shellcheck disable=SC2068
 for i in ${_LICENSES[@]};do
     _file /usr/share/licenses/"${i}"
 done
