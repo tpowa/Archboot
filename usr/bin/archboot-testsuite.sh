@@ -44,7 +44,7 @@ for i in /usr/bin/*; do
 done
 _result bin-binary-error.txt
 _run_test "ldd on executables in /usr/lib"
-for i in $(find /usr/lib -executable -type f | grep -v '.so$'); do
+for i in $(fd -u -t x -E '*.so.*' -E '*.so' . /usr/lib); do
     if ldd "${i}" 2>"${_NO_LOG}" | grep -q 'not found'; then
         echo "${i}" >>lib-binary-error.txt
         ldd "${i}" | grep 'not found' >>lib-binary-error.txt
@@ -54,7 +54,7 @@ done
 _result lib-binary-error.txt
 _run_test "ldd on /usr/lib"
 # ignore wrong reported libsystemd-shared by libsystemd-core
-for i in $(find /usr/lib | grep '.so$'); do
+for i in $(fd -u '.so' /usr/lib); do
     if ldd "${i}" 2>"${_NO_LOG}" | grep -v -E 'tree_sitter|libsystemd-shared' | grep -q 'not found'; then
         echo "${i}" >>lib-error.txt
         ldd "${i}" | grep 'not found' >>lib-error.txt
@@ -94,7 +94,7 @@ _result license-error.txt
 echo -e "Starting none tracked files in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
 read -r -t 10
 _run_test "none tracked files in /usr/lib... this takes a while"
-for i in $(find /usr/lib | grep -v -E '/modules|/udev|/gconv/gconv-modules.cache'); do
+for i in $(fd -u -E '/modules/' -E ' /udev/' -E 'gconv-modules.cache' . /usr/lib); do
     pacman -Qo ${i} &>${_NO_LOG} || echo ${i} >> pacman-error.log
 done
 _result pacman-error.log

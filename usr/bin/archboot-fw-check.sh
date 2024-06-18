@@ -14,10 +14,10 @@ _usage () {
     exit 0
 }
 [[ -z "${1}" || "${1}" != "run" ]] && _usage
-for i in $(find "${_MODULE_DIR}" | grep '.ko.*'); do
+for i in $(fd -u -t f '.ko' "${_MODULE_DIR}"); do
     modinfo -F firmware "${i}" >>modules.txt
 done
-find "${_FIRMWARE}" | grep '.zst$' >firmware.txt
+fd -u -t f 'zst' "${_FIRMWARE}" >firmware.txt
 cp firmware.txt firmware.orig.txt
 while read -r i; do
     sed -i -e "s#${i}##g" firmware.txt
