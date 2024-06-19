@@ -226,7 +226,7 @@ _new_environment() {
     _collect_files &
     _progress_wait "42" "84" "Collecting rootfs files in ${_W_DIR}..." "3.75"
     _progress "85" "Cleanup ${_W_DIR}..."
-    fd -u -mindepth 1 -maxdepth 1 -E 'tmp' . "${_W_DIR}"/. -X rm -rf
+    fd -u --min-depth 1 --max-depth 1 -E 'tmp' . "${_W_DIR}"/. -X rm -rf
     _clean_kernel_cache
     _ram_check
     # local switch, don't kexec on local image
