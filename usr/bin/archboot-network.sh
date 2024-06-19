@@ -137,7 +137,7 @@ _network() {
         fi
         # profile name
         _NETWORK_PROFILE=""
-        _dialog --no-cancel --title " Network Profile Name " --inputbox "" 6 40 "${_INTERFACE}-${_CONNECTION}" 2>"${_ANSWER}"
+        _dialog --no-cancel --title " Network Profile Name " --inputbox "" 7 40 "${_INTERFACE}-${_CONNECTION}" 2>"${_ANSWER}"
         _NETWORK_PROFILE=/etc/systemd/network/$(cat "${_ANSWER}").network
         # wifi setup first
         _CONTINUE=""
