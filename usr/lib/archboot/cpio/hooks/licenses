@@ -45,6 +45,7 @@ libdom/COPYING
 libedit/COPYING
 libevent/LICENSE
 libffi/LICENSE
+libgcrypt/COPYING.LIB
 libgpg-error/COPYING
 libgpg-error/COPYING.LIB
 libhubbub/COPYING
