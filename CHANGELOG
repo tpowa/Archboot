@@ -7,7 +7,7 @@ Environment:
 - added systemd 256.x support
 - cleaned up firmware files
 - added archboot-fw-check.sh
-- added bat dust eza fd procs ripgrep rustscan sd 
+- added bat dust eza fd fzf procs ripgrep rustscan sd 
 - removed marvell prestera firmware
 - force OpenSSH login through ttyd
 cpio:
