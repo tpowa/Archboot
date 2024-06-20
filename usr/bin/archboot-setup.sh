@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 # source base and common first, contains basic parameters
-LANG=C
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/installer/common.sh
 . /usr/lib/archboot/installer/base.sh

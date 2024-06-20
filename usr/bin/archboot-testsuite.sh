@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
-_LANG=C
 _LOG=testsuite.log
 _APPNAME=${0##*/}
 _usage () {

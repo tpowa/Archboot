@@ -1,7 +1,6 @@
 #!/usr/bin/bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
-LANG=C
 _KVER="$(uname -r)"
 _ARCH="$(uname -m)"
 _TITLE="archboot.com | ${_ARCH} | ${_KVER} | Basic Setup | Early Userspace"

@@ -25,7 +25,7 @@ _cleanup() {
 _run_pacman() {
     for i in ${1}; do
         #shellcheck disable=SC2086
-        LANG=C pacman -Sy ${i} --noconfirm &>"${_LOG}"
+        LC_ALL=C.UTF-8 pacman -Sy ${i} --noconfirm &>"${_LOG}"
         if [[ ! -e "/.full_system" ]]; then
             _cleanup
         fi
@@ -41,7 +41,7 @@ _IGNORE=""
         done
     fi
     #shellcheck disable=SC2086
-    LANG=C pacman -Syu ${_IGNORE} --noconfirm &>"${_LOG}"
+    LC_ALL=C.UTF-8 pacman -Syu ${_IGNORE} --noconfirm &>"${_LOG}"
     if [[ ! -e "/.full_system" ]]; then
         _cleanup
     fi
