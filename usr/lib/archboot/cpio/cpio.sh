@@ -106,9 +106,9 @@ _loaded_mods() {
 
 _filter_mods() {
     if [[ -z "${2}" ]]; then
-        grep -E "${1}" <<<"${_ALL_MODS}"
+        rg "${1}" <<<"${_ALL_MODS}"
     else
-        grep -E "${3}" <<<"${_ALL_MODS}" | grep -v -E "${2}"
+        rg "${3}" <<<"${_ALL_MODS}" | rg -v "${2}"
     fi
 }
 
@@ -216,7 +216,7 @@ _install_mods() {
     # - all starting / needs to be removed from paths
     #shellcheck disable=SC2046,SC2086
     tar --hard-dereference -C / -cpf - $(modinfo  -k "${_KERNELVERSION}" -F filename ${_MODS} ${_MOD_DEPS} 2>"${_NO_LOG}" \
-    | grep -v builtin | sed -e 's#^/##g' -e 's# /# #g') | tar -C "${_ROOTFS}" -xpf -
+    | rg -v builtin | sed -e 's#^/##g' -e 's# /# #g') | tar -C "${_ROOTFS}" -xpf -
     # generate new kernel module dependencies"
     depmod -b "${_ROOTFS}" "${_KERNELVERSION}"
     # remove all non-binary module.* files (except devname for on-demand module loading
@@ -230,15 +230,15 @@ _install_libs() {
     while read -r i; do
         [[ -e "${i}" ]] && _file "${i}"
     done < <(objdump -p "${_ROOTFS}"/bin/* "${_ROOTFS}"/lib/systemd/{systemd-*,libsystemd*} "${_ROOTFS}"/lib/security/*.so 2>"${_NO_LOG}" |
-                grep 'NEEDED' | sort -u | sed -e 's#NEEDED##g' -e 's# .* #/lib/#g')
+                rg ' *NEEDED *' -r '/lib/' | sort -u)
     _install_files
     _LIB_COUNT="0"
     while ! [[ "${_LIB_COUNT}" == "${_LIB_COUNT2}" ]]; do
         _LIB_COUNT="${_LIB_COUNT2}"
         while read -r i; do
             [[ -e "${i}" ]] && _file "${i}"
-        done < <(objdump -p "${_ROOTFS}"/lib/*.so* |
-                grep 'NEEDED' | sort -u | sed -e 's#NEEDED##g' -e 's# .* #/lib/#g')
+        done < <(objdump -p "${_ROOTFS}"/lib/*.so* 2>"${_NO_LOG}" |
+                rg ' *NEEDED *' -r '/lib/' | sort -u)
         _install_files
         # rerun loop if new libs were discovered, else break
         _LIB_COUNT2="$(echo "${_ROOTFS}"/lib/*.so* | wc -w)"
