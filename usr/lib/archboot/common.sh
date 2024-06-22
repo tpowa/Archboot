@@ -14,6 +14,7 @@ _LABEL="Exit"
 _DLPROG="curl -L -s"
 _KERNELPKG="linux"
 _KEYRING="archlinux-keyring"
+_MEM_TOTAL="$(rg -w MemTotal /proc/meminfo | rg -o '\d+')"
 if echo "${_BASENAME}" | grep -qw aarch64; then
     _ARCHBOOT="archboot-arm"
     _KEYRING="${_KEYRING} archlinuxarm-keyring"

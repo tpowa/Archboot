@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
-[[ -z $TTY ]] && TTY=$(tty)
-TTY=${TTY#/dev/}
+[[ -z $_TTY ]] && _TTY=$(tty)
+_TTY=${_TTY#/dev/}
 
 _welcome () {
     echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux ${_RUNNING_ARCH^^}\e[m"
@@ -47,7 +47,7 @@ _copy_root() {
 # fstrim <mountpoint> for manual action
 # it needs some seconds to get RAM free on delete!
 _switch_root_zram() {
-if [[ "${TTY}" = "tty1" ]]; then
+if [[ "${_TTY}" = "tty1" ]]; then
     clear
     [[ -d /run/nextroot ]] || mkdir /run/nextroot
     : > /.archboot
@@ -72,7 +72,7 @@ fi
 
 _enter_shell() {
     # dbus sources profiles again
-    if ! echo "${TTY}" | grep -q pts; then
+    if ! echo "${_TTY}" | grep -q pts; then
         echo ""
         echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mlogin\e[m routine or \e[1m\e[92mCTRL-C\e[m for \e[1mbash\e[m prompt."
         cd /
@@ -91,8 +91,8 @@ _run_latest_install() {
 
 _run_update_installer() {
     cd /
-    if [[ "${TTY}" == "tty1" ]]; then
-        if [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2971000 ]]; then
+    if [[ "${_TTY}" == "tty1" ]]; then
+        if [[ "$()" -lt 2971000 ]]; then
             _run_latest
         else
             # local image
@@ -110,7 +110,7 @@ _run_update_installer() {
     fi
 }
 
-if [[ "${TTY}" = "tty1" ]] ; then
+if [[ "${_TTY}" = "tty1" ]] ; then
     if ! mount | grep -q zram0; then
         _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | ZRAM"
         _switch_root_zram | _dialog --title " Initializing System " --gauge "Creating btrfs on /dev/zram0..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
@@ -150,12 +150,12 @@ if [[ -e /usr/bin/setup ]]; then
         launcher
     fi
 # latest image, fail if less than 2.3GB RAM available
-elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2270000 ]]; then
+elif [[ "${_MEM_TOTAL}" -lt 2270000 ]]; then
     _welcome
     _memory_error "2.3GB"
     _enter_shell
 # local image, fail if less than 3.0GB  RAM available
-elif [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -lt 2971000 &&\
+elif [[ "${_MEM_TOTAL}" -lt 2971000 &&\
 -e "${_LOCAL_DB}" ]]; then
     _welcome
     _memory_error "2.9GB"

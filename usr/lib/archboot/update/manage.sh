@@ -5,7 +5,7 @@
 _ram_check() {
     while true; do
         # continue when 1 GB RAM is free
-        [[ "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "1000000" ]] && break
+        [[ "$(rg -w MemAvailable /proc/meminfo | rg -o '\d+')" -gt "1000000" ]] && break
     done
 }
 
@@ -283,7 +283,7 @@ _new_environment() {
     _progress "97" "Waiting for kernel to free RAM..."
     # wait until enough memory is available!
     while true; do
-        [[ "$(($(stat -c %s "${_RAM}/${_INITRD}")*200/100000))" -lt "$(grep -w MemAvailable /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" ]] && break
+        [[ "$(($(stat -c %s "${_RAM}/${_INITRD}")*200/100000))" -lt "$(rg -w MemAvailable /proc/meminfo | rg -o '\d+')" ]] && break
         sleep 1
     done
     _progress "100" "Restarting with KEXEC_LOAD..."
