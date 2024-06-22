@@ -92,7 +92,7 @@ _run_latest_install() {
 _run_update_installer() {
     cd /
     if [[ "${_TTY}" == "tty1" ]]; then
-        if [[ "$()" -lt 2971000 ]]; then
+        if [[ "${_MEM_TOTAL}" -lt 2971000 ]]; then
             _run_latest
         else
             # local image
