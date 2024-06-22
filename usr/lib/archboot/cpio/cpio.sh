@@ -216,7 +216,7 @@ _install_mods() {
     # - all starting / needs to be removed from paths
     #shellcheck disable=SC2046,SC2086
     tar --hard-dereference -C / -cpf - $(modinfo  -k "${_KERNELVERSION}" -F filename ${_MODS} ${_MOD_DEPS} 2>"${_NO_LOG}" \
-    | rg -v builtin | sed -e 's#^/##g' -e 's# /# #g') | tar -C "${_ROOTFS}" -xpf -
+    | rg -v builtin | sd '^/' '' | sd ' /' ' ') | tar -C "${_ROOTFS}" -xpf -
     # generate new kernel module dependencies"
     depmod -b "${_ROOTFS}" "${_KERNELVERSION}"
     # remove all non-binary module.* files (except devname for on-demand module loading
