@@ -2,10 +2,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
+_available_ram() {
+    rg -w MemAvailable /proc/meminfo | rg -o '\d+'
+}
+
 _ram_check() {
     while true; do
         # continue when 1 GB RAM is free
-        [[ "$(rg -w MemAvailable /proc/meminfo | rg -o '\d+')" -gt "1000000" ]] && break
+        [[ "$(_available_ram)" -gt "1000000" ]] && break
     done
 }
 
@@ -283,7 +287,7 @@ _new_environment() {
     _progress "97" "Waiting for kernel to free RAM..."
     # wait until enough memory is available!
     while true; do
-        [[ "$(($(stat -c %s "${_RAM}/${_INITRD}")*200/100000))" -lt "$(rg -w MemAvailable /proc/meminfo | rg -o '\d+')" ]] && break
+        [[ "$(($(stat -c %s "${_RAM}/${_INITRD}")*200/100000))" -lt "$(_available_ram)" ]] && break
         sleep 1
     done
     _progress "100" "Restarting with KEXEC_LOAD..."
