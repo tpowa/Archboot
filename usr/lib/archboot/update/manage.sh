@@ -325,7 +325,7 @@ _full_system() {
     _progress "97" "Adding texinfo and man-pages..."
     pacman -S --noconfirm man-db man-pages texinfo >"${_LOG}" 2>&1 || exit 1
     _progress "98" "Checking kernel version..."
-    _INSTALLED_KERNEL="$(pacman -Qi linux | rg 'Version.* (.*).(arch.*)' -r '$1-$2')"
+    _INSTALLED_KERNEL="$(pacman -Qi linux | rg -o 'Version.* (.*).(arch.*)' -r '$1-$2')"
     if ! [[ "${_INSTALLED_KERNEL}" == "${_RUNNING_KERNEL}" ]]; then
         _progress "99" "Skipping kernel module loading..."
     else

@@ -10,7 +10,7 @@ _configure_sway() {
     echo "Configuring wallpaper..."
     sed -i -e 's|^output .*|output * bg /usr/share/archboot/grub/archboot-background.png fill|g' /etc/sway/config
     echo "Configuring foot..."
-    if ! grep -q 'archboot colors' /etc/xdg/foot/foot.ini; then
+    if ! rg -q 'archboot colors' /etc/xdg/foot/foot.ini; then
 cat <<EOF >> /etc/xdg/foot/foot.ini
 # archboot colors
 [colors]
@@ -43,9 +43,9 @@ EOF
 
     fi
     echo "Autostarting setup..."
-    grep -q 'exec foot' /etc/sway/config ||\
+    rg -q 'exec foot' /etc/sway/config ||\
         echo "exec foot -- /usr/bin/setup" >> /etc/sway/config
-    if ! grep -q firefox /etc/sway/config; then
+    if ! rg -q firefox /etc/sway/config; then
         cat <<EOF >> /etc/sway/config
 # from https://wiki.gentoo.org/wiki/Sway
 # automatic floating
@@ -85,7 +85,7 @@ EOF
         fi
     done
     echo "Configuring waybar..."
-    if ! grep -q 'exec waybar' /etc/sway/config; then
+    if ! rg -q 'exec waybar' /etc/sway/config; then
         # hide sway-bar
         sed -i '/position top/a mode invisible' /etc/sway/config
         # diable not usable plugins
@@ -94,7 +94,7 @@ EOF
         sed -i -e 's#"mpd", "idle_inhibitor", "pulseaudio",##g' /etc/xdg/waybar/config
     fi
     echo "Configuring wayvnc..."
-     if ! grep -q wayvnc /etc/sway/config; then
+     if ! rg -q wayvnc /etc/sway/config; then
         echo "address=0.0.0.0" > /etc/wayvnc
         echo "exec wayvnc -C /etc/wayvnc &" >> /etc/sway/config
     fi
@@ -110,8 +110,10 @@ _install_sway() {
 }
 
 _start_sway() {
+    # list available layouts:
+    # localectl list-x11-keymap-layouts
     echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland \
-        XKB_DEFAULT_LAYOUT=$(grep 'KEYMAP' /etc/vconsole.conf | cut -d '=' -f2 | sed -e 's#-.*##g') \
+        XKB_DEFAULT_LAYOUT=$(rg -o '^KEYMAP=(\w+)-' -r '$1' /etc/vconsole.conf) \
         exec dbus-run-session sway >${_LOG} 2>&1" > /usr/bin/sway-wayland
     chmod 755 /usr/bin/sway-wayland
     sway-wayland
