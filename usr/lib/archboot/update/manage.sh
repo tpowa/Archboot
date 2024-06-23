@@ -86,7 +86,7 @@ _geoip_mirrorlist() {
         echo "GeoIP country ${_COUNTRY} detected." >>"${_LOG}"
         ${_DLPROG} -o /tmp/pacman_mirrorlist.txt "https://www.archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on"
         sed -i -e 's|^#Server|Server|g' /tmp/pacman_mirrorlist.txt
-        if grep -q 'Server = https:' /tmp/pacman_mirrorlist.txt; then
+        if rg -q 'Server = https:' /tmp/pacman_mirrorlist.txt; then
             mv "${_PACMAN_MIRROR}" "${_PACMAN_MIRROR}.bak"
             cp /tmp/pacman_mirrorlist.txt "${_PACMAN_MIRROR}"
             echo "GeoIP mirrors activated successfully." >>"${_LOG}"
@@ -325,7 +325,7 @@ _full_system() {
     _progress "97" "Adding texinfo and man-pages..."
     pacman -S --noconfirm man-db man-pages texinfo >"${_LOG}" 2>&1 || exit 1
     _progress "98" "Checking kernel version..."
-    _INSTALLED_KERNEL="$(pacman -Qi linux | grep Version | cut -d ':' -f 2 | sed -e 's# ##g' -e 's#\.arch#-arch#g')"
+    _INSTALLED_KERNEL="$(pacman -Qi linux | rg 'Version.* (.*).(arch.*)' -r '$1-$2')"
     if ! [[ "${_INSTALLED_KERNEL}" == "${_RUNNING_KERNEL}" ]]; then
         _progress "99" "Skipping kernel module loading..."
     else
