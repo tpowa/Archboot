@@ -17,7 +17,7 @@ _cleanup() {
     fd -u -t f -E 'UTF-8.gz' . /usr/share/i18n/charmaps -X rm &>"${_NO_LOG}"
     # remove packages from cache
     #shellcheck disable=SC2013
-    for i in $(grep -w -E 'reinstalled|installed|upgraded' /var/log/pacman.log | cut -d ' ' -f 4); do
+    for i in $(rg -o ' (\w+) \(' -r '$1' /var/log/pacman.log); do
         rm -rf "${_CACHEDIR}/${i}"-*
     done
 }
@@ -55,7 +55,7 @@ _install_fix_packages() {
 
 _install_graphic() {
     # check for qxl module
-    if grep -q qxl /proc/modules; then
+    if rg -q qxl /proc/modules; then
         _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
     fi
     _run_pacman "${_GRAPHIC}"
@@ -99,25 +99,25 @@ _prepare_browser() {
         # install firefox langpacks
         _LANG="be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr tr uk"
         for i in ${_LANG}; do
-            if grep -q "${i}" /etc/locale.conf; then
+            if rg -q "${i}" /etc/locale.conf; then
                 _run_pacman firefox-i18n-"${i}"
             fi
         done
-        if grep -q en_US /etc/locale.conf; then
+        if rg -q en_US /etc/locale.conf; then
             _run_pacman firefox-i18n-en-us
-        elif grep -q 'C.UTF-8' /etc/locale.conf; then
+        elif rg -q 'C.UTF-8' /etc/locale.conf; then
             _run_pacman firefox-i18n-en-us
-        elif grep -q es_ES /etc/locale.conf; then
+        elif rg -q es_ES /etc/locale.conf; then
             _run_pacman firefox-i18n-es-es
-        elif grep -q pt_PT /etc/locale.conf; then
+        elif rg -q pt_PT /etc/locale.conf; then
             _run_pacman firefox-i18n-pt-pt
-        elif grep -q sv_SE /etc/locale.conf; then
+        elif rg -q sv_SE /etc/locale.conf; then
             _run_pacman firefox-i18n-sv-se
         fi
         _firefox_flags
     else
         #shellcheck disable=SC2046
-        pacman -Q firefox &>"${_NO_LOG}" && pacman -R --noconfirm $(pacman -Q | grep firefox | cut -d ' ' -f 1) &>"${_LOG}"
+        pacman -Q firefox &>"${_NO_LOG}" && pacman -R --noconfirm $(pacman -Q | rg -o 'firefox.* ') &>"${_LOG}"
         pacman -Q chromium &>"${_NO_LOG}" || _run_pacman chromium
         _chromium_flags
     fi
@@ -154,7 +154,7 @@ EOF
 
 _firefox_flags() {
     if [[ -f "/usr/lib/firefox/browser/defaults/preferences/vendor.js" ]]; then
-        if ! grep -q startup /usr/lib/firefox/browser/defaults/preferences/vendor.js; then
+        if ! rg -q startup /usr/lib/firefox/browser/defaults/preferences/vendor.js; then
             echo "Adding firefox flags vendor.js..." >"${_LOG}"
             cat << EOF >> /usr/lib/firefox/browser/defaults/preferences/vendor.js
 pref("browser.aboutwelcome.enabled", false, locked);
