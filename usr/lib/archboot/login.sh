@@ -72,7 +72,7 @@ fi
 
 _enter_shell() {
     # dbus sources profiles again
-    if ! echo "${_TTY}" | grep -q pts; then
+    if ! echo "${_TTY}" | rg -q 'pts'; then
         echo ""
         echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mlogin\e[m routine or \e[1m\e[92mCTRL-C\e[m for \e[1mbash\e[m prompt."
         cd /
@@ -100,7 +100,7 @@ _run_update_installer() {
                 _run_latest_install
             else
                 # latest image
-                if update | grep -q latest-install; then
+                if update | rg -q 'latest-install'; then
                     _run_latest_install
                 else
                     _run_latest
@@ -111,7 +111,7 @@ _run_update_installer() {
 }
 
 if [[ "${_TTY}" = "tty1" ]] ; then
-    if ! mount | grep -q zram0; then
+    if ! mount | rg -q 'zram0'; then
         _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | ZRAM"
         _switch_root_zram | _dialog --title " Initializing System " --gauge "Creating btrfs on /dev/zram0..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
         # fix clear screen on all terminals
