@@ -15,11 +15,11 @@ _DLPROG="curl -L -s"
 _KERNELPKG="linux"
 _KEYRING="archlinux-keyring"
 _MEM_TOTAL="$(rg -w MemTotal /proc/meminfo | rg -o '\d+')"
-if echo "${_BASENAME}" | grep -qw aarch64; then
+if echo "${_BASENAME}" | rg -qw aarch64; then
     _ARCHBOOT="archboot-arm"
     _KEYRING="${_KEYRING} archlinuxarm-keyring"
     _ARCH="aarch64"
-elif echo "${_BASENAME}" | grep -qw riscv64; then
+elif echo "${_BASENAME}" | rg -qw riscv64; then
     _ARCHBOOT="archboot-riscv"
     _ARCH="riscv64"
 else
@@ -53,7 +53,7 @@ _root_check() {
 
 ### check for archboot environment
 _archboot_check() {
-if ! grep -qw 'archboot' /etc/hostname; then
+if ! rg -qw 'archboot' /etc/hostname; then
     echo "This script should only be run in booted archboot environment. Aborting..."
     exit 1
 fi
@@ -152,7 +152,7 @@ _cleanup() {
 }
 
 _run_update_environment() {
-    if update | grep -q latest-install; then
+    if update | rg -q latest-install; then
         update -latest-install
     else
         update -latest
@@ -184,23 +184,15 @@ _kver() {
 
 ### check architecture
 _architecture_check() {
-    echo "${_BASENAME}" | grep -qw aarch64 && _aarch64_check
-    echo "${_BASENAME}" | grep -qw riscv64 && _riscv64_check
-    echo "${_BASENAME}" | grep -qw x86_64 && _x86_64_check
+    echo "${_BASENAME}" | rg -qw aarch64 && _aarch64_check
+    echo "${_BASENAME}" | rg -qw riscv64 && _riscv64_check
+    echo "${_BASENAME}" | rg -qw x86_64 && _x86_64_check
 }
 
 ### check if running in container
 _container_check() {
-    if grep -q bash /proc/1/sched ; then
+    if rg -q bash /proc/1/sched ; then
         echo "ERROR: Running inside container. Aborting..."
-        exit 1
-    fi
-}
-
-### check for tpowa's build server
-_buildserver_check() {
-    if ! grep -qw 'T-POWA-LX' /etc/hostname; then
-        echo "This script should only be run on tpowa's build server. Aborting..."
         exit 1
     fi
 }
@@ -208,7 +200,7 @@ _buildserver_check() {
 _generate_keyring() {
     # use fresh one on normal systems
     # copy existing gpg cache on archboot usage
-    if ! grep -qw archboot /etc/hostname; then
+    if ! rg -qw archboot /etc/hostname; then
         # generate pacman keyring
         echo "Generating pacman keyring in container..."
         ${_NSPAWN} "${1}" pacman-key --init &>"${_NO_LOG}"
@@ -303,7 +295,7 @@ _pacman_key_system() {
 }
 
 _cachedir_check() {
-    if grep -q ^CacheDir /etc/pacman.conf; then
+    if rg -q '^CacheDir' /etc/pacman.conf; then
         echo "Error: CacheDir is set in /etc/pacman.conf. Aborting..."
         exit 1
     fi

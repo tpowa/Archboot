@@ -7,7 +7,6 @@ _SHIM=$(mktemp -d shim.XXX)
 _SHIM32=$(mktemp -d shim32.XXX)
 _SHIMAA64=$(mktemp -d shimaa64.XXX)
 _root_check
-_buildserver_check
 _x86_64_check
 _prepare_shim_files || exit 1
 _upload_efi_files shim-fedora || exit 1
