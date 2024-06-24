@@ -82,8 +82,8 @@ _prepare_kernel_initrd_files() {
         fi
     fi
     _INITRD="initrd-${_ARCH}.img"
-    echo "${_CONFIG}" | grep -qw local && _INITRD="initrd-local-${_ARCH}.img"
-    echo "${_CONFIG}" | grep -qw latest && _INITRD="initrd-latest-${_ARCH}.img"
+    echo "${_CONFIG}" | rg -qw local && _INITRD="initrd-local-${_ARCH}.img"
+    echo "${_CONFIG}" | rg -qw latest && _INITRD="initrd-latest-${_ARCH}.img"
     if [[ -f "${_INITRD}" ]]; then
         echo "Using existing ${_INITRD}..."
         mv "./${_INITRD}" "${_ISODIR}/boot/initrd-${_ARCH}.img"
@@ -95,7 +95,7 @@ _prepare_kernel_initrd_files() {
                          -g "${_ISODIR}/boot/initrd-${_ARCH}.img" || exit 1
     fi
     # delete cachedir on archboot environment
-    if grep -qw 'archboot' /etc/hostname; then
+    if rg -qw 'archboot' /etc/hostname; then
         if [[ -d "${_CACHEDIR}" ]]; then
             echo "Removing ${_CACHEDIR}..."
             rm -rf "${_CACHEDIR}"
@@ -184,7 +184,7 @@ _reproducibility() {
 _prepare_uefi_image() {
     echo "Preparing UEFI image..."
     ## get size of boot files
-    BOOTSIZE=$(du -bc "${_ISODIR}"/EFI "${_ISODIR}"/boot | grep total | cut -f1)
+    BOOTSIZE=$(LANG=C.UTF-8 du -bc "${_ISODIR}"/EFI "${_ISODIR}"/boot | rg '([0-9]+).*total' -r '$1')
     IMGSZ=$((BOOTSIZE/1024 + 2048)) # image size in KB
     VFAT_IMAGE="${_ISODIR}/efi.img"
     ## Creating efi.img
@@ -225,7 +225,7 @@ EOF
 _uboot() {
     echo "Generating ${_ARCH} U-Boot image..."
     ## get size of boot files
-    BOOTSIZE=$(du -bc "${_ISODIR}"/boot | grep total | cut -f1)
+    BOOTSIZE=$(LANG=C.UTF-8 du -bc "${_ISODIR}"/boot | rg '([0-9]+).*total' -r '$1')
     IMGSZ=$((BOOTSIZE/1024 + 2048)) # image size in KB
     VFAT_IMAGE="${_ISODIR}/extlinux.img"
     dd if=/dev/zero of="${VFAT_IMAGE}" bs="${IMGSZ}" count=1024 status=none
@@ -274,7 +274,7 @@ _unify_gpt_partitions() {
     # --> 62: hide all partitions, Windows cannot access any files on this ISO
     #         Windows will now only error on 1 drive and not on all partitions
     # --> 63: disable freedesktop/systemd automount by default on this ISO
-    for i in $(seq 1 "$(sfdisk -J "${_IMAGENAME}.iso" | grep -cw node)"); do
+    for i in $(seq 1 "$(sfdisk -J "${_IMAGENAME}.iso" | rg -cw 'node')"); do
        sfdisk -q --part-attrs "${_IMAGENAME}.iso" "${i}" "RequiredPartition,60,62,63"
        sfdisk -q --part-uuid "${_IMAGENAME}.iso" "${i}" "${i}0000000-0000-0000-0000-000000000000"
     done
