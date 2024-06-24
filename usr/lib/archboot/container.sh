@@ -32,7 +32,7 @@ _clean_cache() {
         echo "Cleaning pacman cache in ${1}..."
         rm -r "${1}${_CACHEDIR}"
     fi
-    if grep -qw 'archboot' /etc/hostname; then
+    if rg -qw 'archboot' /etc/hostname; then
         echo "Cleaning archboot ${_CACHEDIR}..."
         for i in "${1}${_CACHEDIR}"/*; do
             [[ "${i}" == "${1}${_LOCAL_DB}" ]] || rm -f "${_CACHEDIR}"/"$(basename "${i}")"
@@ -106,7 +106,7 @@ _create_pacman_conf() {
     if [[ -z "${_INSTALL_SOURCE}" ]]; then
         echo "Using default pacman.conf..."
         [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="${1}${_PACMAN_CONF}"
-        if ! grep -qw "\[archboot\]" "${_PACMAN_CONF}"; then
+        if ! rg -qw "\[archboot\]" "${_PACMAN_CONF}"; then
             echo "Adding archboot repository to ${_PACMAN_CONF}..."
             echo "[archboot]" >> "${_PACMAN_CONF}"
             echo "Server = https://pkg.archboot.com" >> "${_PACMAN_CONF}"
@@ -166,7 +166,7 @@ _install_base_packages() {
     fi
     if [[ "${2}" == "use_binfmt" ]]; then
         echo "Downloading ${_KEYRING} ${_PACKAGES} to ${1}..."
-        if grep -q 'archboot' /etc/hostname; then
+        if rg -qw 'archboot' /etc/hostname; then
             #shellcheck disable=SC2086
             ${_PACMAN} -Syw ${_KEYRING} ${_PACKAGES} ${_PACMAN_DEFAULTS} \
                         ${_PACMAN_DB} &>"${_LOG}" || exit 1
@@ -177,7 +177,7 @@ _install_base_packages() {
         fi
     fi
     echo "Installing ${_KEYRING} ${_PACKAGES} to ${1}..."
-    if grep -q 'archboot' /etc/hostname; then
+    if rg -qw 'archboot' /etc/hostname; then
         #shellcheck disable=SC2086
         ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} ${_KEYRING} ${_PACKAGES} \
                    ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
@@ -201,7 +201,7 @@ _install_archboot() {
         _pacman_key_system
     fi
     echo "Installing ${_ARCHBOOT} to ${1}..."
-    if grep -q 'archboot' /etc/hostname; then
+    if rg -qw 'archboot' /etc/hostname; then
         #shellcheck disable=SC2086
         ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
         echo "Downloading ${_MAN_INFO_PACKAGES} to ${1}..."
@@ -229,7 +229,7 @@ _copy_mirrorlist_and_pacman_conf() {
     echo "Creating pacman config and mirrorlist in container..."
     cp "/etc/pacman.d/mirrorlist" "${1}/etc/pacman.d/mirrorlist"
     # only copy from archboot pacman.conf, else use default file
-    grep -qw 'archboot' /etc/hostname && cp /etc/pacman.conf "${1}"/etc/pacman.conf
+    rg -qw 'archboot' /etc/hostname && cp /etc/pacman.conf "${1}"/etc/pacman.conf
 }
 
 _copy_archboot_defaults() {
