@@ -176,7 +176,7 @@ _kver() {
         reader='cat'
         bytes="$(od -An -t x2 -N2 "$1" | tr -dc '[:alnum:]')"
         [[ "$bytes" == '8b1f' ]] && reader='zcat'
-        read -r _ _ kver _ < <($reader "$1" | grep -m1 -aoE 'Linux version .(\.[-[:alnum:]+]+)+')
+        read -r _ _ kver _ < <($reader "$1" | rg -m1 -ao 'Linux version .(\.[-[:alnum:]+]+)+')
     fi
     [[ "$kver" =~ $re ]] || return 1
     printf '%s' "$kver"
