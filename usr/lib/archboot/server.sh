@@ -33,7 +33,7 @@ _update_pacman_chroot() {
     # update container to latest packages
     echo "Updating container to latest packages..."
     # fix mirrorlist
-    [[ "${_ARCH}" == "riscv64" ]] && sed -i -e 's|^#Server = https://riscv|Server = https://riscv|g' \
+    [[ "${_ARCH}" == "riscv64" ]] && sd '^#Server = https://riscv' 'Server = https://riscv' \
                                      "${_ARCH_DIR}"/etc/pacman.d/mirrorlist
     ${_NSPAWN} "${_ARCH_DIR}" pacman -Syu --noconfirm &>"${_NO_LOG}" || exit 1
     _fix_network "${_ARCH_DIR}"
