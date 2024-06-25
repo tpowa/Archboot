@@ -199,8 +199,7 @@ _create_iso() {
     fi
     echo ""
     echo "---Complete Package List---"
-    ${_NSPAWN} "${_W_DIR}" pacman -Q | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g" \
-         -e "s/\x1b\[.*[0-9][h;l]//g") >>Release.txt
+    ${_NSPAWN} "${_W_DIR}" pacman -Q | sd '\r|\x1b\[[0-9;]*m|\x1b\[.[0-9]+[h;l]' '') >>Release.txt
     echo "Removing container ${_W_DIR}..."
     rm -r "${_W_DIR}"
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
