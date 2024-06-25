@@ -86,7 +86,7 @@ _result fw-error.txt
 # uninstall base again!
 pacman --noconfirm -Rdd base gettext &>>"${_LOG}"
 _run_test "licenses"
-for i in $(pacman -Ql $(pacman -Q | cut -d ' ' -f 1) | rg -o '/usr/share/licenses/.*'); do
+for i in $(pacman -Ql $(pacman -Q | sd ' .*' '') | rg -o '/usr/share/licenses/.*'); do
     [[ -e "${i}" ]] || echo "${i}" | rg -v '/xz/' >>license-error.txt
 done
 _result license-error.txt
