@@ -112,7 +112,7 @@ _create_pacman_conf() {
             echo "Server = https://pkg.archboot.com" >> "${_PACMAN_CONF}"
         fi
         #shellcheck disable=SC2001
-        [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(echo "${_PACMAN_CONF}" | sed -e "s#^${1}##g")"
+        [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(echo "${_PACMAN_CONF}" | sd "^${1}" '')"
     else
         echo "Using custom pacman.conf..."
         _PACMAN_CONF="$(mktemp "${1}"/pacman.conf.XXX)"
@@ -146,16 +146,14 @@ _ssh_keys() {
 
 _change_pacman_conf() {
     # enable parallel downloads
-    sed -i -e 's:^#ParallelDownloads:ParallelDownloads:g' "${1}"/etc/pacman.conf
-    sed -i -e 's:^#Color:Color:g' "${1}"/etc/pacman.conf
+    sd '^#ParallelDownloads' 'ParallelDownloads' "${1}"/etc/pacman.conf
+    sd '^#Color' 'Color' "${1}"/etc/pacman.conf
 }
 
 # umount special filesystems
 _umount_special() {
     echo "Unmounting special filesystems in ${1}..."
-    umount -R "${1}/proc"
-    umount -R "${1}/sys"
-    umount -R "${1}/dev"
+    umount -R "${1}"/{proc,sys,dev}
 }
 
 _install_base_packages() {
@@ -239,7 +237,7 @@ _copy_archboot_defaults() {
 
 _reproducibility() {
     echo "Reproducibility changes..."
-    sed -i -e '/INSTALLDATE/{n;s/.*/0/}' "${1}""${_PACMAN_LIB}"/local/*/desc
+    sd 'INSTALLDATE' '{n;s/.*/0/}' "${1}""${_PACMAN_LIB}"/local/*/desc
     rm "${1}"/var/cache/ldconfig/aux-cache
     rm "${1}"/etc/ssl/certs/java/cacerts
 }
