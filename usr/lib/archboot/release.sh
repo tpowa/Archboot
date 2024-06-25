@@ -107,27 +107,27 @@ _create_iso() {
     mv init-* boot/
     if [[ "${_ARCH}" == "riscv64" ]]; then
         for i in *.img; do
-            if  echo "${i}" | grep -v local | grep -vq latest; then
+            if  echo "${i}" | rg -v 'local' | rg -vq 'latest'; then
                 mcopy -m -i "${i}"@@1048576 ::/"${_KERNEL_ARCHBOOT}" ./"${_KERNEL_ARCHBOOT}"
                 mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD}"
-            elif echo "${i}" | grep -q latest; then
+            elif echo "${i}" | rg -q 'latest'; then
                 mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD_LATEST}"
-            elif echo "${i}" | grep -q local; then
+            elif echo "${i}" | rg -q 'local'; then
                 mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD_LOCAL}"
             fi
         done
     else
         for i in *.iso; do
-            if  echo "${i}" | grep -v local | grep -vq latest; then
+            if  echo "${i}" | rg -v 'local' | rg -vq 'latest'; then
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
                 mcopy -m -i efi.img ::/"${_AMD_UCODE}" ./"${_AMD_UCODE}"
                 [[ "${_ARCH}" == "aarch64" ]] || mcopy -m -i efi.img ::/"${_INTEL_UCODE}" ./"${_INTEL_UCODE}"
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD}"
                 mcopy -m -i efi.img ::/"${_KERNEL_ARCHBOOT}" ./"${_KERNEL_ARCHBOOT}"
-            elif echo "${i}" | grep -q latest; then
+            elif echo "${i}" | rg -q 'latest'; then
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD_LATEST}"
-            elif echo "${i}" | grep -q local; then
+            elif echo "${i}" | rg -q 'local'; then
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD_LOCAL}"
             fi
@@ -183,19 +183,19 @@ _create_iso() {
     echo "Tobias Powalowski <tpowa@archlinux.org>"
     echo ""
     echo "Requirement: ${_ARCH} with 800M RAM and higher"
-    echo "Archboot:$(${_NSPAWN} "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" | grep Version |\
-         cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")"
+    echo "Archboot:$(${_NSPAWN} "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" |\
+    rg -o 'Version.* (.*)' -r '$1')"
     [[ "${_ARCH}" == "riscv64" ]] || echo "Grub: $(${_NSPAWN} "${_W_DIR}" pacman -Qi grub |\
-                                     grep Version | cut -d ":" -f3 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")"
-    echo "Linux:$(${_NSPAWN} "${_W_DIR}" pacman -Qi linux | grep Version |\
-         cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")"
-    echo "Pacman:$(${_NSPAWN} "${_W_DIR}" pacman -Qi pacman | grep Version |\
-         cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")"
-    echo "Systemd:$(${_NSPAWN} "${_W_DIR}" pacman -Qi systemd | grep Version |\
-         cut -d ":" -f2 | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g")"
+                                     rg -o 'Version.* (.*)' -r '$1')"
+    echo "Linux:$(${_NSPAWN} "${_W_DIR}" pacman -Qi linux |\
+    rg -o 'Version.* (.*)' -r '$1')"
+    echo "Pacman:$(${_NSPAWN} "${_W_DIR}" pacman -Qi pacman |\
+    rg -o 'Version.* (.*)' -r '$1')"
+    echo "Systemd:$(${_NSPAWN} "${_W_DIR}" pacman -Qi systemd |\
+    rg -o 'Version.* (.*)' -r '$1')"
     echo ""
     if [[ -f "${_W_DIR}"/etc/archboot/ssh/archboot-key ]]; then
-        ${_NSPAWN} "${_W_DIR}" cat /etc/archboot/ssh/archboot-key | sed -e "s/\r//g" -e "s/\x1b\[[0-9;]*m//g"
+        cat "${_W_DIR}"/etc/archboot/ssh/archboot-key
     fi
     echo ""
     echo "---Complete Package List---"

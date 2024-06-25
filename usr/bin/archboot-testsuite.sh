@@ -28,25 +28,25 @@ _archboot_check
 echo "Waiting for pacman keyring..."
 _pacman_keyring
 _run_test "journal"
-if ! journalctl -p3 -xb | grep -q 'No entries'; then
+if ! journalctl -p3 -xb | rg -q 'No entries'; then
     journalctl -p3 -xb >>journal-error.txt
     _TEST_FAIL=1
 fi
 _result journal-error.txt
 _run_test "ldd on /usr/bin"
 for i in /usr/bin/*; do
-    if ldd "${i}" 2>"${_NO_LOG}" | grep -q 'not found'; then
+    if ldd "${i}" 2>"${_NO_LOG}" | rg -q 'not found'; then
         echo "${i}" >>bin-binary-error.txt
-        ldd "${i}" | grep 'not found' >>bin-binary-error.txt
+        ldd "${i}" | rg 'not found' >>bin-binary-error.txt
         _TEST_FAIL=1
     fi
 done
 _result bin-binary-error.txt
 _run_test "ldd on executables in /usr/lib"
 for i in $(fd -u -t x -E '*.so.*' -E '*.so' . /usr/lib); do
-    if ldd "${i}" 2>"${_NO_LOG}" | grep -q 'not found'; then
+    if ldd "${i}" 2>"${_NO_LOG}" | rg -q 'not found'; then
         echo "${i}" >>lib-binary-error.txt
-        ldd "${i}" | grep 'not found' >>lib-binary-error.txt
+        ldd "${i}" | rg 'not found' >>lib-binary-error.txt
         _TEST_FAIL=1
     fi
 done
@@ -54,9 +54,9 @@ _result lib-binary-error.txt
 _run_test "ldd on /usr/lib"
 # ignore wrong reported libsystemd-shared by libsystemd-core
 for i in $(fd -u '.so' /usr/lib); do
-    if ldd "${i}" 2>"${_NO_LOG}" | grep -v -E 'tree_sitter|libsystemd-shared' | grep -q 'not found'; then
+    if ldd "${i}" 2>"${_NO_LOG}" | rg -v 'tree_sitter|libsystemd-shared' | rg -q 'not found'; then
         echo "${i}" >>lib-error.txt
-        ldd "${i}" | grep 'not found' >>lib-error.txt
+        ldd "${i}" | rg 'not found' >>lib-error.txt
         _TEST_FAIL=1
     fi
 done
@@ -71,8 +71,8 @@ systemd-confext systemd-cryptsetup systemd-delta systemd-home-fallback-shell sys
 systemd-run systemd-vmspawn systemd-vpick varlinkctl xtrace"
 archboot-binary-check.sh base &>>"${_LOG}"
 #shellcheck disable=SC2013
-for i in $(grep '/usr/bin/' binary.txt | sed -e 's#^/usr/bin/##g'); do
-    if ! echo "${_BASE_BLACKLIST}" | grep -qw "${i}"; then
+for i in $(rg '/usr/bin/(.*)' -r '$1' binary.txt); do
+    if ! echo "${_BASE_BLACKLIST}" | rg -qw "${i}"; then
         echo "${i}" >> base-binary-error.txt
         _TEST_FAIL=1
     fi
@@ -86,8 +86,8 @@ _result fw-error.txt
 # uninstall base again!
 pacman --noconfirm -Rdd base gettext &>>"${_LOG}"
 _run_test "licenses"
-for i in $(pacman -Ql $(pacman -Q | cut -d ' ' -f 1) | cut -d ' ' -f2 | grep 'share/licenses'); do
-    [[ -e "${i}" ]] || echo "${i}" | grep -v '/xz/' >>license-error.txt
+for i in $(pacman -Ql $(pacman -Q | cut -d ' ' -f 1) | rg -o '/usr/share/licenses/.*'); do
+    [[ -e "${i}" ]] || echo "${i}" | rg -v '/xz/' >>license-error.txt
 done
 _result license-error.txt
 echo -e "Starting none tracked files in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
