@@ -27,7 +27,7 @@ _timezone () {
             fi
         done
         _ZONES=""
-        for i in $(timedatectl --no-pager list-timezones | grep -w "${_REGION}" | cut -d '/' -f 2 | sort -u); do
+        for i in $(timedatectl --no-pager list-timezones | rg "${_REGION}" | sd '.*/' '' | sort -u); do
             _ZONES="${_ZONES} ${i} -"
         done
         #shellcheck disable=SC2086
