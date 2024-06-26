@@ -85,7 +85,7 @@ _geoip_mirrorlist() {
         _COUNTRY="$(${_DLPROG} "http://ip-api.com/csv/?fields=countryCode")"
         echo "GeoIP country ${_COUNTRY} detected." >>"${_LOG}"
         ${_DLPROG} -o /tmp/pacman_mirrorlist.txt "https://www.archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on"
-        sed -i -e 's|^#Server|Server|g' /tmp/pacman_mirrorlist.txt
+        sd '^#Server' 'Server' /tmp/pacman_mirrorlist.txt
         if rg -q 'Server = https:' /tmp/pacman_mirrorlist.txt; then
             mv "${_PACMAN_MIRROR}" "${_PACMAN_MIRROR}.bak"
             cp /tmp/pacman_mirrorlist.txt "${_PACMAN_MIRROR}"

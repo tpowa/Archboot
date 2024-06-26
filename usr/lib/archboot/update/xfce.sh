@@ -123,7 +123,7 @@ _configure_xfce() {
 </channel>
 EOF
     echo "Setting breeze as default icons..."
-    sed -i -e 's#<property name="IconThemeName" type="string" value="Adwaita"/>#<property name="IconThemeName" type="string" value="breeze"/>#g' \
+    sd '<property name="IconThemeName" type="string" value="Adwaita"/>' '<property name="IconThemeName" type="string" value="breeze"/>' \
     /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
     echo "Setting archboot background image..."
     cat << EOF >/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
@@ -163,9 +163,9 @@ EOF
 </channel>
 EOF
     echo "Replacing appfinder launcher with gparted..."
-    sed -i -e 's#xfce4-appfinder#gparted#g' /etc/xdg/xfce4/panel/default.xml
+    sd 'xfce4-appfinder' 'gparted' /etc/xdg/xfce4/panel/default.xml
     echo "Replacing directory menu launcher with setup..."
-    sed -i -e 's#directorymenu#archboot#g' /etc/xdg/xfce4/panel/default.xml
+    sd 'directorymenu' 'archboot' /etc/xdg/xfce4/panel/default.xml
     echo "Replacing menu structure..."
     cat << EOF >/etc/xdg/menus/xfce-applications.menu
 <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
@@ -224,7 +224,7 @@ EOF
 </Menu>
 EOF
     echo "Adding gparted to xfce top level menu..."
-    sed -i -e 's#Categories=.*#Categories=X-Xfce-Toplevel;#g' /usr/share/applications/gparted.desktop
+    sd 'Categories=.*' 'Categories=X-Xfce-Toplevel;' /usr/share/applications/gparted.desktop
     _HIDE_MENU="xfce4-mail-reader xfce4-about"
     echo "Hiding ${_HIDE_MENU} menu entries..."
     for i in ${_HIDE_MENU}; do

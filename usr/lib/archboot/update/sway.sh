@@ -6,9 +6,10 @@ _configure_sway() {
     echo "Configuring Sway..."
     echo "Configuring bemenu..."
     #shellcheck disable=SC2016
-    sed -i -e 's|^set $menu.*|set $menu j4-dmenu-desktop --dmenu=\x27bemenu -i --tf "#00ff00" --hf "#00ff00" --nf "#dcdccc" --fn "pango:Terminus 12" -H 30\x27 --no-generic --term="foot"|g' /etc/sway/config
+    sd '^set $menu.*' 'set $menu j4-dmenu-desktop --dmenu=\x27bemenu -i --tf "#00ff00" --hf "#00ff00" --nf "#dcdccc" --fn "pango:Terminus 12" -H 30\x27 --no-generic --term="foot"' \
+    /etc/sway/config
     echo "Configuring wallpaper..."
-    sed -i -e 's|^output .*|output * bg /usr/share/archboot/grub/archboot-background.png fill|g' /etc/sway/config
+    sd '^output .*' 'output * bg /usr/share/archboot/grub/archboot-background.png fill' /etc/sway/config
     echo "Configuring foot..."
     if ! rg -q 'archboot colors' /etc/xdg/foot/foot.ini; then
 cat <<EOF >> /etc/xdg/foot/foot.ini
@@ -87,11 +88,11 @@ EOF
     echo "Configuring waybar..."
     if ! rg -q 'exec waybar' /etc/sway/config; then
         # hide sway-bar
-        sed -i '/position top/a mode invisible' /etc/sway/config
+        sd 'position top' 'a mode invisible' /etc/sway/config
         # diable not usable plugins
         echo "exec waybar" >> /etc/sway/config
-        sed -i -e 's#, "custom/media"##g' /etc/xdg/waybar/config
-        sed -i -e 's#"mpd", "idle_inhibitor", "pulseaudio",##g' /etc/xdg/waybar/config
+        sd ', "custom/media"' '' /etc/xdg/waybar/config
+        sd '"mpd", "idle_inhibitor", "pulseaudio",' '' /etc/xdg/waybar/config
     fi
     echo "Configuring wayvnc..."
      if ! rg -q wayvnc /etc/sway/config; then

@@ -56,7 +56,8 @@ GenericName=Installer
 Exec=konsole -p colors=Linux -e /usr/bin/setup
 Icon=system-software-install
 EOF
-	sed -i -e "s#<default>applications:.*#<default>applications:systemsettings.desktop,applications:org.kde.konsole.desktop,preferred://filemanager,applications:${_STANDARD_BROWSER}.desktop,applications:gparted.desktop,applications:archboot.desktop</default>#g" /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml
+	sd '<default>applications:.*' "<default>applications:systemsettings.desktop,applications:org.kde.konsole.desktop,preferred://filemanager,applications:${_STANDARD_BROWSER}.desktop,applications:gparted.desktop,applications:archboot.desktop</default>" \
+	/usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
 }
 
