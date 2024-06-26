@@ -6,17 +6,17 @@ _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Lau
 
 _check_desktop() {
     _DESKTOP=()
-    update | grep -q Gnome && _DESKTOP+=( "gnome" "Simple Beautiful Elegant" )
-    update | grep -q KDE && _DESKTOP+=( "plasma" "Simple By Default" )
-    update | grep -q Sway && _DESKTOP+=( "sway" "Tiling Wayland Compositor" )
-    update | grep -q Xfce && _DESKTOP+=( "xfce" "Leightweight Desktop" )
+    update | rg -q 'Gnome' && _DESKTOP+=( "gnome" "Simple Beautiful Elegant" )
+    update | rg -q 'KDE' && _DESKTOP+=( "plasma" "Simple By Default" )
+    update | rg -q 'Sway' && _DESKTOP+=( "sway" "Tiling Wayland Compositor" )
+    update | rg -q 'Xfce' && _DESKTOP+=( "xfce" "Leightweight Desktop" )
 }
 
 _check_manage() {
     _MANAGE=()
-    update | grep -q full && _MANAGE+=( "FULL" "Switch To Full Arch Linux System" )
-    update | grep -q 'latest archboot' && _MANAGE+=( "UPDATE" "Update Archboot Environment" )
-    update | grep -q image && _MANAGE+=( "IMAGE" "Create Archboot Images" )
+    update | rg -q 'full' && _MANAGE+=( "FULL" "Switch To Full Arch Linux System" )
+    update | rg -q 'latest archboot' && _MANAGE+=( "UPDATE" "Update Archboot Environment" )
+    update | rg -q 'image' && _MANAGE+=( "IMAGE" "Create Archboot Images" )
 }
 
 _desktop () {

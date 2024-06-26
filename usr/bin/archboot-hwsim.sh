@@ -26,7 +26,7 @@ _pacman_keyring
 echo "Installing kernel..."
 pacman -Sydd --noconfirm --noscriptlet linux &>"${_LOG}"
 depmod -a
-if ! grep -qw mac80211_hwsim /proc/modules; then
+if ! rg -qw 'mac80211_hwsim' /proc/modules; then
 	modprobe mac80211_hwsim
 fi
 iwctl ap wlan0 stop
