@@ -40,7 +40,7 @@ _essid_list() {
     # only show lines with signal '*'
     # kill spaces from the end and replace spaces with + between
     # '+' character is one of 6 forbidden characters in SSID standard
-    for dev in $(iwctl station "${_INTERFACE}" get-networks | grep '\*' | cut -c 1-41 | sed -e 's|\ *.$||g' -e 's|^.*\ \ ||g' -e 's| |\+|g'); do
+    for dev in $(iwctl station "${_INTERFACE}" get-networks | rg -o '(^{1,41}).*\*' -r '$1' | sd ' *.$|^.*  ' '' | sd ' ' '\+'); do
         echo "${dev}"
         [[ "${1}" ]] && echo "${1}"
     done
@@ -66,7 +66,7 @@ _wireless() {
             "RESCAN" "SSIDs" "HIDDEN" "SSID" $(_essid_list _) 2>"${_ANSWER}"; then
             _WLAN_SSID=$(cat "${_ANSWER}")
             _CONTINUE=1
-            if grep -q 'RESCAN' "${_ANSWER}"; then
+            if rg -q 'RESCAN' "${_ANSWER}"; then
                 _CONTINUE=""
             fi
         else
@@ -85,7 +85,7 @@ _wireless() {
     _WLAN_SSID="$(echo ${_WLAN_SSID} | sed -e 's|\+|\ |g')"
     # expect hidden network has a WLAN_KEY
     #shellcheck disable=SC2143
-    if ! [[ "$(iwctl station "${_INTERFACE}" get-networks | grep -w "${_WLAN_SSID}" | cut -c 42-49 | grep -q 'open')" ]] \
+    if ! [[ "$(iwctl station "${_INTERFACE}" get-networks | rg -w "${_WLAN_SSID}" | cut -c 42-49 | rg -q 'open')" ]] \
     || [[ "${_WLAN_CONNECT}" == "connect-hidden" ]]; then
         _dialog --no-cancel --title " Connection Key " --inputbox "" 7 50 "Secret-WirelessKey" 2>"${_ANSWER}"
         _WLAN_KEY=$(cat "${_ANSWER}")
@@ -130,7 +130,7 @@ _network() {
         done
         echo "${_INTERFACE}" >/.network-interface
         # iwd renames wireless devices to wlanX
-        if echo "${_INTERFACE}" | grep -q wlan; then
+        if echo "${_INTERFACE}" | rg -q 'wlan'; then
             _CONNECTION="wireless"
         else
             _CONNECTION="ethernet"

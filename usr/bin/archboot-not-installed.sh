@@ -27,5 +27,5 @@ done
 # linux-firmware-whence only license files
 # pacman-mirrorlist only /etc file
 # pambase only /etc files
-grep -v -E "ca-certificates|dbus-broker-units|iana-etc|licenses|linux-firmware-whence|pacman-mirrorlist|pambase" not-installed.orig.txt >not-installed.txt
+rg -v "ca-certificates|dbus-broker-units|iana-etc|licenses|linux-firmware-whence|pacman-mirrorlist|pambase" not-installed.orig.txt >not-installed.txt
 # vim: set ft=sh ts=4 sw=4 et:
