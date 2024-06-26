@@ -7,7 +7,7 @@
 # wait for modules to initialize cmompletely
 udevadm wait --settle /dev/fb0
 # get screen setting mode from /sys
-_FB_SIZE="$(sed -e 's#.*:##g' -e 's#x.*##g' /sys/class/graphics/fb0/modes 2>/dev/null)"
+_FB_SIZE="$(rg -o ':(.*)x' -r '$1' /sys/class/graphics/fb0/modes 2>/dev/null)"
 if [[ "${_FB_SIZE}" -gt '1900' ]]; then
     _SIZE="32"
 else
