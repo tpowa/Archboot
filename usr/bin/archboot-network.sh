@@ -85,7 +85,7 @@ _wireless() {
     _WLAN_SSID="$(echo ${_WLAN_SSID} | sed -e 's|\+|\ |g')"
     # expect hidden network has a WLAN_KEY
     #shellcheck disable=SC2143
-    if ! [[ "$(iwctl station "${_INTERFACE}" get-networks | rg -w "${_WLAN_SSID}" | cut -c 42-49 | rg -q 'open')" ]] \
+    if ! [[ "$(iwctl station "${_INTERFACE}" get-networks | rg -q "${_WLAN_SSID}.*open")" ]] \
     || [[ "${_WLAN_CONNECT}" == "connect-hidden" ]]; then
         _dialog --no-cancel --title " Connection Key " --inputbox "" 7 50 "Secret-WirelessKey" 2>"${_ANSWER}"
         _WLAN_KEY=$(cat "${_ANSWER}")
