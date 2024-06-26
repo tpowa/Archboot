@@ -23,14 +23,14 @@ _select_mirror() {
         _COUNTRY="$(${_DLPROG} "http://ip-api.com/csv/?fields=countryCode")"
         _DOWNLOAD="Downloading latest mirrorlist for Region ${_COUNTRY}..."
         _download_mirror | _dialog --title " Pacman Configuration " --no-mouse --gauge "${_DOWNLOAD}" 6 70 0
-        if grep -q '#Server = https:' /tmp/pacman_mirrorlist.txt; then
+        if rg -q '#Server = https:' /tmp/pacman_mirrorlist.txt; then
             mv "${_PACMAN_MIRROR}" "${_PACMAN_MIRROR}.bak"
             cp /tmp/pacman_mirrorlist.txt "${_PACMAN_MIRROR}"
         fi
     fi
     # This regex doesn't honor commenting
-    _MIRRORS=$(grep -E -o '(https)://[^/]*' "${_PACMAN_MIRROR}" | sed 's|$| _|g')
-    [[ -z ${_MIRRORS} ]] && _MIRRORS=$(grep -E -o '(http)://[^/]*' "${_PACMAN_MIRROR}" | sed 's|$| _|g')
+    _MIRRORS=$(rg -o '(https)://[^/]*' "${_PACMAN_MIRROR}" | sd '$' ' _')
+    [[ -z ${_MIRRORS} ]] && _MIRRORS=$(rg -o '(http)://[^/]*' "${_PACMAN_MIRROR}" | sd '$' ' _'|)
     #shellcheck disable=SC2086
     _dialog --cancel-label "${_LABEL}" --title " Package Mirror " --menu "" 13 55 7 \
     "Custom Mirror" "_"  ${_MIRRORS} 2>${_ANSWER} || return 1
@@ -45,7 +45,7 @@ _select_mirror() {
         # our mirrorlist and pulling the full URL out. Substitute 'core' in
         # for the repository name, and ensure that if it was listed twice we
         # only return one line for the mirror.
-        _SYNC_URL=$(grep -E -o "${_SERVER}.*" "${_PACMAN_MIRROR}" | head -n1)
+        _SYNC_URL=$(rg -o "${_SERVER}.*" "${_PACMAN_MIRROR}" | head -n1)
     fi
     echo "Using mirror: ${_SYNC_URL}" >"${_LOG}"
     # comment already existing entries
@@ -60,7 +60,7 @@ _select_mirror() {
 }
 
 _enable_testing() {
-    if ! grep -q "^\[.*testing\]" /etc/pacman.conf; then
+    if ! rg -q "^\[.*testing\]" /etc/pacman.conf; then
         _DOTESTING=""
         _dialog --title " Testing Repositories " --defaultno --yesno "Do you want to enable testing repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 8 50 && _DOTESTING=1
         if [[ -n "${_DOTESTING}" ]]; then
@@ -95,18 +95,18 @@ _task_update_environment() {
     _ONLINE_KERNEL=""
     pacman -Sy &>"${_LOG}"
     #shellcheck disable=SC2086
-    _LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+    _LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | rg 'Version.*: (.*)' -r '$1')"
     if  [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         #shellcheck disable=SC2086
-        _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+        _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | rg 'Version.*: (.*)' -r '$1')"
     else
         if [[ -n "${_DOTESTING}" ]]; then
             #shellcheck disable=SC2086
-            _ONLINE_KERNEL="$(pacman -Si core-testing/${_KERNELPKG} 2>${_NO_LOG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+            _ONLINE_KERNEL="$(pacman -Si core-testing/${_KERNELPKG} 2>${_NO_LOG} | rg 'Version.*: (.*)' -r '$1')"
         fi
         if [[ -z "${_ONLINE_KERNEL}" ]]; then
             #shellcheck disable=SC2086
-            _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | grep Version | cut -d ':' -f2 | sed -e 's# ##')"
+            _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | rg 'Version.*: (.*)' -r '$1')"
         fi
     fi
     echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
@@ -170,8 +170,8 @@ EOF
     fi
 done
 if [[ ! -e "/var/cache/pacman/pkg/archboot.db" ]] &&\
-    update | grep -q '\-latest' &&\
-    [[ "$(grep -w MemTotal /proc/meminfo | cut -d ':' -f2 | sed -e 's# ##g' -e 's#kB$##g')" -gt "2571000" ]] &&\
+    update | rg -q '\-latest' &&\
+    [[ "$(rg -o 'MemTotal.* (\d+)' -r '$1' /proc/meminfo)" -gt "2571000" ]] &&\
     ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         _update_environment | _dialog --title " Pacman Configuration " --no-mouse --gauge "Checking on new online kernel version..." 6 70 0
         if [[ -e /.new_kernel ]]; then
