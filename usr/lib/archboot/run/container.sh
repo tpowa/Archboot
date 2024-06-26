@@ -8,7 +8,7 @@ _parameters "$@"
 _root_check
 echo "Starting container creation..."
 [[ -d "${1}" ]] || (echo "Creating directory ${1}..."; mkdir "${1}")
-if echo "${_BASENAME}" | grep -qw "${_RUNNING_ARCH}"; then
+if echo "${_BASENAME}" | rg -qw "${_RUNNING_ARCH}"; then
     # running system = creating system
     _cachedir_check
     _create_pacman_conf "${1}"
@@ -25,22 +25,19 @@ if echo "${_BASENAME}" | grep -qw "${_RUNNING_ARCH}"; then
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _copy_archboot_defaults "${1}"
         # enable [*-testing] if enabled in host
-        if grep -q "^\[core-testing" /etc/pacman.conf; then
+        if rg -q "^\[core-testing" /etc/pacman.conf; then
             echo "Enable [core-testing] and [extra-testing] repository in container..."
-            sed -i -e '/^#\[core-testing\]/ { n ; s/^#// }' "${1}/etc/pacman.conf"
-            sed -i -e '/^#\[extra-testing\]/ { n ; s/^#// }' "${1}/etc/pacman.conf"
-            sed -i -e 's:^#\[core-testing\]:\[core-testing\]:g' \
-                   -e  's:^#\[extra-testing\]:\[extra-testing\]:g' "${1}/etc/pacman.conf"
+            sd '^#(\[[c,e].*-testing\]\n)#' '$1' "${1}/etc/pacman.conf"
         fi
     fi
 else
     # running system != creating system
     if [[ "${_RUNNING_ARCH}" == "x86_64"  ]]; then
-        if echo "${_BASENAME}" | grep -qw aarch64; then
+        if echo "${_BASENAME}" | rg -qw 'aarch64'; then
             _pacman_chroot "${1}" "${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}" \
                            "${_PACMAN_AARCH64_CHROOT}" || exit 1
         fi
-        if echo "${_BASENAME}" | grep -qw riscv64; then
+        if echo "${_BASENAME}" | rg -qw 'riscv64'; then
             _pacman_chroot "${1}" "${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}" \
                            "${_PACMAN_RISCV64_CHROOT}" || exit 1
         fi

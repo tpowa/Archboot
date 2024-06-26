@@ -10,7 +10,7 @@ _root_check
 [[ -d "${1}" ]] || (echo "Creating directory ${1}..."; mkdir "${1}")
 _REPODIR="$(mktemp -d "${1}"/repository.XXX)"
 echo "Starting repository creation..."
-if echo "${_BASENAME}" | grep -qw "${_RUNNING_ARCH}"; then
+if echo "${_BASENAME}" | rg -qw "${_RUNNING_ARCH}"; then
     # running system = creating system
     [[ "${_RUNNING_ARCH}" == "x86_64" ]] && (_x86_64_pacman_use_default || exit 1)
     _cachedir_check
@@ -23,11 +23,11 @@ if echo "${_BASENAME}" | grep -qw "${_RUNNING_ARCH}"; then
 else
     # running system != creating system
     if [[ "${_RUNNING_ARCH}" == "x86_64"  ]]; then
-        if echo "${_BASENAME}" | grep -qw aarch64; then
+        if echo "${_BASENAME}" | rg -qw 'aarch64'; then
             _pacman_chroot "${_REPODIR}" "${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}" \
                            "${_PACMAN_AARCH64_CHROOT}" || exit 1
         fi
-        if echo "${_BASENAME}" | grep -qw riscv64; then
+        if echo "${_BASENAME}" | rg -qw 'riscv64'; then
             _pacman_chroot "${_REPODIR}" "${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}" \
                            "${_PACMAN_RISCV64_CHROOT}" || exit 1
         fi
