@@ -28,7 +28,7 @@ _desktop () {
     "chromium" "Browser From Google" \
     "firefox" "Browser From Mozilla" 2>${_ANSWER} || return 1
     _BROWSER="$(cat ${_ANSWER})"
-    sed -i -e "s#STANDARD_BROWSER=.*#STANDARD_BROWSER=${_BROWSER}#g" /etc/archboot/defaults
+    sd "STANDARD_BROWSER=.*" "STANDARD_BROWSER=${_BROWSER}" /etc/archboot/defaults
     source /etc/locale.conf
     clear
     update -${_EXIT} || exit 1

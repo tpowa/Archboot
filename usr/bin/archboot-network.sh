@@ -82,7 +82,7 @@ _wireless() {
     fi
     # replace # with spaces again
     #shellcheck disable=SC2001,SC2086
-    _WLAN_SSID="$(echo ${_WLAN_SSID} | sed -e 's|\+|\ |g')"
+    _WLAN_SSID="$(echo ${_WLAN_SSID} | sd '\+' ' ')"
     # expect hidden network has a WLAN_KEY
     #shellcheck disable=SC2143
     if ! [[ "$(iwctl station "${_INTERFACE}" get-networks | rg -q "${_WLAN_SSID}.*open")" ]] \

@@ -49,7 +49,7 @@ _select_mirror() {
     fi
     echo "Using mirror: ${_SYNC_URL}" >"${_LOG}"
     # comment already existing entries
-    sed -i -e 's|^Server|#Server|g' "${_PACMAN_MIRROR}"
+    sd '^Server' '#Server' "${_PACMAN_MIRROR}"
     #shellcheck disable=SC2027,SC2086
     echo "Server = "${_SYNC_URL}"" >> "${_PACMAN_MIRROR}"
     if ! pacman -Sy &>${_LOG}; then
@@ -64,9 +64,7 @@ _enable_testing() {
         _DOTESTING=""
         _dialog --title " Testing Repositories " --defaultno --yesno "Do you want to enable testing repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 8 50 && _DOTESTING=1
         if [[ -n "${_DOTESTING}" ]]; then
-            sed -i -e '/^#\[core-testing\]/ { n ; s/^#// }' /etc/pacman.conf
-            sed -i -e '/^#\[extra-testing\]/ { n ; s/^#// }' /etc/pacman.conf
-            sed -i -e 's:^#\[core-testing\]:\[core-testing\]:g' -e  's:^#\[extra-testing\]:\[extra-testing\]:g' /etc/pacman.conf
+            sd '^#(\[[c,e].*-testing\]\n)#' '$1' "${1}/etc/pacman.conf"
         fi
     else
         _DOTESTING=1
