@@ -237,7 +237,7 @@ _copy_archboot_defaults() {
 
 _reproducibility() {
     echo "Reproducibility changes..."
-    sd -p '(INSTALLDATE%)\n.*' '$1\n0' "${1}""${_PACMAN_LIB}"/local/*/desc
+    sd '(INSTALLDATE%)\n.*' '$1\n0' "${1}""${_PACMAN_LIB}"/local/*/desc
     rm "${1}"/var/cache/ldconfig/aux-cache
     rm "${1}"/etc/ssl/certs/java/cacerts
 }
