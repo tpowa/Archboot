@@ -29,7 +29,7 @@ _select_mirror() {
         fi
     fi
     # This regex doesn't honor commenting
-    _MIRRORS=$(rg -o '(https)://[^/]*' "${_PACMAN_MIRROR}" | sd '$' ' _')
+    _MIRRORS=$(rg -o '(https://[^/]*)' -r '$1 _')
     [[ -z ${_MIRRORS} ]] && _MIRRORS=$(rg -o '(http)://[^/]*' "${_PACMAN_MIRROR}" | sd '$' ' _')
     #shellcheck disable=SC2086
     _dialog --cancel-label "${_LABEL}" --title " Package Mirror " --menu "" 13 55 7 \
