@@ -21,7 +21,7 @@ _online_switch() {
 }
 
 _net_interfaces() {
-    find /sys/class/net/* -type l ! -name 'lo' -printf '%f ' -exec cat {}/address \;
+    fd -E '/lo' . '/sys/class/net' -x rg '(.*)' -r '{/} $1' {}/address | sort -u
 }
 
 _essid_scan() {
