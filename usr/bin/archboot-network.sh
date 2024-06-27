@@ -40,11 +40,8 @@ _essid_list() {
     # only show lines with signal '*'
     # kill spaces from the end and replace spaces with + between
     # '+' character is one of 6 forbidden characters in SSID standard
-    _ESSID+="$(iwctl station "${_INTERFACE}" get-networks | rg -o ' {6}(.{34}).*\*' -r '"$1' | sd ' *\n$' '"')"
-    for dev in ${_ESSID[@]}; do
-        echo "\"${dev}\""
-        [[ "${1}" ]] && echo "${1}"
-    done
+    _ESSID+="$(iwctl station "${_INTERFACE}" get-networks | rg -o ' {6}(.{34}).*\*' -r '"$1' | sd ' *\n$' '" _')"
+    echo ${_ESSID[@]}
 }
 
 _wireless() {
