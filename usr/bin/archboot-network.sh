@@ -36,13 +36,6 @@ _essid_scan() {
     done
 }
 
-_essid_list() {
-    # only show lines with signal '*'
-    # kill spaces from the end and replace spaces with + between
-    # '+' character is one of 6 forbidden characters in SSID standard
-
-}
-
 _wireless() {
     _WLAN_HIDDEN=""
     _WLAN_SSID=""
