@@ -31,11 +31,6 @@ _run ()
     [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _map _binary waitpid
     # add file magic file
     _file /usr/share/file/misc/magic.mgc
-    # add C.UTF-8 locale
-    _dir /usr/lib/locale
-    [[ -d /usr/lib/locale/C.utf8 ]] && _full_dir /usr/lib/locale/C.utf8
-    # add custom locale
-    [[ -e "/usr/lib/locale/locale-archive" ]] && _file /usr/lib/locale/locale-archive
     # add shadow
     _map _binary groups ch{age,fn,sh} expiry {fail,last}log \
           {chg,ch,g}passwd group{add,del,mems,mod} grp{ck,conv,unconv} \

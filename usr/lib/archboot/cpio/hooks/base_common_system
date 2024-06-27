@@ -50,6 +50,11 @@ cgls,cgtop,confextdelta,detect-virt,escape,firstboot,hwdb,inhibit,machine-id-set
 resolve,repartrun,socket-activate,stdio-bridge,sysusers,tty-ask-password-agent,umount,creds,cryptenroll,dissect,\
 id128,sysext} tar tee testpkg top touch trust tty unix_{chkpwd,update} /usr/lib/dbus-1.0/dbus-daemon-launch-helper \
                  umount.nfs{,4} update-ca-trust vercmp wc yes zstd
+    # add C.UTF-8 locale
+    _dir /usr/lib/locale
+    [[ -d /usr/lib/locale/C.utf8 ]] && _full_dir /usr/lib/locale/C.utf8
+    # add custom locale
+    [[ -e "/usr/lib/locale/locale-archive" ]] && _file /usr/lib/locale/locale-archive
     # use patched aarch64 pacman-key
     # https://archlinuxarm.org/forum/viewtopic.php?f=15&t=16701
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
