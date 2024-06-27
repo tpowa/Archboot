@@ -41,6 +41,7 @@ _wireless() {
     _WLAN_SSID=""
     _WLAN_KEY=""
     _WLAN_AUTH=""
+
     # unblock all interfaces!
     rfkill unblock all
     # disconnect the interface first!
@@ -55,7 +56,7 @@ _wireless() {
         if _dialog --cancel-label "${_LABEL}" --title " SSID Scan Result " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
             "RESCAN" "SSIDs" "HIDDEN" "SSID" \
             $(iwctl station "${_INTERFACE}" get-networks |\
-            rg -o ' {6}(.{34}).*\*' -r '"$1"' | sd ' *\n$' ' _\n') 2>"${_ANSWER}"; then
+            rg -o ' {6}(.{34}).*\*' -r '"$1' | sd ' *$' '" _\n') 2>"${_ANSWER}"; then
             _WLAN_SSID=$(cat "${_ANSWER}")
             _CONTINUE=1
             if rg -q 'RESCAN' "${_ANSWER}"; then
