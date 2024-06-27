@@ -9,7 +9,7 @@ _destdir_mounts(){
     _ROOTDEV=""
     # check if something is mounted on ${_DESTDIR}
     # bcachefs uses : array for raid devices, kill this one
-    _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d ' ' -f 1 | sed -e 's#:.*##g')"
+    _ROOTDEV="$(mount | rg -o "(.*)[:.*, ]on ${_DESTDIR} " -r '$1')"
     # Run mountpoints, if nothing is mounted on ${_DESTDIR}
     if [[ -z "${_ROOTDEV}" ]]; then
         _dialog --msgbox "Setup couldn't detect mounted partition(s) in ${_DESTDIR}, please set mountpoints first." 0 0
@@ -36,11 +36,11 @@ _clear_fs_values() {
 _ssd_optimization() {
     # bcachefs, btrfs, ext4 and xfs have ssd mount option support
     _SSD_MOUNT_OPTIONS=""
-    if echo "${_FSTYPE}" | grep -Eq 'bcachefs|btrfs|ext4|xfs'; then
+    if echo "${_FSTYPE}" | rg -q 'bcachefs|btrfs|ext4|xfs'; then
         # check all underlying devices on ssd
-        for i in $(${_LSBLK} NAME,TYPE "${_DEV}" -s 2>"${_NO_LOG}" | grep "disk$" | cut -d ' ' -f 1); do
+        for i in $(${_LSBLK} NAME,TYPE "${_DEV}" -s 2>"${_NO_LOG}" | rg '.*/(.*) disk$' -r '$1'); do
             # check for ssd
-            if [[ "$(cat /sys/block/"$(basename "${i}")"/queue/rotational)" == 0 ]]; then
+            if [[ "$(cat /sys/block/"${i}"/queue/rotational)" == 0 ]]; then
                 _SSD_MOUNT_OPTIONS="noatime"
             fi
         done
@@ -105,12 +105,12 @@ _enter_mountpoint() {
         _MP=""
         while [[ -z "${_MP}" ]]; do
             _MP=/boot
-            grep -qw "/boot" /tmp/.parts && _MP=/home
-            grep -qw "/home" /tmp/.parts && _MP=/srv
-            grep -qw "/srv" /tmp/.parts && _MP=/var
+            rg -qw "/boot" /tmp/.parts && _MP=/home
+            rg -qw "/home" /tmp/.parts && _MP=/srv
+            rg -qw "/srv" /tmp/.parts && _MP=/var
             _dialog --no-cancel --title " Mountpoint for ${_DEV} " --inputbox "" 7 65 "${_MP}" 2>"${_ANSWER}" || return 1
             _MP=$(cat "${_ANSWER}")
-            if grep "|${_MP}|" /tmp/.parts; then
+            if rg "|${_MP}|" /tmp/.parts; then
                 _dialog --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
                 _MP=""
             fi
@@ -192,7 +192,7 @@ _create_filesystem() {
             _dialog --no-cancel --title " LABEL Name on ${_DEV} " --inputbox "Keep it short and use no spaces or special characters." 8 60 \
             "$(${_LSBLK} LABEL "${_DEV}" 2>"${_NO_LOG}")" 2>"${_ANSWER}" || return 1
             _LABEL_NAME=$(cat "${_ANSWER}")
-            if grep "|${_LABEL_NAME}$" /tmp/.parts; then
+            if rg "|${_LABEL_NAME}$" /tmp/.parts; then
                 _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical LABEL names! Please enter another name." 3 60
                 sleep 5
                 _LABEL_NAME=""
@@ -376,7 +376,7 @@ _mountpoints() {
                         # remove members of multi devices
                         if [[ -z "${_DOMKFS}" ]]; then
                             _BCFS_UUID="$(${_LSBLK} UUID -d "${_DEV}")"
-                            for i in $(${_LSBLK} NAME,UUID | grep "${_BCFS_UUID}" | cut -d ' ' -f 1); do
+                            for i in $(${_LSBLK} NAME,UUID | rg -o "(.*) ${_BCFS_UUID}" -r '$1'); do
                                 _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${i}" 2>"${_NO_LOG}")/}"
                             done
                         fi
@@ -401,8 +401,8 @@ _mountpoints() {
             fi
         done
         # create swap as last device
-        grep '/dev' /tmp/.parts >/tmp/.parts.tmp
-        grep -v '/dev' /tmp/.parts >>/tmp/.parts.tmp
+        rg '/dev' /tmp/.parts >/tmp/.parts.tmp
+        rg -v '/dev' /tmp/.parts >>/tmp/.parts.tmp
         mv /tmp/.parts.tmp /tmp/.parts
         #shellcheck disable=SC2028
         _dialog --title " Summary " --defaultno --yesno "Syntax\n------\nDEVICE|FSTYPE|MOUNTPOINT|FORMAT|LABEL|FSOPTIONS|FS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _DEVFINISH="DONE"
@@ -419,7 +419,7 @@ _mountpoints() {
     fi
     _printk on
     # bcachefs uses : array for raid devices, kill this one
-     _ROOTDEV="$(mount | grep "${_DESTDIR} " | cut -d ' ' -f 1 | sed -e 's#:.*##g')"
+     _ROOTDEV="$(mount | rg -o "(.*)[:.*, ]on ${_DESTDIR} " -r '$1')"
 }
 
 # _mkfs()
@@ -446,7 +446,7 @@ _mkfs() {
     if [[ "${2}" == "swap" ]]; then
         swapoff -a &>"${_NO_LOG}"
         if [[ -n "${4}" ]]; then
-            if echo "${1}" | grep -q '^/dev'; then
+            if echo "${1}" | rg -q '^/dev'; then
                 mkswap -L "${6}" "${1}" &>"${_LOG}" || : >/tmp/.mp-error
             else
                 [[ -d $(dirname "${3}${1}") ]] || mkdir -p "$(dirname "${3}${1}")"
@@ -467,7 +467,7 @@ _mkfs() {
                 return 1
             fi
         fi
-        if echo "${1}" | grep -q '^/dev'; then
+        if echo "${1}" | rg -q '^/dev'; then
             swapon "${1}" &>"${_LOG}" || : >/tmp/.mp-error
         else
             swapon "${3}${1}" &>"${_LOG}" || : >/tmp/.mp-error
