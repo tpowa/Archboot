@@ -37,7 +37,7 @@ _progress_wait() {
             _progress "${2}" "${3}"
         fi
         _COUNT="$((_COUNT+1))"
-        sleep "${4}"
+        read -r -t "${4}"
     done
 }
 _task() {
@@ -55,7 +55,7 @@ _task() {
             if [[ -b /dev/sr0 ]]; then
                 mount /dev/sr0 /mnt/cdrom &>/dev/null && break
             fi
-            sleep 1
+            read -r -t 1
             _COUNT=$((_COUNT+1))
         done
     fi
@@ -132,7 +132,7 @@ udevadm wait --settle /dev/fb0 -t 10
 _SIZE="16"
 if [[ -e /sys/class/graphics/fb0/modes ]]; then
     # get screen setting mode from /sys
-    _FB_SIZE="$(sed -e 's#.*:##g' -e 's#x.*##g' /sys/class/graphics/fb0/modes 2>/dev/null)"
+    _FB_SIZE="$(rg -o ':(.*)x' -r '$1' /sys/class/graphics/fb0/modes 2>/dev/null)"
     if [[ "${_FB_SIZE}" -gt '1900' ]]; then
         _SIZE="32"
     fi
