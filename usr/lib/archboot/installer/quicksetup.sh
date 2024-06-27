@@ -70,7 +70,7 @@ _auto_create_filesystems() {
         # Add check on nvme or mmc controller:
         # NVME uses /dev/nvme0n1pX name scheme
         # MMC uses /dev/mmcblk0pX
-        if echo "${_DISK}" | grep -q "nvme" || echo "${_DISK}" | grep -q "mmc"; then
+        if echo "${_DISK}" | rg -q "nvme|mmc"; then
             _DEV="${_DISK}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d '|')"
         fi
         _FSTYPE="$(echo "${fsspec}" | tr -d ' ' | cut -f2 -d '|')"
