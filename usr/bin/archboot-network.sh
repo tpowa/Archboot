@@ -51,6 +51,8 @@ _wireless() {
     while [[ -z "${_CONTINUE}" ]]; do
         # scan the area
         _essid_scan | _dialog --title " Network Configuration " --no-mouse --gauge "Scanning 5 second(s) for SSIDs with interface ${_INTERFACE}..." 6 60
+        # only show lines with signal '*'
+        # kill spaces from the end and replace spaces with + between
         #shellcheck disable=SC2086,SC2046
         if _dialog --cancel-label "${_LABEL}" --title " SSID Scan Result " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
             "RESCAN" "SSIDs" "HIDDEN" "SSID" $(iwctl station "${_INTERFACE}" get-networks |\
