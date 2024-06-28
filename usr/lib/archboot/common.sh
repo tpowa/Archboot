@@ -110,7 +110,7 @@ _progress_wait() {
             _progress "${2}" "${3}"
         fi
         _COUNT="$((_COUNT+1))"
-        read -r -t "${4}"
+        sleep "${4}"
     done
 }
 
@@ -304,11 +304,11 @@ _cachedir_check() {
 _pacman_keyring() {
     # pacman-key process itself
     while pgrep -x pacman-key &>"${_NO_LOG}"; do
-        read -r -t 1
+        sleep 1
     done
     # gpg finished in background
     while pgrep -x gpg &>"${_NO_LOG}"; do
-        read -r -t 1
+        sleep 1
     done
     if [[ -e /etc/systemd/system/pacman-init.service ]]; then
         systemctl stop pacman-init.service

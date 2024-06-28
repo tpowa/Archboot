@@ -62,10 +62,10 @@ if [[ "${_TTY}" = "tty1" ]]; then
     rm -r /run/nextroot/sysroot &>"${_NO_LOG}"
     rm /run/nextroot/sysroot/init &>"${_NO_LOG}"
     _progress "100" "System is ready."
-    read -r -t 1
+    sleep 1
 else
     while true; do
-        read -r -t 1
+        sleep 1
     done
 fi
 }
