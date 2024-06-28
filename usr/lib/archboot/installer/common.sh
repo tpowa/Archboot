@@ -78,9 +78,7 @@ _chroot_mount()
 _chroot_umount()
 {
     if rg -qw '^archboot' /etc/hostname; then
-        umount -R "${_DESTDIR}/proc"
-        umount -R "${_DESTDIR}/sys"
-        umount -R "${_DESTDIR}/dev"
+        umount -R "${_DESTDIR}"/{proc,sys,dev}
     fi
 }
 

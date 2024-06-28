@@ -113,12 +113,12 @@ _auto_pacman_keyring()
         _progress "47" "Enable pacman's GPG keyring files on installed system..."
         cp -ar /etc/pacman.d/gnupg "${_DESTDIR}"/etc/pacman.d &>"${_NO_LOG}"
         read -r -t 2
-    fi
+#     fi
 }
 
 _auto_testing()
 {
-    if rg -q "^\[core-testing" /etc/pacman.conf; then
+    if rg -q '^\[core-testing' /etc/pacman.conf; then
         _progress "53"  "Enable [testing] repository on installed system..."
         sd '^#(\[[c,e].*-testing\]\n)#' '$1' "${_DESTDIR}"/etc/pacman.conf
         read -r -t 2
@@ -130,7 +130,7 @@ _auto_pacman_mirror() {
     # add installer-selected mirror to the top of the mirrorlist
     if rg -q '^Server' /etc/pacman.d/mirrorlist; then
         _progress "62" "Enable pacman mirror on installed system..."
-        _SYNC_URL=$(rg '^Server.* (.*)' -r '$1')
+        _SYNC_URL=$(rg '^Server.* (.*)' -r '$1' /etc/pacman.d/mirrorlist)
         #shellcheck disable=SC2027,SC2086
         cat << EOF > /tmp/inst-mirrorlist
 # Mirror used during installation
