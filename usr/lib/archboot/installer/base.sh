@@ -37,7 +37,7 @@ _geteditor() {
                     _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
                     _pacman_error
                     _dialog --no-mouse --infobox "Enable nano's syntax highlighting on installed system..." 3 70
-                    grep -q '^include' "${_DESTDIR}/etc/nanorc" || \
+                    rg -q '^include' "${_DESTDIR}/etc/nanorc" || \
                         echo "include \"/usr/share/nano/*.nanorc\"" >> "${_DESTDIR}/etc/nanorc"
                     sleep 2
                 fi
@@ -66,7 +66,7 @@ _set_uefi_parameters() {
             _UEFI_SECURE_BOOT=1
         fi
         if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-            if grep -q '_IA32_UEFI=1' /proc/cmdline; then
+            if rg -q '_IA32_UEFI=1' /proc/cmdline; then
                 _EFI_MIXED=1
                 _UEFI_ARCH="IA32"
                 _SPEC_UEFI_ARCH="ia32"
