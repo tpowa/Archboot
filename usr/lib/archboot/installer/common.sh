@@ -12,7 +12,7 @@ _LSBLK="lsblk -rpno"
 _FINDMNT="findmnt -vno SOURCE"
 # don't use _DESTDIR=/mnt because it's intended to mount other things there!
 # check first if bootet in archboot
-if grep -qw '^archboot' /etc/hostname; then
+if rg -qw '^archboot' /etc/hostname; then
     _DESTDIR="/mnt/install"
     _NSPAWN="systemd-nspawn -q -D ${_DESTDIR}"
 else
@@ -33,7 +33,7 @@ _linux_firmware() {
     _PACKAGES="${_PACKAGES// linux-firmware / }"
     #shellcheck disable=SC2013
     for i in $(cut -d ' ' -f1</proc/modules); do
-        if modinfo "${i}" | grep -qw 'firmware:'; then
+        if modinfo "${i}" | rg -qw 'firmware:'; then
             _PACKAGES="${_PACKAGES} linux-firmware"
             break
         fi
@@ -43,12 +43,12 @@ _linux_firmware() {
 _marvell_firmware() {
     _MARVELL=""
     _PACKAGES="${_PACKAGES// linux-firmware-marvell / }"
-    for i in $(find /lib/modules/"${_RUNNING_KERNEL}" | grep -w wireless | grep -w marvell); do
-        [[ -f $i ]] && _MARVELL="${_MARVELL} $(basename "${i}" | sed -e 's#\..*$##g')"
+    for i in $(fd -t f . /lib/modules/"${_RUNNING_KERNEL}" | rg -w 'wireless/marvell'); do
+        _MARVELL="${_MARVELL} $(basename "${i}" | sed -e 's#\..*$##g')"
     done
     # check marvell modules if already loaded
     for i in ${_MARVELL}; do
-        if lsmod | grep -qw "${i}"; then
+        if lsmod | rg -qw "${i}"; then
             _PACKAGES="${_PACKAGES} linux-firmware-marvell"
             break
         fi
@@ -58,14 +58,14 @@ _marvell_firmware() {
 # prepares target system as a chroot
 _chroot_mount()
 {
-    if grep -qw '^archboot' /etc/hostname; then
+    if rg -qw '^archboot' /etc/hostname; then
         [[ -e "${_DESTDIR}/proc" ]] || mkdir -m 555 "${_DESTDIR}/proc"
         [[ -e "${_DESTDIR}/sys" ]] || mkdir -m 555 "${_DESTDIR}/sys"
         [[ -e "${_DESTDIR}/dev" ]] || mkdir -m 755 "${_DESTDIR}/dev"
         mount proc "${_DESTDIR}/proc" -t proc -o nosuid,noexec,nodev
         mount sys "${_DESTDIR}/sys" -t sysfs -o nosuid,noexec,nodev,ro
         # needed for efi bootloader installation routines
-        if mount | grep -qw efivarfs; then
+        if mount | rg -qw 'efivarfs'; then
             mount efivarfs ${_DESTDIR}/sys/firmware/efi/efivars -t efivarfs -o nosuid,noexec,nodev
         fi
         mount udev "${_DESTDIR}/dev" -t devtmpfs -o mode=0755,nosuid
@@ -77,7 +77,7 @@ _chroot_mount()
 # tears down chroot in target system
 _chroot_umount()
 {
-    if grep -qw '^archboot' /etc/hostname; then
+    if rg -qw '^archboot' /etc/hostname; then
         umount -R "${_DESTDIR}/proc"
         umount -R "${_DESTDIR}/sys"
         umount -R "${_DESTDIR}/dev"
@@ -99,41 +99,41 @@ _local_pacman_conf() {
 
 _auto_packages() {
     # Add filesystem packages
-    if ${_LSBLK} FSTYPE | grep -q bcachefs; then
-        ! echo "${_PACKAGES}" | grep -qw bcachefs-tools && _PACKAGES="${_PACKAGES} bcachefs-tools"
+    if ${_LSBLK} FSTYPE | rg -q 'bcachefs'; then
+        ! echo "${_PACKAGES}" | rg -qw 'bcachefs-tools' && _PACKAGES="${_PACKAGES} bcachefs-tools"
     fi
-    if ${_LSBLK} FSTYPE | grep -q btrfs; then
-        ! echo "${_PACKAGES}" | grep -qw btrfs-progs && _PACKAGES="${_PACKAGES} btrfs-progs"
+    if ${_LSBLK} FSTYPE | rg -q 'btrfs'; then
+        ! echo "${_PACKAGES}" | rg -qw 'btrfs-progs' && _PACKAGES="${_PACKAGES} btrfs-progs"
     fi
-    if ${_LSBLK} FSTYPE | grep -q ext; then
-        ! echo "${_PACKAGES}" | grep -qw e2fsprogs && _PACKAGES="${_PACKAGES} e2fsprogs"
+    if ${_LSBLK} FSTYPE | rg -q 'ext'; then
+        ! echo "${_PACKAGES}" | rg -qw 'e2fsprogs' && _PACKAGES="${_PACKAGES} e2fsprogs"
     fi
-    if ${_LSBLK} FSTYPE | grep -q xfs; then
-        ! echo "${_PACKAGES}" | grep -qw xfsprogs && _PACKAGES="${_PACKAGES} xfsprogs"
+    if ${_LSBLK} FSTYPE | rg -q 'xfs'; then
+        ! echo "${_PACKAGES}" | rg -qw 'xfsprogs' && _PACKAGES="${_PACKAGES} xfsprogs"
     fi
-    if ${_LSBLK} FSTYPE | grep -q vfat; then
-        ! echo "${_PACKAGES}" | grep -qw dosfstools && _PACKAGES="${_PACKAGES} dosfstools"
+    if ${_LSBLK} FSTYPE | rg -q 'vfat'; then
+        ! echo "${_PACKAGES}" | rg -qw 'dosfstools' && _PACKAGES="${_PACKAGES} dosfstools"
     fi
     # Add packages for complex blockdevices
-    if ${_LSBLK} FSTYPE | grep -qw 'linux_raid_member'; then
-        ! echo "${_PACKAGES}" | grep -qw mdadm && _PACKAGES="${_PACKAGES} mdadm"
+    if ${_LSBLK} FSTYPE | rg -qw 'linux_raid_member'; then
+        ! echo "${_PACKAGES}" | rg -qw 'mdadm' && _PACKAGES="${_PACKAGES} mdadm"
     fi
-    if ${_LSBLK} FSTYPE | grep -qw 'LVM2_member'; then
-        ! echo "${_PACKAGES}" | grep -qw lvm2 && _PACKAGES="${_PACKAGES} lvm2"
+    if ${_LSBLK} FSTYPE | rg -qw 'LVM2_member'; then
+        ! echo "${_PACKAGES}" | rg -qw 'lvm2' && _PACKAGES="${_PACKAGES} lvm2"
     fi
-    if ${_LSBLK} FSTYPE | grep -qw 'crypto_LUKS'; then
-        ! echo "${_PACKAGES}" | grep -qw cryptsetup && _PACKAGES="${_PACKAGES} cryptsetup"
+    if ${_LSBLK} FSTYPE | rg -qw 'crypto_LUKS'; then
+        ! echo "${_PACKAGES}" | rg -qw 'cryptsetup' && _PACKAGES="${_PACKAGES} cryptsetup"
     fi
     #shellcheck disable=SC2010
     # Add iwd, if wlan is detected
-    if ls /sys/class/net | grep -q wlan; then
-        ! echo "${_PACKAGES}" | grep -qw iwd && _PACKAGES="${_PACKAGES} iwd"
+    if ls /sys/class/net | rg -q 'wlan'; then
+        ! echo "${_PACKAGES}" | rg -qw 'iwd' && _PACKAGES="${_PACKAGES} iwd"
     fi
     # Add broadcom-wl, if module is detected
-    if lsmod | grep -qw wl; then
-        ! echo "${_PACKAGES}" | grep -qw broadcom-wl && _PACKAGES="${_PACKAGES} broadcom-wl"
+    if lsmod | rg -qw 'wl'; then
+        ! echo "${_PACKAGES}" | rg -qw 'broadcom-wl' && _PACKAGES="${_PACKAGES} broadcom-wl"
     fi
-    grep -q '^FONT=ter' /etc/vconsole.conf && _PACKAGES="${_PACKAGES} terminus-font"
+    rg -q '^FONT=ter' /etc/vconsole.conf && _PACKAGES="${_PACKAGES} terminus-font"
     # only add firmware if already used
     _linux_firmware
     _marvell_firmware
