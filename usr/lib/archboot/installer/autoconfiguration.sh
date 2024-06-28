@@ -113,7 +113,7 @@ _auto_pacman_keyring()
         _progress "47" "Enable pacman's GPG keyring files on installed system..."
         cp -ar /etc/pacman.d/gnupg "${_DESTDIR}"/etc/pacman.d &>"${_NO_LOG}"
         read -r -t 2
-#     fi
+    fi
 }
 
 _auto_testing()
