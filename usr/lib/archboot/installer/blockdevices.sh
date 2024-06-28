@@ -51,7 +51,7 @@ _blockdevices() {
 # lists linux blockdevice partitions
 _blockdevices_partitions() {
     # all available block devices partitions
-    for dev in $(${_LSBLK} NAME,TYPE | rg -v '^/dev/md' | rg '(.*) parts$' -r '$1'); do
+    for dev in $(${_LSBLK} NAME,TYPE | rg -v '^/dev/md' | rg '(.*) part$' -r '$1'); do
         # exclude checks:
         #- part of raid device
         #  ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | rg 'linux_raid_member'
@@ -66,7 +66,7 @@ _blockdevices_partitions() {
         #- bios_grub partitions
         #  sfdisk -l 2>"${_NO_LOG}" | rg "${dev}" | rg -q 'BIOS boot$'
         #- iso9660 devices
-        #  "${_LSBLK} FSTYPE -s ${dev} | rg "iso9660"
+        #  "${_LSBLK} FSTYPE -s ${dev} | rg 'iso9660'
         if ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | rg -q 'linux_raid_member' &&\
             ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | rg -q 'LVM2_member' &&\
             ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | rg -q 'crypto_LUKS' &&\
@@ -159,7 +159,7 @@ _dm_devices() {
         # - part of raid device
         #   ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | rg 'linux_raid_member$'
         # - part of running raid on encrypted device
-        #   ${_LSBLK} TYPE ${dev} 2>"${_NO_LOG}" | rg "raid.*$
+        #   ${_LSBLK} TYPE ${dev} 2>"${_NO_LOG}" | rg 'raid.*$'
         if ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | rg -q 'crypto_LUKS$' &&\
             ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | rg -q 'LVM2_member$' &&\
             ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | rg -q 'linux_raid_member$' &&\
@@ -222,7 +222,7 @@ _activate_luks()
     if [[ -e /usr/bin/cryptsetup ]]; then
         _dialog --no-mouse --infobox "Scanning for luks encrypted devices..." 0 0
         if ${_LSBLK} FSTYPE | rg -q 'crypto_LUKS'; then
-            for part in $(${_LSBLK} NAME,FSTYPE | rg "(.*) crypto_LUKS$" -r '$1'); do
+            for part in $(${_LSBLK} NAME,FSTYPE | rg '(.*) crypto_LUKS$' -r '$1'); do
                 # skip already encrypted devices, device mapper!
                 if ! ${_LSBLK} TYPE "${part}" 2>"${_NO_LOG}" | rg -q 'crypt$'; then
                     _RUN_LUKS=""
@@ -312,7 +312,7 @@ _stopmd()
         fi
     fi
     if [[ -n "${_DISABLEMD}" || -n "${_DISABLEMDSB}" ]]; then
-        for dev in $(${_LSBLK} NAME,FSTYPE | rg "(.*) linux_raid_member$" -r '$1'); do
+        for dev in $(${_LSBLK} NAME,FSTYPE | rg '(.*) linux_raid_member$' -r '$1'); do
             _clean_disk "${dev}"
         done
         _dialog --no-mouse --infobox "Removing superblock(s) on software raid devices done." 3 60
@@ -355,7 +355,7 @@ _stopluks()
     _DETECTED_LUKS=""
     _LUKSDEV=""
     # detect already running luks devices
-    _LUKSDEV="$(${_LSBLK} NAME,TYPE | rg "(.*) crypt$" -r '$1')"
+    _LUKSDEV="$(${_LSBLK} NAME,TYPE | rg '(.*) crypt$' -r '$1')"
     [[ -z "${_LUKSDEV}" ]] || _DETECTED_LUKS=1
     if [[ -n "${_DETECTED_LUKS}" ]]; then
         _dialog --defaultno --yesno "Setup detected running luks encrypted device(s)...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLELUKS=1
@@ -363,7 +363,7 @@ _stopluks()
     if [[ -n "${_DISABLELUKS}" ]]; then
         _umountall
         for dev in ${_LUKSDEV}; do
-            _LUKS_REAL_DEV="$(${_LSBLK} NAME,FSTYPE -s "${_LUKSDEV}" 2>"${_NO_LOG}" | rg "(.*) crypto_LUKS$" -r '$1')"
+            _LUKS_REAL_DEV="$(${_LSBLK} NAME,FSTYPE -s "${_LUKSDEV}" 2>"${_NO_LOG}" | rg '(.*) crypto_LUKS$' -r '$1')"
             cryptsetup remove "${dev}" >"${_LOG}"
             # delete header from device
             wipefs -a "${_LUKS_REAL_DEV}" &>"${_NO_LOG}"
@@ -379,7 +379,7 @@ _stopluks()
         _dialog --defaultno --yesno "Setup detected not running luks encrypted device(s)...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLELUKS=1
     fi
     if [[ -n "${_DISABLELUKS}" ]]; then
-        for dev in $(${_LSBLK} NAME,FSTYPE | rg "(.*) crypto_LUKS$" -r '$1'); do
+        for dev in $(${_LSBLK} NAME,FSTYPE | rg '(.*) crypto_LUKS$' -r '$1'); do
            # delete header from device
            wipefs -a "${dev}" &>"${_NO_LOG}"
         done
@@ -531,7 +531,7 @@ _createpv()
         : >/tmp/.pvs-create
         _dialog --no-mouse --infobox "Scanning blockdevices... This may need some time." 3 60
         # Remove all lvm devices with children
-        _LVM_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | rg "(.*) lvm$" -r '$1' | sort -u); do
+        _LVM_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | rg '(.*) lvm$' -r '$1' | sort -u); do
                     echo "${dev}"
                     done)"
         #shellcheck disable=SC2119
@@ -592,7 +592,7 @@ _findpv()
         #-  not part of running lvm2
         # ! "$(${_LSBLK} TYPE ${dev} 2>"${_NO_LOG}" | rg -q 'lvm')"
         #- not part of volume group
-        # $(pvs -o vg_name --noheading ${dev} | rg " $")
+        # $(pvs -o vg_name --noheading ${dev} | rg ' $')
         if ! ${_LSBLK} TYPE "${dev}" 2>"${_NO_LOG}" | rg -q 'lvm' && pvs -o vg_name --noheading "${dev}" | rg -q ' $'; then
             ${_LSBLK} NAME,SIZE "${dev}"
         fi
