@@ -27,8 +27,11 @@ _getrootflags() {
 
 _getraidarrays() {
     _RAIDARRAYS=""
+    # fallback to md assembly on boot commandline
     if [[ -f "${_DESTDIR}/etc/mdadm.conf" ]] && ! rg -q '^ARRAY' "${_DESTDIR}"/etc/mdadm.conf 2>"${_NO_LOG}"; then
-        _RAIDARRAYS="$(echo -n "$(grep ^md /proc/mdstat 2>"${_NO_LOG}" | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g')")"
+        _RAIDARRAYS="$(echo -n "$(rg '^md' /proc/mdstat 2>"${_NO_LOG}" |\
+                       sd '\[[0-9]\]| :.* raid[0-9]+' '' |\
+                       sd 'md' 'md=' | sd ' ' ',/dev/' | sd '_' '')")"
     fi
 }
 
