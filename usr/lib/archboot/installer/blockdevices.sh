@@ -565,7 +565,7 @@ _createpv()
             echo "${_DEV}" >>/tmp/.pvs-create
         done
         # final step ask if everything is ok?
-        _dialog --yesno "Would you like to create physical volume on devices below?\n$(sd -p '$' '\n' /tmp/.pvs-create)" 0 0 && break
+        _dialog --yesno "Would you like to create physical volume on devices below?\n$(rg '(.*$)' -r '$1\n' /tmp/.pvs-create)" 0 0 && break
     done
     _DEV="$(echo -n "$(cat /tmp/.pvs-create)")"
     #shellcheck disable=SC2028,SC2086
@@ -650,7 +650,7 @@ _createvg()
             echo "${_PV}" >>/tmp/.pvs
         done
         # final step ask if everything is ok?
-        _dialog --yesno "Would you like to create Volume Group like this?\n\n${_VGDEV}\n\nPhysical Volumes:\n$(sd -p '$' '\n' /tmp/.pvs)" 0 0 && break
+        _dialog --yesno "Would you like to create Volume Group like this?\n\n${_VGDEV}\n\nPhysical Volumes:\n$(rg '(.*$)' -r '$1\n' /tmp/.pvs)" 0 0 && break
     done
     _PV="$(echo -n "$(cat /tmp/.pvs)")"
     _umountall
