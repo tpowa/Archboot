@@ -193,7 +193,8 @@ _user_management() {
             "3") _USER="root"
                  while true; do
                      # root and all users with UID >= 1000
-                     _USERS="$(rg -o '(.*):x:10[0-9][0-9]:.*:(.*):.*:' -r '"$1" "$2"' "${_DESTDIR}"/etc/passwd)"
+                     _USERS="$(rg -o '(.*):x:10[0-9][0-9]:.*:(.*):.*:' -r '$1#$2' "${_DESTDIR}"/etc/passwd |\
+                               sd ' ' ':' | sd '#' ' ')"
                      #shellcheck disable=SC2086
                      _dialog --no-cancel --default-item ${_USER} --menu " User Account Selection " 15 40 10 \
                         "root" "Super User" ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || break
