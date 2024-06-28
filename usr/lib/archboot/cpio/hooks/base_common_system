@@ -45,7 +45,7 @@ update-activation-environment,uuidgen} dd df dir du dust exa eza false fd fzf fz
                  nano nologin nss-config od p11-kit pk12util pam_timestamp_check pacman{,-conf,-key,-db-upgrade} \
                  passwd pgrep pidof pinentry{,-curses} pk{action,check,exec,ttyagent} pluginviewer printf procs ps pwd \
                  rmdir sasldblistusers2 saslpasswd2 tr true repo-{add,elephant,remove} rbash rg rmmod sd sed secret-tool \
-                 shlibsign sign{tool,ver} sleep sort ssltap stat symkeyutil systemd-{ac-power,analyze,ask-password,cat,\
+                 shlibsign sign{tool,ver} sort ssltap stat symkeyutil systemd-{ac-power,analyze,ask-password,cat,\
 cgls,cgtop,confextdelta,detect-virt,escape,firstboot,hwdb,inhibit,machine-id-setup,mount,notify,nspawn,path,\
 resolve,repartrun,socket-activate,stdio-bridge,sysusers,tty-ask-password-agent,umount,creds,cryptenroll,dissect,\
 id128,sysext} tar tee testpkg top touch trust tty unix_{chkpwd,update} /usr/lib/dbus-1.0/dbus-daemon-launch-helper \

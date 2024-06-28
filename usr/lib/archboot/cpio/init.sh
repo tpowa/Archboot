@@ -37,7 +37,7 @@ _progress_wait() {
             _progress "${2}" "${3}"
         fi
         _COUNT="$((_COUNT+1))"
-        read -r -t "${4}"
+        sleep "${4}"
     done
 }
 _task() {
@@ -55,7 +55,7 @@ _task() {
             if [[ -b /dev/sr0 ]]; then
                 mount /dev/sr0 /mnt/cdrom &>/dev/null && break
             fi
-            read -r -t 1
+            sleep 1
             _COUNT=$((_COUNT+1))
         done
     fi
