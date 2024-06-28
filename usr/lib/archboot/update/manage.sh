@@ -294,7 +294,7 @@ _new_environment() {
     kexec -c -f "${_RAM}/${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     while true; do
         _clean_kernel_cache
-        read -r -t 1
+        sleep 1
         printf "\ec"
     done
 }
