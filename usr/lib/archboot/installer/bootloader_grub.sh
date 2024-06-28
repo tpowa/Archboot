@@ -253,7 +253,7 @@ _setup_grub_bios() {
     _grub_install_bios &
     _progress_wait "11" "99" "Setting up GRUB(2) BIOS..." "0.15"
     _progress "100" "Setting up GRUB(2) BIOS completed."
-    read -r -t 2
+    sleep 2
 }
 
 _grub_bios() {
@@ -325,7 +325,7 @@ _grub_bios() {
         _grub_config || return 1
         _pacman_hook_grub_bios
         _dialog --title " Success " --no-mouse --infobox "GRUB(2) BIOS has been installed successfully." 3 55
-        read -r -t 3
+        sleep 3
         _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error installing GRUB(2) BIOS.\nCheck /tmp/grub_bios_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${_DESTDIR}.\nDon't forget to bind mount /dev and /proc into ${_DESTDIR} before chrooting." 0 0
@@ -356,13 +356,13 @@ _grub_install_uefi_sb() {
 _setup_grub_uefi() {
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         _progress "50" "Installing fedora's shim and mokmanager..."
-        read -r -t 2
+        sleep 2
         # install fedora shim
         [[ -d  ${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT ]] || mkdir -p "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT
         cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".EFI
         cp -f /usr/share/archboot/bootloader/mm"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/
         _progress "100" "Installing fedora's shim and mokmanager completed."
-        read -r -t 2
+        sleep 2
     else
         ## Install GRUB
         _progress "10" "Setting up GRUB(2) UEFI..."
@@ -372,7 +372,7 @@ _setup_grub_uefi() {
         _progress_wait "11" "99" "Setting up GRUB(2) UEFI..." "0.1"
         _chroot_umount
         _progress "100" "Setting up GRUB(2) UEFI completed."
-        read -r -t 2
+        sleep 2
     fi
     _GRUB_UEFI=1
 }
@@ -387,7 +387,7 @@ _setup_grub_uefi_sb() {
         _grub_install_uefi_sb &
         _progress_wait "11" "99" "Setting up GRUB(2) UEFI Secure Boot..." "0.1"
         _progress "100" "Setting up GRUB(2) UEFI Secure Boot completed."
-        read -r -t 2
+        sleep 2
     fi
 }
 
@@ -412,7 +412,7 @@ _grub_uefi() {
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         _dialog --title " Success " --no-mouse --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully." 3 60
-        read -r -t 3
+        sleep 3
         _S_BOOTLOADER=1
     elif [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && -n "${_UEFI_SECURE_BOOT}" ]]; then
         _secureboot_keys || return 1
@@ -423,7 +423,7 @@ _grub_uefi() {
         _BOOTMGR_LOADER_PATH="/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         _uefi_bootmgr_setup
         _dialog --title " Success " --no-mouse --infobox "SHIM and GRUB(2) Secure Boot for ${_UEFI_ARCH} has been installed successfully." 3 75
-        read -r -t 3
+        sleep 3
         _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error installing GRUB(2) for ${_UEFI_ARCH} UEFI.\nCheck /tmp/grub_uefi_${_UEFI_ARCH}_install.log for more info.\n\nYou probably need to install it manually by chrooting into ${_DESTDIR}.\nDon't forget to bind mount /dev, /sys and /proc into ${_DESTDIR} before chrooting." 0 0

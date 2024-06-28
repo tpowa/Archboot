@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _auto_partition() {
-    read -r -t 2
+    sleep 2
     _progress "10" "Cleaning ${_DISK}..."
     _clean_disk "${_DISK}"
     # we assume a /dev/sdX,/dev/vdX or /dev/nvmeXnY format
@@ -56,7 +56,7 @@ _auto_partition() {
         fi
     fi
     _progress "100" "Partitions created successfully."
-    read -r -t 2
+    sleep 2
 }
 
 _auto_create_filesystems() {
@@ -98,7 +98,7 @@ _auto_create_filesystems() {
         else
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" || return 1
         fi
-        read -r -t 1
+        sleep 1
         # set default subvolume for systemd-gpt-autogenerator
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             btrfs subvolume set-default "${_DESTDIR}"/"${_MP}" || return 1
@@ -106,7 +106,7 @@ _auto_create_filesystems() {
         _COUNT=$((_COUNT+_PROGRESS_COUNT))
     done
     _progress "100" "Filesystems created successfully."
-    read -r -t 2
+    sleep 2
 }
 _autoprepare() {
     # check on special devices and stop them, else weird things can happen during partitioning!
@@ -178,11 +178,11 @@ _autoprepare() {
                     _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
                     if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
                         _dialog --title " ERROR " --no-mouse --infobox "You have entered a invalid size, please enter again." 3 60
-                        read -r -t 5
+                        sleep 5
                     else
                         if [[ "${_UEFISYSDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_UEFISYSDEV_SIZE}" -lt "260" || "${_UEFISYSDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
                             _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
-                            read -r -t 5
+                            sleep 5
                         else
                             _BOOTDEV_SET=1
                             _UEFISYSDEV_SET=1
@@ -197,11 +197,11 @@ _autoprepare() {
                     _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
                     if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
                         _dialog --title " ERROR " --no-mouse --infobox "You have entered a invalid size, please enter again." 3 60
-                        read -r -t 5
+                        sleep 5
                     else
                         if [[ "${_UEFISYSDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_UEFISYSDEV_SIZE}" -lt "260" || "${_UEFISYSDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
                             _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
-                            read -r -t 5
+                            sleep 5
                         else
                             _UEFISYSDEV_SET=1
                             _UEFISYSDEV_NUM="$((_DEV_NUM+1))"
@@ -216,7 +216,7 @@ _autoprepare() {
                 _BOOTDEV_SIZE="$(cat "${_ANSWER}")"
                 if [[ -z "${_BOOTDEV_SIZE}" ]]; then
                     _dialog --title " ERROR " --no-mouse --infobox "You have entered a invalid size, please enter again." 3 60
-                    read -r -t 5
+                    sleep 5
                 else
                     if [[ "${_BOOTDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_BOOTDEV_SIZE}" -lt "100" || "${_BOOTDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
                         _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
@@ -234,11 +234,11 @@ _autoprepare() {
                 _BOOTDEV_SIZE="$(cat "${_ANSWER}")"
                 if [[ -z "${_BOOTDEV_SIZE}" ]]; then
                     _dialog --title " ERROR " --no-mouse --infobox "You have entered a invalid size, please enter again." 3 60
-                    read -r -t 5
+                    sleep 5
                 else
                     if [[ "${_BOOTDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_BOOTDEV_SIZE}" -lt "100" || "${_BOOTDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
                         _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
-                        read -r -t 5
+                        sleep 5
                     else
                         _BOOTDEV_SET=1
                         _BOOTDEV_NUM=$((_DEV_NUM+1))
@@ -255,11 +255,11 @@ _autoprepare() {
             _SWAPDEV_SIZE=$(cat "${_ANSWER}")
             if [[ -z "${_SWAPDEV_SIZE}" ]]; then
                 _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
-                read -r -t 5
+                sleep 5
             else
                 if [[ "${_SWAPDEV_SIZE}" -ge "${_DISK_SIZE}" ]]; then
                     _dialog --title " ERROR " --no-mouse --infobox "You have entered a too large size, please enter again." 3 60
-                    read -r -t 5
+                    sleep 5
                 elif [[ "${_SWAPDEV_SIZE}" == "0" ]]; then
                     _SWAPDEV_SET=1
                     _SKIP_SWAP=1
@@ -295,11 +295,11 @@ _autoprepare() {
         else
             if [[ -z "${_ROOTDEV_SIZE}" || "${_ROOTDEV_SIZE}" == 0 || "${_ROOTDEV_SIZE}" -lt "2000" ]]; then
                 _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
-                read -r -t 5
+                sleep 5
             else
                 if [[ "${_ROOTDEV_SIZE}" -ge "${_DISK_SIZE}" || "$((_DISK_SIZE-_ROOTDEV_SIZE))" -lt "350" ]]; then
                     _dialog --title " ERROR " --no-mouse --infobox "You have entered a too large size, please enter again." 3 60
-                    read -r -t 5
+                    sleep 5
                 else
                     if _dialog --title " Confirmation " --yesno "$((_DISK_SIZE-_ROOTDEV_SIZE))M will be used for your /home completely?" 5 65; then
                         _ROOTDEV_SET=1
@@ -341,6 +341,6 @@ _autoprepare() {
     fi
     _auto_create_filesystems | _dialog --title " Filesystems " --no-mouse --gauge "Creating Filesystems on ${_DISK}..." 6 75 0
     _dialog --title " Success " --no-mouse --infobox "Quick Setup was successful." 3 40
-    read -r -t 3
+    sleep 3
 }
 # vim: set ft=sh ts=4 sw=4 et:

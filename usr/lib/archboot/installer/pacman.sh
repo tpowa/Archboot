@@ -20,10 +20,10 @@ _run_pacman(){
     # pacman finished, display scrollable output
     if [[ -e "/tmp/.pacman-success" ]]; then
         _progress "100" "Package installation complete." 6 75
-        read -r -t 2
+        sleep 2
     else
         _progress "100" "Package installation failed." 6 75
-        read -r -t 2
+        sleep 2
     fi
     # ensure the disk is synced
     sync

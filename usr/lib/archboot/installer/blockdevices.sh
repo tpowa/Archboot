@@ -284,7 +284,7 @@ _umountall()
         swapoff -a &>"${_NO_LOG}"
         umount -R "${_DESTDIR}"
         _dialog --no-mouse --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR}..." 4 70
-        read -r -t 3
+        sleep 3
     fi
 }
 
@@ -301,7 +301,7 @@ _stopmd()
                 mdadm --manage --stop "/dev/${dev}" &>"${_LOG}"
             done
             _dialog --no-mouse --infobox "Removing software raid device(s) done." 3 50
-            read -r -t 3
+            sleep 3
         fi
     fi
     _DISABLEMDSB=""
@@ -316,7 +316,7 @@ _stopmd()
             _clean_disk "${dev}"
         done
         _dialog --no-mouse --infobox "Removing superblock(s) on software raid devices done." 3 60
-        read -r -t 3
+        sleep 3
     fi
 }
 
@@ -345,7 +345,7 @@ _stoplvm()
             pvremove -f "${dev}" 2>"${_NO_LOG}" >"${_LOG}"
         done
         _dialog --no-mouse --infobox "Removing logical volume(s), logical group(s)\nand physical volume(s) done." 3 60
-        read -r -t 3
+        sleep 3
     fi
 }
 
@@ -369,7 +369,7 @@ _stopluks()
             wipefs -a "${_LUKS_REAL_DEV}" &>"${_NO_LOG}"
         done
         _dialog --no-mouse --infobox "Removing luks encrypted device(s) done." 3 50
-        read -r -t 3
+        sleep 3
     fi
     _DISABLELUKS=""
     _DETECTED_LUKS=""
@@ -384,7 +384,7 @@ _stopluks()
            wipefs -a "${dev}" &>"${_NO_LOG}"
         done
         _dialog --no-mouse --infobox "Removing not running luks encrypted device(s) done." 3 60
-        read -r -t 3
+        sleep 3
     fi
     [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab
 }
@@ -498,10 +498,10 @@ _createmd()
     #shellcheck disable=SC2086
     if mdadm --create ${_RAIDDEV} ${_RAIDOPTIONS} ${_DEVS} &>"${_LOG}"; then
         _dialog --no-mouse --infobox "${_RAIDDEV} created successfully." 3 50
-        read -r -t 3
+        sleep 3
     else
         _dialog --title " ERROR " --no-mouse --infobox "Creating ${_RAIDDEV} failed." 3 60
-        read -r -t 5
+        sleep 5
         return 1
     fi
     if [[ -n "${_RAID_PARTITION}" ]]; then
@@ -573,10 +573,10 @@ _createpv()
     #shellcheck disable=SC2086
     if pvcreate -y ${_DEV} &>"${_LOG}"; then
         _dialog --no-mouse --infobox "Creating physical volume on ${_DEV} was successful." 3 75
-        read -r -t 3
+        sleep 3
     else
         _dialog --title " ERROR " --no-mouse --infobox "Creating physical volume on ${_DEV} failed." 3 60
-        read -r -t 5
+        sleep 5
         return 1
     fi
     # run udevadm to get values exported
@@ -657,7 +657,7 @@ _createvg()
     #shellcheck disable=SC2086
     if vgcreate ${_VGDEV} ${_PV} &>"${_LOG}"; then
         _dialog --no-mouse --infobox "Creating Volume Group ${_VGDEV} was successful." 3 60
-        read -r -t 3
+        sleep 3
     else
         _dialog --msgbox "Error while creating Volume Group ${_VGDEV} (see ${_LOG} for details)." 0 0
         return 1
@@ -725,7 +725,7 @@ _createlv()
         #shellcheck disable=SC2086
         if lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
             _dialog --no-mouse --infobox "Creating Logical Volume ${_LVDEV} was successful." 3 60
-            read -r -t 3
+            sleep 3
         else
             _dialog --msgbox "Error while creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
             return 1
@@ -734,7 +734,7 @@ _createlv()
         #shellcheck disable=SC2086
         if lvcreate ${_LV_EXTRA} -L ${_LV_SIZE} ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
             _dialog --no-mouse --infobox "Creating Logical Volume ${_LVDEV} was successful." 3 60
-            read -r -t 3
+            sleep 3
         else
             _dialog --msgbox "Error while creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
             return 1
@@ -773,7 +773,7 @@ _enter_luks_passphrase () {
             break
         else
              _dialog --no-mouse --infobox "Passphrases didn't match, please enter again." 0 0
-             read -r -t 3
+             sleep 3
             _LUKSPASS=""
             _LUKSPASS2=""
         fi
@@ -785,7 +785,7 @@ _opening_luks() {
     while true; do
         cryptsetup luksOpen "${_DEV}" "${_LUKSDEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}" && break
         _dialog --no-mouse --infobox "Error: Passphrase didn't match, please enter again" 0 0
-        read -r -t 5
+        sleep 5
         _enter_luks_passphrase || return 1
     done
     if _dialog --yesno "Would you like to save the passphrase of luks device in /etc/$(basename "${_LUKSPASSPHRASE}")?\nName:${_LUKSDEV}" 0 0; then

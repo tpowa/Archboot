@@ -30,7 +30,7 @@ BOOTDEOF
         "${_EDITOR}" "${_DESTDIR}/${_LOADER_CFG}"
         _pacman_hook_systemd_bootd
         _dialog --title " Success " --no-mouse --infobox "SYSTEMD-BOOT has been setup successfully." 3 50
-        read -r -t 3
+        sleep 3
         _S_BOOTLOADER=1
     else
         _dialog --msgbox "Error installing SYSTEMD-BOOT." 0 0

@@ -47,7 +47,7 @@ _limine_bios() {
     if chroot "${_DESTDIR}" limine bios-install "${_PARENT_BOOTDEV}" &>"${_LOG}"; then
         _pacman_hook_limine_bios
         _dialog --title " Success " --no-mouse --infobox "LIMINE BIOS has been setup successfully." 3 50
-        read -r -t 3
+        sleep 3
         _S_BOOTLOADER=1
 
     else
@@ -70,10 +70,10 @@ _limine_uefi() {
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        read -r -t 2
+        sleep 2
         _pacman_hook_limine_uefi
         _dialog --title " Success " --no-mouse --infobox "LIMINE has been setup successfully." 3 50
-        read -r -t 3
+        sleep 3
         _S_BOOTLOADER=1
 
     else

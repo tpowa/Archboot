@@ -23,5 +23,5 @@ label linux
     append ${_KERNEL_PARAMS_COMMON_MOD}
 EOF
     _dialog --no-mouse --infobox "UBOOT has been installed successfully." 3 55
-    read -r -t 3
+    sleep 3
 }

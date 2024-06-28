@@ -32,14 +32,14 @@ CONFEOF
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         rm -f "${_DESTDIR}"/boot/refind_linux.conf
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        read -r -t 2
+        sleep 2
         _dialog --msgbox "You will now be put into the editor to edit:\nrefind.conf\n\nAfter you save your changes, exit the editor." 8 50
         _geteditor || return 1
         "${_EDITOR}" "${_REFIND_CONFIG}"
         cp -f "${_REFIND_CONFIG}" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
         _pacman_hook_refind
         _dialog --title " Success " --no-mouse --infobox "rEFInd has been setup successfully." 3 50
-        read -r -t 3
+        sleep 3
         _S_BOOTLOADER=1
     else
         _dialog --title " ERROR " --msgbox "Setting up rEFInd failed." 5 40

@@ -21,10 +21,10 @@ _run_mkinitcpio() {
     _progress_wait "0" "99" "Rebuilding initramfs on installed system..." "0.1"
     if [[ -e "/tmp/.mkinitcpio-success" ]]; then
         _progress "100" "Rebuilding initramfs complete." 6 75
-        read -r -t 2
+        sleep 2
     else
         _progress "100" "Rebuilding initramfs failed." 6 75
-        read -r -t 2
+        sleep 2
     fi
     _chroot_umount
 }
@@ -42,7 +42,7 @@ _run_locale_gen() {
     _locale_gen &
     _progress_wait "0" "99" "Rebuilding glibc locales on installed system..." "0.05"
     _progress "100" "Rebuilding glibc locales on installed system complete." 6 75
-    read -r -t 2
+    sleep 2
 }
 
 _set_mkinitcpio() {
@@ -56,7 +56,7 @@ _check_root_password() {
     # check if empty password is set
     if passwd -R "${_DESTDIR}" -S root | rg -q ' NP '; then
         _dialog --title " Root Account " --no-mouse --infobox "Setup detected no password set for root user.\nPlease set new password now." 4 50
-        read -r -t 3
+        sleep 3
         if _prepare_password Root; then
             _set_password
         else
@@ -94,7 +94,7 @@ _prepare_password() {
             break
         else
             _dialog --title " ERROR " --no-mouse --infobox "Password didn't match, please enter again." 3 50
-            read -r -t 3
+            sleep 3
         fi
     done
 }
@@ -103,7 +103,7 @@ _set_password() {
     passwd -R "${_DESTDIR}" "${_USER}" < /tmp/.password &>"${_NO_LOG}"
     rm /tmp/.password
     _dialog --title " Success " --no-mouse --infobox "New password set for ${_USER}." 3 50
-    read -r -t 2
+    sleep 2
 }
 
 _set_user() {
@@ -160,7 +160,7 @@ _user_management() {
                         usermod -R "${_DESTDIR}" -s "/usr/bin/${_SHELL}" "${i}" &>"${_LOG}"
                     done
                     _dialog --title " Success " --no-mouse --infobox "Default shell set to ${_SHELL}." 3 50
-                    read -r -t 3
+                    sleep 3
                     _NEXTITEM=2
                 else
                     _NEXTITEM=1
@@ -169,7 +169,7 @@ _user_management() {
                      _set_user || break
                      if rg -q "^${_USER}:" "${_DESTDIR}"/etc/passwd; then
                          _dialog --title " ERROR " --no-mouse --infobox "Username already exists! Please choose an other one." 3 60
-                         read -r -t 3
+                         sleep 3
                      else
                          _ADMIN_ATTR=""
                          if _dialog --defaultno --yesno "Enable ${_USER} as Administrator and part of wheel group?" 5 60; then
@@ -181,12 +181,12 @@ _user_management() {
                          if useradd -R "${_DESTDIR}" ${_ADMIN_ATTR} -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
                             _set_password
                             _dialog --title " Success " --no-mouse --infobox "User Account ${_USER} created succesfully." 3 50
-                            read -r -t 2
+                            sleep 2
                             _NEXTITEM=2
                             break
                          else
                              _dialog --title " ERROR " --no-mouse --infobox "User creation failed! Please try again." 3 50
-                             read -r -t 3
+                             sleep 3
                          fi
                      fi
                  done ;;
@@ -232,11 +232,11 @@ _user_management() {
                                      if [[ -n "${_ADMIN_ATTR}" ]]; then
                                          usermod -R "${_DESTDIR}" -rG wheel "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "User ${_USER} removed as Administrator and removed from wheel group." 3 70
-                                         read -r -t 2
+                                         sleep 2
                                      else
                                          usermod -R "${_DESTDIR}" -aG wheel "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "User ${_USER} switched to Administrator and added to wheel group." 3 70
-                                         read -r -t 2
+                                         sleep 2
                                      fi ;;
                                 "2") _NEXTITEM=2
                                      if _prepare_password User; then
@@ -246,14 +246,14 @@ _user_management() {
                                      if _set_comment; then
                                          usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "New comment set for ${_USER}." 3 50
-                                         read -r -t 2
+                                         sleep 2
                                      fi ;;
                                 "4") if _NEXTITEM=4
                                         _dialog --defaultno --yesno \
                                             "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
                                         userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}"; then
                                         _dialog --title " Success " --no-mouse --infobox "User ${_USER} deleted succesfully." 3 50
-                                        read -r -t 3
+                                        sleep 3
                                         break
                                      fi ;;
                                  *) break ;;

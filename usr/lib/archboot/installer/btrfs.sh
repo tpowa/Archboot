@@ -197,7 +197,7 @@ _check_btrfs_subvolume(){
         for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d ' ' -f 9); do
             if echo "${i}" | rg -q "${_BTRFS_SUBVOLUME}"; then
                 _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical SUBVOLUMES! Please enter another name." 3 75
-                read -r -t 3
+                sleep 3
                 _BTRFS_SUBVOLUME=""
             fi
         done
@@ -207,7 +207,7 @@ _check_btrfs_subvolume(){
         _subvolumes_in_use
         if echo "${_SUBVOLUME_IN_USE}" | rg -q "${_BTRFS_SUBVOLUME}"; then
             _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical SUBVOLUMES! Please enter another name." 3 75
-            read -r -t 3
+            sleep 3
             _BTRFS_SUBVOLUME=""
         fi
     fi
@@ -243,7 +243,7 @@ _choose_btrfs_subvolume () {
     else
         if [[ -n "${_SUBVOLUMES_DETECTED}" ]]; then
             _dialog --title " ERROR " --no-mouse --infobox "All subvolumes of the device are already in use.\nSwitching to create a new one now." 4 60
-            read -r -t 5
+            sleep 5
             _prepare_btrfs_subvolume || return 1
         fi
     fi
