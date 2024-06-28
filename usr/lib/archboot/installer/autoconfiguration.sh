@@ -26,7 +26,7 @@ _auto_network()
     fi
     _progress "13" "Enable network and proxy settings on installed system..."
     # copy iwd keys and enable iwd
-    if grep -q 'wlan' /.network-interface 2>"${_NO_LOG}"; then
+    if rg -q 'wlan' /.network-interface 2>"${_NO_LOG}"; then
         cp -r /var/lib/iwd "${_DESTDIR}"/var/lib
         chroot "${_DESTDIR}" systemctl enable iwd &>"${_NO_LOG}"
     fi
@@ -58,7 +58,7 @@ _auto_fstab(){
     fi
     if [[ -f /tmp/.fstab ]]; then
         # clean fstab first from entries
-        sed -i -e '/^\#/!d' "${_DESTDIR}"/etc/fstab
+        sd -p '^[^#]*' '' "${_DESTDIR}"/etc/fstab
         sort /tmp/.fstab >>"${_DESTDIR}"/etc/fstab
     fi
     sleep 2
@@ -86,7 +86,7 @@ _auto_swap () {
 _auto_mdadm()
 {
     if [[ -e ${_DESTDIR}/etc/mdadm.conf ]]; then
-        if grep -q ^md /proc/mdstat 2>"${_NO_LOG}"; then
+        if rg -q ^md /proc/mdstat 2>"${_NO_LOG}"; then
             _progress "34" "Enable mdadm settings on installed system..."
             mdadm -Ds >> "${_DESTDIR}"/etc/mdadm.conf
         fi
@@ -96,10 +96,10 @@ _auto_mdadm()
 
 _auto_luks() {
     # remove root device from crypttab
-    if [[ -e /tmp/.crypttab && "$(grep -v '^#' "${_DESTDIR}"/etc/crypttab)" == "" ]]; then
+    if [[ -e /tmp/.crypttab && "$(rg -v '^#' "${_DESTDIR}"/etc/crypttab)" == "" ]]; then
         _progress "40" "Enable luks settings on installed system..."
         # add to temp crypttab
-        sed -i -e "/^$(basename "${_ROOTDEV}") /d" /tmp/.crypttab
+        sd "^$(basename "${_ROOTDEV}").*\n" '' /tmp/.crypttab
         cat /tmp/.crypttab >> "${_DESTDIR}"/etc/crypttab
         chmod 700 /tmp/passphrase-* 2>"${_NO_LOG}"
         cp /tmp/passphrase-* "${_DESTDIR}"/etc/ 2>"${_NO_LOG}"
@@ -118,11 +118,9 @@ _auto_pacman_keyring()
 
 _auto_testing()
 {
-    if grep -q "^\[.*testing\]" /etc/pacman.conf; then
+    if rg -q "^\[core-testing" /etc/pacman.conf; then
         _progress "53"  "Enable [testing] repository on installed system..."
-        sed -i -e '/^#\[core-testing\]/ { n ; s/^#// }' "${_DESTDIR}"/etc/pacman.conf
-        sed -i -e '/^#\[extra-testing\]/ { n ; s/^#// }' "${_DESTDIR}"/etc/pacman.conf
-        sed -i -e 's:^#\[core-testing\]:\[core-testing\]:g' -e  's:^#\[extra-testing\]:\[extra-testing\]:g' "${_DESTDIR}"/etc/pacman.conf
+        sd '^#(\[[c,e].*-testing\]\n)#' '$1' "${_DESTDIR}"/etc/pacman.conf
         sleep 2
     fi
 }
@@ -130,11 +128,15 @@ _auto_testing()
 _auto_pacman_mirror() {
     # /etc/pacman.d/mirrorlist
     # add installer-selected mirror to the top of the mirrorlist
-    if grep -q '^Server' /etc/pacman.d/mirrorlist; then
+    if rg -q '^Server' /etc/pacman.d/mirrorlist; then
         _progress "62" "Enable pacman mirror on installed system..."
-        _SYNC_URL=$(grep '^Server' /etc/pacman.d/mirrorlist | sed -e 's#.*\ ##g')
+        _SYNC_URL=$(rg '^Server.* (.*)' -r '$1')
         #shellcheck disable=SC2027,SC2086
-        awk "BEGIN { printf(\"# Mirror used during installation\nServer = "${_SYNC_URL}"\n\n\") } 1 " "${_DESTDIR}"/etc/pacman.d/mirrorlist > /tmp/inst-mirrorlist
+        cat << EOF > /tmp/inst-mirrorlist
+# Mirror used during installation
+Server = "${_SYNC_URL}
+EOF
+        cat "${_DESTDIR}"/etc/pacman.d/mirrorlist >> /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "${_DESTDIR}/etc/pacman.d/mirrorlist"
         sleep 2
     fi
@@ -173,8 +175,8 @@ _auto_set_locale() {
     # enable glibc locales from locale.conf
     _progress "90" "Enable glibc locales based on locale.conf on installed system..."
     #shellcheck disable=SC2013
-    for i in $(grep "^LANG" "${_DESTDIR}"/etc/locale.conf | sed -e 's/.*=//g' -e's/\..*//g'); do
-        sed -i -e "s/^#${i}/${i}/g" "${_DESTDIR}"/etc/locale.gen
+    for i in $(rg -o "^LANG=(.*)\..*" -r '$1' "${_DESTDIR}"/etc/locale.conf); do
+        sd "^#${i}" "${i}" "${_DESTDIR}"/etc/locale.gen
     done
     sleep 2
 }
@@ -192,9 +194,9 @@ _auto_bash(){
     if [[ ! -f ${_DESTDIR}/etc/profile.d/custom-bash-prompt.sh ]]; then
         _progress "99" "Setup bash with custom options on installed system..."
          cp "${_DESTDIR}"/etc/skel/.bash* "${_DESTDIR}"/root/
-        ! grep -qw 'custom-bash-options.sh' "${_DESTDIR}/etc/skel/.bashrc" &&\
+        ! rg -qw 'custom-bash-options.sh' "${_DESTDIR}/etc/skel/.bashrc" &&\
             echo ". /etc/profile.d/custom-bash-options.sh" >> "${_DESTDIR}/etc/skel/.bashrc"
-        ! grep -qw 'custom-bash-options.sh' "${_DESTDIR}/root/.bashrc" &&\
+        ! rg -qw 'custom-bash-options.sh' "${_DESTDIR}/root/.bashrc" &&\
             echo ". /etc/profile.d/custom-bash-options.sh" >> "${_DESTDIR}/root/.bashrc"
         cp /etc/profile.d/custom-bash-options.sh "${_DESTDIR}"/etc/profile.d/
         sleep 2
@@ -203,10 +205,10 @@ _auto_bash(){
 
 _auto_hwdetect() {
     # check on framebuffer modules and kms FBPARAMETER
-    grep -q "^radeon" /proc/modules && _FBPARAMETER="--ati-kms"
-    grep -q "^amdgpu" /proc/modules && _FBPARAMETER="--amd-kms"
-    grep -q "^i915" /proc/modules && _FBPARAMETER="--intel-kms"
-    grep -q "^nouveau" /proc/modules && _FBPARAMETER="--nvidia-kms"
+    rg -q "^radeon" /proc/modules && _FBPARAMETER="--ati-kms"
+    rg -q "^amdgpu" /proc/modules && _FBPARAMETER="--amd-kms"
+    rg -q "^i915" /proc/modules && _FBPARAMETER="--intel-kms"
+    rg -q "^nouveau" /proc/modules && _FBPARAMETER="--nvidia-kms"
     _progress "66" "Preconfiguring mkinitcpio settings on installed system..."
     # arrange MODULES for mkinitcpio.conf
     _HWDETECTMODULES="$(hwdetect --root_directory="${_DESTDIR}" --hostcontroller --filesystem "${_FBPARAMETER}")"
@@ -217,8 +219,8 @@ _auto_hwdetect() {
         _HWDETECTHOOKS="$(hwdetect --root_directory="${_DESTDIR}" --rootdevice="${_ROOTDEV}")"
     fi
     # change mkinitcpio.conf
-    [[ -n "${_HWDETECTMODULES}" ]] && sed -i -e "s#^MODULES=.*#${_HWDETECTMODULES}#g" "${_DESTDIR}"/etc/mkinitcpio.conf
-    [[ -n "${_HWDETECTHOOKS}" ]] && sed -i -e "s#^HOOKS=.*#${_HWDETECTHOOKS}#g" "${_DESTDIR}"/etc/mkinitcpio.conf
+    [[ -n "${_HWDETECTMODULES}" ]] && sd "^MODULES=.*" "${_HWDETECTMODULES}" "${_DESTDIR}"/etc/mkinitcpio.conf
+    [[ -n "${_HWDETECTHOOKS}" ]] && sd "^HOOKS=.*" "${_HWDETECTHOOKS}" "${_DESTDIR}"/etc/mkinitcpio.conf
     _progress "100" "Preconfiguring mkinitcpio settings on installed system..."
 }
 
@@ -241,7 +243,7 @@ _auto_mkinitcpio() {
         _dialog --no-mouse --infobox "" 3 70
         _auto_hwdetect | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Preconfiguring mkinitcpio settings on installed system..." 6 75 0
         # disable fallpack preset
-        sed -i -e "s# 'fallback'##g" "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
+        sd " 'fallback'" '' "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
         # remove fallback initramfs
         [[ -e "${_DESTDIR}/boot/initramfs-linux-fallback.img" ]] && rm -f "${_DESTDIR}/boot/initramfs-linux-fallback.img"
         sleep 2
