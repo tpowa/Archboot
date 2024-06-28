@@ -95,7 +95,7 @@ _raid_devices() {
             ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | rg -q 'crypto_LUKS' &&\
             ! ${_LSBLK} FSTYPE "${dev}" -s 2>"${_NO_LOG}" | rg -q 'isw_raid_member' &&\
             ! ${_LSBLK} FSTYPE "${dev}" -s 2>"${_NO_LOG}" | rg -q 'ddf_raid_member' &&\
-            ! find "$dev"*p* -type f -exec echo {} \; 2>"${_NO_LOG}"; then
+            ! fd "${dev}p.*" /dev 2>"${_NO_LOG}"; then
                 ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
     done
