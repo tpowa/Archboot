@@ -4,7 +4,7 @@
 _mkinitcpio() {
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         # disable error out on kms install hook
-        sed -i -e 's: add_checked_modules_from_symbol: #add_checked_modules_from_symbol:g' \
+        sd ' add_checked_modules_from_symbol' ' #add_checked_modules_from_symbol' \
             "${_DESTDIR}"/usr/lib/initcpio/install/kms
         chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}"-"${_RUNNING_ARCH}" &>"${_LOG}" && : > /tmp/.mkinitcpio-success
     else
@@ -54,7 +54,7 @@ _set_mkinitcpio() {
 _check_root_password() {
     _USER="root"
     # check if empty password is set
-    if passwd -R "${_DESTDIR}" -S root | cut -d ' ' -f2 | grep -q NP; then
+    if passwd -R "${_DESTDIR}" -S root | rg -q ' NP '; then
         _dialog --title " Root Account " --no-mouse --infobox "Setup detected no password set for root user.\nPlease set new password now." 4 50
         read -r -t 3
         if _prepare_password Root; then
@@ -64,7 +64,7 @@ _check_root_password() {
         fi
     fi
     # check if account is locked
-    if passwd -R "${_DESTDIR}" -S root | cut -d ' ' -f2 | grep -q L; then
+    if passwd -R "${_DESTDIR}" -S root | rg -q ' L '; then
         _dialog --title " Root Account " --no-mouse --infobox "Setup detected locked account for root user.\nPlease set new password to unlock account now." 4 50
         if _prepare_password Root; then
             _set_password
@@ -154,8 +154,8 @@ _user_management() {
                                 fi ;;
                     esac
                     # change default shell for root and all users >= UID 1000
-                    sed -i -e "s#^SHELL=.*#SHELL=/usr/bin/${_SHELL}#g" "${_DESTDIR}"/etc/default/useradd
-                    for i in root $(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1); do
+                    sd "^SHELL=.*' 'SHELL=/usr/bin/${_SHELL}" "${_DESTDIR}"/etc/default/useradd
+                    for i in root $(rg -o '(.*):x:10[0-9][0-9]' -r '$1' "${_DESTDIR}"/etc/passwd); do
                         usermod -R "${_DESTDIR}" -s "/usr/bin/${_SHELL}" "${i}" &>"${_LOG}"
                     done
                     _dialog --title " Success " --no-mouse --infobox "Default shell set to ${_SHELL}." 3 50
@@ -166,7 +166,7 @@ _user_management() {
                 fi ;;
             "2") while true; do
                      _set_user || break
-                     if grep -q "^${_USER}:" "${_DESTDIR}"/etc/passwd; then
+                     if rg -q "^${_USER}:" "${_DESTDIR}"/etc/passwd; then
                          _dialog --title " ERROR " --no-mouse --infobox "Username already exists! Please choose an other one." 3 60
                          read -r -t 3
                      else
@@ -192,7 +192,7 @@ _user_management() {
             "3") _USER="root"
                  while true; do
                      # root and all users with UID >= 1000
-                     _USERS="$(grep 'x:10[0-9][0-9]' "${_DESTDIR}"/etc/passwd | cut -d : -f 1,5 | sed -e 's: :#:g' | sed -e 's#:# #g')"
+                     _USERS="$(rg -o '(.*):x:10[0-9][0-9]:.*:(.*):.*:' -r '"$1" "$2"' "${_DESTDIR}"/etc/passwd)"
                      #shellcheck disable=SC2086
                      _dialog --no-cancel --default-item ${_USER} --menu " User Account Selection " 15 40 10 \
                         "root" "Super User" ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || break
@@ -209,7 +209,7 @@ _user_management() {
                         while true; do
                             _DEFAULT="--default-item ${_NEXTITEM}"
                             #shellcheck disable=SC2086
-                            if grep wheel "${_DESTDIR}"/etc/group | grep -qw "${_USER}"; then
+                            if rg wheel "${_DESTDIR}"/etc/group | rg -qw "${_USER}"; then
                                 _ADMIN_ATTR=1
                                 _USER_TITLE="${_USER} | Administrator | wheel group"
                                 _USER_MENU="Change To Normal User"
