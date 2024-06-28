@@ -86,7 +86,7 @@ _auto_swap () {
 _auto_mdadm()
 {
     if [[ -e ${_DESTDIR}/etc/mdadm.conf ]]; then
-        if rg -q ^md /proc/mdstat 2>"${_NO_LOG}"; then
+        if rg -q '^md' /proc/mdstat 2>"${_NO_LOG}"; then
             _progress "34" "Enable mdadm settings on installed system..."
             mdadm -Ds >> "${_DESTDIR}"/etc/mdadm.conf
         fi
