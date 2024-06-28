@@ -37,11 +37,11 @@ _getcryptsetup() {
     if ! cryptsetup status "$(basename "${_ROOTDEV}")" | rg -q 'inactive'; then
         if cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}"; then
             if [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
-                _LUKSDEV="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}" | grep device: | sed -e 's#device:##g')" 2>"${_NO_LOG}")"
+                _LUKSDEV="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}" | rg -o 'device: (.*)' -r '$1')" 2>"${_NO_LOG}")"
             elif [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]]; then
-                _LUKSDEV="LABEL=$(${_LSBLK} LABEL "$(cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}" | grep device: | sed -e 's#device:##g')" 2>"${_NO_LOG}")"
+                _LUKSDEV="LABEL=$(${_LSBLK} LABEL "$(cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}" | rg -o 'device: (.*)' -r '$1')" 2>"${_NO_LOG}")"
             else
-                _LUKSDEV="$(cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}" | grep device: | sed -e 's#device:##g'))"
+                _LUKSDEV="$(cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}" | rg -o 'device: (.*)' -r '$1')"
             fi
             _LUKSNAME="$(basename "${_ROOTDEV}")"
             _LUKSSETUP="cryptdevice=${_LUKSDEV}:${_LUKSNAME}"
@@ -155,7 +155,8 @@ _uefi_common() {
 }
 
 _uefi_efibootmgr() {
-    for _bootnum in $(efibootmgr | rg '^Boot[0-9]' | grep -F -i "${_BOOTMGR_LABEL}" | cut -b5-8) ; do
+    # delete existing entry
+    for _bootnum in $(efibootmgr | rg -F -i "${_BOOTMGR_LABEL}" | rg -o '^Boot(\d+)' -r '$1'); do
         efibootmgr --quiet -b "${_bootnum}" -B >> "${_LOG}"
     done
     _BOOTMGRDEV=$(${_LSBLK} PKNAME "${_UEFISYSDEV}" 2>"${_NO_LOG}")

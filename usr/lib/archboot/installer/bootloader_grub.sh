@@ -60,16 +60,16 @@ _grub_config() {
         _SUBDIR="/boot"
         # on btrfs we need to check on subvol
         if mount | rg -q "${_DESTDIR} type btrfs .*subvol"; then
-            _SUBDIR="/$(btrfs subvolume show "${_DESTDIR}/" | grep Name | cut -c 11-60)"/boot
+            _SUBDIR="/$(btrfs subvolume show "${_DESTDIR}/" | rg -o 'Name: +\t+(.*)' -r '$1')"/boot
         fi
         if mount | rg -q "${_DESTDIR}/boot type btrfs .*subvol"; then
-            _SUBDIR="/$(btrfs subvolume show "${_DESTDIR}/boot" | grep Name | cut -c 11-60)"
+            _SUBDIR="/$(btrfs subvolume show "${_DESTDIR}/boot" | rg -o 'Name: +\t+(.*)' -r '$1')"
         fi
     else
         _SUBDIR=""
         # on btrfs we need to check on subvol
         if mount | rg -q "${_DESTDIR}/boot type btrfs .*subvol"; then
-            _SUBDIR="/$(btrfs subvolume show "${_DESTDIR}/boot" | grep Name | cut -c 11-60)"
+            _SUBDIR="/$(btrfs subvolume show "${_DESTDIR}/boot" | rg -o 'Name: +\t+(.*)' -r '$1')"
         fi
     fi
     ## Move old config file, if any
