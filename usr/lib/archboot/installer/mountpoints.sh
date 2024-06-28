@@ -405,7 +405,7 @@ _mountpoints() {
         rg -v '/dev' /tmp/.parts >>/tmp/.parts.tmp
         mv /tmp/.parts.tmp /tmp/.parts
         #shellcheck disable=SC2028
-        _dialog --title " Summary " --defaultno --yesno "Syntax\n------\nDEVICE|FSTYPE|MOUNTPOINT|FORMAT|LABEL|FSOPTIONS|FS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sed -e 's, ,#,g';done </tmp/.parts)" 0 0 && _DEVFINISH="DONE"
+        _dialog --title " Summary " --defaultno --yesno "Syntax\n------\nDEVICE|FSTYPE|MOUNTPOINT|FORMAT|LABEL|FSOPTIONS|FS_DETAILS\n\n$(while read -r i;do echo "${i}\n" | sd ' ' '#';done </tmp/.parts)" 0 0 && _DEVFINISH="DONE"
     done
     # disable swap and all mounted devices
     _umountall
@@ -510,7 +510,7 @@ _mkfs() {
         [[ -n "${11}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} ${11}"
         _MOUNTOPTIONS="${_MOUNTOPTIONS} ${_SSD_MOUNT_OPTIONS}"
         # eleminate spaces at beginning and end, replace other spaces with ,
-        _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sed -e 's#^ *##g' -e 's# *$##g' | sed -e 's# #,#g')"
+        _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sd '^ *| *$' '' | sd ' ' ',')"
         # mount the bad boy
         mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" &>"${_LOG}" || : >/tmp/.mp-error
         #shellcheck disable=SC2181
