@@ -49,7 +49,7 @@ _bcfs_select_raid_devices () {
     _BCFS_RAID_DEVS=""
     #shellcheck disable=SC2001,SC2086
     for i in ${_DEVS}; do
-        echo "${i}" | grep -q /dev && _BCFS_RAID_DEVS="${_BCFS_RAID_DEVS} ${i} _ "
+        echo "${i}" | rg -q /dev && _BCFS_RAID_DEVS="${_BCFS_RAID_DEVS} ${i} _ "
     done
     _BCFS_RAID_DEVS=${_BCFS_RAID_DEVS//${_BCFS_RAID_DEV} _/}
     _RAIDNUMBER=1
