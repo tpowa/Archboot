@@ -23,7 +23,7 @@ When = PostTransaction
 Exec = /usr/bin/systemctl restart systemd-boot-update.service
 EOF
     _dialog --title " Automatic SYSTEMD-BOOT Update " --no-mouse --infobox "Automatic SYSTEMD-BOOT update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
-    sleep 3
+    read -r -t 3
 }
 
 _pacman_hook_limine_bios() {
@@ -36,7 +36,7 @@ When = PostTransaction
 Exec = /usr/bin/sh -c "/usr/bin/cp /usr/share/limine/limine-bios.sys /boot/; /usr/bin/limine bios-install '${_PARENT_BOOTDEV}'"
 EOF
     _dialog --title " Automatic LIMINE BIOS Update " --no-mouse --infobox "Automatic LIMINE BIOS update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
-    sleep 3
+    read -r -t 3
 }
 
 _pacman_hook_limine_uefi() {
@@ -50,7 +50,7 @@ Exec = /usr/bin/sh -c "/usr/bin/cp /usr/share/limine/BOOT${_UEFI_ARCH}.EFI /${_U
 /usr/bin/cp /usr/share/limine/BOOT${_UEFI_ARCH}.EFI /${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI"
 EOF
     _dialog --title " Automatic LIMINE Update " --no-mouse --infobox "Automatic LIMINE update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
-    sleep 3
+    read -r -t 3
 }
 
 _pacman_hook_refind() {
@@ -63,7 +63,7 @@ When = PostTransaction
 Exec = /usr/bin/sh -c "/usr/bin/cp /usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi /${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI;/usr/bin/refind-install"
 EOF
     _dialog --title " Automatic rEFInd Update " --no-mouse --infobox "Automatic rEFInd update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
-    sleep 3
+    read -r -t 3
 }
 
 _pacman_hook_grub_bios() {
@@ -76,7 +76,7 @@ When = PostTransaction
 Exec = /usr/bin/sh -c "grub-install --directory='/usr/lib/grub/i386-pc' --target='i386-pc' --boot-directory='/boot' --recheck '${_BOOTDEV}'"
 EOF
     _dialog --title " Automatic GRUB Update " --no-mouse --infobox "Automatic GRUB BIOS update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
-    sleep 3
+    read -r -t 3
 }
 
 _pacman_hook_grub_uefi() {
@@ -89,7 +89,7 @@ When = PostTransaction
 Exec = /usr/bin/sh -c "grub-install --directory='/usr/lib/grub/${_GRUB_ARCH}-efi' --target='${_GRUB_ARCH}-efi' --efi-directory='/${_UEFISYS_MP}' --bootloader-id='GRUB' --recheck"
 EOF
     _dialog --title " Automatic GRUB Update " --no-mouse --infobox "Automatic GRUB update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
-    sleep 3
+    read -r -t 3
 }
 
 _pacman_hook_grub_sb() {
@@ -102,7 +102,7 @@ When = PostTransaction
 Exec = /usr/bin/sh -c "/usr/bin/grub-mkstandalone -d '/usr/lib/grub/${_GRUB_ARCH}-efi' -O '${_GRUB_ARCH}-efi' --sbat=/usr/share/grub/sbat.csv --fonts='ter-u16n' --locales='en@quot' --themes='' -o '/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi' 'boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}';/usr/bin/sbsign --key '/${_KEYDIR}/MOK/MOK.key' --cert '/${_KEYDIR}/MOK/MOK.crt' --output '/${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi' '/${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi'"
 EOF
     _dialog --title " Automatic GRUB UEFI SB Update " --no-mouse --infobox "Automatic GRUB UEFI SB update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
-    sleep 3
+    read -r -t 3
 }
 
 _pacman_sign() {
@@ -118,5 +118,5 @@ Depends = findutils
 Depends = grep
 EOF
     _dialog --title " Automatic Signing " --no-mouse --infobox "Automatic signing has been enabled successfully:\n\n${_HOOKNAME}" 5 70
-    sleep 3
+    read -r -t 3
 }

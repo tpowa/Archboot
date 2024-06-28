@@ -172,11 +172,11 @@ _run_mkfs() {
         else
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" || return 1
         fi
-        sleep 1
+        read -r -t 1
         _COUNT=$((_COUNT+_PROGRESS_COUNT))
     done < /tmp/.parts
     _progress "100" "Mountpoints finished successfully."
-    sleep 2
+    read -r -t 2
 }
 
 _create_filesystem() {
@@ -194,7 +194,7 @@ _create_filesystem() {
             _LABEL_NAME=$(cat "${_ANSWER}")
             if rg "|${_LABEL_NAME}$" /tmp/.parts; then
                 _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical LABEL names! Please enter another name." 3 60
-                sleep 5
+                read -r -t 5
                 _LABEL_NAME=""
             fi
         done
@@ -309,7 +309,7 @@ _mountpoints() {
                             if ! [[ "${_DEV}" == "> NONE" || "${_DEV}" == "> FILE" ]]; then
                                 if ! [[ "${_FSTYPE}" == "swap" ]]; then
                                     _dialog --title " ERROR " --no-mouse --infobox "SWAP PARTITION has not a swap filesystem." 3 60
-                                    sleep 5
+                                    read -r -t 5
                                     _MP_DONE=""
                                 else
                                     _MP_DONE=1
@@ -320,11 +320,11 @@ _mountpoints() {
                         elif [[ -z "${_ROOT_DONE}" ]]; then
                             if [[ "${_FSTYPE}" == "vfat" ]]; then
                                 _dialog --title " ERROR " --no-mouse --infobox "ROOT DEVICE has a vfat filesystem." 3 60
-                                sleep 5
+                                read -r -t 5
                                 _MP_DONE=""
                             elif [[ "${_FSTYPE}" == "swap" ]]; then
                                 _dialog --title " ERROR " --no-mouse --infobox "ROOT DEVICE has a swap filesystem." 3 60
-                                sleep 5
+                                read -r -t 5
                                 _MP_DONE=""
                             else
                                 _MP_DONE=1
@@ -332,7 +332,7 @@ _mountpoints() {
                         elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
                             if ! [[ "${_FSTYPE}" == "vfat" ]]; then
                                 _dialog --title " ERROR " --no-mouse --infobox "EFI SYSTEM PARTITION has not a vfat filesystem." 3 60
-                                sleep 5
+                                read -r -t 5
                                 _MP_DONE=""
                             else
                                 _MP_DONE=1
@@ -340,7 +340,7 @@ _mountpoints() {
                          elif [[ -n "${_XBOOTLDR}" ]]; then
                             if ! [[ "${_FSTYPE}" == "vfat" ]]; then
                                 _dialog --title " ERROR " --no-mouse --infobox "EXTENDED BOOT LOADER PARTITION has not a vfat filesystem." 3 70
-                                sleep 5
+                                read -r -t 5
                                 _MP_DONE=""
                             else
                                 _MP_DONE=1
@@ -463,7 +463,7 @@ _mkfs() {
             #shellcheck disable=SC2181
             if [[ -f "/tmp/.mp-error" ]]; then
                 _progress "100" "ERROR: Creating swap ${1}"
-                sleep 5
+                read -r -t 5
                 return 1
             fi
         fi
@@ -474,7 +474,7 @@ _mkfs() {
         fi
         if [[ -f "/tmp/.mp-error" ]]; then
             _progress "100" "ERROR: Activating swap ${1}"
-            sleep 5
+            read -r -t 5
             return 1
         fi
     else
@@ -491,16 +491,16 @@ _mkfs() {
             esac
             if [[ -f "/tmp/.mp-error" ]]; then
                 _progress "100" "ERROR: Creating filesystem ${2} on ${1}" 0 0
-                sleep 5
+                read -r -t 5
                 return 1
             fi
-            sleep 2
+            read -r -t 2
         fi
         if [[ "${2}" == "btrfs" && -n "${10}" ]]; then
             _create_btrfs_subvolume
         fi
         _btrfs_scan
-        sleep 2
+        read -r -t 2
         # create our mount directory
         mkdir -p "${3}""${5}"
         # add ssd optimization before mounting
@@ -516,7 +516,7 @@ _mkfs() {
         #shellcheck disable=SC2181
         if [[ -f "/tmp/.mp-error" ]]; then
             _progress "100" "ERROR: Mounting ${3}${5}"
-            sleep 5
+            read -r -t 5
             return 1
         fi
         # create /EFI directory on ESP
@@ -529,7 +529,7 @@ _mkfs() {
         # check if /boot exists on ROOT DEVICE
         if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/" && ! -d "${3}${5}/boot" ]]; then
             _progress "100" "ERROR: ROOT DEVICE ${3}${5} does not contain /boot directory."
-            sleep 5
+            read -r -t 5
             _umountall
             : > /tmp/.mp-error
             return 1
@@ -537,7 +537,7 @@ _mkfs() {
         # check on /EFI on /efi mountpoint
         if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/efi" && ! -d "${3}${5}/EFI" ]]; then
             _progress "100" "ERROR: EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory."
-            sleep 5
+            read -r -t 5
             _umountall
             : > /tmp/.mp-error
             return 1
@@ -546,7 +546,7 @@ _mkfs() {
         if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/boot" && -n "${_UEFI_BOOT}" && ! -d "${3}${5}/EFI" ]]; then
             if ! mountpoint -q "${3}/efi"; then
                 _progress "100" "ERROR: EFI SYSTEM PARTITION (ESP) ${3}${5} does not contain /EFI directory."
-                sleep 5
+                read -r -t 5
                 _umountall
                 : > /tmp/.mp-error
                 return 1

@@ -8,12 +8,12 @@ _auto_timesetting() {
     if [[ -e /etc/localtime && ! -e "${_DESTDIR}"/etc/localtime ]]; then
         _progress "5" "Enable timezone setting on installed system..."
         cp -a /etc/localtime "${_DESTDIR}"/etc/localtime
-        sleep 2
+        read -r -t 2
     fi
     if [[ -f /etc/adjtime && ! -f "${_DESTDIR}"/etc/adjtime ]]; then
         _progress "8" "Enable clock setting on installed system..."
         cp /etc/adjtime "${_DESTDIR}"/etc/adjtime
-        sleep 2
+        read -r -t 2
     fi
 }
 
@@ -47,7 +47,7 @@ _auto_network()
         cp /etc/systemd/network.conf.d/ipv6-privacy-extensions.conf \
            "${_DESTDIR}"/etc/systemd/network.conf.d/ipv6-privacy-extensions.conf
     fi
-    sleep 2
+    read -r -t 2
 }
 
 _auto_fstab(){
@@ -61,7 +61,7 @@ _auto_fstab(){
         sd -p '^[^#]*' '' "${_DESTDIR}"/etc/fstab
         sort /tmp/.fstab >>"${_DESTDIR}"/etc/fstab
     fi
-    sleep 2
+    read -r -t 2
 }
 
 # add udev rule for schedulers by default
@@ -69,7 +69,7 @@ _auto_scheduler () {
     if [[ ! -f ${_DESTDIR}/etc/udev/rules.d/70-ioschedulers.rules ]]; then
         _progress "24" "Enable performance ioscheduler settings on installed system..."
         cp /etc/udev/rules.d/60-ioschedulers.rules "${_DESTDIR}"/etc/udev/rules.d/60-ioschedulers.rules
-        sleep 2
+        read -r -t 2
     fi
 }
 
@@ -78,7 +78,7 @@ _auto_swap () {
     if [[ ! -f ${_DESTDIR}/etc/sysctl.d/99-sysctl.conf ]]; then
         _progress "29" "Enable sysctl swap settings on installed system..."
         cp /etc/sysctl.d/99-sysctl.conf "${_DESTDIR}"/etc/sysctl.d/99-sysctl.conf
-        sleep 2
+        read -r -t 2
     fi
 }
 
@@ -90,7 +90,7 @@ _auto_mdadm()
             _progress "34" "Enable mdadm settings on installed system..."
             mdadm -Ds >> "${_DESTDIR}"/etc/mdadm.conf
         fi
-        sleep 2
+        read -r -t 2
     fi
 }
 
@@ -103,7 +103,7 @@ _auto_luks() {
         cat /tmp/.crypttab >> "${_DESTDIR}"/etc/crypttab
         chmod 700 /tmp/passphrase-* 2>"${_NO_LOG}"
         cp /tmp/passphrase-* "${_DESTDIR}"/etc/ 2>"${_NO_LOG}"
-        sleep 2
+        read -r -t 2
     fi
 }
 
@@ -112,7 +112,7 @@ _auto_pacman_keyring()
     if ! [[ -d ${_DESTDIR}/etc/pacman.d/gnupg ]]; then
         _progress "47" "Enable pacman's GPG keyring files on installed system..."
         cp -ar /etc/pacman.d/gnupg "${_DESTDIR}"/etc/pacman.d &>"${_NO_LOG}"
-        sleep 2
+        read -r -t 2
     fi
 }
 
@@ -121,7 +121,7 @@ _auto_testing()
     if rg -q "^\[core-testing" /etc/pacman.conf; then
         _progress "53"  "Enable [testing] repository on installed system..."
         sd '^#(\[[c,e].*-testing\]\n)#' '$1' "${_DESTDIR}"/etc/pacman.conf
-        sleep 2
+        read -r -t 2
     fi
 }
 
@@ -138,7 +138,7 @@ Server = "${_SYNC_URL}
 EOF
         cat "${_DESTDIR}"/etc/pacman.d/mirrorlist >> /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "${_DESTDIR}/etc/pacman.d/mirrorlist"
-        sleep 2
+        read -r -t 2
     fi
 }
 
@@ -146,7 +146,7 @@ _auto_vconsole() {
     if [[ ! -f ${_DESTDIR}/etc/vconsole.conf ]]; then
         _progress "69" "Setting keymap and font on installed system..."
         cp /etc/vconsole.conf "${_DESTDIR}"/etc/vconsole.conf
-        sleep 2
+        read -r -t 2
     fi
 }
 
@@ -154,7 +154,7 @@ _auto_hostname() {
     if [[ ! -f ${_DESTDIR}/etc/hostname ]]; then
         _progress "76" "Set default hostname on installed system..."
         echo "myhostname" > "${_DESTDIR}"/etc/hostname
-        sleep 2
+        read -r -t 2
     fi
 }
 
@@ -166,7 +166,7 @@ _auto_locale() {
         else
             echo "LANG=C.UTF-8" > "${_DESTDIR}"/etc/locale.conf
             echo "LC_COLLATE=C" >> "${_DESTDIR}"/etc/locale.conf
-            sleep 2
+            read -r -t 2
         fi
     fi
 }
@@ -178,7 +178,7 @@ _auto_set_locale() {
     for i in $(rg -o "^LANG=(.*)\..*" -r '$1' "${_DESTDIR}"/etc/locale.conf); do
         sd "^#${i}" "${i}" "${_DESTDIR}"/etc/locale.gen
     done
-    sleep 2
+    read -r -t 2
 }
 
 _auto_windowkeys() {
@@ -199,7 +199,7 @@ _auto_bash(){
         ! rg -qw 'custom-bash-options.sh' "${_DESTDIR}/root/.bashrc" &&\
             echo ". /etc/profile.d/custom-bash-options.sh" >> "${_DESTDIR}/root/.bashrc"
         cp /etc/profile.d/custom-bash-options.sh "${_DESTDIR}"/etc/profile.d/
-        sleep 2
+        read -r -t 2
     fi
 }
 
@@ -246,7 +246,7 @@ _auto_mkinitcpio() {
         sd " 'fallback'" '' "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
         # remove fallback initramfs
         [[ -e "${_DESTDIR}/boot/initramfs-linux-fallback.img" ]] && rm -f "${_DESTDIR}/boot/initramfs-linux-fallback.img"
-        sleep 2
+        read -r -t 2
         _AUTO_MKINITCPIO=1
         _run_mkinitcpio | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Rebuilding initramfs on installed system..." 6 75 0
         _mkinitcpio_error

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _uki_autobuild() {
-    sleep 2
+    read -r -t 2
     _progress "50" "Enable automatic UKI creation on installed system..."
     cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.path"
 [Unit]

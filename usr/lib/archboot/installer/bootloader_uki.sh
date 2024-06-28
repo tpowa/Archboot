@@ -29,9 +29,9 @@ _uki_install() {
     mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
     rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
     cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-    sleep 2
+    read -r -t 2
     _progress "100" "Unified Kernel Image has been setup successfully."
-    sleep 2
+    read -r -t 2
     _S_BOOTLOADER=1
 }
 
@@ -50,6 +50,6 @@ _uki_uefi() {
         _uki_install | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Setting up Unified Kernel Image..." 6 75 0
     else
         _dialog --title " ERROR " --no-mouse --infobox "Setting up Unified Kernel Image failed!" 3 60
-        sleep 3
+        read -r -t 3
     fi
 }

@@ -39,7 +39,7 @@ _geteditor() {
                     _dialog --no-mouse --infobox "Enable nano's syntax highlighting on installed system..." 3 70
                     rg -q '^include' "${_DESTDIR}/etc/nanorc" || \
                         echo "include \"/usr/share/nano/*.nanorc\"" >> "${_DESTDIR}/etc/nanorc"
-                    sleep 2
+                    read -r -t 2
                 fi
                 ;;
             "NEOVIM") _EDITOR="nvim"
@@ -231,7 +231,7 @@ _mainmenu() {
                      exit 0 ;;
                 "2") _COUNT=0
                      while true; do
-                         sleep 1
+                         read -r -t 1
                          _COUNT=$((_COUNT+1))
                          # abort after 10 seconds
                          _progress "$((_COUNT*10))" "Rebooting in $((10-_COUNT)) second(s). Don't forget to remove the boot medium!"
@@ -241,7 +241,7 @@ _mainmenu() {
                      reboot ;;
                 "3") _COUNT=0
                      while true; do
-                         sleep 1
+                         read -r -t 1
                          _COUNT=$((_COUNT+1))
                          # abort after 10 seconds
                          _progress "$((_COUNT*10))" "Powering off in $((10-_COUNT)) second(s). Don't forget to remove the boot medium!"
