@@ -124,7 +124,7 @@ _auto_packages() {
     fi
     #shellcheck disable=SC2010
     # Add iwd, if wlan is detected
-    if ls /sys/class/net | rg -q 'wlan'; then
+    if fd . /sys/class/net | rg -q 'wlan'; then
         ! echo "${_PACKAGES}" | rg -qw 'iwd' && _PACKAGES="${_PACKAGES} iwd"
     fi
     # Add broadcom-wl, if module is detected

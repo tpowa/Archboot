@@ -421,7 +421,7 @@ _createmd()
         while [[ -z "${_RAIDDEV}" ]]; do
             _dialog --inputbox "Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n" 12 50 "/dev/md0" 2>"${_ANSWER}" || return 1
             _RAIDDEV=$(cat "${_ANSWER}")
-            if rg -q "^${_RAIDDEV//\/dev\//}" /proc/mdstat 2>${_NO_LOG}; then
+            if rg -q "^${_RAIDDEV//\/dev\//}" /proc/mdstat 2>"${_NO_LOG}"; then
                 _dialog --msgbox "ERROR: You have defined 2 identical node names! Please enter another name." 8 65
                 _RAIDDEV=""
             fi
