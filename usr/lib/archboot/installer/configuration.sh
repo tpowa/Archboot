@@ -115,6 +115,7 @@ _set_user() {
 }
 
 _set_comment() {
+    _FN=""
     while true; do
         _dialog --title " ${_USER} Account " --no-cancel --inputbox "Enter a comment eg. your Full Name" 8 40 "" 2>"${_ANSWER}" || return 1
         _FN=$(cat "${_ANSWER}")
