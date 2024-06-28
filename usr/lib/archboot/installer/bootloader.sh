@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
-if [[ "${_RUNNING_ARCH}" == "x86_64" ]] && grep -q 'Intel' /proc/cpuinfo; then
+if [[ "${_RUNNING_ARCH}" == "x86_64" ]] && rg -q 'Intel' /proc/cpuinfo; then
     _UCODE="intel-ucode.img"
     _UCODE_PKG="intel-ucode"
 fi
 
 if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]]; then
-    if grep -q 'AMD' /proc/cpuinfo; then
+    if rg -q 'AMD' /proc/cpuinfo; then
         _UCODE="amd-ucode.img"
         _UCODE_PKG="amd-ucode"
     fi
@@ -27,14 +27,14 @@ _getrootflags() {
 
 _getraidarrays() {
     _RAIDARRAYS=""
-    if [[ -f "${_DESTDIR}/etc/mdadm.conf" ]] && ! grep -q '^ARRAY' "${_DESTDIR}"/etc/mdadm.conf 2>"${_NO_LOG}"; then
+    if [[ -f "${_DESTDIR}/etc/mdadm.conf" ]] && ! rg -q '^ARRAY' "${_DESTDIR}"/etc/mdadm.conf 2>"${_NO_LOG}"; then
         _RAIDARRAYS="$(echo -n "$(grep ^md /proc/mdstat 2>"${_NO_LOG}" | sed -e 's#\[[0-9]\]##g' -e 's# :.* raid[0-9]##g' -e 's#md#md=#g' -e 's# #,/dev/#g' -e 's#_##g')")"
     fi
 }
 
 _getcryptsetup() {
     _LUKSSETUP=""
-    if ! cryptsetup status "$(basename "${_ROOTDEV}")" | grep -q inactive; then
+    if ! cryptsetup status "$(basename "${_ROOTDEV}")" | rg -q 'inactive'; then
         if cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}"; then
             if [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
                 _LUKSDEV="UUID=$(${_LSBLK} UUID "$(cryptsetup status "$(basename "${_ROOTDEV}")" 2>"${_NO_LOG}" | grep device: | sed -e 's#device:##g')" 2>"${_NO_LOG}")"
@@ -103,7 +103,7 @@ _common_bootloader_checks() {
 
 _check_bootpart() {
     _SUBDIR=""
-    _BOOTDEV="$(mount | grep "${_DESTDIR}/boot " | cut -d' ' -f 1)"
+    _BOOTDEV="$(mount | rg -o "(${_DESTDIR}/boot) .*" -r '$1')"
     if [[ -z "${_BOOTDEV}" ]]; then
         _SUBDIR="/boot"
         _BOOTDEV="${_ROOTDEV}"
@@ -120,7 +120,7 @@ _abort_uboot(){
 }
 
 _abort_bcachefs_bootpart() {
-        if  ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | grep -q "bcachefs"; then
+        if  ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | rg -q 'bcachefs'; then
             _dialog --title " ERROR " --no-mouse --infobox "Your selected bootloader cannot boot from bcachefs partition with /boot on it." 0 0
             return 1
         fi
@@ -144,18 +144,18 @@ _uefi_common() {
     # automounted /boot and ESP needs to be mounted first, trigger mount with ls
     ls "${_DESTDIR}/boot" &>"${_NO_LOG}"
     ls "${_DESTDIR}/efi" &>"${_NO_LOG}"
-    _BOOTDEV="$(${_FINDMNT} "${_DESTDIR}/boot" | grep -vw 'systemd-1')"
+    _BOOTDEV="$(${_FINDMNT} "${_DESTDIR}/boot" | rg -vw 'systemd-1')"
     if mountpoint -q "${_DESTDIR}/efi" ; then
         _UEFISYS_MP=efi
     else
         _UEFISYS_MP=boot
     fi
-    _UEFISYSDEV="$(${_FINDMNT} "${_DESTDIR}/${_UEFISYS_MP}" | grep -vw 'systemd-1')"
+    _UEFISYSDEV="$(${_FINDMNT} "${_DESTDIR}/${_UEFISYS_MP}" | rg -vw 'systemd-1')"
     _UEFISYSDEV_FS_UUID="$(_getfsuuid "${_UEFISYSDEV}")"
 }
 
 _uefi_efibootmgr() {
-    for _bootnum in $(efibootmgr | grep '^Boot[0-9]' | grep -F -i "${_BOOTMGR_LABEL}" | cut -b5-8) ; do
+    for _bootnum in $(efibootmgr | rg '^Boot[0-9]' | grep -F -i "${_BOOTMGR_LABEL}" | cut -b5-8) ; do
         efibootmgr --quiet -b "${_bootnum}" -B >> "${_LOG}"
     done
     _BOOTMGRDEV=$(${_LSBLK} PKNAME "${_UEFISYSDEV}" 2>"${_NO_LOG}")

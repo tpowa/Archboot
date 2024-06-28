@@ -5,11 +5,11 @@
 _freeze_xfs() {
     sync
     if [[ -x /usr/bin/xfs_freeze ]]; then
-        if grep "${_DESTDIR}/boot " /proc/mounts | grep -q " xfs "; then
+        if mount | rg -q "${_DESTDIR}/boot type xfs"; then
             xfs_freeze -f "${_DESTDIR}"/boot &>"${_NO_LOG}"
             xfs_freeze -u "${_DESTDIR}"/boot &>"${_NO_LOG}"
         fi
-        if grep "${_DESTDIR} " /proc/mounts | grep -q " xfs "; then
+        if mount | rg -q "${_DESTDIR} type xfs"; then
             xfs_freeze -f "${_DESTDIR}" &>"${_NO_LOG}"
             xfs_freeze -u "${_DESTDIR}" &>"${_NO_LOG}"
         fi
@@ -59,16 +59,16 @@ _grub_config() {
     if [[ "${_ROOTDEV_FS_UUID}" == "${_BOOTDEV_FS_UUID}" ]]; then
         _SUBDIR="/boot"
         # on btrfs we need to check on subvol
-        if mount | grep "${_DESTDIR} " | grep btrfs | grep -q subvol; then
+        if mount | rg -q "${_DESTDIR} type btrfs .*subvol"; then
             _SUBDIR="/$(btrfs subvolume show "${_DESTDIR}/" | grep Name | cut -c 11-60)"/boot
         fi
-        if mount | grep "${_DESTDIR}/boot " | grep btrfs | grep -q subvol; then
+        if mount | rg -q "${_DESTDIR}/boot type btrfs .*subvol"; then
             _SUBDIR="/$(btrfs subvolume show "${_DESTDIR}/boot" | grep Name | cut -c 11-60)"
         fi
     else
         _SUBDIR=""
         # on btrfs we need to check on subvol
-        if mount | grep "${_DESTDIR}/boot " | grep btrfs | grep -q subvol; then
+        if mount | rg -q "${_DESTDIR}/boot type btrfs .*subvol"; then
             _SUBDIR="/$(btrfs subvolume show "${_DESTDIR}/boot" | grep Name | cut -c 11-60)"
         fi
     fi
@@ -261,7 +261,7 @@ _grub_bios() {
     # try to auto-configure GRUB(2)...
     _check_bootpart
     # check if raid, raid partition, or device devicemapper is used
-    if echo "${_BOOTDEV}" | grep -q /dev/md || echo "${_BOOTDEV}" | grep -q /dev/mapper; then
+    if echo "${_BOOTDEV}" | rg -q '/dev/md|/dev/mapper'; then
         # boot from lvm, raid, partitioned and raid devices is supported
         _FAIL_COMPLEX=""
         if cryptsetup status "${_BOOTDEV}"; then
@@ -271,13 +271,13 @@ _grub_bios() {
     fi
     if [[ -z "${_FAIL_COMPLEX}" ]]; then
         # check if mapper is used
-        if  echo "${_BOOTDEV}" | grep -q /dev/mapper; then
+        if  echo "${_BOOTDEV}" | rg -q '/dev/mapper'; then
             _RAID_ON_LVM=""
             #check if mapper contains a md device!
             for devpath in $(pvs -o pv_name --noheading); do
-                if echo "${devpath}" | grep -v "/dev/md.p" | grep -q /dev/md; then
+                if echo "${devpath}" | rg -v "/dev/md.p" | rg -q '/dev/md'; then
                     _DETECTEDVOLUMEGROUP="$(pvs -o vg_name --noheading "${devpath}")"
-                    if echo /dev/mapper/"${_DETECTEDVOLUMEGROUP}"-* | grep -q "${_BOOTDEV}"; then
+                    if echo /dev/mapper/"${_DETECTEDVOLUMEGROUP}"-* | rg -q "${_BOOTDEV}"; then
                         # change _BOOTDEV to md device!
                         _BOOTDEV=$(pvs -o pv_name --noheading "${devpath}")
                         _RAID_ON_LVM=1
@@ -288,7 +288,7 @@ _grub_bios() {
         fi
         #check if raid is used
         _USE_RAID=""
-        if echo "${_BOOTDEV}" | grep -q /dev/md; then
+        if echo "${_BOOTDEV}" | rg -q '/dev/md'; then
             _USE_RAID=1
         fi
     fi
