@@ -291,12 +291,12 @@ _umountall()
 _stopmd()
 {
     _DISABLEMD=""
-    if rg -q ^md /proc/mdstat 2>"${_NO_LOG}"; then
+    if rg -q '^md' /proc/mdstat 2>"${_NO_LOG}"; then
         _dialog --defaultno --yesno "Setup detected already running software raid device(s)...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLEMD=1
         if [[ -n "${_DISABLEMD}" ]]; then
             _umountall
             # shellcheck disable=SC2013
-            for dev in $(rg -o '(^md.*) ' -r '$1' /proc/mdstat); do
+            for dev in $(rg -o '(^md.*) :' -r '$1' /proc/mdstat); do
                 wipefs -a -f "/dev/${dev}" &>"${_NO_LOG}"
                 mdadm --manage --stop "/dev/${dev}" &>"${_LOG}"
             done
@@ -565,7 +565,7 @@ _createpv()
             echo "${_DEV}" >>/tmp/.pvs-create
         done
         # final step ask if everything is ok?
-        _dialog --yesno "Would you like to create physical volume on devices below?\n$(sed -e 's#$#\\n#g' /tmp/.pvs-create)" 0 0 && break
+        _dialog --yesno "Would you like to create physical volume on devices below?\n$(sd '$' '\\n' /tmp/.pvs-create)" 0 0 && break
     done
     _DEV="$(echo -n "$(cat /tmp/.pvs-create)")"
     #shellcheck disable=SC2028,SC2086
@@ -650,7 +650,7 @@ _createvg()
             echo "${_PV}" >>/tmp/.pvs
         done
         # final step ask if everything is ok?
-        _dialog --yesno "Would you like to create Volume Group like this?\n\n${_VGDEV}\n\nPhysical Volumes:\n$(sed -e 's#$#\\n#g' /tmp/.pvs)" 0 0 && break
+        _dialog --yesno "Would you like to create Volume Group like this?\n\n${_VGDEV}\n\nPhysical Volumes:\n$(sd '$' '\\n' /tmp/.pvs)" 0 0 && break
     done
     _PV="$(echo -n "$(cat /tmp/.pvs)")"
     _umountall
@@ -697,7 +697,7 @@ _createlv()
                 elif [[ "${_LV_SIZE}" == 0 ]]; then
                     _dialog --msgbox "ERROR: You have entered a invalid size, please enter again." 0 0
                 else
-                    if [[ "${_LV_SIZE}" -ge "$(vgs -o vg_free --noheading --units M | sed -e 's#m##g')" ]]; then
+                    if [[ "${_LV_SIZE}" -ge "$(vgs -o vg_free --noheading --units M | sd 'm' '')" ]]; then
                         _dialog --msgbox "ERROR: You have entered a too large size, please enter again." 0 0
                     else
                         break
