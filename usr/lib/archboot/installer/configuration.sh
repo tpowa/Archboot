@@ -155,7 +155,7 @@ _user_management() {
                                 fi ;;
                     esac
                     # change default shell for root and all users >= UID 1000
-                    sd "^SHELL=.*' 'SHELL=/usr/bin/${_SHELL}" "${_DESTDIR}"/etc/default/useradd
+                    sd '^SHELL=.*' "SHELL=/usr/bin/${_SHELL}" "${_DESTDIR}"/etc/default/useradd
                     for i in root $(rg -o '(.*):x:10[0-9][0-9]' -r '$1' "${_DESTDIR}"/etc/passwd); do
                         usermod -R "${_DESTDIR}" -s "/usr/bin/${_SHELL}" "${i}" &>"${_LOG}"
                     done
