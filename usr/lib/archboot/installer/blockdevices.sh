@@ -130,7 +130,7 @@ _partitionable_raid_devices_partitions() {
 
 _dmraid_devices() {
     # ddf_raid_member or isw_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE | rg "(.*) raid.*$" -r '$1' | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE | rg '(.*) raid.*$' -r '$1' | sort -u); do
         if ${_LSBLK} NAME,FSTYPE -s "${dev}" 2>"${_NO_LOG}" | rg -q 'ddf_raid_member$|isw_raid_member$'; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
@@ -139,7 +139,7 @@ _dmraid_devices() {
 
 _dmraid_partitions() {
     # ddf_raid_member or isw_raid_member, managed by mdadm
-    for dev in $(${_LSBLK} NAME,TYPE | rg "(.*) md$" -r '$1' | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE | rg '(.*) md$' -r '$1' | sort -u); do
         if ${_LSBLK} NAME,FSTYPE -s "${dev}" 2>"${_NO_LOG}" | rg 'ddf_raid_member$|isw_raid_member$'; then
             ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
