@@ -70,7 +70,7 @@ _find_btrfs_bootloader_subvolume() {
 _subvolumes_in_use() {
     _SUBVOLUME_IN_USE=""
     while read -r i; do
-        echo "${i}" | rg -q "\|btrfs\|" && _SUBVOLUME_IN_USE="${_SUBVOLUME_IN_USE} $(echo "${i}" | cut -d '|' -f 9)"
+        echo "${i}" | rg -F -q "|btrfs|" && _SUBVOLUME_IN_USE="${_SUBVOLUME_IN_USE} $(echo "${i}" | cut -d '|' -f 9)"
     done < /tmp/.parts
 }
 
@@ -80,7 +80,7 @@ _check_btrfs_filesystem_creation() {
     _SKIP_FILESYSTEM=""
     #shellcheck disable=SC2013
     for i in $(rg "${_DEV}[|#]" /tmp/.parts); do
-        if echo "${i}" | rg -q "\|btrfs\|"; then
+        if echo "${i}" | rg -F -q "|btrfs|"; then
             _FSTYPE="btrfs"
             _SKIP_FILESYSTEM=1
             # check on filesystem creation, skip subvolume asking then!
