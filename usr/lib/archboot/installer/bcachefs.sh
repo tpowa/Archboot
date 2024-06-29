@@ -132,7 +132,7 @@ _bcfs_raid_level() {
                 0 0; then
                 while read -r i; do
                     _BCFS_DEVS="${_BCFS_DEVS} ${i}"
-                    _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${i}" 2>"${_NO_LOG}")/}"
+                    _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "$(echo "${i}" | rg -o "/dev/.*)")" 2>"${_NO_LOG}")/}"
                 done </tmp/.bcfs-raid-device
                 break
             fi
