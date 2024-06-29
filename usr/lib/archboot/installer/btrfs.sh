@@ -235,6 +235,7 @@ _choose_btrfs_subvolume () {
     for i in ${_SUBVOLUME_IN_USE}; do
         _SUBVOLUMES="${_SUBVOLUMES//${i} _/}"
     done
+    # clear end spaces
     _SUBVOLUMES="$(echo "${_SUBVOLUMES}" | sd ' +$' '')"
     if [[ -n "${_SUBVOLUMES}" ]]; then
         #shellcheck disable=SC2086

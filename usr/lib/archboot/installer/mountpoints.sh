@@ -192,8 +192,8 @@ _create_filesystem() {
             _dialog --no-cancel --title " LABEL Name on ${_DEV} " --inputbox "Keep it short and use no spaces or special characters." 8 60 \
             "$(${_LSBLK} LABEL "${_DEV}" 2>"${_NO_LOG}")" 2>"${_ANSWER}" || return 1
             _LABEL_NAME=$(cat "${_ANSWER}")
-            if rg "|${_LABEL_NAME}$" /tmp/.parts; then
-                _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical LABEL names! Please enter another name." 3 60
+            if rg "\|${_LABEL_NAME}$" /tmp/.parts; then
+                _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical LABEL names! Please enter another name." 3 65
                 sleep 5
                 _LABEL_NAME=""
             fi
