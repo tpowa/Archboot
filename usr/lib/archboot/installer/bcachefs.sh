@@ -150,7 +150,7 @@ _bcfs_compress() {
         "zstd" "Use ZSTD Compression" \
         "lz4" "Use LZ4 Compression" \
         "gzip" "Use GZIP Compression" 2>"${_ANSWER}" || return 1
-    if [[ "$(cat "${_ANSWER}")" == "NONE" ]]; then
+    if [[ "$(cat "${_ANSWER}")" == "> NONE" ]]; then
         _BCFS_COMPRESS="NONE"
     else
         _BCFS_COMPRESS="$(cat "${_ANSWER}")"
