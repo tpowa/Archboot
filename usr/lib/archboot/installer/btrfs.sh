@@ -235,7 +235,7 @@ _choose_btrfs_subvolume () {
     for i in ${_SUBVOLUME_IN_USE}; do
         _SUBVOLUMES="${_SUBVOLUMES//${i} _/}"
     done
-    if [[ -n "${_SUBVOLUMES}" ]]; then
+    if [[ -n "${_SUBVOLUMES}" && ! "${_SUBVOLUMES}" == " " ]]; then
         #shellcheck disable=SC2086
         _dialog --title " Subvolume " --no-cancel --menu "" 15 50 13 ${_SUBVOLUMES} 2>"${_ANSWER}" || return 1
         _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
