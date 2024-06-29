@@ -8,6 +8,9 @@ Use:
 - curl for downloading files 
 - systemd
 - shellcheck
+- rg instead of grep
+- fd instead of find
+- sd instead of sed
 
 Don't use:
 - fuse, perl, python
@@ -15,5 +18,5 @@ Don't use:
 Kernel Modules / Kernel Firmware:
 - only modules that are needed to access filesystems, input, network
   video and virtualization
-- only network modules for max. 1 Gigabit.
+- only network modules for max. 2.5 Gigabit.
 

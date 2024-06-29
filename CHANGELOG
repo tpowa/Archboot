@@ -29,6 +29,9 @@ setup:
 - added < and > menu points to show direction of navigation
 - disabled dangerous Raid5/6 in btrfs menu
 - fixed error messages in mountpoints function
+- replaced sed with sd
+- replaced grep with rg
+- replaced find with fd
 ---
 2024.05 Highlights:
 - kernel 6.9.x
