@@ -178,7 +178,8 @@ _configure_system() {
         elif [[ "${_FILE}" = "/etc/locale.gen" ]]; then
             _auto_set_locale
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
-            _run_locale_gen
+            _run_locale_gen |\
+            _dialog --title " Locales " --no-mouse --gauge "Rebuilding glibc locales on installed system..." 6 75 0
         elif [[ "${_FILE}" = "> User Management" ]]; then
             _user_management
             _FILE=""
