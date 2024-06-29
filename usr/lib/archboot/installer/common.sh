@@ -44,7 +44,7 @@ _marvell_firmware() {
     _MARVELL=""
     _PACKAGES="${_PACKAGES// linux-firmware-marvell / }"
     for i in $(fd -t f . /lib/modules/"${_RUNNING_KERNEL}" | rg -w 'wireless/marvell'); do
-        _MARVELL="${_MARVELL} $(basename "${i}" | sed -e 's#\..*$##g')"
+        _MARVELL="${_MARVELL} $(basename "${i}" | sd '.ko.*$' '')"
     done
     # check marvell modules if already loaded
     for i in ${_MARVELL}; do

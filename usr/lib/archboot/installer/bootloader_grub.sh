@@ -158,7 +158,7 @@ EOF
     else
         _LINUX_UNMOD_COMMAND="linux ${_SUBDIR}/${_VMLINUZ} ${_KERNEL_PARAMS_MOD}"
     fi
-    _LINUX_MOD_COMMAND=$(echo "${_LINUX_UNMOD_COMMAND}" | sed -e 's#   # #g' | sed -e 's#  # #g')
+    _LINUX_MOD_COMMAND=$(echo "${_LINUX_UNMOD_COMMAND}" | sd ' +' ' ')
     ## create default kernel entry
     _NUMBER=0
     cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
