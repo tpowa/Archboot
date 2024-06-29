@@ -170,6 +170,9 @@ _select_btrfsraid_devices () {
      # final step ask if everything is ok?
      #shellcheck disable=SC2028
      _dialog --title " Summary " --yesno "LEVEL:\n${_BTRFS_LEVEL}\n\nDEVICES:\n$(while read -r i; do echo "${i}\n"; done </tmp/.btrfs-devices)" 0 0 && _BTRFS_RAID_FINISH="DONE"
+     while read -r i; do
+        _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${i}" 2>"${_NO_LOG}")/}"
+     done </tmp/.btrfs-devices
 }
 
 # prepare new btrfs device
