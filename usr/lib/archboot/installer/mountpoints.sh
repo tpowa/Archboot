@@ -110,7 +110,7 @@ _enter_mountpoint() {
             rg -qw "/srv" /tmp/.parts && _MP=/var
             _dialog --no-cancel --title " Mountpoint for ${_DEV} " --inputbox "" 7 65 "${_MP}" 2>"${_ANSWER}" || return 1
             _MP=$(cat "${_ANSWER}")
-            if rg "|${_MP}|" /tmp/.parts; then
+            if rg "\|${_MP}\|" /tmp/.parts; then
                 _dialog --msgbox "ERROR: You have defined 2 identical mountpoints! Please select another mountpoint." 8 65
                 _MP=""
             fi
