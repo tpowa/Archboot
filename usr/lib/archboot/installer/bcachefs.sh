@@ -24,7 +24,7 @@ _bcfs_raid_options() {
         fi
         _DUR_COUNT=$((_DUR_COUNT + _BCFS_DURABILITY))
     fi
-    if [[ "$(cat /sys/block/"$(basename "${_BCFS_RAID_DEV}")"/queue/rotational)" == 0 ]]; then
+    if [[ "$(cat /sys/block/"$(basename "${_BCFS_RAID_DEV}")"/queue/rotational 2>"${_NO_LOG}")" == 0 ]]; then
         _BCFS_SSD_COUNT=$((_BCFS_SSD_COUNT + 1))
         _BCFS_LABEL="--label ssd.ssd${_BCFS_SSD_COUNT}"
         _BCFS_SSD_OPTIONS=1
@@ -132,6 +132,7 @@ _bcfs_raid_level() {
                 0 0; then
                 while read -r i; do
                     _BCFS_DEVS="${_BCFS_DEVS} ${i}"
+                    # cleanup _DEVS array from used devices
                     _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "$(echo "${i}" | rg -o '/dev/.*')" 2>"${_NO_LOG}")/}"
                 done </tmp/.bcfs-raid-device
                 break
