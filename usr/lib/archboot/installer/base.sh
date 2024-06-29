@@ -177,7 +177,7 @@ _configure_system() {
             _set_mkinitcpio
         elif [[ "${_FILE}" = "/etc/locale.gen" ]]; then
             _auto_set_locale |\
-            _dialog " Locales " --no-mouse --gauge "Enable glibc locales based on locale.conf on installed system..."  6 75 0
+            _dialog --title " Locales " --no-mouse --gauge "Enable glibc locales based on locale.conf on installed system..."  6 75 0
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
             _run_locale_gen |\
             _dialog --title " Locales " --no-mouse --gauge "Rebuilding glibc locales on installed system..." 6 75 0
