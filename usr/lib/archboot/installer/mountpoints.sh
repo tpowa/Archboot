@@ -111,7 +111,7 @@ _enter_mountpoint() {
             _dialog --no-cancel --title " Mountpoint for ${_DEV} " --inputbox "" 7 65 "${_MP}" 2>"${_ANSWER}" || return 1
             _MP=$(cat "${_ANSWER}")
             if [[ "$(rg -F "|${_MP}|" /tmp/.parts | cut -d '|' -f 3)" == "${_MP}" ]]; then
-                _dialog --msgbox "ERROR: You have defined 2 identical mountpoints!\nPlease select another mountpoint." 4 65
+                _dialog --infobox "ERROR: You have defined 2 identical mountpoints!\nPlease select another mountpoint." 4 65
                 _MP=""
                 sleep 3
             fi
