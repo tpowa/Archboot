@@ -111,7 +111,7 @@ _enter_mountpoint() {
             _dialog --no-cancel --title " Mountpoint for ${_DEV} " --inputbox "" 7 65 "${_MP}" 2>"${_ANSWER}" || return 1
             _MP=$(cat "${_ANSWER}")
             if [[ "$(rg -F "|${_MP}|" /tmp/.parts | cut -d '|' -f 3)" == "${_MP}" ]]; then
-                _dialog --infobox "ERROR: You have defined 2 identical mountpoints!\nPlease select another mountpoint." 4 65
+                _dialog --infobox "ERROR: You have defined 2 identical mountpoints!\nPlease select another mountpoint." 4 45
                 _MP=""
                 sleep 3
             fi
@@ -194,7 +194,7 @@ _create_filesystem() {
             "$(${_LSBLK} LABEL "${_DEV}" 2>"${_NO_LOG}")" 2>"${_ANSWER}" || return 1
             _LABEL_NAME=$(cat "${_ANSWER}")
             if [[ "$(rg -F "|${_LABEL_NAME}|" /tmp/.parts | cut -d '|' -f5)" == "${_LABEL_NAME}" ]]; then
-                _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical LABEL names!\nPlease enter another name." 4 65
+                _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical LABEL names!\nPlease enter another name." 4 45
                 sleep 3
                 _LABEL_NAME=""
             fi
