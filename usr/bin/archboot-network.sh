@@ -54,10 +54,10 @@ _wireless() {
         # only show lines with signal '*'
         # kill spaces from the end and replace spaces with + between
         #shellcheck disable=SC2086,SC2046
-        if _dialog  --column-separator ":" --cancel-label "${_LABEL}" --title " SSID Scan Result " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
-            "RESCAN":"SSIDs":"HIDDEN":"SSID":$(iwctl station "${_INTERFACE}" get-networks |\
+        if _dialog  --column-separator "+" --cancel-label "${_LABEL}" --title " SSID Scan Result " --menu "" 13 60 6 \
+            "RESCAN"+"SSIDs"+"HIDDEN"+"SSID"+$(iwctl station "${_INTERFACE}" get-networks |\
             rg -o ' {6}(.{34}).*\*' -r '$1' |\
-            sd '\n$' ':_') 2>"${_ANSWER}"; then
+            sd '\n$' '\+_') 2>"${_ANSWER}"; then
             _WLAN_SSID=$(cat "${_ANSWER}")
             _CONTINUE=1
             if rg -q 'RESCAN' "${_ANSWER}"; then
