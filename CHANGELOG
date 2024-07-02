@@ -1,15 +1,17 @@
-On the road to 2024.06:
+On the road to 2024.07:
+---
+Highlights 2024.06:
+- systemd 256.x support
+- force OpenSSH login through ttyd
+- Added bat dust eza fd fzf procs ripgrep rustscan sd
 Early Userspace:
 - always load i8042 and atkbd module
 Environment:
 - removed bridge-utils
 - added archboot-testsuite.sh
-- added systemd 256.x support
 - cleaned up firmware files
-- added archboot-fw-check.sh
-- added bat dust eza fd fzf procs ripgrep rustscan sd 
+- added archboot-fw-check.sh 
 - removed marvell prestera firmware
-- force OpenSSH login through ttyd
 cpio:
 - replaced find with fd calls
 update:
