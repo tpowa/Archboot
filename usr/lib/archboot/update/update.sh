@@ -60,12 +60,12 @@ usage () {
     if ! [[ -e "${_LOCAL_DB}" ]] || [[ -e "${_LOCAL_DB}" && ! -e "/usr/bin/setup" ]]; then
         if [[ "${_MEM_TOTAL}" -gt 2270000 ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-                echo -e " \e[1m-latest\e[m          Launch latest archboot environment (using kexec)."
+                echo -e " \e[1m-latest\e[m          Launch latest Archboot Environment (using kexec)."
             fi
         fi
         if [[ "${_MEM_TOTAL}" -gt 4061000 ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
-                echo -e " \e[1m-latest-install\e[m  Launch latest archboot environment with"
+                echo -e " \e[1m-latest-install\e[m  Launch latest Archboot Environment with"
                 echo -e "                  package cache (using kexec)."
             fi
         fi
