@@ -4,7 +4,7 @@
 _KVER="$(uname -r)"
 _ARCH="$(uname -m)"
 _TITLE="archboot.com | ${_ARCH} | ${_KVER} | Basic Setup | Early Userspace"
-_KEEP="Please keep the boot medium inserted."
+_KEEP="Please keep the boot medium inserted, until this routine is finished."
 _dialog() {
     dialog --backtitle "${_TITLE}" "$@"
     return $?
@@ -106,19 +106,19 @@ _task() {
 _initrd_stage() {
     : >/.archboot
     _task mount &
-    _progress_wait "0" "10" "${_KEEP} Searching for rootfs..." "1"
+    _progress_wait "0" "99" "\n${_KEEP}\n\n1/5: Searching rootfs on blockdevices..." "0.05"
     : >/.archboot
     _task check &
-    _progress_wait "11" "12" "${_KEEP} Checking rootfs..." "1"
+    _progress_wait "0" "99" "\n${_KEEP}\n\n2/5: Mounting rootfs on blockdevice..." "0.05"
     : >/.archboot
     _task btrfs &
-    _progress_wait "13" "20" "${_KEEP} Creating btrfs on /dev/zram0..." "0.5"
+    _progress_wait "0" "99" "\n${_KEEP}\n\n3/5: Create btrfs on /dev/zram0..." "0.05"
     : >/.archboot
     _task system &
-    _progress_wait "21" "95" "${_KEEP} Copying rootfs to /sysroot..." "0.75"
+    _progress_wait "0" "99" "\n${_KEEP}\n\n4/5: Copying rootfs to /sysroot..." "0.05"
     : >/.archboot
     _task unmount &
-    _progress_wait "96" "99" "${_KEEP} Unmounting rootfs..." "1"
+    _progress_wait "0" "99" "\n${_KEEP}\n\n5/5: Unmounting rootfs..." "0.05"
     _progress "100" "The boot medium can be safely removed now."
 }
 # not all devices trigger autoload!
@@ -141,7 +141,7 @@ fi
 _msg "Initializing Console..."
 _clear
 setfont ter-v${_SIZE}n -C /dev/console
-_initrd_stage | _dialog --title " Initializing System " --gauge "${_KEEP} Searching for rootfs..." 6 75 0
+_initrd_stage | _dialog --title " Initializing System " --gauge "\n${_KEEP}\n\n1/5: Search rootfs..." 9 75 0
 _clear
 _msg "The boot medium can be safely removed now."
 echo ""
