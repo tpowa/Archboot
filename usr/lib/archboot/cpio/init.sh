@@ -112,7 +112,7 @@ _initrd_stage() {
     _progress_wait "0" "99" "\n${_KEEP}\n\n2/5: Mounting rootfs on blockdevice..." "0.05"
     : >/.archboot
     _task btrfs &
-    _progress_wait "0" "99" "\n${_KEEP}\n\n3/5: Create btrfs on /dev/zram0..." "0.05"
+    _progress_wait "0" "99" "\n${_KEEP}\n\n3/5: Creating btrfs on /dev/zram0..." "0.05"
     : >/.archboot
     _task system &
     _progress_wait "0" "99" "\n${_KEEP}\n\n4/5: Copying rootfs to /sysroot..." "0.05"
@@ -141,7 +141,7 @@ fi
 _msg "Initializing Console..."
 _clear
 setfont ter-v${_SIZE}n -C /dev/console
-_initrd_stage | _dialog --title " Initializing System " --gauge "\n${_KEEP}\n\n1/5: Search rootfs..." 9 75 0
+_initrd_stage | _dialog --title " Initializing System " --gauge "\n${_KEEP}\n\n1/5: Searching rootfs on blockdevices..." 9 75 0
 _clear
 _msg "The boot medium can be safely removed now."
 echo ""
