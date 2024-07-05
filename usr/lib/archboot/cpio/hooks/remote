@@ -25,7 +25,7 @@ _run ()
     _file_rename /etc/ssh/sshd_config /etc/ssh/sshd_config
     echo "Port 11838" >> "${_ROOTFS}"/etc/ssh/sshd_config
     echo "PasswordAuthentication no" >> "${_ROOTFS}"/etc/ssh/sshd_config
-    _full_dir /usr/lib/libnfsidmap
+    _map _full_dir /usr/lib/{libnfsidmap,ssh}
     # fix libldap for /usr/lib/nfsidmap/umich_ldap.so
     _file /usr/lib/libldap.so{,.2}
     _file /usr/lib/liblber.so{,.2}
