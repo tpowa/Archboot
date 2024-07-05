@@ -52,12 +52,12 @@ if [[ "${_TTY}" = "tty1" ]]; then
     [[ -d /run/nextroot ]] || mkdir /run/nextroot
     : > /.archboot
     _create_btrfs &
-    _progress_wait "0" "99" "1/2: Creating btrfs on /dev/zram0..." "0.05"
+    _progress_wait "0" "99" "Creating btrfs on /dev/zram0..." "0.05"
     # avoid clipping, insert status message
     _progress "100" "Creating btrfs on /dev/zram0..."
     : > /.archboot
     _copy_root &
-    _progress_wait "0" "99" "2/2: Copying rootfs to /run/nextroot..." "0.05"
+    _progress_wait "0" "99" "Copying rootfs to /run/nextroot..." "0.05"
     # cleanup directories and files
     rm -r /run/nextroot/sysroot &>"${_NO_LOG}"
     rm /run/nextroot/sysroot/init &>"${_NO_LOG}"
@@ -112,7 +112,7 @@ _run_update_installer() {
 if [[ "${_TTY}" = "tty1" ]] ; then
     if ! mount | rg -q 'zram0'; then
         _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | ZRAM"
-        _switch_root_zram | _dialog --title " Initializing System " --gauge "1/2: Creating btrfs on /dev/zram0..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
+        _switch_root_zram | _dialog --title " Initializing System " --gauge "Creating btrfs on /dev/zram0..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
         # fix clear screen on all terminals
         printf "\ec" | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
         echo "Launching systemd $(udevadm --version)..."
