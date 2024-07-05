@@ -1,6 +1,6 @@
 On the road to 2024.07:
-- removed sleeps in init.sh and login.sh
-- new messages in init.sh and login.sh
+- optimized init.sh and login.sh
+- added OpenSSH 9.8 support
 ---
 Highlights 2024.06:
 - systemd 256.x support
