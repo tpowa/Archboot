@@ -61,6 +61,7 @@ libpsl/COPYING
 libsasl/COPYING
 libsodium/LICENSE
 libssh2/LICENSE
+libtasn1/COPYING
 libtirpc/LICENSE
 libuv/LICENSE
 libverto/COPYING

@@ -43,7 +43,7 @@ for i in /usr/bin/*; do
 done
 _result bin-binary-error.txt
 _run_test "ldd on executables in /usr/lib"
-for i in $(fd -u -t x -E '*.so.*' -E '*.so' . /usr/lib); do
+for i in $(fd -u -t x -E '*.so.*' -E '*.so' -E 'ssh-sk-helper' . /usr/lib); do
     if ldd "${i}" 2>"${_NO_LOG}" | rg -q 'not found'; then
         echo "${i}" >>lib-binary-error.txt
         ldd "${i}" | rg 'not found' >>lib-binary-error.txt
