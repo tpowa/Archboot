@@ -28,7 +28,6 @@ _clear() {
 }
 # $1: start percentage $2: end percentage $3: message $4: sleep time
 _progress_wait() {
-    _COUNT=${1}
     while [[ -e /.archboot ]]; do
         if [[ "${_COUNT}" -lt "${2}" ]]; then
             _progress "${_COUNT}" "${3}"
@@ -37,7 +36,7 @@ _progress_wait() {
             _COUNT="${1}"
         fi
         _COUNT="$((_COUNT+1))"
-        sleep "${4}"
+        sleep "0.05"
     done
 }
 _task() {
@@ -106,19 +105,19 @@ _task() {
 _initrd_stage() {
     : >/.archboot
     _task mount &
-    _progress_wait "0" "99" "\n${_KEEP}\n\nSearching rootfs on blockdevices..." "0.05"
+    _progress_wait "0" "99" "\n${_KEEP}\n\nSearching rootfs on blockdevices..."
     : >/.archboot
     _task check &
-    _progress_wait "0" "99" "\n${_KEEP}\n\nMounting rootfs on blockdevice..." "0.05"
+    _progress_wait "0" "99" "\n${_KEEP}\n\nMounting rootfs on blockdevice..."
     : >/.archboot
     _task btrfs &
-    _progress_wait "0" "99" "\n${_KEEP}\n\nCreating btrfs on /dev/zram0..." "0.05"
+    _progress_wait "0" "99" "\n${_KEEP}\n\nCreating btrfs on /dev/zram0..."
     : >/.archboot
     _task system &
-    _progress_wait "0" "99" "\n${_KEEP}\n\nCopying rootfs to /sysroot..." "0.05"
+    _progress_wait "0" "99" "\n${_KEEP}\n\nCopying rootfs to /sysroot..."
     : >/.archboot
     _task unmount &
-    _progress_wait "0" "99" "\n${_KEEP}\n\nUnmounting rootfs..." "0.05"
+    _progress_wait "0" "99" "\n${_KEEP}\n\nUnmounting rootfs..."
     _progress "100" "The boot medium can be safely removed now."
 }
 # not all devices trigger autoload!
