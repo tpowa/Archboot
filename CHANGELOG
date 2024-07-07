@@ -1,6 +1,7 @@
 On the road to 2024.07:
 - optimized init.sh and login.sh
 - added OpenSSH 9.8 support
+- changed eza default date colour to white
 ---
 Highlights 2024.06:
 - systemd 256.x support
