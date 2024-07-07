@@ -7,6 +7,8 @@ _run ()
     # turn on initrd mode
     : > "${_ROOTFS}"/etc/initrd-release
     _map _dir /mnt/{cdrom,ventoy,efi}
+    # dialog colours
+    _file_rename "/usr/share/archboot/base/etc/dialogrc" "/etc/dialogrc"
     # systemd
     _map _binary /usr/lib/systemd/systemd{,-battery-check,-executor,-bsod,-journald,\
 -shutdown,-sulogin-shell,-sysctl,-sysroot-fstab-check,-udevd}

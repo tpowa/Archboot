@@ -1,3 +1,6 @@
+screen_color = (WHITE,BLACK,ON)
+shadow_color = (BLACK,BLACK,ON)
+gauge_color = (BLUE,WHITE,ON)
 border_color = (BLACK,WHITE,ON)
 border2_color = (BLACK,WHITE,ON)
 menubox_border_color = (BLACK,WHITE,ON)
