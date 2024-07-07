@@ -26,7 +26,7 @@ _wrn() {
 _clear() {
     printf "\ec"
 }
-# $1: start percentage $2: end percentage $3: message $4: sleep time
+# $1: start percentage $2: end percentage $3: message
 _progress_wait() {
     while [[ -e /.archboot ]]; do
         if [[ "${_COUNT}" -lt "${2}" ]]; then
