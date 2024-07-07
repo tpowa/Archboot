@@ -4,7 +4,7 @@
 _KVER="$(uname -r)"
 _ARCH="$(uname -m)"
 _TITLE="archboot.com | ${_ARCH} | ${_KVER} | Basic Setup | Early Userspace"
-_KEEP="Please keep the boot medium inserted, until this routine is finished."
+_KEEP="Please keep the boot medium inserted..."
 _dialog() {
     dialog --backtitle "${_TITLE}" "$@"
     return $?
@@ -141,7 +141,7 @@ fi
 _msg "Initializing Console..."
 _clear
 setfont ter-v${_SIZE}n -C /dev/console
-_initrd_stage | _dialog --title " Initializing System " --gauge "\n${_KEEP}\n\nSearching rootfs on blockdevices..." 9 73 0
+_initrd_stage | _dialog --title " Initializing System " --gauge "\n${_KEEP}\n\nSearching rootfs on blockdevices..." 9 43 0
 _clear
 _msg "The boot medium can be safely removed now."
 echo ""
