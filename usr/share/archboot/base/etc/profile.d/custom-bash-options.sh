@@ -14,7 +14,7 @@ fi
 # color man pages
 export GROFF_NO_SGR=1
 # color eza date to cyan
-export EZA_COLORS="da=36"
+export EZA_COLORS="da=37"
 # keep history clean from dups and spaces
 HISTCONTROL="erasedups:ignorespace"
 # if installed set neovim as default editor
