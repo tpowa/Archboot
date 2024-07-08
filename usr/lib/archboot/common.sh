@@ -110,7 +110,7 @@ _progress_wait() {
             _progress "${2}" "${3}"
         fi
         _COUNT="$((_COUNT+1))"
-        sleep "${4}"
+        read -r -t "${4}"
     done
 }
 
