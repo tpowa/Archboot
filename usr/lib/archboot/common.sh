@@ -160,26 +160,14 @@ _run_update_environment() {
 }
 
 _kver() {
-    # this is intentionally very loose. only ensure that we're
-    # dealing with some sort of string that starts with something
-    # resembling dotted decimal notation. remember that there's no
-    # requirement for CONFIG_LOCALVERSION to be set.
-    local kver re='^[[:digit:]]+(\.[[:digit:]]+)+'
-    local arch bytes reader
-    arch="${_RUNNING_ARCH}"
-    if [[ $arch == @(i?86|x86_64) ]]; then
-        local -i offset
-        offset="$(od -An -j0x20E -dN2 "$1")" || return
-        read -r kver _ < \
-            <(dd if="$1" bs=1 count=127 skip=$((offset + 0x200)) 2>"${_NO_LOG}")
-    else
-        reader='cat'
-        bytes="$(od -An -t x2 -N2 "$1" | tr -dc '[:alnum:]')"
-        [[ "$bytes" == '8b1f' ]] && reader='zcat'
-        read -r _ _ kver _ < <($reader "$1" | rg -m1 -ao 'Linux version .(\.[-[:alnum:]+]+)+')
+    if [[ -f "${1}" ]]; then
+        # x86_64 default image
+        rg --no-heading -Noazm 1 'ABCDEF(.*)\(.*@' -r '$1' ${1} ||
+        # aarch64, works for compressed and uncompressed image
+        rg --no-heading -Noazm 1 'Linux version ([0-9].*) \(.*@' -r '$1' "${1}" ||
+        # riscv64, rg cannot detect compression without suffix
+        zcat "${1}" | rg -Noazm 1 'Linux version ([0-9].*) \(.*@' -r '$1'
     fi
-    [[ "$kver" =~ $re ]] || return 1
-    printf '%s' "$kver"
 }
 
 ### check architecture
