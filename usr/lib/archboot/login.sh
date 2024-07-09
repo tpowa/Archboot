@@ -127,13 +127,13 @@ if [[ "${_TTY}" = "tty1" ]] ; then
     fi
 fi
 # start bottom on VC10
-while [[ "${_TTY}" = "tty10" ]] ; do
+while [[ "${_TTY}" = "tty6" ]] ; do
     if command -v btm 2>"${_NO_LOG}"; then
         btm
     fi
 done
 # start bandwhich on VC9
-while [[ "${_TTY}" = "tty9" ]] ; do
+while [[ "${_TTY}" = "tty5" ]] ; do
     if command -v bandwhich 2>"${_NO_LOG}"; then
         bandwhich
     fi

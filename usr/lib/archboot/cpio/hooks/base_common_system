@@ -80,8 +80,8 @@ id128,sysext} tar tee testpkg top touch trust tty unix_{chkpwd,update} /usr/lib/
     _symlink /usr/lib/terminfo ../share/terminfo
     # add needed files from running system
     _map _file /etc/{crypttab,fstab,host.conf,hosts,inputrc,mke2fs.conf,nsswitch.conf,\
-protocols,request-key.conf,services}
-    for i in issue securetty tmpfiles.d/var.conf; do
+protocols,request-key.conf,securetty,services}
+    for i in issue tmpfiles.d/var.conf; do
         _file_rename "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done
     # fixing network support from glibc
