@@ -80,8 +80,8 @@ id128,sysext} tar tee testpkg top touch trust tty unix_{chkpwd,update} /usr/lib/
     _symlink /usr/lib/terminfo ../share/terminfo
     # add needed files from running system
     _map _file /etc/{crypttab,fstab,host.conf,hosts,inputrc,mke2fs.conf,nsswitch.conf,\
-protocols,request-key.conf,securetty,services}
-    for i in issue tmpfiles.d/var.conf; do
+protocols,request-key.conf,services}
+    for i in issue securetty tmpfiles.d/var.conf; do
         _file_rename "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done
     # fixing network support from glibc
@@ -122,7 +122,6 @@ protocols,request-key.conf,securetty,services}
     _symlink /etc/systemd/system-generators/systemd-gpt-auto-generator /dev/null
     # disable lastlog
     _symlink /var/log/lastlog /dev/null
-    _file_rename /usr/share/archboot/base/etc/tmpfiles.d/var.conf /etc/tmpfiles.d/var.conf
     # add missing libsystemd files
     _map _file /usr/lib/{libnss_myhostname.so.2,libnss_mymachines.so.2,libnss_resolve.so.2,libnss_systemd.so.2}
     # fix tmpfiles startup
