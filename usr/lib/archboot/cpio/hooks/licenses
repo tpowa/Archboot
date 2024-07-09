@@ -6,7 +6,9 @@ _run ()
 {
 _LICENSES=(
 argon2/LICENSE
+bandwhich/LICENSE
 bat/LICENSE-{APACHE,MIT}
+bottom/LICENSE
 brotli/LICENSE
 bzip2/LICENSE
 curl/COPYING
