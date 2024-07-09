@@ -4,7 +4,7 @@ On the road to 2024.07:
 - changed eza default date colour to white
 - changed dialog to new colour scheme
 - added bandwhich, bottom and zoxide
-- launch bandwhich on VC9 nad bottom on VC10
+- launch bandwhich on VC5 nad bottom on VC6
 setup:
 - abort on pacman package installation error
 ---
