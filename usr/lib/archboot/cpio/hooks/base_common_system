@@ -63,6 +63,8 @@ id128,sysext} tar tee testpkg top touch trust tty unix_{chkpwd,update} /usr/lib/
     fi
     # add zoxide
     echo "eval \"\$(zoxide init bash)\"" >> ${_ROOTFS}/root/.bashrc
+    # add resolve.conf
+    _symlink /etc/resolv.conf ../run/systemd/resolve/stub-resolv.conf
     # add libsasl
     _map _full_dir /usr/lib/{sasl2,girepository-1.0}
     # add duktape, needed by polkit
