@@ -4,7 +4,7 @@
 
 _run ()
 {
-    _map _binary arping bridge clockdiff ctstat dcb devlink \
+    _map _binary arping bandwhich bridge clockdiff ctstat dcb devlink \
                  elinks ethtool genl ifstat lnstat nstat rdma rtacct \
                  rtmon rtstat rustscan ss ssh tc tipc tracepath vdpa 
     # add iproute 2, add openssl helper libraries

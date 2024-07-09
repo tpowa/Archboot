@@ -37,7 +37,7 @@ var/lib/pacman/local \
     fi
     _map _binary agetty archlinux-keyring-wkd-sync awk bat basename brotli bsdtar \
                  {bus,boot,coredump,hostname,journal,locale,login,machine,network,\
-system,timedate,userdb,home,oom,portable}ctl certutil chmod clear cmsutil crlutil curl date \
+system,timedate,userdb,home,oom,portable}ctl btm certutil chmod clear cmsutil crlutil curl date \
                  dbus-{broker{,-launch},cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
 update-activation-environment,uuidgen} dd df dir du dust exa eza false fd fzf fzf-tmux gawk gpg{,-agent,conf,-connect-agent} \
                  gpgme-{tool,json} insmod install kernel-install kill{,all} loadkeys ldconfig \
@@ -49,7 +49,7 @@ update-activation-environment,uuidgen} dd df dir du dust exa eza false fd fzf fz
 cgls,cgtop,confextdelta,detect-virt,escape,firstboot,hwdb,inhibit,machine-id-setup,mount,notify,nspawn,path,\
 resolve,repartrun,socket-activate,stdio-bridge,sysusers,tty-ask-password-agent,umount,creds,cryptenroll,dissect,\
 id128,sysext} tar tee testpkg top touch trust tty unix_{chkpwd,update} /usr/lib/dbus-1.0/dbus-daemon-launch-helper \
-                 umount.nfs{,4} update-ca-trust vercmp wc yes zstd
+                 umount.nfs{,4} update-ca-trust vercmp wc yes zoxide zstd
     # add C.UTF-8 locale
     _dir /usr/lib/locale
     [[ -d /usr/lib/locale/C.utf8 ]] && _full_dir /usr/lib/locale/C.utf8
@@ -61,6 +61,8 @@ id128,sysext} tar tee testpkg top touch trust tty unix_{chkpwd,update} /usr/lib/
         _install_files
         _file_rename "/usr/share/archboot/patches/pacman-key-aarch64" "/usr/bin/pacman-key"
     fi
+    # add zoxide
+    echo "eval \"$(zoxide init bash)\"" >> ${_ROOTFS}/root/.bashrc
     # add libsasl
     _map _full_dir /usr/lib/{sasl2,girepository-1.0}
     # add duktape, needed by polkit
