@@ -162,9 +162,9 @@ _run_update_environment() {
 _kver() {
     if [[ -f "${1}" ]]; then
         # x86_64 default image
-        rg --no-heading -Noazm 1 'ABCDEF(.*)\(.*@' -r '$1' ${1} ||
+        rg -Noazm 1 'ABCDEF\x00+(.*) \(.*@' -r '$1' "${1}" ||
         # aarch64, works for compressed and uncompressed image
-        rg --no-heading -Noazm 1 'Linux version ([0-9].*) \(.*@' -r '$1' "${1}" ||
+        rg -Noazm 1 'Linux version ([0-9].*) \(.*@' -r '$1' "${1}" ||
         # riscv64, rg cannot detect compression without suffix
         zcat "${1}" | rg -Noazm 1 'Linux version ([0-9].*) \(.*@' -r '$1'
     fi
