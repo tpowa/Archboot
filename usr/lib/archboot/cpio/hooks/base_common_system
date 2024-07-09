@@ -62,7 +62,7 @@ id128,sysext} tar tee testpkg top touch trust tty unix_{chkpwd,update} /usr/lib/
         _file_rename "/usr/share/archboot/patches/pacman-key-aarch64" "/usr/bin/pacman-key"
     fi
     # add zoxide
-    echo "eval \"$(zoxide init bash)\"" >> ${_ROOTFS}/root/.bashrc
+    echo "eval \"\$(zoxide init bash)\"" >> ${_ROOTFS}/root/.bashrc
     # add libsasl
     _map _full_dir /usr/lib/{sasl2,girepository-1.0}
     # add duktape, needed by polkit
