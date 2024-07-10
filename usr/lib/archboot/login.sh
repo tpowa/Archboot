@@ -129,7 +129,7 @@ fi
 # start bottom on VC6
 while [[ "${_TTY}" = "tty6" ]] ; do
     if command -v btm 2>"${_NO_LOG}"; then
-        btm
+        btm --battery
     fi
 done
 # start bandwhich on VC5 on online medium
