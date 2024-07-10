@@ -54,8 +54,7 @@ _create_iso() {
     #shellcheck disable=SC1090
     . "${_W_DIR}/etc/archboot/${_ARCH}.conf"
     #shellcheck disable=SC2116,SC2046,SC2027,2086
-    _KERNEL_VERSION="$(${_NSPAWN} "${_W_DIR}" /bin/bash -c "_KERNEL="$(echo ${_KERNEL})";. /usr/lib/archboot/common.sh; _kver ${_KERNEL}")"
-    _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_KERNEL_VERSION}"
+    _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver ${_W_DIR}/${_KERNEL})"
     if ! [[ "${_RUNNING_ARCH}" == "${_ARCH}" ]]; then
         ### to speedup build for riscv64 and aarch64 on x86_64, run compressor on host system
         echo "Generating initramdisks..."
