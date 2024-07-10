@@ -126,16 +126,16 @@ if [[ "${_TTY}" = "tty1" ]] ; then
         [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl start pacman-init
     fi
 fi
-# start bottom on VC10
+# start bottom on VC6
 while [[ "${_TTY}" = "tty6" ]] ; do
     if command -v btm 2>"${_NO_LOG}"; then
         btm
     fi
 done
-# start bandwhich on VC9
+# start bandwhich on VC5 on online medium
 while [[ "${_TTY}" = "tty5" ]] ; do
     if command -v bandwhich 2>"${_NO_LOG}"; then
-        bandwhich
+        [[ ! -e ${_LOCAL_DB} ]] && bandwhich
     fi
 done
 if [[ -e /usr/bin/setup ]]; then
