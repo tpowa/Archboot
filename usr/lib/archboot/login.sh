@@ -133,9 +133,9 @@ while [[ "${_TTY}" = "tty6" ]] ; do
     fi
 done
 # start bandwhich on VC5 on online medium
-while [[ "${_TTY}" = "tty5" ]] ; do
-    if command -v bandwhich 2>"${_NO_LOG}"; then
-        [[ ! -e ${_LOCAL_DB} ]] && bandwhich
+while [[ "${_TTY}" = "tty5" && ! -e "${_LOCAL_DB}" ]] ; do
+    if command -v bandwhich &>"${_NO_LOG}"; then
+        bandwhich
     fi
 done
 if [[ -e /usr/bin/setup ]]; then
