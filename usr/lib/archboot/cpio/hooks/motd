@@ -9,14 +9,15 @@ _run ()
     #shellcheck disable=SC2129
     echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux ${_RUNNING_ARCH^^}\e[m" >> "${_MOTD}"
     echo -e "\e[1m----------------------------------------\e[m" >> "${_MOTD}"
-    echo -e "\e[1mVconsole:\e[m" >> "${_MOTD}"
-    echo -e "--------------------------------------------------------------------------" >> "${_MOTD}"
-    echo -e "|Login Consoles|Network Status|System Status|Log Messages|Systemd Journal|" >> "${_MOTD}"
-    echo -e "--------------------------------------------------------------------------" >> "${_MOTD}"
-    echo -e "|   VC 1 - 4   |     VC 5     |    VC 6     |    VC 11   |     VC 12     |" >> "${_MOTD}"
-    echo -e "--------------------------------------------------------------------------"
-    echo -e "| \e[1;92mALT+F1 - F4\e[m  |    \e[1;92mALT+F5\e[m    |   \e[1;92mALT+F6\e[m    |  \e[1;92mALT+F11\e[m   |    \e[1;92mALT+F12\e[m    |" >> "${_MOTD}"
-    echo -e "--------------------------------------------------------------------------" >> "${_MOTD}"
+    echo -e "\e[1mVconsole Layout:\e[m" >> "${_MOTD}"
+    echo -e "-----------------------------------------------------" >> "${_MOTD}"
+    echo -e "| Login     | Network | System | Log      | Systemd |" >> "${_MOTD}"
+    echo -e "| Consoles  | Status  | Status | Messages | Journal |" >> "${_MOTD}"
+    echo -e "|-----------|---------|--------|----------|---------|" >> "${_MOTD}"
+    echo -e "| VC 1 - 4  | VC 5    | VC 6   | VC 11    | VC 12   |" >> "${_MOTD}"
+    echo -e "|-----------|---------|--------|----------|---------|" >> "${_MOTD}"
+    echo -e "| \e[1;92mALT+F1-F4\e[m | \e[1;92mALT+F5\e[m  | \e[1;92mALT+F6\e[m | \e[1;92mALT+F11\e[m  | \e[1;92mALT+F12\e[m |" >> "${_MOTD}"
+    echo -e "-----------------------------------------------------" >> "${_MOTD}"
 if  echo "${_HOOKS[@]}" | grep -qw net; then
     #shellcheck disable=SC2129
     echo -e "\e[1mFor Additional Wi-Fi Authentification Or Online Help:\e[m" >> "${_MOTD}"
