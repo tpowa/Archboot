@@ -128,7 +128,7 @@ if [[ "${_TTY}" = "tty1" ]] ; then
 fi
 # start bottom on VC6
 while [[ "${_TTY}" = "tty6" ]] ; do
-    if command -v btm 2>"${_NO_LOG}"; then
+    if command -v btm &>"${_NO_LOG}"; then
         btm --battery
     else
         break
