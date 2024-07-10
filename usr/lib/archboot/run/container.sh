@@ -27,6 +27,7 @@ if echo "${_BASENAME}" | rg -qw "${_RUNNING_ARCH}"; then
         # enable [*-testing] if enabled in host
         if rg -q "^\[core-testing" /etc/pacman.conf; then
             echo "Enable [core-testing] and [extra-testing] repository in container..."
+            #shellcheck disable=SC2016
             sd '^#(\[[c,e].*-testing\]\n)#' '$1' "${1}/etc/pacman.conf"
         fi
     fi

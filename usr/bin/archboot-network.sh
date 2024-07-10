@@ -21,6 +21,7 @@ _online_switch() {
 }
 
 _net_interfaces() {
+    #shellcheck disable=SC2016
     fd -E '/lo' . '/sys/class/net' -x rg '(.*)' -r '{/} $1' {}/address | sort -u
 }
 

@@ -66,6 +66,7 @@ _localize_task() {
     echo "LANG=${_LOCALE}.UTF-8" > /.localize
     echo LC_COLLATE=C >> /etc/locale.conf
     localectl set-locale "${_LOCALE}.UTF-8" &>"${_NO_LOG}"
+    #shellcheck disable=SC2016
     sd '(^[a-z])' '#$1' /etc/locale.gen
     sd "^#${_LOCALE}.UTF-8" "${_LOCALE}.UTF-8" /etc/locale.gen
     locale-gen &>"${_NO_LOG}"

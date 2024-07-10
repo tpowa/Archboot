@@ -27,11 +27,11 @@ _desktop () {
     _dialog  --title " Internet Browser " --menu "" 8 40 4 \
     "chromium" "Browser From Google" \
     "firefox" "Browser From Mozilla" 2>${_ANSWER} || return 1
-    _BROWSER="$(cat ${_ANSWER})"
+    _BROWSER=$(cat "${_ANSWER}")
     sd "STANDARD_BROWSER=.*" "STANDARD_BROWSER=${_BROWSER}" /etc/archboot/defaults
     source /etc/locale.conf
     clear
-    update -${_EXIT} || exit 1
+    update -"${_EXIT}" || exit 1
     exit 0
 }
 

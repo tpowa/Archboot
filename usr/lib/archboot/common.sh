@@ -91,7 +91,7 @@ _dialog() {
 
 # $1: percentage $2: message
 _progress() {
-cat 2>${_NO_LOG} <<EOF
+cat 2>"${_NO_LOG}" <<EOF
 XXX
 ${1}
 ${2}

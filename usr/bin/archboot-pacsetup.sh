@@ -64,6 +64,7 @@ _enable_testing() {
         _DOTESTING=""
         _dialog --title " Testing Repositories " --defaultno --yesno "Do you want to enable testing repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 8 50 && _DOTESTING=1
         if [[ -n "${_DOTESTING}" ]]; then
+            #shellcheck disable=SC2016
             sd '^#(\[[c,e].*-testing\]\n)#' '$1' "${1}/etc/pacman.conf"
         fi
     else
