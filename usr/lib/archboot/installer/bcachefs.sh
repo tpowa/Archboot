@@ -93,6 +93,7 @@ _bcfs_select_raid_devices () {
 _bcfs_raid_level() {
     while true ; do
         : >/tmp/.bcfs-raid-device
+        #shellcheck disable=SC2153
         _BCFS_RAID_DEV="${_DEV}"
         _BCFS_LEVEL=""
         _DUR_COUNT=0
