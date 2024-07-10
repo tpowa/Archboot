@@ -10,6 +10,7 @@ rm -r /usr/share/{licenses,locale} /usr/lib/{systemd,tmpfiles.d}
 pacman -Sy
 #shellcheck disable=SC2013
 for i in $(pacman -Q | cut -d ' ' -f1); do
+    #shellcheck disable=SC2086
     rm -r "${_PACMAN_LIB}"/local/"$(pacman -Q ${i} | sd ' ' '-')"
     #shellcheck disable=SC2086
     if pacman -Sdd ${i} --noconfirm >>log.txt; then

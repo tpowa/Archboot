@@ -154,6 +154,7 @@ EOF
         break
     else
         if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
+            #shellcheck disable=SC2119
             _enable_testing
         fi
         _SYNC_URL=""
