@@ -6,6 +6,7 @@ On the road to 2024.07:
 - added bandwhich, bottom and zoxide
 - launch bandwhich on VC5 nad bottom on VC6
 - updated MOTD
+- restart iwd on ESSID rescan
 setup:
 - abort on pacman package installation error
 ---
