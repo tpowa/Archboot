@@ -94,10 +94,11 @@ _run_test "filesystems..."
 for i in bcachefs btrfs ext4 swap xfs vfat; do
     dd if=/dev/zero of=/test.img bs=1M count=1000
     if [[ "${i}" == "swap" ]]; then
-        mkswap /test.img || echo ${i} >>filesystem-error.log
+        mkswap /test.img &>"${_NO_LOG}" || echo ${i} >>filesystem-error.log
     else
-        mkfs.${i} /test.img || echo ${i} >>filesystem-error.log
-        mount -o loop /test.img /mnt || echo ${i} >>filesystem-error.log
+        mkfs.${i} /test.img &>"${_NO_LOG}" || echo "Creation error: ${i}" >>filesystem-error.log
+        mount -o loop /test.img /mnt || echo "Mount error: ${i}" >>filesystem-error.log
+        umount /mnt
     fi
 done
 _result filesytem-error.log
