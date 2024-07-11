@@ -62,6 +62,7 @@ _wireless() {
             _WLAN_SSID=$(cat "${_ANSWER}")
             _CONTINUE=1
             if rg -q 'RESCAN' "${_ANSWER}"; then
+                _dialog --title " Intel Wireless Daemon " --no-mouse --infobox "Restarting IWD Daemon..." 4 50
                 systemctl restart iwd
                 _CONTINUE=""
             fi
