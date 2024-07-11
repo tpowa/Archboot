@@ -92,16 +92,16 @@ done
 _result license-error.txt
 _run_test "filesystems..."
 for i in bcachefs btrfs ext4 swap xfs vfat; do
-    dd if=/dev/zero of=/test.img bs=1M count=1000
+    dd if=/dev/zero of=/test.img bs=1M count=1000 &>"${_NO_LOG}"
     if [[ "${i}" == "swap" ]]; then
-        mkswap /test.img &>"${_NO_LOG}" || echo ${i} >>filesystem-error.log
+        mkswap /test.img &>"${_NO_LOG}" || echo ${i} >>filesystems-error.log
     else
-        mkfs.${i} /test.img &>"${_NO_LOG}" || echo "Creation error: ${i}" >>filesystem-error.log
-        mount -o loop /test.img /mnt || echo "Mount error: ${i}" >>filesystem-error.log
+        mkfs.${i} /test.img &>"${_NO_LOG}" || echo "Creation error: ${i}" >>filesystems-error.log
+        mount -o loop /test.img /mnt || echo "Mount error: ${i}" >>filesystems-error.log
         umount /mnt
     fi
 done
-_result filesytem-error.log
+_result filesytems-error.log
 echo -e "Starting none tracked files in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
 sleep 10
 _run_test "none tracked files in /usr/lib... this takes a while"
