@@ -90,20 +90,22 @@ for i in $(pacman -Ql $(pacman -Q | sd ' .*' '') | rg -o '/usr/share/licenses/.*
     [[ -e "${i}" ]] || echo "${i}" | rg -v '/xz/' >>license-error.txt
 done
 _result license-error.txt
-_run_test "filesystems..."
+_run_test "filesystems"
 for i in bcachefs btrfs ext4 swap vfat xfs; do
     dd if=/dev/zero of=/test.img bs=1M count=1000 &>"${_NO_LOG}"
+    sync
     if [[ "${i}" == "swap" ]]; then
         mkswap /test.img &>"${_NO_LOG}" || echo "Creation error: ${i}" >> filesystems-error.log
+        sync
     else
         mkfs.${i} /test.img &>"${_NO_LOG}" || echo "Creation error: ${i}" >> filesystems-error.log
-        sleep 1
-        mount -o loop /test.img /mnt || echo "Mount error: ${i}" >> filesystems-error.log
+        sync
+        mount -o loop /test.img /mnt &>"${_NO_LOG}" || echo "Mount error: ${i}" >> filesystems-error.log
         umount /mnt
     fi
 done
 _result filesytems-error.log
-_run_test "Wi-Fi iwctl..."
+_run_test "Wi-Fi iwctl"
 archboot-hwsim.sh test &>"${_NO_LOG}"
 iwctl station wlan1 scan
 sleep 5
