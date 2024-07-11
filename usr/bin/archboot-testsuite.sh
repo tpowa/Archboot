@@ -101,14 +101,14 @@ for i in bcachefs btrfs ext4 swap vfat xfs; do
         mkfs.${i} /test.img &>"${_NO_LOG}" || echo "Creation error: ${i}" >> filesystems-error.log
         sync
         mount -o loop /test.img /mnt &>"${_NO_LOG}" || echo "Mount error: ${i}" >> filesystems-error.log
-        umount /mnt
+        umount /mnt || echo "Unmount error: ${i}" >> filesystems-error.log
     fi
 done
 _result filesytems-error.log
 _run_test "blockdevices"
 dd if=/dev/zero of=/test.img bs=1M count=1000 &>"${_NO_LOG}"
 sync
-losetup --show -f /test.img
+losetup -f /test.img
 mdadm --create /dev/md0 --run --level=0 --raid-devices=1 /dev/loop0 &>"${_NO_LOG}" || echo "Creation error: mdadm" >> blockdevices-error.log
 wipefs -a -f /dev/md0  &>"${_NO_LOG}"
 mdadm --manage --stop /dev/md0 &>"${_NO_LOG}" || echo "Stop error: mdadm" >> blockdevices-error.log
