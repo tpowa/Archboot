@@ -90,6 +90,13 @@ for i in $(pacman -Ql $(pacman -Q | sd ' .*' '') | rg -o '/usr/share/licenses/.*
     [[ -e "${i}" ]] || echo "${i}" | rg -v '/xz/' >>license-error.txt
 done
 _result license-error.txt
+_run_test "filesystems..."
+for i in bcachefs,btrfs,ext4,xfs,vfat; do
+    dd if=/dev/zero of=/test.img bs=1M count=1000
+    mkfs.${i} /test.img || echo ${i} >>filesystem-error.log
+    mount -o loop /test.img /mnt || echo ${i} >>filesystem-error.log
+done
+_result filesytem-error.log
 echo -e "Starting none tracked files in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
 sleep 10
 _run_test "none tracked files in /usr/lib... this takes a while"
