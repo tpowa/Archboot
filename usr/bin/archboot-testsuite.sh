@@ -97,7 +97,7 @@ for i in bcachefs btrfs ext4 swap vfat xfs; do
         mkswap /test.img &>"${_NO_LOG}" || echo "Creation error: ${i}" >> filesystems-error.log
     else
         mkfs.${i} /test.img &>"${_NO_LOG}" || echo "Creation error: ${i}" >> filesystems-error.log
-        sync
+        sleep 5
         mount -o loop /test.img /mnt &>"${_NO_LOG}" || echo "Mount error: ${i}" >> filesystems-error.log
         umount /mnt || echo "Unmount error: ${i}" >> filesystems-error.log
     fi
