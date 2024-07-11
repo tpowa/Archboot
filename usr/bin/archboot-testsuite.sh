@@ -109,7 +109,7 @@ _run_test "blockdevices"
 dd if=/dev/zero of=/test.img bs=1M count=1000 &>"${_NO_LOG}"
 sync
 losetup -f /test.img
-mdadm --create /dev/md0 --run --level=0 --raid-devices=1 /dev/loop0 &>"${_NO_LOG}" || echo "Creation error: mdadm" >> blockdevices-error.log
+mdadm --create /dev/md0 --run --level=0 --raid-devices=2 /dev/loop0 missing &>"${_NO_LOG}" || echo "Creation error: mdadm" >> blockdevices-error.log
 wipefs -a -f /dev/md0  &>"${_NO_LOG}"
 mdadm --manage --stop /dev/md0 &>"${_NO_LOG}" || echo "Stop error: mdadm" >> blockdevices-error.log
 wipefs -a -f /dev/loop0 &>"${_NO_LOG}"
