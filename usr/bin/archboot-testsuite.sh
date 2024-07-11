@@ -93,18 +93,16 @@ _result license-error.txt
 _run_test "filesystems"
 for i in bcachefs btrfs ext4 swap vfat xfs; do
     dd if=/dev/zero of=/test.img bs=1M count=1000 &>"${_NO_LOG}"
-    sync
     if [[ "${i}" == "swap" ]]; then
         mkswap /test.img &>"${_NO_LOG}" || echo "Creation error: ${i}" >> filesystems-error.log
-        sync
     else
         mkfs.${i} /test.img &>"${_NO_LOG}" || echo "Creation error: ${i}" >> filesystems-error.log
         sync
-        mount -o loop -t "${i}" /test.img /mnt &>"${_NO_LOG}" || echo "Mount error: ${i}" >> filesystems-error.log
+        mount -o loop /test.img /mnt &>"${_NO_LOG}" || echo "Mount error: ${i}" >> filesystems-error.log
         umount /mnt || echo "Unmount error: ${i}" >> filesystems-error.log
     fi
 done
-_result filesytems-error.log
+_result filesystems-error.log
 _run_test "blockdevices"
 dd if=/dev/zero of=/test.img bs=1M count=1000 &>"${_NO_LOG}"
 sync
