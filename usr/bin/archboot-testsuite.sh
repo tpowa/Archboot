@@ -91,7 +91,7 @@ for i in $(pacman -Ql $(pacman -Q | sd ' .*' '') | rg -o '/usr/share/licenses/.*
 done
 _result license-error.txt
 _run_test "filesystems..."
-for i in bcachefs btrfs ext4 swap xfs vfat; do
+for i in bcachefs btrfs ext4 swap vfat xfs; do
     dd if=/dev/zero of=/test.img bs=1M count=1000 &>"${_NO_LOG}"
     if [[ "${i}" == "swap" ]]; then
         mkswap /test.img &>"${_NO_LOG}" || echo "Creation error: ${i}" >> filesystems-error.log
