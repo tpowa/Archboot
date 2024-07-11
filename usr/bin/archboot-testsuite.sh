@@ -91,10 +91,14 @@ for i in $(pacman -Ql $(pacman -Q | sd ' .*' '') | rg -o '/usr/share/licenses/.*
 done
 _result license-error.txt
 _run_test "filesystems..."
-for i in bcachefs,btrfs,ext4,xfs,vfat; do
+for i in bcachefs btrfs ext4 swap xfs vfat; do
     dd if=/dev/zero of=/test.img bs=1M count=1000
-    mkfs.${i} /test.img || echo ${i} >>filesystem-error.log
-    mount -o loop /test.img /mnt || echo ${i} >>filesystem-error.log
+    if [[ "${i}" == "swap" ]]; then
+        mkswap /test.img || echo ${i} >>filesystem-error.log
+    else
+        mkfs.${i} /test.img || echo ${i} >>filesystem-error.log
+        mount -o loop /test.img /mnt || echo ${i} >>filesystem-error.log
+    fi
 done
 _result filesytem-error.log
 echo -e "Starting none tracked files in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
