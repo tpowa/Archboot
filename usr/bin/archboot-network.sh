@@ -62,6 +62,7 @@ _wireless() {
             _WLAN_SSID=$(cat "${_ANSWER}")
             _CONTINUE=1
             if rg -q 'RESCAN' "${_ANSWER}"; then
+                systemctl restart iwd
                 _CONTINUE=""
             fi
         else
