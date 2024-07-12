@@ -91,25 +91,24 @@ for i in $(pacman -Ql $(pacman -Q | sd ' .*' '') | rg -o '/usr/share/licenses/.*
 done
 _result license-error.txt
 _run_test "filesystems"
-for i in bcachefs btrfs ext4 swap vfat xfs; do
-    dd if=/dev/zero of=/test.img bs=1M count=1000 &>"${_NO_LOG}"
-    if [[ "${i}" == "swap" ]]; then
-        mkswap /test.img &>"${_NO_LOG}" ||\
-        echo "Creation error: ${i}" >> filesystems-error.log
-    else
-        mkfs.${i} /test.img &>"${_NO_LOG}" ||\
-        echo "Creation error: ${i}" >> filesystems-error.log
-        [[ "${i}" == "bcachefs" ]] && sleep 10
-        mount /test.img /mnt &>"${_NO_LOG}" ||\
-        echo "Mount error: ${i}" >> filesystems-error.log
-        umount /mnt &>"${_NO_LOG}" || echo "Unmount error: ${i}" >> filesystems-error.log
-    fi
-done
-_result filesystems-error.log
-_run_test "blockdevices"
 dd if=/dev/zero of=/test.img bs=1M count=1000 &>"${_NO_LOG}"
 sync
 losetup -f /test.img
+for i in bcachefs btrfs ext4 swap vfat xfs; do
+    if [[ "${i}" == "swap" ]]; then
+        mkswap /dev/loop0 &>"${_NO_LOG}" ||\
+        echo "Creation error: ${i}" >> filesystems-error.log
+    else
+        mkfs.${i} /dev/loop0 &>"${_NO_LOG}" ||\
+        echo "Creation error: ${i}" >> filesystems-error.log
+        mount /dev/loop0 /mnt &>"${_NO_LOG}" ||\
+        echo "Mount error: ${i}" >> filesystems-error.log
+        umount /mnt &>"${_NO_LOG}" || echo "Unmount error: ${i}" >> filesystems-error.log
+    fi
+    wipefs -a /dev/loop0 &>"${_NO_LOG}"
+done
+_result filesystems-error.log
+_run_test "blockdevices"
 mdadm --create /dev/md0 --run --level=1 --raid-devices=2 /dev/loop0 missing &>"${_NO_LOG}" ||\
 echo "Creation error: mdadm" >> blockdevices-error.log
 wipefs -a -f /dev/md0  &>"${_NO_LOG}"
