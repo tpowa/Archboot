@@ -130,12 +130,11 @@ echo "Stop error: lvm vg" >> blockdevices-error.log
 pvremove -f /dev/loop0 &>"${_NO_LOG}" ||\
 echo "Stop error: lvm pv" >> blockdevices-error.log
 echo "12345678" >/passphrase
-cryptsetup -q luksFormat /dev/loop0 </passphrase &>"${_NO_LOG}" ||\
+cryptsetup -q luksFormat /dev/loop0 </passphrase ||\
 echo "Creation error: cryptsetup" >> blockdevices-error.log
-sleep 10
-cryptsetup luksOpen /dev/loop0 /dev/mapper/testluks </passphrase &>"${_NO_LOG}" ||\
+cryptsetup luksOpen /dev/loop0 /dev/mapper/testluks </passphrase ||\
 echo "Creation error: cryptsetup open" >> blockdevices-error.log
-cryptsetup remove /dev/mapper/testluks &>"${_NO_LOG}" ||\
+cryptsetup remove /dev/mapper/testluks ||\
 echo "Stop error: cryptsetup" >> blockdevices-error.log
 losetup -D
 rm /test.img
