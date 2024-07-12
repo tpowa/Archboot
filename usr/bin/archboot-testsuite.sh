@@ -2,8 +2,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
-_LOG=testsuite.log
+_LOG="testsuite.log"
 _APPNAME=${0##*/}
+_LOOP="/dev/loop0"
+_IMG="/test.img"
+_PASS="/passphrase"
 _usage () {
     echo -e "\e[1mTestsuite for Archboot Environment\e[m"
     echo -e "\e[1m---------------------------------------------\e[m"
@@ -91,53 +94,53 @@ for i in $(pacman -Ql $(pacman -Q | sd ' .*' '') | rg -o '/usr/share/licenses/.*
 done
 _result license-error.txt
 _run_test "filesystems"
-dd if=/dev/zero of=/test.img bs=1M count=1000 &>"${_NO_LOG}"
+dd if=/dev/zero of="${_IMG}" bs=1M count=1000 &>"${_NO_LOG}"
 sync
-losetup -f /test.img
+losetup -f "${_IMG}"
 for i in bcachefs btrfs ext4 swap vfat xfs; do
     if [[ "${i}" == "swap" ]]; then
-        mkswap /dev/loop0 &>"${_NO_LOG}" ||\
+        mkswap "${_LOOP}" &>"${_NO_LOG}" ||\
         echo "Creation error: ${i}" >> filesystems-error.log
     else
-        mkfs.${i} /dev/loop0 &>"${_NO_LOG}" ||\
+        mkfs.${i} "${_LOOP}" &>"${_NO_LOG}" ||\
         echo "Creation error: ${i}" >> filesystems-error.log
-        mount /dev/loop0 /mnt &>"${_NO_LOG}" ||\
+        mount "${_LOOP}" /mnt &>"${_NO_LOG}" ||\
         echo "Mount error: ${i}" >> filesystems-error.log
         umount /mnt &>"${_NO_LOG}" || echo "Unmount error: ${i}" >> filesystems-error.log
     fi
-    wipefs -a /dev/loop0 &>"${_NO_LOG}"
+    wipefs -a "${_LOOP}" &>"${_NO_LOG}"
 done
 _result filesystems-error.log
 _run_test "blockdevices"
-mdadm --create /dev/md0 --run --level=1 --raid-devices=2 /dev/loop0 missing &>"${_NO_LOG}" ||\
+mdadm --create /dev/md0 --run --level=1 --raid-devices=2 "${_LOOP}" missing &>"${_NO_LOG}" ||\
 echo "Creation error: mdadm" >> blockdevices-error.log
 wipefs -a -f /dev/md0  &>"${_NO_LOG}"
 mdadm --manage --stop /dev/md0 &>"${_NO_LOG}" ||\
-echo "Stop error: mdadm" >> blockdevices-error.log
-wipefs -a -f /dev/loop0 &>"${_NO_LOG}"
-dd if=/dev/zero of=/test.img bs=1M count=10 &>"${_NO_LOG}"
+echo "Remove error: mdadm" >> blockdevices-error.log
+wipefs -a -f "${_LOOP}" &>"${_NO_LOG}"
+dd if=/dev/zero of="${_IMG}" bs=1M count=10 &>"${_NO_LOG}"
 sync
-pvcreate -y /dev/loop0 &>"${_NO_LOG}" ||\
+pvcreate -y "${_LOOP}" &>"${_NO_LOG}" ||\
 echo "Creation error: lvm pv" >> blockdevices-error.log
-vgcreate /dev/mapper/test /dev/loop0 &>"${_NO_LOG}" ||\
+vgcreate /dev/mapper/test "${_LOOP}" &>"${_NO_LOG}" ||\
 echo "Creation error: lvm vg" >> blockdevices-error.log
 lvcreate -W y -C y -y -l +100%FREE /dev/mapper/test -n /dev/mapper/test-test &>"${_NO_LOG}" ||\
 echo "Creation error: lvm lv" >> blockdevices-error.log
 lvremove -f /dev/mapper/test-test &>"${_NO_LOG}" ||\
-echo "Stop error: lvm lv" >> blockdevices-error.log
+echo "Remove error: lvm lv" >> blockdevices-error.log
 vgremove -f test &>"${_NO_LOG}" ||\
-echo "Stop error: lvm vg" >> blockdevices-error.log
-pvremove -f /dev/loop0 &>"${_NO_LOG}" ||\
-echo "Stop error: lvm pv" >> blockdevices-error.log
-echo "12345678" >/passphrase
-cryptsetup -q luksFormat /dev/loop0 </passphrase ||\
+echo "Remove error: lvm vg" >> blockdevices-error.log
+pvremove -f "${_LOOP}" &>"${_NO_LOG}" ||\
+echo "Remove error: lvm pv" >> blockdevices-error.log
+echo "12345678" >"${_PASS}"
+cryptsetup -q luksFormat "${_LOOP}" <"${_PASS}" ||\
 echo "Creation error: cryptsetup" >> blockdevices-error.log
-cryptsetup luksOpen /dev/loop0 testluks </passphrase ||\
+cryptsetup luksOpen "${_LOOP}" testluks <"${_PASS}" ||\
 echo "Creation error: cryptsetup open" >> blockdevices-error.log
 cryptsetup remove testluks ||\
-echo "Stop error: cryptsetup" >> blockdevices-error.log
+echo "Remove error: cryptsetup" >> blockdevices-error.log
 losetup -D
-rm /test.img
+rm "${_IMG}"
 _result blockdevices-error.log
 _run_test "Wi-Fi iwctl"
 archboot-hwsim.sh test &>"${_NO_LOG}"
