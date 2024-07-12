@@ -133,6 +133,7 @@ echo "Stop error: lvm pv" >> blockdevices-error.log
 echo "12345678" >/passphrase
 cryptsetup -q luksFormat /dev/loop0 </passphrase &>"${_NO_LOG}" ||\
 echo "Creation error: cryptsetup" >> blockdevices-error.log
+sync
 cryptsetup luksOpen /dev/loop0 /dev/mapper/testluks </passphrase &>"${_NO_LOG}" ||\
 echo "Creation error: cryptsetup open" >> blockdevices-error.log
 cryptsetup remove /dev/mapper/testluks &>"${_NO_LOG}" ||\
