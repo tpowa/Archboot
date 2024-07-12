@@ -147,12 +147,12 @@ echo "Remove error: cryptsetup" >> blockdevices-error.log
 losetup -D
 rm "${_IMG}"
 _result blockdevices-error.log
-_run_test "Wi-Fi iwctl"
+_run_test "Wi-Fi"
 archboot-hwsim.sh test &>"${_NO_LOG}"
 iwctl station wlan1 scan
 sleep 5
-iwctl station wlan1 get-networks | rg -q test || echo "Wi-Fi iwctl get-networks error" >> iwctl-error.log
-iwctl --passphrase=12345678 station wlan1 connect test || echo "Wi-Fi iwctl connect error" >> iwctl-error.log
+iwctl station wlan1 get-networks | rg -q test || echo "Wi-Fi get-networks error" >> iwctl-error.log
+iwctl --passphrase=12345678 station wlan1 connect test || echo "Wi-Fi connect error" >> iwctl-error.log
 iwctl station wlan1 disconnect || echo "Wi-Fi iwctl disconnect error" >> iwctl-error.log
 _result iwctl-error.log
 echo -e "Starting none tracked files in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
