@@ -36,6 +36,7 @@ json-c/COPYING
 known_spdx_license_exceptions.txt
 known_spdx_license_identifiers.txt
 krb5/LICENSE
+less/LICENSE
 libarchive/COPYING
 libbpf/LICENSE
 libbpf/LICENSE.BSD-2-Clause
@@ -72,6 +73,7 @@ libwapcaplet/COPYING
 libwebsockets/LICENSE
 libxml2/Copyright
 linux-firmware-whence/WHENCE
+lmdb/LICENSE
 lua/LICENSE
 lua51-lpeg/LICENSE
 luajit/COPYRIGHT
