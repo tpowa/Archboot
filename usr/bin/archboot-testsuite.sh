@@ -99,7 +99,6 @@ for i in bcachefs btrfs ext4 swap vfat xfs; do
     else
         mkfs.${i} /test.img &>"${_NO_LOG}" ||\
         echo "Creation error: ${i}" >> filesystems-error.log
-        sleep 5
         mount -o loop /test.img /mnt &>"${_NO_LOG}" ||\
         echo "Mount error: ${i}" >> filesystems-error.log
         umount /mnt || echo "Unmount error: ${i}" >> filesystems-error.log
@@ -124,9 +123,12 @@ vgcreate /dev/mapper/test /dev/loop0 &>"${_NO_LOG}" ||\
 echo "Creation error: lvm vg" >> blockdevices-error.log
 lvcreate -W y -C y -y -l +100%FREE /dev/mapper/test -n /dev/mapper/test-test &>"${_NO_LOG}" ||\
 echo "Creation error: lvm lv" >> blockdevices-error.log
-lvremove -f /dev/mapper/test-test || echo "Stop error: lvm lv" >> blockdevices-error.log
-vgremove -f test || echo "Stop error: lvm vg" >> blockdevices-error.log
-pvremove -f /dev/loop0 || echo "Stop error: lvm pv" >> blockdevices-error.log
+lvremove -f /dev/mapper/test-test &>"${_NO_LOG}" ||\
+echo "Stop error: lvm lv" >> blockdevices-error.log
+vgremove -f test &>"${_NO_LOG}" ||\
+echo "Stop error: lvm vg" >> blockdevices-error.log
+pvremove -f /dev/loop0 &>"${_NO_LOG}" ||\
+echo "Stop error: lvm pv" >> blockdevices-error.log
 echo "12345678" >/passphrase
 cryptsetup -q luksFormat /dev/loop0 </passphrase &>"${_NO_LOG}" ||\
 echo "Creation error: cryptsetup" >> blockdevices-error.log
