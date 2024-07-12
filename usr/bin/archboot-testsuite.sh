@@ -94,11 +94,14 @@ _run_test "filesystems"
 for i in bcachefs btrfs ext4 swap vfat xfs; do
     dd if=/dev/zero of=/test.img bs=1M count=1000 &>"${_NO_LOG}"
     if [[ "${i}" == "swap" ]]; then
-        mkswap /test.img &>"${_NO_LOG}" || echo "Creation error: ${i}" >> filesystems-error.log
+        mkswap /test.img &>"${_NO_LOG}" ||\
+        echo "Creation error: ${i}" >> filesystems-error.log
     else
-        mkfs.${i} /test.img &>"${_NO_LOG}" || echo "Creation error: ${i}" >> filesystems-error.log
+        mkfs.${i} /test.img &>"${_NO_LOG}" ||\
+        echo "Creation error: ${i}" >> filesystems-error.log
         sleep 5
-        mount -o loop /test.img /mnt &>"${_NO_LOG}" || echo "Mount error: ${i}" >> filesystems-error.log
+        mount -o loop /test.img /mnt &>"${_NO_LOG}" ||\
+        echo "Mount error: ${i}" >> filesystems-error.log
         umount /mnt || echo "Unmount error: ${i}" >> filesystems-error.log
     fi
 done
@@ -107,12 +110,32 @@ _run_test "blockdevices"
 dd if=/dev/zero of=/test.img bs=1M count=1000 &>"${_NO_LOG}"
 sync
 losetup -f /test.img
-mdadm --create /dev/md0 --run --level=1 --raid-devices=2 /dev/loop0 missing &>"${_NO_LOG}" || echo "Creation error: mdadm" >> blockdevices-error.log
+mdadm --create /dev/md0 --run --level=1 --raid-devices=2 /dev/loop0 missing &>"${_NO_LOG}" ||\
+echo "Creation error: mdadm" >> blockdevices-error.log
 wipefs -a -f /dev/md0  &>"${_NO_LOG}"
-mdadm --manage --stop /dev/md0 &>"${_NO_LOG}" || echo "Stop error: mdadm" >> blockdevices-error.log
+mdadm --manage --stop /dev/md0 &>"${_NO_LOG}" ||\
+echo "Stop error: mdadm" >> blockdevices-error.log
 wipefs -a -f /dev/loop0 &>"${_NO_LOG}"
 dd if=/dev/zero of=/test.img bs=1M count=10 &>"${_NO_LOG}"
 sync
+pvcreate -y /dev/loop0 &>"${_NO_LOG}" ||\
+echo "Creation error: lvm pv" >> blockdevices-error.log
+vgcreate /dev/mapper/test /dev/loop0 &>"${_NO_LOG}" ||\
+echo "Creation error: lvm vg" >> blockdevices-error.log
+lvcreate -W y -C y -y -l +100%FREE /dev/mapper/test -n /dev/mapper/test-test &>"${_NO_LOG}" ||\
+echo "Creation error: lvm lv" >> blockdevices-error.log
+lvremove -f /dev/mapper/test-test || echo "Stop error: lvm lv" >> blockdevices-error.log
+vgremove -f test || echo "Stop error: lvm vg" >> blockdevices-error.log
+pvremove -f /dev/loop0 || echo "Stop error: lvm pv" >> blockdevices-error.log
+echo "12345678" >/passphrase
+cryptsetup -q luksFormat /dev/loop0 </passphrase &>"${_NO_LOG}" ||\
+echo "Creation error: cryptsetup" >> blockdevices-error.log
+cryptsetup luksOpen /dev/loop0 /dev/mapper/testluks </passphrase &>"${_NO_LOG}" ||\
+echo "Creation error: cryptsetup open" >> blockdevices-error.log
+cryptsetup remove /dev/mapper/testluks &>"${_NO_LOG}" ||\
+echo "Stop error: cryptsetup" >> blockdevices-error.log
+losetup -D
+rm /test.img
 _result blockdevices-error.log
 _run_test "Wi-Fi iwctl"
 archboot-hwsim.sh test &>"${_NO_LOG}"
