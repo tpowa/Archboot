@@ -4,10 +4,10 @@ On the road to 2024.07:
 - changed eza default date colour to white
 - changed dialog to new colour scheme
 - added bandwhich, bottom and zoxide
-- launch bandwhich on VC5 nad bottom on VC6
+- launch bandwhich on VC5 and bottom on VC6
 - updated MOTD
 - restart iwd on ESSID rescan
-- added filesystems and Wi-Fi to testsuite
+- added blockdevices, filesystems and Wi-Fi to testsuite
 setup:
 - abort on pacman package installation error
 ---
