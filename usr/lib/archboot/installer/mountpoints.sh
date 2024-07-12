@@ -490,6 +490,7 @@ _mkfs() {
                 vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}" || : >/tmp/.mp-error ;;
                 xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"|| : >/tmp/.mp-error ;;
             esac
+            sync
             if [[ -f "/tmp/.mp-error" ]]; then
                 _progress "100" "ERROR: Creating filesystem ${2} on ${1}" 0 0
                 sleep 5
