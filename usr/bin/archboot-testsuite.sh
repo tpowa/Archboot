@@ -99,9 +99,11 @@ sync
 losetup -f "${_IMG}"
 for i in bcachefs btrfs ext4 swap vfat xfs; do
     if [[ "${i}" == "swap" ]]; then
+        echo -n " ${i} "
         mkswap "${_LOOP}" &>"${_NO_LOG}" ||\
         echo "Creation error: ${i}" >> filesystems-error.log
     else
+        echo -n " ${i} "
         mkfs.${i} "${_LOOP}" &>"${_NO_LOG}" ||\
         echo "Creation error: ${i}" >> filesystems-error.log
         mount "${_LOOP}" /mnt &>"${_NO_LOG}" ||\
@@ -112,6 +114,7 @@ for i in bcachefs btrfs ext4 swap vfat xfs; do
 done
 _result filesystems-error.log
 _run_test "blockdevices"
+echo -n " mdadm "
 mdadm --create /dev/md0 --run --level=1 --raid-devices=2 "${_LOOP}" missing &>"${_NO_LOG}" ||\
 echo "Creation error: mdadm" >> blockdevices-error.log
 wipefs -a -f /dev/md0  &>"${_NO_LOG}"
@@ -120,6 +123,7 @@ echo "Remove error: mdadm" >> blockdevices-error.log
 wipefs -a -f "${_LOOP}" &>"${_NO_LOG}"
 dd if=/dev/zero of="${_IMG}" bs=1M count=10 &>"${_NO_LOG}"
 sync
+echo -n " lvm "
 pvcreate -y "${_LOOP}" &>"${_NO_LOG}" ||\
 echo "Creation error: lvm pv" >> blockdevices-error.log
 vgcreate /dev/mapper/test "${_LOOP}" &>"${_NO_LOG}" ||\
@@ -132,6 +136,7 @@ vgremove -f test &>"${_NO_LOG}" ||\
 echo "Remove error: lvm vg" >> blockdevices-error.log
 pvremove -f "${_LOOP}" &>"${_NO_LOG}" ||\
 echo "Remove error: lvm pv" >> blockdevices-error.log
+echo -n " cryptsetup "
 echo "12345678" >"${_PASS}"
 cryptsetup -q luksFormat "${_LOOP}" <"${_PASS}" ||\
 echo "Creation error: cryptsetup" >> blockdevices-error.log
