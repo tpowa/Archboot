@@ -4,11 +4,13 @@
 
 _run ()
 {
-    _all_mods -f '_cs|b43' '/net/wireless/|/net/ieee80211/|/net/mac80211/'
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         # add broadcom wl support
+        _all_mods -f '_cs|b43|bcma|brcmfmac|brcmsmac' '/net/wireless/|/net/ieee80211/|/net/mac80211/'
         _mod wl
         _file /usr/lib/modprobe.d/broadcom-wl.conf
+    else
+        _all_mods -f '_cs|b43' '/net/wireless/|/net/ieee80211/|/net/mac80211/'
     fi
 }
 
