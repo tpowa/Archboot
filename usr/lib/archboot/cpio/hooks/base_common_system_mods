@@ -5,7 +5,7 @@
 _run ()
 {
     # add systemd kernel modules
-    _all_mods 'nfs|autofs4|loop|pkcs8_key_parser'
+    _all_mods 'nfs/nfsv4|autofs4|loop|pkcs8_key_parser'
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
