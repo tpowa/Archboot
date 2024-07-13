@@ -8,6 +8,7 @@ On the road to 2024.07:
 - updated MOTD
 - restart iwd on ESSID rescan
 - added blockdevices, filesystems and Wi-Fi to testsuite
+- removed not needed broadcom firmware and modules on x86_64
 setup:
 - abort on pacman package installation error
 ---
