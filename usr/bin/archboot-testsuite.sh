@@ -24,7 +24,7 @@ _result() {
         cat "${1}"
         _TEST_FAIL=1
     else
-        echo -e "\e[1;94m=> \e[1;92mOK\e[m"
+        echo -n -e "\e[1;94m=> \e[1;92mOK\e[m"
     fi
 }
 [[ -z "${1}" || "${1}" != "run" ]] && _usage
