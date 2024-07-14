@@ -37,14 +37,14 @@ if ! journalctl -p3 -xb | rg -q 'No entries'; then
 fi
 _result journal-error.txt
 _run_test "ldd"
-echo "/usr/bin "
+echo -n "/usr/bin "
 for i in /usr/bin/*; do
     if ldd "${i}" 2>"${_NO_LOG}" | rg -q 'not found'; then
         echo "${i}" >>bin-binary-error.txt
         ldd "${i}" | rg 'not found' >>ldd-error.txt
     fi
 done
-echo -n "/usr/lib"
+echo -n "/usr/lib "
 for i in $(fd -u -t x -E '*.so.*' -E '*.so' -E 'ssh-sk-helper' . /usr/lib); do
     if ldd "${i}" 2>"${_NO_LOG}" | rg -q 'not found'; then
         echo "${i}" >>lib-binary-error.txt
