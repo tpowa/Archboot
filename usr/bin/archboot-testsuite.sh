@@ -32,7 +32,7 @@ _archboot_check
 echo "Waiting for pacman keyring..."
 _pacman_keyring
 pacman -Sy &>"${_NO_LOG}"
-echo -e "\e[1mStats:\e[m"
+echo -e "\e[1mArchboot Environment Stats:\e[m"
 echo "Bootup speed (seconds): $(systemd-analyze | rg -o '= (.*)s' -r '$1') |\
  Packages: $(pacman -Q | wc -l) |\
  Available Memory (M): $(rg -o 'Ava.* (.*)[0-9]{3} k' -r '$1' </proc/meminfo)"
