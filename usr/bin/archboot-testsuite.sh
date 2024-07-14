@@ -33,8 +33,8 @@ _pacman_keyring
 pacman -Sy &>"${_NO_LOG}"
 echo -e "\e[1mArchboot Environment Stats:\e[m"
 echo "Bootup speed (seconds): $(systemd-analyze | rg -o '= (.*)s' -r '$1') |\
- Packages: $(pacman -Q | wc -l) |\
- Available Memory (M): $(rg -o 'Ava.* (.*)[0-9]{3} k' -r '$1' </proc/meminfo) |\
+ Packages: $(pacman -Q | wc -l)"
+echo "Available Memory (M): $(rg -o 'Ava.* (.*)[0-9]{3} k' -r '$1' </proc/meminfo) |\
  Rootfs Size (M): $(du -sh / 2>"${_NO_LOG}" | rg -o '(.*)M' -r '$1')"
 _run_test "journal"
 if ! journalctl -p3 -xb | rg -q 'No entries'; then
