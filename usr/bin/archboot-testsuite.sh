@@ -146,8 +146,10 @@ rm "${_IMG}"
 _result blockdevices-error.log
 echo -e "Starting Wi-Fi check in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
 sleep 10
-_run_test "Wi-Fi"
+_run_test "Wi-Fi... this takes a while"
+echo -n "Setting up hwsim... "
 archboot-hwsim.sh test &>"${_NO_LOG}"
+echo -n "iwctl tests running... "
 iwctl station wlan1 scan
 sleep 5
 iwctl station wlan1 get-networks | rg -q test || echo "Wi-Fi get-networks error" >> iwctl-error.log
