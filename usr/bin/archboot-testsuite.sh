@@ -21,7 +21,6 @@ _run_test () {
 _result() {
     if [[ -s ${1} ]]; then
         echo -e "\e[1;94m=> \e[1;91mFAILED\e[m"
-        cat "${1}"
         _TEST_FAIL=1
     else
         echo -e "\e[1;94m=> \e[1;92mOK\e[m"
@@ -169,9 +168,11 @@ sleep 10
 _run_test "pacman database... this takes a while"
 archboot-not-installed.sh &>>"${_LOG}"
 _result not-installed.txt
+echo "\e[1mResult:\e[m"
 if [[ -z "${_TEST_FAIL}" ]]; then
     echo "\e[1;94m=> \e[1;92mAll tests finished successfully.\e[m"
 else
+    echo "\e[1;94m=> \e[1;91mAn error was detected. Please check the log files\e[m"
     exit 1
 fi
 # vim: set ft=sh ts=4 sw=4 et:
