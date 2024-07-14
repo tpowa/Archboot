@@ -168,7 +168,7 @@ sleep 10
 _run_test "pacman database... this takes a while"
 archboot-not-installed.sh &>>"${_LOG}"
 _result not-installed.txt
-echo "\e[1mResult:\e[m"
+echo -e "\e[1mResult:\e[m"
 if [[ -z "${_TEST_FAIL}" ]]; then
     echo -e "\e[1;94m=> \e[1;92mAll tests finished successfully.\e[m"
 else
