@@ -31,9 +31,9 @@ _result() {
 _archboot_check
 echo "Waiting for pacman keyring..."
 _pacman_keyring
-echo -e "\e[1mStats:\e[m Bootup speed: $(systemd-analyze | rg -o '= (.*)' -r '$1')|\
+echo -e "\e[1mStats:\e[m Bootup speed (seconds): $(systemd-analyze | rg -o '= (.*)s' -r '$1')|\
  Packages: $(pacman -Q | wc -l) |\
- Available Memory: $(rg -o 'Ava.* (.*)[0-9]{3} k' -r '$1\M' </proc/meminfo)"
+ Available Memory (M): $(rg -o 'Ava.* (.*)[0-9]{3} k' -r '$1' </proc/meminfo)"
 _run_test "journal"
 if ! journalctl -p3 -xb | rg -q 'No entries'; then
     journalctl -p3 -xb >>journal-error.txt
