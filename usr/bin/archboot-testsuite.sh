@@ -31,6 +31,9 @@ _result() {
 _archboot_check
 echo "Waiting for pacman keyring..."
 _pacman_keyring
+echo "Bootup speed: $(systemd-analyze | rg -o '= (.*)' -r '$1') \
+Packages: $(pacman -Q | wc -l) \
+Available Memory: $(rg -o 'Ava.* (.*)[0-9]{3} k') </proc/meminfo)"
 _run_test "journal"
 if ! journalctl -p3 -xb | rg -q 'No entries'; then
     journalctl -p3 -xb >>journal-error.txt
@@ -40,21 +43,21 @@ _run_test "ldd"
 echo -n "/usr/bin "
 for i in /usr/bin/*; do
     if ldd "${i}" 2>"${_NO_LOG}" | rg -q 'not found'; then
-        echo "${i}" >>bin-binary-error.txt
+        echo "${i}" >>ldd-error.txt
         ldd "${i}" | rg 'not found' >>ldd-error.txt
     fi
 done
 echo -n "/usr/lib "
 for i in $(fd -u -t x -E '*.so.*' -E '*.so' -E 'ssh-sk-helper' . /usr/lib); do
     if ldd "${i}" 2>"${_NO_LOG}" | rg -q 'not found'; then
-        echo "${i}" >>lib-binary-error.txt
+        echo "${i}" >>ldd-error.txt
         ldd "${i}" | rg 'not found' >>ldd-error.txt
     fi
 done
 # ignore wrong reported libsystemd-shared by libsystemd-core
 for i in $(fd -u '.so' /usr/lib); do
     if ldd "${i}" 2>"${_NO_LOG}" | rg -v 'tree_sitter|libsystemd-shared' | rg -q 'not found'; then
-        echo "${i}" >>lib-error.txt
+        echo "${i}" >>ldd-error.txt
         ldd "${i}" | rg 'not found' >>ldd-error.txt
     fi
 done
@@ -76,9 +79,7 @@ for i in $(rg '/usr/bin/(.*)' -r '$1' binary.txt); do
 done
 _result base-binary-error.txt
 _run_test "modules included /usr/lib/firmware"
-if ! archboot-fw-check.sh run; then
-    TEST_FAIL=1
-fi
+archboot-fw-check.sh run
 _result fw-error.txt
 # uninstall base again!
 pacman --noconfirm -Rdd base gettext &>>"${_LOG}"
