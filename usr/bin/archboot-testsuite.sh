@@ -16,7 +16,7 @@ _usage () {
     exit 0
 }
 _run_test () {
-    echo -e -n "\e[1mTestsuite checking ${1}...\e[m"
+    echo -e "\e[1mTestsuite checking ${1}...\e[m"
 }
 _result() {
     if [[ -s ${1} ]]; then
