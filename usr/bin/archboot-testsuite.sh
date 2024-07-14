@@ -22,6 +22,7 @@ _result() {
     if [[ -s ${1} ]]; then
         echo -e "\e[1;94m=> \e[1;91mFAILED\e[m"
         cat "${1}"
+        _TEST_FAIL=1
     else
         echo -e "\e[1;94m=> \e[1;92mOK\e[m"
     fi
@@ -33,37 +34,31 @@ _pacman_keyring
 _run_test "journal"
 if ! journalctl -p3 -xb | rg -q 'No entries'; then
     journalctl -p3 -xb >>journal-error.txt
-    _TEST_FAIL=1
 fi
 _result journal-error.txt
-_run_test "ldd on /usr/bin"
+_run_test "ldd"
+echo "/usr/bin "
 for i in /usr/bin/*; do
     if ldd "${i}" 2>"${_NO_LOG}" | rg -q 'not found'; then
         echo "${i}" >>bin-binary-error.txt
-        ldd "${i}" | rg 'not found' >>bin-binary-error.txt
-        _TEST_FAIL=1
+        ldd "${i}" | rg 'not found' >>ldd-error.txt
     fi
 done
-_result bin-binary-error.txt
-_run_test "ldd on executables in /usr/lib"
+echo -n "/usr/lib"
 for i in $(fd -u -t x -E '*.so.*' -E '*.so' -E 'ssh-sk-helper' . /usr/lib); do
     if ldd "${i}" 2>"${_NO_LOG}" | rg -q 'not found'; then
         echo "${i}" >>lib-binary-error.txt
-        ldd "${i}" | rg 'not found' >>lib-binary-error.txt
-        _TEST_FAIL=1
+        ldd "${i}" | rg 'not found' >>ldd-error.txt
     fi
 done
-_result lib-binary-error.txt
-_run_test "ldd on /usr/lib"
 # ignore wrong reported libsystemd-shared by libsystemd-core
 for i in $(fd -u '.so' /usr/lib); do
     if ldd "${i}" 2>"${_NO_LOG}" | rg -v 'tree_sitter|libsystemd-shared' | rg -q 'not found'; then
         echo "${i}" >>lib-error.txt
-        ldd "${i}" | rg 'not found' >>lib-error.txt
-        _TEST_FAIL=1
+        ldd "${i}" | rg 'not found' >>ldd-error.txt
     fi
 done
-_result lib-error.txt
+_result ldd-error.txt
 _run_test "on missing base binaries"
 # not needed binaries, that are tolerated
 _BASE_BLACKLIST="arpd backup bashbug enosys exch fsck.cramfs fsck.minix gawk-5.3.0 \
@@ -77,7 +72,6 @@ archboot-binary-check.sh base &>>"${_LOG}"
 for i in $(rg '/usr/bin/(.*)' -r '$1' binary.txt); do
     if ! echo "${_BASE_BLACKLIST}" | rg -qw "${i}"; then
         echo "${i}" >> base-binary-error.txt
-        _TEST_FAIL=1
     fi
 done
 _result base-binary-error.txt
