@@ -169,5 +169,9 @@ sleep 10
 _run_test "pacman database... this takes a while"
 archboot-not-installed.sh &>>"${_LOG}"
 _result not-installed.txt
-[[ -n "${_TEST_FAIL}" ]] && exit 1
+if [[ -z "${_TEST_FAIL}" ]]; then
+    echo "\e[1;94m=> \e[1;92mAll tests finished successfully.\e[m"
+else
+    exit 1
+fi
 # vim: set ft=sh ts=4 sw=4 et:
