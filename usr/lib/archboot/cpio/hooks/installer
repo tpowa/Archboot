@@ -6,7 +6,7 @@ _run ()
 {
     _dir /mnt/install
     _map _binary genfstab arch-chroot pacstrap \
-    archboot-{binary-check.sh,fw-check.sh,not-installed.sh,testsuite.sh} hwdetect
+    archboot-{binary-check.sh,fw-check.sh,not-installed.sh} hwdetect
     _file_rename /usr/bin/archboot-setup.sh /usr/bin/setup
     _file_rename /usr/bin/archboot-launcher.sh /usr/bin/launcher
     _file_rename /usr/bin/archboot-quickinst.sh /usr/bin/quickinst
@@ -15,6 +15,7 @@ _run ()
     _file_rename /usr/bin/archboot-copy-mountpoint.sh /usr/bin/copy-mountpoint.sh
     _file_rename /usr/bin/archboot-rsync-backup.sh /usr/bin/rsync-backup.sh
     _file_rename /usr/bin/archboot-restore-usbstick.sh /usr/bin/restore-usbstick.sh
+    _file_rename /usr/bin/archboot-testsuite.sh /usr/bin/testsuite.sh
     _full_dir /usr/lib/archboot/installer
     _file /etc/archboot/defaults
     _file /usr/share/archboot/grub/archboot-background.png
