@@ -151,9 +151,13 @@ _download_latest_task() {
     ${_DLPROG} -o "${_ETC}/defaults" "${_SOURCE}${_ETC}/defaults?inline=false"
     # helper binaries
     # main binaries
-    _SCRIPTS="quickinst setup clock launcher localize network pacsetup update copy-mountpoint rsync-backup restore-usbstick testsuite"
+    _SCRIPTS="quickinst setup clock launcher localize network pacsetup update testsuite"
     for i in ${_SCRIPTS}; do
         [[ -e "${_BIN}/${i}" ]] && ${_DLPROG} -o "${_BIN}/${i}" "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false"
+    done
+    _SCRIPTS="copy-mountpoint rsync-backup restore-usbstick"
+    for i in ${_SCRIPTS}; do
+        [[ -e "${_BIN}/${i}.sh" ]] && ${_DLPROG} -o "${_BIN}/${i}.sh" "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false"
     done
     _SCRIPTS="binary-check.sh fw-check.sh not-installed.sh secureboot-keys.sh mkkeys.sh hwsim.sh"
     for i in ${_SCRIPTS}; do
