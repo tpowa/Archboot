@@ -144,6 +144,8 @@ echo "Remove error: cryptsetup" >> blockdevices-error.log
 losetup -D
 rm "${_IMG}"
 _result blockdevices-error.log
+echo -e "Starting Wi-Fi check in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
+sleep 10
 _run_test "Wi-Fi"
 archboot-hwsim.sh test &>"${_NO_LOG}"
 iwctl station wlan1 scan
