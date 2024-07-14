@@ -1,4 +1,5 @@
 On the road to 2024.07:
+Environment:
 - optimized init.sh and login.sh
 - added OpenSSH 9.8 support
 - changed eza default date colour to white
@@ -6,11 +7,14 @@ On the road to 2024.07:
 - added bandwhich, bottom and zoxide
 - launch bandwhich on VC5 and bottom on VC6
 - updated MOTD
-- restart iwd on ESSID rescan
-- added blockdevices, filesystems and Wi-Fi to testsuite
 - removed not needed broadcom firmware and modules on x86_64
 - fixed smb filesystem
 - removed hfs, hfsplus, isofs, nfsv2, nfsv3 and udf filesystems
+network:
+- restart iwd on ESSID rescan
+testsuite:
+- renamed archboot-testsuite.sh to test:xsuite
+- added stats, blockdevices, filesystems and Wi-Fi
 setup:
 - abort on pacman package installation error
 ---
