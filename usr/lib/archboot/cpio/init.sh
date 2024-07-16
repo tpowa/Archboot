@@ -5,6 +5,7 @@ _KVER="$(uname -r)"
 _ARCH="$(uname -m)"
 _TITLE="archboot.com | ${_ARCH} | ${_KVER} | Basic Setup | Early Userspace"
 _KEEP="Please keep the boot medium inserted..."
+_NO_LOG="/dev/null"
 _dialog() {
     dialog --backtitle "${_TITLE}" "$@"
     return $?
@@ -44,15 +45,15 @@ _task() {
         _COUNT=0
         while ! [[ "${_COUNT}" == 10 ]]; do
             # dd / rufus
-            mount UUID=1234-ABCD /mnt/efi &>/dev/null && break
+            mount UUID=1234-ABCD /mnt/efi &>"${_NO_LOG}" && break
             # ventoy
-            if mount LABEL=Ventoy /mnt/ventoy &>/dev/null; then
-                mount /mnt/ventoy/archboot-*-*-"${_KVER}"-"${_ARCH}".iso /mnt/cdrom &>/dev/null && break
-                mount /mnt/ventoy/archboot-*-*-"${_KVER}"-latest-"${_ARCH}".iso /mnt/cdrom &>/dev/null && break
-                mount /mnt/ventoy/archboot-*-*-"${_KVER}"-local-"${_ARCH}".iso /mnt/cdrom &>/dev/null && break
+            if mount LABEL=Ventoy /mnt/ventoy &>"${_NO_LOG}"; then
+                mount /mnt/ventoy/archboot-*-*-"${_KVER}"-"${_ARCH}".iso /mnt/cdrom &>"${_NO_LOG}" && break
+                mount /mnt/ventoy/archboot-*-*-"${_KVER}"-latest-"${_ARCH}".iso /mnt/cdrom &>"${_NO_LOG}" && break
+                mount /mnt/ventoy/archboot-*-*-"${_KVER}"-local-"${_ARCH}".iso /mnt/cdrom &>"${_NO_LOG}" && break
             fi
             if [[ -b /dev/sr0 ]]; then
-                mount /dev/sr0 /mnt/cdrom &>/dev/null && break
+                mount /dev/sr0 /mnt/cdrom &>"${_NO_LOG}" && break
             fi
             sleep 1
             _COUNT=$((_COUNT+1))
@@ -60,7 +61,7 @@ _task() {
     fi
     if [[ "${1}" == check ]]; then
         if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]] ; then
-            if ! mount /mnt/cdrom/efi.img /mnt/efi &>/dev/null; then
+            if ! mount /mnt/cdrom/efi.img /mnt/efi &>"${_NO_LOG}"; then
                 _clear
                 _wrn "Archboot Emergeny Shell:"
                 _wrn "Error: Didn't find a device with archboot rootfs!"
@@ -74,7 +75,7 @@ _task() {
     if [[ "${1}" == btrfs ]]; then
         echo "zstd" >/sys/block/zram0/comp_algorithm
         echo "5G" >/sys/block/zram0/disksize
-        mkfs.btrfs /dev/zram0 &>/dev/null
+        mkfs.btrfs /dev/zram0 &>"${_NO_LOG}"
         # use discard to get immediate remove of files
         mount -o discard /dev/zram0 /sysroot
     fi
@@ -88,17 +89,17 @@ _task() {
         rm init
     fi
     if [[ "${1}" == unmount ]]; then
-        if mountpoint /mnt/ventoy &>/dev/null; then
+        if mountpoint /mnt/ventoy &>"${_NO_LOG}"; then
             for i in /mnt/{efi,cdrom,ventoy}; do
-                umount -q -A "${i}" 2>/dev/null
+                umount -q -A "${i}" 2>"${_NO_LOG}"
             done
         fi
-        if mountpoint /mnt/cdrom &>/dev/null; then
+        if mountpoint /mnt/cdrom &>"${_NO_LOG}"; then
             for i in /mnt/{efi,cdrom}; do
-                umount -q -A "${i}" 2>/dev/null
+                umount -q -A "${i}" 2>"${_NO_LOG}"
             done
         fi
-        umount -q -A UUID=1234-ABCD 2>/dev/null
+        umount -q -A UUID=1234-ABCD 2>"${_NO_LOG}"
     fi
     rm /.archboot
 }
@@ -125,13 +126,13 @@ for i in atkbd cdrom i8042 usb-storage zram zstd; do
     modprobe -q "${i}"
 done
 # systemd >= 256 mounts /usr ro by default
-mount -o remount,rw /usr 2>/dev/null
+mount -o remount,rw /usr 2>"${_NO_LOG}"
 # take care of builtin drm modules, timeout after 10 seconds to avoid hang on some systems
 udevadm wait --settle /dev/fb0 -t 10
 _SIZE="16"
 if [[ -e /sys/class/graphics/fb0/modes ]]; then
     # get screen setting mode from /sys
-    _FB_SIZE="$(rg -o ':(.*)x' -r '$1' /sys/class/graphics/fb0/modes 2>/dev/null)"
+    _FB_SIZE="$(rg -o ':(.*)x' -r '$1' /sys/class/graphics/fb0/modes 2>"${_NO_LOG}")"
     if [[ "${_FB_SIZE}" -gt '1900' ]]; then
         _SIZE="32"
     fi
