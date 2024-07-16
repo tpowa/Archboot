@@ -10,9 +10,9 @@ Environment:
 - removed not needed broadcom firmware and modules on x86_64
 - fixed smb filesystem
 - removed hfs, hfsplus, isofs, nfsv2, nfsv3 and udf filesystems
-- use 3cpio/zstd for multi archive initramfs decompression
+- use 3cpio with zstd for multi archive initramfs decompression
 cpio:
-- create multi archive cpio initramfs files
+- create multi archive cpio initramfs files, up to 25% faster
 network:
 - restart iwd on ESSID rescan
 testsuite:
