@@ -83,7 +83,7 @@ _task() {
         #shellcheck disable=SC2164
         cd /sysroot
         # fastest uncompression of zstd cpio format
-        3cpio -x "/mnt/efi/boot/initrd-${_ARCH}.img" &>/dev/null
+        3cpio -x "/mnt/efi/boot/initrd-${_ARCH}.img"
         rm -r sysroot
         rm init
     fi
