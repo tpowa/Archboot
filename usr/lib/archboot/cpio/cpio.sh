@@ -251,7 +251,7 @@ _create_cpio() {
     # Reproducibility: set all timestamps to 0
     fd . -u --min-depth 1 -X touch -hcd "@0"
     echo "Appending directories..."
-    fd . -t d -0 | sort -z |
+    fd . -u -t d -0 | sort -z |
         LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
         LC_ALL=C.UTF-8 bsdtar --null -cf - --format=newc @- > "${_GENERATE_IMAGE}" || _abort "Image creation failed!"
     echo "Appending compressed files..."
