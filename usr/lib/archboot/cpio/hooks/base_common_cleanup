@@ -6,7 +6,7 @@ _run ()
 {
     ! grep -qw 'archboot' /etc/hostname && return
     _install_files
-    rm /usr/bin/{bsdcpio,blkid,gzip,journalctl,less,lsmod,mkfs.btrfs,\
+    rm /usr/bin/{3cpio,blkid,gzip,journalctl,less,lsmod,mkfs.btrfs,\
 mountpoint,setfont,sulogin,systemctl}
 }
 

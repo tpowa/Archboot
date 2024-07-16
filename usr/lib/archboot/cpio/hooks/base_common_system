@@ -35,7 +35,7 @@ usr/share/{locale/{be,bg,cs,da,de,en_US,el,es,fi,fr,hu,it,lt,lv,mk,nl,nn,pl,pt,r
 var/lib/pacman/local \
 | tar -C "${_ROOTFS}" -xpf -
     fi
-    _map _binary agetty archlinux-keyring-wkd-sync awk bat basename brotli bsdtar \
+    _map _binary agetty archlinux-keyring-wkd-sync awk bat basename brotli bsd{cpio,tar} \
                  {bus,boot,coredump,hostname,journal,locale,login,machine,network,\
 system,timedate,userdb,home,oom,portable}ctl btm certutil chmod clear cmsutil crlutil curl date \
                  dbus-{broker{,-launch},cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
@@ -49,7 +49,7 @@ update-activation-environment,uuidgen} dd df dir du dust exa eza false fd fzf fz
 cgls,cgtop,confextdelta,detect-virt,escape,firstboot,hwdb,inhibit,machine-id-setup,mount,notify,nspawn,path,\
 resolve,repartrun,socket-activate,stdio-bridge,sysusers,tty-ask-password-agent,umount,creds,cryptenroll,dissect,\
 id128,sysext} tar tee testpkg top touch trust tty unix_{chkpwd,update} /usr/lib/dbus-1.0/dbus-daemon-launch-helper \
-                 umount.nfs{,4} update-ca-trust vercmp wc yes zoxide zstd
+                 umount.nfs{,4} update-ca-trust vercmp wc yes zoxide
     # add C.UTF-8 locale
     _dir /usr/lib/locale
     [[ -d /usr/lib/locale/C.utf8 ]] && _full_dir /usr/lib/locale/C.utf8
