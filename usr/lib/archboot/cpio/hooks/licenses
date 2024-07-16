@@ -5,6 +5,7 @@
 _run ()
 {
 _LICENSES=(
+3cpio/LICENSE
 argon2/LICENSE
 bandwhich/LICENSE
 bat/LICENSE-{APACHE,MIT}
