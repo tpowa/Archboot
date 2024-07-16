@@ -5,7 +5,7 @@ _KVER="$(uname -r)"
 _ARCH="$(uname -m)"
 _TITLE="archboot.com | ${_ARCH} | ${_KVER} | Basic Setup | Early Userspace"
 _KEEP="Please keep the boot medium inserted..."
-_NO_LOG="/dev/null"
+_NO_LOG=/dev/null
 _dialog() {
     dialog --backtitle "${_TITLE}" "$@"
     return $?
