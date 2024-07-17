@@ -249,7 +249,7 @@ _create_cpio() {
     # Reproducibility:
     # set all timestamps to 0
     # fd . -u --min-depth 1 -X touch -hcd "@0"
-    # Pipe needed as is, bsdcpio is not reproducible!
+    # Pipe needed as is, bsdcpio is faster but not reproducible!
     # cpio, pax, tar are slower than bsdtar!
     # LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
     # LC_ALL=C.UTF-8 bsdtar --null -cf - --format=newc @-
