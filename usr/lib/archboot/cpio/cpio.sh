@@ -255,14 +255,14 @@ _create_cpio() {
         LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
         LC_ALL=C.UTF-8 bsdtar --null -cf - --format=newc @- > "${_GENERATE_IMAGE}" || _abort "Image creation failed!"
     echo "Appending compressed files..."
-    fd . -u -e 'bz2' -e 'gz' -e 'xz' -e 'zst' --min-depth 1 -0 | sort -z |
+    fd . -t f -t l -u -e 'bz2' -e 'gz' -e 'xz' -e 'zst' --min-depth 1 -0 | sort -z |
         LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
         LC_ALL=C.UTF-8 bsdtar --null -cf - --format=newc @- >> "${_GENERATE_IMAGE}" || _abort "Image creation failed!"
     fd . -u -e 'bz2' -e 'gz' -e 'xz' -e 'zst' --min-depth 1 -X rm
     fd . -u --min-depth 1 -X touch -hcd "@0"
     echo "Appending zstd compressed image..."
     # use zstd only it has best compression and decompression
-    fd . -u --min-depth 1 -0 | sort -z |
+    fd . -t f -t l -u --min-depth 1 -0 | sort -z |
         LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
         LC_ALL=C.UTF-8 bsdtar --null -cf - --format=newc @- |
         zstd -T0 -19 >> "${_GENERATE_IMAGE}" || _abort "Image creation failed!"
