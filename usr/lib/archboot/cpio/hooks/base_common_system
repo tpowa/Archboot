@@ -35,7 +35,7 @@ usr/share/{locale/{be,bg,cs,da,de,en_US,el,es,fi,fr,hu,it,lt,lv,mk,nl,nn,pl,pt,r
 var/lib/pacman/local \
 | tar -C "${_ROOTFS}" -xpf -
     fi
-    _map _binary agetty archlinux-keyring-wkd-sync awk bat basename brotli bsd{cpio,tar} \
+    _map _binary agetty archlinux-keyring-wkd-sync awk bat basename brotli bsdtar \
                  {bus,boot,coredump,hostname,journal,locale,login,machine,network,\
 system,timedate,userdb,home,oom,portable}ctl btm certutil chmod clear cmsutil crlutil curl date \
                  dbus-{broker{,-launch},cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
