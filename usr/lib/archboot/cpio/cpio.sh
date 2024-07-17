@@ -253,6 +253,8 @@ _create_cpio() {
     # cpio, pax, tar are slower than bsdtar!
     # LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
     # LC_ALL=C.UTF-8 bsdtar --null -cf - --format=newc @-
+    # Compression:
+    # use zstd only it has best compression and decompression
     # Result:
     # Multi CPIO archive, extractable with 3cpio
     pushd "${_ROOTFS}" >"${_NO_LOG}" || return
@@ -270,7 +272,6 @@ _create_cpio() {
     fd . -u -e 'bz2' -e 'gz' -e 'xz' -e 'zst' --min-depth 1 -X rm
     fd . -u --min-depth 1 -X touch -hcd "@0"
     echo "Appending zstd compressed image..."
-    # use zstd only it has best compression and decompression
     fd . -t f -t l -u --min-depth 1 -0 | sort -z |
         LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
         LC_ALL=C.UTF-8 bsdtar --null -cf - --format=newc @- |
