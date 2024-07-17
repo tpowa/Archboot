@@ -12,11 +12,11 @@ Environment:
 - removed hfs, hfsplus, isofs, nfsv2, nfsv3 and udf filesystems
 - use 3cpio with zstd for multi cpio archive initramfs decompression
 cpio:
-- create multi cpio archive initramfs files, up to 25% faster
+- create multi cpio archive initramfs files => up to 25% faster
 network:
 - restart iwd on ESSID rescan
 testsuite:
-- renamed archboot-testsuite.sh to test:xsuite
+- renamed archboot-testsuite.sh to testsuite
 - added stats, blockdevices, filesystems and Wi-Fi
 setup:
 - abort on pacman package installation error
