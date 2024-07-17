@@ -100,7 +100,7 @@ for i in bcachefs btrfs ext4 swap vfat xfs; do
         mkswap "${_LOOP}" &>"${_NO_LOG}" ||\
         echo "Creation error: ${i}" >> filesystems-error.log
     else
-        command -v mkfs.${i} &>"${_NO_LOG}" || break
+        modinfo ${i} &>"${_NO_LOG}" || break
         echo -n "${i} "
         mkfs.${i} "${_LOOP}" &>"${_NO_LOG}" ||\
         echo "Creation error: ${i}" >> filesystems-error.log
