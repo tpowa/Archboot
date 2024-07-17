@@ -268,7 +268,7 @@ _create_cpio() {
     fd . -t f -t l -u -e 'bz2' -e 'gz' -e 'xz' -e 'zst' --min-depth 1 -0 | sort -z |
         LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
         LC_ALL=C.UTF-8 bsdtar --null -cf - --format=newc @- >> "${_GENERATE_IMAGE}" || _abort "Image creation failed!"
-    echo "Removing compressed files..."
+    # remove compressed files, timestamps need reset!
     fd . -u -e 'bz2' -e 'gz' -e 'xz' -e 'zst' --min-depth 1 -X rm
     fd . -u --min-depth 1 -X touch -hcd "@0"
     echo "Appending zstd compressed image..."
