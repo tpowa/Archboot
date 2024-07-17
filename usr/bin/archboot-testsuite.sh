@@ -95,6 +95,7 @@ dd if=/dev/zero of="${_IMG}" bs=1M count=1000 &>"${_NO_LOG}"
 sync
 losetup -f "${_IMG}"
 for i in bcachefs btrfs ext4 swap vfat xfs; do
+    command -v mkfs.${i} || return 1
     if [[ "${i}" == "swap" ]]; then
         echo -n "${i} "
         mkswap "${_LOOP}" &>"${_NO_LOG}" ||\
