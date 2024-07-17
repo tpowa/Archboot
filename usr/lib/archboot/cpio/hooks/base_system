@@ -23,12 +23,11 @@ _run ()
                  su sum swap{label,off,on} sync sysctl tac tail taskset test timeout tload \
                  tput truncate tsort tunelp uclampset ul \
                  un{ame26,compress,expand,iq,link,lz4,lzma,share,xz,zstd} uptime users utmpdump \
-                 uuidd uuidgen uuidparse vdir vigr vipw vmstat w wall watch wdctl whereis who \
+                 uuidd uuidgen uuidparse vdir vigr vipw vmstat w waitpid wall watch wdctl whereis who \
                  whoami write xargs xz{,cat,cmp,dec,grep,egrep,fgrep} \
                  z{cat,cmp,diff,egrep,fgrep,force,grep,less,more,new,ramctl} zstd{cat,grep,less,mt}
-    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _map _binary archlinux-userland-fs-cmp i386 x86_64 peekfd waitpid
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _map _binary archlinux-userland-fs-cmp i386 x86_64 peekfd
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _map _binary archlinux-userland-fs-cmp peekfd
-    [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _map _binary waitpid
     # add file magic file
     _file /usr/share/file/misc/magic.mgc
     # add shadow
