@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="https://archboot.com/gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2024 Fundraise: 0% <progress max="100" value="38">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2024 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 16.07.2024 12:30</strong></p>
+<strong>Last update: 17.07.2024 07:27</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -1066,6 +1066,7 @@ The archboot initrd toolchain uses its <strong>own</strong> cpio generator. Some
 <li>libraries outside of lib/ are <strong>not</strong> checked!</li>
 <li><strong>tar</strong> is used for copying/renaming files and directories. It's faster than install and cp!</li>
 <li><strong>mkdir</strong> is used for creating directories. It's faster than install!</li>
+<li><strong>3cpio</strong> can be used to examine/extract/list the initramfs files.</li>
 </ul>
 Options supported in <strong>/etc/archboot/&lt;profile&gt;.conf</strong> files:<br>
 <table>
