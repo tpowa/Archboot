@@ -100,13 +100,14 @@ for i in bcachefs btrfs ext4 swap vfat xfs; do
         mkswap "${_LOOP}" &>"${_NO_LOG}" ||\
         echo "Creation error: ${i}" >> filesystems-error.log
     else
-        modinfo ${i} &>"${_NO_LOG}" || break
-        echo -n "${i} "
-        mkfs.${i} "${_LOOP}" &>"${_NO_LOG}" ||\
-        echo "Creation error: ${i}" >> filesystems-error.log
-        mount "${_LOOP}" /mnt &>"${_NO_LOG}" ||\
-        echo "Mount error: ${i}" >> filesystems-error.log
-        umount /mnt &>"${_NO_LOG}" || echo "Unmount error: ${i}" >> filesystems-error.log
+        if modinfo ${i} &>"${_NO_LOG}"; then
+            echo -n "${i} "
+            mkfs.${i} "${_LOOP}" &>"${_NO_LOG}" ||\
+            echo "Creation error: ${i}" >> filesystems-error.log
+            mount "${_LOOP}" /mnt &>"${_NO_LOG}" ||\
+            echo "Mount error: ${i}" >> filesystems-error.log
+            umount /mnt &>"${_NO_LOG}" || echo "Unmount error: ${i}" >> filesystems-error.log
+        fi
     fi
     wipefs -a "${_LOOP}" &>"${_NO_LOG}"
 done
