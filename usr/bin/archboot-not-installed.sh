@@ -13,8 +13,8 @@ for i in $(pacman -Q | cut -d ' ' -f1); do
     #shellcheck disable=SC2086
     rm -r "${_PACMAN_LIB}"/local/"$(pacman -Q ${i} | sd ' ' '-')"
     #shellcheck disable=SC2086
-    if pacman -Sdd ${i} --noconfirm >>log.txt; then
-        echo "${i}" >> not-installed.orig.txt
+    if pacman -Sdd ${i} --noconfirm >>pacman.log; then
+        echo "${i}" >> not-installed.orig.log
     else
         #shellcheck disable=SC2086
         pacman -Sdd ${i} --noconfirm --overwrite '*'
@@ -28,5 +28,5 @@ done
 # linux-firmware-whence only license files
 # pacman-mirrorlist only /etc file
 # pambase only /etc files
-rg -v "ca-certificates|dbus-broker-units|iana-etc|licenses|linux-firmware-whence|pacman-mirrorlist|pambase" not-installed.orig.txt >not-installed.txt
+rg -v "ca-certificates|dbus-broker-units|iana-etc|licenses|linux-firmware-whence|pacman-mirrorlist|pambase" not-installed.orig.log >not-installed.log
 # vim: set ft=sh ts=4 sw=4 et:

@@ -7,7 +7,7 @@ _usage () {
     echo "Check on missing binaries in archboot environment"
     echo "-------------------------------------------------"
     echo "This will check binaries from package, if they exist"
-    echo "and report missing to binary.txt"
+    echo "and report missing to binary.log"
     echo ""
     echo "usage: ${_APPNAME} <package>"
     exit 0
@@ -22,9 +22,9 @@ if [[ "${1}" == "base" ]]; then
 else
     _PACKAGE="${1}"
 fi
-echo "${_PACKAGE}" >binary.txt
+echo "${_PACKAGE}" >binary.log
 #shellcheck disable=SC2086
 for i in $(pacman -Ql ${_PACKAGE} | rg -o '/usr/bin/..*$'); do
-	command -v "${i}" &>"${_NO_LOG}" || echo "${i}" >>binary.txt
+	command -v "${i}" &>"${_NO_LOG}" || echo "${i}" >>binary.log
 done
 # vim: set ft=sh ts=4 sw=4 et:
