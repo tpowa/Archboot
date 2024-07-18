@@ -20,6 +20,7 @@ pacsetup:
 testsuite:
 - renamed archboot-testsuite.sh to testsuite
 - added stats, blockdevices, filesystems and Wi-Fi
+- log to /dev/tty11 | VC11
 setup:
 - abort on pacman package installation error
 ---
