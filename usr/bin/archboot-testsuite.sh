@@ -30,7 +30,7 @@ _result() {
 _archboot_check
 echo "Waiting for pacman keyring..."
 _pacman_keyring
-pacman -Sy &>"${_NO_LOG}"
+pacman -Sy &>"${_LOG}"
 echo -e "\e[1mArchboot Environment Stats:\e[m"
 echo "Bootup speed (seconds): $(systemd-analyze | rg -o '= (.*)s' -r '$1') |\
  Packages: $(pacman -Q | wc -l)"
@@ -150,7 +150,7 @@ echo -e "Starting Wi-Fi check in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to st
 sleep 10
 _run_test "Wi-Fi... this takes a while"
 echo -n "Setting up hwsim... "
-archboot-hwsim.sh test &>"${_NO_LOG}"
+archboot-hwsim.sh test &>"${_LOG}"
 echo -n "iwctl tests running... "
 iwctl station wlan1 scan
 sleep 5
