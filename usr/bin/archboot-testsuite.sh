@@ -69,9 +69,9 @@ _run_test "on missing base binaries"
 _BASE_BLACKLIST="arpd backup bashbug enosys exch fsck.cramfs fsck.minix gawk-5.3.0 \
 gawkbug gencat getconf iconv iconvconfig importctl lastlog2 ld.so locale lsclocks makedb \
 makepkg-template memusage memusagestat mkfs.bfs mkfs.cramfs mkfs.minix mtrace newgidmap \
-newuidmap pcprofiledump pldd pstree.x11 restore routel run0 setpgid sln sotruss sprof \
-systemd-confext systemd-cryptsetup systemd-delta systemd-home-fallback-shell systemd-repart \
-systemd-run systemd-vmspawn systemd-vpick varlinkctl xtrace"
+newuidmap pcprofiledump pivot_root pldd pstree.x11 restore routel run0 setpgid sln sotruss \
+sprof switch_root systemd-confext systemd-cryptsetup systemd-delta systemd-home-fallback-shell \
+systemd-repart systemd-run systemd-vmspawn systemd-vpick varlinkctl xtrace"
 archboot-binary-check.sh base &>>"${_LOG}"
 #shellcheck disable=SC2013
 for i in $(rg '/usr/bin/(.*)' -r '$1' binary.log); do
