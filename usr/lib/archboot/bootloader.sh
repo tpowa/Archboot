@@ -100,7 +100,7 @@ _upload_efi_files() {
         fi
     done
     #shellcheck disable=SC2086
-    run0 -u "${_USER}" -D "${1}" ${_RSYNC} ./* "${_SERVER}:.${_ARCH_SERVERDIR}/" || exit 1
+    run0 -u "${_USER}" -D ./ ${_RSYNC} ./* "${_SERVER}:.${_ARCH_SERVERDIR}/" || exit 1
     cd ..
 }
 
