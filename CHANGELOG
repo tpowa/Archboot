@@ -1,5 +1,6 @@
 On the road to 2024.07:
 Environment:
+- kernel 6.10.x
 - optimized init.sh and login.sh
 - added OpenSSH 9.8 support
 - changed eza default date colour to white

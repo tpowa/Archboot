@@ -23,6 +23,7 @@ fd/LICENSE-MIT
 file/COPYING
 fzf/LICENSE
 gcc-libs/RUNTIME.LIBRARY.EXCEPTION
+gpgme/MIT.txt
 gnupg/BSD-2-Clause.txt
 gnupg/BSD-3-Clause.txt
 gnupg/BSD-4-Clause.txt
