@@ -2,7 +2,8 @@ On the road to 2024.07:
 Environment:
 - kernel 6.10.x
 - OpenSSH 9.8
-- use 3cpio with zstd for multi cpio archive initramfs decompression
+- use 3cpio with zstd for concatenated cpio archive initramfs
+  decompression
 - updated MOTD
 - optimized init.sh and login.sh
 - changed eza default date colour to white
@@ -14,7 +15,7 @@ Environment:
 - removed hfs, hfsplus, isofs, nfsv2, nfsv3 and udf filesystems
 - removed makepkg
 cpio:
-- create multi cpio archive initramfs files => up to 25% faster
+- create concatenated cpio archive initramfs files => up to 25% faster
   1st part: all directories
   2nd part: all already compressed files
   3rd part: zstd compressed rootfs
