@@ -5,7 +5,6 @@
 _run ()
 {
     _binary lshw
-    _map _file /usr/share/lshw/{manuf,oui,pnpid}.txt
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

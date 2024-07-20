@@ -16,9 +16,9 @@ Environment:
 - removed makepkg, pivot_root and switch_root
 cpio:
 - create concatenated cpio archive initramfs files => up to 25% faster
-  1st part: all directories
-  2nd part: all already compressed files
-  3rd part: zstd compressed rootfs
+  Part 1: all directories
+  Part 2: all already compressed files
+  Part 3: zstd compressed rootfs
 network:
 - restart iwd on ESSID rescan
 pacsetup:
