@@ -104,7 +104,7 @@ _update_source() {
 
 _server_release() {
     cd "${_ISO_HOME_ARCH}" || exit 1
-    "archboot-${_ARCH}-release.sh" "${_ISO_BUILD_DIR}" "${_ARCHBOOT_SOURCE}/${_ARCH}/${_DIR}" || exit 1
+    "archboot-${_ARCH}-release.sh" "${_ISO_BUILD_DIR}" "file:///${_ISO_HOME_SOURCE}/${_DIR}" || exit 1
     # set user rights on files
     [[ -d "${_ISO_BUILD_DIR}" ]] || exit 1
     chmod 755 "${_ISO_BUILD_DIR}"
