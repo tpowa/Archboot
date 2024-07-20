@@ -16,7 +16,7 @@ daemon,launch,monitor,run-session,send,test-tool,update-activation-environment,u
 kernel-install,systemd-{analyze,ask-password,cat,cgls,cgtop,delta,detect-virt,escape,firstboot,\
 hwdb,inhibit,machine-id-setup,mount,notify,nspawn,path,resolve,run,umount,socket-activate,\
 stdio-bridge,sysusers,tty-ask-password-agent,repart,creds,cryptenroll,dissect,id128,sysext},\
-{bus,boot,coredump,locale,login,machine,network,hostname,timedate,userdb,home,oom,portable}ctl,zoxide}
+{bus,coredump,locale,login,machine,network,hostname,timedate,userdb,home,oom,portable}ctl,zoxide}
 }
 
 # vim: set ft=sh ts=4 sw=4 et:
