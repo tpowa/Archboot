@@ -21,9 +21,10 @@ _update_pacman_chroot() {
     cd "${_ISO_HOME}" || exit 1
     [[ -d "${_ARCH_DIR}" ]] || mkdir "${_ARCH_DIR}"
     echo "Downloading pacman ${_ARCH} chroot..."
-    [[ -f pacman-${_ARCH}-chroot-latest.tar.zst ]] && rm pacman-"${_ARCH}"-chroot-latest.tar.zst{,.sig} 2>"${_NO_LOG}"
-    ${_DLPROG} -O "${_ARCH_CHROOT_PUBLIC}"/"${_PACMAN_CHROOT}"
-    ${_DLPROG} -O "${_ARCH_CHROOT_PUBLIC}"/"${_PACMAN_CHROOT}".sig
+    if ! [[ -f pacman-${_ARCH}-chroot-latest.tar.zst ]]; then
+        ${_DLPROG} -O "${_ARCH_CHROOT_PUBLIC}"/"${_PACMAN_CHROOT}"
+        ${_DLPROG} -O "${_ARCH_CHROOT_PUBLIC}"/"${_PACMAN_CHROOT}".sig
+    fi
     # verify download
     #shellcheck disable=SC2024
     gpg --chuid "${_USER}" --verify "${_PACMAN_CHROOT}.sig" &>"${_NO_LOG}" || exit 1

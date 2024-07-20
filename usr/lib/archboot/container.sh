@@ -51,10 +51,6 @@ _pacman_chroot() {
     echo "Verifying ${3}..."
     gpg --verify "${3}.sig" &>"${_NO_LOG}" || exit 1
     bsdtar -C "${1}" -xf "${3}"
-    if [[ -f "${3}" && -f "${3}".sig ]]; then
-        echo "Removing installation tarball ${3}..."
-        rm "${3}"{,.sig}
-    fi
     echo "Updating container to latest packages..."
     ${_NSPAWN} "${1}" pacman -Syu --noconfirm &>"${_NO_LOG}"
 }
