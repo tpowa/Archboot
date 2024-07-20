@@ -66,7 +66,7 @@ done
 _result ldd-error.log
 _run_test "on missing base binaries"
 # not needed binaries, that are tolerated
-_BASE_BLACKLIST="arpd backup bashbug enosys exch fsck.cramfs fsck.minix gawk-5.3.0 \
+_BASE_BLACKLIST="arpd backup bashbug bootctl enosys exch fsck.cramfs fsck.minix gawk-5.3.0 \
 gawkbug gencat getconf iconv iconvconfig importctl lastlog2 ld.so locale lsclocks makedb \
 makepkg-template memusage memusagestat mkfs.bfs mkfs.cramfs mkfs.minix mtrace newgidmap \
 newuidmap pcprofiledump pivot_root pldd pstree.x11 restore routel run0 setpgid sln sotruss \

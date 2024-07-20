@@ -13,7 +13,7 @@ Environment:
 - fixed smb filesystem
 - removed not needed broadcom firmware and modules on x86_64
 - removed hfs, hfsplus, isofs, nfsv2, nfsv3 and udf filesystems
-- removed makepkg, pivot_root and switch_root
+- removed bootctl, makepkg, pivot_root and switch_root
 cpio:
 - create concatenated cpio archive initramfs files => up to 25% faster
   Part 1: all directories

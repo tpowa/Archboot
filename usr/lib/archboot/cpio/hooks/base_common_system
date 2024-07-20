@@ -6,8 +6,8 @@ _run ()
 {
     # remove conflicting grub, rpcbind and ukify files
     tar -C / --exclude=etc/{skel/.zshrc,systemd/system/multi-user.target.wants/remote-fs.target} \
---exclude=usr/share/bash-completion/completions/grub \
---exclude=usr/lib/{modules-load.d/cdrecord.conf,systemd/{systemd-journal-{gatewayd,remote},{system/{blk-availability.service,lvm2*,\
+--exclude=usr/share/{bash-completion/completions/grub,systemd/bootctl} \
+--exclude=usr/lib/{modules-load.d/cdrecord.conf,systemd/{boot,systemd-journal-{gatewayd,remote},{system/{blk-availability.service,lvm2*,\
 rpcbind*,sysinit.target.wants/lvm2*},ukify}},sysusers.d/rpcbind*,tmpfiles.d/rpcbind*} \
 --hard-dereference -cpf - \
 etc/{bash_completion.d,ca-certificates/extracted,default,pam.d,profile.d,security,skel,ssl/certs,sysctl.d,systemd,tpm2-tss,xdg} \
@@ -36,7 +36,7 @@ var/lib/pacman/local \
 | tar -C "${_ROOTFS}" -xpf -
     fi
     _map _binary agetty archlinux-keyring-wkd-sync awk bat basename brotli bsdtar \
-                 {bus,boot,coredump,hostname,journal,locale,login,machine,network,\
+                 {bus,coredump,hostname,journal,locale,login,machine,network,\
 system,timedate,userdb,home,oom,portable}ctl btm certutil chmod clear cmsutil crlutil curl date \
                  dbus-{broker{,-launch},cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
 update-activation-environment,uuidgen} dd df dir du dust exa eza false fd fzf fzf-tmux gawk gpg{,-agent,conf,-connect-agent} \
