@@ -80,12 +80,6 @@ for i in $(rg '/usr/bin/(.*)' -r '$1' binary.log); do
     fi
 done
 _result base-binary-error.log
-_run_test "binary execution"
-for i in $(fd -E 'archboot*' -E '*sum' . /usr/bin); do
-    echo $i
-    ./i || echo $i >> binary-execution-error.log
-do
-_result binary-execution-error.log
 _run_test "modules included /usr/lib/firmware"
 archboot-fw-check.sh run
 _result fw-error.log
