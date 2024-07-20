@@ -20,10 +20,12 @@ _update_pacman_chroot() {
     # update pacman chroot
     cd "${_ISO_HOME}" || exit 1
     [[ -d "${_ARCH_DIR}" ]] || mkdir "${_ARCH_DIR}"
-    echo "Downloading pacman ${_ARCH} chroot..."
     if ! [[ -f pacman-${_ARCH}-chroot-latest.tar.zst ]]; then
+        echo "Downloading pacman ${_ARCH} chroot..."
         ${_DLPROG} -O "${_ARCH_CHROOT_PUBLIC}"/"${_PACMAN_CHROOT}"
         ${_DLPROG} -O "${_ARCH_CHROOT_PUBLIC}"/"${_PACMAN_CHROOT}".sig
+    else
+        echo "Using local pacman ${_ARCH} chroot..."
     fi
     # verify download
     #shellcheck disable=SC2024
