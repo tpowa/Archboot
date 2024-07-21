@@ -47,24 +47,24 @@ _create_iso() {
         # init ramdisk
         _create_initrd_dir "${_ARCH}-init.conf"
         . "/etc/archboot/${_ARCH}-init.conf"
-        _create_cpio "${_W_DIR}/tmp/initrd" "init-${_ARCH}.img"
+        _create_cpio "${_W_DIR}/tmp/initrd" "../../init-${_ARCH}.img"
         if ! [[ "${_ARCH}" == "riscv64" ]]; then
             # local ramdisk
             echo "Generating local initramfs..."
             _create_initrd_dir "${_W_DIR}/tmp/initrd" "${_CONFIG_LOCAL}"
             . "/etc/archboot/${_CONFIG_LOCAL}"
-            _create_cpio "${_W_DIR}/tmp/initrd" "initrd-local-${_ARCH}.img"
+            _create_cpio "${_W_DIR}/tmp/initrd" "../../initrd-local-${_ARCH}.img"
             # latest ramdisk
             echo "Generating latest initramfs..."
             _create_initrd_dir "${_CONFIG_LATEST}"
             . "/etc/archboot/${_CONFIG_LATEST}"
-            _create_cpio "${_W_DIR}/tmp/initrd" "initrd-latest-${_ARCH}.img"
+            _create_cpio "${_W_DIR}/tmp/initrd" "../../initrd-latest-${_ARCH}.img"
         fi
         # normal ramdisk
         echo "Generating normal initramfs..."
         _create_initrd_dir "${_ARCH}.conf"
         . "/etc/archboot/${_ARCH}.conf"
-        _create_cpio "${_W_DIR}/tmp/initrd" "initrd-${_ARCH}.img"
+        _create_cpio "${_W_DIR}/tmp/initrd" "../../initrd-${_ARCH}.img"
     fi
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
