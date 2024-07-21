@@ -25,7 +25,7 @@ pacsetup:
 - fixed fallback to http mirrors on aarch64
 testsuite:
 - renamed archboot-testsuite.sh to testsuite
-- added stats, blockdevices, filesystems and Wi-Fi
+- added blockdevices, filesystems, stats and Wi-Fi
 - log to /dev/tty11 | VC11
 server-release:
 - use local files instead of resync from source server'

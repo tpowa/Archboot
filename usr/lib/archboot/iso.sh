@@ -4,6 +4,7 @@
 . /etc/archboot/defaults
 _CONFIG_DIR="/etc/archboot"
 _ISODIR="$(mktemp -d ISODIR.XXX)"
+_BOOTLOADER="/usr/share/archboot/bootloader"
 
 _usage () {
     echo "CREATE ${_ARCH} USB/CD IMAGES"
@@ -124,18 +125,18 @@ _prepare_fedora_shim_bootloaders_x86_64 () {
     echo "Preparing fedora shim..."
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim x64 signed files from fedora
-    cp "/usr/share/archboot/bootloader/mmx64.efi" "${_ISODIR}/EFI/BOOT/MMX64.EFI"
-    cp "/usr/share/archboot/bootloader/BOOTX64.efi" "${_ISODIR}/EFI/BOOT/BOOTX64.EFI"
-    cp "/usr/share/archboot/bootloader/mmia32.efi" "${_ISODIR}/EFI/BOOT/MMIA32.EFI"
-    cp "/usr/share/archboot/bootloader/BOOTIA32.efi" "${_ISODIR}/EFI/BOOT/BOOTIA32.EFI"
+    cp "${_BOOTLOADER}/mmx64.efi" "${_ISODIR}/EFI/BOOT/MMX64.EFI"
+    cp "${_BOOTLOADER}/BOOTX64.efi" "${_ISODIR}/EFI/BOOT/BOOTX64.EFI"
+    cp "${_BOOTLOADER}/mmia32.efi" "${_ISODIR}/EFI/BOOT/MMIA32.EFI"
+    cp "${_BOOTLOADER}/BOOTIA32.efi" "${_ISODIR}/EFI/BOOT/BOOTIA32.EFI"
 }
 
 _prepare_fedora_shim_bootloaders_aarch64 () {
     echo "Preparing fedora shim..."
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim aa64 signed files from fedora
-    cp "/usr/share/archboot/bootloader/mmaa64.efi" "${_ISODIR}/EFI/BOOT/MMAA64.EFI"
-    cp "/usr/share/archboot/bootloader/BOOTAA64.efi" "${_ISODIR}/EFI/BOOT/BOOTAA64.EFI"
+    cp "${_BOOTLOADER}/mmaa64.efi" "${_ISODIR}/EFI/BOOT/MMAA64.EFI"
+    cp "${_BOOTLOADER}/BOOTAA64.efi" "${_ISODIR}/EFI/BOOT/BOOTAA64.EFI"
 }
 
 _prepare_uefi_shell_tianocore() {
@@ -149,18 +150,18 @@ _prepare_uefi_shell_tianocore() {
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 _prepare_uefi_X64() {
     echo "Preparing X64 grub..."
-    cp /usr/share/archboot/bootloader/grubx64.efi "${_ISODIR}/EFI/BOOT/GRUBX64.EFI"
+    cp "${_BOOTLOADER}/grubx64.efi" "${_ISODIR}/EFI/BOOT/GRUBX64.EFI"
 }
 
 _prepare_uefi_IA32() {
     echo "Preparing IA32 grub..."
-    cp /usr/share/archboot/bootloader/grubia32.efi "${_ISODIR}/EFI/BOOT/GRUBIA32.EFI"
+    cp "${_BOOTLOADER}/grubia32.efi" "${_ISODIR}/EFI/BOOT/GRUBIA32.EFI"
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
 _prepare_uefi_AA64() {
     echo "Preparing AA64 grub..."
-    cp /usr/share/archboot/bootloader/grubaa64.efi "${_ISODIR}/EFI/BOOT/GRUBAA64.EFI"
+    cp "${_BOOTLOADER}/grubaa64.efi" "${_ISODIR}/EFI/BOOT/GRUBAA64.EFI"
 }
 
 _prepare_memtest() {
@@ -177,7 +178,6 @@ _prepare_background() {
 
 _reproducibility() {
     # Reproducibility: set all timestamps to 0
-    # from /usr/bin/mkinitcpio
     fd . "${_ISODIR}" -u --min-depth 1 -X touch -hcd "@0"
 }
 
