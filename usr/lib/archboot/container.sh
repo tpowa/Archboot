@@ -21,7 +21,7 @@ _parameters() {
         case ${1} in
             -cc|--cc) _CLEANUP_CONTAINER="1" ;;
             -cp|--cp) _CLEANUP_CACHE="1" ;;
-            -install-source=*|--install-source=*) _INSTALL_SOURCE="$(echo "${1}" | awk -F= '{print $2;}')" ;;
+            -install-source=*|--install-source=*) _INSTALL_SOURCE="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
         esac
         shift
     done

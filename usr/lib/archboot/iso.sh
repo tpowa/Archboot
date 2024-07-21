@@ -27,8 +27,8 @@ _parameters() {
         case ${1} in
             -g|--g) export _GENERATE="1" ;;
             -s|--s) _SAVE_INIT="1" ;;
-            -c=*|--c=*) _CONFIG="$(echo "${1}" | awk -F= '{print $2;}')" ;;
-            -i=*|--i=*) _IMAGENAME="$(echo "${1}" | awk -F= '{print $2;}')" ;;
+            -c=*|--c=*) _CONFIG="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
+            -i=*|--i=*) _IMAGENAME="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
             -h|--h|?) _usage ;;
             *) _usage ;;
         esac
