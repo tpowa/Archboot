@@ -16,7 +16,7 @@ usage () {
 _DIR="${2}"
 while [ $# -gt 0 ]; do
 	case ${1} in
-		-name=*|--name=*) NAME="$(echo "${1}" | awk -F= '{print $2;}')" ;;
+		-name=*|--name=*) NAME="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
 		-h|--h|?) usage ;; 
         esac
 	shift
