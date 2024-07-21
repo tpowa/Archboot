@@ -249,7 +249,7 @@ _fix_network() {
 _create_archboot_db() {
     echo "Creating archboot repository db..."
     #shellcheck disable=SC2046
-    LC_ALL=C.UTF-8 repo-add -q "${1}"/archboot.db.tar.gz $(fd -u -t f -E '*.sig' . "${1}"/)
+    LC_ALL=C.UTF-8 repo-add -q "${1}"/archboot.db.tar.gz $(fd -u -t f -E 'archboot.*tar.gz' -E '*.sig' . "${1}"/)
 }
 
 _pacman_parameters() {
