@@ -31,30 +31,6 @@ _create_initrd_dir() {
         -k ${_KERNEL} -c /etc/archboot/${1} -d /tmp/initrd" || exit 1
 }
 
-_compress_initrd() {
-    pushd "${_W_DIR}/tmp/initrd" >"${_NO_LOG}" || return
-    echo "Creating initramfs:"
-    fd . -u --min-depth 1 -X touch -hcd "@0"
-    echo "Appending directories..."
-    fd . -u -t d -0 | sort -z |
-        LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
-        LC_ALL=C.UTF-8 bsdtar --null -cf - --format=newc @- > "../../${1}" || _abort "Image creation failed!"
-    echo "Appending compressed files..."
-    fd . -t f -t l -u -e 'bz2' -e 'gz' -e 'xz' -e 'zst' --min-depth 1 -0 | sort -z |
-        LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
-        LC_ALL=C.UTF-8 bsdtar --null -cf - --format=newc @- >> "../../${1}" || _abort "Image creation failed!"
-    # remove compressed files, timestamps need reset!
-    fd . -u -e 'bz2' -e 'gz' -e 'xz' -e 'zst' --min-depth 1 -X rm
-    fd . -u --min-depth 1 -X touch -hcd "@0"
-    echo "Appending zstd compressed image..."
-    fd . -t f -t l -u --min-depth 1 -0 | sort -z |
-        LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
-        LC_ALL=C.UTF-8 bsdtar --null -cf - --format=newc @- |
-        zstd -T0 -19 >> "../../${1}" || _abort "Image creation failed!"
-    popd >"${_NO_LOG}" || return
-    echo "Build complete."
-}
-
 _create_iso() {
     mkdir -p "${1}"
     cd "${1}" || exit 1
@@ -71,24 +47,24 @@ _create_iso() {
         # init ramdisk
         _create_initrd_dir "${_ARCH}-init.conf"
         . "/etc/archboot/${_ARCH}-init.conf"
-        _compress_initrd "init-${_ARCH}.img"
+        _create_cpio "${_W_DIR}/tmp/initrd" "init-${_ARCH}.img"
         if ! [[ "${_ARCH}" == "riscv64" ]]; then
             # local ramdisk
             echo "Generating local initramfs..."
-            _create_initrd_dir "${_CONFIG_LOCAL}"
+            _create_initrd_dir "${_W_DIR}/tmp/initrd" "${_CONFIG_LOCAL}"
             . "/etc/archboot/${_CONFIG_LOCAL}"
-            _compress_initrd "initrd-local-${_ARCH}.img"
+            _create_cpio "${_W_DIR}/tmp/initrd" "initrd-local-${_ARCH}.img"
             # latest ramdisk
             echo "Generating latest initramfs..."
             _create_initrd_dir "${_CONFIG_LATEST}"
             . "/etc/archboot/${_CONFIG_LATEST}"
-            _compress_initrd "initrd-latest-${_ARCH}.img"
+            _create_cpio "${_W_DIR}/tmp/initrd" "initrd-latest-${_ARCH}.img"
         fi
         # normal ramdisk
         echo "Generating normal initramfs..."
         _create_initrd_dir "${_ARCH}.conf"
         . "/etc/archboot/${_ARCH}.conf"
-        _compress_initrd "initrd-${_ARCH}.img"
+        _create_cpio "${_W_DIR}/tmp/initrd" "initrd-${_ARCH}.img"
     fi
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then

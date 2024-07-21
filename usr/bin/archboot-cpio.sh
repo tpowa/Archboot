@@ -79,9 +79,8 @@ ldconfig -r "${_ROOTFS}" &>"${_NO_LOG}" || exit 1
 # remove /var/cache/ldconfig/aux-cache for reproducibility
 rm -f -- "${_ROOTFS}/var/cache/ldconfig/aux-cache"
 if [[ -n "${_GENERATE_IMAGE}" ]]; then
-    _create_cpio "${_GENERATE_IMAGE}" "${_COMP}" || exit 1
+    _create_cpio "${_ROOTFS}" "${_GENERATE_IMAGE}" || exit 1
     _cleanup
-    echo "Build complete."
 elif [[ -n "${_TARGET_DIR}" ]]; then
     _cleanup
     echo "Build directory complete."
