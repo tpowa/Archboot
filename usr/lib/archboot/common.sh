@@ -40,7 +40,11 @@ _WAYLAND_PACKAGE="egl-wayland"
 _STANDARD_PACKAGES="gparted xorg-xhost mtools noto-fonts"
 # chromium is now working on riscv64
 [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _STANDARD_BROWSER="firefox"
-_NSPAWN="systemd-nspawn -q -D"
+if [[ -d "${_ISO_HOME}" ]]; then
+    _NSPAWN="systemd-nspawn -q --bind ${_ISO_HOME} -D"
+else
+    _NSPAWN="systemd-nspawn -q -D"
+fi
 _MAN_INFO_PACKAGES="man-db man-pages texinfo"
 
 ### check for root
