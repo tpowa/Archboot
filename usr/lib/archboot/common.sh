@@ -248,6 +248,7 @@ _fix_network() {
 
 _create_archboot_db() {
     echo "Creating archboot repository db..."
+    sync
     #shellcheck disable=SC2046
     LC_ALL=C.UTF-8 fd -u -t f -E '*.sig' . "${1}"/ -X repo-add -q "${1}"/archboot.db.tar.gz
 }
