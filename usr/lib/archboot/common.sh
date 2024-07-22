@@ -168,7 +168,7 @@ _kver() {
     # aarch64 compressed and uncompressed:
     # rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1' ${1}
     # riscv64: zcat ${1} | rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1'
-    if [[ -f ${1} ]]; then
+    if [[ -f "${1}" ]]; then
         rg -Noazm 1 'ABCDEF\x00+(.*) \(.*@' -r '$1' "${1}" ||\
         rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1' "${1}" ||\
         zcat "${1}" | rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1'
