@@ -166,11 +166,11 @@ _run_update_environment() {
 _kver() {
     if [[ -f "${1}" ]]; then
         # x86_64 default image
-        rg -Noazm 1 'ABCDEF\x00+(.*) \(.*@' -r '$1' "${1}" ||
+        rg -Noazm 1 'ABCDEF\x00+(.*) \(.*@' -r '$1' ${1} ||
         # aarch64, works for compressed and uncompressed image
-        rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1' "${1}" ||
+        rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1' ${1} ||
         # riscv64, rg cannot detect compression without suffix
-        zcat "${1}" | rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1'
+        zcat ${1} | rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1'
     fi
 }
 
@@ -247,10 +247,27 @@ _fix_network() {
 }
 
 _create_archboot_db() {
-    echo "Creating archboot repository db..."
-    sync
+    echo "Creating reproducible repository db..."
+    pushd ${1} >"${_NO_LOG}" || return 1
     #shellcheck disable=SC2046
-    LC_ALL=C.UTF-8 fd -u -t f -E '*.sig' . "${1}"/ -X repo-add -q "${1}"/archboot.db.tar.gz
+    LC_ALL=C.UTF-8 fd -u -t f -E '*.sig' . -X repo-add -q archboot.db.tar
+    for i in archboot.{db.tar,files.tar}; do
+        mkdir repro
+        cd repro
+        bsdtar -xf ../${i} || return 1
+        fd . -u --min-depth 1 -X touch -hcd "@0"
+        fd --strip-cwd-prefix -t f -t l -u --min-depth 1 -0 | sort -z |
+            LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
+            LC_ALL=C.UTF-8 bsdtar --null -cf - --format=gnutar @- |
+            zstd -T0 -19 >> "../${i}.zst" || return 1
+        cd ..
+        rm -r repro
+    done
+    rm archboot.{db,files}
+    rm archboot.{db,files}.tar
+    ln -s archboot.db.tar.zst archboot.db
+    ln -s archboot.files.tar.zst archboot.files
+    popd >"${_NO_LOG}" || return 1
 }
 
 _pacman_parameters() {
@@ -320,7 +337,7 @@ _create_cpio() {
     # use zstd it has best compression and decompression
     # Result:
     # Multi CPIO archive, extractable with 3cpio
-    pushd "${1}" >"${_NO_LOG}" || return
+    pushd "${1}" >"${_NO_LOG}" || return 1
     echo "Creating initramfs:"
     fd . -u --min-depth 1 -X touch -hcd "@0"
     echo "Appending directories..."
@@ -339,7 +356,7 @@ _create_cpio() {
         LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
         LC_ALL=C.UTF-8 bsdtar --null -cf - --format=newc @- |
         zstd -T0 -19 >> "${2}" || _abort "Image creation failed!"
-    popd >"${_NO_LOG}" || return
+    popd >"${_NO_LOG}" || return 1
     echo "Build complete."
 }
 # vim: set ft=sh ts=4 sw=4 et:
