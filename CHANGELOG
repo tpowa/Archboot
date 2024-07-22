@@ -29,6 +29,8 @@ testsuite:
 - log to /dev/tty11 | VC11
 server-release:
 - use local files instead of resync from source server'
+- switched db compression to zst
+- make db files reproducible
 setup:
 - abort on pacman package installation error
 ---
