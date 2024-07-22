@@ -27,6 +27,7 @@ _usage () {
 }
 
 _create_initrd_dir() {
+    _KERNEL="$(echo ${_KERNEL})"
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-cpio.sh \
         -k ${_KERNEL} -c /etc/archboot/${1} -d /tmp/initrd" || exit 1
 }
