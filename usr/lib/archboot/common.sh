@@ -169,10 +169,9 @@ _kver() {
     # rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1' ${1}
     # riscv64: zcat ${1} | rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1'
     if [[ -f ${1} ]]; then
-        #shellcheck disable=SC2086
-        rg -Noazm 1 'ABCDEF\x00+(.*) \(.*@' -r '$1' ${1} ||\
-        rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1' ${1} ||\
-        zcat ${1} | rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1'
+        rg -Noazm 1 'ABCDEF\x00+(.*) \(.*@' -r '$1' "${1}" ||\
+        rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1' "${1}" ||\
+        zcat "${1}" | rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1'
     fi
 }
 
