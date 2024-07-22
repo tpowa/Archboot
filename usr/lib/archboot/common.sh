@@ -164,12 +164,14 @@ _run_update_environment() {
 }
 
 _kver() {
-    if [[ -f "${1}" ]]; then
-        # x86_64 default image
-        rg -Noazm 1 'ABCDEF\x00+(.*) \(.*@' -r '$1' ${1} ||
-        # aarch64, works for compressed and uncompressed image
-        rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1' ${1} ||
-        # riscv64, rg cannot detect compression without suffix
+    # x86_64: rg -Noazm 1 'ABCDEF\x00+(.*) \(.*@' -r '$1' ${1}
+    # aarch64 compressed and uncompressed:
+    # rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1' ${1}
+    # riscv64: zcat ${1} | rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1'
+    if [[ -f ${1} ]]; then
+        #shellcheck disable=SC2086
+        rg -Noazm 1 'ABCDEF\x00+(.*) \(.*@' -r '$1' ${1} ||\
+        rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1' ${1} ||\
         zcat ${1} | rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1'
     fi
 }
