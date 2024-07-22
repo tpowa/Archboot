@@ -27,9 +27,8 @@ _usage () {
 }
 
 _create_initrd_dir() {
-    _KERNEL="$(echo ${_KERNEL})"
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-cpio.sh \
-        -k ${_KERNEL} -c /etc/archboot/${1} -d /tmp/initrd" || exit 1
+        -c /etc/archboot/${1} -d /tmp/initrd" || exit 1
 }
 
 _create_iso() {
@@ -40,9 +39,9 @@ _create_iso() {
     _create_archboot_db "${_W_DIR}${_CACHEDIR}"
     #shellcheck disable=SC1090
     . "${_W_DIR}/etc/archboot/${_ARCH}.conf"
-    _KERNEL="$(echo ${_W_DIR}/${_KERNEL})"
+    _KVER="$(_kver ${_W_DIR}/${_KERNEL})"
     #shellcheck disable=SC2116,SC2046,SC2027,2086
-    _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver ${_KERNEL})"
+    _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_KVER}"
     if ! [[ "${_RUNNING_ARCH}" == "${_ARCH}" ]]; then
         ### to speedup build for riscv64 and aarch64 on x86_64, run compressor on host system
         echo "Generating initramdisks..."
