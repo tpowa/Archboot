@@ -1,0 +1,6 @@
+[Unit]
+Description=Check, build and upload archboot images at night
+
+[Service]
+ExecStart=/home/tobias/Arch/iso/chroots/trigger-update.sh
+
