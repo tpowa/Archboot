@@ -39,8 +39,8 @@ _create_iso() {
     _create_archboot_db "${_W_DIR}${_CACHEDIR}"
     #shellcheck disable=SC1090
     . "${_W_DIR}/etc/archboot/${_ARCH}.conf"
+    #shellcheck disable=SC2116,SC2046,2086
     _KVER="$(_kver $(echo ${_W_DIR}${_KERNEL}))"
-    #shellcheck disable=SC2116,SC2046,SC2027,2086
     _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_KVER}"
     if ! [[ "${_RUNNING_ARCH}" == "${_ARCH}" ]]; then
         ### to speedup build for riscv64 and aarch64 on x86_64, run compressor on host system
