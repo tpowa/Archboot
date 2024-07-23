@@ -16,10 +16,7 @@ ARCHBOOT CPIO
 Tool for creating an archboot initramfs image.
 
  -h               Display this message and exit
-
  -c <config>      Use <config> file
- -k <kernel>      Use specified <kernel>
-
  -g <path>        Generate cpio image and write to specified <path>
  -d <dir>         Generate image into <dir>
 
@@ -38,9 +35,6 @@ while [ $# -gt 0 ]; do
     case "${1}" in
         -c) shift
             _CONFIG="${1}"
-            ;;
-        -k) shift
-            _KERNEL="${1}"
             ;;
         -d) shift
             _TARGET_DIR="${1}"
