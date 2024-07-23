@@ -51,7 +51,7 @@ _create_iso() {
         if ! [[ "${_ARCH}" == "riscv64" ]]; then
             # local ramdisk
             echo "Generating local initramfs..."
-            _create_initrd_dir "${_W_DIR}/tmp/initrd" "${_CONFIG_LOCAL}"
+            _create_initrd_dir "${_CONFIG_LOCAL}"
             _create_cpio "${_W_DIR}/tmp/initrd" "../../initrd-local-${_ARCH}.img"
             # latest ramdisk
             echo "Generating latest initramfs..."
