@@ -172,7 +172,7 @@ _kver() {
     if [[ -f "${1}" ]]; then
         rg -Noazm 1 'ABCDEF\x00+(.*) \(.*@' -r '$1' "${1}" ||\
         rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1' "${1}" ||\
-        zcat "${1}" | rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1'
+        zcat "${1}" 2>"${_NO_LOG}" | rg -Noazm 1 'Linux version (.*) \(.*@' -r '$1'
     fi
 }
 
