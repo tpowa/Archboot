@@ -39,7 +39,7 @@ _create_iso() {
     _create_archboot_db "${_W_DIR}${_CACHEDIR}"
     #shellcheck disable=SC1090
     . "${_W_DIR}/etc/archboot/${_ARCH}.conf"
-    _KVER="$(_kver $(echo  ${_W_DIR}/${_KERNEL}))"
+    _KVER="$(_kver $(echo ${_W_DIR}/${_KERNEL}))"
     #shellcheck disable=SC2116,SC2046,SC2027,2086
     _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_KVER}"
     if ! [[ "${_RUNNING_ARCH}" == "${_ARCH}" ]]; then
