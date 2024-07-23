@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# created by Tobias Powalowski <tpowa@archlinux.org>
 _ARCH="x86_64 aarch64 riscv64"
 _PACKAGES="archboot bcachefs-tools btrfs-progs e2fsprogs glibc linux systemd openssh ttyd xfsprogs"
 _CHROOTS="/home/tobias/Arch/iso/chroots"
