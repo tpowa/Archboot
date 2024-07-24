@@ -31,6 +31,8 @@ server-release:
 - use local files instead of resync from source server'
 - switched db compression to zst
 - make db files reproducible
+server-update:
+- added automatic update scripts
 setup:
 - abort on pacman package installation error
 ---
