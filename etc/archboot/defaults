@@ -39,6 +39,7 @@ _CUSTOM_PACMAN_CONF="/etc/archboot/pacman.conf.archboot"
 _CUSTOM_MIRRORLIST="/etc/archboot/mirrorlist.archboot"
 # local paths
 _ISO_HOME="/home/tobias/Arch/iso"
+_ISO_HOME_CHROOTS="${_ISO_HOME}/chroots"
 _ISO_HOME_ARCH="${_ISO_HOME}/${_ARCH}"
 _ISO_HOME_SOURCE="${_ISO_HOME}/${_ARCH}/sources"
 # external paths
