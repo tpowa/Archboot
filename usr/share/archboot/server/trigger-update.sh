@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _ARCH="x86_64 aarch64 riscv64"
-_PACKAGES="archboot bcachefs-tools btrfs-progs e2fsprogs glibc linux systemd openssh ttyd xfsprogs"
+_PACKAGES="archboot bcachefs-tools btrfs-progs e2fsprogs glibc linux linux-firmware systemd openssh ttyd xfsprogs"
 _CHROOTS="/home/tobias/Arch/iso/chroots"
 cd "${_CHROOTS}" || exit 1
 for i in ${_ARCH}; do
