@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _ARCH="x86_64 aarch64 riscv64"
-_PACKAGES="archboot bcachefs-tools btrfs-progs e2fsprogs glibc linux linux-firmware systemd openssh ttyd xfsprogs"
+_TRIGGER="archboot bcachefs-tools btrfs-progs cryptsetup device-mapper e2fsprogs glibc linux linux-firmware lvm2 mdadm systemd thin-provisioning-tools openssh ttyd xfsprogs"
 _CHROOTS="/home/tobias/Arch/iso/chroots"
 cd "${_CHROOTS}" || exit 1
 for i in ${_ARCH}; do
     systemd-nspawn -q -D "${i}" pacman --noconfirm -Syu
-    for k in ${_PACKAGES}; do
+    for k in ${_TRIGGER}; do
         if rg -qw "${k}" "${i}"/var/log/pacman.log; then
             archboot-"${i}"-server-release.sh
             break
