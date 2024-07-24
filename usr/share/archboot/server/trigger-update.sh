@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _ARCH="x86_64 aarch64 riscv64"
-_TRIGGER="archboot bcachefs-tools btrfs-progs coreutils cryptsetup device-mapper dosfstools e2fsprogs glibc linux linux-firmware lvm2 mdadm openssh pacman systemd thin-provisioning-tools ttyd util-linux xfsprogs"
+_TRIGGER="archboot bcachefs-tools btrfs-progs coreutils cryptsetup device-mapper dosfstools e2fsprogs glibc iproute2 iwd linux linux-firmware lvm2 mdadm openssh pacman systemd thin-provisioning-tools ttyd util-linux xfsprogs"
 _CHROOTS="/home/tobias/Arch/iso/chroots"
 cd "${_CHROOTS}" || exit 1
 [[ -e MASK ]] && exit 0
