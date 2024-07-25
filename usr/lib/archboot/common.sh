@@ -258,9 +258,9 @@ _create_archboot_db() {
         bsdtar -C repro -xf "${i}" || return 1
         fd --base-directory repro . -u --min-depth 1 -X touch -hcd "@0"
         fd --base-directory repro --strip-cwd-prefix -t f -t l -u --min-depth 1 -0 | sort -z |
-            LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
-            LC_ALL=C.UTF-8 bsdtar --null -cf - --format=gnutar @- |
-            zstd -T0 -19 >> "../${i}.zst" || return 1
+            LC_ALL=C.UTF-8 bsdtar -C repro --null -cnf - -T - |
+            LC_ALL=C.UTF-8 bsdtar -C repro --null -cf - --format=gnutar @- |
+            zstd -T0 -19 >> "${i}.zst" || return 1
         rm -r repro
     done
     rm archboot.{db,files}
