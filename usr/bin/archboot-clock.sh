@@ -54,6 +54,7 @@ _timeset() {
         _dialog --title " Time " --no-cancel --timebox "Use <TAB> to navigate and up/down to change values." 0 0 2>"${_ANSWER}"
         _TIME="$(cat "${_ANSWER}")"
         # save the time
+        #shellcheck disable=SC2027
         _DATETIME=""${_DATE}" "${_TIME}""
         timedatectl set-time "${_DATETIME}"
         _SET_TIME="1"

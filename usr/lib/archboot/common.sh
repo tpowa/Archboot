@@ -250,19 +250,17 @@ _fix_network() {
 
 _create_archboot_db() {
     echo "Creating reproducible repository db..."
-    pushd ${1} >"${_NO_LOG}" || return 1
+    pushd "${1}" >"${_NO_LOG}" || return 1
     #shellcheck disable=SC2046
     LC_ALL=C.UTF-8 fd -u -t f -E '*.sig' . -X repo-add -q archboot.db.tar
     for i in archboot.{db.tar,files.tar}; do
         mkdir repro
-        cd repro
-        bsdtar -xf ../${i} || return 1
-        fd . -u --min-depth 1 -X touch -hcd "@0"
-        fd --strip-cwd-prefix -t f -t l -u --min-depth 1 -0 | sort -z |
+        bsdtar -C repro -xf "${i}" || return 1
+        fd --base-directory repro . -u --min-depth 1 -X touch -hcd "@0"
+        fd --base-directory repro --strip-cwd-prefix -t f -t l -u --min-depth 1 -0 | sort -z |
             LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
             LC_ALL=C.UTF-8 bsdtar --null -cf - --format=gnutar @- |
             zstd -T0 -19 >> "../${i}.zst" || return 1
-        cd ..
         rm -r repro
     done
     rm archboot.{db,files}

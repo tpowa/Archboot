@@ -4,7 +4,7 @@
 . /etc/archboot/defaults
 . /etc/archboot/server-update.conf
 [[ -d "${_ISO_HOME_CHROOTS}" ]] || mkdir -p "${_ISO_HOME_CHROOTS}"
-cd "${_ISO_HOME_CHROOTS}"
+cd "${_ISO_HOME_CHROOTS}" || exit 1
 # stop if MASK is set
 [[ -e MASK ]] && exit 0
 for i in ${_SERVER_ARCH}; do
