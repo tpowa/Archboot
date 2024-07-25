@@ -9,7 +9,7 @@ _usage () {
     echo -e "\e[1m---------------------------------------------\e[m"
     echo "Check on new packages and release new images to server."
     echo ""
-    echo -e "usage: \e[1m${_APPNAME} run\e[m"
+    echo -e "usage: add parameter \e[1m${_APPNAME} run\e[m to execute script."
     exit 0
 }
 [[ -z "${1}" || "${1}" != "run" ]] && _usage
