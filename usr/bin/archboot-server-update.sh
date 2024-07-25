@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
+_APPNAME=${0##*/}
 . /etc/archboot/defaults
 . /etc/archboot/server-update.conf
 . /usr/lib/archboot/common.sh

@@ -12,7 +12,7 @@ _usage () {
     echo -e "\e[1m---------------------------------------------\e[m"
     echo "Run automatic tests to detect errors/changes."
     echo ""
-    echo -e "usage: add parameter \e[1m${_APPNAME} run\e[m to execute script."
+    echo -e "usage: \e[1m${_APPNAME} run\e[m"
     exit 0
 }
 _run_test () {
