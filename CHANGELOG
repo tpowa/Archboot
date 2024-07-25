@@ -1,15 +1,17 @@
-On the road to 2024.07:
-Environment:
+On the road to 2024.08:
+---
+Highlights 2024.07:
 - kernel 6.10.x
 - OpenSSH 9.8
 - use 3cpio with zstd for concatenated cpio archive initramfs
   decompression => up to 25% faster bootup
+- launch bandwhich on VC5 and bottom on VC6
 - updated MOTD
+Environment:
 - optimized init.sh and login.sh
 - changed eza default date colour to white
 - changed dialog to new colour scheme
 - added bandwhich, bottom and zoxide
-- launch bandwhich on VC5 and bottom on VC6
 - fixed smb filesystem
 - removed not needed broadcom firmware and modules on x86_64
 - removed hfs, hfsplus, isofs, nfsv2, nfsv3 and udf filesystems
