@@ -3,6 +3,17 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
 . /etc/archboot/server-update.conf
+. /usr/lib/archboot/common.sh
+_usage () {
+    echo -e "\e[1mUpdate archboot server with new images\e[m"
+    echo -e "\e[1m---------------------------------------------\e[m"
+    echo "Check on new packages and release new images to server."
+    echo ""
+    echo -e "usage: \e[1m${_APPNAME} run\e[m"
+    exit 0
+}
+[[ -z "${1}" || "${1}" != "run" ]] && _usage
+_root_check
 [[ -d "${_ISO_HOME_CHROOTS}" ]] || mkdir -p "${_ISO_HOME_CHROOTS}"
 cd "${_ISO_HOME_CHROOTS}" || exit 1
 # stop if MASK is set
