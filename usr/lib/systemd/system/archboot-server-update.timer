@@ -2,8 +2,8 @@
 Description=Runs trigger-update.sh at night
 
 [Timer]
-# Run everday at 2:00 night
-OnCalendar=*-*-* 2:00:00
+# Run everday at 1:00:00 night
+OnCalendar=*-*-* 1:00:00
 Unit=archboot-server-update.service
 Persistent=true
 
