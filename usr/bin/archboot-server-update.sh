@@ -31,6 +31,7 @@ for i in ${_SERVER_ARCH}; do
         # if trigger successful, release new image to server
         if rg -qw "${k}" "${i}"/var/log/pacman.log; then
             archboot-"${i}"-server-release.sh || echo "Error: ${i} release!" >> error.log
+            sleep 2500
             break
         fi
     done
