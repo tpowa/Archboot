@@ -96,6 +96,7 @@ openssh/rijndael.Public-Domain.txt
 openssh/snprintf.Public-Domain.txt
 openssh/ssh.BSD-3-Clause.txt
 openssl/LICENSE.txt
+ouch/LICENSE
 p11-kit/COPYING
 pcre2/LICENSE
 popt/LICENSE
