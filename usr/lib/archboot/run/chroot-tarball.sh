@@ -25,7 +25,7 @@ fi
 _usage () {
     echo "CREATE ${_CAP_ARCH} PACMAN CHROOT"
     echo "-----------------------------"
-    echo "This will create the ${_ARCH} pacman chroot tarball."
+    echo "This will create the ${_ARCH} pacman container tarball."
     echo "usage: ${_BASENAME} <build-directory>"
     exit 0
 }

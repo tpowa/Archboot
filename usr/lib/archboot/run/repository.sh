@@ -24,12 +24,12 @@ else
     # running system != creating system
     if [[ "${_RUNNING_ARCH}" == "x86_64"  ]]; then
         if echo "${_BASENAME}" | rg -qw 'aarch64'; then
-            _pacman_chroot "${_REPODIR}" "${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}" \
-                           "${_ISO_HOME}/${_PACMAN_AARCH64_CHROOT}" || exit 1
+            _pacman_container "${_REPODIR}" "${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}" \
+                              "${_ISO_HOME}/${_PACMAN_AARCH64_CHROOT}" || exit 1
         fi
         if echo "${_BASENAME}" | rg -qw 'riscv64'; then
-            _pacman_chroot "${_REPODIR}" "${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}" \
-                           "${_ISO_HOME}/${_PACMAN_RISCV64_CHROOT}" || exit 1
+            _pacman_container "${_REPODIR}" "${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}" \
+                              "${_ISO_HOME}/${_PACMAN_RISCV64_CHROOT}" || exit 1
         fi
         _create_pacman_conf "${_REPODIR}" "use_binfmt"
         _pacman_parameters "${_REPODIR}" "use_binfmt"

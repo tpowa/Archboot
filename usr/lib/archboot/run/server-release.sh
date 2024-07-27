@@ -5,7 +5,7 @@
 _root_check
 _container_check
 if echo "${_BASENAME}" | rg -qw 'riscv64' || echo "${_BASENAME}" | rg -qw 'aarch64'; then
-    _update_pacman_chroot || exit 1
+    _update_pacman_container || exit 1
 fi
 _update_source
 if echo "${_BASENAME}" | rg -qw 'x86_64'; then

@@ -40,7 +40,7 @@ _clean_cache() {
     fi
 }
 
-_pacman_chroot() {
+_pacman_container() {
     if ! [[ -f ${3} && -f ${3}.sig ]]; then
         echo "Downloading ${3}..."
         ${_DLPROG} -O "${2}"/"${3}"
