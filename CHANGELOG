@@ -11,7 +11,7 @@ Environment:
 - optimized init.sh and login.sh
 - changed eza default date colour to white
 - changed dialog to new colour scheme
-- added bandwhich, bottom and zoxide
+- added bandwhich, bottom, choose, dog, dysk, miniserve, ouch and zoxide
 - fixed smb filesystem
 - removed not needed broadcom firmware and modules on x86_64
 - removed hfs, hfsplus, isofs, nfsv2, nfsv3 and udf filesystems
