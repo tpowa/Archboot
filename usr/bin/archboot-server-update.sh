@@ -15,8 +15,8 @@ _usage () {
 }
 [[ -z "${1}" || "${1}" != "run" ]] && _usage
 _root_check
-[[ -d "${_ISO_HOME_CHROOTS}" ]] || mkdir -p "${_ISO_HOME_CHROOTS}"
-cd "${_ISO_HOME_CHROOTS}" || exit 1
+[[ -d "${_ISO_HOME_CONTAINERS}" ]] || mkdir -p "${_ISO_HOME_CONTAINERS}"
+cd "${_ISO_HOME_CONTAINERS}" || exit 1
 # stop if MASK is set
 [[ -e MASK ]] && exit 0
 _FIRST_RUN=1
