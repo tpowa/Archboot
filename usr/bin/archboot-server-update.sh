@@ -38,5 +38,6 @@ for i in ${_SERVER_ARCH}; do
         fi
     done
     rm "${i}"/var/log/pacman.log
+    rm "${i}"/var/cache/pacman/pkg/*
 done
 # vim: set ft=sh ts=4 sw=4 et:
