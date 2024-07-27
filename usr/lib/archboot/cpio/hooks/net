@@ -5,7 +5,7 @@
 _run ()
 {
     _map _binary arping bandwhich bridge clockdiff ctstat dcb dog devlink \
-                 elinks ethtool genl ifstat lnstat netscan nstat miniserve rdma \
+                 elinks ethtool genl ifstat lnstat netscanner nstat miniserve rdma \
                  rtacct rtmon rtstat rustscan ss ssh tc tipc tracepath trip vdpa
     # add iproute 2, add openssl helper libraries
     _map _full_dir /usr/lib/{tc,engines-3} /usr/share/tc
