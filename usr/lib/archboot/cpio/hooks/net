@@ -5,8 +5,8 @@
 _run ()
 {
     _map _binary arping bandwhich bridge clockdiff ctstat dcb dog devlink \
-                 elinks ethtool genl ifstat lnstat nstat miniserve rdma rtacct \
-                 rtmon rtstat rustscan ss ssh tc tipc tracepath vdpa 
+                 elinks ethtool genl ifstat lnstat netscan nstat miniserve rdma \
+                 rtacct rtmon rtstat rustscan ss ssh tc tipc tracepath trip vdpa
     # add iproute 2, add openssl helper libraries
     _map _full_dir /usr/lib/{tc,engines-3} /usr/share/tc
     # add config for rustmap, no nmap available
