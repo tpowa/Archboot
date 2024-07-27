@@ -37,9 +37,9 @@ var/lib/pacman/local \
     fi
     _map _binary agetty archlinux-keyring-wkd-sync awk bat basename brotli bsdtar \
                  {bus,coredump,hostname,journal,locale,login,machine,network,\
-system,timedate,userdb,home,oom,portable}ctl btm certutil chmod clear cmsutil crlutil curl date \
+system,timedate,userdb,home,oom,portable}ctl btm certutil chmod choose clear cmsutil crlutil curl date \
                  dbus-{broker{,-launch},cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
-update-activation-environment,uuidgen} dd df dir du dust exa eza false fd fzf fzf-tmux gawk gpg{,-agent,conf,-connect-agent} \
+update-activation-environment,uuidgen} dd df dir du dust dysk exa eza false fd fzf fzf-tmux gawk gpg{,-agent,conf,-connect-agent} \
                  gpgme-{tool,json} insmod install kernel-install kill{,all} loadkeys ldconfig \
                  login mktemp mkhomedir_helper modutil more mount.ddi mount.nfs{,4} \
                  nano nologin nss-config od p11-kit pk12util pam_timestamp_check pacman{,-conf,-key,-db-upgrade} \
