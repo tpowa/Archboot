@@ -2,5 +2,5 @@
 Description=Check, build and upload archboot images at night
 
 [Service]
-ExecStart="/usr/bin/archboot-server-update.sh run"
+ExecStart=/usr/bin/archboot-server-update.sh run
 
