@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="https://archboot.com/gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2024 Fundraise: 0% <progress max="100" value="38">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2024 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 25.07.2024 11:32</strong></p>
+<strong>Last update: 27.07.2024 11:55</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -1205,20 +1205,20 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 <ul>
 <li>You have to skip the tarball creation step, on <strong>aarch64</strong> or <strong>riscv64</strong> hardware.</li>
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <a href="https://archlinux.org/packages/?name=qemu-user-static"><strong>qemu-user-static</strong></a> package, for building on <strong>x86_64</strong> hardware.</li>
-<li>On first time setup you need to create the pacman-aarch64-chroot tarball on <strong>x86_64</strong> hardware.</li>
+<li>On first time setup you need to create the pacman-aarch64-container tarball on <strong>x86_64</strong> hardware.</li>
 </ul>
 <table>
 <thead>
 <tr class="header">
-<th>Create pacman chroot tarball:</th>
+<th>Create pacman container tarball:</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code># archboot-pacman-aarch64-chroot.sh &lt;build-directory&gt;</code></td>
+<td><code># archboot-pacman-aarch64-container.sh &lt;build-directory&gt;</code></td>
 </tr>
 <tr class="even">
-<td><code># archboot-pacman-riscv64-chroot.sh &lt;build-directory&gt;</code></td>
+<td><code># archboot-pacman-riscv64-container.sh &lt;build-directory&gt;</code></td>
 </tr>
 </tbody>
 </table>
