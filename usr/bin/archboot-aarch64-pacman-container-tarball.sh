@@ -1,1 +1,1 @@
-../lib/archboot/run/chroot-tarball.sh
+../lib/archboot/run/container-tarball.sh
