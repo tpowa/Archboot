@@ -6,8 +6,8 @@ _run ()
 {
     _binary nvim
     _map _full_dir /usr/share/nvim /usr/lib/tree_sitter /usr/lib/lua/5.1
-    #fix symlinks
-    _map _file /usr/lib/libtree-sitter*
+    #fix tree-sitter symlinks and libutf8proc
+    _map _file /usr/lib/libtree-sitter* /usr/lib/libutf8proc*
     # add lastplace plugin:
     # https://github.com/neovim/neovim/issues/16339
     _file_rename /usr/share/archboot/nvim/nvim-lastplace.lua /usr/share/nvim/runtime/plugin/nvim-lastplace.lua
