@@ -13,7 +13,7 @@ _update()
 	esac
 	case $cur in
 		*)
-			OPTS="$(update | grep '\-[a-z]' | cut -d ' ' -f2 | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g")"
+			OPTS="$(update | rg '\-[a-z]' | choose 0 | sd '\x1B\[[0-9;]*[a-zA-Z]' '')"
 			COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
 			return 0
 			;;

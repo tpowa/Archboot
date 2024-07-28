@@ -110,7 +110,7 @@ _enter_mountpoint() {
             rg -qw "/srv" /tmp/.parts && _MP=/var
             _dialog --no-cancel --title " Mountpoint for ${_DEV} " --inputbox "" 7 65 "${_MP}" 2>"${_ANSWER}" || return 1
             _MP=$(cat "${_ANSWER}")
-            if [[ "$(rg -F "|${_MP}|" /tmp/.parts | cut -d '|' -f 3)" == "${_MP}" ]]; then
+            if [[ "$(rg -F "|${_MP}|" /tmp/.parts | choose 2 -f '\|')" == "${_MP}" ]]; then
                 _dialog --infobox "ERROR: You have defined 2 identical mountpoints!\nPlease select another mountpoint." 4 45
                 _MP=""
                 sleep 3
@@ -140,18 +140,18 @@ _check_mkfs_values() {
 _run_mkfs() {
     while read -r line; do
         # basic parameters
-        _DEV=$(echo "${line}" | cut -d '|' -f 1)
-        _FSTYPE=$(echo "${line}" | cut -d '|' -f 2)
-        _MP=$(echo "${line}" | cut -d '|' -f 3)
-        _DOMKFS=$(echo "${line}" | cut -d '|' -f 4)
-        _LABEL_NAME=$(echo "${line}" | cut -d '|' -f 5)
-        _FS_OPTIONS=$(echo "${line}" | cut -d '|' -f 6)
+        _DEV=$(echo "${line}" | choose 0 -f '\|')
+        _FSTYPE=$(echo "${line}" | choose 1 -f '\|')
+        _MP=$(echo "${line}" | choose 2 -f '\|')
+        _DOMKFS=$(echo "${line}" | choose 3 -f '\|')
+        _LABEL_NAME=$(echo "${line}" | choose 4 -f '\|')
+        _FS_OPTIONS=$(echo "${line}" | choose 5 -f '\|')
         [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
         # bcachefs, btrfs and other parameters
         if [[ ${_FSTYPE} == "bcachefs" ]]; then
             _BCFS_DEVS="${_BCFS_DEVS//#/ }"
-            _BCFS_DEVS=$(echo "${line}" | cut -d '|' -f 7)
-            _BCFS_COMPRESS=$(echo "${line}" | cut -d '|' -f 8)
+            _BCFS_DEVS=$(echo "${line}" | choose 6 -f '\|')
+            _BCFS_COMPRESS=$(echo "${line}" | choose 7 -f '\|')
             if [[ "${_BCFS_COMPRESS}" == "NONE" ]];then
                 _BCFS_COMPRESS=""
             else
@@ -160,13 +160,13 @@ _run_mkfs() {
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
                   "${_BCFS_DEVS}" "${_BCFS_COMPRESS}" || return 1
         elif [[ ${_FSTYPE} == "btrfs" ]]; then
-            _BTRFS_DEVS=$(echo "${line}" | cut -d '|' -f 7)
+            _BTRFS_DEVS=$(echo "${line}" | choose 6 -f '\|')
             # remove # from array
             _BTRFS_DEVS="${_BTRFS_DEVS//#/ }"
-            _BTRFS_LEVEL=$(echo "${line}" | cut -d '|' -f 8)
+            _BTRFS_LEVEL=$(echo "${line}" | choose 7 -f '\|')
             [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _BTRFS_LEVEL="-m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
-            _BTRFS_SUBVOLUME=$(echo "${line}" | cut -d '|' -f 9)
-            _BTRFS_COMPRESS=$(echo "${line}" | cut -d '|' -f 10)
+            _BTRFS_SUBVOLUME=$(echo "${line}" | choose 8 -f '\|')
+            _BTRFS_COMPRESS=$(echo "${line}" | choose 9 -f '\|')
             [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
                   "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
@@ -193,7 +193,7 @@ _create_filesystem() {
             _dialog --no-cancel --title " LABEL Name on ${_DEV} " --inputbox "Keep it short and use no spaces or special characters." 8 60 \
             "$(${_LSBLK} LABEL "${_DEV}" 2>"${_NO_LOG}")" 2>"${_ANSWER}" || return 1
             _LABEL_NAME=$(cat "${_ANSWER}")
-            if [[ "$(rg -F "|${_LABEL_NAME}|" /tmp/.parts | cut -d '|' -f5)" == "${_LABEL_NAME}" ]]; then
+            if [[ "$(rg -F "|${_LABEL_NAME}|" /tmp/.parts | choose 4 -f '\|')" == "${_LABEL_NAME}" ]]; then
                 _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical LABEL names!\nPlease enter another name." 4 45
                 sleep 3
                 _LABEL_NAME=""

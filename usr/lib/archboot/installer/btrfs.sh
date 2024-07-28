@@ -23,7 +23,7 @@ _umount_btrfs() {
 _find_btrfsraid_devices() {
     _btrfs_scan
     if [[ -z "${_DETECT_CREATE_FILESYSTEM}" && "${_FSTYPE}" == "btrfs" ]]; then
-        for i in $(btrfs filesystem show "${_DEV}" | cut -d ' ' -f 11); do
+        for i in $(btrfs filesystem show "${_DEV}" | choose 10); do
             _BTRFS_DEVS="${_BTRFS_DEVS}#${i}"
         done
     fi
@@ -34,7 +34,7 @@ _find_btrfsraid_bootloader_devices() {
     _BTRFS_COUNT=1
     if [[ "$(${_LSBLK} FSTYPE "${_BOOTDEV}")" == "btrfs" ]]; then
         _BTRFS_DEVS=""
-        for i in $(btrfs filesystem show "${_BOOTDEV}" | cut -d ' ' -f 11); do
+        for i in $(btrfs filesystem show "${_BOOTDEV}" | choose 10); do
             _BTRFS_DEVS="${_BTRFS_DEVS}#${i}"
             _BTRFS_COUNT=$((_BTRFS_COUNT+1))
         done
@@ -46,7 +46,7 @@ _find_btrfs_subvolume() {
     if [[ -z "${_DETECT_CREATE_FILESYSTEM}" ]]; then
         # existing btrfs subvolumes
         _mount_btrfs
-        for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d ' ' -f 9 | rg -v 'var/lib/machines|var/lib/portables'); do
+        for i in $(btrfs subvolume list "${_BTRFSMP}" | choose 8 | rg -v 'var/lib/machines|var/lib/portables'); do
             echo "${i}"
             [[ "${1}" ]] && echo "${1}"
         done
@@ -59,7 +59,7 @@ _find_btrfs_bootloader_subvolume() {
         _BTRFS_SUBVOLUMES=""
         _DEV="${_BOOTDEV}"
         _mount_btrfs
-        for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d ' ' -f 7); do
+        for i in $(btrfs subvolume list "${_BTRFSMP}" | choose 7); do
             _BTRFS_SUBVOLUMES="${_BTRFS_SUBVOLUMES}#${i}"
         done
         _umount_btrfs
@@ -70,7 +70,7 @@ _find_btrfs_bootloader_subvolume() {
 _subvolumes_in_use() {
     _SUBVOLUME_IN_USE=""
     while read -r i; do
-        echo "${i}" | rg -F -q "|btrfs|" && _SUBVOLUME_IN_USE="${_SUBVOLUME_IN_USE} $(echo "${i}" | cut -d '|' -f 9)"
+        echo "${i}" | rg -F -q "|btrfs|" && _SUBVOLUME_IN_USE="${_SUBVOLUME_IN_USE} $(echo "${i}" | choose 8 -f '\|')"
     done < /tmp/.parts
 }
 
@@ -84,7 +84,7 @@ _check_btrfs_filesystem_creation() {
             _FSTYPE="btrfs"
             _SKIP_FILESYSTEM=1
             # check on filesystem creation, skip subvolume asking then!
-            echo "${i}" | cut -d '|' -f 4 | rg -q 1 && _DETECT_CREATE_FILESYSTEM=1
+            echo "${i}" | choose 3 -f '\|' | rg -q 1 && _DETECT_CREATE_FILESYSTEM=1
         fi
     done
 }
@@ -198,7 +198,7 @@ _check_btrfs_subvolume(){
     [[ -n "${_DOMKFS}" && "${_FSTYPE}" == "btrfs" ]] && _DETECT_CREATE_FILESYSTEM=1
     if [[ -z "${_DETECT_CREATE_FILESYSTEM}" && -z "${_CREATE_MOUNTPOINTS}" ]]; then
         _mount_btrfs
-        for i in $(btrfs subvolume list "${_BTRFSMP}" | cut -d ' ' -f 9); do
+        for i in $(btrfs subvolume list "${_BTRFSMP}" | choose 8); do
             if echo "${i}" | rg -q "${_BTRFS_SUBVOLUME}"; then
                 _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical SUBVOLUMES!\nPlease enter another name." 4 45
                 sleep 3

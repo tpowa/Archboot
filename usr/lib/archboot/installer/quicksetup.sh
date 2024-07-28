@@ -66,17 +66,17 @@ _auto_create_filesystems() {
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     ## make and mount filesystems
     for fsspec in ${_FSSPECS}; do
-        _DEV="${_DISK}$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d '|')"
+        _DEV="${_DISK}$(echo "${fsspec}" | tr -d ' ' | choose 0 -f '\|')"
         # Add check on nvme or mmc controller:
         # NVME uses /dev/nvme0n1pX name scheme
         # MMC uses /dev/mmcblk0pX
         if echo "${_DISK}" | rg -q "nvme|mmc"; then
-            _DEV="${_DISK}p$(echo "${fsspec}" | tr -d ' ' | cut -f1 -d '|')"
+            _DEV="${_DISK}p$(echo "${fsspec}" | tr -d ' ' | choose 0 -f '\|')"
         fi
-        _FSTYPE="$(echo "${fsspec}" | tr -d ' ' | cut -f2 -d '|')"
+        _FSTYPE="$(echo "${fsspec}" | tr -d ' ' | choose 1 -f '\|')"
         _DOMKFS=1
-        _MP="$(echo "${fsspec}" | tr -d ' ' | cut -f3 -d '|')"
-        _LABEL_NAME="$(echo "${fsspec}" | tr -d ' ' | cut -f4 -d '|')"
+        _MP="$(echo "${fsspec}" | tr -d ' ' | choose 2 -f '\|')"
+        _LABEL_NAME="$(echo "${fsspec}" | tr -d ' ' | choose 3 -f '\|')"
         _FS_OPTIONS=""
         _BTRFS_DEVS=""
         _BTRFS_LEVEL=""
