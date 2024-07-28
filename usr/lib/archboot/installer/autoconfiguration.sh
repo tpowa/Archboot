@@ -135,7 +135,7 @@ _auto_pacman_mirror() {
         #shellcheck disable=SC2027,SC2086
         cat << EOF > /tmp/inst-mirrorlist
 # Mirror used during installation
-Server = "${_SYNC_URL}
+Server = ${_SYNC_URL}
 EOF
         cat "${_DESTDIR}"/etc/pacman.d/mirrorlist >> /tmp/inst-mirrorlist
         mv /tmp/inst-mirrorlist "${_DESTDIR}/etc/pacman.d/mirrorlist"
