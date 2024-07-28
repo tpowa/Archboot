@@ -38,6 +38,7 @@ server-update:
 - added automatic update scripts
 setup:
 - abort on pacman package installation error
+- fixed autoconfiguration of mirror
 ---
 Highlights 2024.06:
 - systemd 256.x support
