@@ -18,12 +18,12 @@ _run ()
     echo -e "|-----------|---------|--------|----------|---------|" >> "${_MOTD}"
     echo -e "| \e[1;92mALT+F1-F4\e[m | \e[1;92mALT+F5\e[m  | \e[1;92mALT+F6\e[m | \e[1;92mALT+F11\e[m  | \e[1;92mALT+F12\e[m |" >> "${_MOTD}"
     echo -e "-----------------------------------------------------" >> "${_MOTD}"
-if  echo "${_HOOKS[@]}" | grep -qw net; then
+if  echo "${_HOOKS[@]}" | rg -qw net; then
     #shellcheck disable=SC2129
     echo -e "\e[1mFor Additional Wi-Fi Authentification Or Online Help:\e[m" >> "${_MOTD}"
     echo -e "  - Use the \e[1;92m'elinks'\e[m text mode browser." >> "${_MOTD}"
 fi
-if  echo "${_HOOKS[@]}" | grep -qw installer; then
+if  echo "${_HOOKS[@]}" | rg -qw installer; then
     #shellcheck disable=SC2129
     echo -e "\e[1mManage Archboot Environment:\e[m" >> "${_MOTD}"
     echo -e "  - Use the \e[1;92m'launcher'\e[m or the expert \e[1;92m'update'\e[m script." >> "${_MOTD}"

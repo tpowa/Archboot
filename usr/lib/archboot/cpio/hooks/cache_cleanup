@@ -4,7 +4,7 @@
 
 _run ()
 {
-  ! grep -qw 'archboot' /etc/hostname && return
+  ! rg -qw 'archboot' /etc/hostname && return
   [[ -d /var/cache/pacman/pkg ]] && rm -r /var/cache/pacman/pkg
 }
 

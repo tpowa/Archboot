@@ -4,7 +4,7 @@
 
 _run ()
 {
-    ! grep -qw 'archboot' /etc/hostname && return
+    ! rg -qw 'archboot' /etc/hostname && return
     # remove pacman-init.service
     rm -f /tmp/etc/systemd/system/multi-user.target.wants/pacman-init.service
     rm -f /tmp/etc/systemd/system/pacman-init.service
