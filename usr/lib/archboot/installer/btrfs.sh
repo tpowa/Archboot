@@ -23,7 +23,7 @@ _umount_btrfs() {
 _find_btrfsraid_devices() {
     _btrfs_scan
     if [[ -z "${_DETECT_CREATE_FILESYSTEM}" && "${_FSTYPE}" == "btrfs" ]]; then
-        for i in $(btrfs filesystem show "${_DEV}" | choose 10); do
+        for i in $(btrfs filesystem show "${_DEV}" | rg -o ' (/dev/.*)' -r '$1'); do
             _BTRFS_DEVS="${_BTRFS_DEVS}#${i}"
         done
     fi
@@ -34,7 +34,7 @@ _find_btrfsraid_bootloader_devices() {
     _BTRFS_COUNT=1
     if [[ "$(${_LSBLK} FSTYPE "${_BOOTDEV}")" == "btrfs" ]]; then
         _BTRFS_DEVS=""
-        for i in $(btrfs filesystem show "${_BOOTDEV}" | choose 10); do
+        for i in $(btrfs filesystem show "${_BOOTDEV}" | rg -o ' (/dev/.*)' -r '$1'); do
             _BTRFS_DEVS="${_BTRFS_DEVS}#${i}"
             _BTRFS_COUNT=$((_BTRFS_COUNT+1))
         done
