@@ -8,8 +8,9 @@ Use:
 - curl for downloading files 
 - systemd
 - shellcheck
-- rg instead of grep
+- choose instead of cut
 - fd instead of find
+- rg instead of grep
 - sd instead of sed
 
 Don't use:
