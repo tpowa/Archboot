@@ -135,6 +135,7 @@ _check_mkfs_values() {
     [[ -z "${_BTRFS_LEVEL}" ]] && _BTRFS_LEVEL="NONE"
     [[ -z "${_LABEL_NAME}" && -n "$(${_LSBLK} LABEL "${_DEV}")" ]] && _LABEL_NAME="$(${_LSBLK} LABEL "${_DEV}" 2>"${_NO_LOG}")"
     [[ -z "${_LABEL_NAME}" ]] && _LABEL_NAME="NONE"
+    [[ -z "${_DOMKFS}" ]] && _DOMKFS="0"
 }
 
 _run_mkfs() {
@@ -187,7 +188,7 @@ _create_filesystem() {
     _BTRFS_LEVEL=""
     _SKIP_FILESYSTEM=""
     [[ -z "${_DOMKFS}" ]] && _dialog --yesno "Would you like to create a filesystem on ${_DEV}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS=1
-    if [[ -n "${_DOMKFS}" ]]; then
+    if [[ "${_DOMKFS}" == "1" ]]; then
         [[ "${_FSTYPE}" == "swap" || "${_FSTYPE}" == "vfat" ]] || _select_filesystem || return 1
         while [[ -z "${_LABEL_NAME}" ]]; do
             _dialog --no-cancel --title " LABEL Name on ${_DEV} " --inputbox "Keep it short and use no spaces or special characters." 8 60 \
@@ -375,7 +376,7 @@ _mountpoints() {
                     elif [[ "${_FSTYPE}" == "bcachefs" ]]; then
                         echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BCFS_DEVS}|${_BCFS_COMPRESS}" >>/tmp/.parts
                         # remove members of multi devices
-                        if [[ -z "${_DOMKFS}" ]]; then
+                        if [[ "${_DOMKFS}" == "0" ]]; then
                             _BCFS_UUID="$(${_LSBLK} UUID -d "${_DEV}")"
                             for i in $(${_LSBLK} NAME,UUID | rg -o "(.*) ${_BCFS_UUID}" -r '$1'); do
                                 _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${i}" 2>"${_NO_LOG}")/}"
@@ -428,7 +429,7 @@ _mountpoints() {
 # returns: 1 on failure
 _mkfs() {
     [[ -f "/tmp/.mp-error" ]] && rm /tmp/.mp-error
-    if [[ -n "${4}" ]]; then
+    if [[ "${4}" == "1" ]]; then
         if [[ "${2}" == "swap" ]]; then
             _progress "${_COUNT}" "Creating and activating swapspace on ${1}..."
         else
@@ -446,7 +447,7 @@ _mkfs() {
     _MOUNTOPTIONS=""
     if [[ "${2}" == "swap" ]]; then
         swapoff -a &>"${_NO_LOG}"
-        if [[ -n "${4}" ]]; then
+        if [[ "${4}" == "1" ]]; then
             if echo "${1}" | rg -q '^/dev'; then
                 mkswap -L "${6}" "${1}" &>"${_LOG}" || : >/tmp/.mp-error
             else
@@ -480,7 +481,7 @@ _mkfs() {
         fi
     else
         # if we were tasked to create the filesystem, do so
-        if [[ -n "${4}" ]]; then
+        if [[ "${4}" == "1" ]]; then
             #shellcheck disable=SC2086
             case ${2} in
                 # don't handle anything else here, we will error later
@@ -554,7 +555,7 @@ _mkfs() {
             fi
         fi
         # btrfs needs balancing on fresh created raid, else weird things could happen
-        [[ "${2}" == "btrfs" && -n "${4}" ]] && btrfs balance start --full-balance "${3}""${5}" &>"${_LOG}"
+        [[ "${2}" == "btrfs" && "${4}" == "1" ]] && btrfs balance start --full-balance "${3}""${5}" &>"${_LOG}"
     fi
     # add to .device-names for config files
     #shellcheck disable=SC2155
