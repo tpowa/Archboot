@@ -22,7 +22,7 @@ _clear_fs_values() {
     : >/tmp/.btrfs-devices
     _SKIP_FILESYSTEM=""
     _FS_TYPE=""
-    _DOMKFS=""
+    _DOMKFS=0
     _LABEL_NAME=""
     _FS_OPTIONS=""
     _BTRFS_DEVS=""
@@ -135,7 +135,6 @@ _check_mkfs_values() {
     [[ -z "${_BTRFS_LEVEL}" ]] && _BTRFS_LEVEL="NONE"
     [[ -z "${_LABEL_NAME}" && -n "$(${_LSBLK} LABEL "${_DEV}")" ]] && _LABEL_NAME="$(${_LSBLK} LABEL "${_DEV}" 2>"${_NO_LOG}")"
     [[ -z "${_LABEL_NAME}" ]] && _LABEL_NAME="NONE"
-    [[ -z "${_DOMKFS}" ]] && _DOMKFS="0"
 }
 
 _run_mkfs() {
@@ -187,7 +186,7 @@ _create_filesystem() {
     _BTRFS_DEVS=""
     _BTRFS_LEVEL=""
     _SKIP_FILESYSTEM=""
-    [[ -z "${_DOMKFS}" ]] && _dialog --yesno "Would you like to create a filesystem on ${_DEV}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS=1
+    [[ "${_DOMKFS}" == "0" ]] && _dialog --yesno "Would you like to create a filesystem on ${_DEV}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS=1
     if [[ "${_DOMKFS}" == "1" ]]; then
         [[ "${_FSTYPE}" == "swap" || "${_FSTYPE}" == "vfat" ]] || _select_filesystem || return 1
         while [[ -z "${_LABEL_NAME}" ]]; do
