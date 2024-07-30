@@ -2,14 +2,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
-_APPNAME=${0##*/}
 _usage () {
     echo "Check on missing binaries in archboot environment"
     echo "-------------------------------------------------"
     echo "This will check binaries from package, if they exist"
     echo "and report missing to binary.log"
     echo ""
-    echo "usage: ${_APPNAME} <package>"
+    echo "usage: ${_BASENAME} <package>"
     exit 0
 }
 [[ -z "${1}" ]] && _usage

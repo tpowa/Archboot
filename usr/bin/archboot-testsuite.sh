@@ -2,8 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
-_LOG="/dev/tty11"
-_APPNAME=${0##*/}
 _LOOP="/dev/loop0"
 _IMG="/test.img"
 _PASS="/passphrase"
@@ -12,7 +10,7 @@ _usage () {
     echo -e "\e[1m---------------------------------------------\e[m"
     echo "Run automatic tests to detect errors/changes."
     echo ""
-    echo -e "usage: \e[1m${_APPNAME} run\e[m"
+    echo -e "usage: \e[1m${_BASENAME} run\e[m"
     exit 0
 }
 _run_test () {

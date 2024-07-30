@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
-_APPNAME=${0##*/}
 _MODULE_DIR="/usr/lib/modules/${_RUNNING_KERNEL}"
 _FIRMWARE="/lib/firmware"
 _usage () {
@@ -10,7 +9,7 @@ _usage () {
     echo -e "\e[1m---------------------------------------------------------------\e[m"
     echo "Check modules on firmware depends and existence in environment."
     echo ""
-    echo -e "usage: \e[1m${_APPNAME} run\e[m"
+    echo -e "usage: \e[1m${_BASENAME} run\e[m"
     exit 0
 }
 [[ -z "${1}" || "${1}" != "run" ]] && _usage

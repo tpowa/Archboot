@@ -4,7 +4,7 @@
 #    by Tobias Powalowski <tpowa@archlinux.org>
 # usage(exitvalue)
 # outputs a usage message and exits with value
-_APPNAME=${0##*/}
+. /usr/lib/archboot/common.sh
 _usage()
 {
     echo -e "\e[1mWelcome to \e[36mARCHBOOT\e[m\e[1m - RSYNC BACKUP:\e[m"
@@ -16,7 +16,7 @@ _usage()
     echo -e "  \e[1mexcluded\e[m \e[1m/sysroot /var/run /var/lib/systemd\e[m"
     echo -e "- \e[1m--numeric-ids\e[m option is invoked to \e[1mpreserve\e[m users"
     echo ""
-    echo -e "usage: \e[1m${_APPNAME} <backupdir> <backupdestination>\e[m"
+    echo -e "usage: \e[1m${_BASENAME} <backupdir> <backupdestination>\e[m"
     exit 0
 }
 ##################################################

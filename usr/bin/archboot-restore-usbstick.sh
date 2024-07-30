@@ -5,7 +5,7 @@
 #    by Tobias Powalowski <tpowa@archlinux.org>
 # usage(exitvalue)
 # outputs a usage message and exits with value
-_APPNAME=${0##*/}
+. /usr/lib/archboot/common.sh
 _usage()
 {
     echo -e "\e[1mWelcome to \e[36mARCHBOOT\e[m \e[1m- RESTORE USB STICK:\e[m"
@@ -13,7 +13,7 @@ _usage()
     echo -e "This script restores an USB device to a \e[1mFAT32\e[m device."
     echo -e "\e[91mWARNING: ALL DATA WILL BE LOST ON THE DEVICE! \e[m"
     echo ""
-    echo -e "usage: \e[1m${_APPNAME} <device>\e[m"
+    echo -e "usage: \e[1m${_BASENAME} <device>\e[m"
     exit 0
 }
 ##################################################

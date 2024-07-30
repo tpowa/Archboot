@@ -6,7 +6,6 @@
 # usage(exitvalue)
 # outputs a usage message and exits with value
 . /usr/lib/archboot/common.sh
-_APPNAME=${0##*/}
 _usage()
 {
     echo -e "\e[1mWelcome to \e[34marchboot's\e[m \e[1mHWSIM:\e[m"
@@ -16,7 +15,7 @@ _usage()
 	echo "- wlan0 will be setup as the AP. Don't use for scanning!"
 	echo "- wlan1 will be setup for STATION mode. Use this for scanning for your AP."
 	echo ""
-    echo -e "usage: \e[1m${_APPNAME} <SSID>\e[m"
+    echo -e "usage: \e[1m${_BASENAME} <SSID>\e[m"
     exit 0
 }
 [[ -z "${1}" ]] && _usage
