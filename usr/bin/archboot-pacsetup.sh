@@ -44,7 +44,7 @@ _select_mirror() {
         # Form the full URL for our mirror by grepping for the server name in
         # our mirrorlist and pulling the full URL out and ensure that if it
         # was listed twice we only return one line for the mirror.
-        _SYNC_URL=$(rg -o "${_SERVER}.*" "${_PACMAN_MIRROR}" | head -n1)
+        _SYNC_URL=$(rg -m1 -o "${_SERVER}.*" "${_PACMAN_MIRROR}")
     fi
     echo "Using mirror: ${_SYNC_URL}" >"${_LOG}"
     # comment already existing entries
