@@ -42,9 +42,8 @@ _select_mirror() {
             _SYNC_URL=$(cat "${_ANSWER}")
     else
         # Form the full URL for our mirror by grepping for the server name in
-        # our mirrorlist and pulling the full URL out. Substitute 'core' in
-        # for the repository name, and ensure that if it was listed twice we
-        # only return one line for the mirror.
+        # our mirrorlist and pulling the full URL out and ensure that if it
+        # was listed twice we only return one line for the mirror.
         _SYNC_URL=$(rg -o "${_SERVER}.*" "${_PACMAN_MIRROR}" | head -n1)
     fi
     echo "Using mirror: ${_SYNC_URL}" >"${_LOG}"
