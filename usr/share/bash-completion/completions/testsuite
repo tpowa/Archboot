@@ -1,19 +1,19 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_update()
+_testsuite()
 {
     local cur prev OPTS
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     case $prev in
-        -*)
+        run)
             return 0
             ;;
     esac
     case $cur in
         *)
-            OPTS="$(update | rg '\-[a-z]' | choose 0 | sd '\x1B\[[0-9;]*[a-zA-Z]' '')"
+            OPTS="run"
             COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
             return 0
             ;;
@@ -21,4 +21,4 @@ _update()
     compopt -o bashdefault -o default
     return 0
 }
-complete -F _update update
+complete -F _testsuite testsuite

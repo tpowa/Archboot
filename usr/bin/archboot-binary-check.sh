@@ -8,7 +8,7 @@ _usage () {
     echo "This will check binaries from package, if they exist"
     echo "and report missing to binary.log"
     echo ""
-    echo -e "Usage: \e[1m\e${_BASENAME} <package>\e[m"
+    echo -e "Usage: \e[1m${_BASENAME} <package>\e[m"
     exit 0
 }
 [[ -z "${1}" ]] && _usage
