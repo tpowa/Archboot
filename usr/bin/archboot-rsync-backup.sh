@@ -7,8 +7,8 @@
 . /usr/lib/archboot/common.sh
 _usage()
 {
-    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Rsync Backup:\e[m"
-    echo -e "\e[1m------------------------\e[m"
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Rsync Backup\e[m"
+    echo -e "\e[1m-----------------------\e[m"
     echo -e "- Copy \e[1m<backupdir>\e[m to \e[1m<backupdestination>\e[m using rsync."
     echo -e "- For system backup, start with \e[1mfull\e[m mounted system and then"
     echo -e "  invoke this script with system's root directory as \e[1mbackupdir\e[m."

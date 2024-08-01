@@ -7,8 +7,8 @@
 . /usr/lib/archboot/common.sh
 _usage()
 {
-    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Copy Mountpoint:\e[m"
-    echo -e "\e[1m---------------------------\e[m"
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Copy Mountpoint\e[m"
+    echo -e "\e[1m--------------------------\e[m"
     echo "- Copy mountpoint recursivly from <oldmountpoint> to <newmountpoint>,"
     echo -e "  using the \e[1mtar\e[m utility."
     echo -e "- For system copying start with mounted \e[1m/\e[m and then invoke this script"
