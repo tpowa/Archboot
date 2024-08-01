@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Copyright (c) 2015 by Roderick W. Smith
 # Licensed under the terms of the GPL v3
-# replaced GUID with uuidgen 
+# replaced GUID with uuidgen Tobias Powalowski - <tpowa@archlinux.org>
 echo -n "Enter a Common Name to embed in the keys: "
 read -r NAME
 openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME PK/" -keyout PK.key \
