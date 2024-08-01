@@ -1,5 +1,8 @@
 On the road to 2024.08:
 ---
+quickinst:
+- updated usage information
+---
 Highlights 2024.07:
 - kernel 6.10.x
 - OpenSSH 9.8
