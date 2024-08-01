@@ -6,7 +6,7 @@
 _DESTDIR="${1}"
 
 _usage() {
-    echo -e "\e[96mArchboot\e[m \e[1m- Quickinst Installer:\e[m"
+    echo -e "\e[1m\e[36mArchboot\e[m \e[1m- Quickinst Installer:\e[m"
     echo -e "\e[1m-------------------------------\e[m"
     echo -e "Usage: \e[1mquickinst <destdir>\e[m"
     echo ""
