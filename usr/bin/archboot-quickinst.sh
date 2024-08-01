@@ -6,25 +6,21 @@
 _DESTDIR="${1}"
 
 _usage() {
-    echo -e "\e[1mWelcome to \e[36mARCHBOOT\e[m \e[1m- QUICKINST INSTALLER:\e[m"
-    echo -e "\e[1m-------------------------------------------\e[m"
-    echo -e "usage: \e[1mquickinst <destdir>\e[m"
+    echo -e "\e[1m\e[36mARCHBOOT\e[m \e[1m- QUICKINST INSTALLER:\e[m"
+    echo -e "\e[1m-------------------------------\e[m"
+    echo -e "Usage: \e[1mquickinst <destdir>\e[m"
     echo ""
-    echo "This script is for users who would rather partition/mkfs/mount their target"
-    echo "media manually than go through the routines in the setup script."
+    echo "This script is for users, who would rather partition/mkfs/mount"
+    echo "their target media manually, than go through the routines in"
+    echo "the setup script."
     echo
     if ! [[ -e "${_LOCAL_DB}" ]]; then
-        echo -e "First configure \e[1m/etc/pacman.conf\e[m which repositories to use"
-        echo -e "and set a mirror in \e[1m/etc/pacman.d/mirrorlist\e[m"
+        echo -e "Configure repositories: \e[1m/etc/pacman.conf\e[m"
+        echo -e "Configure mirror: \e[1m/etc/pacman.d/mirrorlist\e[m"
     fi
-    echo
-    echo -e "Make sure you have all your filesystems mounted under \e[1m<destdir>\e[m."
-    echo -e "Then run this script to install all packages listed in \e[1m/etc/archboot/defaults\e[m"
-    echo -e "to \e[1m<destdir>\e[m."
-    echo
-    echo "Example:"
-    echo -e "  \e[1mquickinst /mnt\e[m"
-    echo ""
+    echo -e "Configure packages to install: \e[1m/etc/archboot/defaults\e[m"
+    echo -e "Mount all your filesystems: \e[1m<destdir>\e[m."
+    echo -e "Run: \e[1mquickinst <destdir>\e[m"
     exit 0
 }
 
