@@ -165,15 +165,15 @@ _create_iso() {
     echo "Tobias Powalowski <tpowa@archlinux.org>"
     echo ""
     echo "Requirement: ${_ARCH} with 800M RAM and higher"
-    echo "Archboot:$(${_NSPAWN} "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" |\
+    echo "Archboot: $(${_NSPAWN} "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" |\
     rg -o 'Version.* (.*)\r' -r '$1')"
     [[ "${_ARCH}" == "riscv64" ]] || echo "Grub: $(${_NSPAWN} "${_W_DIR}" pacman -Qi grub |\
                                      rg -o 'Version.* (.*)\r' -r '$1')"
-    echo "Linux:$(${_NSPAWN} "${_W_DIR}" pacman -Qi linux |\
+    echo "Linux: $(${_NSPAWN} "${_W_DIR}" pacman -Qi linux |\
     rg -o 'Version.* (.*)\r' -r '$1')"
-    echo "Pacman:$(${_NSPAWN} "${_W_DIR}" pacman -Qi pacman |\
+    echo "Pacman: $(${_NSPAWN} "${_W_DIR}" pacman -Qi pacman |\
     rg -o 'Version.* (.*)\r' -r '$1')"
-    echo "Systemd:$(${_NSPAWN} "${_W_DIR}" pacman -Qi systemd |\
+    echo "Systemd: $(${_NSPAWN} "${_W_DIR}" pacman -Qi systemd |\
     rg -o 'Version.* (.*)\r' -r '$1')"
     echo ""
     if [[ -f "${_W_DIR}"/etc/archboot/ssh/archboot-key ]]; then
