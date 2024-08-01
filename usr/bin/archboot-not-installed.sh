@@ -3,7 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 _usage () {
-    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Check not installed packages\e[m"
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Check Not Installed Packages\e[m"
     echo -e "\e[1m---------------------------------------\e[m"
     echo "Check the system for uninstalled packages with pacman."
     echo ""

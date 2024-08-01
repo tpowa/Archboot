@@ -2,7 +2,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 _usage () {
-    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Generate Secure Boot keys, MOK files\e[m"
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Generate Secure Boot Keys, MOK Files\e[m"
     echo -e "\e[1m-----------------------------------------------\e[m"
     echo "This script generates all needed keys for a Secure Boot setup."
     echo -e "It will include the \e[1m2\e[m needed Microsoft certificates, in order"
