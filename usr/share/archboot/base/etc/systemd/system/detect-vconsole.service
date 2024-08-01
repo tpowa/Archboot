@@ -8,4 +8,4 @@ After=systemd-udev-trigger.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/bin/detect-vconsole.sh
+ExecStart=/usr/bin/detect-vconsole.sh run
