@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
-usage () {
+_usage () {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Generate Secure Boot keys, MOK files\e[m"
     echo -e "\e[1m-----------------------------------------------\e[m"
     echo "This script generates all needed keys for a Secure Boot setup."
@@ -12,18 +12,18 @@ usage () {
     echo -e "Usage: \e[1m${_BASENAME} -name=<your name> <directory>\e[m"
     exit 0
 }
-[[ -z "${1}" || -z "${2}" ]] && usage
+[[ -z "${1}" || -z "${2}" ]] && _usage
 _DIR="${2}"
 while [ $# -gt 0 ]; do
-	case ${1} in
-		-name=*|--name=*) NAME="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
-		-h|--h|?) usage ;; 
+    case ${1} in
+        -name=*|--name=*) NAME="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
+        -h|--h|?) _usage ;;
         esac
-	shift
+    shift
 done
 if [[ -z "${NAME}" ]]; then
     echo "ERROR: no name specified"
-    usage
+    _usage
     #shellcheck disable=2317
     exit 1
 fi

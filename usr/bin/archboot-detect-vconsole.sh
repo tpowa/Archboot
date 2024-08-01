@@ -5,7 +5,7 @@
 #  by Tobias Powalowski <tpowa@archlinux.org>
 #
 . /usr/lib/archboot/common.sh
-usage() {
+_usage() {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Detect Big Screen\e[m"
     echo -e "\e[1m----------------\e[m"
     echo "Detect big screen on boot and change to bigger font afterwards."
