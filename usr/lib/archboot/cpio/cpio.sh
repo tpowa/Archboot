@@ -11,7 +11,7 @@ _TARGET_DIR=""
 
 _usage() {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Cpio\e[m"
-    echo -e "\e[1m----------------\e[m"
+    echo -e "\e[1m---------------\e[m"
     echo "Tool for creating an archboot initramfs image."
     echo
     echo " -h               Display this message and exit"
@@ -19,7 +19,7 @@ _usage() {
     echo " -g <path>        Generate cpio image and write to specified <path>"
     echo " -d <dir>         Generate image into <dir>"
     echo
-    echo -e "Usage: \e[1m${_APPNAME} <options>\e[m"
+    echo -e "Usage: \e[1m${_BASENAME} <options>\e[m"
     exit 0
 }
 
