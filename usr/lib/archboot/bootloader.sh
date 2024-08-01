@@ -14,7 +14,7 @@ _GRUB_ISO="/usr/share/archboot/grub/archboot-iso-grub.cfg"
 
 _usage() {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Bootloader\e[m"
-    echo -e "\e[1m----------------\e[m"
+    echo -e "\e[1m---------------------\e[m"
     echo "Upload bootloaders to archboot server."
     echo ""
     echo -e "Usage: \e[1m${_BASENAME} run\e[m"
