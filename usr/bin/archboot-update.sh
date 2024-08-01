@@ -28,8 +28,8 @@ while [ $# -gt 0 ]; do
         -custom-xorg|--custom-xorg) _CUSTOM_X="1" ;;
         -custom-wayland|--custom-wayland) _CUSTOM_WAYLAND="1" ;;
         -full-system|--full-system) _FULL_SYSTEM="1" ;;
-        -h|--h|-help|--help|?) usage ;;
-        *) usage ;;
+        -h|--h|-help|--help|?) _usage ;;
+        *) _usage ;;
         esac
     shift
 done
