@@ -71,7 +71,7 @@ EOF
     echo "Finished: Keys created in ${_DIR}"
 else
     echo "ERROR: no directory specified"
-    usage
+    _usage
     #shellcheck disable=2317
     exit 1
 fi
