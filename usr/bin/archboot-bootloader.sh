@@ -3,6 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/bootloader.sh
+[[ -z "${1}" || "${1}" != "run" ]] && _usage
 _SHIM=$(mktemp -d shim.XXX)
 _SHIM32=$(mktemp -d shim32.XXX)
 _SHIMAA64=$(mktemp -d shimaa64.XXX)

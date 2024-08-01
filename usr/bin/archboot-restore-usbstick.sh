@@ -8,12 +8,12 @@
 . /usr/lib/archboot/common.sh
 _usage()
 {
-    echo -e "\e[1mWelcome to \e[36mARCHBOOT\e[m \e[1m- RESTORE USB STICK:\e[m"
-    echo -e "\e[1m----------------------------------------\e[m"
+    echo -e "\e[1m\e[36mARCHBOOT\e[m \e[1m- Restore USB Stick\e[m"
+    echo -e "\e[1m----------------------------\e[m"
     echo -e "This script restores an USB device to a \e[1mFAT32\e[m device."
-    echo -e "\e[91mWARNING: ALL DATA WILL BE LOST ON THE DEVICE! \e[m"
+    echo -e "\e[1m\e[91mWARNING: ALL DATA WILL BE LOST ON THE DEVICE! \e[m"
     echo ""
-    echo -e "usage: \e[1m${_BASENAME} <device>\e[m"
+    echo -e "Usage: \e[1m${_BASENAME} <device>\e[m"
     exit 0
 }
 ##################################################

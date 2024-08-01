@@ -12,6 +12,15 @@ _SHIM_AA64_RPM="aarch64/shim-aa64-${_SHIM_VERSION}-${_SHIM_RELEASE}.aarch64.rpm"
 _ARCH_SERVERDIR="/${_PUB}/src/bootloader"
 _GRUB_ISO="/usr/share/archboot/grub/archboot-iso-grub.cfg"
 
+_usage() {
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Bootloader\e[m"
+    echo -e "\e[1m----------------\e[m"
+    echo "Upload bootloaders to archboot server."
+    echo ""
+    echo -e "Usage: \e[1m${_BASENAME} run\e[m"
+    exit 0
+}
+
 _grub_mkstandalone() {
     #shellcheck disable=SC2086
     ${1} ${2} grub-mkstandalone -d "/usr/lib/grub/${_GRUB_ARCH}" -O "${_GRUB_ARCH}" \

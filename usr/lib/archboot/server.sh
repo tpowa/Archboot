@@ -5,6 +5,15 @@
 . /usr/lib/archboot/container.sh
 _ISO_BUILD_DIR="$(mktemp -d "${_ISO_HOME_ARCH}"/server-release.XXX)"
 
+_usage() {
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Server Release\e[m"
+    echo -e "\e[1m----------------\e[m"
+    echo "Upload new image to archboot server."
+    echo ""
+    echo -e "Usage: \e[1m${_BASENAME} run\e[m"
+    exit 0
+}
+
 _update_pacman_container() {
     if [[ "${_ARCH}" == "aarch64" ]]; then
         _ARCH_DIR="${_PACMAN_AARCH64}"

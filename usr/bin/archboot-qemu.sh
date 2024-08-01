@@ -3,6 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/qemu.sh
+[[ -z "${1}" || "${1}" != "run" ]] && _usage
 _UBOOT=$(mktemp -d uboot.XXX)
 _OVMF32=$(mktemp -d ovmf32.XXX)
 _OVMF=$(mktemp -d ovmf.XXX)
