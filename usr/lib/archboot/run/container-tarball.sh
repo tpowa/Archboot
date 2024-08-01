@@ -23,10 +23,11 @@ elif echo "${_BASENAME}" | rg -qw 'riscv64'; then
 fi
 
 _usage () {
-    echo "CREATE ${_CAP_ARCH} PACMAN CHROOT"
-    echo "-----------------------------"
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create ${_CAP_ARCH} Pacman Container\e[m"
+    echo -e "\e[1m------------------------------------------\e[m"
     echo "This will create the ${_ARCH} pacman container tarball."
-    echo "usage: ${_BASENAME} <build-directory>"
+    echo ""
+    echo -e "Usage: \e[1m${_BASENAME} <build-directory>\e[m"
     exit 0
 }
 
