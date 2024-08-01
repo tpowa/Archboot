@@ -3,12 +3,12 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 _usage () {
-    echo "Check on missing binaries in archboot environment"
-    echo "-------------------------------------------------"
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Check on missing binaries\e[m"
+    echo "------------------------------------"
     echo "This will check binaries from package, if they exist"
     echo "and report missing to binary.log"
     echo ""
-    echo "usage: ${_BASENAME} <package>"
+    echo -e "Usage: \e[1m\e${_BASENAME} <package>\e[m"
     exit 0
 }
 [[ -z "${1}" ]] && _usage
