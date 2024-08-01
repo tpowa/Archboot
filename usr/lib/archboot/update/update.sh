@@ -27,7 +27,7 @@ _graphic_options() {
     fi
 }
 
-usage () {
+_usage () {
     echo -e "\e[1mManage \e[36mArchboot\e[m\e[1m - Environment:\e[m"
     echo -e "\e[1m------------------------------\e[m"
     echo -e " \e[1m-help\e[m            This message."
