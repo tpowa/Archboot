@@ -7,19 +7,19 @@ _ISODIR="$(mktemp -d ISODIR.XXX)"
 _BOOTLOADER="/usr/share/archboot/bootloader"
 
 _usage () {
-    echo "CREATE ${_ARCH} USB/CD IMAGES"
-    echo "-----------------------------"
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create ${_ARCH} USB/CD Images\e[m"
+    echo -e "\e[1m--------------------------------------\e[m"
     echo "This will create an archboot iso image."
     echo ""
+    echo " -h                  This message."
     echo " -g                  Starting generation of image."
     echo " -c=CONFIG           Which CONFIG should be used."
     echo "                     ${_CONFIG_DIR} locates the configs"
     echo "                     default=${_ARCH}.conf"
     echo " -i=IMAGENAME        Your IMAGENAME."
-    echo " -s                  Save init ramdisk to $(pwd)"
-    echo " -h                  This message."
+    echo " -s                  Save initramfs to $(pwd)"
     echo ""
-    echo "usage: ${_BASENAME} <options>"
+    echo -e "Usage: \e[1m${_BASENAME} <options>\e[m"
     exit 0
 }
 
