@@ -5,8 +5,8 @@
 . /etc/archboot/server-update.conf
 . /usr/lib/archboot/common.sh
 _usage () {
-    echo -e "\e[1mUpdate archboot server with new images\e[m"
-    echo -e "\e[1m---------------------------------------------\e[m"
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Update Server To New Image\e[m"
+    echo -e "\e[1m-------------------------------------\e[m"
     echo "Check on new packages and release new images to server."
     echo ""
     echo -e "Usage: \e[1m${_BASENAME} run\e[m"
