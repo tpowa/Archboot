@@ -5,11 +5,11 @@
 _MODULE_DIR="/usr/lib/modules/${_RUNNING_KERNEL}"
 _FIRMWARE="/lib/firmware"
 _usage () {
-    echo -e "\e[1mCheck Firmware And Modules Archboot Environment\e[m"
-    echo -e "\e[1m---------------------------------------------------------------\e[m"
+    echo -e "\e[1m\e[36mArchboot\e[m \e[1m- Check Firmware And Modules\e[m"
+    echo -e "\e[1m-------------------------------------\e[m"
     echo "Check modules on firmware depends and existence in environment."
     echo ""
-    echo -e "usage: \e[1m${_BASENAME} run\e[m"
+    echo -e "Usage: \e[1m${_BASENAME} run\e[m"
     exit 0
 }
 [[ -z "${1}" || "${1}" != "run" ]] && _usage
