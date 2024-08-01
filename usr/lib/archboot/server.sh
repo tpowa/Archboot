@@ -7,7 +7,7 @@ _ISO_BUILD_DIR="$(mktemp -d "${_ISO_HOME_ARCH}"/server-release.XXX)"
 
 _usage() {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Server Release\e[m"
-    echo -e "\e[1m----------------\e[m"
+    echo -e "\e[1m-------------------------\e[m"
     echo "Upload new image to archboot server."
     echo ""
     echo -e "Usage: \e[1m${_BASENAME} run\e[m"

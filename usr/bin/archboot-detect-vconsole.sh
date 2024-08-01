@@ -7,7 +7,7 @@
 . /usr/lib/archboot/common.sh
 _usage() {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Detect Big Screen\e[m"
-    echo -e "\e[1m----------------\e[m"
+    echo -e "\e[1m----------------------------\e[m"
     echo "Detect big screen on boot and change to bigger font afterwards."
     echo ""
     echo -e "Usage: \e[1m${_BASENAME} run\e[m"

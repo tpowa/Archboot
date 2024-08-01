@@ -7,7 +7,7 @@ _ISODIR="$(mktemp -d ISODIR.XXX)"
 _BOOTLOADER="/usr/share/archboot/bootloader"
 
 _usage () {
-    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create ${_ARCH} USB/CD Images\e[m"
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create ${_ARCH} USB/CD Image\e[m"
     echo -e "\e[1m--------------------------------------\e[m"
     echo "This will create an archboot iso image."
     echo ""

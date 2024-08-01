@@ -17,8 +17,8 @@ _CONFIG_LOCAL="${_ARCH}-local.conf"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 
 _usage () {
-    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create Archboot Release Image\e[m"
-    echo -e "\e[1m----------------------------------------\e[m"
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create Release Images\e[m"
+    echo -e "\e[1m--------------------------------\e[m"
     echo "This will create an archboot release image in <directory>."
     echo "You can specify a certain <server> with an archboot repository."
     echo ""
