@@ -3,25 +3,23 @@
 # archboot-cpio.sh - modular tool for building an initramfs image
 # optimized for size and speed
 # by Tobias Powalowski <tpowa@archlinux.org>
-
+. /usr/lib/archboot/common.sh
 _CONFIG=""
 _CPIO=/usr/lib/archboot/cpio/hooks
 _GENERATE_IMAGE=""
 _TARGET_DIR=""
 
 _usage() {
-    cat <<EOF
-ARCHBOOT CPIO
--------------
-Tool for creating an archboot initramfs image.
-
- -h               Display this message and exit
- -c <config>      Use <config> file
- -g <path>        Generate cpio image and write to specified <path>
- -d <dir>         Generate image into <dir>
-
-usage: ${0##*/} <options>
-EOF
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Cpio\e[m"
+    echo -e "\e[1m----------------\e[m"
+    echo "Tool for creating an archboot initramfs image."
+    echo
+    echo " -h               Display this message and exit"
+    echo " -c <config>      Use <config> file"
+    echo " -g <path>        Generate cpio image and write to specified <path>"
+    echo " -d <dir>         Generate image into <dir>"
+    echo
+    echo -e "Usage: \e[1m${_APPNAME} <options>\e[m"
     exit 0
 }
 
