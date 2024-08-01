@@ -2,8 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # rsync-backup.sh - copy files recursivly with rsync
 # by Tobias Powalowski <tpowa@archlinux.org>
-# usage(exitvalue)
-# outputs a usage message and exits with value
 . /usr/lib/archboot/common.sh
 _usage()
 {

@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# 
-#    archboot-restore-usbstick.sh - restore usbstick to FAT32
-#    by Tobias Powalowski <tpowa@archlinux.org>
-# usage(exitvalue)
-# outputs a usage message and exits with value
+# archboot-restore-usbstick.sh - restore usbstick to FAT32
+# by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 _usage()
 {
