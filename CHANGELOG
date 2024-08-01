@@ -1,7 +1,7 @@
 On the road to 2024.08:
 ---
-quickinst:
-- updated usage information
+Environment:
+- updated and unified usage information in all scripts
 ---
 Highlights 2024.07:
 - kernel 6.10.x
