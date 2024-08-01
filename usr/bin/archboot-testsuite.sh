@@ -6,11 +6,11 @@ _LOOP="/dev/loop0"
 _IMG="/test.img"
 _PASS="/passphrase"
 _usage () {
-    echo -e "\e[1mTestsuite for Archboot Environment\e[m"
-    echo -e "\e[1m---------------------------------------------\e[m"
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Testsuite\e[m"
+    echo -e "\e[1m--------------------\e[m"
     echo "Run automatic tests to detect errors/changes."
     echo ""
-    echo -e "usage: \e[1m${_BASENAME} run\e[m"
+    echo -e "Usage: \e[1m${_BASENAME} run\e[m"
     exit 0
 }
 _run_test () {
@@ -168,7 +168,7 @@ _result pacman-error.log
 echo -e "Starting pacman database check in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
 sleep 10
 _run_test "pacman database... this takes a while"
-archboot-not-installed.sh &>>"${_LOG}"
+archboot-not-installed.sh run &>>"${_LOG}"
 _result not-installed.log
 echo -e "\e[1mResult:\e[m"
 if [[ -z "${_TEST_FAIL}" ]]; then

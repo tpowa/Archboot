@@ -2,6 +2,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
+_usage () {
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Check not installed packages\e[m"
+    echo -e "\e[1m---------------------------------------\e[m"
+    echo "Check the system for uninstalled packages with pacman."
+    echo ""
+    echo -e "Usage: \e[1m${_BASENAME} run\e[m"
+    exit 0
+}
+[[ -z "${1}" || "${1}" != "run" ]] && _usage
 _archboot_check
 # consider only license package and locale as uninstalled
 # it's hard to track manually changes in systemd files
