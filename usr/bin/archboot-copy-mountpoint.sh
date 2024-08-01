@@ -8,14 +8,14 @@
 . /usr/lib/archboot/common.sh
 _usage()
 {
-    echo -e "\e[1mWelcome to \e[36mARCHBOOT\e[m\e[1m - COPY MOUNTPOINT:\e[m"
-    echo -e "\e[1m--------------------------------------\e[m"
-    echo "- Copy mountpoint recursivly from one mountpoint to an other one,"
-    echo "  using tar utility."
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Copy Mountpoint:\e[m"
+    echo -e "\e[1m---------------------------\e[m"
+    echo "- Copy mountpoint recursivly from <oldmountpoint> to <newmountpoint>,"
+    echo -e "  using the \e[1mtar\e[m utility."
     echo -e "- For system copying start with mounted \e[1m/\e[m and then invoke this script"
     echo -e "  for each additional mountpoint eg. \e[1m/boot\e[m or \e[1m/home\e[m."
     echo ""
-    echo -e "usage: \e[1m${_BASENAME} <oldmountpoint> <newmountpoint>\e[m"
+    echo -e "Usage: \e[1m${_BASENAME} <oldmountpoint> <newmountpoint>\e[m"
     exit 0
 }
 ##################################################
