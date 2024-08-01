@@ -2,14 +2,14 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 usage () {
-    echo -e "\e[1mGenerate Secure Boot keys,MOK files and backup existing keys:\e[m"
-    echo -e "\e[1m-------------------------------------------------------------\e[m"
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Generate Secure Boot keys, MOK files\e[m"
+    echo -e "\e[1m-----------------------------------------------\e[m"
     echo "This script generates all needed keys for a Secure Boot setup."
     echo -e "It will include the \e[1m2\e[m needed Microsoft certificates, in order"
     echo "to avoid soft bricking of devices."
     echo -e "Backup of your existing keys are put to \e[1mBACKUP\e[m directory."
     echo ""
-    echo -e "\e[1musage: ${_BASENAME} -name=<your name> <directory>\e[m"
+    echo -e "Usage: \e[1m${_BASENAME} -name=<your name> <directory>\e[m"
     exit 0
 }
 [[ -z "${1}" || -z "${2}" ]] && usage
