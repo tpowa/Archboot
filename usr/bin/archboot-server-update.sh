@@ -29,13 +29,15 @@ for i in ${_SERVER_ARCH}; do
     fi
     # update container to latest packages
     systemd-nspawn -q -D "${i}" pacman --noconfirm -Syu
+    rg -o 'updgraded (.*) \(' -r '$1' "${i}"/var/log/pacman.log > upgrade-"${i}".log
     for k in ${_TRIGGER}; do
         # if trigger successful, release new image to server
-        if rg -qw "${k}" "${i}"/var/log/pacman.log; then
+        if rg -qw "${k}" upgrade-"${i}".log; then
             archboot-"${i}"-server-release.sh run || echo "Error: ${i} release!" >> error.log
             break
         fi
     done
+    rm upgrade-"${i}".log
     rm "${i}"/var/log/pacman.log
     rm "${i}"/var/cache/pacman/pkg/*
 done
