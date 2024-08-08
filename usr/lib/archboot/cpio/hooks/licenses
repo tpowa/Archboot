@@ -117,6 +117,7 @@ tree-sitter-c/LICENSE
 tree-sitter-lua/LICENSE.md
 tree-sitter-markdown/LICENSE
 tree-sitter-query/LICENSE
+tree-sitter-vim/LICENSE
 tree-sitter-vimdoc/LICENSE
 tree-sitter/LICENSE
 ttyd/LICENSE
