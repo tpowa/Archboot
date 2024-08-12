@@ -149,13 +149,16 @@ echo -e "Starting Wi-Fi check in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to st
 sleep 10
 _run_test "Wi-Fi... this takes a while"
 echo -n "Setting up hwsim... "
-archboot-hwsim.sh test &>"${_LOG}"
-echo -n "iwctl tests running... "
-iwctl station wlan1 scan
-sleep 5
-iwctl station wlan1 get-networks | rg -q test || echo "Wi-Fi get-networks error" >> iwctl-error.log
-iwctl --passphrase=12345678 station wlan1 connect test || echo "Wi-Fi connect error" >> iwctl-error.log
-iwctl station wlan1 disconnect || echo "Wi-Fi iwctl disconnect error" >> iwctl-error.log
+if archboot-hwsim.sh test &>"${_LOG}"; then
+    echo -n "iwctl tests running... "
+    iwctl station wlan1 scan
+    sleep 5
+    iwctl station wlan1 get-networks | rg -q test || echo "Wi-Fi get-networks error" >> iwctl-error.log
+    iwctl --passphrase=12345678 station wlan1 connect test || echo "Wi-Fi connect error" >> iwctl-error.log
+    iwctl station wlan1 disconnect || echo "Wi-Fi iwctl disconnect error" >> iwctl-error.log
+else
+    echo "Hwsim failed." >> iwctl-error.log
+fi
 _result iwctl-error.log
 echo -e "Starting none tracked files in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
 sleep 10

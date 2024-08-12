@@ -23,7 +23,11 @@ echo "Installing kernel..."
 pacman -Sydd --noconfirm --noscriptlet linux &>"${_LOG}"
 depmod -a
 if ! rg -qw 'mac80211_hwsim' /proc/modules; then
-	modprobe mac80211_hwsim
+    # kernel module mismatch needs to be checked
+    if ! modprobe mac80211_hwsim; then
+        echo "Error: Module mismatch detected!"
+        exit 1
+    fi
 fi
 iwctl ap wlan0 stop
 systemctl restart iwd
