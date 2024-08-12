@@ -157,7 +157,7 @@ if archboot-hwsim.sh test &>"${_LOG}"; then
     iwctl --passphrase=12345678 station wlan1 connect test || echo "Wi-Fi connect error" >> iwctl-error.log
     iwctl station wlan1 disconnect || echo "Wi-Fi iwctl disconnect error" >> iwctl-error.log
 else
-    echo "Hwsim failed." >> iwctl-error.log
+    echo "Hwsim setup failed." >> iwctl-error.log
 fi
 _result iwctl-error.log
 echo -e "Starting none tracked files in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."

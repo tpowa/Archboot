@@ -151,7 +151,7 @@ _download_latest_task() {
     ${_DLPROG} -o "${_ETC}/defaults" "${_SOURCE}${_ETC}/defaults?inline=false"
     # helper binaries
     # main binaries
-    _SCRIPTS="quickinst setup clock launcher localize network pacsetup update testsuite"
+    _SCRIPTS="quickinst setup clock clean-blockdevice launcher localize network pacsetup update testsuite"
     for i in ${_SCRIPTS}; do
         [[ -e "${_BIN}/${i}" ]] && ${_DLPROG} -o "${_BIN}/${i}" "${_SOURCE}${_BIN}/archboot-${i}.sh?inline=false"
     done
