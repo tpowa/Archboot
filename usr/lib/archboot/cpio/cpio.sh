@@ -14,6 +14,7 @@ _usage() {
     echo -e "\e[1m---------------\e[m"
     echo "Tool for creating an archboot initramfs image."
     echo
+    echo "Options:"
     echo " -h               Display this message and exit"
     echo " -c <config>      Use <config> file"
     echo " -g <path>        Generate cpio image and write to specified <path>"
