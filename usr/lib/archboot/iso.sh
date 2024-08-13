@@ -11,13 +11,13 @@ _usage () {
     echo -e "\e[1m--------------------------------------\e[m"
     echo "This will create an archboot iso image."
     echo ""
-    echo " -h                  This message."
-    echo " -g                  Starting generation of image."
-    echo " -c=CONFIG           Which CONFIG should be used."
-    echo "                     ${_CONFIG_DIR} includes the config files"
-    echo "                     default=${_ARCH}.conf"
-    echo " -i=IMAGENAME        Your IMAGENAME."
-    echo " -s                  Save initramfs files in current work directory"
+    echo "Options:"
+    echo " -g              Starting generation of image."
+    echo " -c=CONFIG       Which CONFIG should be used."
+    echo "                 ${_CONFIG_DIR} includes the config files"
+    echo "                 default=${_ARCH}.conf"
+    echo " -i=IMAGENAME    Your IMAGENAME."
+    echo " -s              Save initramfs files in current work directory"
     echo ""
     echo -e "Usage: \e[1m${_BASENAME} <options>\e[m"
     exit 0
@@ -30,7 +30,6 @@ _parameters() {
             -s|--s) _SAVE_INIT="1" ;;
             -c=*|--c=*) _CONFIG="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
             -i=*|--i=*) _IMAGENAME="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
-            -h|--h|?) _usage ;;
             *) _usage ;;
         esac
         shift
