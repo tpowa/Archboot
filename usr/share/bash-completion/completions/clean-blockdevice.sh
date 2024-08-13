@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_clean-blockdevice()
+_clean_blockdevice()
 {
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
@@ -8,4 +8,4 @@ _clean-blockdevice()
     COMPREPLY=( $(compgen -W "$(lsblk -pnro NAME,TYPE | rg '(.*) disk$' -r '$1')" -- $cur) )
     return 0
 }
-complete -F _clean-blockdevice clean-blockdevice
+complete -F _clean_blockdevice clean-blockdevice.sh

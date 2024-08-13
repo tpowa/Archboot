@@ -15,7 +15,7 @@ _run ()
     _file_rename /usr/bin/archboot-copy-mountpoint.sh /usr/bin/copy-mountpoint.sh
     _file_rename /usr/bin/archboot-rsync-backup.sh /usr/bin/rsync-backup.sh
     _file_rename /usr/bin/archboot-restore-usbstick.sh /usr/bin/restore-usbstick.sh
-    _file_rename /usr/bin/archboot-clean-blockdevice.sh /usr/bin/clean-blockdevice
+    _file_rename /usr/bin/archboot-clean-blockdevice.sh /usr/bin/clean-blockdevice.sh
     _file_rename /usr/bin/archboot-testsuite.sh /usr/bin/testsuite
     _full_dir /usr/lib/archboot/installer
     _file /etc/archboot/defaults
