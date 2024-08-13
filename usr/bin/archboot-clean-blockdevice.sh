@@ -22,7 +22,7 @@ if ! [[ ${UID} -eq 0 ]]; then
     exit 1
 fi
 echo -e "\e[1mCleaning blockdevice(s) $*...\e[m"
-echo -e "\e[91mWARNING: 10 seconds for hitting CTRL+C to stop the process on ${i} now! \e[m"
+echo -e "\e[91mWARNING: 10 seconds for hitting CTRL+C to stop the process on $* now! \e[m"
 sleep 10
 #shellcheck disable=SC2068
 for i in $@; do
