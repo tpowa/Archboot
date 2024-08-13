@@ -16,16 +16,17 @@ _usage()
 ##################################################
 [[ -z "${1}" ]] && _usage
 _root_check
-echo -e "\e[91mWARNING: 10 seconds for hitting CTRL+C to stop the process on ${1} now! \e[m"
-sleep 10
-# clean partitiontable
-echo -e "\e[1mRestoring USB STICK...\e[m"
-echo -e "\e[1mSTEP 1/3:\e[m Cleaning partition table..."
-dd if=/dev/zero of="${1}" bs=512 count=2048
-wipefs -a "${1}"
-# create new MBR and partition on <DEVICE>
-echo -e "\e[1mSTEP 2/3:\e[m Create new MBR and partitiontable..."
-fdisk "${1}" <<EOF
+if [[ -b "${1}" ]]; then
+    echo -e "\e[91mWARNING: 10 seconds for hitting CTRL+C to stop the process on ${1} now! \e[m"
+    sleep 10
+    # clean partitiontable
+    echo -e "\e[1mRestoring USB STICK...\e[m"
+    echo -e "\e[1mSTEP 1/3:\e[m Cleaning partition table..."
+    dd if=/dev/zero of="${1}" bs=512 count=2048
+    wipefs -a "${1}"
+    # create new MBR and partition on <DEVICE>
+    echo -e "\e[1mSTEP 2/3:\e[m Create new MBR and partitiontable..."
+    fdisk "${1}" <<EOF
 n
 p
 1
@@ -35,9 +36,12 @@ t
 b
 w
 EOF
-# wait for partitiontable to be resynced
-sleep 5
-# create FAT32 filesystem on <device-partition>
-echo -e "\e[1mSTEP 3/3:\e[m Create FAT32 filesystem..."
-mkfs.vfat -F32 "${1}"1
-echo -e "\e[1mFinished.\e[m"
+    # wait for partitiontable to be resynced
+    sleep 5
+    # create FAT32 filesystem on <device-partition>
+    echo -e "\e[1mSTEP 3/3:\e[m Create FAT32 filesystem..."
+    mkfs.vfat -F32 "${1}"1
+    echo -e "\e[1mFinished.\e[m"
+else
+    echo -e "\e[1m\e[91mError: ${1} not a valid blockdevice! \e[m"
+fi

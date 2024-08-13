@@ -22,9 +22,13 @@ echo -e "\e[91mWARNING: 10 seconds for hitting CTRL+C to stop the process on $* 
 sleep 10
 #shellcheck disable=SC2068
 for i in $@; do
-    echo -e "\e[1mSTEP 1/2:\e[m Cleaning ${i} filesystem signatures..."
-    wipefs -f -a "${i}"
-    echo -e "\e[1mSTEP 2/2:\e[m Cleaning ${i} partition table..."
-    dd if=/dev/zero of="${i}" bs=1M count=10
-    echo -e "\e[1mFinished ${i}.\e[m"
+    if [[ -b "${i}" ]]; then
+        echo -e "\e[1mSTEP 1/2:\e[m Cleaning ${i} filesystem signatures..."
+        wipefs -f -a "${i}"
+        echo -e "\e[1mSTEP 2/2:\e[m Cleaning ${i} partition table..."
+        dd if=/dev/zero of="${i}" bs=1M count=10
+        echo -e "\e[1mFinished ${i}.\e[m"
+    else
+        echo -e "\e[1m\e[91mError: ${i} not a valid blockdevice! \e[m"
+    fi
 done
