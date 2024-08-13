@@ -15,7 +15,7 @@ _usage()
     exit 0
 }
 ##################################################
-[[ -z "${1}" ]] && _usage "$@"
+[[ -z "${1}" ]] && _usage
 ### check for root
 if ! [[ ${UID} -eq 0 ]]; then 
     echo "ERROR: Please run as root user!"
