@@ -14,12 +14,8 @@ _usage()
     exit 0
 }
 ##################################################
-[[ -z "${1}" ]] && _usage "$@"
-### check for root
-if ! [[ ${UID} -eq 0 ]]; then 
-    echo "ERROR: Please run as root user!"
-    exit 1
-fi
+[[ -z "${1}" ]] && _usage
+_root_check
 echo -e "\e[91mWARNING: 10 seconds for hitting CTRL+C to stop the process on ${1} now! \e[m"
 sleep 10
 # clean partitiontable
