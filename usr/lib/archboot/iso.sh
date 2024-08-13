@@ -14,10 +14,10 @@ _usage () {
     echo " -h                  This message."
     echo " -g                  Starting generation of image."
     echo " -c=CONFIG           Which CONFIG should be used."
-    echo "                     ${_CONFIG_DIR} locates the configs"
+    echo "                     ${_CONFIG_DIR} includes the config files"
     echo "                     default=${_ARCH}.conf"
     echo " -i=IMAGENAME        Your IMAGENAME."
-    echo " -s                  Save initramfs to $(pwd)"
+    echo " -s                  Save initramfs files in current work directory"
     echo ""
     echo -e "Usage: \e[1m${_BASENAME} <options>\e[m"
     exit 0
