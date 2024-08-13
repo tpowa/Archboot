@@ -17,7 +17,7 @@ _DIR="${2}"
 while [ $# -gt 0 ]; do
     case ${1} in
         -name=*|--name=*) NAME="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
-        -h|--h|?) _usage ;;
+        -h|--h|-help|--help|?) _usage ;;
         esac
     shift
 done

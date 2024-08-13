@@ -43,7 +43,7 @@ while [ $# -gt 0 ]; do
                 _abort "Unable to write to path!" "${1}"
             fi
             ;;
-        -h) _usage
+        -h|--h|-help|--help|?) _usage
             ;;
     esac
     shift
