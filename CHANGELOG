@@ -3,6 +3,7 @@ On the road to 2024.08:
 Environment:
 - updated and unified usage information in all scripts
 - added clean-blockdevice.sh script
+- added bash completion for restore-usbstick.sh and clean-blockdevice.sh
 ---
 Highlights 2024.07:
 - kernel 6.10.x
