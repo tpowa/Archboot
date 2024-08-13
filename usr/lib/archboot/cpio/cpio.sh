@@ -39,7 +39,7 @@ while [ $# -gt 0 ]; do
             _TARGET_DIR="${1}"
             ;;
         -g) shift
-            [[ -d "${1}" ]] && _abort "Invalid image path -- ${1} is a existing directory!"
+            [[ -d "${1}" ]] && _abort "Invalid image path -- ${1} is an existing directory!"
             if ! _GENERATE_IMAGE="$(readlink -f "${1}")" || [[ ! -e "${_GENERATE_IMAGE%/*}" ]]; then
                 _abort "Unable to write to path!" "${1}"
             fi
