@@ -73,17 +73,14 @@ Edit your \e[1m/etc/mkinitcpio.conf\e[m to fit your needs. After that run:
 Then \e[1mexit\e[m your chroot shell, edit \e[1m${_DESTDIR}/etc/fstab\e[m and \e[1mreboot\e[m!"
 }
 
-# start script
 if [[ -z "${1}" ]]; then
     _usage
 fi
-
 if [[ -e "${_LOCAL_DB}" ]]; then
     _local_pacman_conf
 else
     _PACMAN_CONF=""
 fi
-
 if ! _prepare_pacman; then
     echo -e "Pacman preparation \e[91mFAILED\e[m."
     exit 1
