@@ -125,7 +125,7 @@ EOF
     echo "Setting breeze as default icons..."
     sd '<property name="IconThemeName" type="string" value="Adwaita"/>' '<property name="IconThemeName" type="string" value="breeze"/>' \
     /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
-    echo "Setting archboot background image..."
+    echo "Setting Archboot background image..."
     cat << EOF >/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
 <?xml version="1.0" encoding="UTF-8"?>
 

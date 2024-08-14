@@ -44,7 +44,7 @@ _prepare_pacman() {
 
 # package_installation
 _install_packages() {
-    # add packages from archboot defaults
+    # add packages from Archboot defaults
     _PACKAGES="$(rg -o '^_PACKAGES="(.*)"' -r '$1' /etc/archboot/defaults)"
     # fallback if _PACKAGES is empty
     [[ -z "${_PACKAGES}" ]] && _PACKAGES="base linux linux-firmware"

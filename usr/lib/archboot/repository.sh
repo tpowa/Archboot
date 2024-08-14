@@ -7,7 +7,7 @@ _GPG_KEY="/usr/share/archboot/gpg/tpowa.gpg"
 _usage () {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create Repository\e[m"
     echo -e "\e[1m----------------------------\e[m"
-    echo "This will create an Archboot repository for an archboot image."
+    echo "This will create an Archboot repository for an Archboot image."
     echo ""
     echo -e "Usage: \e[1m${_BASENAME} <directory>\e[m"
     exit 0

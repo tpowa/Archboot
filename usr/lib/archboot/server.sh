@@ -108,7 +108,7 @@ _sign_b2sum() {
 _update_source() {
     cd "${_ISO_HOME_SOURCE}" || exit 1
     _create_archive
-    echo "Creating ${_ARCH} archboot repository..."
+    echo "Creating ${_ARCH} Archboot repository..."
     "archboot-${_ARCH}-create-repository.sh" "${_DIR}" || exit 1
     chown -R "${_USER}:${_GROUP}" "${_DIR}"
     _server_upload "${_SERVER_SOURCE_DIR}" "${_ISO_HOME_SOURCE}"

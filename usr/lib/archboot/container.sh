@@ -6,12 +6,12 @@
 _usage () {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create Container\e[m"
     echo -e "\e[1m---------------------------\e[m"
-    echo "This will create an Archboot container for an archboot image."
+    echo "This will create an Archboot container for an Archboot image."
     echo
     echo "Options:"
     echo -e " \e[1m-cc\e[m    Cleanup container eg. removing manpages, includes..."
     echo -e " \e[1m-cp\e[m    Cleanup container package cache"
-    echo -e " \e[1m-install-source=<server>\e[m    Use <server> containing archboot repository"
+    echo -e " \e[1m-install-source=<server>\e[m    Use <server> containing Archboot repository"
     echo
     echo -e "Usage: \e[1m${_BASENAME} <directory> <options>\e[m"
     exit 0
@@ -34,7 +34,7 @@ _clean_cache() {
         rm -r "${1}${_CACHEDIR}"
     fi
     if rg -qw 'archboot' /etc/hostname; then
-        echo "Cleaning archboot ${_CACHEDIR}..."
+        echo "Cleaning Archboot ${_CACHEDIR}..."
         for i in "${1}${_CACHEDIR}"/*; do
             [[ "${i}" == "${1}${_LOCAL_DB}" ]] || rm -f "${_CACHEDIR}"/"$(basename "${i}")"
         done
@@ -91,7 +91,7 @@ _prepare_pacman() {
     mount udev "${1}/dev" -t devtmpfs -o mode=0755,nosuid
     mount devpts "${1}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
     mount shm "${1}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
-    echo "Removing archboot repository sync db..."
+    echo "Removing Archboot repository sync db..."
     rm -f "${_PACMAN_LIB}"/sync/archboot.db
     echo "Updating Arch Linux keyring..."
     #shellcheck disable=SC2086
@@ -104,7 +104,7 @@ _create_pacman_conf() {
         echo "Using default pacman.conf..."
         [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="${1}${_PACMAN_CONF}"
         if ! rg -qw "\[archboot\]" "${_PACMAN_CONF}"; then
-            echo "Adding archboot repository to ${_PACMAN_CONF}..."
+            echo "Adding Archboot repository to ${_PACMAN_CONF}..."
             echo "[archboot]" >> "${_PACMAN_CONF}"
             echo "Server = https://pkg.archboot.com" >> "${_PACMAN_CONF}"
         fi
@@ -214,7 +214,7 @@ _install_archboot() {
     # cleanup
     if ! [[ "${2}"  == "use_binfmt" ]]; then
         rm -r "${1}"/blankdb
-        echo "Removing archboot repository sync db..."
+        echo "Removing Archboot repository sync db..."
         rm "${_PACMAN_LIB}"/sync/archboot.db
     fi
 }
@@ -223,12 +223,12 @@ _copy_mirrorlist_and_pacman_conf() {
     # copy local mirrorlist to container
     echo "Creating pacman config and mirrorlist in container..."
     cp "/etc/pacman.d/mirrorlist" "${1}/etc/pacman.d/mirrorlist"
-    # only copy from archboot pacman.conf, else use default file
+    # only copy from Archboot pacman.conf, else use default file
     rg -qw 'archboot' /etc/hostname && cp /etc/pacman.conf "${1}"/etc/pacman.conf
 }
 
 _copy_archboot_defaults() {
-    echo "Copying archboot defaults to container..."
+    echo "Copying Archboot defaults to container..."
     cp /etc/archboot/defaults "${1}"/etc/archboot/defaults
 }
 

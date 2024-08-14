@@ -55,10 +55,10 @@ _root_check() {
     fi
 }
 
-### check for archboot environment
+### check for Archboot environment
 _archboot_check() {
 if ! rg -qw 'archboot' /etc/hostname; then
-    echo "This script should only be run in booted archboot environment. Aborting..."
+    echo "This script should only be run in booted Archboot Environment. Aborting..."
     exit 1
 fi
 }
@@ -193,7 +193,7 @@ _container_check() {
 
 _generate_keyring() {
     # use fresh one on normal systems
-    # copy existing gpg cache on archboot usage
+    # copy existing gpg cache on Archboot usage
     if ! rg -qw archboot /etc/hostname; then
         # generate pacman keyring
         echo "Generating pacman keyring in container..."

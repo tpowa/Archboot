@@ -12,7 +12,7 @@ _TARGET_DIR=""
 _usage() {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Cpio\e[m"
     echo -e "\e[1m---------------\e[m"
-    echo "Tool for creating an archboot initramfs image."
+    echo "Tool for creating an Archboot initramfs image."
     echo
     echo "Options:"
     echo " -h               Display this message and exit"

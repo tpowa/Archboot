@@ -64,8 +64,8 @@ _task() {
             if ! mount /mnt/cdrom/efi.img /mnt/efi &>"${_NO_LOG}"; then
                 _clear
                 _wrn "Archboot Emergeny Shell:"
-                _wrn "Error: Didn't find a device with archboot rootfs!"
-                _msg "This needs further debugging. Please contact the archboot author."
+                _wrn "Error: Didn't find a device with Archboot rootfs!"
+                _msg "This needs further debugging. Please contact the Archboot author."
                 _msg "Tobias Powalowski: tpowa@archlinux.org"
                 echo ""
                 systemctl start emergency.service

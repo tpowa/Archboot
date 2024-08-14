@@ -13,7 +13,7 @@ _configure_sway() {
     echo "Configuring foot..."
     if ! rg -q 'archboot colors' /etc/xdg/foot/foot.ini; then
 cat <<EOF >> /etc/xdg/foot/foot.ini
-# archboot colors
+# Archboot colors
 [colors]
 background=000000
 foreground=ffffff

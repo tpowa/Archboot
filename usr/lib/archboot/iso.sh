@@ -94,7 +94,7 @@ _prepare_kernel_initrd_files() {
         archboot-cpio.sh -c "${_CONFIG}" -k "${_KERNEL}" \
                          -g "${_ISODIR}/boot/initrd-${_ARCH}.img" || exit 1
     fi
-    # delete cachedir on archboot environment
+    # delete cachedir on Archboot environment
     if rg -qw 'archboot' /etc/hostname; then
         if [[ -d "${_CACHEDIR}" ]]; then
             echo "Removing ${_CACHEDIR}..."

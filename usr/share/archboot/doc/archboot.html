@@ -448,7 +448,7 @@
 <ul>
 <li>You will be asked if you want to activate the <a href="https://wiki.archlinux.org/title/Testing" title="Testing"><strong>testing</strong></a> repositories <strong>&lt;default=no&gt;</strong>.</li>
 <li>Latest <a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>pacman</strong></a> <a href="https://wiki.archlinux.org/title/Mirror" title="Mirror"><strong>mirrors</strong></a> will be <a href="http://ip-api.com" title="GeoIP"><strong>GeoIP</strong></a> synced and you have to select your <strong>favourite</strong> mirror.</li>
-<li>If a new kernel is online available, you can decide to load the latest archboot environment <strong>&lt;default=no&gt;</strong>.</li>
+<li>If a new kernel is online available, you can decide to load the latest Archboot Environment <strong>&lt;default=no&gt;</strong>.</li>
 </ul>
 <h3 data-number="3.5" id="interactive-launcher"><span class="header-section-number">3.5</span> <strong>Interactive Launcher</strong></h3>
 <ul>
@@ -637,7 +637,7 @@
 </table>
 <h3 data-number="3.12" id="system-configuration"><span class="header-section-number">3.12</span> System Configuration On Installed System</h3>
 <p>You can also run <strong>archboot-setup.sh</strong> for <strong>system configuration</strong> on an installed system.</p>
-<p><a href="#package-installation" title="Installation"><strong>Install</strong></a> your corresponding archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
+<p><a href="#package-installation" title="Installation"><strong>Install</strong></a> your corresponding Archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
 <h2 data-number="4." id="faq-known-issues-and-limitations"><span class="header-section-number">4.</span> <strong>FAQ / Known Issues / Limitations</strong></h2>
 <p>Please <strong>check</strong> the forum threads or project page for posted <strong>fixes</strong> and <strong>workarounds</strong>.</p>
 <table>
@@ -663,7 +663,7 @@ Some hardware does not like the <a href="https://wiki.archlinux.org/title/KMS" t
 </li>
 </ul>
 <ul>
-<li><strong>Package</strong> XYZ is <strong>missing</strong> in archboot environment.<br>
+<li><strong>Package</strong> XYZ is <strong>missing</strong> in Archboot Environment.<br>
 <a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the missing package as needed.
 For example, <a href="https://wiki.archlinux.org/title/Archinstall" title="Archinstall"><strong>archinstall</strong></a> is not included by default.<br>It needs python3, which is a large dependency.
 </li>
@@ -680,7 +680,7 @@ For example, <a href="https://wiki.archlinux.org/title/Archinstall" title="Archi
 </ul>
 <ul>
 <li><strong>UTM</strong> does not work with <strong>Apple virtualization</strong>.<br>
-The AARCH64 <strong>kernel </strong> does not seem to support this feature. This cannot be fixed on archboot side.
+The AARCH64 <strong>kernel </strong> does not seem to support this feature. This cannot be fixed on Archboot side.
 </li>
 </ul>
 <ul>
@@ -1045,7 +1045,7 @@ The calculated size to boot the image follows the formula:<br>
 <table>
 <thead>
 <tr class="header">
-<th>Create an archboot container for image creation:</th>
+<th>Create an Archboot container for image creation:</th>
 </tr>
 </thead>
 <tbody>
@@ -1074,7 +1074,7 @@ There are the following configuration files for ISO creation:
 <li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the _KERNEL and the _HOOKS, which are used for the initrd.</li>
 </ul>
 <h4 data-number="7.2.3.3" id="archboot-cpio.sh"><span class="header-section-number">7.2.3.3</span> <strong>archboot-cpio.sh</strong></h4>
-The archboot initrd toolchain uses its <strong>own</strong> cpio generator. Some differences to other initcpio creators:
+The Archboot initramfs toolchain uses its <strong>own</strong> cpio generator. Some differences to other initcpio creators:
 <ul>
 <li><strong>objdump</strong> is used for library detection. It's faster than ldd!</li>
 <li>libraries for binaries outside of bin/ are <strong>not</strong> detected!</li>
@@ -1171,7 +1171,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tbody>
 </table>
 <h4 data-number="7.2.3.4" id="archboot-x86_64-iso.sh"><span class="header-section-number">7.2.3.4</span> <strong>archboot-x86_64-iso.sh</strong></h4>
-<p>Script for image creation from running system or for use in archboot container.</p>
+<p>Script for image creation from running system or for use in Archboot container.</p>
 <table>
 <thead>
 <tr class="header">

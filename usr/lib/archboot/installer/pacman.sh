@@ -62,7 +62,7 @@ _run_autoconfig() {
 _install_packages() {
     _destdir_mounts || return 1
     _PACKAGES=""
-    # add packages from archboot defaults
+    # add packages from Archboot defaults
     _PACKAGES="$(rg -o '^_PACKAGES="(.*)"' -r '$1' /etc/archboot/defaults)"
     # fallback if _PACKAGES is empty
     [[ -z "${_PACKAGES}" ]] && _PACKAGES="base linux linux-firmware"
