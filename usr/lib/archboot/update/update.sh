@@ -31,7 +31,7 @@ _usage () {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Manage Environment:\e[m"
     echo -e "\e[1m------------------------------\e[m"
     echo "The main tool to manage or update the Archboot Environment."
-    echo ""
+    echo
     echo "Options:"
     echo -e " \e[1m-help\e[m            This message."
     if [[ ! -e "${_LOCAL_DB}" || -e "/usr/bin/setup" ]]; then
@@ -44,7 +44,7 @@ _usage () {
     elif [[ "${_MEM_TOTAL}" -gt 2571000 && ! -e "/.full_system" && -e "${_LOCAL_DB}" && -e "/usr/bin/setup" ]]; then
         echo -e " \e[1m-full-system\e[m     Switch to full Arch Linux system."
     fi
-    echo -e ""
+    echo
     if [[ -e "/usr/bin/setup" ]]; then
         # works only on latest image
         if ! [[ -e "${_LOCAL_DB}" ]]; then
@@ -76,6 +76,7 @@ _usage () {
             echo -e " \e[1m-latest-image\e[m    Generate latest image files in /archboot directory."
         fi
     fi
+    echo
     echo -e "Usage: \e[1m${_BASENAME} <option>\e[m"
     exit 0
 }
