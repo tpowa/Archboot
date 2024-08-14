@@ -78,8 +78,6 @@ if [[ -z "${1}" ]]; then
     _usage
 fi
 
-! [[ -d /tmp ]] && mkdir /tmp
-
 if [[ -e "${_LOCAL_DB}" ]]; then
     _local_pacman_conf
 else
