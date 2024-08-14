@@ -8,8 +8,6 @@ _DESTDIR="${1}"
 _usage() {
     echo -e "\e[1m\e[36mArchboot\e[m \e[1m- Quickinst Installer\e[m"
     echo -e "\e[1m------------------------------\e[m"
-    echo -e "Usage: \e[1mquickinst <destdir>\e[m"
-    echo ""
     echo "This script is for users, who would rather partition/mkfs/mount"
     echo "their target media manually, than go through the routines in"
     echo "the setup script."
@@ -19,8 +17,9 @@ _usage() {
         echo -e "Configure mirror: \e[1m/etc/pacman.d/mirrorlist\e[m"
     fi
     echo -e "Configure packages to install: \e[1m/etc/archboot/defaults\e[m"
-    echo -e "Mount all your filesystems: \e[1m<destdir>\e[m."
-    echo -e "Run: \e[1mquickinst <destdir>\e[m"
+    echo -e "Mount all your filesystems: \e[1m<destdir>\e[m"
+    echo ""
+    echo -e "Usage: \e[1mquickinst <destdir>\e[m"
     exit 0
 }
 
