@@ -44,7 +44,7 @@ _create_container() {
 }
 
 _network_check() {
-    _TITLE="Archboot ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Network Check"
+    _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Network Check"
     # wait 20 seconds for network link
     _COUNT=0
     while true; do
