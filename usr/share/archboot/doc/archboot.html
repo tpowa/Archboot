@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="https://archboot.com/gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2024 Fundraise: 0% <progress max="100" value="48">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2024 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 02.08.2024 08:13</strong></p>
+<strong>Last update: 14.08.2024 16:26</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -39,7 +39,8 @@
 <li><a href="#cli-manage-archboot" id="toc-manage-archboot"><span class="toc-section-number">3.8</span> For Experts: CLI Manage Environment</a></li>
 <li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">3.9</span> Tools For Backup And Copying Of An Existing System</a></li>
 <li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">3.10</span> Restoring An USB Device To FAT32 State</a></li>
-<li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.11</span> System Configuration On Installed System</a></li>
+<li><a href="#clean-blockdevice" id="toc-clean-blockdevice"><span class="toc-section-number">3.11</span> Clean Blockdevice</a></li>
+<li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.12</span> System Configuration On Installed System</a></li>
 </ul></li>
 <li><strong><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><span class="toc-section-number">4.</span> FAQ / Known Issues / Limitations</a></strong></li>
 <li><strong><a href="#archiso" id="toc-archiso"><span class="toc-section-number">5.</span> Comparison To Archiso Image</a></strong></li>
@@ -620,7 +621,21 @@
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.11" id="system-configuration"><span class="header-section-number">3.11</span> System Configuration On Installed System</h3>
+<h3 data-number="3.11" id="clean-blockdevice"><span class="header-section-number">3.11</span> Clean Blockdevice</h3>
+<p>You can use <strong>clean-blockdevice.sh</strong> for cleaning partition table and filesystem signatures of any blockdevice.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Attention: This will render all data on your device inaccessible!</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code># clean-blockdevice.sh &lt;device(s)&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<h3 data-number="3.12" id="system-configuration"><span class="header-section-number">3.12</span> System Configuration On Installed System</h3>
 <p>You can also run <strong>archboot-setup.sh</strong> for <strong>system configuration</strong> on an installed system.</p>
 <p><a href="#package-installation" title="Installation"><strong>Install</strong></a> your corresponding archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
 <h2 data-number="4." id="faq-known-issues-and-limitations"><span class="header-section-number">4.</span> <strong>FAQ / Known Issues / Limitations</strong></h2>
@@ -815,7 +830,7 @@ The calculated size to boot the image follows the formula:<br>
 </tr>
 <tr class="odd">
 <td>ROOTFS packages</td>
-<td class="MyYes">225</td>
+<td class="MyYes">226</td>
 <td class="MyNo">419</td>
 </tr>
 <tr class="even">
