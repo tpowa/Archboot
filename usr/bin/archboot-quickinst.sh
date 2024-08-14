@@ -53,6 +53,26 @@ _install_packages() {
     ${_PACMAN} -S ${_PACKAGES}
 }
 
+_post_installation() {
+    echo -e "
+
+\e[1mPackage installation complete.\e[m
+
+Please install a \e[1mbootloader\e[m. Edit the appropriate config file for
+your loader. Please use \e[1m${_VMLINUZ}\e[m as kernel image.
+Chroot into your system to install it:
+  \e[1m# mount -o bind /dev ${_DESTDIR}/dev\e[m
+  \e[1m# mount -t proc none ${_DESTDIR}/proc\e[m
+  \e[1m# mount -t sysfs none ${_DESTDIR}/sys\e[m
+  \e[1m# chroot ${_DESTDIR} /bin/bash\e[m
+
+Next step, initramfs setup:
+Edit your \e[1m/etc/mkinitcpio.conf\e[m to fit your needs. After that run:
+  \e[1m# mkinitcpio -p ${_KERNELPKG}\e[m
+
+Then \e[1mexit\e[m your chroot shell, edit \e[1m${_DESTDIR}/etc/fstab\e[m and \e[1mreboot\e[m!"
+}
+
 # start script
 if [[ -z "${1}" ]]; then
     _usage
@@ -78,24 +98,7 @@ if ! _install_packages; then
 fi
 _locale_gen
 _chroot_umount
-
-echo -e "
-
-\e[1mPackage installation complete.\e[m
-
-Please install a \e[1mbootloader\e[m. Edit the appropriate config file for
-your loader. Please use \e[1m${_VMLINUZ}\e[m as kernel image.
-Chroot into your system to install it:
-  \e[1m# mount -o bind /dev ${_DESTDIR}/dev\e[m
-  \e[1m# mount -t proc none ${_DESTDIR}/proc\e[m
-  \e[1m# mount -t sysfs none ${_DESTDIR}/sys\e[m
-  \e[1m# chroot ${_DESTDIR} /bin/bash\e[m
-
-Next step, initramfs setup:
-Edit your \e[1m/etc/mkinitcpio.conf\e[m to fit your needs. After that run:
-  \e[1m# mkinitcpio -p ${_KERNELPKG}\e[m
-
-Then \e[1mexit\e[m your chroot shell, edit \e[1m${_DESTDIR}/etc/fstab\e[m and \e[1mreboot\e[m!"
+_post_installation
 exit 0
 
 # vim: set ts=4 sw=4 et:
