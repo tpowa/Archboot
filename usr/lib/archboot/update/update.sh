@@ -28,7 +28,7 @@ _graphic_options() {
 }
 
 _usage () {
-    echo -e "\e[1mManage \e[36mArchboot\e[m\e[1m - Environment:\e[m"
+    echo -e "\e[36mArchboot\e[m \e[1m - Manage Environment:\e[m"
     echo -e "\e[1m------------------------------\e[m"
     echo -e " \e[1m-help\e[m            This message."
     if [[ ! -e "${_LOCAL_DB}" || -e "/usr/bin/setup" ]]; then
