@@ -7,12 +7,12 @@ _usage () {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create Container\e[m"
     echo -e "\e[1m---------------------------\e[m"
     echo "This will create an archboot container for an archboot image."
-    echo ""
+    echo
     echo "Options:"
-    echo " \e[1m-cc\e[m    Cleanup container eg. removing manpages, includes..."
-    echo " \e[1m-cp\e[m    Cleanup container package cache"
-    echo " \e[1m-install-source=<server>\e[m    Use <server> containing archboot repository"
-    echo ""
+    echo -e " \e[1m-cc\e[m    Cleanup container eg. removing manpages, includes..."
+    echo -e " \e[1m-cp\e[m    Cleanup container package cache"
+    echo -e " \e[1m-install-source=<server>\e[m    Use <server> containing archboot repository"
+    echo
     echo -e "Usage: \e[1m${_BASENAME} <directory> <options>\e[m"
     exit 0
 }
