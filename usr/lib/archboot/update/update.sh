@@ -30,6 +30,8 @@ _graphic_options() {
 _usage () {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Manage Environment:\e[m"
     echo -e "\e[1m------------------------------\e[m"
+    echo "The main tool to manage or update the Archboot Environment."
+    echo ""
     echo "Options:"
     echo -e " \e[1m-help\e[m            This message."
     if [[ ! -e "${_LOCAL_DB}" || -e "/usr/bin/setup" ]]; then
@@ -74,7 +76,7 @@ _usage () {
             echo -e " \e[1m-latest-image\e[m    Generate latest image files in /archboot directory."
         fi
     fi
-    echo -e "Usage: \e[1m${_BASENAME} <options>\e[m"
+    echo -e "Usage: \e[1m${_BASENAME} <option>\e[m"
     exit 0
 }
 # vim: set ft=sh ts=4 sw=4 et:
