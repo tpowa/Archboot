@@ -6,7 +6,7 @@
 _usage () {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create Container\e[m"
     echo -e "\e[1m---------------------------\e[m"
-    echo "This will create an archboot container for an archboot image."
+    echo "This will create an Archboot container for an archboot image."
     echo
     echo "Options:"
     echo -e " \e[1m-cc\e[m    Cleanup container eg. removing manpages, includes..."

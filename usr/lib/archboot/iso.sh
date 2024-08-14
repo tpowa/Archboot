@@ -9,16 +9,16 @@ _BOOTLOADER="/usr/share/archboot/bootloader"
 _usage () {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create ${_ARCH} USB/CD Image\e[m"
     echo -e "\e[1m--------------------------------------\e[m"
-    echo "This will create an archboot iso image."
-    echo ""
+    echo "This will create an Archboot iso image."
+    echo
     echo "Options:"
-    echo " -g              Starting generation of image."
-    echo " -c=CONFIG       Which CONFIG should be used."
+    echo -e " \e[1m-g\e[m              Starting generation of image."
+    echo -e " \e[1m-c=CONFIG\e[m       Which CONFIG should be used."
     echo "                 ${_CONFIG_DIR} includes the config files"
     echo "                 default=${_ARCH}.conf"
-    echo " -i=IMAGENAME    Your IMAGENAME."
-    echo " -s              Save initramfs files in current work directory"
-    echo ""
+    echo -e " \e[1m-i=IMAGENAME\e[m    Your IMAGENAME."
+    echo -e " \e[1m-s\e[m              Save initramfs files in current work directory"
+    echo
     echo -e "Usage: \e[1m${_BASENAME} <options>\e[m"
     exit 0
 }

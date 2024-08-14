@@ -19,7 +19,7 @@ _W_DIR="$(mktemp -u archboot-release.XXX)"
 _usage () {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create Release Images\e[m"
     echo -e "\e[1m--------------------------------\e[m"
-    echo "This will create an archboot release image in <directory>."
+    echo "This will create an Archboot release image in <directory>."
     echo "Optional: You can specify a certain <server> with an archboot repository."
     echo ""
     echo -e "Usage: \e[1m${_BASENAME} <directory> <server>\e[m"
