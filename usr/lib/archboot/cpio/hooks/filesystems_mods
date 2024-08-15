@@ -9,4 +9,3 @@ _run ()
     _map _mod crypto-crc32c crypto-crc32 libcrc32c configfs nls_cp437 nls_ascii
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

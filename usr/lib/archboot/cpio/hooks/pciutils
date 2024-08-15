@@ -7,4 +7,3 @@ _run ()
     _map _binary lspci pcilmr setpci update-pciids
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

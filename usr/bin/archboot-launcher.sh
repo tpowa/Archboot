@@ -113,4 +113,3 @@ while true; do
     _check_manage
     _launcher
 done
-# vim: set ts=4 sw=4 et:

@@ -118,4 +118,3 @@ echo "Removing ${1} directory."
 rm -r "${1}"
 echo "Finished ${1}."
 }
-# vim: set ft=sh ts=4 sw=4 et:

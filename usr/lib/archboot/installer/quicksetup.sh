@@ -343,4 +343,3 @@ _autoprepare() {
     _dialog --title " Success " --no-mouse --infobox "Quick Setup was successful." 3 40
     sleep 3
 }
-# vim: set ft=sh ts=4 sw=4 et:

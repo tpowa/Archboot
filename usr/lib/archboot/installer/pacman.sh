@@ -79,4 +79,3 @@ _install_packages() {
     _chroot_umount
     _run_locale_gen | _dialog --title " Locales " --no-mouse --gauge "Rebuilding glibc locales on installed system..." 6 75 0
 }
-# vim: set ft=sh ts=4 sw=4 et:

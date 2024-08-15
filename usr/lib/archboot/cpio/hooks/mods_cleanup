@@ -9,4 +9,3 @@ _run ()
     rm -r /lib/modules
     _MODS="" _MOD_DEPS=""
 }
-# vim: set ft=sh ts=4 sw=4 et:

@@ -18,4 +18,3 @@ growfs,info,io,logprint,metadump,mdrestore,mkfile,ncheck,quota,repair,rtcp,space
     _map _file /usr/lib/libINI*
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

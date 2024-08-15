@@ -8,4 +8,3 @@ _run ()
     _map _file /etc/{conf.d/smartd,smartd.conf}
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

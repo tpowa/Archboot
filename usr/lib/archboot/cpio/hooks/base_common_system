@@ -148,4 +148,3 @@ linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz} \
     _map _file /usr/share/{ca-certificates/trust-source/mozilla.trust.p11-kit,p11-kit/modules/p11-kit-trust.module}
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

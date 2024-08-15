@@ -94,4 +94,3 @@ while [[ -z "${_SET_TIME}" ]]; do
     _timeset
 done
 _cleanup
-# vim: set ts=4 sw=4 et:

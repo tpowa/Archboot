@@ -14,4 +14,3 @@ _run ()
     _map _file /usr/lib/{libgcc_s.so.1,ossl-modules/legacy.so}
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

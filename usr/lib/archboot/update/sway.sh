@@ -119,4 +119,3 @@ _start_sway() {
     chmod 755 /usr/bin/sway-wayland
     sway-wayland
 }
-# vim: set ft=sh ts=4 sw=4 et:

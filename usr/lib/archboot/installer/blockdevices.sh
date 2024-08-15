@@ -837,4 +837,3 @@ _createluks()
     cryptsetup -q luksFormat "${_DEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}"
     _opening_luks
 }
-# vim: set ft=sh ts=4 sw=4 et:

@@ -15,4 +15,3 @@ create,display,export,extend,import,merge,mknodes,reduce,remove,rename,s,scan,sp
     _map _file /etc/lvm/lvm.conf /usr/lib/{liblvm*,systemd/system/{lvm2*,blk-availability.service,sysinit.target.wants/lvm2*}}
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

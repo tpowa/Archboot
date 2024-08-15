@@ -21,4 +21,3 @@ _run ()
     _all_mods -f '9pnet|bluetooth|fs' 'virtio'
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

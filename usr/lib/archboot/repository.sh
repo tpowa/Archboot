@@ -35,4 +35,3 @@ _cleanup_repodir() {
     rm -r "${1}"
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

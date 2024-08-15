@@ -393,4 +393,3 @@ _new_image() {
     _progress "100" "New isofiles are located in /archboot."
     sleep 2
 }
-# vim: set ft=sh ts=4 sw=4 et:

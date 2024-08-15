@@ -146,4 +146,3 @@ _clear
 _msg "The boot medium can be safely removed now."
 echo ""
 _msg "Launching $(systemctl --version | head -n1)..."
-# vim: set ft=sh ts=4 sw=4 et:

@@ -186,4 +186,3 @@ fi
 _dialog --title " Success " --no-mouse --infobox "Pacman configuration completed successfully." 3 60
 sleep 2
 _cleanup
-# vim: set ft=sh ts=4 sw=4 et:

@@ -32,4 +32,3 @@ if  echo "${_HOOKS[@]}" | rg -qw installer; then
 fi
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

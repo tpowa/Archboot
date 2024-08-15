@@ -7,4 +7,3 @@ _run ()
     _all_mods -f '_cs|b44|broadcom/bnx2x|brocade|cavium|chelsio|cisco|netronome|mellanox|myricom|qlogic|qualcomm' '/drivers/net/ethernet|/net/ipv4|/net/ipv6|/drivers/net/usb'
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

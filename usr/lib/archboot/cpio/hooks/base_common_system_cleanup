@@ -19,4 +19,3 @@ stdio-bridge,sysusers,tty-ask-password-agent,repart,creds,cryptenroll,dissect,id
 {bus,coredump,locale,login,machine,network,hostname,timedate,userdb,home,oom,portable}ctl,zoxide}
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

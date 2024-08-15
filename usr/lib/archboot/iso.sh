@@ -292,4 +292,3 @@ _cleanup_iso() {
     echo "Removing ${_ISODIR}..."
     [[ -d "${_ISODIR}" ]] && rm -r "${_ISODIR}"
 }
-# vim: set ft=sh ts=4 sw=4 et:

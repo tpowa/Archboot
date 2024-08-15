@@ -231,4 +231,3 @@ while true; do
     _network && break
 done
 _cleanup
-# vim: set ft=sh ts=4 sw=4 et:

@@ -221,4 +221,3 @@ _create_iso() {
         done
     fi
 }
-# vim: set ft=sh ts=4 sw=4 et:

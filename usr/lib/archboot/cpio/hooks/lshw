@@ -7,4 +7,3 @@ _run ()
     _binary lshw
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

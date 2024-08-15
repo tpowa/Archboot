@@ -26,4 +26,3 @@ echo "${_PACKAGE}" >binary.log
 for i in $(pacman -Ql ${_PACKAGE} | rg -o '/usr/bin/..*$'); do
 	command -v "${i}" &>"${_NO_LOG}" || echo "${i}" >>binary.log
 done
-# vim: set ft=sh ts=4 sw=4 et:

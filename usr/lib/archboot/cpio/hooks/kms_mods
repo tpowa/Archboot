@@ -17,4 +17,3 @@ _run ()
     _map _all_mods 'chromeos_privacy_screen' 'thinkpad_acpi'
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

@@ -70,4 +70,3 @@ echo "Syncing tarball to ${_SERVER}:${_PUB}/.${_SERVER_PACMAN_ARCH}..."
 #shellcheck disable=SC2086
 run0 -u "${_USER}" ${_RSYNC} "${_PACMAN_ARCH_CHROOT}"{,.sig} "${_SERVER}:${_PUB}/.${_SERVER_PACMAN_ARCH}" || exit 1
 echo "Finished."
-# vim: set ft=sh ts=4 sw=4 et:

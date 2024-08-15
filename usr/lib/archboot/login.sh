@@ -179,4 +179,3 @@ else
     _welcome
     _run_update_installer
 fi
-# vim: set ft=sh ts=4 sw=4 et:

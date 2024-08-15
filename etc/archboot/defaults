@@ -65,4 +65,3 @@ _GPG="--detach-sign --no-armor --batch --passphrase-file /etc/archboot/gpg.passp
 # use this public gpg key to verify
 _GPG_KEY="/usr/share/archboot/gpg/tpowa.gpg"
 _GPG_KEY_ID="5B7E3FB71B7F10329A1C03AB771DF6627EDF681F"
-# vim: set ft=sh ts=4 sw=4 et:

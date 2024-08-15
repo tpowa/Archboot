@@ -11,4 +11,3 @@ elinks,ethtool,genl,ifstat,lnstat,nstat,ssh,tracepath,rdma,rtacct,\
 rtmon,rtstat,ss,tc,tipc,vdpa}
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

@@ -244,4 +244,3 @@ _set_hostname() {
     echo "Setting hostname to archboot..."
     echo 'archboot' > "${1}/etc/hostname"
 }
-# vim: set ft=sh ts=4 sw=4 et:

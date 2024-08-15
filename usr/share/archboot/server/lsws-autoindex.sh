@@ -37,4 +37,3 @@ for i in $(seq 0 3); do
         fi
     done
 done
-# vim: set ft=sh ts=4 sw=4 et:

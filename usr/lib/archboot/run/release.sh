@@ -10,4 +10,3 @@ echo "Starting release creation in ${1}..."
 _create_iso "$@" || exit 1
 echo "Finished release creation in ${1}."
 
-# vim: set ft=sh ts=4 sw=4 et:

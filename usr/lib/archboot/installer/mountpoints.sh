@@ -624,4 +624,3 @@ _mkfs() {
         _check_filesystem_fstab "$@"
     fi
 }
-# vim: set ft=sh ts=4 sw=4 et:

@@ -250,4 +250,3 @@ _start_xfce() {
     sleep 2
     startxfce4 >"${_LOG}" 2>&1
 }
-# vim: set ft=sh ts=4 sw=4 et:

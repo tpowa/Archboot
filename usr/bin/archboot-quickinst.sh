@@ -96,4 +96,3 @@ _chroot_umount
 _post_installation
 exit 0
 
-# vim: set ts=4 sw=4 et:

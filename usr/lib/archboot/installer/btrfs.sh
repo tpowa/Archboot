@@ -283,4 +283,3 @@ _btrfs_compress() {
         _BTRFS_COMPRESS="compress=$(cat "${_ANSWER}")"
     fi
 }
-# vim: set ft=sh ts=4 sw=4 et:

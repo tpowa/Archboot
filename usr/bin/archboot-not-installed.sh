@@ -38,4 +38,3 @@ done
 # pacman-mirrorlist only /etc file
 # pambase only /etc files
 rg -v "ca-certificates|dbus-units|dbus-broker-units|iana-etc|licenses|linux-firmware-whence|pacman-mirrorlist|pambase" not-installed.orig.log >not-installed.log
-# vim: set ft=sh ts=4 sw=4 et:

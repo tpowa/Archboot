@@ -8,4 +8,3 @@ _run ()
   [[ -d /var/cache/pacman/pkg ]] && rm -r /var/cache/pacman/pkg
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

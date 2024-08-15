@@ -359,4 +359,3 @@ _create_cpio() {
     popd >"${_NO_LOG}" || return 1
     echo "Build complete."
 }
-# vim: set ft=sh ts=4 sw=4 et:

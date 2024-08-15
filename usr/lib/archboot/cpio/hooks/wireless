@@ -15,4 +15,3 @@ _run ()
     _map _file /etc/conf.d/wireless-regdom /usr/lib/crda/{regulatory.bin,pubkeys/wens.key.pub.pem}
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

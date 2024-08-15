@@ -135,4 +135,3 @@ _server_release() {
     mv "${_ISO_BUILD_DIR}" "${_DIR}"
     _server_upload "${_SERVER_IMAGE_DIR}" "${_ISO_HOME_ARCH}"
 }
-# vim: set ft=sh ts=4 sw=4 et:

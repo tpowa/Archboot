@@ -103,4 +103,3 @@ while [[ -z "${_LOCALE}" ]]; do
 done
 _localize
 _cleanup
-# vim: set ts=4 sw=4 et:

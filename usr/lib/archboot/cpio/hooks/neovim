@@ -13,4 +13,3 @@ _run ()
     _file_rename /usr/share/archboot/nvim/nvim-lastplace.lua /usr/share/nvim/runtime/plugin/nvim-lastplace.lua
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

@@ -143,4 +143,3 @@ _locale_gen() {
     ${_NSPAWN} locale-gen &>"${_NO_LOG}"
     [[ -e /.archboot ]] && rm /.archboot
 }
-# vim: set ft=sh ts=4 sw=4 et:

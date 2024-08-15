@@ -126,4 +126,3 @@ if [[ -n "${_FULL_SYSTEM}" ]]; then
     clear
 fi
 [[ -e /.update ]] && rm /.update
-# vim: set ft=sh ts=4 sw=4 et:

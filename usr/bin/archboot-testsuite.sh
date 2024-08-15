@@ -180,4 +180,3 @@ else
     echo -e "\e[1;94m=> \e[1;91mAn error was detected. Please check the corresponding log files.\e[m"
     exit 1
 fi
-# vim: set ft=sh ts=4 sw=4 et:

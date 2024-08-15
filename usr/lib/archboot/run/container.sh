@@ -57,4 +57,3 @@ _reproducibility "${1}"
 _set_hostname "${1}" || exit 1
 _ssh_keys "${1}" || exit 1
 echo "Finished container setup in ${1}."
-# vim: set ft=sh ts=4 sw=4 et:

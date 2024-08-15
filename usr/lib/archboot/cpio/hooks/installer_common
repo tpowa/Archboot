@@ -14,4 +14,3 @@ _run ()
     echo ". /usr/lib/archboot/login.sh" >> "${_ROOTFS}/root/.bashrc"
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

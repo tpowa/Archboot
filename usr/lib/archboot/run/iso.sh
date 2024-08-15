@@ -46,4 +46,3 @@ if echo "${_BASENAME}" | rg -qw 'aarch64' || echo "${_BASENAME}" | rg -qw 'x86_6
 else
     echo "Finished Image creation."
 fi
-# vim: set ft=sh ts=4 sw=4 et:

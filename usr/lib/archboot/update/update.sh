@@ -79,4 +79,3 @@ _usage () {
     echo -e "Usage: \e[1m${_BASENAME} <option>\e[m"
     exit 0
 }
-# vim: set ft=sh ts=4 sw=4 et:

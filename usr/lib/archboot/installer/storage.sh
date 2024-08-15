@@ -120,4 +120,3 @@ _create_special() {
         _NEXTITEM=4
     fi
 }
-# vim: set ft=sh ts=4 sw=4 et:

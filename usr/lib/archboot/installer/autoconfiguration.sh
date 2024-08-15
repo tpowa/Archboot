@@ -254,4 +254,3 @@ _auto_mkinitcpio() {
         _printk on
     fi
 }
-# vim: set ft=sh ts=4 sw=4 et:

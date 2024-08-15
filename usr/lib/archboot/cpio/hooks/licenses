@@ -147,4 +147,3 @@ done
     _map _full_dir /usr/share/licenses/{spdx,linux-firmware}
 }
 
-# vim: set ft=sh ts=4 sw=4 et:

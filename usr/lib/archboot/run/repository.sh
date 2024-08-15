@@ -43,4 +43,3 @@ _move_packages "${_REPODIR}" "${1}" || exit 1
 _cleanup_repodir "${_REPODIR}" || exit 1
 _create_archboot_db "${1}" || exit 1
 echo "Finished repository creation in ${_REPODIR}."
-# vim: set ft=sh ts=4 sw=4 et:
