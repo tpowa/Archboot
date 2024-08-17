@@ -21,7 +21,7 @@ cp firmware.log firmware.orig.log
 while read -r i; do
     sd "${i}" '' firmware.log
 done < modules.log
-rg -v 'amd|amss|atmel|ath[0-9]|board-2|brcm|cs42l43|htc_*|i915|imx|intel|iwlwifi|libertas|m3\.bin|mediatek|mrvl|mwl.*|mt7650|nvidia|radeon|regdb|rsi|rt[0-9][0-9]*|rtl|rtw8[8-9]|slicoss|ti-connect|ti_*|vpu_*|/.zst' firmware.log > fw-error.log
+rg -v 'amd|amss|atmel|ath[0-9]|board-2|brcm|cs42l43|htc_*|i915|imx|intel|iwlwifi|libertas|m3\.bin|mediatek|mrvl|mwl.*|mt7650|nvidia|radeon|regdb|rsi|rt[0-9][0-9]*|rtl|rtw8[8-9]|slicoss|ti-connect|ti_*|vpu_*|xe|/.zst' firmware.log > fw-error.log
 if [[ -s fw-error.log ]]; then
     exit 1
 fi
