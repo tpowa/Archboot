@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="https://archboot.com/gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2024 Fundraise: 0% <progress max="100" value="48">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2024 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 26.08.2024 22:42</strong></p>
+<strong>Last update: 27.08.2024 22:42</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -82,7 +82,6 @@
 <thead>
 <tr class="header">
 <th>Arch Linux Distribution</th>
-<th>Main Mirror</th>
 <th>Release</th>
 <th>B2SUM</th>
 <th>Archive</th>
@@ -92,7 +91,6 @@
 <tbody>
 <tr class="odd">
 <td><a href="https://archlinuxarm.org/"><strong>ARM - aarch64</strong></a><sup>1</sup></td>
-<td><a href="https://release.archboot.com/aarch64/latest"><strong>U.S.</a> | <a href="https://release.archboot.de/aarch64/latest"><strong>EU</strong></a> | <a href="https://release.archboot.net/aarch64/latest"><strong>Asia</strong></a></td>
 <td><a href="https://release.archboot.com/aarch64/latest/Release.txt"><strong>Packages</strong></a></td>
 <td><a href="https://release.archboot.com/aarch64/latest/b2sum.txt"><strong>Check</strong></a></td>
 <td><a href="https://release.archboot.com/aarch64"><strong>Browse</strong></a></td>
@@ -100,7 +98,6 @@
 </tr>
 <tr class="even">
 <td><a href="https://archriscv.felixc.at/"><strong>RISC-V - riscv64</strong></a><sup>2</sup></td>
-<td><a href="https://release.archboot.com/riscv64/latest"><strong>U.S.</a> | <a href="https://release.archboot.de/riscv64/latest"><strong>EU</strong></a> | <a href="https://release.archboot.net/riscv64/latest"><strong>Asia</strong></a></td>
 <td><a href="https://release.archboot.com/riscv64/latest/Release.txt"><strong>Packages</strong></a></td>
 <td><a href="https://release.archboot.com/riscv64/latest/b2sum.txt"><strong>Check</strong></a></td>
 <td><a href="https://release.archboot.com/riscv64"><strong>Browse</strong></a></td>
@@ -108,7 +105,6 @@
 </tr>
 <tr class="odd">
 <td><a href="https://archlinux.org/"><strong>X64 - x86_64</strong></a><sup>3</sup></td>
-<td><a href="https://release.archboot.com/x86_64/latest"><strong>U.S.</a> | <a href="https://release.archboot.de/x86_64/latest"><strong>EU</strong></a> | <a href="https://release.archboot.net/x86_64/latest"><strong>Asia</strong></a></td>
 <td><a href="https://release.archboot.com/x86_64/latest/Release.txt"><strong>Packages</strong></a></td>
 <td><a href="https://release.archboot.com/x86_64/latest/b2sum.txt"><strong>Check</strong></a></td>
 <td><a href="https://release.archboot.com/x86_64"><strong>Browse</strong></a></td>
@@ -119,17 +115,37 @@
 <p><sup>1</sup> Supports <strong>aarch64, Apple Mac M1 and higher</strong> for virtual machines eg. <a href="https://wiki.archlinux.org/title/Parallels_Desktop" title="Parallels Desktop"><strong>Parallels Desktop</strong></a>, <a href="https://mac.getutm.app/" title="UTM MacOS"><strong>UTM</strong></a> and <a href="https://wiki.archlinux.org/title/VMware" title="VMware"><strong>VMware</strong></a><br>
 <sup>2</sup> Supports <strong>riscv64</strong> and needs <a href="https://www.denx.de/wiki/U-Boot" title="U-Boot"><strong>U-Boot</strong></a> to launch. Recommended <strong>only</strong> for testing in a virtual machine.<br>
 <sup>3</sup> Supports <strong>x86_64</strong>. Use it for <strong>real</strong> machines <strong>and/or</strong> virtual machines.</p>
-<ul>
-<li>The <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Image / UKI</strong></a> can be booted from your <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> firmware or <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> like any other <strong>&lt;EFI&gt;</strong> file.</li>
-<li>For <strong>rescue booting</strong>, add an entry pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initrd</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a>.</li>
-<li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting, add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initrd</strong></a> and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong></a> setup.</li>
-</ul>
 <table>
 <thead>
 <tr class="header">
 <th>Location</th>
-<th>User Hosted Mirror</th>
-<th>Architecture</th>
+<th>Main Mirrors</th>
+<th>Download</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>United States</strong></td>
+<td><a href="https://release.archboot.com"><strong>archboot.com</a></td>
+<td><a href="https://release.archboot.com/aarch64/latest"><strong>aarch64</a> | <a href="https://release.archboot.com/riscv64/latest"><strong>riscv64</strong></a> | <a href="https://release.archboot.com/x86_64/latest"><strong>x86_64</strong></a></td>
+</tr>
+<tr class="even">
+<td><strong>Europe</strong></td>
+<td><a href="https://release.archboot.de"><strong>archboot.de</a></td>
+<td><a href="https://release.archboot.de/aarch64/latest"><strong>aarch64</a> | <a href="https://release.archboot.de/riscv64/latest"><strong>riscv64</strong></a> | <a href="https://release.archboot.de/x86_64/latest"><strong>x86_64</strong></a></td>
+</tr>
+<tr class="odd">
+<td><strong>Asia</strong></td>
+<td><a href="https://release.archboot.net"><strong>archboot.net</a></td>
+<td><a href="https://release.archboot.net/aarch64/latest"><strong>aarch64</a> | <a href="https://release.archboot.net/riscv64/latest"><strong>riscv64</strong></a> | <a href="https://release.archboot.net/x86_64/latest"><strong>x86_64</strong></a></td>
+</tr>
+</table>
+<table>
+<thead>
+<tr class="header">
+<th>Location</th>
+<th>User Hosted Mirrors</th>
+<th>Download</th>
 </tr>
 </thead>
 <tbody>
@@ -139,6 +155,11 @@
 <td><a href="https://mirror.pagenotfound.de/archboot/aarch64/latest"><strong>aarch64</a> | <a href="https://mirror.pagenotfound.de/archboot/riscv64/latest"><strong>riscv64</strong></a> | <a href="https://mirror.pagenotfound.de/archboot/x86_64/latest"><strong>x86_64</strong></a></td>
 </tr>
 </table>
+<ul>
+<li>The <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Image / UKI</strong></a> can be booted from your <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> firmware or <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> like any other <strong>&lt;EFI&gt;</strong> file.</li>
+<li>For <strong>rescue booting</strong>, add an entry pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initrd</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a>.</li>
+<li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting, add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initrd</strong></a> and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong></a> setup.</li>
+</ul>
 <h3 data-number="2.1" id="image-types"><span class="header-section-number">2.1</span> <strong>ISO / Initrd / UKI Types</strong></h3>
 <table>
 <thead>
