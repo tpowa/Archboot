@@ -1,4 +1,6 @@
-On the road to 2024.08:
+On the road to 2024.09:
+---
+Maintenance Release 2024.08:
 Environment:
 - updated and unified usage information in all scripts
 - added clean-blockdevice.sh script
