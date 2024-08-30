@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# archboot-restore-usbstick.sh - restore usbstick to FAT32
+# archboot-clean-blockdevice.sh - clean blockdevice from filesystem 
+# signatures and partition table
 # by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 _usage()
