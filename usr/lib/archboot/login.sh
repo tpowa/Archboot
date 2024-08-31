@@ -133,12 +133,12 @@ _run_autorun() {
         done
     fi
     if [[ -f /etc/archboot/run/autorun.sh ]]; then
-        echo "Running custom autorun.sh..."
         echo "Waiting for pacman keyring..."
         _pacman_keyring
         echo "Updating pacman keyring..."
         pacman -Sy --noconfirm ${_KEYRING} &>"${_LOG}"
         chmod 755 /etc/archboot/run/autorun.sh
+        echo "Running custom autorun.sh..."
         /etc/archboot/run/./autorun.sh
         echo "Finished autorun.sh."
     fi
