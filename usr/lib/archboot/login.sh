@@ -110,10 +110,12 @@ _run_update_installer() {
 }
 
 _run_autorun() {
-    if rg -q 'autorun=' /proc/cmdline && [[ ! -e "${_LOCAL_DB}" ]]; then
+    # check on cmdline, don't run on local image, only run autorun once!
+    if rg -q 'autorun=' /proc/cmdline && [[ ! -e "${_LOCAL_DB}" && ! -e /.autorun ]]; then
+        : > /.autorun
         _REMOTE_AUTORUN="$(rg -o 'autorun=(.*)' -r '$1' /proc/cmdline | sd ' .*' '')"
         echo "Trying 30 seconds to download:"
-        echo -n "${_REMOTE_AUTORUN} --> /etc/archboot/run/autorun.sh..."
+        echo -n "${_REMOTE_AUTORUN} --> autorun.sh..."
         [[ -d /etc/archboot/run ]] || mkdir -p /etc/archboot/run
         _COUNT=""
         while true; do
