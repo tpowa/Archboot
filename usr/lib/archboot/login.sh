@@ -112,29 +112,30 @@ _run_update_installer() {
 _run_autorun() {
     if rg -q 'autorun=' /proc/cmdline && [[ ! -e "${_LOCAL_DB}" ]]; then
         _REMOTE_AUTORUN="$(rg -o 'autorun=(.*)' -r '$1' /proc/cmdline | sd ' .*' '')"
-        echo -n "Trying 30 seconds to download ${_REMOTE_AUTORUN}..."
+        echo "Trying 30 seconds to download:"
+        echo -n "${_REMOTE_AUTORUN} --> /etc/archboot/run/autorun.sh..."
+        [[ -d /etc/archboot/run ]] || mkdir -p /etc/archboot/run
         _COUNT=""
         while true; do
             sleep 1
             if ${_DLPROG} -o /etc/archboot/run/autorun.sh "${_REMOTE_AUTORUN}"; then
-                echo " => Success."
+                echo -e "\e[1;94m => \e[1;92mSuccess.\e[m"
                 break
             fi
             _COUNT=$((_COUNT+1))
             if [[ "${_COUNT}" == 30 ]]; then
-                echo " => Error: Download failed!"
+                echo -e "\e[1;94m => \e[1;91mERROR: Download failed.\e[m"
                 sleep 5
                 break
             fi
         done
     fi
     if [[ -f /etc/archboot/run/autorun.sh ]]; then
-        echo
         echo "Running custom autorun.sh..."
         echo "Waiting for pacman keyring..."
         _pacman_keyring
         chmod 755 /etc/archboot/run/autorun.sh
-        ./etc/archboot/run/autorun.sh
+        /etc/archboot/run/./autorun.sh
     fi
 }
 
