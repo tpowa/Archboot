@@ -111,7 +111,7 @@ _run_update_installer() {
 
 _run_autorun() {
     # check on cmdline, don't run on local image, only run autorun once!
-    if rg -q 'autorun=' /proc/cmdline && [[ ! -e "${_LOCAL_DB}" && ! -e /.autorun ]]; then
+    if rg -q 'autorun=' /proc/cmdline && [[ ! -e "${_LOCAL_DB}" ]]; then
         : > /.autorun
         _REMOTE_AUTORUN="$(rg -o 'autorun=(.*)' -r '$1' /proc/cmdline | sd ' .*' '')"
         echo "Trying 30 seconds to download:"
@@ -138,6 +138,7 @@ _run_autorun() {
         _pacman_keyring
         chmod 755 /etc/archboot/run/autorun.sh
         /etc/archboot/run/./autorun.sh
+        echo "Finished autorun.sh."
     fi
 }
 
@@ -157,7 +158,7 @@ if [[ "${_TTY}" = "tty1" ]] ; then
         # initialize pacman keyring
         [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl start pacman-init
     fi
-    _run_autorun
+    ! [[ -e /.autorun ]] && _run_autorun
 fi
 # start bottom on VC6
 while [[ "${_TTY}" = "tty6" ]] ; do
