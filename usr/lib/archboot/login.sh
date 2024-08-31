@@ -110,7 +110,7 @@ _run_update_installer() {
 }
 
 _run_autorun() {
-    # check on cmdline, don't run on local image, only run autorun once!
+    # check on cmdline parameter, don't run on local image
     if rg -q 'autorun=' /proc/cmdline && [[ ! -e "${_LOCAL_DB}" ]]; then
         : > /.autorun
         clear
@@ -165,6 +165,7 @@ if [[ "${_TTY}" = "tty1" ]] ; then
         # initialize pacman keyring
         [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl start pacman-init
     fi
+    # only run autorun.sh once!
     ! [[ -e /.autorun ]] && _run_autorun
 fi
 # start bottom on VC6
