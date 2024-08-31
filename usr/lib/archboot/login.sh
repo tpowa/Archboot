@@ -111,7 +111,7 @@ _run_update_installer() {
 
 _run_autorun() {
     if rg -q 'autorun=' /proc/cmdline && [[ ! -e "${_LOCAL_DB}" ]]; then
-        _REMOTE_AUTORUN="$(rg -o 'autorun=(.*/.*\.sh)' -r '$1' /proc/cmdline)"
+        _REMOTE_AUTORUN="$(rg -o 'autorun=(.*)' -r '$1' /proc/cmdline | sd ' .*' '')"
         echo -n "Trying 30 seconds to download ${_REMOTE_AUTORUN}..."
         _COUNT=""
         while true; do
