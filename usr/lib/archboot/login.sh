@@ -109,6 +109,35 @@ _run_update_installer() {
     fi
 }
 
+_run_autorun() {
+    if rg -q 'autorun=' /proc/cmdline && [[ ! -e "${_LOCAL_DB}" ]]; then
+        _REMOTE_AUTORUN="$(rg -o 'autorun=(.*sh)' -r '$1' /proc/cmdline)"
+        echo -n "Trying 30 seconds to download ${_REMOTE_AUTORUN}..."
+        _COUNT=""
+        while true; do
+            sleep 1
+            if ${_DLPROG} -o /etc/archboot/run/autorun.sh "${_REMOTE_AUTORUN}"; then
+                echo " => Success."
+                break
+            fi
+            _COUNT=$((_COUNT+1))
+            if [[ "${_COUNT}" == 30 ]]; then
+                echo " => Error: Download failed!"
+                sleep 5
+                break
+            fi
+        done
+    fi
+    if [[ -f /etc/archboot/run/autorun.sh ]]; then
+        echo
+        echo "Running custom autorun.sh..."
+        echo "Waiting for pacman keyring..."
+        _pacman_keyring
+        chmod 755 /etc/archboot/run/autorun.sh
+        ./etc/archboot/run/autorun.sh
+    fi
+}
+
 if [[ "${_TTY}" = "tty1" ]] ; then
     if ! mount | rg -q 'zram0'; then
         _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | ZRAM"
@@ -125,6 +154,7 @@ if [[ "${_TTY}" = "tty1" ]] ; then
         # initialize pacman keyring
         [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl start pacman-init
     fi
+    _run_autorun
 fi
 # start bottom on VC6
 while [[ "${_TTY}" = "tty6" ]] ; do

@@ -1,4 +1,5 @@
 On the road to 2024.09:
+- added custom autorun script support
 ---
 Highlights 2024.08:
 - added clean-blockdevice.sh script
