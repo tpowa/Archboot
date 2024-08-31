@@ -113,6 +113,7 @@ _run_autorun() {
     # check on cmdline, don't run on local image, only run autorun once!
     if rg -q 'autorun=' /proc/cmdline && [[ ! -e "${_LOCAL_DB}" ]]; then
         : > /.autorun
+        clear
         _REMOTE_AUTORUN="$(rg -o 'autorun=(.*)' -r '$1' /proc/cmdline | sd ' .*' '')"
         echo "Trying 30 seconds to download:"
         echo -n "${_REMOTE_AUTORUN} --> autorun.sh..."
