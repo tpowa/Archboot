@@ -141,6 +141,10 @@ _run_autorun() {
         echo "Running custom autorun.sh..."
         /etc/archboot/run/./autorun.sh
         echo "Finished autorun.sh."
+        echo
+        echo "Relogin on tty1 in 5 seconds..."
+        sleep 5
+        exit
     fi
 }
 
