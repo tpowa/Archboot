@@ -144,6 +144,9 @@ done
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _file /usr/share/licenses/broadcom-wl/LICENSE
     fi
+    if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
+        _file /usr/share/licenses/systemd/MIT-0.txt
+    fi
     _map _full_dir /usr/share/licenses/{spdx,linux-firmware}
 }
 
