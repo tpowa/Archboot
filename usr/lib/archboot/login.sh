@@ -136,6 +136,8 @@ _run_autorun() {
         echo "Running custom autorun.sh..."
         echo "Waiting for pacman keyring..."
         _pacman_keyring
+        echo "Updating pacman keyring..."
+        pacman -Sy ${_KEYRING}
         chmod 755 /etc/archboot/run/autorun.sh
         /etc/archboot/run/./autorun.sh
         echo "Finished autorun.sh."
