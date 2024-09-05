@@ -187,7 +187,7 @@ _download_latest_task() {
     LIBS="autoconfiguration.sh quicksetup.sh base.sh bcachefs.sh blockdevices.sh bootloader.sh \
             bootloader_sb.sh bootloader_grub.sh bootloader_uki.sh bootloader_systemd_bootd.sh \
             bootloader_limine.sh bootloader_pacman_hooks.sh bootloader_refind.sh \
-            bootloader_systemd_services.sh bootloader_uboot.sh btrfs.sh common.sh \
+            bootloader_uboot.sh btrfs.sh common.sh \
             configuration.sh mountpoints.sh pacman.sh partition.sh storage.sh"
     for i in ${LIBS}; do
         ${_DLPROG} -o "${_INST}/${i}" "${_SOURCE}${_INST}/${i}?inline=false"
