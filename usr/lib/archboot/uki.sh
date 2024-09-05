@@ -19,6 +19,7 @@ _usage () {
     echo -e " \e[1m-c=CONFIG\e[m       Which CONFIG should be used."
     echo "                 ${_CONFIG_DIR} includes the config files"
     echo "                 default=${_ARCH}.conf"
+    echo -e " \e[1m-cli='options'\e[m  Your custom kernel commandline options."
     echo -e " \e[1m-i=IMAGENAME\e[m    Your IMAGENAME."
     echo
     echo -e "Usage: \e[1m${_BASENAME} <options>\e[m"
@@ -30,6 +31,7 @@ _parameters() {
         case ${1} in
             -g|--g) export _GENERATE="1" ;;
             -c=*|--c=*) _CONFIG="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
+            -cli=*) _CMDLINE="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
             -i=*|--i=*) _UKI="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
             *) _usage ;;
         esac
@@ -51,7 +53,7 @@ _config() {
 
 _prepare_kernel_initramfs() {
     # needed to hash the kernel for secureboot enabled systems
-    echo "Preparing kernel..."
+    echo "Preparing kernel and initramfs..."
     install -m644 "${_KERNEL}" "${_UKIDIR}/kernel"
     _INITRD="initrd-${_ARCH}.img"
     echo "Running archboot-cpio.sh for ${_INITRD}..."
@@ -72,7 +74,7 @@ _prepare_ucode() {
 
 _prepare_background() {
     echo "Preparing UKI splash..."
-    cp "${_SPLASH}" "${_UKIDIR}/splash.png"
+    cp "${_SPLASH}" "${_UKIDIR}/splash.bmp"
 }
 
 _prepare_osrelease() {
@@ -88,13 +90,13 @@ _reproducibility() {
 _systemd_ukify() {
     echo "Generating ${_ARCH} UKI image..."
     pushd "${_UKIDIR}" &>"${_NO_LOG}" || exit 1
-    [[ "${_ARCH}" == "aarch64" ]] && _CMDLINE="console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto"
-    [[ "${_ARCH}" == "aarch64" ]] && _CMDLINE="nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto"
-    [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=intel-ucode"
-    [[ -n "${_AMD_UCODE}" ]] && _AMD_UCODE="--initrd=amd-ucode"
+    [[ "${_ARCH}" == "x86_64" && -z "${_CMDLINE}" ]] && _CMDLINE="console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto"
+    [[ "${_ARCH}" == "aarch64" && -z "${_CMDLINE}" ]] && _CMDLINE="nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto"
+    [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=intel-ucode.img"
+    [[ -n "${_AMD_UCODE}" ]] && _AMD_UCODE="--initrd=amd-ucode.img"
     /usr/lib/systemd/ukify build --linux=kernel \
-        ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${_INITRD}" --cmdline=@"${_CMDLINE}" \
-        --os-release=@os-release --splash=splash.png --output=../"${_UKI}" &>"${_NO_LOG}" || exit 1
+        ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${_INITRD}" --cmdline="${_CMDLINE}" \
+        --os-release=@os-release --splash=splash.bmp --output="../${_UKI}" &>"${_NO_LOG}" || exit 1
     popd &>"${_NO_LOG}" || exit 1
 }
 
