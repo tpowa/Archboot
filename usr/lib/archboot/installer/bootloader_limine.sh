@@ -12,16 +12,16 @@ _limine_common() {
 _limine_config() {
     _PARTN="$(${_LSBLK} PARTN "${_BOOTDEV}")"
     cat << CONFEOF > "${_LIMINE_CONFIG}"
-    TIMEOUT=5
+timeout: 5
 
-:Arch Linux
-    PROTOCOL=linux
-    KERNEL_PATH=boot://${_PARTN}/${_VMLINUZ}
-    CMDLINE=${_KERNEL_PARAMS_MOD}
-    MODULE_PATH=boot://${_PARTN}/${_INITRAMFS}
+/Arch Linux
+    protocol: linux
+    kernel_path: boot(${_PARTN}):/${_VMLINUZ}
+    cmdline: ${_KERNEL_PARAMS_MOD}
+    module_path: boot(${_PARTN}):/${_INITRAMFS}
 CONFEOF
-    ## Edit limine.cfg config file
-    _dialog --msgbox "You will now be put into the editor to edit:\nlimine.cfg\n\nAfter you save your changes, exit the editor." 8 50
+    ## Edit limine.conf config file
+    _dialog --msgbox "You will now be put into the editor to edit:\nlimine.conf\n\nAfter you save your changes, exit the editor." 8 50
     _geteditor || return 1
     "${_EDITOR}" "${_LIMINE_CONFIG}"
 }
@@ -36,7 +36,7 @@ _limine_bios() {
         return 1
     fi
     _dialog --no-mouse --infobox "Setting up LIMINE BIOS now..." 3 60
-    _LIMINE_CONFIG="${_DESTDIR}/boot/limine.cfg"
+    _LIMINE_CONFIG="${_DESTDIR}/boot/limine.conf"
     _VMLINUZ="${_SUBDIR}/${_VMLINUZ}"
     _INITRAMFS="${_SUBDIR}/${_INITRAMFS}"
     _limine_config
@@ -61,7 +61,7 @@ _limine_uefi() {
     _dialog --no-mouse --infobox "Setting up LIMINE now..." 3 60
     [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
     cp -f "${_DESTDIR}/usr/share/limine/BOOT${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI"
-    _LIMINE_CONFIG="${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine.cfg"
+    _LIMINE_CONFIG="${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine.conf"
     _limine_config
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI" ]]; then
         _BOOTMGR_LABEL="LIMINE"
