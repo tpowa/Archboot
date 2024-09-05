@@ -14,12 +14,12 @@ Unit=run_ukify.service
 [Install]
 WantedBy=multi-user.target
 CONFEOF
-        cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.service"
+    cat << CONFEOF > "${_DESTDIR}/etc/systemd/system/run_ukify.service"
 [Unit]
 Description=Run systemd ukify
 [Service]
 Type=oneshot
-ExecStart="/usr/lib/systemd/ukify build --config=/etc/ukify.conf --output ${_UEFISYS_MP}/EFI/Linux/archlinux-linux.efi"
+ExecStart="/usr/lib/systemd/ukify build --config=/etc/ukify.conf --output ${_UEFISYS_MP}/EFI/Linux/arch-linux.efi"
 CONFEOF
     ${_NSPAWN} systemctl enable run_ukify.path &>"${_NO_LOG}"
 }
