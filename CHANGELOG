@@ -1,6 +1,11 @@
 On the road to 2024.09:
 - switched Europe domain from archboot.de to archboot.eu
 - added custom autorun script support
+- added archboot-x86_64-uki.sh script
+- added archboot-aarch64-uki.sh script
+setup:
+- switched to new limine 8.0 config layout (issue #4)
+- switched to mkinitcpio uki generation (issue #3)
 ---
 Highlights 2024.08:
 - added clean-blockdevice.sh script
