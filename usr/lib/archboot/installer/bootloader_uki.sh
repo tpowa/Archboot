@@ -18,7 +18,7 @@ OSRelease=@/etc/os-release
 Splash=/usr/share/systemd/bootctl/splash-arch.bmp
 CONFEOF
     mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux"
-    _dialog --msgbox "You will now be put into the editor to edit:\n- kernel commandline config file\n- ukify.conf config file\n\nAfter you save your changes, exit the editor." 9 50
+    _dialog --msgbox "You will now be put into the editor to edit:\n- kernel commandline config file\n- uki config file\n\nAfter you save your changes, exit the editor." 9 50
 }
 
 _uki_install() {
@@ -45,7 +45,7 @@ _uki_uefi() {
     "${_EDITOR}" "${_CMDLINE}"
     "${_EDITOR}" "${_UKIFY_CONFIG}"
     # enable uki handling in presets
-    sd '#default_uki' 'default_uki' "${_DESTDIR}/etc/mkinitcpio.d/presets"
+    sd '#default_uki' 'default_uki' "${_DESTDIR}/etc/mkinitcpio.d/*.preset"
     _run_mkinitcpio
     _mkinitcpio_error
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi" ]]; then
