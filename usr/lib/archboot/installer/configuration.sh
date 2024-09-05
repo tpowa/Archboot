@@ -15,15 +15,15 @@ _mkinitcpio() {
 
 _run_mkinitcpio() {
     _chroot_mount
-    echo "Initramfs progress..." > /tmp/mkinitcpio.log
+    echo "Mkinitcpio progress..." > /tmp/mkinitcpio.log
     : > /.archboot
     _mkinitcpio &
-    _progress_wait "0" "99" "Rebuilding initramfs on installed system..." "0.1"
+    _progress_wait "0" "99" "Running mkinitcpio on installed system..." "0.1"
     if [[ -e "/tmp/.mkinitcpio-success" ]]; then
-        _progress "100" "Rebuilding initramfs complete." 6 75
+        _progress "100" "Mkinitcpio complete." 6 75
         sleep 2
     else
-        _progress "100" "Rebuilding initramfs failed." 6 75
+        _progress "100" "Mkinitcpio failed." 6 75
         sleep 2
     fi
     _chroot_umount

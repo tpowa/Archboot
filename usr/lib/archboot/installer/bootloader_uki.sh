@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _uki_config() {
-    _UKIFY_CONFIG="${_DESTDIR}/etc/ukify.conf"
+    _UKIFY_CONFIG="${_DESTDIR}/etc/kernel/uki.conf"
     _CMDLINE="${_DESTDIR}/etc/kernel/cmdline"
     echo "${_KERNEL_PARAMS_MOD}" > "${_CMDLINE}"
     echo "[UKI]" > "${_UKIFY_CONFIG}"
@@ -22,7 +22,6 @@ CONFEOF
 }
 
 _uki_install() {
-    _uki_autobuild
     _BOOTMGR_LABEL="Arch Linux - Unified Kernel Image"
     _BOOTMGR_LOADER_PATH="/EFI/Linux/arch-linux.efi"
     _uefi_bootmgr_setup
@@ -45,7 +44,10 @@ _uki_uefi() {
     _geteditor || return 1
     "${_EDITOR}" "${_CMDLINE}"
     "${_EDITOR}" "${_UKIFY_CONFIG}"
-    ${_NSPAWN} /usr/lib/systemd/ukify build --config=/etc/ukify.conf --output "${_UEFISYS_MP}"/EFI/Linux/arch-linux.efi >>"${_LOG}"
+    # enable uki handling in presets
+    sd '#default_uki' 'default_uki' "${_DESTDIR}/etc/mkinitcpio.d/presets"
+    _run_mkinitcpio
+    _mkinitcpio_error
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi" ]]; then
         _uki_install | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Setting up Unified Kernel Image..." 6 75 0
     else

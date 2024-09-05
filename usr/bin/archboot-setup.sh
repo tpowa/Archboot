@@ -19,7 +19,6 @@
 . /usr/lib/archboot/installer/bootloader_uboot.sh
 . /usr/lib/archboot/installer/bootloader_uki.sh
 . /usr/lib/archboot/installer/bootloader_pacman_hooks.sh
-. /usr/lib/archboot/installer/bootloader_systemd_services.sh
 . /usr/lib/archboot/installer/btrfs.sh
 . /usr/lib/archboot/installer/configuration.sh
 . /usr/lib/archboot/installer/mountpoints.sh
