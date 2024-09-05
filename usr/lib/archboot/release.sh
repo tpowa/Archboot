@@ -128,12 +128,10 @@ _create_iso() {
             # add INTEL ucode license
             mkdir -p licenses/intel-ucode
             cp /usr/share/licenses/intel-ucode/* licenses/intel-ucode/
-            _EFISTUB="/usr/lib/systemd/boot/efi/linuxx64.efi.stub"
             echo "console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto" > ${_CMDLINE}
         fi
         if [[ "${_ARCH}" == "aarch64" ]]; then
             echo "nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto" > ${_CMDLINE}
-            _EFISTUB="/usr/lib/systemd/boot/efi/linuxaa64.efi.stub"
             _INTEL_UCODE=""
             # replace aarch64 Image.gz with Image kernel for UKI, compressed image is not working at the moment
             cp "${_W_DIR}/boot/Image" "boot/Image-${_ARCH}"
