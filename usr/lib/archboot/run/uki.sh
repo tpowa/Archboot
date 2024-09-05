@@ -15,6 +15,7 @@ _prepare_ucode || exit 1
 _prepare_background || exit 1
 _prepare_osrelease || exit 1
 _reproducibility || exit 1
+_systemd_ukify || exit 1
 _create_cksum || exit 1
 _cleanup_uki || exit 1
 echo "Finished UKI creation."

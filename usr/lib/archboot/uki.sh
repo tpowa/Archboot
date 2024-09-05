@@ -50,7 +50,6 @@ _config() {
 }
 
 _prepare_kernel_initramfs() {
-    mkdir -p "${_UKIDIR}"
     # needed to hash the kernel for secureboot enabled systems
     echo "Preparing kernel..."
     install -m644 "${_KERNEL}" "${_UKIDIR}/kernel"
