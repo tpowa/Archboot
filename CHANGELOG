@@ -7,6 +7,8 @@ Highlights 2024.08:
 Environment:
 - updated and unified usage information in all scripts
 - added bash completion for restore-usbstick.sh and clean-blockdevice.sh
+setup:
+- added new limine config syntax issue #4
 ---
 Highlights 2024.07:
 - kernel 6.10.x
