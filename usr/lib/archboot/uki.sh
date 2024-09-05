@@ -88,15 +88,15 @@ _reproducibility() {
 
 _systemd_ukify() {
     echo "Generating ${_ARCH} UKI image..."
-    cd "${_UKIDIR}"
+    pushd "${_UKIDIR}" &>"${_NO_LOG}" || exit 1
     [[ "${_ARCH}" == "aarch64" ]] && _CMDLINE="console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto"
     [[ "${_ARCH}" == "aarch64" ]] && _CMDLINE="nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto"
     [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=intel-ucode"
     [[ -n "${_AMD_UCODE}" ]] && _AMD_UCODE="--initrd=amd-ucode"
     /usr/lib/systemd/ukify build --linux=kernel \
-        ${_INTEL_UCODE} ${_AMD_UCODE} --initrd=${_INITRD} --cmdline=@${_CMDLINE} \
-        --os-release=@os-release --splash=splash.png --output=../${_UKI} &>"${_NO_LOG}" || exit 1
-    cd ..
+        ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${_INITRD}" --cmdline=@"${_CMDLINE}" \
+        --os-release=@os-release --splash=splash.png --output=../"${_UKI}" &>"${_NO_LOG}" || exit 1
+    popd &>"${_NO_LOG}" || exit 1
 }
 
 _create_cksum() {
