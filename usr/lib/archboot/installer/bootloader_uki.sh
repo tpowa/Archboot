@@ -45,7 +45,7 @@ _uki_uefi() {
     "${_EDITOR}" "${_CMDLINE}"
     "${_EDITOR}" "${_UKIFY_CONFIG}"
     # enable uki handling in presets
-    sd '#default_uki' 'default_uki' "${_DESTDIR}/etc/mkinitcpio.d/*.preset"
+    sd '#default_uki' 'default_uki' "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
     _run_mkinitcpio
     _mkinitcpio_error
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi" ]]; then
