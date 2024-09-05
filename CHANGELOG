@@ -8,6 +8,7 @@ Environment:
 - updated and unified usage information in all scripts
 - added bash completion for restore-usbstick.sh and clean-blockdevice.sh
 setup:
+- switched to mkinitcpio handle UKI creation #3
 - added new limine config syntax issue #4
 ---
 Highlights 2024.07:
