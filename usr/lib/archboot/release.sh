@@ -39,7 +39,7 @@ _create_iso() {
     . "${_W_DIR}/etc/archboot/${_ARCH}.conf"
     #shellcheck disable=SC2116,SC2046,2086
     _KVER="$(_kver $(echo ${_W_DIR}${_KERNEL}))"
-    _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_KVER}"
+    _NAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_KVER}"
     if ! [[ "${_RUNNING_ARCH}" == "${_ARCH}" ]]; then
         ### to speedup build for riscv64 and aarch64 on x86_64, run compressor on host system
         echo "Generating initramdisks..."
@@ -68,16 +68,16 @@ _create_iso() {
         echo "Generating local ISO..."
         # generate local iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g -s \
-            -c=${_CONFIG_LOCAL} -i=${_ISONAME}-local-${_ARCH}" || exit 1
+            -c=${_CONFIG_LOCAL} -i=${_NAME}-local-${_ARCH}" || exit 1
         echo "Generating latest ISO..."
         # generate latest iso in container
         ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_ARCH}-iso.sh -g \
-            -c=${_CONFIG_LATEST} -i=${_ISONAME}-latest-${_ARCH}" || exit 1
+            -c=${_CONFIG_LATEST} -i=${_NAME}-latest-${_ARCH}" || exit 1
     fi
     echo "Generating normal ISO..."
     # generate iso in container
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;archboot-${_ARCH}-iso.sh -g -s \
-        -i=${_ISONAME}-${_ARCH}" || exit 1
+        -i=${_NAME}-${_ARCH}" || exit 1
     # move iso out of container
     mv "${_W_DIR}"/*.iso ./ &>"${_NO_LOG}"
     mv "${_W_DIR}"/*.img ./ &>"${_NO_LOG}"
@@ -140,9 +140,9 @@ _create_iso() {
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
         for initrd in ${_INITRD} ${_INITRD_LATEST} ${_INITRD_LOCAL}; do
-            [[ "${initrd}" == "${_INITRD}" ]] && _UKI="boot/archboot-${_ARCH}.efi"
-            [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="boot/archboot-latest-${_ARCH}.efi"
-            [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="boot/archboot-local-${_ARCH}.efi"
+            [[ "${initrd}" == "${_INITRD}" ]] && _UKI="boot/${_NAME}-${_ARCH}.efi"
+            [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="boot/${_NAME}-latest-${_ARCH}.efi"
+            [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="boot/${_NAME}-local-${_ARCH}.efi"
             #shellcheck disable=SC2086
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux=${_KERNEL_ARCHBOOT} \
                 ${_INTEL_UCODE} ${_AMD_UCODE} --initrd=${initrd} --cmdline=@${_CMDLINE} \
