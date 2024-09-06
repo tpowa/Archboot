@@ -232,7 +232,7 @@ _copy_archboot_defaults() {
     cp /etc/archboot/defaults "${1}"/etc/archboot/defaults
 }
 
-_reproducibility() {
+_container_reproducibility() {
     echo "Reproducibility changes..."
     #shellcheck disable=SC2016
     sd '(INSTALLDATE%)\n.*' '$1\n0' "${1}""${_PACMAN_LIB}"/local/*/desc

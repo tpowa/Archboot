@@ -2,11 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
-_AMD_UCODE="/boot/amd-ucode.img"
-_INTEL_UCODE="/boot/intel-ucode.img"
 _SPLASH="/usr/share/archboot/uki/archboot-background.bmp"
 _OSREL="/usr/share/archboot/base/etc/os-release"
-_CONFIG_DIR="/etc/archboot"
 _UKIDIR="$(mktemp -d UKIDIR.XXX)"
 
 _usage () {
@@ -72,7 +69,7 @@ _prepare_ucode() {
     cp "${_AMD_UCODE}" "${_UKIDIR}/"
 }
 
-_prepare_background() {
+_prepare_splash() {
     echo "Preparing UKI splash..."
     cp "${_SPLASH}" "${_UKIDIR}/splash.bmp"
 }
@@ -80,11 +77,6 @@ _prepare_background() {
 _prepare_osrelease() {
     echo "Preparing os-release..."
     cp "${_OSREL}" "${_UKIDIR}/os-release"
-}
-
-_reproducibility() {
-    # Reproducibility: set all timestamps to 0
-    fd . "${_UKIDIR}" -u --min-depth 1 -X touch -hcd "@0"
 }
 
 _systemd_ukify() {

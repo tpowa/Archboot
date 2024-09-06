@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
-_CONFIG_DIR="/etc/archboot"
 _ISODIR="$(mktemp -d ISODIR.XXX)"
 _BOOTLOADER="/usr/share/archboot/bootloader"
 
@@ -107,14 +106,14 @@ _prepare_ucode() {
     # only x86_64
     if [[ "${_ARCH}" == "x86_64" ]]; then
         echo "Preparing intel-ucode..."
-        cp /boot/intel-ucode.img "${_ISODIR}/boot/"
+        cp "${_INTEL_UCODE}" "${_ISODIR}/boot/"
         mkdir -p "${_ISODIR}"/licenses/intel-ucode
         cp /usr/share/licenses/intel-ucode/LICENSE "${_ISODIR}/licenses/intel-ucode"
     fi
     # both x86_64 and aarch64
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
         echo "Preparing amd-ucode..."
-        cp /boot/amd-ucode.img "${_ISODIR}/boot/"
+        cp "${_AMD_UCODE}" "${_ISODIR}/boot/"
         mkdir -p "${_ISODIR}"/licenses/amd-ucode
         cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_ISODIR}/licenses/amd-ucode"
     fi
@@ -173,11 +172,6 @@ _prepare_background() {
     echo "Preparing grub background..."
     [[ -d "${_ISODIR}/boot/grub" ]] || mkdir -p "${_ISODIR}/boot/grub"
     cp ${_GRUB_BACKGROUND} "${_ISODIR}/boot/grub/archboot-background.png"
-}
-
-_reproducibility() {
-    # Reproducibility: set all timestamps to 0
-    fd . "${_ISODIR}" -u --min-depth 1 -X touch -hcd "@0"
 }
 
 _prepare_uefi_image() {

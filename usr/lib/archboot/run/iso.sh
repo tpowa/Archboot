@@ -26,9 +26,9 @@ if echo "${_BASENAME}" | rg -qw 'aarch64' || echo "${_BASENAME}" | rg -qw 'x86_6
         _prepare_memtest || exit 1
     fi
     _prepare_background || exit 1
-    _reproducibility
+    _reproducibility "${_ISODIR}"
     _prepare_uefi_image || exit 1
-    _reproducibility
+    _reproducibility "${_ISODIR}"
     _grub_mkrescue || exit 1
     _unify_gpt_partitions || exit 1
 else
@@ -36,7 +36,7 @@ else
     echo "Starting Image creation..."
     _prepare_kernel_initrd_files || exit 1
     _prepare_extlinux_conf || exit 1
-    _reproducibility
+    _reproducibility "${_ISODIR}"
     _uboot || exit 1
 fi
 _create_cksum || exit 1

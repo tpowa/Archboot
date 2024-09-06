@@ -26,6 +26,9 @@ else
     _ARCHBOOT="archboot"
     _ARCH="x86_64"
 fi
+_CONFIG_DIR="/etc/archboot"
+_AMD_UCODE="/boot/amd-ucode.img"
+_INTEL_UCODE="/boot/intel-ucode.img"
 _PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
 _PACMAN_CONF="/etc/pacman.conf"
 _PACMAN_LIB="/var/lib/pacman"
@@ -358,4 +361,9 @@ _create_cpio() {
         zstd -T0 -19 >> "${2}" || _abort "Image creation failed!"
     popd >"${_NO_LOG}" || return 1
     echo "Build complete."
+}
+
+_reproducibility() {
+    # Reproducibility: set all timestamps to 0
+    fd . "${1}" -u --min-depth 1 -X touch -hcd "@0"
 }

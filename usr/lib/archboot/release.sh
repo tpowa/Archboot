@@ -2,8 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
-_AMD_UCODE="boot/amd-ucode.img"
-_INTEL_UCODE="boot/intel-ucode.img"
 _INITRD="boot/initrd-${_ARCH}.img"
 _INITRD_LATEST="boot/initrd-latest-${_ARCH}.img"
 _INITRD_LOCAL="boot/initrd-local-${_ARCH}.img"
@@ -102,8 +100,8 @@ _create_iso() {
         for i in *.iso; do
             if  echo "${i}" | rg -v 'local' | rg -vq 'latest'; then
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
-                mcopy -m -i efi.img ::/"${_AMD_UCODE}" ./"${_AMD_UCODE}"
-                [[ "${_ARCH}" == "aarch64" ]] || mcopy -m -i efi.img ::/"${_INTEL_UCODE}" ./"${_INTEL_UCODE}"
+                mcopy -m -i efi.img ::"${_AMD_UCODE}" ."${_AMD_UCODE}"
+                [[ "${_ARCH}" == "aarch64" ]] || mcopy -m -i efi.img ::"${_INTEL_UCODE}" ."${_INTEL_UCODE}"
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD}"
                 mcopy -m -i efi.img ::/"${_KERNEL_ARCHBOOT}" ./"${_KERNEL_ARCHBOOT}"
             elif echo "${i}" | rg -q 'latest'; then
@@ -137,8 +135,8 @@ _create_iso() {
             cp "${_W_DIR}/boot/Image" "boot/Image-${_ARCH}"
             _KERNEL_ARCHBOOT="boot/Image-${_ARCH}"
         fi
-        [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=${_INTEL_UCODE}"
-        [[ -n "${_AMD_UCODE}" ]] && _AMD_UCODE="--initrd=${_AMD_UCODE}"
+        [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=.${_INTEL_UCODE}"
+        [[ -n "${_AMD_UCODE}" ]] && _AMD_UCODE="--initrd=.${_AMD_UCODE}"
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
         for initrd in ${_INITRD} ${_INITRD_LATEST} ${_INITRD_LOCAL}; do
