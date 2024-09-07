@@ -130,9 +130,7 @@ _create_iso() {
             [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="boot/${_NAME}-latest-${_ARCH}.efi"
             [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="boot/${_NAME}-local-${_ARCH}.efi"
             #shellcheck disable=SC2086
-            ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
-                ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${initrd}" --cmdline="${_CMDLINE}" \
-                --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}" &>"${_NO_LOG}" || exit 1
+            ${_NSPAWN} "${_W_DIR}" _run_ukify
         done
         # fix permission and timestamp
         mv "${_W_DIR}"/boot ./

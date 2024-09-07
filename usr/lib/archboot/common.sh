@@ -373,6 +373,12 @@ _create_cpio() {
     echo "Build complete."
 }
 
+_run_ukify() {
+    /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
+        ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${initrd}" --cmdline="${_CMDLINE}" \
+        --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}" &>"${_NO_LOG}"
+}
+
 _reproducibility() {
     # Reproducibility: set all timestamps to 0
     fd . "${1}" -u --min-depth 1 -X touch -hcd "@0"
