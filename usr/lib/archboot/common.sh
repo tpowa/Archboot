@@ -59,8 +59,6 @@ elif [[ "${_ARCH}" == "aarch64" ]]; then
     _INTEL_UCODE=""
     _CMDLINE="nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto"
 fi
-[[ -n "${_INTEL_UCODE}" ]] && _UKI_INTEL_UCODE="--initrd=${_INTEL_UCODE}"
-_UKI_AMD_UCODE="--initrd=${_AMD_UCODE}"
 
 ### check for root
 _root_check() {
