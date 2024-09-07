@@ -59,14 +59,12 @@ _prepare_initramfs() {
 
 _systemd_ukify() {
     echo "Generating ${_ARCH} UKI image..."
-    cd "${_UKIDIR}" &>"${_NO_LOG}" || exit 1
     [[ -n "/${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=/${_INTEL_UCODE}"
     _AMD_UCODE="--initrd=/${_AMD_UCODE}"
     #shellcheck disable=SC2086
     /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
         ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${_INITRD}" --cmdline="${_CMDLINE}" \
-        --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="../${_UKI}" &>"${_NO_LOG}" || exit 1
-    cd ../ &>"${_NO_LOG}" || exit 1
+        --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}" &>"${_NO_LOG}" || exit 1
 }
 
 _create_cksum() {
