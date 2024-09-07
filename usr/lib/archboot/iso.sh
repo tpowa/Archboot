@@ -171,7 +171,7 @@ _prepare_memtest() {
 _prepare_background() {
     echo "Preparing grub background..."
     [[ -d "${_ISODIR}/boot/grub" ]] || mkdir -p "${_ISODIR}/boot/grub"
-    cp ${_GRUB_BACKGROUND} "${_ISODIR}/boot/grub/archboot-background.png"
+    cp "${_GRUB_BACKGROUND}" "${_ISODIR}/boot/grub/archboot-background.png"
 }
 
 _prepare_uefi_image() {

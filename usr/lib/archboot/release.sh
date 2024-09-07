@@ -34,7 +34,7 @@ _create_iso() {
     . "${_W_DIR}/etc/archboot/${_ARCH}.conf"
     #shellcheck disable=SC2116,SC2046,2086
     _KERNEL="$(echo ${_W_DIR}${_KERNEL})"
-    _NAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver ${_KERNEL})"
+    _NAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver "${_KERNEL}")"
     if ! [[ "${_RUNNING_ARCH}" == "${_ARCH}" ]]; then
         ### to speedup build for riscv64 and aarch64 on x86_64, run compressor on host system
         echo "Generating initramdisks..."
@@ -83,7 +83,7 @@ _create_iso() {
     if [[ "${_ARCH}" == "riscv64" ]]; then
         for i in *.img; do
             if  echo "${i}" | rg -v 'local' | rg -vq 'latest'; then
-                mv ${_KERNEL} boot/
+                mv "${_KERNEL}" boot/
                 mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD}"
             elif echo "${i}" | rg -q 'latest'; then
                 mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD_LATEST}"
@@ -99,7 +99,7 @@ _create_iso() {
                 if [[ "${_ARCH}" == "aarch64" ]]; then
                     # replace aarch64 Image.gz with Image kernel for UKI
                     # compressed image is not working at the moment
-                    _KERNEL="$(echo ${_KERNEL} | sd '\.gz' '')"
+                    _KERNEL="$(echo "${_KERNEL}" | sd '\.gz' '')"
                     mv "${_KERNEL}" boot/
                 else
                     mv "${_W_DIR}/${_INTEL_UCODE}" boot/
@@ -130,9 +130,9 @@ _create_iso() {
             [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="boot/${_NAME}-latest-${_ARCH}.efi"
             [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="boot/${_NAME}-local-${_ARCH}.efi"
             #shellcheck disable=SC2086
-            ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux=${_KERNEL} \
-                ${_INTEL_UCODE} ${_AMD_UCODE} --initrd=${initrd} --cmdline="${_CMDLINE}" \
-                --os-release=@${_OSREL} --splash=${_SPLASH} --output=${_UKI} &>"${_NO_LOG}" || exit 1
+            ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
+                ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${initrd}" --cmdline="${_CMDLINE}" \
+                --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}" &>"${_NO_LOG}" || exit 1
         done
         # fix permission and timestamp
         mv "${_W_DIR}"/boot ./
