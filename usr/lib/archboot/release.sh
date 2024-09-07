@@ -95,7 +95,7 @@ _create_iso() {
         for i in *.iso; do
             if  echo "${i}" | rg -v 'local' | rg -vq 'latest'; then
                 mv "${_W_DIR}/${_AMD_UCODE}" boot/
-                mv "${_W_DIR}/${_KERNEL}" boot/
+                mv "${_KERNEL}" boot/
                 if [[ "${_ARCH}" == "aarch64" ]]; then
                     # replace aarch64 Image.gz with Image kernel for UKI
                     # compressed image is not working at the moment
@@ -120,17 +120,19 @@ _create_iso() {
         mv "${_W_DIR}/usr/share/licenses/amd-ucode" licenses/
         [[ "${_ARCH}" == "x86_64" ]] && mv "${_W_DIR}/usr/share/licenses/intel-ucode" licenses/
         echo "Generating Unified Kernel Images..."
-        _KERNEL="boot/${_KERNEL##*/})"
+        _KERNEL="boot/${_KERNEL##*/}"
         [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=${_INTEL_UCODE}"
         _AMD_UCODE="--initrd=${_AMD_UCODE}"
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
         for initrd in ${_INITRD} ${_INITRD_LATEST} ${_INITRD_LOCAL}; do
-            [[ "${initrd}" == "${_INITRD}" ]] && _UKI="boot/${_NAME}-${_ARCH}.efi"
-            [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="boot/${_NAME}-latest-${_ARCH}.efi"
-            [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="boot/${_NAME}-local-${_ARCH}.efi"
+            [[ "${initrd}" == "${_INITRD}" ]] && _UKI="/boot/${_NAME}-${_ARCH}.efi"
+            [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="/boot/${_NAME}-latest-${_ARCH}.efi"
+            [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="/boot/${_NAME}-local-${_ARCH}.efi"
             #shellcheck disable=SC2086
-            ${_NSPAWN} "${_W_DIR}" _run_ukify
+            ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
+                ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${initrd}" --cmdline="${_CMDLINE}" \
+                --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}" || exit 1
         done
         # fix permission and timestamp
         mv "${_W_DIR}"/boot ./
@@ -163,17 +165,17 @@ _create_iso() {
     ${_NSPAWN} "${_W_DIR}" pacman -Q | sd '\r|\x1b\[[0-9;]*m|\x1b\[.[0-9]+[h;l]' '') >>Release.txt
     echo "Removing container ${_W_DIR}..."
     rm -r "${_W_DIR}"
-    if ! [[ "${_ARCH}" == "riscv64" ]]; then
+    if [[ "${_ARCH}" == "riscv64" ]]; then
+        echo "Creating img/ directory..."
+        mkdir img
+        mv ./*.img img/
+    else
         echo "Creating iso/ directory..."
         mkdir iso
         mv ./*.iso iso/
         echo "Creating uki/ directory..."
         mkdir uki
         mv boot/*.efi uki/
-    else
-        echo "Creating img/ directory..."
-        mkdir img
-        mv ./*.img img/
     fi
     echo "Generating b2sum..."
     for i in *; do

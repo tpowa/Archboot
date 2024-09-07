@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
-_AMD_UCODE="boot/amd-ucode.img"
+_AMD_UCODE="/boot/amd-ucode.img"
 _CACHEDIR="/var/cache/pacman/pkg"
 _CONFIG_DIR="/etc/archboot"
 _DLPROG="curl -L -s"
 _FIX_PACKAGES="libelf libevent talloc gcc-libs glibc glib2 icu pcre2 nss terminus-font"
-_INTEL_UCODE="boot/intel-ucode.img"
+_INTEL_UCODE="/boot/intel-ucode.img"
 _KERNELPKG="linux"
 _KEYRING="archlinux-keyring"
 _LABEL="Exit"
@@ -371,12 +371,6 @@ _create_cpio() {
         zstd -T0 -19 >> "${2}" || _abort "Image creation failed!"
     popd >"${_NO_LOG}" || return 1
     echo "Build complete."
-}
-
-_run_ukify() {
-    /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
-        ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${initrd}" --cmdline="${_CMDLINE}" \
-        --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}" &>"${_NO_LOG}"
 }
 
 _reproducibility() {
