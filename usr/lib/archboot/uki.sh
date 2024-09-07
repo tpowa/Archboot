@@ -2,8 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
-_SPLASH="/usr/share/archboot/uki/archboot-background.bmp"
-_OSREL="/usr/share/archboot/base/etc/os-release"
 _UKIDIR="$(mktemp -d UKIDIR.XXX)"
 
 _usage () {
@@ -43,53 +41,31 @@ _config() {
     #shellcheck disable=SC1090
     . "${_CONFIG}"
     #shellcheck disable=SC2116,2086
-    _KERNEL="$(echo ${_KERNEL})"
+    # aarch64 .gz kernel is not supported!
+    _KERNEL="$(echo ${_KERNEL} | sd '\.gz' '')"
     #shellcheck disable=SC2154
     [[ -z "${_UKI}" ]] && _UKI="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver "${_KERNEL}")-${_ARCH}".efi
 }
 
-_prepare_kernel_initramfs() {
+_prepare_initramfs() {
     # needed to hash the kernel for secureboot enabled systems
-    echo "Preparing kernel and initramfs..."
-    install -m644 "${_KERNEL}" "${_UKIDIR}/kernel"
-    _INITRD="initrd-${_ARCH}.img"
+    echo "Preparing initramfs..."
+    _INITRD="${_UKIDIR}/initrd.img"
     echo "Running archboot-cpio.sh for ${_INITRD}..."
     #shellcheck disable=SC2154
     archboot-cpio.sh -c "${_CONFIG}" -k "${_KERNEL}" \
-                     -g "${_UKIDIR}/${_INITRD}" || exit 1
-}
-
-_prepare_ucode() {
-    # only x86_64
-    if [[ "${_ARCH}" == "x86_64" ]]; then
-        echo "Preparing intel-ucode..."
-        cp "${_INTEL_UCODE}" "${_UKIDIR}/"
-    fi
-    echo "Preparing amd-ucode..."
-    cp "${_AMD_UCODE}" "${_UKIDIR}/"
-}
-
-_prepare_splash() {
-    echo "Preparing UKI splash..."
-    cp "${_SPLASH}" "${_UKIDIR}/splash.bmp"
-}
-
-_prepare_osrelease() {
-    echo "Preparing os-release..."
-    cp "${_OSREL}" "${_UKIDIR}/os-release"
+                     -g "${_INITRD}" || exit 1
 }
 
 _systemd_ukify() {
     echo "Generating ${_ARCH} UKI image..."
-    pushd "${_UKIDIR}" &>"${_NO_LOG}" || exit 1
-    [[ "${_ARCH}" == "x86_64" && -z "${_CMDLINE}" ]] && _CMDLINE="console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto"
-    [[ "${_ARCH}" == "aarch64" && -z "${_CMDLINE}" ]] && _CMDLINE="nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto"
-    [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=intel-ucode.img"
-    [[ -n "${_AMD_UCODE}" ]] && _AMD_UCODE="--initrd=amd-ucode.img"
-    /usr/lib/systemd/ukify build --linux=kernel \
+    cd "${_UKIDIR}" &>"${_NO_LOG}" || exit 1
+    [[ -n "/${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=/${_INTEL_UCODE}"
+    _AMD_UCODE="--initrd=/${_AMD_UCODE}"
+    /usr/lib/systemd/ukify build --linux=${_KERNEL} \
         ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${_INITRD}" --cmdline="${_CMDLINE}" \
-        --os-release=@os-release --splash=splash.bmp --output="../${_UKI}" &>"${_NO_LOG}" || exit 1
-    popd &>"${_NO_LOG}" || exit 1
+        --os-release=@${_OSREL} --splash=${_SPLASH} --output="../${_UKI}" &>"${_NO_LOG}" || exit 1
+    cd ../ &>"${_NO_LOG}" || exit 1
 }
 
 _create_cksum() {

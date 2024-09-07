@@ -2,19 +2,38 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
-_BASENAME=${0##*/}
-_RUNNING_ARCH="$(uname -m)"
-_RUNNING_KERNEL="$(uname -r)"
-_LOG="/dev/tty11"
-_NO_LOG="/dev/null"
-_VC_NUM="${_LOG/\/dev\/tty/}"
-_VC="VC${_VC_NUM}"
-_ANSWER="/.${_BASENAME}"
-_LABEL="Exit"
+_AMD_UCODE="boot/amd-ucode.img"
+_CACHEDIR="/var/cache/pacman/pkg"
+_CONFIG_DIR="/etc/archboot"
 _DLPROG="curl -L -s"
+_FIX_PACKAGES="libelf libevent talloc gcc-libs glibc glib2 icu pcre2 nss terminus-font"
+_INTEL_UCODE="boot/intel-ucode.img"
 _KERNELPKG="linux"
 _KEYRING="archlinux-keyring"
+_LABEL="Exit"
+_LOCAL_DB="${_CACHEDIR}/archboot.db"
+_LOG="/dev/tty11"
+_MAN_INFO_PACKAGES="man-db man-pages texinfo"
 _MEM_TOTAL="$(rg -o 'MemTotal.* (\d+)' -r '$1' /proc/meminfo)"
+_NO_LOG="/dev/null"
+_OSREL="/usr/share/archboot/base/etc/os-release"
+_PACMAN_CONF="/etc/pacman.conf"
+_PACMAN_LIB="/var/lib/pacman"
+_PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
+_PUB="public_html"
+_RSYNC="rsync -a -q --delete --delete-delay"
+_RUNNING_ARCH="$(uname -m)"
+_RUNNING_KERNEL="$(uname -r)"
+_SPLASH="/usr/share/archboot/uki/archboot-background.bmp"
+_STANDARD_PACKAGES="gparted xorg-xhost mtools noto-fonts"
+_VNC_PACKAGE="tigervnc"
+_WAYLAND_PACKAGE="egl-wayland"
+_XORG_PACKAGE="xorg"
+
+_BASENAME=${0##*/}
+_ANSWER="/.${_BASENAME}"
+_VC_NUM="${_LOG/\/dev\/tty/}"
+_VC="VC${_VC_NUM}"
 if echo "${_BASENAME}" | rg -qw aarch64; then
     _ARCHBOOT="archboot-arm"
     _KEYRING="${_KEYRING} archlinuxarm-keyring"
@@ -26,21 +45,6 @@ else
     _ARCHBOOT="archboot"
     _ARCH="x86_64"
 fi
-_CONFIG_DIR="/etc/archboot"
-_AMD_UCODE="/boot/amd-ucode.img"
-_INTEL_UCODE="/boot/intel-ucode.img"
-_PACMAN_MIRROR="/etc/pacman.d/mirrorlist"
-_PACMAN_CONF="/etc/pacman.conf"
-_PACMAN_LIB="/var/lib/pacman"
-_CACHEDIR="/var/cache/pacman/pkg"
-_LOCAL_DB="${_CACHEDIR}/archboot.db"
-_PUB="public_html"
-_RSYNC="rsync -a -q --delete --delete-delay"
-_FIX_PACKAGES="libelf libevent talloc gcc-libs glibc glib2 icu pcre2 nss terminus-font"
-_XORG_PACKAGE="xorg"
-_VNC_PACKAGE="tigervnc"
-_WAYLAND_PACKAGE="egl-wayland"
-_STANDARD_PACKAGES="gparted xorg-xhost mtools noto-fonts"
 # chromium is now working on riscv64
 [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _STANDARD_BROWSER="firefox"
 if [[ -d "${_ISO_HOME}" ]]; then
@@ -48,7 +52,15 @@ if [[ -d "${_ISO_HOME}" ]]; then
 else
     _NSPAWN="systemd-nspawn -q -D"
 fi
-_MAN_INFO_PACKAGES="man-db man-pages texinfo"
+
+if [[ "${_ARCH}" == "x86_64" ]]; then
+    _CMDLINE="console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto"
+elif [[ "${_ARCH}" == "aarch64" ]]; then
+    _INTEL_UCODE=""
+    _CMDLINE="nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto"
+fi
+[[ -n "${_INTEL_UCODE}" ]] && _UKI_INTEL_UCODE="--initrd=${_INTEL_UCODE}"
+_UKI_AMD_UCODE="--initrd=${_AMD_UCODE}"
 
 ### check for root
 _root_check() {

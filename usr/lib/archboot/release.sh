@@ -5,11 +5,6 @@
 _INITRD="boot/initrd-${_ARCH}.img"
 _INITRD_LATEST="boot/initrd-latest-${_ARCH}.img"
 _INITRD_LOCAL="boot/initrd-local-${_ARCH}.img"
-if [[ "${_ARCH}" == "aarch64" ]]; then
-    _KERNEL_ARCHBOOT="boot/Image-${_ARCH}.gz"
-else
-    _KERNEL_ARCHBOOT="boot/vmlinuz-${_ARCH}"
-fi
 _CONFIG_LATEST="${_ARCH}-latest.conf"
 _CONFIG_LOCAL="${_ARCH}-local.conf"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
@@ -38,8 +33,8 @@ _create_iso() {
     #shellcheck disable=SC1090
     . "${_W_DIR}/etc/archboot/${_ARCH}.conf"
     #shellcheck disable=SC2116,SC2046,2086
-    _KVER="$(_kver $(echo ${_W_DIR}${_KERNEL}))"
-    _NAME="archboot-$(date +%Y.%m.%d-%H.%M)-${_KVER}"
+    _KERNEL="$(echo ${_W_DIR}${_KERNEL})"
+    _NAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver ${_KERNEL})"
     if ! [[ "${_RUNNING_ARCH}" == "${_ARCH}" ]]; then
         ### to speedup build for riscv64 and aarch64 on x86_64, run compressor on host system
         echo "Generating initramdisks..."
@@ -88,7 +83,7 @@ _create_iso() {
     if [[ "${_ARCH}" == "riscv64" ]]; then
         for i in *.img; do
             if  echo "${i}" | rg -v 'local' | rg -vq 'latest'; then
-                mcopy -m -i "${i}"@@1048576 ::/"${_KERNEL_ARCHBOOT}" ./"${_KERNEL_ARCHBOOT}"
+                mv ${_KERNEL} boot/
                 mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD}"
             elif echo "${i}" | rg -q 'latest'; then
                 mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD_LATEST}"
@@ -99,11 +94,18 @@ _create_iso() {
     else
         for i in *.iso; do
             if  echo "${i}" | rg -v 'local' | rg -vq 'latest'; then
+                mv "${_W_DIR}/${_AMD_UCODE}" boot/
+                mv "${_W_DIR}/${_KERNEL}" boot/
+                if [[ "${_ARCH}" == "aarch64" ]]; then
+                    # replace aarch64 Image.gz with Image kernel for UKI
+                    # compressed image is not working at the moment
+                    _KERNEL="$(echo ${_KERNEL} | sd '\.gz' '')"
+                    mv "${_KERNEL}" boot/
+                else
+                    mv "${_W_DIR}/${_INTEL_UCODE}" boot/
+                fi
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
-                mcopy -m -i efi.img ::"${_AMD_UCODE}" ."${_AMD_UCODE}"
-                [[ "${_ARCH}" == "aarch64" ]] || mcopy -m -i efi.img ::"${_INTEL_UCODE}" ."${_INTEL_UCODE}"
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD}"
-                mcopy -m -i efi.img ::/"${_KERNEL_ARCHBOOT}" ./"${_KERNEL_ARCHBOOT}"
             elif echo "${i}" | rg -q 'latest'; then
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD_LATEST}"
@@ -113,30 +115,17 @@ _create_iso() {
             fi
             rm efi.img
         done
-        echo "Generating Unified Kernel Images..."
-        # create unified kernel image UKI, code adapted from wiki
-        # https://wiki.archlinux.org/title/Unified_kernel_image
-        _SPLASH="/usr/share/archboot/uki/archboot-background.bmp"
-        _OSREL="/usr/share/archboot/base/etc/os-release"
-        # add AMD ucode license
-        mkdir -p licenses/amd-ucode
-        cp /usr/share/licenses/amd-ucode/* licenses/amd-ucode/
-        _CMDLINE="boot/cmdline.txt"
+        # add ucode licenses
         if [[ "${_ARCH}" == "x86_64" ]]; then
-            # add INTEL ucode license
-            mkdir -p licenses/intel-ucode
-            cp /usr/share/licenses/intel-ucode/* licenses/intel-ucode/
-            echo "console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto" > ${_CMDLINE}
+            mkdir -p licenses/
+            mv "${_W_DIR}/usr/share/licenses/intel-ucode" licenses/
         fi
-        if [[ "${_ARCH}" == "aarch64" ]]; then
-            echo "nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto" > ${_CMDLINE}
-            _INTEL_UCODE=""
-            # replace aarch64 Image.gz with Image kernel for UKI, compressed image is not working at the moment
-            cp "${_W_DIR}/boot/Image" "boot/Image-${_ARCH}"
-            _KERNEL_ARCHBOOT="boot/Image-${_ARCH}"
-        fi
-        [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=.${_INTEL_UCODE}"
-        [[ -n "${_AMD_UCODE}" ]] && _AMD_UCODE="--initrd=.${_AMD_UCODE}"
+        mkdir -p licenses/amd-ucode
+        mv "${_W_DIR}/usr/share/licenses/amd-ucode" licenses/
+        echo "Generating Unified Kernel Images..."
+        _KERNEL="boot/${_KERNEL##*/})"
+        [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=${_INTEL_UCODE}"
+        _AMD_UCODE="--initrd=${_AMD_UCODE}"
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
         for initrd in ${_INITRD} ${_INITRD_LATEST} ${_INITRD_LOCAL}; do
@@ -144,13 +133,12 @@ _create_iso() {
             [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="boot/${_NAME}-latest-${_ARCH}.efi"
             [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="boot/${_NAME}-local-${_ARCH}.efi"
             #shellcheck disable=SC2086
-            ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux=${_KERNEL_ARCHBOOT} \
-                ${_INTEL_UCODE} ${_AMD_UCODE} --initrd=${initrd} --cmdline=@${_CMDLINE} \
+            ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux=${_KERNEL} \
+                ${_INTEL_UCODE} ${_AMD_UCODE} --initrd=${initrd} --cmdline="${_CMDLINE}" \
                 --os-release=@${_OSREL} --splash=${_SPLASH} --output=${_UKI} &>"${_NO_LOG}" || exit 1
         done
         # fix permission and timestamp
         mv "${_W_DIR}"/boot ./
-        rm "${_CMDLINE}"
         chmod 644 boot/*.efi
     fi
     touch boot/*
