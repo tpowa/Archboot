@@ -63,7 +63,7 @@ _systemd_ukify() {
     _AMD_UCODE="--initrd=/${_AMD_UCODE}"
     #shellcheck disable=SC2086
     /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
-        ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${initrd}" --cmdline="${_CMDLINE}" \
+        ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${_INITRD}" --cmdline="${_CMDLINE}" \
         --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}" &>"${_NO_LOG}" || exit 1
 }
 
