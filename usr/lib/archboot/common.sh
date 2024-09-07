@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
-_AMD_UCODE="/boot/amd-ucode.img"
+_AMD_UCODE="boot/amd-ucode.img"
 _CACHEDIR="/var/cache/pacman/pkg"
 _CONFIG_DIR="/etc/archboot"
 _DLPROG="curl -L -s"
 _FIX_PACKAGES="libelf libevent talloc gcc-libs glibc glib2 icu pcre2 nss terminus-font"
-_INTEL_UCODE="/boot/intel-ucode.img"
+_INTEL_UCODE="boot/intel-ucode.img"
 _KERNELPKG="linux"
 _KEYRING="archlinux-keyring"
 _LABEL="Exit"
