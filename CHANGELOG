@@ -6,7 +6,7 @@ On the road to 2024.09:
 - switched name scheme for UKI images
 - switched TRIGGERS to an array
 - reordered config arrays
-- switched to more arrays to simplify code
+- switched to use more arrays to simplify and cleanup code
 setup:
 - switched to new limine 8.0 config layout (issue #4)
 - switched to mkinitcpio uki generation (issue #3)
