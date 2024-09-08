@@ -23,7 +23,8 @@ _cleanup() {
 }
 
 _run_pacman() {
-    for i in ${1}; do
+    #shellcheck disable=2068
+    for i in $@; do
         #shellcheck disable=SC2086
         LC_ALL=C.UTF-8 pacman -Sy ${i} --noconfirm &>"${_LOG}"
         if [[ ! -e "/.full_system" ]]; then
@@ -51,7 +52,8 @@ _IGNORE=()
 }
 
 _install_fix_packages() {
-    _run_pacman "$(echo ${_FIX_PACKAGES[@]})"
+    #shellcheck disable=SC2068
+    _run_pacman ${_FIX_PACKAGES[@]}
     rm /.archboot
 }
 
@@ -60,14 +62,16 @@ _install_graphic() {
     if rg -q qxl /proc/modules; then
         _GRAPHIC+=(xf86-video-qxl)
     fi
-    _run_pacman "$(echo ${_GRAPHIC[@]})"
+    #shellcheck disable=SC2068
+    _run_pacman ${_GRAPHIC[@]}
     rm /.archboot
 }
 
 
 _prepare_graphic() {
     # fix libs first, then install packages from defaults
-    _GRAPHIC="${1}"
+    #shellcheck disable=SC2206
+    _GRAPHIC=($@)
     if [[ ! -e "/.full_system" ]]; then
         _progress "1" "Removing firmware files..."
         rm -rf /usr/lib/firmware
@@ -129,14 +133,14 @@ _custom_wayland_xorg() {
     if [[ -n "${_CUSTOM_WL}" ]]; then
         echo -e "\e[1mStep 1/2:\e[m Installing custom wayland..."
         echo "          This will need some time..."
-        #shellcheck disable=SC2145
-        _prepare_graphic "${_WAYLAND_PACKAGE} $(echo ${_CUSTOM_WAYLAND[@]})" > "${_LOG}" 2>&1
+        #shellcheck disable=SC2068,SC2086
+        _prepare_graphic ${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND[@]} > "${_LOG}" 2>&1
     fi
     if [[ -n "${_CUSTOM_X}" ]]; then
         echo -e "\e[1mStep 1/2:\e[m Installing custom xorg..."
         echo "          This will need some time..."
-        #shellcheck disable=SC2145
-        _prepare_graphic "${_XORG_PACKAGE} $(echo ${_CUSTOM_XORG[@]})" > "${_LOG}" 2>&1
+        #shellcheck disable=SC2068,SC2086
+        _prepare_graphic ${_XORG_PACKAGE} ${_CUSTOM_XORG[@]} > "${_LOG}" 2>&1
     fi
     echo -e "\e[1mStep 2/2:\e[m Setting up browser...\e[m"
     command -v firefox &>"${_NO_LOG}"  && _firefox_flags

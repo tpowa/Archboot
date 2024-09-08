@@ -61,20 +61,14 @@ EOF
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/
 }
 
-_prepare_plasma() {
+_install_plasma() {
     if ! [[ -e /usr/bin/startplasma-x11 ]]; then
-        _prepare_graphic "${_PACKAGES[@]}"
+		#shellcheck disable=SC2086,SC2068
+        _prepare_graphic ${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES[@]} ${_PLASMA_PACKAGES[@]}
     fi
     _prepare_browser >"${_LOG}" 2>&1
     _configure_plasma >"${_LOG}" 2>&1
 }
-
-_install_plasma() {
-	#shellcheck disable=SC2206
-    _PACKAGES=(${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES[@]} ${_PLASMA_PACKAGES[@]})
-    _prepare_plasma
-}
-
 
 _start_plasma() {
     _progress "100" "Launching Plasma/KDE Wayland now, logging is done on ${_LOG}..."
