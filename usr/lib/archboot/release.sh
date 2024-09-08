@@ -126,13 +126,13 @@ _create_iso() {
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
         for initrd in ${_INITRD} ${_INITRD_LATEST} ${_INITRD_LOCAL}; do
-            [[ "${initrd}" == "${_INITRD}" ]] && _UKI="/boot/${_NAME}-${_ARCH}.efi"
-            [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="/boot/${_NAME}-latest-${_ARCH}.efi"
-            [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="/boot/${_NAME}-local-${_ARCH}.efi"
+            [[ "${initrd}" == "${_INITRD}" ]] && _UKI="/boot/${_NAME}-${_ARCH}"
+            [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="/boot/${_NAME}-latest-${_ARCH}"
+            [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="/boot/${_NAME}-local-${_ARCH}"
             #shellcheck disable=SC2086
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
                 ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${initrd}" --cmdline="${_CMDLINE}" \
-                --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}" &>"${_NO_LOG}" || exit 1
+                --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}.efi" &>"${_NO_LOG}" || exit 1
         done
         # fix permission and timestamp
         mv "${_W_DIR}"/boot ./

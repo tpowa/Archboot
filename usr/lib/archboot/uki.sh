@@ -44,7 +44,7 @@ _config() {
     # aarch64 .gz kernel is not supported!
     _KERNEL="$(echo ${_KERNEL} | sd '\.gz' '')"
     #shellcheck disable=SC2154
-    [[ -z "${_UKI}" ]] && _UKI="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver "${_KERNEL}")-${_ARCH}".efi
+    [[ -z "${_UKI}" ]] && _UKI="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver "${_KERNEL}")-${_ARCH}"
 }
 
 _prepare_initramfs() {
@@ -64,7 +64,7 @@ _systemd_ukify() {
     #shellcheck disable=SC2086
     /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
         ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${_INITRD}" --cmdline="${_CMDLINE}" \
-        --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}" &>"${_NO_LOG}" || exit 1
+        --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}.efi" &>"${_NO_LOG}" || exit 1
 }
 
 _create_cksum() {
