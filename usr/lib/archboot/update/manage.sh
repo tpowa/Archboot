@@ -306,6 +306,7 @@ _new_environment() {
 _full_system() {
     _progress "1" "Refreshing pacman package database..."
     pacman -Sy >"${_LOG}" 2>&1 || exit 1
+    #shellcheck disable=SC2207
     _PACKAGES=($(pacman -Qqn))
     _COUNT=0
     _PACKAGE_COUNT="$(pacman -Qqn | wc -l)"
@@ -314,6 +315,7 @@ _full_system() {
     else
         _MKINITCPIO="initramfs"
     fi
+    #shellcheck disable=SC2068
     for i in ${_PACKAGES[@]}; do
         if [[ "$((_COUNT*100/_PACKAGE_COUNT-4))" -gt 1 ]]; then
             _progress "$((_COUNT*100/_PACKAGE_COUNT-4))" "Reinstalling all packages, installing ${i} now..."

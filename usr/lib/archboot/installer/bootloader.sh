@@ -133,14 +133,16 @@ _uefi_common() {
     _PACKAGES=()
     _DEV=""
     _BOOTDEV=""
-    [[ -f "${_DESTDIR}/usr/bin/mkfs.vfat" ]] || _PACKAGES+="dosfstools"
-    [[ -f "${_DESTDIR}/usr/bin/efivar" ]] || _PACKAGES+="efivar"
-    [[ -f "${_DESTDIR}/usr/bin/efibootmgr" ]] || _PACKAGES+="efibootmgr"
+    [[ -f "${_DESTDIR}/usr/bin/mkfs.vfat" ]] || _PACKAGES+=(dosfstools)
+    [[ -f "${_DESTDIR}/usr/bin/efivar" ]] || _PACKAGES+=(efivar)
+    [[ -f "${_DESTDIR}/usr/bin/efibootmgr" ]] || _PACKAGES+=(efibootmgr)
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
-        [[ -f "${_DESTDIR}/usr/bin/mokutil" ]] || _PACKAGES+="mokutil"
-        [[ -f "${_DESTDIR}/usr/bin/sbsign" ]] || _PACKAGES+="sbsigntools"
+        [[ -f "${_DESTDIR}/usr/bin/mokutil" ]] || _PACKAGES+=(mokutil)
+        [[ -f "${_DESTDIR}/usr/bin/sbsign" ]] || _PACKAGES+=(sbsigntools)
     fi
-    if [[ -n "${_PACKAGES[@]}" ]]; then
+    #shellcheck disable=SC2128
+    if [[ -n "${_PACKAGES}" ]]; then
+        #shellcheck disable=SC2145
         _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
         _pacman_error
     fi
@@ -244,7 +246,9 @@ _install_bootloader() {
     fi
     if [[ -n "${_UCODE}" ]]; then
         if ! [[ -f "${_DESTDIR}/boot/${_UCODE}" ]]; then
+            #shellcheck disable=SC2206
             _PACKAGES=(${_UCODE_PKG})
+            #shellcheck disable=SC2145
             _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
             _pacman_error
         fi

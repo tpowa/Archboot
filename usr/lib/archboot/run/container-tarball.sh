@@ -50,7 +50,7 @@ _fix_network "${1}"
 # update container to latest packages
 echo "Installing pacman to container..."
 mkdir -p "${1}/${_PACMAN_ARCH}${_PACMAN_LIB}"
-#shellcheck disable=SC2086
+#shellcheck disable=SC2068
 systemd-nspawn -D "${1}" pacman --root "/${_PACMAN_ARCH}" -Sy awk ${_KEYRING[@]} \
                --ignore systemd-resolvconf --noconfirm &>"${_NO_LOG}"
 _generate_keyring "${1}/${_PACMAN_ARCH}" || exit 1

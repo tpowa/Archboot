@@ -27,11 +27,13 @@ _grub_common_before() {
     _abort_bcachefs_bootpart || return 1
     if [[ ! -d "${_DESTDIR}/usr/lib/grub" ]]; then
         _PACKAGES=(grub)
+        #shellcheck disable=SC2145
         _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
         _pacman_error
     fi
     if [[ ! -f "${_DESTDIR}/usr/share/grub/ter-u16n.pf2" ]]; then
         _PACKAGES=(terminus-font)
+        #shellcheck disable=SC2145
         _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
         _pacman_error
     fi

@@ -142,6 +142,7 @@ _user_management() {
                         "BASH") _SHELL="bash"
                                 if ! [[ -f "${_DESTDIR}/usr/share/bash-completion/completions/arch" ]]; then
                                     _PACKAGES=(bash-completion)
+                                    #shellcheck disable=SC2145
                                     _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " \
                                         --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
                                     _pacman_error
@@ -149,6 +150,7 @@ _user_management() {
                         "ZSH") _SHELL="zsh"
                                 if ! [[ -f "${_DESTDIR}/usr/bin/zsh" ]]; then
                                     _PACKAGES=(grml-zsh-config)
+                                    #shellcheck disable=SC2145
                                     _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " \
                                         --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
                                     _pacman_error

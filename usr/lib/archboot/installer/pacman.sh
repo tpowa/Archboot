@@ -4,7 +4,7 @@
 
 
 _pacman() {
-    #shellcheck disable=SC2086,SC2069
+    #shellcheck disable=SC2086,SC2068
     ${_PACMAN} -Sy ${_PACKAGES[@]} &>"${_LOG}" && : > /tmp/.pacman-success
     rm /.archboot
 }
@@ -16,6 +16,7 @@ _run_pacman(){
     [[ ! -d "${_DESTDIR}${_PACMAN_LIB}" ]] && mkdir -p "${_DESTDIR}${_PACMAN_LIB}"
     : > /.archboot
     _pacman &
+     #shellcheck disable=SC2145
     _progress_wait "0" "99" "Installing package(s):\n${_PACKAGES[@]}..." "2"
     # pacman finished, display scrollable output
     if [[ -e "/tmp/.pacman-success" ]]; then
@@ -62,9 +63,11 @@ _run_autoconfig() {
 _install_packages() {
     _destdir_mounts || return 1
     # add packages from Archboot defaults
-    . /etc/arhboot/defaults
+    . /etc/archboot/defaults
     _auto_packages
+    #shellcheck disable=SC2145
     _dialog --title " Summary " --yesno "Next step will install the following packages for a minimal system:\n${_PACKAGES[@]}\n\nYou can watch the progress on your ${_VC} console." 9 75 || return 1
+    #shellcheck disable=SC2145
     _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 8 75 0
     _pacman_error || return 1
     _NEXTITEM=3

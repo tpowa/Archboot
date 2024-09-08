@@ -59,7 +59,7 @@ _prepare_initramfs() {
 
 _systemd_ukify() {
     echo "Generating ${_ARCH} UKI image..."
-    [[ -n "/${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=/${_INTEL_UCODE}"
+    [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=/${_INTEL_UCODE}"
     _AMD_UCODE="--initrd=/${_AMD_UCODE}"
     #shellcheck disable=SC2086
     /usr/lib/systemd/ukify build --linux="${_KERNEL}" \

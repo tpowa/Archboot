@@ -36,7 +36,7 @@ _prepare_pacman() {
     fi
     _pacman_keyring
     ${_PACMAN} -Sy
-    #shellcheck disable=SC2086
+    #shellcheck disable=SC2086,SC2068
     pacman -Sy ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING[@]} || exit 1
 }
 
@@ -44,7 +44,7 @@ _prepare_pacman() {
 _install_packages() {
     . /etc/archboot/defaults
     _auto_packages
-    #shellcheck disable=SC2086
+    #shellcheck disable=SC2068
     ${_PACMAN} -S ${_PACKAGES[@]}
 }
 

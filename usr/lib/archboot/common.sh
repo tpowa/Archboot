@@ -7,15 +7,15 @@ _CACHEDIR="/var/cache/pacman/pkg"
 _CONFIG_DIR="/etc/archboot"
 _DLPROG="curl -L -s"
 _FIX_PACKAGES=(
+  gcc-libs
+  glib2
+  glibc
+  icu
   libelf
   libevent
-  talloc
-  gcc-libs
-  glibc
-  glib2
-  icu
-  pcre2
   nss
+  pcre2
+  talloc
   terminus-font
 )
 _INTEL_UCODE="boot/intel-ucode.img"
@@ -42,9 +42,9 @@ _RUNNING_KERNEL="$(uname -r)"
 _SPLASH="/usr/share/archboot/uki/archboot-background.bmp"
 _STANDARD_PACKAGES=(
   gparted
-  xorg-xhost
   mtools
   noto-fonts
+  xorg-xhost
 )
 _VNC_PACKAGE="tigervnc"
 _WAYLAND_PACKAGE="egl-wayland"
@@ -56,7 +56,7 @@ _VC_NUM="${_LOG/\/dev\/tty/}"
 _VC="VC${_VC_NUM}"
 if echo "${_BASENAME}" | rg -qw aarch64; then
     _ARCHBOOT="archboot-arm"
-    _KEYRING+="archlinuxarm-keyring"
+    _KEYRING+=(archlinuxarm-keyring)
     _ARCH="aarch64"
 elif echo "${_BASENAME}" | rg -qw riscv64; then
     _ARCHBOOT="archboot-riscv"

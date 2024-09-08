@@ -30,11 +30,12 @@ fi
 _PACMAN="pacman --root ${_DESTDIR} --cachedir=${_DESTDIR}${_CACHEDIR} --noconfirm"
 
 _linux_firmware() {
-    _PACKAGES="${_PACKAGES[@]//linux-firmware/}"
+    #shellcheck disable=SC2206
+    _PACKAGES=(${_PACKAGES[@]//linux-firmware/})
     #shellcheck disable=SC2013
     for i in $(choose 0 </proc/modules); do
         if modinfo "${i}" | rg -qw 'firmware:'; then
-            _PACKAGES+="linux-firmware"
+            _PACKAGES+=(linux-firmware)
             break
         fi
     done
@@ -42,14 +43,15 @@ _linux_firmware() {
 
 _marvell_firmware() {
     _MARVELL=""
-    _PACKAGES="${_PACKAGES[@]//linux-firmware-marvell/}"
+    #shellcheck disable=SC2206
+    _PACKAGES=(${_PACKAGES[@]//linux-firmware-marvell/})
     for i in $(fd -t f . /lib/modules/"${_RUNNING_KERNEL}" | rg -w 'wireless/marvell'); do
         _MARVELL="${_MARVELL} $(basename "${i}" | sd '.ko.*$' '')"
     done
     # check marvell modules if already loaded
     for i in ${_MARVELL}; do
         if lsmod | rg -qw "${i}"; then
-            _PACKAGES+="linux-firmware-marvell"
+            _PACKAGES+=(linux-firmware-marvell)
             break
         fi
     done
@@ -98,40 +100,40 @@ _local_pacman_conf() {
 _auto_packages() {
     # Add filesystem packages
     if ${_LSBLK} FSTYPE | rg -q 'bcachefs'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'bcachefs-tools' && _PACKAGES+="bcachefs-tools"
+        ! echo "${_PACKAGES[@]}" | rg -qw 'bcachefs-tools' && _PACKAGES+=(bcachefs-tools)
     fi
     if ${_LSBLK} FSTYPE | rg -q 'btrfs'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'btrfs-progs' && _PACKAGES+="btrfs-progs"
+        ! echo "${_PACKAGES[@]}" | rg -qw 'btrfs-progs' && _PACKAGES+=(btrfs-progs)
     fi
     if ${_LSBLK} FSTYPE | rg -q 'ext'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'e2fsprogs' && _PACKAGES+="e2fsprogs"
+        ! echo "${_PACKAGES[@]}" | rg -qw 'e2fsprogs' && _PACKAGES+=(e2fsprogs)
     fi
     if ${_LSBLK} FSTYPE | rg -q 'xfs'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'xfsprogs' && _PACKAGES+="xfsprogs"
+        ! echo "${_PACKAGES[@]}" | rg -qw 'xfsprogs' && _PACKAGES+=(xfsprogs)
     fi
     if ${_LSBLK} FSTYPE | rg -q 'vfat'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'dosfstools' && _PACKAGES+="dosfstools"
+        ! echo "${_PACKAGES[@]}" | rg -qw 'dosfstools' && _PACKAGES+=(dosfstools)
     fi
     # Add packages for complex blockdevices
     if ${_LSBLK} FSTYPE | rg -qw 'linux_raid_member'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'mdadm' && _PACKAGES+="mdadm"
+        ! echo "${_PACKAGES[@]}" | rg -qw 'mdadm' && _PACKAGES+=(mdadm)
     fi
     if ${_LSBLK} FSTYPE | rg -qw 'LVM2_member'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'lvm2' && _PACKAGES+="lvm2"
+        ! echo "${_PACKAGES[@]}" | rg -qw 'lvm2' && _PACKAGES+=(lvm2)
     fi
     if ${_LSBLK} FSTYPE | rg -qw 'crypto_LUKS'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'cryptsetup' && _PACKAGES+="cryptsetup"
+        ! echo "${_PACKAGES[@]}" | rg -qw 'cryptsetup' && _PACKAGES+=(cryptsetup)
     fi
     #shellcheck disable=SC2010
     # Add iwd, if wlan is detected
     if fd . /sys/class/net | rg -q 'wlan'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'iwd' && _PACKAGES+="iwd"
+        ! echo "${_PACKAGES[@]}" | rg -qw 'iwd' && _PACKAGES+=(iwd)
     fi
     # Add broadcom-wl, if module is detected
     if lsmod | rg -qw 'wl'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'broadcom-wl' && _PACKAGES+="broadcom-wl"
+        ! echo "${_PACKAGES[@]}" | rg -qw 'broadcom-wl' && _PACKAGES+=(broadcom-wl)
     fi
-    rg -q '^FONT=ter' /etc/vconsole.conf && _PACKAGES+="terminus-font"
+    rg -q '^FONT=ter' /etc/vconsole.conf && _PACKAGES+=(terminus-font)
     # only add firmware if already used
     _linux_firmware
     _marvell_firmware

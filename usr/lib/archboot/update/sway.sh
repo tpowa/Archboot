@@ -102,6 +102,7 @@ EOF
 }
 
 _install_sway() {
+    #shellcheck disable=SC2206
     _PACKAGES=(${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES[@]} ${_SWAY_PACKAGES[@]})
     if ! [[ -e /usr/bin/sway ]]; then
         _prepare_graphic "${_PACKAGES[@]}"

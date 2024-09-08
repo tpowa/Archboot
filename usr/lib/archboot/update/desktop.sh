@@ -35,12 +35,14 @@ _run_pacman() {
 
 _update_packages() {
 _IGNORE=()
-    if [[ -n "${_GRAPHIC_IGNORE[@]}" ]]; then
+    if [[ -n "${_GRAPHIC_IGNORE}" ]]; then
+        #shellcheck disable=SC2068
         for i in ${_GRAPHIC_IGNORE[@]}; do
-            _IGNORE+="--ignore ${i}"
+            #shellcheck disable=SC2206
+            _IGNORE+=(--ignore ${i})
         done
     fi
-    #shellcheck disable=SC2086
+    #shellcheck disable=SC2086,SC2068
     LC_ALL=C.UTF-8 pacman -Syu ${_IGNORE[@]} --noconfirm &>"${_LOG}"
     if [[ ! -e "/.full_system" ]]; then
         _cleanup
@@ -127,11 +129,13 @@ _custom_wayland_xorg() {
     if [[ -n "${_CUSTOM_WL}" ]]; then
         echo -e "\e[1mStep 1/2:\e[m Installing custom wayland..."
         echo "          This will need some time..."
+        #shellcheck disable=SC2145
         _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND[@]}" > "${_LOG}" 2>&1
     fi
     if [[ -n "${_CUSTOM_X}" ]]; then
         echo -e "\e[1mStep 1/2:\e[m Installing custom xorg..."
         echo "          This will need some time..."
+        #shellcheck disable=SC2145
         _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG[@]}" > "${_LOG}" 2>&1
     fi
     echo -e "\e[1mStep 2/2:\e[m Setting up browser...\e[m"

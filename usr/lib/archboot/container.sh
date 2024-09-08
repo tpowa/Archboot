@@ -94,7 +94,7 @@ _prepare_pacman() {
     echo "Removing Archboot repository sync db..."
     rm -f "${_PACMAN_LIB}"/sync/archboot.db
     echo "Updating Arch Linux keyring..."
-    #shellcheck disable=SC2086
+    #shellcheck disable=SC2086,SC2068
     pacman -Sy --config ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING[@]} &>"${_NO_LOG}"
 }
 
@@ -160,27 +160,29 @@ _install_base_packages() {
         _MKINITCPIO=initramfs
     fi
     if [[ "${2}" == "use_binfmt" ]]; then
+        #shellcheck disable=SC2068,SC2145
         echo "Downloading ${_KEYRING[@]} ${_PACKAGES[@]} to ${1}..."
         if rg -qw 'archboot' /etc/hostname; then
-            #shellcheck disable=SC2086
+            #shellcheck disable=SC2086,SC2068
             ${_PACMAN} -Syw ${_KEYRING[@]} ${_PACKAGES[@]} ${_PACMAN_DEFAULTS} \
                         ${_PACMAN_DB} &>"${_LOG}" || exit 1
         else
-            #shellcheck disable=SC2086
+            #shellcheck disable=SC2086,SC2068
             ${_PACMAN} -Syw ${_KEYRING[@]} ${_PACKAGES[@]} ${_PACMAN_DEFAULTS} \
                        ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
         fi
     fi
+    #shellcheck disable=SC2068,SC2145
     echo "Installing ${_KEYRING[@]} ${_PACKAGES[@]} to ${1}..."
     if rg -qw 'archboot' /etc/hostname; then
-        #shellcheck disable=SC2086
+        #shellcheck disable=SC2086,SC2068
         ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} ${_KEYRING[@]} ${_PACKAGES[@]} \
                    ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
         echo "Downloading mkinitcpio to ${1}..."
         #shellcheck disable=SC2086
         ${_PACMAN} -Syw mkinitcpio ${_PACMAN_DEFAULTS} >"${_LOG}" 2>&1 || exit 1
     else
-        #shellcheck disable=SC2086
+        #shellcheck disable=SC2086,SC2068
         ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} ${_KEYRING[@]} ${_PACKAGES[@]} \
                    ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
         echo "Downloading mkinitcpio to ${1}..."
@@ -199,15 +201,17 @@ _install_archboot() {
     if rg -qw 'archboot' /etc/hostname; then
         #shellcheck disable=SC2086
         ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} &>"${_LOG}" || exit 1
+        #shellcheck disable=SC2145
         echo "Downloading ${_MAN_INFO_PACKAGES[@]} to ${1}..."
-        #shellcheck disable=SC2086
+        #shellcheck disable=SC2086,SC2068
         ${_PACMAN} -Syw ${_MAN_INFO_PACKAGES[@]} ${_PACMAN_DEFAULTS} \
                    ${_PACMAN_DB} &>"${_LOG}" || exit 1
     else
         #shellcheck disable=SC2086
         ${_PACMAN} -Sy ${_ARCHBOOT} ${_PACMAN_DEFAULTS} &>"${_NO_LOG}" || exit 1
+        #shellcheck disable=SC2145
         echo "Downloading ${_MAN_INFO_PACKAGES[@]} to ${1}..."
-        #shellcheck disable=SC2086
+        #shellcheck disable=SC2086,SC2068
         ${_PACMAN} -Syw ${_MAN_INFO_PACKAGES[@]} ${_PACMAN_DEFAULTS} \
                    ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
     fi

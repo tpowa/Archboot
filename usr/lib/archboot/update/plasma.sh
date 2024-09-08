@@ -70,6 +70,7 @@ _prepare_plasma() {
 }
 
 _install_plasma() {
+	#shellcheck disable=SC2206
     _PACKAGES=(${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES[@]} ${_PLASMA_PACKAGES[@]})
     _prepare_plasma
 }
