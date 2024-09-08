@@ -9,6 +9,7 @@ _parameters "$@"
 _root_check
 _architecture_check
 _config
+_UKIDIR="$(mktemp -d UKIDIR.XXX)"
 echo "Starting UKI creation..."
 _prepare_initramfs || exit 1
 _systemd_ukify || exit 1

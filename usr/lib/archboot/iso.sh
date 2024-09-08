@@ -2,20 +2,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
-_ISODIR="$(mktemp -d ISODIR.XXX)"
 _BOOTLOADER="/usr/share/archboot/bootloader"
 
 _usage () {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create ${_ARCH} ISO Image\e[m"
-    echo -e "\e[1m--------------------------------------\e[m"
-    echo "This will create an Archboot ISO image."
+    echo -e "\e[1m----------------------------------------\e[m"
+    echo "Create an Archboot ISO image: <name>.iso"
     echo
     echo "Options:"
-    echo -e " \e[1m-g\e[m              Start generation of an ISO image."
-    echo -e " \e[1m-c=CONFIG\e[m       Which CONFIG should be used."
-    echo "                 ${_CONFIG_DIR} includes the config files"
-    echo "                 default=${_ARCH}.conf"
-    echo -e " \e[1m-i=ISO\e[m          Your custom ISO name."
+    echo -e " \e[1m-g\e[m              Start generation of an ISO image"
+    echo -e " \e[1m-c=CONFIG\e[m       CONFIG from ${_CONFIG_DIR}: default=${_ARCH}.conf"
+    echo -e " \e[1m-i=ISO\e[m          Customize ISO name"
     echo -e " \e[1m-s\e[m              Save initramfs files in current work directory"
     echo
     echo -e "Usage: \e[1m${_BASENAME} <options>\e[m"
