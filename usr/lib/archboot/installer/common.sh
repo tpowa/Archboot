@@ -31,7 +31,7 @@ _PACMAN="pacman --root ${_DESTDIR} --cachedir=${_DESTDIR}${_CACHEDIR} --noconfir
 
 _linux_firmware() {
     #shellcheck disable=SC2206
-    _PACKAGES=(${_PACKAGES[@]//linux-firmware/})
+    _PACKAGES=(${_PACKAGES[@]/linux-firmware})
     #shellcheck disable=SC2013
     for i in $(choose 0 </proc/modules); do
         if modinfo "${i}" | rg -qw 'firmware:'; then
@@ -44,7 +44,7 @@ _linux_firmware() {
 _marvell_firmware() {
     _MARVELL=""
     #shellcheck disable=SC2206
-    _PACKAGES=(${_PACKAGES[@]//linux-firmware-marvell/})
+    _PACKAGES=(${_PACKAGES[@]/linux-firmware-marvell})
     for i in $(fd -t f . /lib/modules/"${_RUNNING_KERNEL}" | rg -w 'wireless/marvell'); do
         _MARVELL="${_MARVELL} $(basename "${i}" | sd '.ko.*$' '')"
     done
