@@ -4,8 +4,6 @@
 _PACKAGES=(
   base
   linux
-  linux-firmware
-  linux-firmware-marvell
   polkit
 )
 # grub setup
