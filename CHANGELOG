@@ -4,6 +4,8 @@ On the road to 2024.09:
 - added archboot-x86_64-uki.sh script
 - added archboot-aarch64-uki.sh script
 - switched name scheme for UKI images
+- switched TRIGGERS to an array
+- reordered config arrays
 setup:
 - switched to new limine 8.0 config layout (issue #4)
 - switched to mkinitcpio uki generation (issue #3)
