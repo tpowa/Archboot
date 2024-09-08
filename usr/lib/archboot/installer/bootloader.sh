@@ -142,8 +142,8 @@ _uefi_common() {
     fi
     #shellcheck disable=SC2128
     if [[ -n "${_PACKAGES}" ]]; then
-        #shellcheck disable=SC2145
-        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
+        #shellcheck disable=SC2116,SC2068
+        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n$(echo ${_PACKAGES[@]})..." 7 75 0
         _pacman_error
     fi
     # automounted /boot and ESP needs to be mounted first, trigger mount with ls
@@ -248,8 +248,8 @@ _install_bootloader() {
         if ! [[ -f "${_DESTDIR}/boot/${_UCODE}" ]]; then
             #shellcheck disable=SC2206
             _PACKAGES=(${_UCODE_PKG})
-            #shellcheck disable=SC2145
-            _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
+            #shellcheck disable=SC2116,SC2068
+            _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n$(echo ${_PACKAGES[@]})..." 7 75 0
             _pacman_error
         fi
     fi

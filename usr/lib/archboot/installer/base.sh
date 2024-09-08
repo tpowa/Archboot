@@ -34,8 +34,8 @@ _geteditor() {
             "NANO") _EDITOR="nano"
                 if ! [[ -f "${_DESTDIR}/usr/bin/nano" ]]; then
                     _PACKAGES=(nano)
-                    #shellcheck disable=SC2145
-                    _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
+                    #shellcheck disable=SC2116,2068
+                    _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n$(echo ${_PACKAGES[@]})..." 7 75 0
                     _pacman_error
                     _dialog --no-mouse --title " Autoconfiguration " --infobox "Enable nano's syntax highlighting on installed system..." 3 70
                     rg -q '^include' "${_DESTDIR}/etc/nanorc" || \
@@ -46,8 +46,8 @@ _geteditor() {
             "NEOVIM") _EDITOR="nvim"
                 if ! [[ -f "${_DESTDIR}/usr/bin/nvim" ]]; then
                     _PACKAGES=(neovim)
-                    #shellcheck disable=SC2145
-                    _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
+                    #shellcheck disable=SC2116,2068
+                    _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n$(echo ${_PACKAGES[@]})..." 7 75 0
                     _pacman_error
                 fi
                 ;;
