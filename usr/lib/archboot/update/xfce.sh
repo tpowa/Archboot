@@ -4,7 +4,7 @@
 _install_xfce() {
     if ! [[ -e /usr/bin/startxfce4 ]]; then
         #shellcheck disable=SC2145
-        _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} ${_STANDARD_PACKAGES[@]} ${_XFCE_PACKAGES[@]}"
+        _prepare_graphic "${_XORG_PACKAGE} ${_VNC_PACKAGE} $(echo ${_STANDARD_PACKAGES[@]}) $(echo ${_XFCE_PACKAGES[@]})"
     fi
     _prepare_browser >"${_LOG}" 2>&1
     _configure_xfce  >"${_LOG}" 2>&1
