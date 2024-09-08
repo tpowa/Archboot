@@ -102,9 +102,9 @@ EOF
 }
 
 _install_sway() {
-    _PACKAGES="${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES} ${_SWAY_PACKAGES}"
+    _PACKAGES=(${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES[@]} ${_SWAY_PACKAGES[@]})
     if ! [[ -e /usr/bin/sway ]]; then
-        _prepare_graphic "${_PACKAGES}"
+        _prepare_graphic "${_PACKAGES[@]}"
     fi
     _prepare_browser >"${_LOG}" 2>&1
     _configure_sway >"${_LOG}" 2>&1

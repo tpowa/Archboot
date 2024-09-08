@@ -1,33 +1,82 @@
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 # SPDX-License-Identifier: GPL-3.0-or-later
 # packages to install (eg. firmware, kernel packages)
-_PACKAGES="base linux linux-firmware linux-firmware-marvell polkit"
+_PACKAGES=(
+  base
+  linux
+  linux-firmware
+  linux-firmware-marvell
+  polkit
+)
 # grub setup
 _GRUB_CONFIG="/usr/share/archboot/grub/archboot-main-grub.cfg"
 _GRUB_BACKGROUND="/usr/share/archboot/grub/archboot-background.png"
 ### Graphical environment defaults
 # ignore packages to upgrade before graphical startup eg. kernel and firmware
-_GRAPHIC_IGNORE="linux linux-firmware linux-firmware-marvell"
+_GRAPHIC_IGNORE=(
+  linux
+  linux-firmware
+  linux-firmware-marvell
+)
 # VNC password
 _VNC_PW="archboot"
 ### Standard Web Browser: chromium or firefox
 _STANDARD_BROWSER="firefox"
 ### GNOME defaults
 # GNOME packages
-_GNOME_PACKAGES="gnome-desktop-4 gnome-shell gnome-terminal gnome-control-center nautilus gvfs-smb gthumb file-roller gnome-keyring gedit"
+_GNOME_PACKAGES=(
+  file-roller
+  gedit
+  gnome-control-center
+  gnome-desktop-4
+  gnome-keyring
+  gnome-shell
+  gnome-terminal
+  gthumb
+  gvfs-smb
+  nautilus
+)
 ### KDE/Plasma defaults
 # KDE/Plasma packages
-_PLASMA_PACKAGES="plasma-wayland-session plasma-desktop konsole kscreen kate dolphin powerdevil ark gwenview"
+_PLASMA_PACKAGES=(
+  ark
+  dolphin
+  gwenview
+  kate
+  konsole
+  kscreen
+  plasma-desktop
+  plasma-wayland-session
+  powerdevil
+)
 ### SWAY defaults
 # Sway packages
-_SWAY_PACKAGES="sway swaybg foot bemenu-wayland j4-dmenu-desktop wayvnc waybar ttf-font-awesome"
+_SWAY_PACKAGES=(
+  bemenu-wayland
+  foot
+  j4-dmenu-desktop
+  sway
+  swaybg
+  ttf-font-awesome
+  waybar
+  wayvnc
+)
 ### XFCE defaults
 # Xfce packages
-_XFCE_PACKAGES="xfce4 breeze-icons gvfs-smb thunar-archive-plugin file-roller gnome-keyring mousepad ristretto"
+_XFCE_PACKAGES=(
+  breeze-icons
+  file-roller
+  gnome-keyring
+  gvfs-smb
+  mousepad
+  ristretto
+  thunar-archive-plugin
+  xfce4
+)
 ### Custom Graphical defaults
 # Custom packages
-_CUSTOM_XORG=""
-_CUSTOM_WAYLAND=""
+_CUSTOM_XORG=()
+_CUSTOM_WAYLAND=()
 ### server setup
 # release directory
 _DIR="$(date +%Y.%m)"

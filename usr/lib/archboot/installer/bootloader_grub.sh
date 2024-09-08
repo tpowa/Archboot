@@ -26,13 +26,13 @@ _grub_common_before() {
     _common_bootloader_checks
     _abort_bcachefs_bootpart || return 1
     if [[ ! -d "${_DESTDIR}/usr/lib/grub" ]]; then
-        _PACKAGES="grub"
-        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+        _PACKAGES=(grub)
+        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
         _pacman_error
     fi
     if [[ ! -f "${_DESTDIR}/usr/share/grub/ter-u16n.pf2" ]]; then
-        _PACKAGES=terminus-font
-        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+        _PACKAGES=(terminus-font)
+        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
         _pacman_error
     fi
 }

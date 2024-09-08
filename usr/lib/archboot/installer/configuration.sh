@@ -141,16 +141,16 @@ _user_management() {
                     case $(cat "${_ANSWER}") in
                         "BASH") _SHELL="bash"
                                 if ! [[ -f "${_DESTDIR}/usr/share/bash-completion/completions/arch" ]]; then
-                                    _PACKAGES="bash-completion"
+                                    _PACKAGES=(bash-completion)
                                     _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " \
-                                        --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+                                        --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
                                     _pacman_error
                                 fi ;;
                         "ZSH") _SHELL="zsh"
                                 if ! [[ -f "${_DESTDIR}/usr/bin/zsh" ]]; then
-                                    _PACKAGES="grml-zsh-config"
+                                    _PACKAGES=(grml-zsh-config)
                                     _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " \
-                                        --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+                                        --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
                                     _pacman_error
                                 fi ;;
                     esac

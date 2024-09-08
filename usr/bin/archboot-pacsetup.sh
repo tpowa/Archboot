@@ -72,10 +72,8 @@ _enable_testing() {
 
 _task_pacman_keyring_install() {
     _pacman_keyring
-    _KEYRING="archlinux-keyring"
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
-    pacman -Sy --noconfirm --noprogressbar ${_KEYRING} &>"${_LOG}"
+    pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>"${_LOG}"
     rm /.archboot
 }
 _prepare_pacman() {

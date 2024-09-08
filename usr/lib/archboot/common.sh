@@ -6,14 +6,29 @@ _AMD_UCODE="boot/amd-ucode.img"
 _CACHEDIR="/var/cache/pacman/pkg"
 _CONFIG_DIR="/etc/archboot"
 _DLPROG="curl -L -s"
-_FIX_PACKAGES="libelf libevent talloc gcc-libs glibc glib2 icu pcre2 nss terminus-font"
+_FIX_PACKAGES=(
+  libelf
+  libevent
+  talloc
+  gcc-libs
+  glibc
+  glib2
+  icu
+  pcre2
+  nss
+  terminus-font
+)
 _INTEL_UCODE="boot/intel-ucode.img"
 _KERNELPKG="linux"
-_KEYRING="archlinux-keyring"
+_KEYRING=(archlinux-keyring)
 _LABEL="Exit"
 _LOCAL_DB="${_CACHEDIR}/archboot.db"
 _LOG="/dev/tty11"
-_MAN_INFO_PACKAGES="man-db man-pages texinfo"
+_MAN_INFO_PACKAGES=(
+  man-db
+  man-pages
+  texinfo
+)
 _MEM_TOTAL="$(rg -o 'MemTotal.* (\d+)' -r '$1' /proc/meminfo)"
 _NO_LOG="/dev/null"
 _OSREL="/usr/share/archboot/base/etc/os-release"
@@ -25,7 +40,12 @@ _RSYNC="rsync -a -q --delete --delete-delay"
 _RUNNING_ARCH="$(uname -m)"
 _RUNNING_KERNEL="$(uname -r)"
 _SPLASH="/usr/share/archboot/uki/archboot-background.bmp"
-_STANDARD_PACKAGES="gparted xorg-xhost mtools noto-fonts"
+_STANDARD_PACKAGES=(
+  gparted
+  xorg-xhost
+  mtools
+  noto-fonts
+)
 _VNC_PACKAGE="tigervnc"
 _WAYLAND_PACKAGE="egl-wayland"
 _XORG_PACKAGE="xorg"
@@ -36,7 +56,7 @@ _VC_NUM="${_LOG/\/dev\/tty/}"
 _VC="VC${_VC_NUM}"
 if echo "${_BASENAME}" | rg -qw aarch64; then
     _ARCHBOOT="archboot-arm"
-    _KEYRING="${_KEYRING} archlinuxarm-keyring"
+    _KEYRING+="archlinuxarm-keyring"
     _ARCH="aarch64"
 elif echo "${_BASENAME}" | rg -qw riscv64; then
     _ARCHBOOT="archboot-riscv"

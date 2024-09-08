@@ -130,18 +130,18 @@ _abort_bcachefs_bootpart() {
 }
 
 _uefi_common() {
-    _PACKAGES=""
+    _PACKAGES=()
     _DEV=""
     _BOOTDEV=""
-    [[ -f "${_DESTDIR}/usr/bin/mkfs.vfat" ]] || _PACKAGES="${_PACKAGES} dosfstools"
-    [[ -f "${_DESTDIR}/usr/bin/efivar" ]] || _PACKAGES="${_PACKAGES} efivar"
-    [[ -f "${_DESTDIR}/usr/bin/efibootmgr" ]] || _PACKAGES="${_PACKAGES} efibootmgr"
+    [[ -f "${_DESTDIR}/usr/bin/mkfs.vfat" ]] || _PACKAGES+="dosfstools"
+    [[ -f "${_DESTDIR}/usr/bin/efivar" ]] || _PACKAGES+="efivar"
+    [[ -f "${_DESTDIR}/usr/bin/efibootmgr" ]] || _PACKAGES+="efibootmgr"
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
-        [[ -f "${_DESTDIR}/usr/bin/mokutil" ]] || _PACKAGES="${_PACKAGES} mokutil"
-        [[ -f "${_DESTDIR}/usr/bin/sbsign" ]] || _PACKAGES="${_PACKAGES} sbsigntools"
+        [[ -f "${_DESTDIR}/usr/bin/mokutil" ]] || _PACKAGES+="mokutil"
+        [[ -f "${_DESTDIR}/usr/bin/sbsign" ]] || _PACKAGES+="sbsigntools"
     fi
-    if [[ -n "${_PACKAGES}" ]]; then
-        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+    if [[ -n "${_PACKAGES[@]}" ]]; then
+        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
         _pacman_error
     fi
     # automounted /boot and ESP needs to be mounted first, trigger mount with ls
@@ -244,8 +244,8 @@ _install_bootloader() {
     fi
     if [[ -n "${_UCODE}" ]]; then
         if ! [[ -f "${_DESTDIR}/boot/${_UCODE}" ]]; then
-            _PACKAGES="${_UCODE_PKG}"
-            _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+            _PACKAGES=(${_UCODE_PKG})
+            _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
             _pacman_error
         fi
     fi

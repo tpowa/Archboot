@@ -5,7 +5,7 @@
 
 _pacman() {
     #shellcheck disable=SC2086,SC2069
-    ${_PACMAN} -Sy ${_PACKAGES} &>"${_LOG}" && : > /tmp/.pacman-success
+    ${_PACMAN} -Sy ${_PACKAGES[@]} &>"${_LOG}" && : > /tmp/.pacman-success
     rm /.archboot
 }
 
@@ -16,7 +16,7 @@ _run_pacman(){
     [[ ! -d "${_DESTDIR}${_PACMAN_LIB}" ]] && mkdir -p "${_DESTDIR}${_PACMAN_LIB}"
     : > /.archboot
     _pacman &
-    _progress_wait "0" "99" "Installing package(s):\n${_PACKAGES}..." "2"
+    _progress_wait "0" "99" "Installing package(s):\n${_PACKAGES[@]}..." "2"
     # pacman finished, display scrollable output
     if [[ -e "/tmp/.pacman-success" ]]; then
         _progress "100" "Package installation complete." 6 75
@@ -61,16 +61,11 @@ _run_autoconfig() {
 
 _install_packages() {
     _destdir_mounts || return 1
-    _PACKAGES=""
     # add packages from Archboot defaults
-    _PACKAGES="$(rg -o '^_PACKAGES="(.*)"' -r '$1' /etc/archboot/defaults)"
-    # fallback if _PACKAGES is empty
-    [[ -z "${_PACKAGES}" ]] && _PACKAGES="base linux linux-firmware"
+    . /etc/arhboot/defaults
     _auto_packages
-    # fix double spaces
-    _PACKAGES="${_PACKAGES//  / }"
-    _dialog --title " Summary " --yesno "Next step will install the following packages for a minimal system:\n${_PACKAGES}\n\nYou can watch the progress on your ${_VC} console." 9 75 || return 1
-    _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 8 75 0
+    _dialog --title " Summary " --yesno "Next step will install the following packages for a minimal system:\n${_PACKAGES[@]}\n\nYou can watch the progress on your ${_VC} console." 9 75 || return 1
+    _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 8 75 0
     _pacman_error || return 1
     _NEXTITEM=3
     _chroot_mount

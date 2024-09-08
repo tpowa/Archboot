@@ -36,8 +36,8 @@ _uki_install() {
 
 _uki_uefi() {
     if [[ ! -f "${_DESTDIR}/usr/lib/systemd/ukify" ]]; then
-        _PACKAGES="systemd-ukify"
-        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+        _PACKAGES=(systemd-ukify)
+        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
         _pacman_error
     fi
     _uki_config

@@ -34,14 +34,14 @@ _run_pacman() {
 }
 
 _update_packages() {
-_IGNORE=""
-    if [[ -n "${_GRAPHIC_IGNORE}" ]]; then
-        for i in ${_GRAPHIC_IGNORE}; do
-            _IGNORE="${_IGNORE} --ignore ${i}"
+_IGNORE=()
+    if [[ -n "${_GRAPHIC_IGNORE[@]}" ]]; then
+        for i in ${_GRAPHIC_IGNORE[@]}; do
+            _IGNORE+="--ignore ${i}"
         done
     fi
     #shellcheck disable=SC2086
-    LC_ALL=C.UTF-8 pacman -Syu ${_IGNORE} --noconfirm &>"${_LOG}"
+    LC_ALL=C.UTF-8 pacman -Syu ${_IGNORE[@]} --noconfirm &>"${_LOG}"
     if [[ ! -e "/.full_system" ]]; then
         _cleanup
     fi
@@ -49,16 +49,16 @@ _IGNORE=""
 }
 
 _install_fix_packages() {
-    _run_pacman "${_FIX_PACKAGES}"
+    _run_pacman "${_FIX_PACKAGES[@]}"
     rm /.archboot
 }
 
 _install_graphic() {
     # check for qxl module
     if rg -q qxl /proc/modules; then
-        _GRAPHIC="${_GRAPHIC} xf86-video-qxl"
+        _GRAPHIC+="xf86-video-qxl"
     fi
-    _run_pacman "${_GRAPHIC}"
+    _run_pacman "${_GRAPHIC[@]}"
     rm /.archboot
 }
 
@@ -124,15 +124,15 @@ _prepare_browser() {
 }
 
 _custom_wayland_xorg() {
-    if [[ -n "${_CUSTOM_WAYLAND}" ]]; then
+    if [[ -n "${_CUSTOM_WL}" ]]; then
         echo -e "\e[1mStep 1/2:\e[m Installing custom wayland..."
         echo "          This will need some time..."
-        _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND}" > "${_LOG}" 2>&1
+        _prepare_graphic "${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND[@]}" > "${_LOG}" 2>&1
     fi
     if [[ -n "${_CUSTOM_X}" ]]; then
         echo -e "\e[1mStep 1/2:\e[m Installing custom xorg..."
         echo "          This will need some time..."
-        _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG}" > "${_LOG}" 2>&1
+        _prepare_graphic "${_XORG_PACKAGE} ${_CUSTOM_XORG[@]}" > "${_LOG}" 2>&1
     fi
     echo -e "\e[1mStep 2/2:\e[m Setting up browser...\e[m"
     command -v firefox &>"${_NO_LOG}"  && _firefox_flags

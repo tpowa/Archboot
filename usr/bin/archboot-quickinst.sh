@@ -36,21 +36,16 @@ _prepare_pacman() {
     fi
     _pacman_keyring
     ${_PACMAN} -Sy
-    _KEYRING="archlinux-keyring"
-    [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _KEYRING="${_KEYRING} archlinuxarm-keyring"
     #shellcheck disable=SC2086
-    pacman -Sy ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING} || exit 1
+    pacman -Sy ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING[@]} || exit 1
 }
 
 # package_installation
 _install_packages() {
-    # add packages from Archboot defaults
-    _PACKAGES="$(rg -o '^_PACKAGES="(.*)"' -r '$1' /etc/archboot/defaults)"
-    # fallback if _PACKAGES is empty
-    [[ -z "${_PACKAGES}" ]] && _PACKAGES="base linux linux-firmware"
+    . /etc/archboot/defaults
     _auto_packages
     #shellcheck disable=SC2086
-    ${_PACMAN} -S ${_PACKAGES}
+    ${_PACMAN} -S ${_PACKAGES[@]}
 }
 
 _post_installation() {

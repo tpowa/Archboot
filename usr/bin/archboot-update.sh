@@ -26,7 +26,7 @@ while [ $# -gt 0 ]; do
         -gnome|--gnome) _L_GNOME="1";;
         -plasma|--plasma) _L_PLASMA="1" ;;
         -custom-xorg|--custom-xorg) _CUSTOM_X="1" ;;
-        -custom-wayland|--custom-wayland) _CUSTOM_WAYLAND="1" ;;
+        -custom-wayland|--custom-wayland) _CUSTOM_WL="1" ;;
         -full-system|--full-system) _FULL_SYSTEM="1" ;;
         -h|--h|-help|--help|?) _usage ;;
         *) _usage ;;

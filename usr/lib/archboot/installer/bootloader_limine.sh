@@ -3,8 +3,8 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _limine_common() {
     if [[ ! -f "${_DESTDIR}/usr/bin/limine" ]]; then
-        _PACKAGES="limine"
-        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES}..." 7 75 0
+        _PACKAGES=(limine)
+        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[@]}..." 7 75 0
         _pacman_error
     fi
 }

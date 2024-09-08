@@ -28,14 +28,14 @@ EOF
 
 _prepare_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
-        _prepare_graphic "${_PACKAGES}"
+        _prepare_graphic "${_PACKAGES[@]}"
     fi
     _prepare_browser >"${_LOG}" 2>&1
     _configure_gnome >"${_LOG}" 2>&1
 }
 
 _install_gnome() {
-    _PACKAGES="${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES} ${_GNOME_PACKAGES}"
+    _PACKAGES=(${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES[@]} ${_GNOME_PACKAGES[@]})
     _prepare_gnome
 }
 
