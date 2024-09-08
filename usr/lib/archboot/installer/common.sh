@@ -42,9 +42,11 @@ _linux_firmware() {
 _marvell_firmware() {
     _MARVELL=()
     for i in $(fd -t f . /lib/modules/"${_RUNNING_KERNEL}" | rg -w 'wireless/marvell'); do
+        #shellcheck disable=SC2207
         _MARVELL+=($(basename "${i}" | sd '.ko.*$' ''))
     done
     # check marvell modules if already loaded
+    #shellcheck disable=SC2068
     for i in ${_MARVELL[@]}; do
         if lsmod | rg -qw "${i}"; then
             _PACKAGES+=(linux-firmware-marvell)

@@ -60,6 +60,7 @@ if [[ -n "${_G_RELEASE}" ]]; then
     clear
 fi
 # install custom xorg or wayland
+#shellcheck disable=SC2128
 if [[ -n "${_CUSTOM_X}" || -n "${_CUSTOM_WAYLAND}" ]]; then
     _custom_wayland_xorg
 fi

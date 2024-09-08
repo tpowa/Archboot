@@ -35,7 +35,8 @@ _run_pacman() {
 }
 
 _update_packages() {
-_IGNORE=()
+    _IGNORE=()
+    #shellcheck disable=SC2128
     if [[ -n "${_GRAPHIC_IGNORE}" ]]; then
         #shellcheck disable=SC2068
         for i in ${_GRAPHIC_IGNORE[@]}; do
