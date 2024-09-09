@@ -159,7 +159,7 @@ _install_base_packages() {
     else
         _MKINITCPIO=initramfs
     fi
-    _PACKAGES+=(linux-firmware linux-firmware-marvell)
+    _PACKAGES+=(${_LINUX_FIRMWARE[@]})
     if [[ "${2}" == "use_binfmt" ]]; then
         #shellcheck disable=SC2068,SC2145
         echo "Downloading ${_KEYRING[@]} ${_PACKAGES[@]} to ${1}..."

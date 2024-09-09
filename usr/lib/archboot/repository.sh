@@ -20,7 +20,7 @@ _download_packages() {
         _pacman_key_system
     fi
     #shellcheck disable=SC2206
-    _PACKAGES+=(${_KEYRING[@]} ${_ARCHBOOT} ${_MAN_INFO_PACKAGES[@]})
+    _PACKAGES+=(${_KEYRING[@]} ${_LINUX_FIRMWARE[@]} ${_ARCHBOOT} ${_MAN_INFO_PACKAGES[@]})
     #shellcheck disable=SC2145
     echo "Downloading ${_PACKAGES[@]} to ${1}..."
     #shellcheck disable=SC2086,SC2068
