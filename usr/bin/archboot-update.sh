@@ -61,7 +61,7 @@ if [[ -n "${_G_RELEASE}" ]]; then
 fi
 # install custom xorg or wayland
 #shellcheck disable=SC2128
-if [[ -n "${_CUSTOM_X}" || -n "${_CUSTOM_WAYLAND}" ]]; then
+if [[ -n "${_CUSTOM_X}" || -n "${_CUSTOM_WL}" ]]; then
     _custom_wayland_xorg
 fi
 # Gnome, KDE/PLASMA or XFCE launch
