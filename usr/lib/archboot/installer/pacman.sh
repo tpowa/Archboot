@@ -64,6 +64,7 @@ _install_packages() {
     _destdir_mounts || return 1
     # add packages from Archboot defaults
     . /etc/archboot/defaults
+    _PACKAGES=(${_PACKAGES/linux-firmware*})
     _auto_packages
     #shellcheck disable=SC2116,SC2068
     _dialog --title " Summary " --yesno "Next step will install the following packages for a minimal system:\n$(echo ${_PACKAGES[@]})\n\nYou can watch the progress on your ${_VC} console." 9 75 || return 1

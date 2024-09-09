@@ -24,10 +24,6 @@ _KEYRING=(archlinux-keyring)
 _LABEL="Exit"
 _LOCAL_DB="${_CACHEDIR}/archboot.db"
 _LOG="/dev/tty11"
-_LINUX_FIRMWARE=(
- linux-firmware
- linux-firmware-marvell
-)
 _MAN_INFO_PACKAGES=(
   man-db
   man-pages
