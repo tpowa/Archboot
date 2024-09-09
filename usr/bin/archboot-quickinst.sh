@@ -42,7 +42,6 @@ _prepare_pacman() {
 
 # package_installation
 _install_packages() {
-    . /etc/archboot/defaults
     _auto_packages
     #shellcheck disable=SC2068
     ${_PACMAN} -S ${_PACKAGES[@]}
