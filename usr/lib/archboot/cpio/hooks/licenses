@@ -5,140 +5,141 @@
 _run ()
 {
 _LICENSES=(
-3cpio/LICENSE
-argon2/LICENSE
-bandwhich/LICENSE
-bat/LICENSE-{APACHE,MIT}
-bottom/LICENSE
-brotli/LICENSE
-bzip2/LICENSE
-curl/COPYING
-dbus/COPYING
-dog/LICENCE
-duktape/LICENSE.txt
-dust/LICENSE
-dysk/LICENSE
-e2fsprogs/MIT-LICENSE
-expat/COPYING
-eza/LICENSE
-fd/LICENSE-MIT
-file/COPYING
-fzf/LICENSE
-gcc-libs/RUNTIME.LIBRARY.EXCEPTION
-gpgme/MIT.txt
-gnupg/BSD-2-Clause.txt
-gnupg/BSD-3-Clause.txt
-gnupg/BSD-4-Clause.txt
-gnupg/MIT.txt
-gnupg/Unicode-TOU.txt
-gssproxy/COPYING
-hdparm/LICENSE.TXT
-iana-etc/LICENSE
-icu/LICENSE
-iputils/LICENSE.BSD3
-json-c/COPYING
-known_spdx_license_exceptions.txt
-known_spdx_license_identifiers.txt
-krb5/LICENSE
-less/LICENSE
-libarchive/COPYING
-libbpf/LICENSE
-libbpf/LICENSE.BSD-2-Clause
-libbpf/LICENSE.LGPL-2.1
-libbsd/LICENSE
-libcap/License
-libcss/COPYING
-libdom/COPYING
-libedit/COPYING
-libevent/LICENSE
-libffi/LICENSE
-libgcrypt/{LICENSES,COPYING.LIB}
-libgit2/COPYING
-libgpg-error/COPYING
-libgpg-error/COPYING.LIB
-libhubbub/COPYING
-libinih/LICENSE.txt
-libldap/LICENSE
-libmd/COPYING
-libnghttp2/COPYING
-libnghttp3/COPYING
-libp11-kit/COPYING
-libparserutils/COPYING
-libpsl/COPYING
-libsasl/COPYING
-libsodium/LICENSE
-libssh2/LICENSE
-libtasn1/COPYING
-libtirpc/LICENSE
-libutf8proc/LICENSE.md
-libuv/LICENSE
-libverto/COPYING
-libvterm/LICENSE
-libwapcaplet/COPYING
-libwebsockets/LICENSE
-libxml2/Copyright
-linux-firmware-whence/WHENCE
-lua/LICENSE
-lua51-lpeg/LICENSE
-luajit/COPYRIGHT
-miniserve/LICENSE
-msgpack-c/LICENSE
-ncurses/COPYING
-neovim/LICENSE.txt
-netscanner/LICENSE
-nfsidmap/LICENSE
-openssh/BSD-2-Clause.txt
-openssh/LICENCE
-openssh/blowfish.BSD-3-Clause.txt
-openssh/openbsd-compat.BSD-3-Clause.txt
-openssh/openbsd-compat.ISC.txt
-openssh/openbsd-compat.MIT.txt
-openssh/replacement.BSD-2-Clause.txt
-openssh/rijndael.Public-Domain.txt
-openssh/snprintf.Public-Domain.txt
-openssh/ssh.BSD-3-Clause.txt
-openssl/LICENSE.txt
-ouch/LICENSE
-p11-kit/COPYING
-pcre2/LICENSE
-popt/LICENSE
-procs/LICENSE
-ripgrep/{COPYING,LICENSE-MIT,UNLICENSE}
-sbctl/LICENSE
-sd/LICENSE
-sdparm/LICENSE
-shadow/COPYING
-sqlite/license.txt
-systemd/MIT-0.txt
-terminus-font/LICENSE
-tmux/LICENSE
-tpm2-tss/LICENSE
-tre/LICENSE
-tree-sitter-c/LICENSE
-tree-sitter-lua/LICENSE.md
-tree-sitter-markdown/LICENSE
-tree-sitter-query/LICENSE
-tree-sitter-vim/LICENSE
-tree-sitter-vimdoc/LICENSE
-tree-sitter/LICENSE
-ttyd/LICENSE
-tzdata/LICENSE
-util-linux-libs/COPYING.BSD-2-Clause
-util-linux-libs/COPYING.BSD-3-Clause
-util-linux-libs/COPYING.BSD-4-Clause-UC
-util-linux-libs/COPYING.ISC
-util-linux-libs/util-linux-BSD-2-Clause.txt
-util-linux/COPYING.BSD-2-Clause
-util-linux/COPYING.BSD-3-Clause
-util-linux/COPYING.BSD-4-Clause-UC
-util-linux/COPYING.ISC
-util-linux/util-linux-BSD-2-Clause.txt
-wireless-regdb/LICENSE
-xxhash/LICENSE
-xz/COPYING
-zlib/LICENSE
-zoxide/LICENSE
-zstd/LICENSE)
+  3cpio/LICENSE
+  argon2/LICENSE
+  bandwhich/LICENSE
+  bat/LICENSE-{APACHE,MIT}
+  bottom/LICENSE
+  brotli/LICENSE
+  bzip2/LICENSE
+  curl/COPYING
+  dbus/COPYING
+  dog/LICENCE
+  duktape/LICENSE.txt
+  dust/LICENSE
+  dysk/LICENSE
+  e2fsprogs/MIT-LICENSE
+  expat/COPYING
+  eza/LICENSE
+  fd/LICENSE-MIT
+  file/COPYING
+  fzf/LICENSE
+  gcc-libs/RUNTIME.LIBRARY.EXCEPTION
+  gpgme/MIT.txt
+  gnupg/BSD-2-Clause.txt
+  gnupg/BSD-3-Clause.txt
+  gnupg/BSD-4-Clause.txt
+  gnupg/MIT.txt
+  gnupg/Unicode-TOU.txt
+  gssproxy/COPYING
+  hdparm/LICENSE.TXT
+  iana-etc/LICENSE
+  icu/LICENSE
+  iputils/LICENSE.BSD3
+  json-c/COPYING
+  known_spdx_license_exceptions.txt
+  known_spdx_license_identifiers.txt
+  krb5/LICENSE
+  less/LICENSE
+  libarchive/COPYING
+  libbpf/LICENSE
+  libbpf/LICENSE.BSD-2-Clause
+  libbpf/LICENSE.LGPL-2.1
+  libbsd/LICENSE
+  libcap/License
+  libcss/COPYING
+  libdom/COPYING
+  libedit/COPYING
+  libevent/LICENSE
+  libffi/LICENSE
+  libgcrypt/{LICENSES,COPYING.LIB}
+  libgit2/COPYING
+  libgpg-error/COPYING
+  libgpg-error/COPYING.LIB
+  libhubbub/COPYING
+  libinih/LICENSE.txt
+  libldap/LICENSE
+  libmd/COPYING
+  libnghttp2/COPYING
+  libnghttp3/COPYING
+  libp11-kit/COPYING
+  libparserutils/COPYING
+  libpsl/COPYING
+  libsasl/COPYING
+  libsodium/LICENSE
+  libssh2/LICENSE
+  libtasn1/COPYING
+  libtirpc/LICENSE
+  libutf8proc/LICENSE.md
+  libuv/LICENSE
+  libverto/COPYING
+  libvterm/LICENSE
+  libwapcaplet/COPYING
+  libwebsockets/LICENSE
+  libxml2/Copyright
+  linux-firmware-whence/WHENCE
+  lua/LICENSE
+  lua51-lpeg/LICENSE
+  luajit/COPYRIGHT
+  miniserve/LICENSE
+  msgpack-c/LICENSE
+  ncurses/COPYING
+  neovim/LICENSE.txt
+  netscanner/LICENSE
+  nfsidmap/LICENSE
+  openssh/BSD-2-Clause.txt
+  openssh/LICENCE
+  openssh/blowfish.BSD-3-Clause.txt
+  openssh/openbsd-compat.BSD-3-Clause.txt
+  openssh/openbsd-compat.ISC.txt
+  openssh/openbsd-compat.MIT.txt
+  openssh/replacement.BSD-2-Clause.txt
+  openssh/rijndael.Public-Domain.txt
+  openssh/snprintf.Public-Domain.txt
+  openssh/ssh.BSD-3-Clause.txt
+  openssl/LICENSE.txt
+  ouch/LICENSE
+  p11-kit/COPYING
+  pcre2/LICENSE
+  popt/LICENSE
+  procs/LICENSE
+  ripgrep/{COPYING,LICENSE-MIT,UNLICENSE}
+  sbctl/LICENSE
+  sd/LICENSE
+  sdparm/LICENSE
+  shadow/COPYING
+  sqlite/license.txt
+  systemd/MIT-0.txt
+  terminus-font/LICENSE
+  tmux/LICENSE
+  tpm2-tss/LICENSE
+  tre/LICENSE
+  tree-sitter-c/LICENSE
+  tree-sitter-lua/LICENSE.md
+  tree-sitter-markdown/LICENSE
+  tree-sitter-query/LICENSE
+  tree-sitter-vim/LICENSE
+  tree-sitter-vimdoc/LICENSE
+  tree-sitter/LICENSE
+  ttyd/LICENSE
+  tzdata/LICENSE
+  util-linux-libs/COPYING.BSD-2-Clause
+  util-linux-libs/COPYING.BSD-3-Clause
+  util-linux-libs/COPYING.BSD-4-Clause-UC
+  util-linux-libs/COPYING.ISC
+  util-linux-libs/util-linux-BSD-2-Clause.txt
+  util-linux/COPYING.BSD-2-Clause
+  util-linux/COPYING.BSD-3-Clause
+  util-linux/COPYING.BSD-4-Clause-UC
+  util-linux/COPYING.ISC
+  util-linux/util-linux-BSD-2-Clause.txt
+  wireless-regdb/LICENSE
+  xxhash/LICENSE
+  xz/COPYING
+  zlib/LICENSE
+  zoxide/LICENSE
+  zstd/LICENSE
+  )
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
         _LICENSES+=(broadcom-wl/LICENSE)
     fi
