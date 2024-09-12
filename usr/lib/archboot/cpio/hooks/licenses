@@ -139,13 +139,13 @@ xz/COPYING
 zlib/LICENSE
 zoxide/LICENSE
 zstd/LICENSE)
-#shellcheck disable=SC2068
-for i in ${_LICENSES[@]};do
-    _file /usr/share/licenses/"${i}"
-done
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-        _file /usr/share/licenses/broadcom-wl/LICENSE
+        _LICENSES+=(broadcom-wl/LICENSE)
     fi
+    #shellcheck disable=SC2068
+    for i in ${_LICENSES[@]};do
+        _file /usr/share/licenses/"${i}"
+    done
     _map _full_dir /usr/share/licenses/{spdx,linux-firmware}
 }
 
