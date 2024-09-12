@@ -135,6 +135,7 @@ util-linux/COPYING.ISC
 util-linux/util-linux-BSD-2-Clause.txt
 wireless-regdb/LICENSE
 xxhash/LICENSE
+xz/COPYING
 zlib/LICENSE
 zoxide/LICENSE
 zstd/LICENSE)

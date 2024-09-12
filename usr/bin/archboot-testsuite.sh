@@ -86,7 +86,7 @@ pacman --noconfirm -Rdd base gettext &>>"${_LOG}"
 _run_test "licenses"
 #shellcheck disable=SC2046
 for i in $(pacman -Ql $(pacman -Q | sd ' .*' '') | rg -o '/usr/share/licenses/.*'); do
-    [[ -e "${i}" ]] || echo "${i}" | rg -v '/xz/' >>license-error.log
+    [[ -e "${i}" ]] || echo "${i}" >>license-error.log
 done
 _result license-error.log
 _run_test "filesystems"
