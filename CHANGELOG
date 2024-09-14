@@ -1,4 +1,5 @@
 On the road to 2024.09:
+- pacman 7.0
 - switched Europe domain from archboot.de to archboot.eu
 - added custom autorun script support
 - added archboot-x86_64-uki.sh script
