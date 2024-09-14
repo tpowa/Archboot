@@ -145,7 +145,7 @@ _create_iso() {
     echo "archboot.com | (c) 2006 - $(date +%Y)"
     echo "Tobias Powalowski <tpowa@archlinux.org>"
     echo ""
-    echo "This release is based on these main packages:"
+    echo "The release is based on these main packages:"
     echo "Archboot: $(${_NSPAWN} "${_W_DIR}" pacman -Qi "${_ARCHBOOT}" |\
     rg -o 'Version.* (.*)\r' -r '$1')"
     [[ "${_ARCH}" == "riscv64" ]] || echo "Grub: $(${_NSPAWN} "${_W_DIR}" pacman -Qi grub |\
