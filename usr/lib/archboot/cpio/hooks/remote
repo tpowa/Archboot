@@ -21,6 +21,8 @@ _run ()
         _file_rename /etc/archboot/ssh/archboot-key.pub /root/.ssh/archboot-key.pub
         _file /etc/archboot/ssh/archboot-key.pub
     fi
+    # add empty.sshd directory
+    _dir /usr/share/empty.sshd
     # switch port to ARCH and disable password login
     _file_rename /etc/ssh/sshd_config /etc/ssh/sshd_config
     echo "Port 11838" >> "${_ROOTFS}"/etc/ssh/sshd_config
