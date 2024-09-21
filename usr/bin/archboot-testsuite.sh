@@ -64,16 +64,62 @@ done
 _result ldd-error.log
 _run_test "on missing base binaries"
 # not needed binaries, that are tolerated
-_BASE_BLACKLIST="arpd backup bashbug bootctl enosys exch fsck.cramfs fsck.minix gawk-5.3.1 \
-gawkbug gencat getconf iconv iconvconfig importctl lastlog2 ld.so locale lsclocks makedb \
-makepkg-template memusage memusagestat mkfs.bfs mkfs.cramfs mkfs.minix mtrace newgidmap \
-newuidmap pcprofiledump pivot_root pldd pstree.x11 restore routel run0 setpgid sln sotruss \
-sprof switch_root systemd-confext systemd-cryptsetup systemd-delta systemd-home-fallback-shell \
-systemd-repart systemd-run systemd-vmspawn systemd-vpick varlinkctl xtrace"
+_BASE_BLACKLIST=(
+  arpd
+  backup
+  bashbug
+  bootctl
+  enosys
+  exch
+  fsck.cramfs
+  fsck.minix
+  gawkbug
+  gencat
+  getconf
+  iconv
+  iconvconfig
+  importctl
+  lastlog2
+  ld.so
+  locale
+  lsclocks
+  makedb
+  makepkg-template
+  memusage
+  memusagestat
+  mkfs.bfs
+  mkfs.cramfs
+  mkfs.minix
+  mtrace
+  newgidmap
+  newuidmap
+  pcprofiledump
+  pivot_root
+  pldd
+  pstree.x11
+  restore
+  routel
+  run0
+  setpgid
+  sln
+  sotruss
+  sprof
+  switch_root
+  systemd-confext
+  systemd-cryptsetup
+  systemd-delta
+  systemd-home-fallback-shell
+  systemd-repart
+  systemd-run
+  systemd-vmspawn
+  systemd-vpick
+  varlinkctl
+  xtrace
+)
 archboot-binary-check.sh base &>>"${_LOG}"
 #shellcheck disable=SC2013
-for i in $(rg '/usr/bin/(.*)' -r '$1' binary.log); do
-    if ! echo "${_BASE_BLACKLIST}" | rg -qw "${i}"; then
+for i in $(rg '/usr/bin/(.*)' -r '$1' binary.log | rg -v gawk-*); do
+    if ! echo "${_BASE_BLACKLIST[@]}" | rg -qw "${i}"; then
         echo "${i}" >> base-binary-error.log
     fi
 done
