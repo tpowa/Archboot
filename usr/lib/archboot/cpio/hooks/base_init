@@ -35,4 +35,3 @@ _run ()
     _file_rename /usr/share/archboot/base/etc/systemd/system/initrd-cleanup.service \
                  /etc/systemd/system/initrd-cleanup.service
 }
-

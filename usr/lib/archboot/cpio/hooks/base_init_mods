@@ -4,6 +4,5 @@
 
 _run() {
     ### init modules
-    _map _mod vfat iso9660 nls_cp437 nls_ascii cdrom exfat
+    _map _mod vfat iso9660 isofs nls_cp437 nls_ascii cdrom exfat
 }
-
