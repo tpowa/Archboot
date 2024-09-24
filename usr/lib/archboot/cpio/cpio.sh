@@ -66,12 +66,12 @@ _map() {
 
 _loaded_mods() {
     #shellcheck disable=SC2046
-    modinfo -k "${_KERNELVERSION}" --field filename $(cut -d ' ' -f1 </proc/modules) \
+    modinfo -k "$(_kver "${_KERNEL}")" --field filename $(cut -d ' ' -f1 </proc/modules) \
     $(modinfo --field depends $(cut -d ' ' -f1 </proc/modules) | sed -e 's#,# #g') \
     $(modinfo --field softdep $(cut -d ' ' -f1 </proc/modules) | sed -e 's#.*:\ # #g') 2>"${_NO_LOG}" |\
     grep -v builtin
     #shellcheck disable=SC2046
-    modinfo -k "${_KERNELVERSION}" --field firmware $(cut -d ' ' -f1 </proc/modules) | sed -e 's#^#/usr/lib/firmware/#g' -e 's#$#.zst#g'
+    modinfo -k "$(_kver "${_KERNEL}")" --field firmware $(cut -d ' ' -f1 </proc/modules) | sed -e 's#^#/usr/lib/firmware/#g' -e 's#$#.zst#g'
     ### get filenames for extraction
     # modules from /sys
     #shellcheck disable=SC2046
@@ -188,16 +188,16 @@ _install_mods() {
     # Checking kernel module dependencies:
     # first try, pull in the easy modules
     #shellcheck disable=SC2086
-    _MOD_DEPS="$(modinfo -k "${_KERNELVERSION}" -F depends ${_MODS} 2>"${_NO_LOG}" | tr "," "\n" | sort -u) \
-               $(modinfo -k "${_KERNELVERSION}" -F softdep ${_MODS} 2>"${_NO_LOG}" | tr ".*: " "\n" | sort -u)"
+    _MOD_DEPS="$(modinfo -k "$(_kver "${_KERNEL}")" -F depends ${_MODS} 2>"${_NO_LOG}" | tr "," "\n" | sort -u) \
+               $(modinfo -k "$(_kver "${_KERNEL}")" -F softdep ${_MODS} 2>"${_NO_LOG}" | tr ".*: " "\n" | sort -u)"
     _DEP_COUNT=0
     # next tries, ensure to catch all modules with depends
     while ! [[ "${_DEP_COUNT}" == "${_DEP_COUNT2}" ]]; do
         _DEP_COUNT="${_DEP_COUNT2}"
         #shellcheck disable=SC2046,SC2086
         _MOD_DEPS="$(echo ${_MOD_DEPS} \
-                $(modinfo -k "${_KERNELVERSION}" -F depends ${_MOD_DEPS} 2>"${_NO_LOG}" | tr "," "\n" | sort -u) \
-                $(modinfo -k "${_KERNELVERSION}" -F softdep ${_MOD_DEPS} 2>"${_NO_LOG}" | tr ".*: " "\n" | sort -u) \
+                $(modinfo -k "$(_kver "${_KERNEL}")" -F depends ${_MOD_DEPS} 2>"${_NO_LOG}" | tr "," "\n" | sort -u) \
+                $(modinfo -k "$(_kver "${_KERNEL}")" -F softdep ${_MOD_DEPS} 2>"${_NO_LOG}" | tr ".*: " "\n" | sort -u) \
                 | tr " " "\n" | sort -u)"
         _DEP_COUNT2="$(wc -w <<< "${_MOD_DEPS}")"
     done
@@ -208,10 +208,10 @@ _install_mods() {
     # - builtin needs to be removed
     # - all starting / needs to be removed from paths
     #shellcheck disable=SC2046,SC2086
-    tar --hard-dereference -C / -cpf - $(modinfo  -k "${_KERNELVERSION}" -F filename ${_MODS} ${_MOD_DEPS} 2>"${_NO_LOG}" \
+    tar --hard-dereference -C / -cpf - $(modinfo  -k "$(_kver "${_KERNEL}")" -F filename ${_MODS} ${_MOD_DEPS} 2>"${_NO_LOG}" \
     | rg -v builtin | sd '^/' '' | sd ' /' ' ') | tar -C "${_ROOTFS}" -xpf -
     # generate new kernel module dependencies"
-    depmod -b "${_ROOTFS}" "${_KERNELVERSION}"
+    depmod -b "${_ROOTFS}" "$(_kver "${_KERNEL}")"
     # remove all non-binary module.* files (except devname for on-demand module loading
     # and builtin.modinfo for checking on builtin modules)
     rm "${_ROOTFS}${_MOD_DIR}"/modules.{alias,builtin,dep,order,symbols}
