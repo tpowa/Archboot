@@ -56,4 +56,5 @@ _change_pacman_conf "${1}" || exit 1
 _container_reproducibility "${1}"
 _set_hostname "${1}" || exit 1
 _ssh_keys "${1}" || exit 1
+_depmod "${1}" || exit 1
 echo "Finished container setup in ${1}."

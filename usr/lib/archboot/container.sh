@@ -102,7 +102,14 @@ _prepare_pacman() {
 _create_pacman_conf() {
     if [[ -z "${_INSTALL_SOURCE}" ]]; then
         echo "Using default pacman.conf..."
-        [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="${1}${_PACMAN_CONF}"
+        if [[ "${2}" == "use_binfmt" ]]; then
+            _PACMAN_CONF="${1}${_PACMAN_CONF}"
+            # CDN on aarch64 is broken sometimes
+            sd '^Server = http://mirror.archlinuxarm.org/$arch/$repo' \
+               '# Server = http://mirror.archlinuxarm.org/$arch/$repo' ${1}/etc/pacman.d/mirrorlist
+            sd '# Server = http://de.mirror.archlinuxarm.org/$arch/$repo' \
+               'Server = http://de.mirror.archlinuxarm.org/$arch/$repo' ${1}/etc/pacman.d/mirrorlist
+        fi
         if ! rg -qw "\[archboot\]" "${_PACMAN_CONF}"; then
             echo "Adding Archboot repository to ${_PACMAN_CONF}..."
             echo "[archboot]" >> "${_PACMAN_CONF}"
@@ -247,4 +254,9 @@ _container_reproducibility() {
 _set_hostname() {
     echo "Setting hostname to archboot..."
     echo 'archboot' > "${1}/etc/hostname"
+
+_depmod() {
+    echo "Running depmod..."
+    ${_NSPAWN} "${1}" depmod -a
+}
 }
