@@ -107,8 +107,8 @@ _create_pacman_conf() {
             # CDN on aarch64 is broken sometimes
             sd '^Server = http://mirror.archlinuxarm.org/$arch/$repo' \
                '# Server = http://mirror.archlinuxarm.org/$arch/$repo' ${1}/etc/pacman.d/mirrorlist
-            sd '# Server = http://de.mirror.archlinuxarm.org/$arch/$repo' \
-               'Server = http://de.mirror.archlinuxarm.org/$arch/$repo' ${1}/etc/pacman.d/mirrorlist
+            sd '# Server = http://de3.mirror.archlinuxarm.org/$arch/$repo' \
+               'Server = http://de3.mirror.archlinuxarm.org/$arch/$repo' ${1}/etc/pacman.d/mirrorlist
         fi
         if ! rg -qw "\[archboot\]" "${_PACMAN_CONF}"; then
             echo "Adding Archboot repository to ${_PACMAN_CONF}..."
@@ -254,9 +254,11 @@ _container_reproducibility() {
 _set_hostname() {
     echo "Setting hostname to archboot..."
     echo 'archboot' > "${1}/etc/hostname"
+}
 
 _depmod() {
     echo "Running depmod..."
-    ${_NSPAWN} "${1}" depmod $(kver "${1}/${_KERNEL}")
+    _KERNELVERSION="$(_kver $(basename ${1}/lib/modules/*))"
+    ${_NSPAWN} "${1}" depmod "${_KERNELVERSION}"
 }
-}
+
