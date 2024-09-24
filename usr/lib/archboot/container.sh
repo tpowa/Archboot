@@ -258,7 +258,7 @@ _set_hostname() {
 
 _depmod() {
     echo "Running depmod..."
-    _KERNELVERSION="$(basename ${1}/lib/modules/*))"
+    _KERNELVERSION="$(basename ${1}/lib/modules/*)"
     ${_NSPAWN} "${1}" depmod "${_KERNELVERSION}"
 }
 
