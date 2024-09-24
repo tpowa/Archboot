@@ -82,7 +82,6 @@ _LICENSES=(
   lua51-lpeg/LICENSE
   luajit/COPYRIGHT
   miniserve/LICENSE
-  msgpack-c/LICENSE
   ncurses/COPYING
   neovim/LICENSE.txt
   netscanner/LICENSE
