@@ -257,6 +257,6 @@ _set_hostname() {
 
 _depmod() {
     echo "Running depmod..."
-    ${_NSPAWN} "${1}" depmod -a
+    ${_NSPAWN} "${1}" depmod $(kver "${1}/${_KERNEL}")
 }
 }
