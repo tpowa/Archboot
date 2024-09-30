@@ -20,7 +20,7 @@ _LICENSES=(
   dysk/LICENSE
   e2fsprogs/MIT-LICENSE
   expat/COPYING
-  eza/LICENSE
+  eza/LICENSE.txt
   fd/LICENSE-MIT
   file/COPYING
   fzf/LICENSE
