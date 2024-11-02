@@ -33,6 +33,7 @@ _LICENSES=(
   gnupg/Unicode-TOU.txt
   gssproxy/COPYING
   hdparm/LICENSE.TXT
+  http-parser/LICENSE-MIT
   iana-etc/LICENSE
   icu/LICENSE
   iputils/LICENSE.BSD3
