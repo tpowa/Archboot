@@ -122,6 +122,12 @@ _LICENSES=(
   tree-sitter/LICENSE
   ttyd/LICENSE
   tzdata/LICENSE
+  usbutils/CC0-1.0.txt
+  usbutils/GPL-2.0-only.txt
+  usbutils/GPL-2.0-or-later.txt
+  usbutils/GPL-3.0-only.txt
+  usbutils/LGPL-2.1-or-later.txt
+  usbutils/MIT.txt
   util-linux-libs/COPYING.BSD-2-Clause
   util-linux-libs/COPYING.BSD-3-Clause
   util-linux-libs/COPYING.BSD-4-Clause-UC
