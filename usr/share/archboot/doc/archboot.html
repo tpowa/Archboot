@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="https://archboot.com/gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2024 Fundraise: 0% <progress max="100" value="84">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2024 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 15.11.2024 07:23</strong></p>
+<strong>Last update: 15.11.2024 07:48</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -1330,7 +1330,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 <h2 data-number="8" id="testing-image-and-files-with-qemu"><span class="header-section-number">8.</span> Testing Image And Files With QEMU</h2>
 <p>You can run <a href="https://wiki.archlinux.org/title/QEMU" title="QEMU"><strong>QEMU</strong></a> tests at different stages of ISO creation.</p>
 <h3 data-number="8.1" id="running-aarch64"><span class="header-section-number">8.1</span> <strong>Running AARCH64:</strong></h3>
-<p><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <a href="https://archlinux.org/packages/?name=edk2-armvirt"><strong>edk2-armvirt</strong></a> package.</p>
+<p><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <a href="https://archlinux.org/packages/?name=edk2-aarch64"><strong>edk2-aarch64</strong></a> package.</p>
 <table>
 <thead>
 <tr class="header">
@@ -1339,7 +1339,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ qemu-system-aarch64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -boot d -bios /usr/share/edk2-armvirt/aarch64/QEMU_EFI.fd \<br>-machine virt -cpu cortex-a57 -device virtio-gpu-pci \<br>-device nec-usb-xhci -device usb-tablet \<br>-device usb-kbd -m &lt;memory&gt; </code></td>
+<td><code>$ qemu-system-aarch64 -drive file=&lt;isofile&gt;,if=virtio,format=raw \<br>-usb -boot d -bios /usr/share/edk2/aarch64/QEMU_EFI.fd \<br>-machine virt -cpu cortex-a57 -device virtio-gpu-pci \<br>-device nec-usb-xhci -device usb-tablet \<br>-device usb-kbd -m &lt;memory&gt; </code></td>
 </tr>
 </tbody>
 </table>
