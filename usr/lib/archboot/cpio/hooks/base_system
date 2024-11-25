@@ -34,5 +34,7 @@ _run ()
     _map _binary groups ch{age,fn,sh} expiry {fail,last}log \
           {chg,ch,g}passwd group{add,del,mems,mod} grp{ck,conv,unconv} \
           newusers pw{ck,conv,unconv} user{add,del,mod} sg getsubids
+    # add ncurses libs
+    _file /usr/lib/libncurses*
 }
 
