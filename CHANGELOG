@@ -1,6 +1,9 @@
-On the road to 2024.11:
+On the road to 2024.12:
+---
+Highligts 2024.11:
+- kernel 6.12.x
 - adapted pam 1.7.0 changes
-- fixed archinstall
+- fixed archinstall 3.0.x
 ---
 Highlights 2024.10:
 - kernel 6.11.x
