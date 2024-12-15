@@ -1,5 +1,6 @@
 On the road to 2024.12:
 - fixed font setting on early userspace
+- removed mkinitcpio and mkinitcpio-busybox from pacman db
 ---
 Highligts 2024.11:
 - kernel 6.12.x
