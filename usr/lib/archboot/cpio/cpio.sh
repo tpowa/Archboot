@@ -152,7 +152,7 @@ _binary() {
 _init_rootfs() {
     # creates a temporary directory for the rootfs and initialize it with a
     # basic set of necessary directories and symlinks
-    _TMPDIR="$(mktemp -d --tmpdir mkinitcpio.XXXX)"
+    _TMPDIR="$(mktemp -d --tmpdir archboot-cpio.XXXX)"
     _ROOTFS="${2:-${_TMPDIR}/root}"
     # basic directory structure
     mkdir -p "${_ROOTFS}"/{dev,etc,mnt,proc,root,run,sys,sysroot,tmp,usr/{local{,/bin,/sbin,/lib},lib,bin},var}
