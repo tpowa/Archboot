@@ -138,9 +138,12 @@ if [[ -e /sys/class/graphics/fb0/modes ]]; then
     fi
 fi
 # it needs one echo before, in order to reset the consolefont!
-_msg "Initializing Console..."
-_clear
-setfont ter-v${_SIZE}n -C /dev/console
+while true; do
+    _msg "Initializing Console..."
+    _clear
+    setfont -C /dev/console ter-v${_SIZE}n && break
+    sleep 0.1
+done
 _initrd_stage | _dialog --title " Initializing System " --gauge "\n${_KEEP}\n\nSearching rootfs on blockdevices..." 9 43 0
 _clear
 _msg "The boot medium can be safely removed now."
