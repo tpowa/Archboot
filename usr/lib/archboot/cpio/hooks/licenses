@@ -13,7 +13,7 @@ _LICENSES=(
   brotli/LICENSE
   bzip2/LICENSE
   curl/COPYING
-  dbus/COPYING
+  dbus/{COPYING,AFL-2.1.txt}
   dog/LICENCE
   duktape/LICENSE.txt
   dust/LICENSE
