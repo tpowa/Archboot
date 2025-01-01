@@ -1,4 +1,8 @@
 On the road to 2025.01:
+Environment:
+- removed sbsigntools
+setup:
+- replaced sbsigntools with systemd-sbsign
 ---
 Highlights 2024.12:
 init:
