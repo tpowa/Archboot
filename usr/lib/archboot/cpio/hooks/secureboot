@@ -4,7 +4,7 @@
 
 _run ()
 {
-    _map _binary mokutil openssl
+    _map _binary mokutil openssl cert-to-efi-sig-list sign-efi-sig-list
     _file /etc/ssl/openssl.cnf
     # add mkkeys.sh, 
     # curl -s -L -O https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh
