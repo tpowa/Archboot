@@ -138,7 +138,6 @@ _uefi_common() {
     [[ -f "${_DESTDIR}/usr/bin/efibootmgr" ]] || _PACKAGES+=(efibootmgr)
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         [[ -f "${_DESTDIR}/usr/bin/mokutil" ]] || _PACKAGES+=(mokutil)
-        [[ -f "${_DESTDIR}/usr/bin/sbsign" ]] || _PACKAGES+=(sbsigntools)
     fi
     #shellcheck disable=SC2128
     if [[ -n "${_PACKAGES}" ]]; then

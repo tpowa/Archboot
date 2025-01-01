@@ -48,8 +48,16 @@ _mok_sign () {
     rm /tmp/.password
     _dialog --title " Machine Owner Key " --no-mouse --infobox "Machine Owner Key has been installed successfully." 3 70
     sleep 3
-    ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output /boot/"${_VMLINUZ}" /boot/"${_VMLINUZ}" &>"${_LOG}"
-    ${_NSPAWN} sbsign --key /"${_KEYDIR}"/MOK/MOK.key --cert /"${_KEYDIR}"/MOK/MOK.crt --output "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
+    ${_NSPAWN} /usr/lib/systemd/systemd-sbsign \
+               --private-key=/"${_KEYDIR}"/MOK/MOK.key \
+               --certificate=/"${_KEYDIR}"/MOK/MOK.crt \
+               --output=/boot/"${_VMLINUZ}" \
+               sign /boot/"${_VMLINUZ}" &>"${_LOG}"
+    ${_NSPAWN} /usr/lib/systemd/systemd-sbsign \
+               --private-key=/"${_KEYDIR}"/MOK/MOK.key \
+               --certificate=/"${_KEYDIR}"/MOK/MOK.crt \
+               --output="${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi \
+               sign "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
     _dialog --title " Kernel And Bootloader Signing " --no-mouse --infobox "/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nhave been signed successfully." 5 60
     sleep 3
 }

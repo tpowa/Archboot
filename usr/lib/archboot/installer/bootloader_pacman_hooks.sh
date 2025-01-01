@@ -99,7 +99,7 @@ _pacman_hook_grub_sb() {
     cat << EOF >> "${_HOOKNAME}"
 Description = Update GRUB UEFI SB after upgrade...
 When = PostTransaction
-Exec = /usr/bin/sh -c "/usr/bin/grub-mkstandalone -d '/usr/lib/grub/${_GRUB_ARCH}-efi' -O '${_GRUB_ARCH}-efi' --sbat=/usr/share/grub/sbat.csv --fonts='ter-u16n' --locales='en@quot' --themes='' -o '/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi' 'boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}';/usr/bin/sbsign --key '/${_KEYDIR}/MOK/MOK.key' --cert '/${_KEYDIR}/MOK/MOK.crt' --output '/${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi' '/${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi'"
+Exec = /usr/bin/sh -c "/usr/bin/grub-mkstandalone -d '/usr/lib/grub/${_GRUB_ARCH}-efi' -O '${_GRUB_ARCH}-efi' --sbat=/usr/share/grub/sbat.csv --fonts='ter-u16n' --locales='en@quot' --themes='' -o '/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi' 'boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}';/usr/lib/systemd/systemd-sbsign --private-key='/${_KEYDIR}/MOK/MOK.key' --certificate='/${_KEYDIR}/MOK/MOK.crt' --output='/${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi' sign '/${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi'"
 EOF
     _dialog --title " Automatic GRUB UEFI SB Update " --no-mouse --infobox "Automatic GRUB UEFI SB update has been enabled successfully:\n\n${_HOOKNAME}" 5 70
     sleep 3
@@ -112,8 +112,8 @@ _pacman_sign() {
     cat << EOF >> "${_HOOKNAME}"
 Description = Signing kernel with Machine Owner Key for Secure Boot
 When = PostTransaction
-Exec = /usr/bin/find /boot/ -maxdepth 1 -name 'vmlinuz-*' -exec /usr/bin/sh -c 'if ! /usr/bin/sbverify --list {} 2>"${_NO_LOG}" | /usr/bin/grep -q "signature certificates"; then /usr/bin/sbsign --key /${_KEYDIR}/MOK/MOK.key --cert /${_KEYDIR}/MOK/MOK.crt --output {} {}; fi' ;
-Depends = sbsigntools
+Exec = /usr/bin/find /boot/ -maxdepth 1 -name 'vmlinuz-*' -exec /usr/bin/sh -c '/usr/lib/systemd/systemd-sbsign --private-key=/${_KEYDIR}/MOK/MOK.key --certificate=/${_KEYDIR}/MOK/MOK.crt --output={} sign {}'
+Depends = systemd
 Depends = findutils
 Depends = grep
 EOF
