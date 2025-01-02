@@ -3,12 +3,12 @@
 . /usr/lib/archboot/common.sh
 _MS_GUID="77fa9abd-0359-4d32-bd60-28f4e78f784b"
 _MS_PATH="https://www.microsoft.com/pkiops/certs"
-_MS_CERTS="MicWinProPCA2011_2011-10-19 MicCorUEFCA2011_2011-06-27 'windows uefi ca 2023' 'microsoft uefi ca 2023'"
+_MS_CERTS=(MicWinProPCA2011_2011-10-19 MicCorUEFCA2011_2011-06-27 'windows uefi ca 2023' 'microsoft uefi ca 2023')
 _usage () {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Generate Secure Boot Keys, MOK Files\e[m"
     echo -e "\e[1m-----------------------------------------------\e[m"
     echo "This script generates all needed keys for a Secure Boot setup."
-    echo -e "It will include the \e[1m2\e[m needed Microsoft certificates, in order"
+    echo -e "It will include the \e[1m4\e[m needed Microsoft certificates, in order"
     echo "to avoid soft bricking of devices."
     echo -e "Backup of your existing keys are put to \e[1mBACKUP\e[m directory."
     echo ""
@@ -52,7 +52,7 @@ ${_NAME}
 EOF
     # download MS Certificates, else EFI might get broken!
     echo "Downloading Microsoft Certificates..."
-    for i in ${_MS_CERTS}; do
+    for i in ${_MS_CERTS[@]}; do
         ${_DLPROG} -O "${_MS_PATH}/${i}.crt" || exit 1
     done
     echo "Creating EFI Signature Lists from Microsoft's DER format db certificates..."
