@@ -13,7 +13,8 @@ openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME DB/" -keyout DB.key \
 openssl x509 -in PK.crt -out PK.cer -outform DER
 openssl x509 -in KEK.crt -out KEK.cer -outform DER
 openssl x509 -in DB.crt -out DB.cer -outform DER
-uuidgen > myGUID.txt
+GUID="$(uuidgen)"
+echo "$GUID" > myGUID.txt
 cert-to-efi-sig-list -g "$GUID" PK.crt PK.esl
 cert-to-efi-sig-list -g "$GUID" KEK.crt KEK.esl
 cert-to-efi-sig-list -g "$GUID" DB.crt DB.esl
