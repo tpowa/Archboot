@@ -3,12 +3,11 @@
 . /usr/lib/archboot/common.sh
 _MS_GUID="77fa9abd-0359-4d32-bd60-28f4e78f784b"
 _MS_PATH="https://www.microsoft.com/pkiops/certs"
-_MS_CERTS=(MicWinProPCA2011_2011-10-19 MicCorUEFCA2011_2011-06-27 'windows uefi ca 2023' 'microsoft uefi ca 2023')
 _usage () {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Generate Secure Boot Keys, MOK Files\e[m"
     echo -e "\e[1m-----------------------------------------------\e[m"
     echo "This script generates all needed keys for a Secure Boot setup."
-    echo -e "It will include the \e[1m4\e[m needed Microsoft certificates, in order"
+    echo -e "It will include the \e[1m6\e[m needed Microsoft certificates, in order"
     echo "to avoid soft bricking of devices."
     echo -e "Backup of your existing keys are put to \e[1mBACKUP\e[m directory."
     echo ""
@@ -52,18 +51,21 @@ ${_NAME}
 EOF
     # download MS Certificates, else EFI might get broken!
     echo "Downloading Microsoft Certificates..."
-    for i in ${_MS_CERTS[@]}; do
-        ${_DLPROG} -O "${_MS_PATH}/${i}.crt" || exit 1
-    done
+    ${_DLPROG} -O ${_MS_PATH}/MicWinProPCA2011_2011-10-19.crt || exit 1
+    ${_DLPROG} -O ${_MS_PATH}/MicCorUEFCA2011_2011-06-27.crt || exit 1
+    ${_DLPROG} ${_MS_PATH}/windows%20uefi%20ca%202023.crt -o windows_uefi_ca_2023.crt || exit 1
+    ${_DLPROG} ${_MS_PATH}/microsoft%20uefi%20ca%202023.crt -o microsoft_uefi_ca_2023.crt || exit 1
+    ${_DLPROG} -O ${_MS_PATH}/MicCorKEKCA2011_2011-06-24.crt || exit 1
+    ${_DLPROG} ${_MS_PATH}/microsoft%20corporation%20kek%202k%20ca%202023.crt -o microsoft_corporation_kek_2k_ca_2023.crt || exit 1
     echo "Creating EFI Signature Lists from Microsoft's DER format db certificates..."
-    sbsiglist --owner ${_MS_GUID} --type x509 --output MS_Win_db.esl MicWinProPCA2011_2011-10-19.crt
-    sbsiglist --owner ${_MS_GUID} --type x509 --output MS_UEFI_db.esl MicCorUEFCA2011_2011-06-27.crt
-    sbsiglist --owner ${_MS_GUID} --type x509 --output MS_Win_db_2023.esl 'windows uefi ca 2023.crt'
-    sbsiglist --owner ${_MS_GUID} --type x509 --output MS_UEFI_db_2023.esl 'microsoft uefi ca 2023.crt'
+    sbsiglist --owner ${_MS_GUID} --type x509 --output MS_Win_db_2011.esl MicWinProPCA2011_2011-10-19.crt
+    sbsiglist --owner ${_MS_GUID} --type x509 --output MS_UEFI_db_2011.esl MicCorUEFCA2011_2011-06-27.crt
+    sbsiglist --owner ${_MS_GUID} --type x509 --output MS_Win_db_2023.esl windows_uefi_ca_2023.crt
+    sbsiglist --owner ${_MS_GUID} --type x509 --output MS_UEFI_db_2023.esl microsoft_uefi_ca_2023.crt
     cat MS_Win_db_2011.esl MS_Win_db_2023.esl MS_UEFI_db_2011.esl MS_UEFI_db_2023.esl > MS_db.esl
     echo "Creating an EFI Signature List from Microsoft's DER format KEK certificates..."
     sbsiglist --owner ${_MS_GUID} --type x509 --output MS_Win_KEK_2011.esl MicCorKEKCA2011_2011-06-24.crt
-    sbsiglist --owner ${_MS_GUID} --type x509 --output MS_Win_KEK_2023.esl 'microsoft corporation kek 2k ca 2023.crt'
+    sbsiglist --owner ${_MS_GUID} --type x509 --output MS_Win_KEK_2023.esl 'microsoft_corporation_kek_2k_ca_2023.crt'
     cat MS_Win_KEK_2011.esl MS_Win_KEK_2023.esl > MS_Win_KEK.esl
     echo "Signing a db variable update with your KEK..."
     sign-efi-sig-list -a -g ${_MS_GUID} -k KEK.key -c KEK.crt db MS_db.esl add_MS_db.auth
