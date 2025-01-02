@@ -1,6 +1,5 @@
 On the road to 2025.01:
 Environment:
-- removed sbsigntools
 - added missing efitools for sb certification creation
 setup:
 - replaced sbsigntools with systemd-sbsign
