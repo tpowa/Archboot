@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
-_run ()
+_run () {
     # efitools, mokutil, openssl and sbsigntools
     _map _binary mokutil openssl cert-to-efi-{hash-list,sig-list} \
                  efi-{readvar,updatevar} efitool-mkusb flash-var \
