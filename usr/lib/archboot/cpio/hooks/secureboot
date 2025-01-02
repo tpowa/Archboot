@@ -8,7 +8,6 @@ _run ()
                  efi-{readvar,updatevar} efitool-mkusb flash-var \
                  hash-to-efi-sig-list sig-list-to-certs sign-efi-sig-list \
                  sb{attach,keysync,siglist,sign,varsign,verify}
-
     _file /etc/ssl/openssl.cnf
     # add mkkeys.sh, 
     # curl -s -L -O https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh
