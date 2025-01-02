@@ -19,7 +19,6 @@ _LICENSES=(
   dust/LICENSE
   dysk/LICENSE
   e2fsprogs/MIT-LICENSE
-  efitools/COPYING
   expat/COPYING
   eza/LICENSE.txt
   fd/LICENSE-MIT
