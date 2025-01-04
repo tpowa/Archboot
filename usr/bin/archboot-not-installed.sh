@@ -32,7 +32,7 @@ done
 # remove false positives:
 # ca-certificates has no files
 # dbus-broker-units only systemd files
-# gnulib-l10j only files in /usr/share/locale
+# gnulib-l10n only files in /usr/share/locale
 # iana-etc only /etc files
 # licenses mandatory removed
 # linux-firmware-whence only license files
