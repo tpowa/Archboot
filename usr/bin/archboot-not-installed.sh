@@ -32,9 +32,10 @@ done
 # remove false positives:
 # ca-certificates has no files
 # dbus-broker-units only systemd files
+# gnulib-l10j only files in /usr/share/locale
 # iana-etc only /etc files
 # licenses mandatory removed
 # linux-firmware-whence only license files
 # pacman-mirrorlist only /etc file
 # pambase only /etc files
-rg -v "ca-certificates|dbus-units|dbus-broker-units|iana-etc|licenses|linux-firmware-whence|pacman-mirrorlist|pambase" not-installed.orig.log >not-installed.log
+rg -v "ca-certificates|dbus-units|dbus-broker-units|gnulib-l10n|iana-etc|licenses|linux-firmware-whence|pacman-mirrorlist|pambase" not-installed.orig.log >not-installed.log
