@@ -3,11 +3,11 @@
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
 _run () {
-    # efitools, mokutil, openssl and sbsigntools
+    # efitools, mokutil, openssl, sbctl and sbsigntools
     _map _binary mokutil openssl cert-to-efi-{hash-list,sig-list} \
                  efi-{readvar,updatevar} efitool-mkusb flash-var \
                  hash-to-efi-sig-list sig-list-to-certs sign-efi-sig-list \
-                 sb{attach,keysync,siglist,sign,varsign,verify}
+                 sb{attach,ctl,keysync,siglist,sign,varsign,verify}
     _file /etc/ssl/openssl.cnf
     # add mkkeys.sh, 
     # curl -s -L -O https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh
