@@ -1,6 +1,6 @@
 On the road to 2025.01:
 Environment:
-- added missing efitools for secure boot certificate creation
+- added missing efitools for secureboot certificate creation
 - updated secureboot scripts
 setup:
 - replaced sbsigntools with systemd-sbsign
