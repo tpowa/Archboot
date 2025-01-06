@@ -153,9 +153,15 @@ EOF
           <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
         </property>
       </property>
+      <property name="monitorVirtual-1" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="3"/>
+          <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
+        </property>
+      </property>
     </property>
   </property>
-  <property name="last-settings-migration-version" type="uint" value="1"/>
 </channel>
 EOF
     echo "Replacing appfinder launcher with gparted..."
