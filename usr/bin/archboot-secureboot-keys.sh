@@ -46,7 +46,7 @@ if [[ -n "${_DIR}" ]]; then
     cd BACKUP || exit 1; mokutil --export; cd .. || exit 1
     echo "Generating Keys in ${_DIR}"
     # add mkkeys.sh
-    ${_NAME} ${_MKKEYS}
+    _NAME=${_NAME} ${_MKKEYS}
     # download MS Certificates, else EFI might get broken!
     echo "Downloading Microsoft Certificates..."
     ${_DLPROG} -O ${_MS_PATH}/MicWinProPCA2011_2011-10-19.crt || exit 1
