@@ -8,8 +8,7 @@ if [[ -z "${_NAME}" ]]; then
   echo -n "Enter a Common Name to embed in the keys: "
   read -r _NAME
 fi
-echo ""
-echo "Creating keys with Common Name: ${_NAME} ..."
+echo "Creating keys with Common Name: ${_NAME}"
 openssl req -new -x509 -newkey rsa:4096 -subj "/CN=${_NAME} PK/" -keyout PK.key \
         -out PK.crt -days 3650 -nodes -sha256 &>"${_NO_LOG}"
 openssl req -new -x509 -newkey rsa:4096 -subj "/CN=${_NAME} KEK/" -keyout KEK.key \

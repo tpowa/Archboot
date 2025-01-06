@@ -61,7 +61,7 @@ if [[ -n "${_DIR}" ]]; then
     sbsiglist --owner ${_MS_GUID} --type x509 --output MS_Win_db_2023.esl windows_uefi_ca_2023.crt
     sbsiglist --owner ${_MS_GUID} --type x509 --output MS_UEFI_db_2023.esl microsoft_uefi_ca_2023.crt
     cat MS_Win_db_2011.esl MS_Win_db_2023.esl MS_UEFI_db_2011.esl MS_UEFI_db_2023.esl > MS_db.esl
-    echo "Creating an EFI Signature List from Microsoft's DER format KEK certificates..."
+    echo "Creating EFI Signature List from Microsoft's DER format KEK certificates..."
     sbsiglist --owner ${_MS_GUID} --type x509 --output MS_Win_KEK_2011.esl MicCorKEKCA2011_2011-06-24.crt
     sbsiglist --owner ${_MS_GUID} --type x509 --output MS_Win_KEK_2023.esl 'microsoft_corporation_kek_2k_ca_2023.crt'
     cat MS_Win_KEK_2011.esl MS_Win_KEK_2023.esl > MS_Win_KEK.esl
