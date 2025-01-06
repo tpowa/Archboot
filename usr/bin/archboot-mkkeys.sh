@@ -4,10 +4,12 @@
 # replaced GUID with uuidgen Tobias Powalowski - <tpowa@archlinux.org>
 _GUID="$(uuidgen --random)"
 _NO_LOG=/dev/null
-echo -n "Enter a Common Name to embed in the keys: "
-read -r _NAME
+if [[ -z "${_NAME}" ]]; then
+  echo -n "Enter a Common Name to embed in the keys: "
+  read -r _NAME
+fi
 echo ""
-echo "Creating keys..."
+echo "Creating keys with Common Name: ${_NAME} ..."
 openssl req -new -x509 -newkey rsa:4096 -subj "/CN=${_NAME} PK/" -keyout PK.key \
         -out PK.crt -days 3650 -nodes -sha256 &>"${_NO_LOG}"
 openssl req -new -x509 -newkey rsa:4096 -subj "/CN=${_NAME} KEK/" -keyout KEK.key \
