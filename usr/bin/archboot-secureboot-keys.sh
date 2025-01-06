@@ -87,7 +87,7 @@ EOF
     mv ./*.crt ./*.auth ./*.esl MS
     cd ..
     chmod 700 "${_DIR}"
-    echo "Finished: Keys created in ${_DIR}"
+    echo "Keys created successfully in ${_DIR}"
 else
     echo "ERROR: no directory specified"
     _usage
