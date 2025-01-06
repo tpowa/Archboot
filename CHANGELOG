@@ -2,6 +2,7 @@ On the road to 2025.01:
 Environment:
 - added missing efitools for secureboot certificate creation
 - updated secureboot scripts
+- updated Xfce to 4.20 series
 setup:
 - replaced sbsigntools with systemd-sbsign
 ---
