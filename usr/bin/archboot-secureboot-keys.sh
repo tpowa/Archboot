@@ -68,13 +68,13 @@ EOF
     sbsiglist --owner ${_MS_GUID} --type x509 --output MS_Win_KEK_2023.esl 'microsoft_corporation_kek_2k_ca_2023.crt'
     cat MS_Win_KEK_2011.esl MS_Win_KEK_2023.esl > MS_Win_KEK.esl
     echo "Signing a db variable update with your KEK..."
-    sign-efi-sig-list -a -g ${_MS_GUID} -k KEK.key -c KEK.crt db MS_db.esl add_MS_db.auth
+    sign-efi-sig-list -a -g ${_MS_GUID} -k KEK.key -c KEK.crt db MS_db.esl add_MS_db.auth &>"${_NO_LOG}"
     echo "Signing a KEK variable update with your PK..."
-    sign-efi-sig-list -a -g ${_MS_GUID} -k PK.key -c PK.crt KEK MS_Win_KEK.esl add_MS_Win_KEK.auth
+    sign-efi-sig-list -a -g ${_MS_GUID} -k PK.key -c PK.crt KEK MS_Win_KEK.esl add_MS_Win_KEK.auth &>"${_NO_LOG}"
     # generate new machine owner key
     echo "Generating Machine Owner Key (MOK) ..."
-    openssl req -new -x509 -newkey rsa:2048 -keyout MOK.key -out MOK.crt -nodes -days 3650 -subj "/CN=${_NAME}/"
-    openssl x509 -in MOK.crt -out MOK.cer -outform DER
+    openssl req -new -x509 -newkey rsa:2048 -keyout MOK.key -out MOK.crt -nodes -days 3650 -subj "/CN=${_NAME}/" &>"${_NO_LOG}"
+    openssl x509 -in MOK.crt -out MOK.cer -outform DER &>"${_NO_LOG}"
     DIRS="DB KEK MOK PK noPK"
     for i in $DIRS; do
         [[ ! -d "$i" ]] && mkdir "$i"
