@@ -155,6 +155,7 @@ EOF
       </property>
     </property>
   </property>
+  <property name="last-settings-migration-version" type="uint" value="1"/>
 </channel>
 EOF
     echo "Replacing appfinder launcher with gparted..."
