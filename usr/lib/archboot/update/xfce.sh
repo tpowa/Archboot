@@ -132,30 +132,30 @@ EOF
         <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
         <property name="last-single-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
         <property name="image-show" type="bool" value="true"/>
-        <property name="image-style" type="int" value="0"/>
+        <property name="image-style" type="int" value="3"/>
         <property name="workspace0" type="empty">
-          <property name="color-style" type="int" value="0"/>
+          <property name="color-style" type="int" value="3"/>
           <property name="image-style" type="int" value="3"/>
           <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
         </property>
       </property>
       <property name="monitorVNC-0" type="empty">
         <property name="workspace0" type="empty">
-          <property name="color-style" type="int" value="0"/>
+          <property name="color-style" type="int" value="3"/>
           <property name="image-style" type="int" value="3"/>
           <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
         </property>
       </property>
       <property name="monitorHDMI1" type="empty">
         <property name="workspace0" type="empty">
-          <property name="color-style" type="int" value="0"/>
+          <property name="color-style" type="int" value="3"/>
           <property name="image-style" type="int" value="3"/>
           <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
         </property>
       </property>
       <property name="monitorVirtual-1" type="empty">
         <property name="workspace0" type="empty">
-          <property name="color-style" type="int" value="0"/>
+          <property name="color-style" type="int" value="3"/>
           <property name="image-style" type="int" value="3"/>
           <property name="last-image" type="string" value="/usr/share/archboot/grub/archboot-background.png"/>
         </property>
