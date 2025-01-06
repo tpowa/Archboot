@@ -3,6 +3,7 @@
 # Licensed under the terms of the GPL v3
 # replaced GUID with uuidgen Tobias Powalowski - <tpowa@archlinux.org>
 _GUID="$(uuidgen --random)"
+_NO_LOG=/dev/null
 echo -n "Enter a Common Name to embed in the keys: "
 read -r _NAME
 echo "Creating keys..."
