@@ -78,10 +78,6 @@ _configure_xfce() {
     <property name="plugin-6" type="string" value="systray">
         <property name="square-icons" type="bool" value="true"/>
     </property>
-    <property name="plugin-8" type="string" value="pulseaudio">
-      <property name="enable-keyboard-shortcuts" type="bool" value="true"/>
-      <property name="show-notifications" type="bool" value="true"/>
-    </property>
     <property name="plugin-9" type="string" value="power-manager-plugin"/>
     <property name="plugin-10" type="string" value="notification-plugin"/>
     <property name="plugin-11" type="string" value="separator">
@@ -124,7 +120,7 @@ _configure_xfce() {
 </channel>
 EOF
     echo "Setting breeze as default icons..."
-    sd '<property name="IconThemeName" type="string" value="Adwaita"/>' '<property name="IconThemeName" type="string" value="breeze"/>' \
+    sd '<property name="IconThemeName" type="string" value="elementary"/>' '<property name="IconThemeName" type="string" value="breeze"/>' \
     /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
     echo "Setting Archboot background image..."
     cat << EOF >/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
