@@ -124,7 +124,7 @@ EOF
     /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
     echo "Setting Archboot background image..."
     cat << EOF >/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <channel name="xfce4-desktop" version="1.0">
   <property name="backdrop" type="empty">
