@@ -45,7 +45,7 @@ if [[ -n "${_DIR}" ]]; then
     efi-readvar -v dbx -o BACKUP/old_dbx.esl
     cd BACKUP || exit 1; mokutil --export; cd .. || exit 1
     echo "Generating Keys in ${_DIR}"
-    # add mkkeys.sh
+    # create custom keys
     _NAME=${_NAME} ${_MKKEYS}
     # download MS Certificates, else EFI might get broken!
     echo "Downloading Microsoft Certificates..."
@@ -70,7 +70,7 @@ if [[ -n "${_DIR}" ]]; then
     echo "Signing a KEK variable update with your PK..."
     sign-efi-sig-list -a -g ${_MS_GUID} -k PK.key -c PK.crt KEK MS_Win_KEK.esl add_MS_Win_KEK.auth &>"${_NO_LOG}"
     # generate new machine owner key
-    echo "Generating Machine Owner Key (MOK) ..."
+    echo "Generating Machine Owner Key MOK..."
     openssl req -new -x509 -newkey rsa:2048 -keyout MOK.key -out MOK.crt -nodes -days 3650 -subj "/CN=${_NAME}/" &>"${_NO_LOG}"
     openssl x509 -in MOK.crt -out MOK.cer -outform DER &>"${_NO_LOG}"
     DIRS="DB KEK MOK PK noPK"

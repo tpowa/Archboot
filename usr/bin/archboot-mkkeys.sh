@@ -7,6 +7,7 @@ _NO_LOG=/dev/null
 if [[ -z "${_NAME}" ]]; then
   echo -n "Enter a Common Name to embed in the keys: "
   read -r _NAME
+  _EXIT_MESSAGE=1
 fi
 echo "Creating keys with Common Name: ${_NAME}"
 openssl req -new -x509 -newkey rsa:4096 -subj "/CN=${_NAME} PK/" -keyout PK.key \
@@ -29,9 +30,11 @@ sign-efi-sig-list -g "${_GUID}" -k PK.key -c PK.crt PK noPK.esl noPK.auth &>"${_
 sign-efi-sig-list -g "${_GUID}" -k PK.key -c PK.crt KEK KEK.esl KEK.auth &>"${_NO_LOG}"
 sign-efi-sig-list -g "${_GUID}" -k KEK.key -c KEK.crt db DB.esl DB.auth &>"${_NO_LOG}"
 chmod 0600 ./*.key
-echo ""
-echo "For use with KeyTool, copy the *.auth and *.esl files to a FAT USB"
-echo "flash drive or to your EFI System Partition (ESP)."
-echo "For use with most UEFIs' built-in key managers, copy the *.cer files;"
-echo "but some UEFIs require the *.auth files."
-echo ""
+if [[ -n "${_EXIT_MESSAGE}" ]]; then
+  echo ""
+  echo "For use with KeyTool, copy the *.auth and *.esl files to a FAT USB"
+  echo "flash drive or to your EFI System Partition (ESP)."
+  echo "For use with most UEFIs' built-in key managers, copy the *.cer files;"
+  echo "but some UEFIs require the *.auth files."
+  echo ""
+fi
