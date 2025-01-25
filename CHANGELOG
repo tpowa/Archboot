@@ -3,6 +3,7 @@ Environment:
 - added missing efitools for Secure Boot certificate creation
 - updated Secure Boot scripts
 - updated Xfce to 4.20 series
+- fixed compression algorithm choosing on bootup
 setup:
 - replaced sbsigntools with systemd-sbsign
 ---
