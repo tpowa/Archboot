@@ -4,6 +4,7 @@ Environment:
 - updated Secure Boot scripts
 - updated Xfce to 4.20 series
 - fixed compression algorithm choosing on bootup
+- added partclone for supported filesystems
 setup:
 - replaced sbsigntools with systemd-sbsign
 ---
