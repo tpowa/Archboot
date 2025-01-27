@@ -6,7 +6,6 @@ _run ()
 {
 _LICENSES=(
   3cpio/LICENSE
-  argon2/LICENSE
   bandwhich/LICENSE
   bat/LICENSE-{APACHE,MIT}
   bottom/LICENSE
@@ -33,7 +32,6 @@ _LICENSES=(
   gnupg/Unicode-TOU.txt
   gssproxy/COPYING
   hdparm/LICENSE.TXT
-  http-parser/LICENSE-MIT
   iana-etc/LICENSE
   icu/LICENSE
   iputils/LICENSE.BSD3
