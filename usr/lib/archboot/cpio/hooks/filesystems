@@ -17,6 +17,6 @@ growfs,info,io,logprint,metadump,mdrestore,mkfile,ncheck,property,quota,repair,r
     # fix libinih for plasma wallpaper
     _map _file /usr/lib/libINI*
     # add partclone
-    partclone.{btrfs,chkimg,dd,exfat,ext4,ext4dev,extfs,fat,fat12,fat16,fat32,imager,info,restore,vfat,xfs}
+    _map _binary partclone.{btrfs,chkimg,dd,exfat,ext4,ext4dev,extfs,fat,fat12,fat16,fat32,imager,info,restore,vfat,xfs}
 }
 
