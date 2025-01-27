@@ -8,7 +8,7 @@ _run ()
                  elinks ethtool genl ifstat lnstat netscanner nstat miniserve rdma \
                  rtacct rtmon rtstat rustscan ss ssh tc tipc tracepath trip vdpa
     # add iproute 2, add openssl helper libraries
-    _map _full_dir /usr/lib/{tc,engines-3} /usr/share/tc
+    _map _full_dir /usr/lib/engines-3 /usr/share/tc
     # add config for rustmap, no nmap available
     echo "ulimit = 5000" >> "${_ROOTFS}"/root/.rustscan.toml
     echo "scripts = \"None\"" >> "${_ROOTFS}"/root/.rustscan.toml
