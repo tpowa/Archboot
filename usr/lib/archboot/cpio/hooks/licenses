@@ -77,6 +77,7 @@ _LICENSES=(
   libwebsockets/LICENSE
   libxml2/Copyright
   linux-firmware-whence/WHENCE
+  llhttp/LICENSE-MIT
   lua/LICENSE
   lua51-lpeg/LICENSE
   luajit/COPYRIGHT
