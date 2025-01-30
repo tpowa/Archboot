@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="https://archboot.com/gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2025 Fundraise: 0% <progress max="100" value="0">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2025 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 02.01.2025 18:52</strong></p>
+<strong>Last update: 30.01.2025 23:38</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -663,11 +663,19 @@
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td><code># clean-blockdevice.sh &lt;device(s)&gt;</code></td>
-</tr>
+<tr><td><code>### clean partition table and filesystem signatures
+# clean-blockdevice.sh &lt;device(s)&gt;</code></td></tr>
+<tr><td><code>### Overwrite device with random numbers
+# dd if=/dev/urandom of=&lt;device(s)&gt; status=progress bs=1M</code></td></tr>
+<tr><td><code>### ATA Secure Erase SSD device
+# hdparm --user-master u --security-set-pass secure &lt;device(s)&gt;
+# hdparm --user-master u --security-erase secure &lt;device(s)&gt;
+</code></td></tr>
+<tr><td><code>### Erase NVME device
+# nvme format -s1 &lt;device(s)&gt;</code></td></tr>
 </tbody>
 </table>
+
 <h3 data-number="3.13" id="system-configuration"><span class="header-section-number">3.13</span> System Configuration On Installed System</h3>
 <p>You can also run <strong>archboot-setup.sh</strong> for <strong>system configuration</strong> on an installed system.</p>
 <p><a href="#package-installation" title="Installation"><strong>Install</strong></a> your corresponding Archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
