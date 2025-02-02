@@ -1,4 +1,7 @@
 On the road to 2025.02:
+setup:
+- fixed btrfs data raid level (was always set as single)
+- removed btrfs raid0 selection
 ---
 Highlights: 2025.01
 Environment:
