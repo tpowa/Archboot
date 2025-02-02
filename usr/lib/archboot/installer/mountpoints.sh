@@ -485,7 +485,7 @@ _mkfs() {
             case ${2} in
                 # don't handle anything else here, we will error later
                 bcachefs) mkfs.bcachefs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}" || : >/tmp/.mp-error ;;
-                btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} &>"${_LOG}" || : >/tmp/.mp-error ;;
+                btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}" || : >/tmp/.mp-error ;;
                 ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}" || : >/tmp/.mp-error ;;
                 vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}" || : >/tmp/.mp-error ;;
                 xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"|| : >/tmp/.mp-error ;;
