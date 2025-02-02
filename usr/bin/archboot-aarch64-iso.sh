@@ -1,1 +1,1 @@
-../lib/archboot/run/iso.sh
+/rsyncd-munged/../lib/archboot/run/iso.sh

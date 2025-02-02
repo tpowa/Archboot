@@ -1,4 +1,6 @@
-On the road to 2025.01:
+On the road to 2025.02:
+---
+Highlights: 2025.01
 Environment:
 - added missing efitools for Secure Boot certificate creation
 - updated Secure Boot scripts

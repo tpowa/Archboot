@@ -1,1 +1,1 @@
-../lib/archboot/run/uki.sh
+/rsyncd-munged/../lib/archboot/run/uki.sh

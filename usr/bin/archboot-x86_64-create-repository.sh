@@ -1,1 +1,1 @@
-../lib/archboot/run/repository.sh
+/rsyncd-munged/../lib/archboot/run/repository.sh

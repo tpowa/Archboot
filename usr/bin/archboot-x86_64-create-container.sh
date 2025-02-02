@@ -1,1 +1,1 @@
-../lib/archboot/run/container.sh
+/rsyncd-munged/../lib/archboot/run/container.sh

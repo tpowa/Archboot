@@ -1,1 +1,1 @@
-../lib/archboot/run/release.sh
+/rsyncd-munged/../lib/archboot/run/release.sh

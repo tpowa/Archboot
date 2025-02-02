@@ -1,1 +1,1 @@
-../lib/archboot/run/container-tarball.sh
+/rsyncd-munged/../lib/archboot/run/container-tarball.sh
