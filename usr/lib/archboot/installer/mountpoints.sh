@@ -164,7 +164,11 @@ _run_mkfs() {
             # remove # from array
             _BTRFS_DEVS="${_BTRFS_DEVS//#/ }"
             _BTRFS_LEVEL=$(echo "${line}" | choose -f '\|' 7)
-            [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]] && _BTRFS_LEVEL="-m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
+            if [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]];then
+                _BTRFS_LEVEL="-m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
+            else
+                _BTRFS_LEVEL=""
+            fi
             _BTRFS_SUBVOLUME=$(echo "${line}" | choose -f '\|' 8)
             _BTRFS_COMPRESS=$(echo "${line}" | choose -f '\|' 9)
             [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
