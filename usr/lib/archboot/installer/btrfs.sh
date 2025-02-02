@@ -113,10 +113,9 @@ _btrfsraid_level() {
         #shellcheck disable=SC2086
         _dialog --no-cancel --title " Raid Data Level " --menu "" 11 50 5 \
             "> NONE" "No Raid Device" \
-            "raid0" "Raid 0 Device" \
+            "single" "Single Device" \
             "raid1" "Raid 1 Device" \
-            "raid10" "Raid 10 Device" \
-            "single" "Single Device" 2>"${_ANSWER}" || return 1
+            "raid10" "Raid 10 Device" 2>"${_ANSWER}" || return 1
         _BTRFS_LEVEL=$(cat "${_ANSWER}")
         if [[ "${_BTRFS_LEVEL}" == "> NONE" ]]; then
             echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
