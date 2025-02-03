@@ -218,7 +218,7 @@ _uboot() {
     echo "Generating ${_ARCH} U-Boot image..."
     ## get size of boot files
     BOOTSIZE=$(LC_ALL=C.UTF-8 du -bc "${_ISODIR}"/boot | rg '([0-9]+).*total' -r '$1')
-    IMGSZ=$((BOOTSIZE/1024 + 2048)) # image size in KB
+    IMGSZ=$((BOOTSIZE/1024 + 2048 + 8192)) # image size in KB
     VFAT_IMAGE="${_ISODIR}/extlinux.img"
     dd if=/dev/zero of="${VFAT_IMAGE}" bs="${IMGSZ}" count=1024 status=none
     sfdisk "${VFAT_IMAGE}" &>"${_NO_LOG}" <<EOF
