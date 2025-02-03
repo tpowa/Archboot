@@ -131,10 +131,6 @@ _auto_packages() {
     if fd . /sys/class/net | rg -q 'wlan'; then
         ! echo "${_PACKAGES[@]}" | rg -qw 'iwd' && _PACKAGES+=(iwd)
     fi
-    # Add broadcom-wl, if module is detected
-    if lsmod | rg -qw 'wl'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'broadcom-wl' && _PACKAGES+=(broadcom-wl)
-    fi
     rg -q '^FONT=ter' /etc/vconsole.conf && _PACKAGES+=(terminus-font)
     # only add firmware if already used
     _linux_firmware

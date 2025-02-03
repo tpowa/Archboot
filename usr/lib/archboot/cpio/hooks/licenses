@@ -145,9 +145,6 @@ _LICENSES=(
   zoxide/LICENSE
   zstd/LICENSE
   )
-    #if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
-    #    _LICENSES+=(broadcom-wl/LICENSE)
-    #fi
     #shellcheck disable=SC2068
     for i in ${_LICENSES[@]};do
         _file /usr/share/licenses/"${i}"
