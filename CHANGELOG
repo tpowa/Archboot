@@ -1,4 +1,5 @@
 On the road to 2025.02:
+- removed broadcom-wl module
 setup:
 - fixed btrfs data raid level (was always set as single)
 - removed btrfs raid0 selection
