@@ -174,8 +174,10 @@ _prepare_background() {
 _prepare_uefi_image() {
     echo "Preparing UEFI image..."
     ## get size of boot files
+    # 2048 first sector
+    # 8192 to avoid disk full errors
     BOOTSIZE=$(LC_ALL=C.UTF-8 du -bc "${_ISODIR}"/EFI "${_ISODIR}"/boot | rg '([0-9]+).*total' -r '$1')
-    IMGSZ=$((BOOTSIZE/1024 + 2048)) # image size in KB
+    IMGSZ=$((BOOTSIZE/1024 + 2048 + 8192)) # image size in KB
     VFAT_IMAGE="${_ISODIR}/efi.img"
     ## Creating efi.img
     mkfs.vfat -n ARCHBOOT --invariant -C "${VFAT_IMAGE}" "${IMGSZ}" >"${_NO_LOG}"
