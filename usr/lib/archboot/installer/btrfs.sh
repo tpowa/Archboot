@@ -107,7 +107,6 @@ _btrfs_parts() {
 _btrfsraid_level() {
     _BTRFS_RAID_FINISH=""
     _BTRFS_LEVEL=""
-    _BTRFS_DEV="${_DEV}"
     : >/tmp/.btrfs-devices
     while [[ "${_BTRFS_RAID_FINISH}" != "DONE" ]]; do
         #shellcheck disable=SC2086
@@ -121,7 +120,7 @@ _btrfsraid_level() {
         _BTRFS_LEVEL=$(cat "${_ANSWER}")
         if [[ "${_BTRFS_LEVEL}" == "> NONE" ]]; then
             _BTRFS_LEVEL="NONE"
-            echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
+            echo "${_DEV}" >>/tmp/.btrfs-devices
             break
         else
             # take selected device as 1st device, add additional devices in part below.
@@ -132,10 +131,11 @@ _btrfsraid_level() {
 
 # select btrfs raid devices
 _select_btrfsraid_devices () {
-    # select the second device to use, no missing option available!
-    : >/tmp/.btrfs-devices
-    echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
     while true; do
+        _BTRFS_DEV="${_DEV}"
+        # select the second device to use, no missing option available!
+        : >/tmp/.btrfs-devices
+        echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
         _BTRFS_DEVS=""
         #shellcheck disable=SC2001,SC2086
         for i in ${_DEVS}; do
