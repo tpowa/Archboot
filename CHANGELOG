@@ -6,6 +6,7 @@ setup:
 - fixed btrfs data raid level (was always set as single)
 - removed btrfs raid0 selection
 - added btrfs raid1c3 and raid1c4 selection
+- allow reconfiguring btrfs raid device
 ---
 Highlights: 2025.01
 Environment:
