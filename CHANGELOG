@@ -3,13 +3,13 @@ On the road to 2025.02:
 - removed broadcom-wl module
 network:
 - better input suggestions for ipv4 static setup
-- added error message on missing netmask on static setup
+- added error message on missing netmask on ipv4 static setup
 setup:
-- show error message on running out of devices
+- Setting mountpoints shows error message on running out of devices
 - fixed btrfs data raid level (was always set as single)
 - removed btrfs raid0 selection
-- added btrfs raid1c3 and raid1c4 selection
-- allow reconfiguring btrfs raid device
+- added btrfs raid1c3 and raid1c4 selection support
+- allow reconfiguring of btrfs raid devices
 ---
 Highlights: 2025.01
 Environment:
