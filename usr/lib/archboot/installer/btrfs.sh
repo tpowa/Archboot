@@ -152,12 +152,11 @@ _select_btrfsraid_devices () {
         # clean loop from used partition and options
         _BTRFS_DEVS=${_BTRFS_DEVS//${_BTRFS_DEV} _/}
         # add more devices
-        # RAID5 needs 3 devices
-        # RAID6, RAID10 needs 4 devices!
-        if [[ "${_RAIDNUMBER}" -ge 3 && ! "${_BTRFS_LEVEL}" == "raid10" && ! "${_BTRFS_LEVEL}" == "raid6" && \
-               ! "${_BTRFS_LEVEL}" == "raid5" && ! "${_BTRFS_LEVEL}" == "raid1c3" && ! "${_BTRFS_LEVEL}" == "raid1c4" ]] ||\
-            [[ "${_RAIDNUMBER}" -ge 4 && "${_BTRFS_LEVEL}" == "raid5" || "${_BTRFS_LEVEL}" == "raid1c3" ]] ||\
-            [[ "${_RAIDNUMBER}" -ge 5 && "${_BTRFS_LEVEL}" == "raid10" || "${_BTRFS_LEVEL}" == "raid6" || "${_BTRFS_LEVEL}" == "raid1c4" ]]; then
+        # raid1c3 and RAID5 need 3 devices
+        # raid1c4, RAID6 and RAID10 need 4 devices!
+        if [[ "${_RAIDNUMBER}" -ge 3 && ! "${_BTRFS_LEVEL}" == raid[5,6,10] && ! "${_BTRFS_LEVEL}" == raid1c[3,4] ]] ||\
+            [[ "${_RAIDNUMBER}" -ge 4 && "${_BTRFS_LEVEL}" == "raid5" ]] || [[ "${_RAIDNUMBER}" -ge 4 && "${_BTRFS_LEVEL}" == "raid1c3" ]] ||\
+            [[ "${_RAIDNUMBER}" -ge 5 && "${_BTRFS_LEVEL}" == raid[6,10] ]] || [[ "${_RAIDNUMBER}" -ge 5 && "${_BTRFS_LEVEL}" == "raid1c4" ]]; then
                 #shellcheck disable=SC2086
                 _dialog --title " Device ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
                     ${_BTRFS_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
