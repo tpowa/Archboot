@@ -160,7 +160,7 @@ _network() {
                 if echo ${_IPADDR} | rg -q '/'; then
                     break
                 else
-                    _dialog --title " ERROR " --no-mouse --infobox "No netmask was given, please add netmask too like this:\n1.2.3.4/24, or 1.2.3.4/255.255.255.0" 4 60
+                    _dialog --title " ERROR " --no-mouse --infobox "No netmask was given, please add netmask too like this:\n\n1.2.3.4/24, or 1.2.3.4/255.255.255.0" 5 60
                     sleep 5
                 fi
             done
