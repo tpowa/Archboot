@@ -246,6 +246,10 @@ _mountpoints() {
         while [[ "${_DEV}" != "> DONE" ]]; do
             _MP_DONE=""
             while [[ -z "${_MP_DONE}" ]]; do
+                if [[ -z "${_DEV}" ]] ; then
+                     _dialog --title " ERROR " --no-mouse --infobox "All devices already in use, please start again." 3 70
+                     return 1
+                fi
                 #shellcheck disable=SC2086
                 if [[ -z "${_SWAP_DONE}" ]]; then
                     _dialog --title " Swap " --menu "" 14 55 8 "> NONE" "No Swap" "> FILE" "Swap File" ${_DEVS} 2>"${_ANSWER}" || return 1
