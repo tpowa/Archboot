@@ -135,9 +135,9 @@ _select_btrfsraid_devices () {
     # select the second device to use, no missing option available!
     : >/tmp/.btrfs-devices
     echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
-    _BTRFS_DEVS=""
-    #shellcheck disable=SC2001,SC2086
     while true; do
+        _BTRFS_DEVS=""
+        #shellcheck disable=SC2001,SC2086
         for i in ${_DEVS}; do
             echo "${i}" | rg -q '/dev' && _BTRFS_DEVS="${_BTRFS_DEVS} ${i} _ "
         done
