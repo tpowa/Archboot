@@ -160,8 +160,8 @@ _network() {
                 if echo ${_IPADDR} | rg -q '/'; then
                     break
                 else
-                    _dialog --title " ERROR " --no-mouse --infobox "No netmask was given, please add netmask too eg:\n1.2.3.4/24, or 1.2.3.4/255.255.255.0" 4 60
-                    sleep 3
+                    _dialog --title " ERROR " --no-mouse --infobox "No netmask was given, please add netmask too like this:\n1.2.3.4/24, or 1.2.3.4/255.255.255.0" 4 60
+                    sleep 5
                 fi
             done
             _dialog --no-cancel --title " Gateway " --inputbox "" 7 40 "$(echo ${_IPADDR} | choose 0 1 2 -f '\.' -o '.').1" 2>"${_ANSWER}"
