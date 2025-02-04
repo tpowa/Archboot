@@ -164,7 +164,7 @@ _network() {
                     sleep 3
                 fi
             done
-            _dialog --no-cancel --title " Gateway " --inputbox "" 7 40 "$(echo ${_IPADDR} | rg '\.*[0-9]/.*$' -r '').1" 2>"${_ANSWER}"
+            _dialog --no-cancel --title " Gateway " --inputbox "" 7 40 "$(echo ${_IPADDR} | choose 0 1 2 -f '\.' -o '.').1" 2>"${_ANSWER}"
             _GW=$(cat "${_ANSWER}")
             _dialog --no-cancel --title " Domain Name Server " --inputbox "" 7 40 "${_GW}" 2>"${_ANSWER}"
             _DNS=$(cat "${_ANSWER}")
