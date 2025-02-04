@@ -111,10 +111,12 @@ _btrfsraid_level() {
     : >/tmp/.btrfs-devices
     while [[ "${_BTRFS_RAID_FINISH}" != "DONE" ]]; do
         #shellcheck disable=SC2086
-        _dialog --no-cancel --title " Raid Data Level " --menu "" 11 50 5 \
+        _dialog --no-cancel --title " Raid Data Level " --menu "" 13 50 7 \
             "> NONE" "No Raid Device" \
             "single" "Single Device" \
-            "raid1" "Raid 1 Device" \
+            "raid1" "Raid 1 Device, 2 copies" \
+            "raid1c3" "Raid 1 Device, 3 copies" \
+            "raid1c4" "Raid 1 Device, 4 copies" \
             "raid10" "Raid 10 Device" 2>"${_ANSWER}" || return 1
         _BTRFS_LEVEL=$(cat "${_ANSWER}")
         if [[ "${_BTRFS_LEVEL}" == "> NONE" ]]; then
@@ -152,8 +154,8 @@ _select_btrfsraid_devices () {
         # add more devices
         # RAID5 needs 3 devices
         # RAID6, RAID10 needs 4 devices!
-        if [[ "${_RAIDNUMBER}" -ge 3 && ! "${_BTRFS_LEVEL}" == "raid10" && ! "${_BTRFS_LEVEL}" == "raid6" && ! "${_BTRFS_LEVEL}" == "raid5" ]] ||\
-            [[ "${_RAIDNUMBER}" -ge 4 && "${_BTRFS_LEVEL}" == "raid5" ]] ||\
+        if [[ "${_RAIDNUMBER}" -ge 3 && ! "${_BTRFS_LEVEL}" == "raid10" && ! "${_BTRFS_LEVEL}" == "raid6" && ! "${_BTRFS_LEVEL}" == "raid5" && ! "${_BTRFS_LEVEL}" == "raid1c4" ]] ||\
+            [[ "${_RAIDNUMBER}" -ge 4 && "${_BTRFS_LEVEL}" == "raid5" || "${_BTRFS_LEVEL}" == "raid1c4" ]] ||\
             [[ "${_RAIDNUMBER}" -ge 5 && "${_BTRFS_LEVEL}" == "raid10" || "${_BTRFS_LEVEL}" == "raid6" ]]; then
                 #shellcheck disable=SC2086
                 _dialog --title " Device ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
