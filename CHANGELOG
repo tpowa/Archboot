@@ -2,6 +2,7 @@ On the road to 2025.02:
 - kernel 6.13.x
 - removed broadcom-wl module
 setup:
+- show error message on running out of devices
 - fixed btrfs data raid level (was always set as single)
 - removed btrfs raid0 selection
 - added btrfs raid1c3 and raid1c4 selection
