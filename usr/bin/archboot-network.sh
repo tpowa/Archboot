@@ -154,11 +154,19 @@ _network() {
             _DNS=""
         else
             _IP="static"
-            _dialog  --no-cancel --title " IP Address And Netmask " --inputbox "" 7 40 "192.168.1.23/24" 2>"${_ANSWER}"
-            _IPADDR=$(cat "${_ANSWER}")
-            _dialog --no-cancel --title " Gateway " --inputbox "" 7 40 "192.168.1.1" 2>"${_ANSWER}"
+            while true; do
+                _dialog  --no-cancel --title " IP Address And Netmask " --inputbox "" 7 40 "192.168.1.23/24" 2>"${_ANSWER}"
+                _IPADDR=$(cat "${_ANSWER}")
+                if echo ${_IPADDR} | rg -q '/'; then
+                    break
+                else
+                    _dialog --title " ERROR " --no-mouse --infobox "No netmask was given, please add netmask too eg. /24!" 3 60
+                    sleep 3
+                fi
+            done
+            _dialog --no-cancel --title " Gateway " --inputbox "" 7 40 "$(echo ${_IPADDR} | rg '\.*[0-9]/.*$' -r '').1" 2>"${_ANSWER}"
             _GW=$(cat "${_ANSWER}")
-            _dialog --no-cancel --title " Domain Name Server " --inputbox "" 7 40 "192.168.1.1" 2>"${_ANSWER}"
+            _dialog --no-cancel --title " Domain Name Server " --inputbox "" 7 40 "${_GW}" 2>"${_ANSWER}"
             _DNS=$(cat "${_ANSWER}")
         fi
         # http/ftp proxy settings
