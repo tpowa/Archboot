@@ -10,7 +10,7 @@ _run ()
         #_mod wl
         # _file /usr/lib/modprobe.d/broadcom-wl.conf
     #else
-        _all_mods -f '_cs|admtek|atmel|b43|intersil|ipw2x00|iwlegacy|microchip|purelifi|quantenna|rsi|silabs|st/|zydas' \
+        _all_mods -f '_cs|admtek|atmel|b43|intersil|ipw2x00|iwlegacy|microchip|purelifi|quantenna|rsi|silabs|/st/|zydas' \
                      '/net/wireless/|/net/ieee80211/|/net/mac80211/'
     #fi
 }
