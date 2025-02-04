@@ -7,7 +7,7 @@ _run()
     ### add block device support
     # sata, scsi, nvme
     _map _all_mods 'scsi/.*ata' \
-            'ata/(ahci|ata_generic)'
+            'ata/(ahci|ata_piix|ata_generic)'
     _all_mods -f 'pcmcia|scsi/(ch|imm|ppa|sg|st)|rdma|rnbd|rbd|nbd|qed|cxgb|bnx2|csiostor|qla1280|qla2xxx|qla4xxx|iscsi|brd|aoe|null_blk|pktcdvd|drbd|floppy|lpfc|ublk_drv|bfa|snic|fnic|fcoe' '/(block|scsi|fusion|nvme)/'
     # usb
     _all_mods '/drivers/usb/storage/'
