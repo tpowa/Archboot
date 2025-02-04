@@ -1,6 +1,9 @@
 On the road to 2025.02:
 - kernel 6.13.x
 - removed broadcom-wl module
+network:
+- better input suggestions for ipv4 static setup
+- added error message on missing netmask on static setup
 setup:
 - show error message on running out of devices
 - fixed btrfs data raid level (was always set as single)
