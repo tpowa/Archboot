@@ -2,6 +2,7 @@ On the road to 2025.02:
 - kernel 6.13.x
 - removed broadcom-wl module
 - cleaned up wireless modules
+- cleanud up network modules
 - cleaned up sata modules
 network:
 - better input suggestions for ipv4 static setup
