@@ -4,5 +4,5 @@
 
 _run ()
 {
-    _all_mods -f '_cs|3com|adaptec|adi|alteon|b44|broadcom/bnx2x|brocade|cadence|cavium|chelsio|cisco|dlink|ec_bhf.*|emulex|engleder|ethoc.*|fealnx.*|hisilicon|huawei|netronome|mellanox|mscc|myricom|natsemi|neterion|nvidia|pensando|qlogic|qualcomm|rdc|sfc|silan|sis|smsc|sun|tehuti|vertexcom|via|wiznet' '/drivers/net/(ethernet|usb|vmx3net)|/net/(ipv4|ipv6)'
+    _all_mods -f '_cs|3com|adaptec|adi|alteon|b44|broadcom/bnx2x|brocade|cadence|cavium|chelsio|cisco|dlink|ec_bhf.*|emulex|engleder|ethoc.*|fealnx.*|hisilicon|huawei|netronome|mellanox|mscc|myricom|natsemi|neterion|nvidia|pensando|qlogic|qualcomm|rdc|sfc|silan|sis|smsc|sun|tehuti|vertexcom|via|wiznet' '/drivers/net/(ethernet|usb|vmxnet3)|/net/(ipv4|ipv6)'
 }
