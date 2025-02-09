@@ -106,7 +106,7 @@ _create_iso() {
                 fi
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD}"
-                mcopy -m -i  mcopy -m -i efi.img ::/boot/firmware ./
+                mcopy -m -i  mcopy -m -i efi.img ::/boot/firmware boot/
             elif echo "${i}" | rg -q 'latest'; then
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD_LATEST}"
