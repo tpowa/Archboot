@@ -36,7 +36,7 @@ while [ $# -gt 0 ]; do
         -c) shift
             _CONFIG="${1}"
             ;;
-        -firmware) shift
+        -firmware)
             _FW_CPIO=1
             ;;
         -d) shift
