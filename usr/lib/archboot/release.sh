@@ -127,14 +127,28 @@ _create_iso() {
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
         for initrd in ${_INITRD} ${_INITRD_LATEST} ${_INITRD_LOCAL}; do
+            _FW_IMG=()
+            # all firmwares
             if [[ "${initrd}" == "${_INITRD}" ]]; then
                 _UKI="/boot/${_NAME}-${_ARCH}"
-                for i in "${_W_DIR}"/boot/firmware/*; do
-                    _FW_IMG+=(--initrd=/boot/firmware/$(basename ${i}) )
+                if [[ -z ${_FW_IMG} ]]; then
+                    for i in "${_W_DIR}"/boot/firmware/*; do
+                        _FW_IMG+=(--initrd=/boot/firmware/$(basename ${i}) )
+                    done
+            fi
+            # only kms firmwares
+            if [[ "${initrd}" == "${_INITRD_LATEST}" ]]; then
+                _UKI="/boot/${_NAME}-latest-${_ARCH}"
+                for i in amdgpu i915 nvidia radeon xe; do
+                    _FW_IMG+=(--initrd=/boot/firmware/${i} )
                 done
             fi
-            [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="/boot/${_NAME}-latest-${_ARCH}" && _FW_IMG=""
-            [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="/boot/${_NAME}-local-${_ARCH}" && _FW_IMG=""
+            if [[ "${initrd}" == "${_INITRD_LOCAL}" ]]; then
+                _UKI="/boot/${_NAME}-local-${_ARCH}"
+                for i in amdgpu i915 nvidia radeon xe; do
+                    _FW_IMG+=(--initrd=/boot/firmware/${i} )
+                done
+            fi
             #shellcheck disable=SC2086
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
                 ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${initrd}" ${_FW_IMG[@]} --cmdline="${_CMDLINE}" \
