@@ -131,10 +131,9 @@ _create_iso() {
             # all firmwares
             if [[ "${initrd}" == "${_INITRD}" ]]; then
                 _UKI="/boot/${_NAME}-${_ARCH}"
-                if [[ -z ${_FW_IMG} ]]; then
-                    for i in "${_W_DIR}"/boot/firmware/*; do
-                        _FW_IMG+=(--initrd=/boot/firmware/$(basename ${i}) )
-                    done
+                for i in "${_W_DIR}"/boot/firmware/*; do
+                    _FW_IMG+=(--initrd=/boot/firmware/$(basename ${i}) )
+                done
             fi
             # only kms firmwares
             if [[ "${initrd}" == "${_INITRD_LATEST}" ]]; then
