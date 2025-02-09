@@ -96,7 +96,7 @@ if [[ -n "${_GENERATE_IMAGE}" ]]; then
                 if echo "${i}" | rg -q ath11k; then
                     mv "${_ROOTFS}"/lib/firmware/wil6210* "${_FW_SOURCE}"/lib/firmware/
                 fi
-                echo "Creating firmware $(basename ${i}).img..."
+                echo "Preparing firmware $(basename ${i}).img..."
                 mv "${i}" "${_FW_SOURCE}"/lib/firmware/
                 _create_cpio "${_FW_SOURCE}" "$(dirname ${_GENERATE_IMAGE})/firmware/$(basename ${i}).img" &>${_NO_LOG} || exit 1
                 # remove directory
@@ -104,13 +104,13 @@ if [[ -n "${_GENERATE_IMAGE}" ]]; then
             done
             # intel wireless
             if ls "${_ROOTFS}"/lib/firmware/iwl* &>${_NO_LOG}; then
-                echo "Creating firmware iwlwifi.img..."
+                echo "Preparing firmware iwlwifi.img..."
                 mv "${_ROOTFS}"/lib/firmware/iwl* "${_FW_SOURCE}"/lib/firmware/
                 _create_cpio "${_FW_SOURCE}" "$(dirname ${_GENERATE_IMAGE})/firmware/iwlwifi.img" &>${_NO_LOG} || exit 1
             fi
             # ralink wireless
             if ls "${_ROOTFS}"/lib/firmware/rt* &>${_NO_LOG}; then
-                echo "Creating firmware ralink.img..."
+                echo "Preparing firmware ralink.img..."
                 mv "${_ROOTFS}"/lib/firmware/rt* "${_FW_SOURCE}"/lib/firmware/
                 _create_cpio "${_FW_SOURCE}" "$(dirname ${_GENERATE_IMAGE})/firmware/ralink.img" &>${_NO_LOG} || exit 1
             fi
