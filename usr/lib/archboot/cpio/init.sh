@@ -7,6 +7,9 @@ _TITLE="archboot.com | ${_ARCH} | ${_KVER} | Basic Setup | Early Userspace"
 _KEEP="Please keep the boot medium inserted..."
 _NO_LOG=/dev/null
 _FW=/mnt/efi/boot/firmware
+_VGA="VGA compatible controller"
+_ETH="Ethernet controller"
+_WIFI="Network controller"
 _dialog() {
     dialog --backtitle "${_TITLE}" "$@"
     return $?
@@ -42,66 +45,66 @@ _progress_wait() {
     done
 }
 _graphic_fw() {
-    if lspci -mm | rg -q 'VGA'; then
-        if lspci -mm | rg 'VGA' | rg -q 'AMD'; then
-            for i in /mnt/efi/boot/firmware/amd*; do
+    if lspci -mm | rg -q "${_VGA}"; then
+        if lspci -mm | rg "${_VGA}" | rg -q 'AMD'; then
+            for i in ${_FW}/amd*; do
                 3cpio -x --force "${_FW}/$i" &>"${_NO_LOG}"
             done
         fi
-        if lspci -mm | rg 'VGA' | rg -q 'Intel'; then
-            if lspci -mm | rg 'VGA' | rg 'Intel' | rg -q 'Xe'; then
+        if lspci -mm | rg "${_VGA}" | rg -q 'Intel'; then
+            if lspci -mm | rg "${_VGA}" | rg 'Intel' | rg -q 'Xe'; then
                 3cpio -x --force "${_FW}/xe.img" &>"${_NO_LOG}"
             else
                 3cpio -x --force "${_FW}/i915.img" &>"${_NO_LOG}"
             fi
         fi
-        if lspci -mm | rg 'VGA' | rg -q 'NVIDIA'; then
+        if lspci -mm | rg "${_VGA}" | rg -q 'NVIDIA'; then
             3cpio -x --force "${_FW}/nvidia.img" &>"${_NO_LOG}"
         fi
-        if lspci -mm | rg 'VGA' | rg -q 'RADEON|Radeon'; then
+        if lspci -mm | rg "${_VGA}" | rg -q 'RADEON|Radeon'; then
             3cpio -x --force "${_FW}/radeon.img" &>"${_NO_LOG}"
         fi
     fi
 }
 _ethernet_fw() {
-    if lspci -mm | rg -q 'Ethernet'; then
-        if lspci -mm | rg 'Ethernet' | rg -q 'Broadcom'; then
+    if lspci -mm | rg -q "${_ETH}"; then
+        if lspci -mm | rg "${_ETH}" | rg -q 'Broadcom'; then
             3cpio -x --force "${_FW}/bnx2.img" &>"${_NO_LOG}"
             3cpio -x --force "${_FW}/tigon.img" &>"${_NO_LOG}"
         fi
-        if lspci -mm | rg 'Ethernet' | rg -q 'Realtek'; then
+        if lspci -mm | rg "${_ETH}" | rg -q 'Realtek'; then
              3cpio -x --force "${_FW}/rtl_nic.img" &>"${_NO_LOG}"
         fi
     fi
 }
 _wireless_fw() {
-    if lspci -mm | rg -q 'Network'; then
-        if lspci -mm | rg 'Network' | rg -q 'Atheros'; then
-            for i in /mnt/efi/boot/firmware/ath*; do
+    if lspci -mm | rg -q "${_WIFI}"; then
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Atheros'; then
+            for i in ${_FW}/ath*; do
                 3cpio -x --force "${_FW}/$i" &>"${_NO_LOG}"
             done
         fi
-        if lspci -mm | rg 'Network' | rg -q 'Intel'; then
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Intel'; then
             3cpio -x --force "${_FW}/iwlwifi.img" &>"${_NO_LOG}"
         fi
-        if lspci -mm | rg 'Network' | rg -q 'Marvell'; then
-            for i in libertas mrvl /mnt/efi/boot/firmware/mwl*; do
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Marvell'; then
+            for i in libertas mrvl ${_FW}/mwl*; do
                 3cpio -x --force "${_FW}/$i" &>"${_NO_LOG}"
             done
         fi
-        if lspci -mm | rg 'Network' | rg -q 'Mediatek'; then
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Mediatek'; then
             3cpio -x --force "${_FW}/mediatek.img" &>"${_NO_LOG}"
         fi
-        if lspci -mm | rg 'Network' | rg -q 'Ralink'; then
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Ralink'; then
             3cpio -x --force "${_FW}/ralink.img" &>"${_NO_LOG}"
         fi
-        if lspci -mm | rg 'Network' | rg -q 'Realtek'; then
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Realtek'; then
             3cpio -x --force "${_FW}/rtlwifi.img" &>"${_NO_LOG}"
-            for i in /mnt/efi/boot/firmware/rtw*; do
+            for i in ${_FW}/rtw*; do
                 3cpio -x --force "${_FW}/$i" &>"${_NO_LOG}"
             done
         fi
-        if lspci -mm | rg 'Network' | rg -q 'Texas'; then
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Texas'; then
             3cpio -x --force "${_FW}/ti-connectivity.img" &>"${_NO_LOG}"
         fi
     fi
