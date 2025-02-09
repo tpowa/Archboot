@@ -135,17 +135,12 @@ _create_iso() {
                     _FW_IMG+=(--initrd=/boot/firmware/$(basename ${i}) )
                 done
             fi
+            [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="/boot/${_NAME}-latest-${_ARCH}"
+            [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="/boot/${_NAME}-local-${_ARCH}"
             # only kms firmwares
-            if [[ "${initrd}" == "${_INITRD_LATEST}" ]]; then
-                _UKI="/boot/${_NAME}-latest-${_ARCH}"
+            if [[ "${initrd}" == "${_INITRD_LOCAL}" || "${initrd}" == "${_INITRD_LATEST}" ]]; then
                 for i in amdgpu i915 nvidia radeon xe; do
-                    _FW_IMG+=(--initrd=/boot/firmware/${i} )
-                done
-            fi
-            if [[ "${initrd}" == "${_INITRD_LOCAL}" ]]; then
-                _UKI="/boot/${_NAME}-local-${_ARCH}"
-                for i in amdgpu i915 nvidia radeon xe; do
-                    _FW_IMG+=(--initrd=/boot/firmware/${i} )
+                    _FW_IMG+=(--initrd=/boot/firmware/${i}.img )
                 done
             fi
             #shellcheck disable=SC2086
