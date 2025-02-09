@@ -85,7 +85,6 @@ if [[ -n "${_GENERATE_IMAGE}" ]]; then
         [[ -d "${_FW_SOURCE}/lib/firmware" ]] || mkdir -p "${_FW_SOURCE}/lib/firmware"
         [[ -d "$(dirname ${_GENERATE_IMAGE})/firmware" ]] || mkdir "$(dirname ${_GENERATE_IMAGE})/firmware"
         if [[ -d "${_ROOTFS}"/lib/firmware ]]; then
-
             for i in $(fd --type d  -d 1 . "${_ROOTFS}"/lib/firmware); do
                 # those from firmware basedir belong to corresponding chipsets
                 if echo "${i}" | rg -q mediatek; then

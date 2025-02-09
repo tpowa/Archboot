@@ -1,9 +1,15 @@
 On the road to 2025.02:
 - kernel 6.13.x
 - removed broadcom-wl module
+- cleaned up firmware
 - cleaned up wireless modules
 - cleanud up network modules
 - cleaned up sata modules
+normal ISO image:
+- splitted firmware into separate initramfs files
+- autodetect needed firmware files from lspci output
+- reduced needed RAM to boot from 900M for VMs down to 600M !!!
+- maximized boot speed !!!
 network:
 - improved suggestions for ipv4 static setup
 - improved error handling on missing netmask on ipv4 static setup
