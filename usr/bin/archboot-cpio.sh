@@ -103,13 +103,13 @@ if [[ -n "${_GENERATE_IMAGE}" ]]; then
                 rm -r "${_FW_SOURCE}"/lib/firmware/*
             done
             # intel wireless
-            if echo "${_ROOTFS}"/lib/firmware/iwl* &>${_NO_LOG}; then
+            if ls "${_ROOTFS}"/lib/firmware/iwl* &>${_NO_LOG}; then
                 echo "Creating firmware iwlwifi.img..."
                 mv "${_ROOTFS}"/lib/firmware/iwl* "${_FW_SOURCE}"/lib/firmware/
                 _create_cpio "${_FW_SOURCE}" "$(dirname ${_GENERATE_IMAGE})/firmware/iwlwifi.img" &>${_NO_LOG} || exit 1
             fi
             # ralink wireless
-            if echo "${_ROOTFS}"/lib/firmware/rt* &>${_NO_LOG}; then
+            if ls "${_ROOTFS}"/lib/firmware/rt* &>${_NO_LOG}; then
                 echo "Creating firmware ralink.img..."
                 mv "${_ROOTFS}"/lib/firmware/rt* "${_FW_SOURCE}"/lib/firmware/
                 _create_cpio "${_FW_SOURCE}" "$(dirname ${_GENERATE_IMAGE})/firmware/ralink.img" &>${_NO_LOG} || exit 1

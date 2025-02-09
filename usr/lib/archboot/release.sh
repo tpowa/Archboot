@@ -129,8 +129,8 @@ _create_iso() {
         for initrd in ${_INITRD} ${_INITRD_LATEST} ${_INITRD_LOCAL}; do
             if [[ "${initrd}" == "${_INITRD}" ]]; then
                 _UKI="/boot/${_NAME}-${_ARCH}"
-                for i in firmware/*; do
-                    _FW_IMG+=(--initrd=$i )
+                for i in boot/firmware/*; do
+                    _FW_IMG+=(--initrd=/$i )
                 done
             fi
             [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="/boot/${_NAME}-latest-${_ARCH}" && _FW_IMG=""
