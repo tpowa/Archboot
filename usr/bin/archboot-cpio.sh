@@ -79,6 +79,40 @@ ldconfig -r "${_ROOTFS}" &>"${_NO_LOG}" || exit 1
 # remove /var/cache/ldconfig/aux-cache for reproducibility
 rm -f -- "${_ROOTFS}/var/cache/ldconfig/aux-cache"
 if [[ -n "${_GENERATE_IMAGE}" ]]; then
+    # divide firmware in cpio images
+    if [[ -n "${_FW_CPIO}" ]]; then
+        _FW_SOURCE="${_BUILD_DIR}/fw"
+        [[ -d "${_FW_SOURCE}/lib/firmware" ]] || mkdir -p "${_FW_SOURCE}/lib/firmware"
+        [[ -d "$(dirname ${_GENERATE_IMAGE})/firmware" ]] || mkdir "$(dirname ${_GENERATE_IMAGE})/firmware"
+        if [[ -d "${_ROOTFS}"/lib/firmware ]]; then
+
+            for i in $(fd --type d  -d 1 . "${_ROOTFS}"/lib/firmware); do
+                # those from firmware basedir belong to corresponding chipsets
+                if echo "${i}" | rg -q mediatek; then
+                    mv "${_ROOTFS}"/lib/firmware/{mt76*,vpu_*} "${_FW_SOURCE}"/lib/firmware/
+                fi
+                if echo "${i}" | rg -q ath9k_htc; then
+                    mv "${_ROOTFS}"/lib/firmware/htc_* "${_FW_SOURCE}"/lib/firmware/
+                fi
+                if echo "${i}" | rg -q ath11k; then
+                    mv "${_ROOTFS}"/lib/firmware/wil6210* "${_FW_SOURCE}"/lib/firmware/
+                fi
+                mv "${i}" "${_FW_SOURCE}"/lib/firmware/
+                echo "Creating firmware $(basename ${i}).img..."
+                _create_cpio "${_FW_SOURCE}" "$(dirname ${_GENERATE_IMAGE})/firmware/$(basename ${i}).img" &>${_NO_LOG} || exit 1
+                # remove directory
+                rm -r "${_FW_SOURCE}"/lib/firmware/*
+            done
+            # intel wireless
+            mv "${_ROOTFS}"/lib/firmware/iwl* "${_FW_SOURCE}"/lib/firmware/
+            echo "Creating firmware iwlwifi.img..."
+            _create_cpio "${_FW_SOURCE}" "$(dirname ${_GENERATE_IMAGE})/firmware/iwlwifi.img" &>${_NO_LOG} || exit 1
+            # ralink wireless
+            mv "${_ROOTFS}"/lib/firmware/rt* "${_FW_SOURCE}"/lib/firmware/
+            echo "Creating firmware ralink.img..."
+            _create_cpio "${_FW_SOURCE}" "$(dirname ${_GENERATE_IMAGE})/firmware/ralink.img" &>${_NO_LOG} || exit 1
+        fi
+    fi
     _create_cpio "${_ROOTFS}" "${_GENERATE_IMAGE}" || exit 1
     _cleanup
 elif [[ -n "${_TARGET_DIR}" ]]; then

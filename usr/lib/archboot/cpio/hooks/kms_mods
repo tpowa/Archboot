@@ -5,7 +5,7 @@
 _run ()
 {
     # add firmware files
-    for i in amdgpu i915 nvidia radeon; do
+    for i in amdgpu i915 nvidia radeon xe; do
         [[ -d "/lib/firmware/${i}" ]] && _full_dir /lib/firmware/${i}
     done
     ### kmx modules

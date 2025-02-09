@@ -70,7 +70,7 @@ _prepare_kernel_initrd_files() {
         cp "./init-${_ARCH}.img" "${_ISODIR}/boot/"
     else
         echo "Running archboot-cpio.sh for init-${_ARCH}.img..."
-        archboot-cpio.sh -c "/etc/archboot/${_ARCH}-init.conf" -k "${_KERNEL}" \
+        archboot-cpio.sh -c "/etc/archboot/${_ARCH}-init.conf" -firmware \
                          -g "${_ISODIR}/boot/init-${_ARCH}.img" || exit 1
         # save init ramdisk for further images
         if [[ -n "${_SAVE_INIT}" ]]; then
@@ -87,7 +87,7 @@ _prepare_kernel_initrd_files() {
     if ! [[ -f "${_ISODIR}/boot/initrd-${_ARCH}.img" ]]; then
         echo "Running archboot-cpio.sh for initrd-${_ARCH}.img..."
         #shellcheck disable=SC2154
-        archboot-cpio.sh -c "${_CONFIG}" -k "${_KERNEL}" \
+        archboot-cpio.sh -c "${_CONFIG}" -firmware \
                          -g "${_ISODIR}/boot/initrd-${_ARCH}.img" || exit 1
     fi
     # delete cachedir on Archboot environment

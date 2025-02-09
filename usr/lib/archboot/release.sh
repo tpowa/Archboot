@@ -106,6 +106,7 @@ _create_iso() {
                 fi
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD}"
+                mcopy -m -i  mcopy -m -i efi.img ::/boot/firmware ./
             elif echo "${i}" | rg -q 'latest'; then
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD_LATEST}"
@@ -126,12 +127,17 @@ _create_iso() {
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
         for initrd in ${_INITRD} ${_INITRD_LATEST} ${_INITRD_LOCAL}; do
-            [[ "${initrd}" == "${_INITRD}" ]] && _UKI="/boot/${_NAME}-${_ARCH}"
-            [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="/boot/${_NAME}-latest-${_ARCH}"
-            [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="/boot/${_NAME}-local-${_ARCH}"
+            if [[ "${initrd}" == "${_INITRD}" ]]; then
+                _UKI="/boot/${_NAME}-${_ARCH}"
+                for i in firmware/*; do
+                    _FW_IMG+=(--initrd=$i )
+                done
+            fi
+            [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="/boot/${_NAME}-latest-${_ARCH}" && _FW_IMG=""
+            [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="/boot/${_NAME}-local-${_ARCH}" && _FW_IMG=""
             #shellcheck disable=SC2086
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
-                ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${initrd}" --cmdline="${_CMDLINE}" \
+                ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${initrd}" ${_FW_IMG[@]} --cmdline="${_CMDLINE}" \
                 --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}.efi" &>"${_NO_LOG}" || exit 1
         done
         # fix permission and timestamp

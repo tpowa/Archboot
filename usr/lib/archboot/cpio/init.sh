@@ -6,6 +6,7 @@ _ARCH="$(uname -m)"
 _TITLE="archboot.com | ${_ARCH} | ${_KVER} | Basic Setup | Early Userspace"
 _KEEP="Please keep the boot medium inserted..."
 _NO_LOG=/dev/null
+_FW=/mnt/efi/boot/firmware
 _dialog() {
     dialog --backtitle "${_TITLE}" "$@"
     return $?
@@ -39,6 +40,71 @@ _progress_wait() {
         _COUNT="$((_COUNT+1))"
         sleep "0.05"
     done
+}
+_graphic_fw() {
+    if lspci -mm | rg -q 'VGA'; then
+        if lspci -mm | rg 'VGA' | rg -q 'AMD'; then
+            for i in /mnt/efi/boot/firmware/amd*; do
+                3cpio -x --force "${_FW}/$i"
+            done
+        fi
+        if lspci -mm | rg 'VGA' | rg -q 'Intel'; then
+            if lspci -mm | rg 'VGA' | rg 'Intel' | rg -q 'Xe'; then
+                3cpio -x --force "${_FW}/xe.img"
+            else
+                3cpio -x --force "${_FW}/i915.img"
+            fi
+        fi
+        if lspci -mm | rg 'VGA' | rg -q 'NVIDIA'; then
+            3cpio -x --force "${_FW}/nvidia.img"
+        fi
+        if lspci -mm | rg 'VGA' | rg -q 'RADEON|Radeon'; then
+            3cpio -x --force "${_FW}/radeon.img"
+        fi
+    fi
+}
+_ethernet_fw() {
+    if lspci -mm | rg -q 'Ethernet'; then
+        if lspci -mm | rg 'Ethernet' | rg -q 'Broadcom'; then
+            3cpio -x --force "${_FW}/bnx2.img"
+            3cpio -x --force "${_FW}/tigon.img"
+        fi
+        if lspci -mm | rg 'Ethernet' | rg -q 'Realtek'; then
+             3cpio -x --force "${_FW}/rtl_nic.img"
+        fi
+    fi
+}
+_wireless_fw() {
+    if lspci -mm | rg -q 'Network'; then
+        if lspci -mm | rg 'Network' | rg -q 'Atheros'; then
+            for i in /mnt/efi/boot/firmware/ath*; do
+                3cpio -x --force "${_FW}/$i"
+            done
+        fi
+        if lspci -mm | rg 'Network' | rg -q 'Intel'; then
+            3cpio -x --force "${_FW}/iwlwifi.img"
+        fi
+        if lspci -mm | rg 'Network' | rg -q 'Marvell'; then
+            for i in libertas mrvl /mnt/efi/boot/firmware/mwl*; do
+                3cpio -x --force "${_FW}/$i"
+            done
+        fi
+        if lspci -mm | rg 'Network' | rg -q 'Mediatek'; then
+            3cpio -x --force "${_FW}/mediatek.img"
+        fi
+        if lspci -mm | rg 'Network' | rg -q 'Ralink'; then
+            3cpio -x --force "${_FW}/ralink.img"
+        fi
+        if lspci -mm | rg 'Network' | rg -q 'Realtek'; then
+            3cpio -x --force "${_FW}/rtlwifi.img"
+            for i in /mnt/efi/boot/firmware/rtw*; do
+                3cpio -x --force "${_FW}/$i"
+            done
+        fi
+        if lspci -mm | rg 'Network' | rg -q 'Texas'; then
+            3cpio -x --force "${_FW}/ti-connectivity.img"
+        fi
+    fi
 }
 _task() {
     if [[ "${1}" == mount ]]; then
@@ -89,6 +155,13 @@ _task() {
         rm -r sysroot
         rm init
     fi
+    if [[ "${1}" == firmware ]]; then
+        #shellcheck disable=SC2164
+        cd /sysroot
+        _graphic_fw
+        _ethernet_fw
+        _wireless_fw
+    fi
     if [[ "${1}" == unmount ]]; then
         if mountpoint /mnt/ventoy &>"${_NO_LOG}"; then
             for i in /mnt/{efi,cdrom,ventoy}; do
@@ -117,6 +190,9 @@ _initrd_stage() {
     : >/.archboot
     _task system &
     _progress_wait "0" "99" "\n${_KEEP}\n\nCopying rootfs to /sysroot..."
+    : >/.archboot
+    _task firmware &
+    _progress_wait "0" "99" "\n${_KEEP}\n\nCopying firmware to /sysroot..."
     : >/.archboot
     _task unmount &
     _progress_wait "0" "99" "\n${_KEEP}\n\nUnmounting rootfs..."

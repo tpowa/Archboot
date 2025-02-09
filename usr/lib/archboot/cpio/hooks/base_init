@@ -11,8 +11,8 @@ _run ()
     _file_rename "/usr/share/archboot/base/etc/dialogrc" "/etc/dialogrc"
     # systemd
     _map _binary /usr/lib/systemd/systemd{,-battery-check,-executor,-bsod,-journald,\
--shutdown,-sulogin-shell,-sysctl,-sysroot-fstab-check,-udevd}
-    _map _file /usr/lib/systemd/{lib*,system-generators/systemd-fstab-generator}
+-shutdown,-sulogin-shell,-sysctl,-sysroot-fstab-check,-udevd} lspci
+    _map _file /usr/lib/systemd/{lib*,system-generators/systemd-fstab-generator} /usr/share/hwdata/pci.ids
     # only take services from systemd package
     pacman -Sy &>"${_NO_LOG}"
     #shellcheck disable=SC2046

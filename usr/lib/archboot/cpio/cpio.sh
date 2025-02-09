@@ -17,6 +17,7 @@ _usage() {
     echo "Options:"
     echo " -h               Display this message and exit"
     echo " -c <config>      Use <config> file"
+    echo " -firmware        split firmware into separate images"
     echo " -g <path>        Generate cpio image and write to specified <path>"
     echo " -d <dir>         Generate image into <dir>"
     echo
@@ -34,6 +35,9 @@ while [ $# -gt 0 ]; do
     case "${1}" in
         -c) shift
             _CONFIG="${1}"
+            ;;
+        -firmware) shift
+            _FW_CPIO=1
             ;;
         -d) shift
             _TARGET_DIR="${1}"
