@@ -1,7 +1,7 @@
 On the road to 2025.02:
 - kernel 6.13.x
 - cleaned up firmware
-- cleanud up network modules
+- cleaned up network modules
 - cleaned up sata modules
 - cleaned up wireless modules
 - removed broadcom-wl module
