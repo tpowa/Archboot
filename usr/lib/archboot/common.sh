@@ -359,6 +359,10 @@ _pacman_keyring() {
 }
 
 _create_cpio() {
+    # $1: path of files
+    # $2: output
+    # $3: compression
+    [[ -z "${3}" ]] && 3="-19"
     # Reproducibility:
     # set all timestamps to 0
     # fd . -u --min-depth 1 -X touch -hcd "@0"
@@ -388,7 +392,7 @@ _create_cpio() {
     fd . -t f -t l -u --min-depth 1 -0 | sort -z |
         LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
         LC_ALL=C.UTF-8 bsdtar --null -cf - --format=newc @- |
-        zstd -T0 -19 >> "${2}" || _abort "Image creation failed!"
+        zstd -T0 "${3}" >> "${2}" || _abort "Image creation failed!"
     popd >"${_NO_LOG}" || return 1
     echo "Build complete."
 }

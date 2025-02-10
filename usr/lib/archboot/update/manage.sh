@@ -187,7 +187,8 @@ _collect_files() {
 }
 
 _create_initramfs() {
-    _create_cpio "${_ROOTFS_DIR}" "${_RAM}/${_INITRD}"
+    # add -3 for speeding up zstd compression
+    _create_cpio "${_ROOTFS_DIR}" "${_RAM}/${_INITRD}" -3
     rm "${_W_DIR}"/.archboot
 }
 
