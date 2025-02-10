@@ -4,6 +4,6 @@
 
 _run ()
 {
-    _map _binary lspci pcilmr setpci update-pciids
+    _map _binary pcilmr setpci update-pciids
 }
 
