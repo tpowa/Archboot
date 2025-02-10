@@ -125,7 +125,64 @@ _clean_archboot() {
 }
 
 _collect_files() {
+    _FW="${_W_DIR}/tmp/lib/firmware"
+    _VGA="VGA compatible controller"
+    _ETH="Ethernet controller"
+    _WIFI="Network controller"
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -c ${_CONFIG} -d /tmp" &>"${_LOG}"
+    mkdir -p lib/firmware
+    if lspci -mm | rg -q "${_VGA}"; then
+        if lspci -mm | rg "${_VGA}" | rg -q 'AMD'; then
+            mv "${_FW}"/amd* lib/firmware/
+        fi
+        if lspci -mm | rg "${_VGA}" | rg -q 'Intel'; then
+            if lspci -mm | rg "${_VGA}" | rg 'Intel' | rg -q 'Xe'; then
+                mv "${_FW}"/xe lib/firmware/
+            else
+                mv "${_FW}"/i915 lib/firmware/
+            fi
+        fi
+        if lspci -mm | rg "${_VGA}" | rg -q 'NVIDIA'; then
+             mv "${_FW}"/nvidia lib/firmware/
+        fi
+        if lspci -mm | rg "${_VGA}" | rg -q 'RADEON|Radeon'; then
+            mv "${_FW}"/radeon lib/firmware/
+        fi
+    fi
+    if lspci -mm | rg -q "${_ETH}"; then
+        if lspci -mm | rg "${_ETH}" | rg -q 'Broadcom'; then
+            mv "${_FW}"/{bnx2,tigon} lib/firmware/
+        fi
+        if lspci -mm | rg "${_ETH}" | rg -q 'Realtek'; then
+            mv "${_FW}"/rtl_nic lib/firmware/
+        fi
+    fi
+    if lspci -mm | rg -q "${_WIFI}"; then
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Atheros'; then
+            mv "${_FW}"/{ath*,htc_*,wil6210*} lib/firmware/
+        fi
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Intel'; then
+            mv "${_FW}"/iwl* lib/firmware/
+        fi
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Marvell'; then
+            mv "${_FW}"/{mwl*,libertas,mrvl} lib/firmware/
+        fi
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Mediatek'; then
+            mv "${_FW}"/{mt76*,mediatek,vpu_*} lib/firmware/
+        fi
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Ralink'; then
+            mv "${_FW}"/rt*bin* lib/firmware/
+        fi
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Realtek'; then
+            mv "${_FW}"/{rtw*,rtlwifi} lib/firmware/
+        fi
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Texas'; then
+            mv "${_FW}"/ti-connectivity lib/firmware/
+        fi
+    fi
+    mv "${_FW}"/regulatory* lib/firmware/
+    rm -r "${_FW}"
+    mv lib/firmware "${_W_DIR}"/tmp/lib
     rm "${_W_DIR}"/.archboot
 }
 
