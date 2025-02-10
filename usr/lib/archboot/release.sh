@@ -132,7 +132,7 @@ _create_iso() {
             if [[ "${initrd}" == "${_INITRD}" ]]; then
                 _UKI="/boot/${_NAME}-${_ARCH}"
                 for i in "${_W_DIR}"/boot/firmware/*; do
-                    _FW_IMG+=(--initrd=/boot/firmware/$(basename ${i}) )
+                    _FW_IMG+=(--initrd=/boot/firmware/"$(basename "${i}")" )
                 done
             fi
             [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="/boot/${_NAME}-latest-${_ARCH}"
@@ -140,10 +140,10 @@ _create_iso() {
             # only kms firmwares
             if [[ "${initrd}" == "${_INITRD_LOCAL}" || "${initrd}" == "${_INITRD_LATEST}" ]]; then
                 for i in amdgpu i915 nvidia radeon xe; do
-                    _FW_IMG+=(--initrd=/boot/firmware/${i}.img )
+                    _FW_IMG+=(--initrd=/boot/firmware/"${i}".img )
                 done
             fi
-            #shellcheck disable=SC2086
+            #shellcheck disable=SC2086,SC2068
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
                 ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${initrd}" ${_FW_IMG[@]} --cmdline="${_CMDLINE}" \
                 --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}.efi" &>"${_NO_LOG}" || exit 1

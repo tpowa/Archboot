@@ -105,10 +105,12 @@ _create_pacman_conf() {
         if [[ "${2}" == "use_binfmt" ]]; then
             _PACMAN_CONF="${1}${_PACMAN_CONF}"
             # CDN on aarch64 is broken sometimes
+            # shellcheck disable=SC2016
             sd '^Server = http://mirror.archlinuxarm.org/$arch/$repo' \
-               '# Server = http://mirror.archlinuxarm.org/$arch/$repo' ${1}/etc/pacman.d/mirrorlist
+               '# Server = http://mirror.archlinuxarm.org/$arch/$repo' "${1}"/etc/pacman.d/mirrorlist
+            # shellcheck disable=SC2016
             sd '# Server = http://de3.mirror.archlinuxarm.org/$arch/$repo' \
-               'Server = http://de3.mirror.archlinuxarm.org/$arch/$repo' ${1}/etc/pacman.d/mirrorlist
+               'Server = http://de3.mirror.archlinuxarm.org/$arch/$repo' "${1}"/etc/pacman.d/mirrorlist
         fi
         if ! rg -qw "\[archboot\]" "${_PACMAN_CONF}"; then
             echo "Adding Archboot repository to ${_PACMAN_CONF}..."
@@ -258,7 +260,7 @@ _set_hostname() {
 
 _depmod() {
     echo "Running depmod..."
-    _KERNELVERSION="$(basename ${1}/lib/modules/*)"
+    _KERNELVERSION="$(basename "${1}"/lib/modules/*)"
     ${_NSPAWN} "${1}" depmod "${_KERNELVERSION}"
 }
 
