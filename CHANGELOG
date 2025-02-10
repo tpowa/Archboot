@@ -10,6 +10,9 @@ ISO images:
 - autodetect needed firmware files from lspci output
 - reduced needed RAM to boot from 900M for VMs down to 600M !!!
 - maximized boot speed !!!
+kexec routine:
+- autodetect needed firmware files from lspci output
+- reduced needed RAM and maximized speed
 network:
 - improved suggestions for ipv4 static setup
 - improved error handling on missing netmask on ipv4 static setup
