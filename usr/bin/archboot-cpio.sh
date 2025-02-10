@@ -83,7 +83,7 @@ if [[ -n "${_GENERATE_IMAGE}" ]]; then
     if [[ -n "${_FW_CPIO}" ]]; then
         _FW_SOURCE="${_BUILD_DIR}/fw"
         [[ -d "${_FW_SOURCE}/lib/firmware" ]] || mkdir -p "${_FW_SOURCE}/lib/firmware"
-        [[ -d "$(dirname ${_GENERATE_IMAGE})/firmware" ]] || mkdir "$(dirname ${_GENERATE_IMAGE})/firmware"
+        [[ -d "$(dirname "${_GENERATE_IMAGE}")/firmware" ]] || mkdir "$(dirname "${_GENERATE_IMAGE}")/firmware"
         if [[ -d "${_ROOTFS}"/lib/firmware ]]; then
             for i in $(fd --type d  -d 1 . "${_ROOTFS}"/lib/firmware); do
                 # those from firmware basedir belong to corresponding chipsets
@@ -96,9 +96,9 @@ if [[ -n "${_GENERATE_IMAGE}" ]]; then
                 if echo "${i}" | rg -q ath11k; then
                     mv "${_ROOTFS}"/lib/firmware/wil6210* "${_FW_SOURCE}"/lib/firmware/
                 fi
-                echo "Preparing firmware $(basename ${i}).img..."
+                echo "Preparing firmware $(basename "${i}").img..."
                 mv "${i}" "${_FW_SOURCE}"/lib/firmware/
-                _create_cpio "${_FW_SOURCE}" "$(dirname ${_GENERATE_IMAGE})/firmware/$(basename ${i}).img" &>${_NO_LOG} || exit 1
+                _create_cpio "${_FW_SOURCE}" "$(dirname "${_GENERATE_IMAGE}")/firmware/$(basename "${i}").img" &>${_NO_LOG} || exit 1
                 # remove directory
                 rm -r "${_FW_SOURCE}"/lib/firmware/*
             done
@@ -106,13 +106,13 @@ if [[ -n "${_GENERATE_IMAGE}" ]]; then
             if ls "${_ROOTFS}"/lib/firmware/iwl* &>${_NO_LOG}; then
                 echo "Preparing firmware iwlwifi.img..."
                 mv "${_ROOTFS}"/lib/firmware/iwl* "${_FW_SOURCE}"/lib/firmware/
-                _create_cpio "${_FW_SOURCE}" "$(dirname ${_GENERATE_IMAGE})/firmware/iwlwifi.img" &>${_NO_LOG} || exit 1
+                _create_cpio "${_FW_SOURCE}" "$(dirname "${_GENERATE_IMAGE}")/firmware/iwlwifi.img" &>${_NO_LOG} || exit 1
             fi
             # ralink wireless
             if ls "${_ROOTFS}"/lib/firmware/rt* &>${_NO_LOG}; then
                 echo "Preparing firmware ralink.img..."
                 mv "${_ROOTFS}"/lib/firmware/rt* "${_FW_SOURCE}"/lib/firmware/
-                _create_cpio "${_FW_SOURCE}" "$(dirname ${_GENERATE_IMAGE})/firmware/ralink.img" &>${_NO_LOG} || exit 1
+                _create_cpio "${_FW_SOURCE}" "$(dirname "${_GENERATE_IMAGE}")/firmware/ralink.img" &>${_NO_LOG} || exit 1
             fi
         fi
     fi

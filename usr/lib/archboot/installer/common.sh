@@ -99,6 +99,7 @@ _auto_packages() {
     # add packages from Archboot defaults
     . /etc/archboot/defaults
     # remove linux-firmware packages first
+    #shellcheck disable=SC2206
     _PACKAGES=(${_PACKAGES[@]/linux-firmware*})
     # Add filesystem packages
     if ${_LSBLK} FSTYPE | rg -q 'bcachefs'; then
