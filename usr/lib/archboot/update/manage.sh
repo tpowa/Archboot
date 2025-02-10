@@ -130,19 +130,7 @@ _collect_files() {
 }
 
 _create_initramfs() {
-    # https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt
-    # compress image with zstd
-    cd "${_ROOTFS_DIR}" || exit 1
-    fd . -u --min-depth 1 -0 |
-            sort -z |
-            LC_ALL=C.UTF-8 bsdtar --null -cnf - -T - |
-            LC_ALL=C.UTF-8 bsdtar --null -cf - --format=newc @- |
-            zstd --rm -T0> "${_RAM}/${_INITRD}" &
-    sleep 2
-    while pgrep -x zstd &>"${_NO_LOG}"; do
-        _clean_kernel_cache
-        sleep 1
-    done
+    _create_cpio "${_ROOTFS_DIR}" "${_RAM}/${_INITRD}"
     rm "${_W_DIR}"/.archboot
 }
 
