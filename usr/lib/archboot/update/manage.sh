@@ -22,7 +22,7 @@ _kill_w_dir() {
 _create_container() {
     # create container without package cache
     if [[ -n "${_L_COMPLETE}" ]]; then
-        "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp >"${_LOG}" 2>&1 || exit 1
+        "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp &>"${_LOG}" || exit 1
     fi
     # create container with package cache
     if [[ -e "${_LOCAL_DB}" ]]; then
@@ -30,14 +30,14 @@ _create_container() {
         # add the db too on reboot
         install -D -m644 "${_LOCAL_DB}" "${_W_DIR}""${_LOCAL_DB}"
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
-            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file://"${_CACHEDIR}" >"${_LOG}" 2>&1 || exit 1
+            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file://"${_CACHEDIR}" &>"${_LOG}" || exit 1
         fi
         # needed for checks
         cp "${_W_DIR}""${_LOCAL_DB}" "${_LOCAL_DB}"
     else
         # online mode
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
-            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc >"${_LOG}" 2>&1 || exit 1
+            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc &>"${_LOG}" || exit 1
         fi
     fi
     rm "${_W_DIR}"/.archboot
@@ -125,7 +125,7 @@ _clean_archboot() {
 }
 
 _collect_files() {
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -c ${_CONFIG} -d /tmp" >"${_LOG}" 2>&1
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -c ${_CONFIG} -d /tmp" &>"${_LOG}"
     rm "${_W_DIR}"/.archboot
 }
 
@@ -305,7 +305,7 @@ _new_environment() {
 
 _full_system() {
     _progress "1" "Refreshing pacman package database..."
-    pacman -Sy >"${_LOG}" 2>&1 || exit 1
+    pacman -Sy &>"${_LOG}" || exit 1
     #shellcheck disable=SC2207
     _PACKAGES=($(pacman -Qqn))
     _COUNT=0
@@ -321,15 +321,15 @@ _full_system() {
             _progress "$((_COUNT*100/_PACKAGE_COUNT-4))" "Reinstalling all packages, installing ${i} now..."
         fi
         #shellcheck disable=SC2086
-        pacman -S --assume-installed ${_MKINITCPIO} --noconfirm ${i} >"${_LOG}" 2>&1 || exit 1
+        pacman -S --assume-installed ${_MKINITCPIO} --noconfirm ${i} &>"${_LOG}" || exit 1
         _COUNT="$((_COUNT+1))"
     done
     : >/tmp/60-mkinitcpio-remove.hook
     : >/tmp/90-mkinitcpio-install.hook
     # install mkinitcpio as last package, without rebuild trigger
-    pacman -S --hookdir /tmp --noconfirm mkinitcpio >"${_LOG}" 2>&1 || exit 1
+    pacman -S --hookdir /tmp --noconfirm mkinitcpio &>"${_LOG}" || exit 1
     _progress "97" "Adding texinfo and man-pages..."
-    pacman -S --noconfirm man-db man-pages texinfo >"${_LOG}" 2>&1 || exit 1
+    pacman -S --noconfirm man-db man-pages texinfo &>"${_LOG}" || exit 1
     _progress "98" "Checking kernel version..."
     _INSTALLED_KERNEL="$(pacman -Qi linux | rg -o 'Version.* (.*).(arch.*)' -r '$1-$2')"
     if ! [[ "${_INSTALLED_KERNEL}" == "${_RUNNING_KERNEL}" ]]; then
