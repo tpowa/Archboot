@@ -362,11 +362,7 @@ _create_cpio() {
     # $1: path of files
     # $2: output
     # $3: compression
-    if [[ -z "${3}" ]]; then
-        _COMP_LEVEL="-19"
-    else
-        _COMP_LEVEL="${3}"
-    fi
+    _COMP_LEVEL="${3:--19}"
     # Reproducibility:
     # set all timestamps to 0
     # fd . -u --min-depth 1 -X touch -hcd "@0"
