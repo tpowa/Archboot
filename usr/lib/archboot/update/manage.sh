@@ -126,61 +126,64 @@ _clean_archboot() {
 
 _clean_fw() {
     _FW="${_W_DIR}/lib/firmware"
+    _FW_NEW="new/firmware"
     _VGA="VGA compatible controller"
     _ETH="Ethernet controller"
     _WIFI="Network controller"
-    mkdir -p lib/firmware
+    mkdir -p new/firmware
     if lspci -mm | rg -q "${_VGA}"; then
         if lspci -mm | rg "${_VGA}" | rg -q 'AMD'; then
-            mv "${_FW}"/amd* lib/firmware/
+            mv "${_FW}"/amd* ${_FW_NEW}/
         fi
         if lspci -mm | rg "${_VGA}" | rg -q 'Intel'; then
             if lspci -mm | rg "${_VGA}" | rg 'Intel' | rg -q 'Xe'; then
-                mv "${_FW}"/xe lib/firmware/
+                mv "${_FW}"/xe ${_FW_NEW}/
             else
-                mv "${_FW}"/i915 lib/firmware/
+                mv "${_FW}"/i915 ${_FW_NEW}/
             fi
         fi
         if lspci -mm | rg "${_VGA}" | rg -q 'NVIDIA'; then
-             mv "${_FW}"/nvidia lib/firmware/
+             mv "${_FW}"/nvidia ${_FW_NEW}/
         fi
         if lspci -mm | rg "${_VGA}" | rg -q 'RADEON|Radeon'; then
-            mv "${_FW}"/radeon lib/firmware/
+            mv "${_FW}"/radeon ${_FW_NEW}/
         fi
     fi
     if lspci -mm | rg -q "${_ETH}"; then
         if lspci -mm | rg "${_ETH}" | rg -q 'Broadcom'; then
-            mv "${_FW}"/{bnx2,tigon} lib/firmware/
+            mv "${_FW}"/{bnx2,tigon} ${_FW_NEW}/
         fi
         if lspci -mm | rg "${_ETH}" | rg -q 'Realtek'; then
-            mv "${_FW}"/rtl_nic lib/firmware/
+            mv "${_FW}"/rtl_nic ${_FW_NEW}/
         fi
     fi
     if lspci -mm | rg -q "${_WIFI}"; then
         if lspci -mm | rg "${_WIFI}" | rg -q 'Atheros'; then
-            mv "${_FW}"/{ath*,htc_*,wil6210*} lib/firmware/
+            mv "${_FW}"/{ath*,htc_*,wil6210*} ${_FW_NEW}/
         fi
         if lspci -mm | rg "${_WIFI}" | rg -q 'Intel'; then
-            mv "${_FW}"/iwl* lib/firmware/
+            mv "${_FW}"/iwl* ${_FW_NEW}/
         fi
         if lspci -mm | rg "${_WIFI}" | rg -q 'Marvell'; then
-            mv "${_FW}"/{mwl*,libertas,mrvl} lib/firmware/
+            mv "${_FW}"/{mwl*,libertas,mrvl} ${_FW_NEW}/
         fi
         if lspci -mm | rg "${_WIFI}" | rg -q 'Mediatek'; then
-            mv "${_FW}"/{mt76*,mediatek,vpu_*} lib/firmware/
+            mv "${_FW}"/{mt76*,mediatek,vpu_*} ${_FW_NEW}/
         fi
         if lspci -mm | rg "${_WIFI}" | rg -q 'Ralink'; then
-            mv "${_FW}"/rt*bin* lib/firmware/
+            mv "${_FW}"/rt*bin* ${_FW_NEW}/
         fi
         if lspci -mm | rg "${_WIFI}" | rg -q 'Realtek'; then
-            mv "${_FW}"/{rtw*,rtlwifi} lib/firmware/
+            mv "${_FW}"/{rtw*,rtlwifi} ${_FW_NEW}/
         fi
         if lspci -mm | rg "${_WIFI}" | rg -q 'Texas'; then
-            mv "${_FW}"/ti-connectivity lib/firmware/
+            mv "${_FW}"/ti-connectivity ${_FW_NEW}/
         fi
     fi
-    mv "${_FW}"/{amd-ucode,intel-ucode,regulatory*} lib/firmware/
-    mv lib/firmware "${_W_DIR}"/lib
+    mv "${_FW}"/{amd-ucode,intel-ucode,regulatory*} ${_FW_NEW}/
+    rm -r "${_FW}"
+    mv "${_FW_NEW}" "${_W_DIR}"/lib
+    rm -r new/
 }
 
 _collect_files() {
