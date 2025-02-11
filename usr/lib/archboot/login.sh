@@ -208,9 +208,9 @@ if [[ -e /usr/bin/setup ]]; then
         launcher
     fi
 # latest image, fail if less than 2.3GB RAM available
-elif [[ "${_MEM_TOTAL}" -lt 2270000 ]]; then
+elif [[ "${_MEM_TOTAL}" -lt 2070000 ]]; then
     _welcome
-    _memory_error "2.3GB"
+    _memory_error "2.1GB"
     _enter_shell
 # local image, fail if less than 3.0GB  RAM available
 elif [[ "${_MEM_TOTAL}" -lt 2971000 &&\
