@@ -124,7 +124,7 @@ _clean_archboot() {
     done
 }
 
-_fw_cleanup() {
+_clean_fw() {
     _FW="${_W_DIR}/lib/firmware"
     _VGA="VGA compatible controller"
     _ETH="Ethernet controller"
@@ -266,7 +266,7 @@ _new_environment() {
     : > "${_W_DIR}"/.archboot
     _create_container &
     _progress_wait "2" "40" "Generating container in ${_W_DIR}..." "5.5"
-    _clean_firmware
+    _clean_fw
     _clean_kernel_cache
     _ram_check
     _progress "41" "Copying kernel ${_VMLINUZ} to ${_RAM}/..."
