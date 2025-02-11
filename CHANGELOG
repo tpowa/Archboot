@@ -8,11 +8,9 @@ On the road to 2025.02:
 ISO images:
 - splitted firmware into separate initramfs files
 - autodetect needed firmware files from lspci output
-- reduced needed RAM to boot from 900M for VMs down to 600M !!!
+- On normal image reduced needed RAM to boot from 900M for VMs down to 600M!
+- On latest image reduced needed RAM to boot from 2300M down to 2100M!
 - maximized boot speed !!!
-kexec routine:
-- autodetect needed firmware files from lspci output
-- reduced needed RAM and maximized speed
 network:
 - improved suggestions for ipv4 static setup
 - improved error handling on missing netmask on ipv4 static setup
