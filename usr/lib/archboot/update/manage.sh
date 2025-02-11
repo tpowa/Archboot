@@ -124,12 +124,11 @@ _clean_archboot() {
     done
 }
 
-_collect_files() {
-    _FW="${_W_DIR}/tmp/lib/firmware"
+_fw_cleanup() {
+    _FW="${_W_DIR}/lib/firmware"
     _VGA="VGA compatible controller"
     _ETH="Ethernet controller"
     _WIFI="Network controller"
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -c ${_CONFIG} -d /tmp" &>"${_LOG}"
     mkdir -p lib/firmware
     if lspci -mm | rg -q "${_VGA}"; then
         if lspci -mm | rg "${_VGA}" | rg -q 'AMD'; then
@@ -180,9 +179,12 @@ _collect_files() {
             mv "${_FW}"/ti-connectivity lib/firmware/
         fi
     fi
-    mv "${_FW}"/regulatory* lib/firmware/
-    rm -r "${_FW}"
-    mv lib/firmware "${_W_DIR}"/tmp/lib
+    mv "${_FW}"/{amd-ucode,intel-ucode,regulatory*} lib/firmware/
+    mv lib/firmware "${_W_DIR}"/lib
+}
+
+_collect_files() {
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -c ${_CONFIG} -d /tmp" &>"${_LOG}"
     rm "${_W_DIR}"/.archboot
 }
 
@@ -264,6 +266,7 @@ _new_environment() {
     : > "${_W_DIR}"/.archboot
     _create_container &
     _progress_wait "2" "40" "Generating container in ${_W_DIR}..." "5.5"
+    _clean_firmware
     _clean_kernel_cache
     _ram_check
     _progress "41" "Copying kernel ${_VMLINUZ} to ${_RAM}/..."
