@@ -248,7 +248,7 @@ _cpio_fw() {
         _FW_SOURCE="${_BUILD_DIR}/fw"
         [[ -d "${_FW_SOURCE}/lib/firmware" ]] || mkdir -p "${_FW_SOURCE}/lib/firmware"
         if [[ -n ${_GENERATE_IMAGE} ]]; then
-            _FW_DEST="$(dirname ${_GENERATE_IMAGE})"
+            _FW_DEST="$(dirname "${_GENERATE_IMAGE}")"
         else
             _FW_DEST="${_TARGET_DIR}"
         fi
@@ -259,7 +259,7 @@ _cpio_fw() {
                 echo "${i}" | rg -q mediatek && mv "${_ROOTFS}"/lib/firmware/{mt76*,vpu_*} "${_FW_SOURCE}/lib/firmware/"
                 echo "${i}" | rg -q ath9k_htc && mv "${_ROOTFS}"/lib/firmware/htc_* "${_FW_SOURCE}/lib/firmware/"
                 echo "${i}" | rg -q ath11k && mv "${_ROOTFS}"/lib/firmware/wil6210* "${_FW_SOURCE}/lib/firmware/"
-                echo "Preparing firmware "${i}".img..."
+                echo "Preparing firmware ${i}.img..."
                 mv "${_ROOTFS}/lib/firmware/${i}" "${_FW_SOURCE}/lib/firmware/"
                 _create_cpio "${_FW_SOURCE}" "${_FW_DEST}/firmware/${i}".img &>${_NO_LOG} || exit 1
                 # remove directory

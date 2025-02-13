@@ -46,18 +46,18 @@ _create_iso() {
             echo "Generating local initramfs..."
             _create_initrd_dir "${_CONFIG_LOCAL}"
             _create_cpio "${_W_DIR}/tmp/initrd" "../../initrd-local-${_ARCH}.img"
-            mv "${_W_DIR}"/tmp/initrd/firmware ${_W_DIR}/firmware-local
+            mv "${_W_DIR}/tmp/initrd/firmware" "${_W_DIR}/firmware-local"
             # latest ramdisk
             echo "Generating latest initramfs..."
             _create_initrd_dir "${_CONFIG_LATEST}"
             _create_cpio "${_W_DIR}/tmp/initrd" "../../initrd-latest-${_ARCH}.img"
-            mv "${_W_DIR}"/tmp/initrd/firmware ${_W_DIR}/firmware-latest
+            mv "${_W_DIR}/tmp/initrd/firmware" "${_W_DIR}/firmware-latest"
         fi
         # normal ramdisk
         echo "Generating normal initramfs..."
         _create_initrd_dir "${_ARCH}.conf"
         _create_cpio "${_W_DIR}/tmp/initrd" "../../initrd-${_ARCH}.img"
-        mv "${_W_DIR}"/tmp/initrd/firmware ${_W_DIR}/
+        mv "${_W_DIR}/tmp/initrd/firmware" "${_W_DIR}/"
     fi
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
