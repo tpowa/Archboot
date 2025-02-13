@@ -51,7 +51,7 @@ _blockdevices() {
 # lists linux blockdevice partitions
 _blockdevices_partitions() {
     # all available block devices partitions
-    for dev in $(${_LSBLK} NAME,TYPE | rg -v '^/dev/md|disk$|rom$' | rg '(.*) .*$' -r '$1'); do
+    for dev in $(${_LSBLK} NAME,TYPE | rg -v '^/dev/md' | rg '(.*) part$' -r '$1'); do
         # exclude checks:
         #- part of raid device
         #  ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | rg 'linux_raid_member'
@@ -150,7 +150,7 @@ _dmraid_partitions() {
 # - show device mapper devices:
 #   lvm2 and cryptdevices
 _dm_devices() {
-    for dev in $(${_LSBLK} NAME,TYPE | rg '(.*) lvm$|(.*) crypt$' -r '$1' | sort -u); do
+    for dev in $(${_LSBLK} NAME,TYPE | rg 'lvm$|crypt$' | rg '(.*) .*' -r '$1' | sort -u); do
         # exclude checks:
         # - part of lvm2 device
         #   ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | rg 'LVM2_member'
