@@ -57,8 +57,6 @@ _blockdevices_partitions() {
         #  ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | rg 'linux_raid_member'
         #- part of lvm2 device
         #  ${_LSBLK} FSTYPE /dev/${dev} 2>"${_NO_LOG}" | rg 'LVM2_member'
-        #- part of luks device
-        #  ${_LSBLK} FSTYPE /dev/${dev} 2>"${_NO_LOG}" | rg 'crypto_LUKS'
         #- extended partition
         #  sfdisk -l 2>"${_NO_LOG}" | rg "${dev}" | rg 'Extended$'
         # - extended partition (LBA)
@@ -69,7 +67,6 @@ _blockdevices_partitions() {
         #  "${_LSBLK} FSTYPE -s ${dev} | rg 'iso9660'
         if ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | rg -q 'linux_raid_member' &&\
             ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | rg -q 'LVM2_member' &&\
-            ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | rg -q 'crypto_LUKS' &&\
             ! ${_LSBLK} FSTYPE -s "${dev}" 2>"${_NO_LOG}" | rg -q 'iso9660' &&\
             ! sfdisk -l 2>"${_NO_LOG}" | rg "${dev}" | rg -q 'Extended$' &&\
             ! sfdisk -l 2>"${_NO_LOG}" | rg "${dev}" | rg -q '\(LBA\)$' &&\
