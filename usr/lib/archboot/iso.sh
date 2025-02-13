@@ -88,7 +88,7 @@ _prepare_kernel_initrd_files() {
     fi
     if [[ -f "${_ISODIR}/boot/initrd-${_ARCH}.img" ]]; then
         echo "Using existing firmware..."
-        mv "./firmware" "${_ISODIR}/boot/firmware"
+        mv ./firmware "${_ISODIR}/boot/firmware"
     else
         echo "Running archboot-cpio.sh for initrd-${_ARCH}.img..."
         #shellcheck disable=SC2154
