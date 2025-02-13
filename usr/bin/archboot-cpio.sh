@@ -83,7 +83,7 @@ if [[ -n "${_GENERATE_IMAGE}" ]]; then
     _create_cpio "${_ROOTFS}" "${_GENERATE_IMAGE}" || exit 1
     _cleanup
 elif [[ -n "${_TARGET_DIR}" ]]; then
-    _cpio_fw_dir
+    _cpio_fw
     _cleanup
     echo "Build directory complete."
 else
