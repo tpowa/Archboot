@@ -78,17 +78,16 @@ _prepare_kernel_initrd_files() {
         fi
     fi
     _INITRD="initrd-${_ARCH}.img"
+    _FW="firmware-local"
     echo "${_CONFIG}" | rg -qw local && _INITRD="initrd-local-${_ARCH}.img" && _FW=firmware-local
     echo "${_CONFIG}" | rg -qw latest && _INITRD="initrd-latest-${_ARCH}.img" && _FW=firmware-latest
     if [[ -f "${_INITRD}" ]]; then
         echo "Using existing ${_INITRD}..."
         mv "./${_INITRD}" "${_ISODIR}/boot/initrd-${_ARCH}.img"
-        echo "Using existing ${_FW}..."
-        mv "./${_FW}" "${_ISODIR}/boot/firmware"
     fi
     if [[ -f "${_ISODIR}/boot/initrd-${_ARCH}.img" ]]; then
-        echo "Using existing firmware..."
-        mv ./firmware "${_ISODIR}/boot/firmware"
+        echo "Using existing ${_FW}..."
+        mv "./${_FW}" "${_ISODIR}/boot/firmware"
     else
         echo "Running archboot-cpio.sh for initrd-${_ARCH}.img..."
         #shellcheck disable=SC2154
