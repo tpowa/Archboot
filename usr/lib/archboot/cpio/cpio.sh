@@ -248,7 +248,7 @@ _cpio_fw() {
         _FW_SOURCE="${_BUILD_DIR}/fw"
         [[ -d "${_FW_SOURCE}/lib/firmware" ]] || mkdir -p "${_FW_SOURCE}/lib/firmware"
         if [[ -n ${_GENERATE_IMAGE} ]]; then
-            _FW_DEST="${_GENERATE_IMAGE}"
+            _FW_DEST="$(dirname ${_GENERATE_IMAGE})"
         else
             _FW_DEST="${_TARGET_DIR}"
         fi
