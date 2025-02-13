@@ -51,7 +51,7 @@ _blockdevices() {
 # lists linux blockdevice partitions
 _blockdevices_partitions() {
     # all available block devices partitions
-    for dev in $(${_LSBLK} NAME,TYPE | rg -v '^/dev/md' | rg '(.*) .*$' -r '$1'); do
+    for dev in $(${_LSBLK} NAME,TYPE | rg -v '^/dev/md|disk$|rom$' | rg '(.*) .*$' -r '$1'); do
         # exclude checks:
         #- part of raid device
         #  ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | rg 'linux_raid_member'
