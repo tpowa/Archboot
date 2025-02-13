@@ -15,6 +15,7 @@ network:
 - improved suggestions for ipv4 static setup
 - improved error handling on missing netmask on ipv4 static setup
 setup:
+- fixed block device listing of /dev/mapper devices
 - improved setting mountpoints on running out of devices
 - fixed btrfs data raid level (was always set as single)
 - removed btrfs raid0 selection
