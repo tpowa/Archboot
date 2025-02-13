@@ -21,7 +21,7 @@ _usage () {
 
 _create_initrd_dir() {
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-cpio.sh \
-        -c /etc/archboot/${1} -d /tmp/initrd" || exit 1
+        -c /etc/archboot/${1} -firmware -d /tmp/initrd" || exit 1
 }
 
 _create_iso() {
@@ -46,15 +46,18 @@ _create_iso() {
             echo "Generating local initramfs..."
             _create_initrd_dir "${_CONFIG_LOCAL}"
             _create_cpio "${_W_DIR}/tmp/initrd" "../../initrd-local-${_ARCH}.img"
+            mv "${_W_DIR}"/tmp/initrd/firmware ../../firmware-local
             # latest ramdisk
             echo "Generating latest initramfs..."
             _create_initrd_dir "${_CONFIG_LATEST}"
             _create_cpio "${_W_DIR}/tmp/initrd" "../../initrd-latest-${_ARCH}.img"
+            mv "${_W_DIR}"/tmp/initrd/firmware ../../firmware-latest
         fi
         # normal ramdisk
         echo "Generating normal initramfs..."
         _create_initrd_dir "${_ARCH}.conf"
         _create_cpio "${_W_DIR}/tmp/initrd" "../../initrd-${_ARCH}.img"
+        mv "${_W_DIR}"/tmp/initrd/firmware ../../firmware
     fi
     # riscv64 does not support kexec at the moment
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
