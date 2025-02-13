@@ -78,9 +78,9 @@ _prepare_kernel_initrd_files() {
         fi
     fi
     _INITRD="initrd-${_ARCH}.img"
-    _FW="firmware-local"
-    echo "${_CONFIG}" | rg -qw local && _INITRD="initrd-local-${_ARCH}.img" && _FW=firmware-local
-    echo "${_CONFIG}" | rg -qw latest && _INITRD="initrd-latest-${_ARCH}.img" && _FW=firmware-latest
+    _FW="firmware"
+    echo "${_CONFIG}" | rg -qw local && _INITRD="initrd-local-${_ARCH}.img" && _FW="firmware-local"
+    echo "${_CONFIG}" | rg -qw latest && _INITRD="initrd-latest-${_ARCH}.img" && _FW="firmware-latest"
     if [[ -f "${_INITRD}" ]]; then
         echo "Using existing ${_INITRD}..."
         mv "./${_INITRD}" "${_ISODIR}/boot/initrd-${_ARCH}.img"
