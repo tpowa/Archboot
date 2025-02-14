@@ -245,37 +245,39 @@ _install_libs() {
 _cpio_fw() {
     # divide firmware in cpio images
     if [[ -n "${_FW_CPIO}" ]]; then
-        _FW_SOURCE="${_BUILD_DIR}/fw"
-        [[ -d "${_FW_SOURCE}/lib/firmware" ]] || mkdir -p "${_FW_SOURCE}/lib/firmware"
+        _FW_SRC="${_ROOTFS}/lib/firmware"
+        _FW_TMP="${_BUILD_DIR}/fw"
+        _FW_TMP_SRC="${_FW_TMP_SRC}/lib/firmware"
         if [[ -n ${_GENERATE_IMAGE} ]]; then
-            _FW_DEST="$(dirname "${_GENERATE_IMAGE}")"
+            _FW_DEST="$(dirname "${_GENERATE_IMAGE}/firmware")"
         else
-            _FW_DEST="${_TARGET_DIR}"
+            _FW_DEST="${_TARGET_DIR}/firmware"
         fi
-        [[ -d "${_FW_DEST}/firmware" ]] || mkdir -p "${_FW_DEST}/firmware"
-        if [[ -d "${_ROOTFS}"/lib/firmware ]]; then
-            for i in $(fd --type d --base-directory "${_ROOTFS}/lib/firmware" --path-separator '' -d 1); do
+        [[ -d "${_FW_TMP_SRC}" ]] || mkdir -p "${_FW_TMP_SRC}"
+        [[ -d "${_FW_DEST}" ]] || mkdir -p "${_FW_DEST}"
+        if [[ -d "${_FW_SRC}" ]]; then
+            for i in $(fd --type d --base-directory "${_FW_SRC}" --path-separator '' -d 1); do
                 # those from firmware basedir belong to corresponding chipsets
-                echo "${i}" | rg -q mediatek && mv "${_ROOTFS}"/lib/firmware/{mt76*,vpu_*} "${_FW_SOURCE}/lib/firmware/"
-                echo "${i}" | rg -q ath9k_htc && mv "${_ROOTFS}"/lib/firmware/htc_* "${_FW_SOURCE}/lib/firmware/"
-                echo "${i}" | rg -q ath11k && mv "${_ROOTFS}"/lib/firmware/wil6210* "${_FW_SOURCE}/lib/firmware/"
+                echo "${i}" | rg -q mediatek && mv "${_FW_SRC}"/{mt76*,vpu_*} "${_FW_TMP_SRC}/"
+                echo "${i}" | rg -q ath9k_htc && mv "${_FW_SRC}"/htc_* "${_FW_TMP_SRC}/"
+                echo "${i}" | rg -q ath11k && mv "${_FW_SRC}"/wil6210* "${_FW_TMP_SRC}/"
                 echo "Preparing firmware ${i}.img..."
-                mv "${_ROOTFS}/lib/firmware/${i}" "${_FW_SOURCE}/lib/firmware/"
-                _create_cpio "${_FW_SOURCE}" "${_FW_DEST}/firmware/${i}".img &>${_NO_LOG} || exit 1
+                mv "${_FW_SRC}/${i}" "${_FW_TMP_SRC}/"
+                _create_cpio "${_FW_TMP}" "${_FW_DEST}/${i}".img &>${_NO_LOG} || exit 1
                 # remove directory
-                rm -r "${_FW_SOURCE}"/lib/firmware/*
+                rm -r "${_FW_TMP_SRC:?}"/*
             done
             # intel wireless
-            if ls "${_ROOTFS}"/lib/firmware/iwl* &>${_NO_LOG}; then
+            if ls "${_FW_SRC}"/iwl* &>${_NO_LOG}; then
                 echo "Preparing firmware iwlwifi.img..."
-                mv "${_ROOTFS}"/lib/firmware/iwl* "${_FW_SOURCE}/lib/firmware/"
-                _create_cpio "${_FW_SOURCE}" "${_FW_DEST}/firmware/iwlwifi.img" &>${_NO_LOG} || exit 1
+                mv "${_FW_SRC}"/iwl* "${_FW_TMP_SRC}/"
+                _create_cpio "${_FW_TMP}" "${_FW_DEST}/iwlwifi.img" &>${_NO_LOG} || exit 1
             fi
             # ralink wireless
-            if ls "${_ROOTFS}"/lib/firmware/rt* &>${_NO_LOG}; then
+            if ls "${_FW_SRC}"/rt* &>${_NO_LOG}; then
                 echo "Preparing firmware ralink.img..."
-                mv "${_ROOTFS}"/lib/firmware/rt* "${_FW_SOURCE}/lib/firmware/"
-                _create_cpio "${_FW_SOURCE}" "${_FW_DEST}/firmware/ralink.img" &>${_NO_LOG} || exit 1
+                mv "${_FW_SRC}"/rt* "${_FW_TMP_SRC}/"
+                _create_cpio "${_FW_TMP}" "${_FW_DEST}/ralink.img" &>${_NO_LOG} || exit 1
             fi
         fi
     fi
