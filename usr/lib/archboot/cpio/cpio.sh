@@ -263,7 +263,7 @@ _cpio_fw() {
                 echo "${i}" | rg -q ath11k && mv "${_FW_SRC}"/wil6210* "${_FW_TMP_SRC}/"
                 echo "Preparing firmware ${i}.img..."
                 mv "${_FW_SRC}/${i}" "${_FW_TMP_SRC}/"
-                _create_cpio "${_FW_TMP}" "${_FW_DEST}/${i}".img &>${_NO_LOG} || exit 1
+                _create_cpio "${_FW_TMP}" "${_FW_DEST}/${i}.img" &>${_NO_LOG} || exit 1
                 # remove directory
                 rm -r "${_FW_TMP_SRC:?}"/*
             done
