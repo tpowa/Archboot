@@ -247,7 +247,7 @@ _cpio_fw() {
     if [[ -n "${_FW_CPIO}" ]]; then
         _FW_SRC="${_ROOTFS}/lib/firmware"
         _FW_TMP="${_BUILD_DIR}/fw"
-        _FW_TMP_SRC="${_FW_TMP_SRC}/lib/firmware"
+        _FW_TMP_SRC="${_FW_TMP}/lib/firmware"
         if [[ -n ${_GENERATE_IMAGE} ]]; then
             _FW_DEST="$(dirname "${_GENERATE_IMAGE}/firmware")"
         else
@@ -272,12 +272,14 @@ _cpio_fw() {
                 echo "Preparing firmware iwlwifi.img..."
                 mv "${_FW_SRC}"/iwl* "${_FW_TMP_SRC}/"
                 _create_cpio "${_FW_TMP}" "${_FW_DEST}/iwlwifi.img" &>${_NO_LOG} || exit 1
+                rm "${_FW_TMP_SRC:?}"/*
             fi
             # ralink wireless
             if ls "${_FW_SRC}"/rt* &>${_NO_LOG}; then
                 echo "Preparing firmware ralink.img..."
                 mv "${_FW_SRC}"/rt* "${_FW_TMP_SRC}/"
                 _create_cpio "${_FW_TMP}" "${_FW_DEST}/ralink.img" &>${_NO_LOG} || exit 1
+                rm "${_FW_TMP_SRC:?}"/*
             fi
         fi
     fi
