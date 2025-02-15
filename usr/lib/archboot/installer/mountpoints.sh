@@ -91,13 +91,13 @@ _enter_mountpoint() {
     elif [[ -z "${_ROOT_DONE}" ]]; then
         _MP="/"
         _ROOT_DONE=1
-    elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
+    elif [[ -z "${_ESP_DONE}" ]]; then
         _dialog --no-cancel --title " EFI SYSTEM PARTITION (ESP) " --menu "" 8 50 2 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
         _MP=$(cat "${_ANSWER}")
         if [[ ${_MP} == "/efi" ]]; then
             _XBOOTLDR=1
         fi
-        _UEFISYSDEV_DONE=1
+        _ESP_DONE=1
     elif [[ -n "${_XBOOTLDR}" ]]; then
         _MP=/boot
         _XBOOTLDR=""
@@ -239,15 +239,15 @@ _mountpoints() {
         _ROOT_DONE=""
         _ROOT_BTRFS=""
         if [[ -n ${_UEFI_BOOT} ]];then
-            _UEFISYSDEV_DONE=""
+            _ESP_DONE=""
         else
-            _UEFISYSDEV_DONE=1
+            _ESP_DONE=1
         fi
         while [[ "${_DEV}" != "> DONE" ]]; do
             _MP_DONE=""
             while [[ -z "${_MP_DONE}" ]]; do
-                if ! echo "${_DEVS}" | rg -q /dev && [[ -z ${_UEFISYSDEV_DONE}  ]]; then
-                     _dialog --title " ERROR " --no-mouse --infobox "All devices already in use, please fix and start again." 3 70
+                if ! echo "${_DEVS}" | rg -q /dev && [[ -z "${_ESP_DONE}" ]]; then
+                     _dialog --title " ERROR " --no-mouse --infobox "All devices already in use, please fix devices and start again." 3 70
                      sleep 5
                      return 1
                 fi
@@ -256,7 +256,7 @@ _mountpoints() {
                     _dialog --title " Swap " --menu "" 14 55 8 "> NONE" "No Swap" "> FILE" "Swap File" ${_DEVS} 2>"${_ANSWER}" || return 1
                 elif [[ -z "${_ROOT_DONE}" ]]; then
                     _dialog --title " Root Partition " --no-cancel --menu "" 14 55 8 ${_DEVS} 2>"${_ANSWER}" || return 1
-                elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
+                elif [[ -z "${_ESP_DONE}" ]]; then
                     _dialog --title " EFI SYSTEM PARTITION (ESP) " --no-cancel --menu "" 14 55 8 ${_DEVS} 2>"${_ANSWER}" || return 1
                 elif [[ -n "${_XBOOTLDR}" ]]; then
                     _dialog --title " Extended Boot Loader Partition (XBOOTLDR) " --no-cancel --menu "" 14 55 8 ${_DEVS} 2>"${_ANSWER}" || return 1
@@ -288,7 +288,7 @@ _mountpoints() {
                                 _DOMKFS=1
                             fi
                         fi
-                        if [[ -z "${_UEFISYSDEV_DONE}" && -n "${_ROOT_DONE}" ]]; then
+                        if [[ -z "${_ESP_DONE}" && -n "${_ROOT_DONE}" ]]; then
                             # create vfat on ESP, if not already vfat format
                             if [[ ! "${_FSTYPE}" == "vfat" ]]; then
                                 _FSTYPE="vfat"
@@ -299,7 +299,7 @@ _mountpoints() {
                                 _SKIP_FILESYSTEM=1
                             fi
                         fi
-                        if [[ -n "${_UEFISYSDEV_DONE}" && -n "${_XBOOTLDR}" ]]; then
+                        if [[ -n "${_ESP_DONE}" && -n "${_XBOOTLDR}" ]]; then
                             # create vfat on XBOOTLDR, if not already vfat format
                             if [[ ! "${_FSTYPE}" == "vfat" ]]; then
                                 _FSTYPE="vfat"
@@ -316,7 +316,7 @@ _mountpoints() {
                             _SKIP_FILESYSTEM=1
                         fi
                         # allow reformat, if already vfat format
-                        if [[ -n "${_UEFISYSDEV_DONE}" && -n "${_ROOT_DONE}" && -z "${_XBOOTLDR}" ]]; then
+                        if [[ -n "${_ESP_DONE}" && -n "${_ROOT_DONE}" && -z "${_XBOOTLDR}" ]]; then
                             [[ "${_FSTYPE}" == "vfat" ]] && _FSTYPE=""
                         fi
                     else
@@ -344,7 +344,7 @@ _mountpoints() {
                             else
                                 _MP_DONE=1
                             fi
-                        elif [[ -z "${_UEFISYSDEV_DONE}" ]]; then
+                        elif [[ -z "${_ESP_DONE}" ]]; then
                             if ! [[ "${_FSTYPE}" == "vfat" ]]; then
                                 _dialog --title " ERROR " --no-mouse --infobox "EFI SYSTEM PARTITION has not a vfat filesystem." 3 60
                                 sleep 5
@@ -402,7 +402,7 @@ _mountpoints() {
                     # remove root btrfs on ESP selection menu, readd it on top aftwerwards
                     if [[ ! "${_FSTYPE}" == "btrfs" ]]; then
                         _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
-                        if [[ -n "${_UEFISYSDEV_DONE}" && -z "${_XBOOTLDR}" && -n ${_ROOT_BTRFS} ]]; then
+                        if [[ -n "${_ESP_DONE}" && -z "${_XBOOTLDR}" && -n ${_ROOT_BTRFS} ]]; then
                             _DEVS="${_ROOT_BTRFS} ${_DEVS}"
                             _ROOT_BTRFS=""
                         fi
