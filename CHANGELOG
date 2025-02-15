@@ -15,6 +15,7 @@ network:
 - improved suggestions for ipv4 static setup
 - improved error handling on missing netmask on ipv4 static setup
 setup:
+- fixed startup on running system
 - fixed btrfs subvolume creation on fresh devices
 - fixed blockdevice listing of /dev/mapper devices
 - check on available devices in mountpoints

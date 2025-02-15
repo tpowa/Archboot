@@ -193,7 +193,9 @@ _configure_system() {
 }
 
 _mainmenu() {
-    [[ -n "${_NEXTITEM}" ]] && _DEFAULT="--default-item ${_NEXTITEM}"
+    if [[ -n "${_NEXTITEM}" ]]; then
+        _DEFAULT="--default-item ${_NEXTITEM}"
+    fi
     #shellcheck disable=SC2086
     _dialog --no-cancel ${_DEFAULT} --title " Setup Menu " \
     --menu "" 11 45 7 \
