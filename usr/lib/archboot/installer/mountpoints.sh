@@ -310,7 +310,11 @@ _mountpoints() {
                                 _SKIP_FILESYSTEM=1
                             fi
                         fi
-                        # allow reformat. if already vfat format
+                        if rg ${_DEV} /tmp/.parts | rg -q btrfs; then
+                            _FSTYPE="btrfs"
+                            _SKIP_FILESYSTEM=1
+                        fi
+                        # allow reformat, if already vfat format
                         if [[ -n "${_UEFISYSDEV_DONE}" && -n "${_ROOT_DONE}" && -z "${_XBOOTLDR}" ]]; then
                             [[ "${_FSTYPE}" == "vfat" ]] && _FSTYPE=""
                         fi
