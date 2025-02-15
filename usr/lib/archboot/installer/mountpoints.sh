@@ -246,8 +246,8 @@ _mountpoints() {
         while [[ "${_DEV}" != "> DONE" ]]; do
             _MP_DONE=""
             while [[ -z "${_MP_DONE}" ]]; do
-                if ! echo "${_DEVS}" | rg -q /dev && ! echo "${_DEVS}" | rg -q '> DONE'; then
-                     _dialog --title " ERROR " --no-mouse --infobox "All devices already in use, please start again." 3 70
+                if ! echo "${_DEVS}" | rg -q /dev && [[ -z ${_UEFISYSDEV_DONE}  ]]; then
+                     _dialog --title " ERROR " --no-mouse --infobox "All devices already in use, please fix and start again." 3 70
                      sleep 5
                      return 1
                 fi
