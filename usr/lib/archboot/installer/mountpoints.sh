@@ -246,6 +246,7 @@ _mountpoints() {
         _SWAP_DONE=""
         _ROOT_DONE=""
         _ROOT_BTRFS=""
+        _XBOOTLDR=""
         if [[ -n ${_UEFI_BOOT} ]];then
             _ESP_DONE=""
         else
