@@ -16,8 +16,8 @@ network:
 - improved error handling on missing netmask on ipv4 static setup
 setup:
 - fixed btrfs subvolume creation on fresh devices
-- fixed block device listing of /dev/mapper devices
-- improved setting mountpoints on running out of devices
+- fixed blockdevice listing of /dev/mapper devices
+- check on available devices in mountpoints
 - fixed btrfs data raid level (was always set as single)
 - removed btrfs raid0 selection
 - added btrfs raid1c3 and raid1c4 selection support
