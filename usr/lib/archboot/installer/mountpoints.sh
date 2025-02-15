@@ -278,6 +278,7 @@ _mountpoints() {
                     ! [[ "${_DEV}" == "> NONE" || "${_DEV}" == "> FILE" ]] && _FSTYPE="$(${_LSBLK} FSTYPE "${_DEV}" 2>"${_NO_LOG}")"
                     if [[ -z "${_SWAP_DONE}" ]] || [[ "${_DEV}" == "> NONE" ]]; then
                         _SKIP_FILESYSTEM=1
+                        _SWAP_DONE=1
                     fi
                     # _CREATE_MOUNTPOINTS switch for create filesystem and only mounting filesystem
                     if [[  -n "${_CREATE_MOUNTPOINTS}" ]]; then
