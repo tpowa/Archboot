@@ -249,7 +249,7 @@ _cpio_fw() {
         _FW_TMP="${_BUILD_DIR}/fw"
         _FW_TMP_SRC="${_FW_TMP}/lib/firmware"
         if [[ -n ${_GENERATE_IMAGE} ]]; then
-            _FW_DEST="$(dirname "${_GENERATE_IMAGE}/firmware")"
+            _FW_DEST="$(dirname "${_GENERATE_IMAGE}")/firmware"
         else
             _FW_DEST="${_TARGET_DIR}/firmware"
         fi
@@ -278,7 +278,6 @@ _cpio_fw() {
                 mv "${_FW_SRC}"/iwl* "${_FW_TMP_SRC}/"
                 #if [[ -n ${_GENERATE_IMAGE} ]]; then
                     _create_cpio "${_FW_TMP}" "${_FW_DEST}/iwlwifi.img" &>${_NO_LOG} || exit 1
-                    rm "${_FW_TMP_SRC:?}"/*
                 #else
                 #fi
             fi
@@ -288,7 +287,6 @@ _cpio_fw() {
                 mv "${_FW_SRC}"/rt* "${_FW_TMP_SRC}/"
                 #if [[ -n ${_GENERATE_IMAGE} ]]; then
                     _create_cpio "${_FW_TMP}" "${_FW_DEST}/ralink.img" &>${_NO_LOG} || exit 1
-                    rm "${_FW_TMP_SRC:?}"/*
                 #else
                 #fi
             fi
