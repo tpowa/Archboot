@@ -14,7 +14,7 @@ ISO images:
 network:
 - improved suggestions for ipv4 static setup
 - improved error handling on missing netmask on ipv4 static setup
-setu
+setup:
 - fixed btrfs subvolume creation on fresh devices
 - fixed block device listing of /dev/mapper devices
 - improved setting mountpoints on running out of devices
