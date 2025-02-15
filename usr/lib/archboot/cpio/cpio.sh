@@ -261,25 +261,36 @@ _cpio_fw() {
                 echo "${i}" | rg -q mediatek && mv "${_FW_SRC}"/{mt76*,vpu_*} "${_FW_TMP_SRC}/"
                 echo "${i}" | rg -q ath9k_htc && mv "${_FW_SRC}"/htc_* "${_FW_TMP_SRC}/"
                 echo "${i}" | rg -q ath11k && mv "${_FW_SRC}"/wil6210* "${_FW_TMP_SRC}/"
-                echo "Preparing firmware ${i}.img..."
-                mv "${_FW_SRC}/${i}" "${_FW_TMP_SRC}/"
-                _create_cpio "${_FW_TMP}" "${_FW_DEST}/${i}.img" &>${_NO_LOG} || exit 1
-                # remove directory
-                rm -r "${_FW_TMP_SRC:?}"/*
+                #if [[ -n ${_GENERATE_IMAGE} ]]; then
+                    echo "Preparing firmware ${i}.img..."
+                    mv "${_FW_SRC}/${i}" "${_FW_TMP_SRC}/"
+                    _create_cpio "${_FW_TMP}" "${_FW_DEST}/${i}.img" &>${_NO_LOG} || exit 1
+                    # remove directory
+                    rm -r "${_FW_TMP_SRC:?}"/*
+                #else
+                #    echo "Saving firmware files to ${i}..."
+                #    mv
+                #fi
             done
             # intel wireless
             if ls "${_FW_SRC}"/iwl* &>${_NO_LOG}; then
                 echo "Preparing firmware iwlwifi.img..."
                 mv "${_FW_SRC}"/iwl* "${_FW_TMP_SRC}/"
-                _create_cpio "${_FW_TMP}" "${_FW_DEST}/iwlwifi.img" &>${_NO_LOG} || exit 1
-                rm "${_FW_TMP_SRC:?}"/*
+                #if [[ -n ${_GENERATE_IMAGE} ]]; then
+                    _create_cpio "${_FW_TMP}" "${_FW_DEST}/iwlwifi.img" &>${_NO_LOG} || exit 1
+                    rm "${_FW_TMP_SRC:?}"/*
+                #else
+                #fi
             fi
             # ralink wireless
             if ls "${_FW_SRC}"/rt* &>${_NO_LOG}; then
                 echo "Preparing firmware ralink.img..."
                 mv "${_FW_SRC}"/rt* "${_FW_TMP_SRC}/"
-                _create_cpio "${_FW_TMP}" "${_FW_DEST}/ralink.img" &>${_NO_LOG} || exit 1
-                rm "${_FW_TMP_SRC:?}"/*
+                #if [[ -n ${_GENERATE_IMAGE} ]]; then
+                    _create_cpio "${_FW_TMP}" "${_FW_DEST}/ralink.img" &>${_NO_LOG} || exit 1
+                    rm "${_FW_TMP_SRC:?}"/*
+                #else
+                #fi
             fi
         fi
     fi
