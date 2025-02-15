@@ -310,7 +310,8 @@ _mountpoints() {
                                 _SKIP_FILESYSTEM=1
                             fi
                         fi
-                        if rg ${_DEV} /tmp/.parts | rg -q btrfs; then
+                        # check on btrfs to allow subvolume creation
+                        if rg "${_DEV}" /tmp/.parts | rg -q btrfs; then
                             _FSTYPE="btrfs"
                             _SKIP_FILESYSTEM=1
                         fi
