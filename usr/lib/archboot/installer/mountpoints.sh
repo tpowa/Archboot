@@ -137,6 +137,14 @@ _check_mkfs_values() {
     [[ -z "${_LABEL_NAME}" ]] && _LABEL_NAME="NONE"
 }
 
+_check_devices() {
+    if ! echo "${_DEVS}" | rg -q /dev; then
+        _dialog --title " ERROR " --no-mouse --infobox "All devices already in use, please fix devices and start again." 3 70
+        sleep 5
+        return 1
+    fi
+}
+
 _run_mkfs() {
     while read -r line; do
         # basic parameters
@@ -246,19 +254,18 @@ _mountpoints() {
         while [[ "${_DEV}" != "> DONE" ]]; do
             _MP_DONE=""
             while [[ -z "${_MP_DONE}" ]]; do
-                if ! echo "${_DEVS}" | rg -q /dev && [[ -z "${_ESP_DONE}" ]]; then
-                     _dialog --title " ERROR " --no-mouse --infobox "All devices already in use, please fix devices and start again." 3 70
-                     sleep 5
-                     return 1
-                fi
                 #shellcheck disable=SC2086
                 if [[ -z "${_SWAP_DONE}" ]]; then
+                    _check_devices || return 1
                     _dialog --title " Swap " --menu "" 14 55 8 "> NONE" "No Swap" "> FILE" "Swap File" ${_DEVS} 2>"${_ANSWER}" || return 1
                 elif [[ -z "${_ROOT_DONE}" ]]; then
+                    _check_devices || return 1
                     _dialog --title " Root Partition " --no-cancel --menu "" 14 55 8 ${_DEVS} 2>"${_ANSWER}" || return 1
                 elif [[ -z "${_ESP_DONE}" ]]; then
+                    _check_devices || return 1
                     _dialog --title " EFI SYSTEM PARTITION (ESP) " --no-cancel --menu "" 14 55 8 ${_DEVS} 2>"${_ANSWER}" || return 1
                 elif [[ -n "${_XBOOTLDR}" ]]; then
+                    _check_devices || return 1
                     _dialog --title " Extended Boot Loader Partition (XBOOTLDR) " --no-cancel --menu "" 14 55 8 ${_DEVS} 2>"${_ANSWER}" || return 1
                 else
                     _dialog --title " Additional Partitions " --no-cancel --menu "" 14 55 8 ${_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
