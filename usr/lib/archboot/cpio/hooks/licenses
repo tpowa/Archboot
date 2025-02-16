@@ -41,9 +41,7 @@ _LICENSES=(
   krb5/LICENSE
   less/LICENSE
   libarchive/COPYING
-  libbpf/LICENSE
-  libbpf/LICENSE.BSD-2-Clause
-  libbpf/LICENSE.LGPL-2.1
+  libbpf/LICENSE{,.BSD-2-Clause,.LGPL-2.1}
   libbsd/LICENSE
   libcap/License
   libcss/COPYING

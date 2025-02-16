@@ -36,6 +36,7 @@ done
 # iana-etc only /etc files
 # licenses mandatory removed
 # linux-firmware-whence only license files
+# linux-firmware-marvell is available on marvell systems
 # pacman-mirrorlist only /etc file
 # pambase only /etc files
-rg -v "ca-certificates|dbus-units|dbus-broker-units|gnulib-l10n|iana-etc|licenses|linux-firmware-whence|pacman-mirrorlist|pambase" not-installed.orig.log >not-installed.log
+rg -v "ca-certificates|dbus-units|dbus-broker-units|gnulib-l10n|iana-etc|licenses|linux-firmware-whence|linux-firmware-marvell||pacman-mirrorlist|pambase" not-installed.orig.log >not-installed.log
