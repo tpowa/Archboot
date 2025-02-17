@@ -222,7 +222,7 @@ while true; do
     setfont -C /dev/console ter-v${_SIZE}n && break
     sleep 0.1
 done
-_initrd_stage | _dialog --title " Initializing System " --gauge "\n${_KEEP}\n\nSearching rootfs on blockdevices..." 9 43 0
+_initrd_stage | _dialog --title " Initializing System " --gauge "\n${_KEEP}\n\nSearching rootfs on blockdevices..." 9 60 0
 _clear
 _msg "The boot medium can be safely removed now."
 echo ""
