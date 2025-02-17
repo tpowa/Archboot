@@ -27,8 +27,7 @@ _create_initrd_dir() {
 _create_fw_cpio() {
     [[ -d "${_W_DIR}/firmware" ]] || mkdir -p "${_W_DIR}/firmware"
     for i in "${_W_DIR}"/tmp/firmware/*; do
-        cd "${_W_DIR}"/tmp/firmware/${i}
-        _create_cpio "./" "../../firmware/$(basename ${i}).img"
+        _create_cpio "${_W_DIR}/tmp/firmware/${i}" "../../firmware/$(basename ${i}).img"
     done
 }
 
