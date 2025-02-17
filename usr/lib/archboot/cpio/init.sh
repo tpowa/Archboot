@@ -44,71 +44,6 @@ _progress_wait() {
         sleep "0.05"
     done
 }
-_graphic_fw() {
-    if lspci -mm | rg -q "${_VGA}"; then
-        if lspci -mm | rg "${_VGA}" | rg -q 'AMD'; then
-            for i in "${_FW}"/amd*; do
-                3cpio -x --force "${_FW}"/"${i}" &>"${_NO_LOG}"
-            done
-        fi
-        if lspci -mm | rg "${_VGA}" | rg -q 'Intel'; then
-            if lspci -mm | rg "${_VGA}" | rg 'Intel' | rg -q 'Xe'; then
-                3cpio -x --force "${_FW}/xe.img" &>"${_NO_LOG}"
-            else
-                3cpio -x --force "${_FW}/i915.img" &>"${_NO_LOG}"
-            fi
-        fi
-        if lspci -mm | rg "${_VGA}" | rg -q 'NVIDIA'; then
-            3cpio -x --force "${_FW}"/nvidia.img &>"${_NO_LOG}"
-        fi
-        if lspci -mm | rg "${_VGA}" | rg -q 'RADEON|Radeon'; then
-            3cpio -x --force "${_FW}"/radeon.img &>"${_NO_LOG}"
-        fi
-    fi
-}
-_ethernet_fw() {
-    if lspci -mm | rg -q "${_ETH}"; then
-        if lspci -mm | rg "${_ETH}" | rg -q 'Broadcom'; then
-            3cpio -x --force "${_FW}"/bnx2.img &>"${_NO_LOG}"
-            3cpio -x --force "${_FW}"/tigon.img &>"${_NO_LOG}"
-        fi
-        if lspci -mm | rg "${_ETH}" | rg -q 'Realtek'; then
-             3cpio -x --force "${_FW}"/rtl_nic.img &>"${_NO_LOG}"
-        fi
-    fi
-}
-_wireless_fw() {
-    if lspci -mm | rg -q "${_WIFI}"; then
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Atheros'; then
-            for i in "${_FW}"/ath*; do
-                3cpio -x --force "${_FW}"/"${i}" &>"${_NO_LOG}"
-            done
-        fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Intel'; then
-            3cpio -x --force "${_FW}"/iwlwifi.img &>"${_NO_LOG}"
-        fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Marvell'; then
-            for i in libertas mrvl "${_FW}"/mwl*; do
-                3cpio -x --force "${_FW}"/"${i}" &>"${_NO_LOG}"
-            done
-        fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Mediatek'; then
-            3cpio -x --force "${_FW}/mediatek.img" &>"${_NO_LOG}"
-        fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Ralink'; then
-            3cpio -x --force "${_FW}/ralink.img" &>"${_NO_LOG}"
-        fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Realtek'; then
-            3cpio -x --force "${_FW}/rtlwifi.img" &>"${_NO_LOG}"
-            for i in "${_FW}"/rtw*; do
-                3cpio -x --force "${_FW}"/"${i}" &>"${_NO_LOG}"
-            done
-        fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Texas'; then
-            3cpio -x --force "${_FW}"/ti-connectivity.img &>"${_NO_LOG}"
-        fi
-    fi
-}
 _task() {
     if [[ "${1}" == mount ]]; then
         _COUNT=0
@@ -158,12 +93,10 @@ _task() {
         rm -r sysroot
         rm init
     fi
-    if [[ "${1}" == firmware ]]; then
+    if [[ "${1}" == fw_run ]]; then
         #shellcheck disable=SC2164
         cd /sysroot
-        _graphic_fw
-        _ethernet_fw
-        _wireless_fw
+        3cpio -x --force "${2}" &>"${_NO_LOG}"
     fi
     if [[ "${1}" == unmount ]]; then
         if mountpoint /mnt/ventoy &>"${_NO_LOG}"; then
@@ -194,8 +127,73 @@ _initrd_stage() {
     _task system &
     _progress_wait "0" "99" "\n${_KEEP}\n\nCopying rootfs to /sysroot..."
     : >/.archboot
-    _task firmware &
-    _progress_wait "0" "99" "\n${_KEEP}\n\nCopying firmware to /sysroot..."
+    # Graphic firmware
+    if lspci -mm | rg -q "${_VGA}"; then
+        if lspci -mm | rg "${_VGA}" | rg -q 'AMD'; then
+            for i in "${_FW}"/amd*; do
+                _FW_RUN+=("${_FW}/${i}")
+            done
+        fi
+        if lspci -mm | rg "${_VGA}" | rg -q 'Intel'; then
+            if lspci -mm | rg "${_VGA}" | rg 'Intel' | rg -q 'Xe'; then
+                _FW_RUN+=("${_FW}/xe.img")
+            else
+                _FW_RUN+=("${_FW}/i915.img")
+            fi
+        fi
+        if lspci -mm | rg "${_VGA}" | rg -q 'NVIDIA'; then
+            _FW_RUN+=("${_FW}/nvidia.img")
+        fi
+        if lspci -mm | rg "${_VGA}" | rg -q 'RADEON|Radeon'; then
+            _FW_RUN+=("${_FW}/radeon.img")
+        fi
+    fi
+    # Ethernet firmware
+    if lspci -mm | rg -q "${_ETH}"; then
+        if lspci -mm | rg "${_ETH}" | rg -q 'Broadcom'; then
+            _FW_RUN+=("${_FW}/bnx2.img" "${_FW}/tigon.img")
+        fi
+        if lspci -mm | rg "${_ETH}" | rg -q 'Realtek'; then
+             _FW_RUN+=("${_FW}/rtl_nic.img")
+        fi
+    fi
+    # Wifi firmware
+    if lspci -mm | rg -q "${_WIFI}"; then
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Atheros'; then
+            for i in "${_FW}"/ath*; do
+                _FW_RUN+=("${i}")
+            done
+        fi
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Intel'; then
+            _FW_RUN+=("${_FW}/iwlwifi.img")
+        fi
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Marvell'; then
+            for i in "${_FW}"/libertas "${_FW}"/mrvl "${_FW}"/mwl*; do
+                _FW_RUN+=("${i}")
+            done
+        fi
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Mediatek'; then
+            _FW_RUN+=("${_FW}/mediatek.img")
+        fi
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Ralink'; then
+            _FW_RUN+=("${_FW}/ralink.img")
+        fi
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Realtek'; then
+            _FW_RUN+=("${_FW}/rtlwifi.img")
+            for i in "${_FW}"/rtw*; do
+                _FW_RUN+=("${i}")
+            done
+        fi
+        if lspci -mm | rg "${_WIFI}" | rg -q 'Texas'; then
+            _FW_RUN+=("${_FW}/ti-connectivity.img")
+        fi
+    fi
+    #shellcheck disable=SC2068
+    for i in ${_FW_RUN[@]}; do
+        : >/.archboot
+        _task fw_run "${i}" &
+        _progress_wait "0" "99" "\n${_KEEP}\n\nCopying firmware $(basename "${i}") to /sysroot..."
+    done
     : >/.archboot
     _task unmount &
     _progress_wait "0" "99" "\n${_KEEP}\n\nUnmounting rootfs..."
