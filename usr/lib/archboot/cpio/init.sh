@@ -192,7 +192,7 @@ _initrd_stage() {
     for i in ${_FW_RUN[@]}; do
         : >/.archboot
         _task fw_run "${i}" &
-        _progress_wait "0" "99" "\n${_KEEP}\n\nCopying firmware $(basename "${i}") to /sysroot..."
+        _progress_wait "0" "99" "\n${_KEEP}\n\nCopying $(basename -s '.img' "${i}") firmware to /sysroot..."
     done
     : >/.archboot
     _task unmount &
