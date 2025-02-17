@@ -271,7 +271,7 @@ _cpio_fw() {
                     rm -r "${_FW_TMP_SRC:?}"/*
                 elif [[ -n "${_TARGET_DIR}" ]]; then
                     echo "Saving firmware files to ${_FW_TARGET_DIR}/${i}..."
-                    [[ -d "${_FW_DIR}/${i}/lib/firmware" ]] || mkdir -p "${_FW_DIR}/${i}/lib/firmware"
+                    [[ -d "${_FW_TARGET_DIR}/${i}/lib/firmware" ]] || mkdir -p "${_FW_TARGET_DIR}/${i}/lib/firmware"
                     # those from firmware basedir belong to corresponding chipsets
                     echo "${i}" | rg -q mediatek && mv "${_FW_SRC}"/{mt76*,vpu_*} "${_FW_TARGET_DIR}/${i}/lib/firmware/"
                     echo "${i}" | rg -q ath9k_htc && mv "${_FW_SRC}"/htc_* "${_FW_TARGET_DIR}/${i}/lib/firmware/"
@@ -287,7 +287,7 @@ _cpio_fw() {
                     _create_cpio "${_FW_TMP}" "${_FW_DEST}/iwlwifi.img" &>${_NO_LOG} || exit 1
                 elif [[ -n "${_TARGET_DIR}" ]]; then
                     echo "Saving firmware files to ${_FW_TARGET_DIR}/iwlwifi..."
-                    [[ -d "${_FW_DIR}/iwlwifi/lib/firmware" ]] || mkdir -p "${_FW_DIR}/iwlwifi/lib/firmware"
+                    [[ -d "${_FW_TARGET_DIR}/iwlwifi/lib/firmware" ]] || mkdir -p "${_FW_TARGET_DIR}/iwlwifi/lib/firmware"
                     mv "${_FW_SRC}"/iwl* "${_FW_TARGET_DIR}/iwlwifi/lib/firmware/"
                 fi
             fi
@@ -299,7 +299,7 @@ _cpio_fw() {
                     _create_cpio "${_FW_TMP}" "${_FW_DEST}/ralink.img" &>${_NO_LOG} || exit 1
                 elif [[ -n "${_TARGET_DIR}" ]]; then
                     echo "Saving firmware files to ${_FW_TARGET_DIR}/ralink..."
-                    [[ -d "${_FW_DIR}/ralink/lib/firmware" ]] || mkdir -p "${_FW_DIR}/ralink/lib/firmware"
+                    [[ -d "${_FW_TARGET_DIR}/ralink/lib/firmware" ]] || mkdir -p "${_FW_TARGET_DIR}/ralink/lib/firmware"
                     mv "${_FW_SRC}"/rt* "${_FW_TARGET_DIR}/ralink/lib/firmware"
                 fi
             fi
