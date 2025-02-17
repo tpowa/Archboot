@@ -300,7 +300,7 @@ _cpio_fw() {
                 elif [[ -n "${_TARGET_DIR}" ]]; then
                     echo "Saving firmware files to ${_FW_TARGET_DIR}/ralink..."
                     [[ -d "${_FW_TARGET_DIR}/ralink/lib/firmware" ]] || mkdir -p "${_FW_TARGET_DIR}/ralink/lib/firmware"
-                    mv "${_FW_SRC}"/rt* "${_FW_TARGET_DIR}/ralink/lib/firmware"
+                    mv "${_FW_SRC}"/rt* "${_FW_TARGET_DIR}/ralink/lib/firmware/"
                 fi
             fi
         fi
