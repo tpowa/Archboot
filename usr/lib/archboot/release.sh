@@ -24,6 +24,14 @@ _create_initrd_dir() {
         -c /etc/archboot/${1} -firmware -d /tmp/initrd" || exit 1
 }
 
+_create_fw_cpio() {
+    [[ -d "${_W_DIR}/firmware" ]] || mkdir -p "${_W_DIR}/firmware"
+    for i in "${_W_DIR}"/tmp/firmware/*; do
+        cd "${_W_DIR}"/tmp/firmware/${i}
+        _create_cpio "./" "../../firmware/$(basename ${i}).img"
+    done
+}
+
 _create_iso() {
     mkdir -p "${1}"
     cd "${1}" || exit 1
@@ -45,18 +53,20 @@ _create_iso() {
             # local ramdisk
             echo "Generating local initramfs..."
             _create_initrd_dir "${_CONFIG_LOCAL}"
-            mv "${_W_DIR}/tmp/initrd/firmware" "${_W_DIR}/firmware-local"
+            _create_fw_cpio
+            mv "${_W_DIR}/firmware" "${_W_DIR}/firmware-local"
             _create_cpio "${_W_DIR}/tmp/initrd" "../../initrd-local-${_ARCH}.img"
             # latest ramdisk
             echo "Generating latest initramfs..."
             _create_initrd_dir "${_CONFIG_LATEST}"
-            mv "${_W_DIR}/tmp/initrd/firmware" "${_W_DIR}/firmware-latest"
+            _create_fw_cpio
+            mv "${_W_DIR}/firmware" "${_W_DIR}/firmware-latest"
             _create_cpio "${_W_DIR}/tmp/initrd" "../../initrd-latest-${_ARCH}.img"
         fi
         # normal ramdisk
         echo "Generating normal initramfs..."
         _create_initrd_dir "${_ARCH}.conf"
-        mv "${_W_DIR}/tmp/initrd/firmware" "${_W_DIR}/"
+        _create_fw_cpio
         _create_cpio "${_W_DIR}/tmp/initrd" "../../initrd-${_ARCH}.img"
     fi
     # riscv64 does not support kexec at the moment
