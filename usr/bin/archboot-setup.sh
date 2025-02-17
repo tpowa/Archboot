@@ -29,9 +29,13 @@ if [[ -e /tmp/.setup-running ]]; then
     _dialog --msgbox "Attention:\n\nSetup already runs on a different console!\nPlease remove /tmp/.setup-running first to launch setup!" 8 60
     exit 1
 fi
+_set_title
+if ! [[ "${UID}" == 1 ]]; then
+    _dialog --msgbox "Error:\n\nSetup needs to run as root user." 7 40
+    exit 1
+fi
 : >/tmp/.setup-running
 : >/tmp/.setup
-_set_title
 _set_uefi_parameters
 while true; do
     _mainmenu
