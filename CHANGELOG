@@ -10,19 +10,19 @@ ISO images:
 - autodetect needed firmware files from lspci output
 - On normal image reduced needed RAM to boot from 900M for VMs down to 600M!
 - On latest image reduced needed RAM to boot from 2300M down to 2100M!
-- maximized boot speed !!!
+- maximized boot speed!
 network:
 - improved suggestions for ipv4 static setup
 - improved error handling on missing netmask on ipv4 static setup
 setup:
 - fixed startup on running system
-- fixed btrfs subvolume creation on fresh devices
 - fixed blockdevice listing of /dev/mapper devices
 - check on available devices in mountpoints
+- fixed btrfs subvolume creation on fresh devices
 - fixed btrfs data raid level (was always set as single)
-- removed btrfs raid0 selection
 - added btrfs raid1c3 and raid1c4 selection support
 - allow reconfiguring of btrfs raid devices
+- removed btrfs raid0 selection
 ---
 Highlights: 2025.01
 Environment:
