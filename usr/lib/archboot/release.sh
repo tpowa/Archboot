@@ -27,7 +27,7 @@ _create_initrd_dir() {
 _create_fw_cpio() {
     [[ -d "${_W_DIR}/firmware" ]] || mkdir -p "${_W_DIR}/firmware"
     for i in "${_W_DIR}"/tmp/archboot-firmware/*; do
-        _create_cpio "${i}" "../../../firmware/$(basename ${i}).img"
+        _create_cpio "${i}" "../../../firmware/$(basename "${i}").img"
     done
 }
 
@@ -144,7 +144,7 @@ _create_iso() {
             if [[ "${initrd}" == "${_INITRD}" ]]; then
                 _UKI="/boot/${_NAME}-${_ARCH}"
                 for i in "${_W_DIR}"/boot/firmware/*; do
-                    _FW_IMG+=(--initrd=/boot/firmware/$(basename "${i}"))
+                    _FW_IMG+=(--initrd=/boot/firmware/"$(basename "${i}")")
                 done
             fi
             [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="/boot/${_NAME}-latest-${_ARCH}"
