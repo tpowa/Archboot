@@ -131,7 +131,7 @@ _initrd_stage() {
     if lspci -mm | rg -q "${_VGA}"; then
         if lspci -mm | rg "${_VGA}" | rg -q 'AMD'; then
             for i in "${_FW}"/amd*; do
-                _FW_RUN+=("${_FW}/${i}")
+                _FW_RUN+=("${i}")
             done
         fi
         if lspci -mm | rg "${_VGA}" | rg -q 'Intel'; then
