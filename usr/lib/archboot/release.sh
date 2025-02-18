@@ -27,7 +27,7 @@ _create_initrd_dir() {
 _create_fw_cpio() {
     [[ -d "${_W_DIR}/firmware" ]] || mkdir -p "${_W_DIR}/firmware"
     for i in "${_W_DIR}"/tmp/archboot-firmware/*; do
-        if [[ -e "${_W_DIR}/firmware-local/${i}.img" ]]; then
+        if [[ -e "${i}.img" ]]; then
             echo "Using existing $(basename ${i}).img firmware..."
             cp "${_W_DIR}/firmware-local/${i}.img" "${_W_DIR}/firmware/"
         else
