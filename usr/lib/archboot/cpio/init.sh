@@ -128,15 +128,15 @@ _initrd_stage() {
     _task system &
     _progress_wait "0" "99" "\n${_KEEP}\n\nCopying rootfs to /sysroot..."
     : >/.archboot
-    # Graphic firmware
     lspci -mm >"${_PCI}"
+    # Graphic firmware
     if rg -q "${_VGA}" "${_PCI}"; then
-        if rg "${_VGA}" | rg -q 'AMD'; then
+        if rg "${_VGA}" "${_PCI}" | rg -q 'AMD'; then
             for i in "${_FW}"/amd*; do
                 _FW_RUN+=("${i}")
             done
         fi
-        if rg "${_VGA}" | rg -q 'Intel'; then
+        if rg "${_VGA}" "${_PCI}" | rg -q 'Intel'; then
             if rg "${_VGA}" "${_PCI}" | rg 'Intel' | rg -q 'Xe'; then
                 _FW_RUN+=("${_FW}/xe.img")
             else
