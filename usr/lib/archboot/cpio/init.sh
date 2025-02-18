@@ -227,3 +227,5 @@ _clear
 _msg "The boot medium can be safely removed now."
 echo ""
 _msg "Launching $(systemctl --version | head -n1)..."
+# debug option for early userspace
+rg -q 'archboot-early-debug' /proc/cmdline && mv /sysroot /sysroot.debug
