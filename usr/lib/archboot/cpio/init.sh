@@ -229,5 +229,5 @@ echo ""
 _msg "Launching $(systemctl --version | head -n1)..."
 # debug option for early userspace
 if rg -q 'archboot-early-debug' /proc/cmdline; then
-    mv /sysroot /sysroot.debug
+    umount /sysroot
 fi
