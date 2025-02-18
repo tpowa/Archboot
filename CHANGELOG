@@ -1,5 +1,6 @@
 On the road to 2025.02:
 - kernel 6.13.x
+Environment:
 - cleaned up firmware
 - cleaned up network modules
 - cleaned up sata modules
@@ -7,10 +8,14 @@ On the road to 2025.02:
 - removed broadcom-wl module
 ISO images:
 - splitted firmware into separate initramfs files
-- autodetect needed firmware files from lspci output
-- On normal image reduced needed RAM to boot from 900M for VMs down to 600M!
-- On latest image reduced needed RAM to boot from 2300M down to 2100M!
+- On normal image reduced needed RAM by 30%,
+  to boot from 900M for VMs down to 600M!
+- On latest image reduced needed RAM by 10% 
+  to boot from 2300M down to 2100M!
 - maximized boot speed!
+init.sh:
+- added commandline early userspace debug parameter: archboot-early-debug
+- autodetect needed firmware files from lspci output
 network:
 - improved suggestions for ipv4 static setup
 - improved error handling on missing netmask on ipv4 static setup
