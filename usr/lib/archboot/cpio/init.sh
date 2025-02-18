@@ -1,14 +1,15 @@
 #!/usr/bin/bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
-_KVER="$(uname -r)"
 _ARCH="$(uname -m)"
+_KVER="$(uname -r)"
 _TITLE="archboot.com | ${_ARCH} | ${_KVER} | Basic Setup | Early Userspace"
 _KEEP="Please keep the boot medium inserted..."
 _NO_LOG=/dev/null
 _FW=/mnt/efi/boot/firmware
-_VGA="VGA compatible controller"
+_PCI=/tmp/lspci.txt
 _ETH="Ethernet controller"
+_VGA="VGA compatible controller"
 _WIFI="Network controller"
 _dialog() {
     dialog --backtitle "${_TITLE}" "$@"
@@ -128,63 +129,64 @@ _initrd_stage() {
     _progress_wait "0" "99" "\n${_KEEP}\n\nCopying rootfs to /sysroot..."
     : >/.archboot
     # Graphic firmware
-    if lspci -mm | rg -q "${_VGA}"; then
-        if lspci -mm | rg "${_VGA}" | rg -q 'AMD'; then
+    lspci -mm >"${_PCI}"
+    if rg -q "${_VGA}" "${_PCI}"; then
+        if rg "${_VGA}" | rg -q 'AMD'; then
             for i in "${_FW}"/amd*; do
                 _FW_RUN+=("${i}")
             done
         fi
-        if lspci -mm | rg "${_VGA}" | rg -q 'Intel'; then
-            if lspci -mm | rg "${_VGA}" | rg 'Intel' | rg -q 'Xe'; then
+        if rg "${_VGA}" | rg -q 'Intel'; then
+            if rg "${_VGA}" "${_PCI}" | rg 'Intel' | rg -q 'Xe'; then
                 _FW_RUN+=("${_FW}/xe.img")
             else
                 _FW_RUN+=("${_FW}/i915.img")
             fi
         fi
-        if lspci -mm | rg "${_VGA}" | rg -q 'NVIDIA'; then
+        if rg "${_VGA}" "${_PCI}" | rg -q 'NVIDIA'; then
             _FW_RUN+=("${_FW}/nvidia.img")
         fi
-        if lspci -mm | rg "${_VGA}" | rg -q 'RADEON|Radeon'; then
+        if rg "${_VGA}" "${_PCI}" | rg -q 'RADEON|Radeon'; then
             _FW_RUN+=("${_FW}/radeon.img")
         fi
     fi
     # Ethernet firmware
-    if lspci -mm | rg -q "${_ETH}"; then
-        if lspci -mm | rg "${_ETH}" | rg -q 'Broadcom'; then
+    if rg -q "${_ETH}" "${_PCI}"; then
+        if rg "${_ETH}" "${_PCI}" | rg -q 'Broadcom'; then
             _FW_RUN+=("${_FW}/bnx2.img" "${_FW}/tigon.img")
         fi
-        if lspci -mm | rg "${_ETH}" | rg -q 'Realtek'; then
+        if rg "${_ETH}" "${_PCI}" | rg -q 'Realtek'; then
              _FW_RUN+=("${_FW}/rtl_nic.img")
         fi
     fi
     # Wifi firmware
-    if lspci -mm | rg -q "${_WIFI}"; then
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Atheros'; then
+    if rg -q "${_WIFI}" "${_PCI}"; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Atheros'; then
             for i in "${_FW}"/ath*; do
                 _FW_RUN+=("${i}")
             done
         fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Intel'; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Intel'; then
             _FW_RUN+=("${_FW}/iwlwifi.img")
         fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Marvell'; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Marvell'; then
             for i in "${_FW}"/libertas "${_FW}"/mrvl "${_FW}"/mwl*; do
                 _FW_RUN+=("${i}")
             done
         fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Mediatek'; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Mediatek'; then
             _FW_RUN+=("${_FW}/mediatek.img")
         fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Ralink'; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Ralink'; then
             _FW_RUN+=("${_FW}/ralink.img")
         fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Realtek'; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Realtek'; then
             _FW_RUN+=("${_FW}/rtlwifi.img")
             for i in "${_FW}"/rtw*; do
                 _FW_RUN+=("${i}")
             done
         fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Texas'; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Texas'; then
             _FW_RUN+=("${_FW}/ti-connectivity.img")
         fi
     fi
