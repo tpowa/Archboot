@@ -2,9 +2,7 @@ On the road to 2025.02:
 - kernel 6.13.x
 Environment:
 - cleaned up firmware
-- cleaned up network modules
-- cleaned up sata modules
-- cleaned up wireless modules
+- cleaned up network, sata and wireless modules
 - removed broadcom-wl module
 ISO images:
 - splitted firmware into separate initramfs files
