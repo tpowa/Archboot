@@ -247,17 +247,17 @@ _cpio_fw() {
     if [[ -n "${_FW_CPIO}" ]]; then
         _FW=lib/firmware
         _FW_SRC="${_ROOTFS}/${_FW}"
-        if [[ -n "${_GENERATE_IMAGE}" ]]; then
-            _FW_TMP="${_BUILD_DIR}/fw"
-            _FW_TMP_SRC="${_FW_TMP}/${_FW}"
-            _FW_DEST="$(dirname "${_GENERATE_IMAGE}")/firmware"
-            [[ -d "${_FW_DEST}" ]] || mkdir -p "${_FW_DEST}"
-            [[ -d "${_FW_TMP_SRC}" ]] || mkdir -p "${_FW_TMP_SRC}"
-        elif [[ -n "${_TARGET_DIR}" ]]; then
-            _FW_TARGET_DIR="/tmp/archboot-firmware"
-            [[ -d "${_FW_TMP}" ]] && rm -r "${_FW_TMP}"
-        fi
         if [[ -d "${_FW_SRC}" ]]; then
+            if [[ -n "${_GENERATE_IMAGE}" ]]; then
+                _FW_TMP="${_BUILD_DIR}/fw"
+                _FW_TMP_SRC="${_FW_TMP}/${_FW}"
+                _FW_DEST="$(dirname "${_GENERATE_IMAGE}")/firmware"
+                [[ -d "${_FW_DEST}" ]] || mkdir -p "${_FW_DEST}"
+                [[ -d "${_FW_TMP_SRC}" ]] || mkdir -p "${_FW_TMP_SRC}"
+            elif [[ -n "${_TARGET_DIR}" ]]; then
+                _FW_TARGET_DIR="/tmp/archboot-firmware"
+                [[ -d "${_FW_TMP}" ]] && rm -r "${_FW_TMP}"
+            fi
             for i in $(fd --type d --base-directory "${_FW_SRC}" --path-separator '' -d 1); do
                 if [[ -n "${_GENERATE_IMAGE}" ]]; then
                     # those from firmware basedir belong to corresponding chipsets
