@@ -14,7 +14,7 @@ _check_gpt() {
     fi
     if [[ -n "${_GUID_DETECTED}" ]]; then
         if [[ -n "${_CHECK_BIOS_BOOT_GRUB}" ]]; then
-            if ! ${_LSBLK} PARTTYPE "${_DISK}" | rg -q '21686148-6449-6E6F-744E-656564454649'; then
+            if ! ${_LSBLK} PARTTYPE "${_DISK}" | rg -q '21686148-6449-6e6f-744e-656564454649'; then
                 _dialog --msgbox "Setup detected no BIOS BOOT PARTITION in ${_DISK}. Please create a >=1M BIOS BOOT PARTITION for grub BIOS GPT support." 0 0
                 _RUN_CFDISK=1
             fi
