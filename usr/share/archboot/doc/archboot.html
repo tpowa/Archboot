@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="https://archboot.com/gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2025 Fundraise: 0% <progress max="100" value="0">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2025 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 19.02.2025 16:28</strong></p>
+<strong>Last update: 19.02.2025 22:32</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -41,7 +41,8 @@
 <li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">3.10</span> Tools For Backup And Copying Of An Existing System</a></li>
 <li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">3.11</span> Restoring An USB Device To FAT32 State</a></li>
 <li><a href="#clean-blockdevice" id="toc-clean-blockdevice"><span class="toc-section-number">3.12</span> Clean Blockdevice</a></li>
-<li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.13</span> System Configuration On Installed System</a></li>
+<li><a href="#debug-early-userspace" id="toc-debug-early-userspace"><span class="toc-section-number">3.13</span> Debug Early Userspace</a></li>
+<li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.14</span> System Configuration On Installed System</a></li>
 </ul></li>
 <li><strong><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><span class="toc-section-number">4.</span> FAQ / Known Issues / Limitations</a></strong></li>
 <li><strong><a href="#archiso" id="toc-archiso"><span class="toc-section-number">5.</span> Comparison To Archiso Image</a></strong></li>
@@ -675,8 +676,11 @@
 # nvme format -s1 &lt;device(s)&gt;</code></td></tr>
 </tbody>
 </table>
-
-<h3 data-number="3.13" id="system-configuration"><span class="header-section-number">3.13</span> System Configuration On Installed System</h3>
+<h3 data-number="3.13" id="debug-early-userspace"><span class="header-section-number">3.13</span> Debug Early Userspace</h3>
+<p>You can add <strong>archboot-early-debug</strong> on <strong>kernel commandline</strong> to debug the early userspace.</p>
+<p>To debug the rootfs you can simply mount <strong>/dev/zram0</strong> to <strong>/sysroot</strong> to analyze the rootfs.</p>
+<p>To continue boot, after debugging you can simply mount <strong>/dev/zram0</strong> to <strong>/sysroot</strong> and exit the bash shell.</p>
+<h3 data-number="3.14" id="system-configuration"><span class="header-section-number">3.14</span> System Configuration On Installed System</h3>
 <p>You can also run <strong>archboot-setup.sh</strong> for <strong>system configuration</strong> on an installed system.</p>
 <p><a href="#package-installation" title="Installation"><strong>Install</strong></a> your corresponding Archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
 <h2 data-number="4." id="faq-known-issues-and-limitations"><span class="header-section-number">4.</span> <strong>FAQ / Known Issues / Limitations</strong></h2>
