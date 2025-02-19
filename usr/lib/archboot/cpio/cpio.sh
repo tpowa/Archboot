@@ -255,7 +255,7 @@ _cpio_fw() {
                 [[ -d "${_FW_DEST}" ]] || mkdir -p "${_FW_DEST}"
                 [[ -d "${_FW_TMP_SRC}" ]] || mkdir -p "${_FW_TMP_SRC}"
             elif [[ -n "${_TARGET_DIR}" ]]; then
-                _FW_TARGET_DIR="/tmp/archboot-firmware"
+                _FW_TMP="/tmp/archboot-firmware"
                 [[ -d "${_FW_TMP}" ]] && rm -r "${_FW_TMP}"
             fi
             for i in $(fd --type d --base-directory "${_FW_SRC}" --path-separator '' -d 1); do
