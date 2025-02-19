@@ -30,7 +30,7 @@ if [[ -e /tmp/.setup-running ]]; then
     exit 1
 fi
 _set_title
-if ! [[ "${UID}" == 1 ]]; then
+if ! [[ "${UID}" == 0 ]]; then
     _dialog --msgbox "Error:\n\nSetup needs to run as root user." 7 40
     exit 1
 fi
