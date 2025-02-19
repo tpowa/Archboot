@@ -18,6 +18,7 @@ network:
 - improved suggestions for ipv4 static setup
 - improved error handling on missing netmask on ipv4 static setup
 setup:
+- fixed BIOS_boot partition detection
 - fixed startup on running system
 - added root check
 - fixed blockdevice listing of /dev/mapper devices
