@@ -140,8 +140,8 @@ _create_iso() {
         [[ "${_ARCH}" == "x86_64" ]] && mv "${_W_DIR}/usr/share/licenses/intel-ucode" licenses/
         echo "Generating Unified Kernel Images..."
         _KERNEL="boot/kernel/${_KERNEL##*/}"
-        [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=${_INTEL_UCODE}"
-        _AMD_UCODE="--initrd=${_AMD_UCODE}"
+        [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=/boot/ucode/intel-ucode.img"
+        _AMD_UCODE="--initrd=/boot/ucode/amd-ucode.img"
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
         for initrd in ${_INITRD_NORMAL} ${_INITRD_LATEST} ${_INITRD_LOCAL}; do
