@@ -125,11 +125,11 @@ _server_release() {
     cd "${_ISO_BUILD_DIR}" || exit 1
     # removing b2sum
     rm b2sum.txt
-    _sign_b2sum "*"
-    for i in boot iso img uki; do
-        [[ -d ${i} ]] && _sign_b2sum "${i}/*"
+    for i in $(fd -t f | sort); do
+        _sign_b2sum "${i}"
+        chown -R "${_USER}:${_GROUP}" "${i}"
+        touch "${i}"
     done
-    chown -R "${_USER}:${_GROUP}" ./*
     cd ..
     _create_archive
     mv "${_ISO_BUILD_DIR}" "${_DIR}"

@@ -3,8 +3,9 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
 _INITRD="boot/initrd-${_ARCH}.img"
-_INITRD_LATEST="boot/initrd-latest-${_ARCH}.img"
-_INITRD_LOCAL="boot/initrd-local-${_ARCH}.img"
+_INITRD_NORMAL="boot/initrd/initrd-${_ARCH}.img"
+_INITRD_LATEST="boot/initrd/initrd-latest-${_ARCH}.img"
+_INITRD_LOCAL="boot/initrd/initrd-local-${_ARCH}.img"
 _CONFIG_LATEST="${_ARCH}-latest.conf"
 _CONFIG_LOCAL="${_ARCH}-local.conf"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
@@ -96,13 +97,13 @@ _create_iso() {
     mv "${_W_DIR}"/*.img ./ &>"${_NO_LOG}"
     # create boot directory with ramdisks
     echo "Creating boot directory..."
-    mkdir -p boot/
-    mv init-* boot/
+    mkdir -p boot/{init,firmware,kernel,initrd,ucode}
+    mv init-* boot/init/
     if [[ "${_ARCH}" == "riscv64" ]]; then
         for i in *.img; do
             if  echo "${i}" | rg -v 'local' | rg -vq 'latest'; then
-                mv "${_KERNEL}" boot/
-                mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD}"
+                mv "${_KERNEL}" boot/kernel/
+                mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD_NORMAL}"
             elif echo "${i}" | rg -q 'latest'; then
                 mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD_LATEST}"
             elif echo "${i}" | rg -q 'local'; then
@@ -112,18 +113,18 @@ _create_iso() {
     else
         for i in *.iso; do
             if  echo "${i}" | rg -v 'local' | rg -vq 'latest'; then
-                mv "${_W_DIR}/${_AMD_UCODE}" boot/
-                mv "${_KERNEL}" boot/
+                mv "${_W_DIR}/${_AMD_UCODE}" boot/ucode/
+                mv "${_KERNEL}" boot/kernel/
                 if [[ "${_ARCH}" == "aarch64" ]]; then
                     # replace aarch64 Image.gz with Image kernel for UKI
                     # compressed image is not working at the moment
                     _KERNEL="$(echo "${_KERNEL}" | sd '\.gz' '')"
-                    mv "${_KERNEL}" boot/
+                    mv "${_KERNEL}" boot/kernel/
                 else
-                    mv "${_W_DIR}/${_INTEL_UCODE}" boot/
+                    mv "${_W_DIR}/${_INTEL_UCODE}" boot/ucode/
                 fi
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
-                mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD}"
+                mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD_NORMAL}"
                 mcopy -m -i  mcopy -m -i efi.img ::/boot/firmware boot/
             elif echo "${i}" | rg -q 'latest'; then
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
@@ -135,26 +136,25 @@ _create_iso() {
             rm efi.img
         done
         # add ucode licenses
-        mkdir -p licenses/
         mv "${_W_DIR}/usr/share/licenses/amd-ucode" licenses/
         [[ "${_ARCH}" == "x86_64" ]] && mv "${_W_DIR}/usr/share/licenses/intel-ucode" licenses/
         echo "Generating Unified Kernel Images..."
-        _KERNEL="boot/${_KERNEL##*/}"
+        _KERNEL="boot/kernel/${_KERNEL##*/}"
         [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=${_INTEL_UCODE}"
         _AMD_UCODE="--initrd=${_AMD_UCODE}"
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
-        for initrd in ${_INITRD} ${_INITRD_LATEST} ${_INITRD_LOCAL}; do
+        for initrd in ${_INITRD_NORMAL} ${_INITRD_LATEST} ${_INITRD_LOCAL}; do
             _FW_IMG=()
             # all firmwares
-            if [[ "${initrd}" == "${_INITRD}" ]]; then
-                _UKI="/boot/${_NAME}-${_ARCH}"
+            if [[ "${initrd}" == "${_INITRD_NORMAL}" ]]; then
+                _UKI="${_NAME}-${_ARCH}"
                 for i in "${_W_DIR}"/boot/firmware/*; do
                     _FW_IMG+=(--initrd=/boot/firmware/"$(basename "${i}")")
                 done
             fi
-            [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="/boot/${_NAME}-latest-${_ARCH}"
-            [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="/boot/${_NAME}-local-${_ARCH}"
+            [[ "${initrd}" == "${_INITRD_LATEST}" ]] && _UKI="${_NAME}-latest-${_ARCH}"
+            [[ "${initrd}" == "${_INITRD_LOCAL}" ]] && _UKI="${_NAME}-local-${_ARCH}"
             # only kms firmwares
             if [[ "${initrd}" == "${_INITRD_LOCAL}" || "${initrd}" == "${_INITRD_LATEST}" ]]; then
                 for i in amdgpu i915 nvidia radeon xe; do
@@ -164,11 +164,11 @@ _create_iso() {
             #shellcheck disable=SC2086,SC2068
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
                 ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${initrd}" ${_FW_IMG[@]} --cmdline="${_CMDLINE}" \
-                --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}.efi" &>"${_NO_LOG}" || exit 1
+                --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="/boot/uki/${_UKI}.efi" &>"${_NO_LOG}" || exit 1
         done
         # fix permission and timestamp
         mv "${_W_DIR}"/boot ./
-        chmod 644 boot/*.efi
+        chmod 644 boot/uki/*.efi
     fi
     touch boot/*
     echo "Generating Release.txt..."
@@ -205,32 +205,9 @@ _create_iso() {
         echo "Creating iso/ directory..."
         mkdir iso
         mv ./*.iso iso/
-        echo "Creating uki/ directory..."
-        mkdir uki
-        mv boot/*.efi uki/
     fi
     echo "Generating b2sum..."
-    for i in *; do
-        if [[ -f "${i}" ]]; then
+    for i in $(fd -t f | sort); do
             cksum -a blake2b "${i}" >> b2sum.txt
-        fi
     done
-    for i in boot/*; do
-        if [[ -f "${i}" ]]; then
-            cksum -a blake2b "${i}" >> b2sum.txt
-        fi
-    done
-    if ! [[ "${_ARCH}" == "riscv64" ]]; then
-        for i in iso/* uki/*; do
-            if [[ -f "${i}" ]]; then
-                cksum -a blake2b "${i}" >> b2sum.txt
-            fi
-        done
-    else
-        for i in img/*; do
-            if [[ -f "${i}" ]]; then
-                cksum -a blake2b "${i}" >> b2sum.txt
-            fi
-        done
-    fi
 }
