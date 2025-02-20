@@ -97,7 +97,7 @@ _create_iso() {
     mv "${_W_DIR}"/*.img ./ &>"${_NO_LOG}"
     # create boot directory with ramdisks
     echo "Creating boot directory..."
-    mkdir -p boot/{init,firmware,kernel,initrd,ucode}
+    mkdir -p boot/{init,firmware,kernel,initrd,ucode,uki}
     mv init-* boot/init/
     if [[ "${_ARCH}" == "riscv64" ]]; then
         for i in *.img; do
