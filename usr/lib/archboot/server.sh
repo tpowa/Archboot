@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+<#!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
@@ -91,21 +91,6 @@ _create_archive() {
     [[ -d "${_DIR}" ]] && mv "${_DIR}" archive/
 }
 
-# sign files and create new b2sum.txt
-_sign_b2sum() {
-    for i in $1; do
-        if [[ -f "${i}" ]]; then
-            #shellcheck disable=SC2046,SC2086,SC2116
-            gpg --chuid "${_USER}" $(echo ${_GPG}) "${i}"
-            cksum -a blake2b "${i}" >> b2sum.txt
-        fi
-        if [[ -f "${i}.sig" ]]; then
-            cksum -a blake2b "${i}.sig" >> b2sum.txt
-        fi
-    done
-    gpg --chuid "${_USER}" $(echo ${_GPG}) b2sum.txt
-}
-
 _update_source() {
     cd "${_ISO_HOME_SOURCE}" || exit 1
     _create_archive
@@ -124,13 +109,17 @@ _server_release() {
     chmod 755 "${_ISO_BUILD_DIR}"
     chown -R "${_USER}:${_GROUP}" "${_ISO_BUILD_DIR}"
     cd "${_ISO_BUILD_DIR}" || exit 1
-    # removing b2sum
+    # recreate b2sum and sign files
     rm b2sum.txt
     for i in $(fd -t f | sort); do
-        _sign_b2sum "${i}"
+        #shellcheck disable=SC2046,SC2086,SC2116
+        gpg --chuid "${_USER}" $(echo ${_GPG}) "${i}"
+        cksum -a blake2b "${i}" >> b2sum.txt
+        cksum -a blake2b "${i}.sig" >> b2sum.txt
         chown -R "${_USER}:${_GROUP}" "${i}"
         touch "${i}"
     done
+    gpg --chuid "${_USER}" $(echo ${_GPG}) b2sum.txt
     cd ..
     _create_archive
     mv "${_ISO_BUILD_DIR}" "${_DIR}"
