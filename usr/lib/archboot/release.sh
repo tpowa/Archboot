@@ -168,7 +168,7 @@ _create_iso() {
         done
         # fix permission and timestamp
         mv "${_W_DIR}"/boot ./
-        chmod 644 boot/uki/*.efi
+        chmod 644 boot/*.efi
     fi
     touch boot/*
     echo "Generating Release.txt..."
@@ -208,7 +208,7 @@ _create_iso() {
     fi
     echo "Creating uki/ directory..."
     mkdir uki
-    mv ./*.efi uki/
+    mv boot/*.efi uki/
     echo "Generating b2sum..."
     for i in $(fd -t f | sort); do
             cksum -a blake2b "${i}" >> b2sum.txt
