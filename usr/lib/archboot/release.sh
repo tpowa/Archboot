@@ -97,7 +97,7 @@ _create_iso() {
     mv "${_W_DIR}"/*.img ./ &>"${_NO_LOG}"
     # create boot directory with ramdisks
     echo "Creating boot directory..."
-    mkdir -p boot/{init,firmware,kernel,initrd,ucode,uki}
+    mkdir -p boot/{init,firmware,kernel,initrd,ucode}
     mv init-* boot/init/
     if [[ "${_ARCH}" == "riscv64" ]]; then
         for i in *.img; do
@@ -164,7 +164,7 @@ _create_iso() {
             #shellcheck disable=SC2086,SC2068
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
                 ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${initrd}" ${_FW_IMG[@]} --cmdline="${_CMDLINE}" \
-                --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="/boot/uki/${_UKI}.efi" &>"${_NO_LOG}" || exit 1
+                --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="/boot/${_UKI}.efi" &>"${_NO_LOG}" || exit 1
         done
         # fix permission and timestamp
         mv "${_W_DIR}"/boot ./
@@ -206,6 +206,9 @@ _create_iso() {
         mkdir iso
         mv ./*.iso iso/
     fi
+    echo "Creating uki/ directory..."
+    mkdir uki
+    mv ./*.efi uki/
     echo "Generating b2sum..."
     for i in $(fd -t f | sort); do
             cksum -a blake2b "${i}" >> b2sum.txt
