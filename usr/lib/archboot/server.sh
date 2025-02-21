@@ -103,6 +103,7 @@ _sign_b2sum() {
             cksum -a blake2b "${i}.sig" >> b2sum.txt
         fi
     done
+    gpg --chuid "${_USER}" $(echo ${_GPG}) b2sum.txt
 }
 
 _update_source() {
