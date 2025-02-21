@@ -12,7 +12,7 @@ mmpstatus,scrub,scrub_all,undo} e4{crypt,defrag} exfatlabel fatlabel findfs fsck
 msdos,vfat,xfs} fs{freeze,trim} getcifsacl mk{_cmds,dosfs,e2fs,swap} mkfs.{bcachefs,\
 exfat,ext4,msdos,vfat,xfs} mount.{bcachefs,cifs,smb3} nfs{conf,dcld,idmap} nfsv4.exportd \
                  nvme setcifsacl tune.exfat tune2fs wipefs xfs_{admin,bmap,copy,db,estimate,freeze,fsr,\
-growfs,info,io,logprint,metadump,mdrestore,mkfile,ncheck,property,quota,repair,rtcp,spaceman}
+growfs,info,io,logprint,metadump,mdrestore,mkfile,ncheck,property,protofile,quota,repair,rtcp,spaceman}
     _map _full_dir /etc/{cifs-utils,request-key.d,nvme}
     # fix libinih for plasma wallpaper
     _map _file /usr/lib/libINI*
