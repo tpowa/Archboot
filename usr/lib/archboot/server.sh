@@ -119,6 +119,7 @@ _server_release() {
         chown -R "${_USER}:${_GROUP}" "${i}"
         touch "${i}"
     done
+    #shellcheck disable=SC2046,SC2086,SC2116
     gpg --chuid "${_USER}" $(echo ${_GPG}) b2sum.txt
     cd ..
     _create_archive
