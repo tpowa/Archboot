@@ -96,7 +96,7 @@ _create_iso() {
     mv "${_W_DIR}"/*.iso ./ &>"${_NO_LOG}"
     mv "${_W_DIR}"/*.img ./ &>"${_NO_LOG}"
     # create boot directory with ramdisks
-    echo "Creating boot directory..."
+    echo "Creating boot directories..."
     mkdir -p boot/{init,firmware,kernel,initrd,ucode}
     mv init-* boot/init/
     if [[ "${_ARCH}" == "riscv64" ]]; then
@@ -136,6 +136,7 @@ _create_iso() {
             rm efi.img
         done
         # add ucode licenses
+        mkdir licenses
         mv "${_W_DIR}/usr/share/licenses/amd-ucode" licenses/
         [[ "${_ARCH}" == "x86_64" ]] && mv "${_W_DIR}/usr/share/licenses/intel-ucode" licenses/
         echo "Generating Unified Kernel Images..."

@@ -116,7 +116,7 @@ _prepare_ucode() {
         echo "Preparing amd-ucode..."
         cp "/${_AMD_UCODE}" "${_ISODIR}/boot/"
         mkdir -p "${_ISODIR}"/licenses/amd-ucode
-        cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_ISODIR}/licenses/amd-ucode"
+        cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_ISODIR}/licenses/amd-ucode/"
     fi
 }
 
