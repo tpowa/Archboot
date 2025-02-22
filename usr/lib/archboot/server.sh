@@ -111,7 +111,7 @@ _server_release() {
     cd "${_ISO_BUILD_DIR}" || exit 1
     # recreate b2sum and sign files
     rm b2sum.txt
-    for i in $(fd -t f | sort); do
+    for i in $(fd -t f); do
         #shellcheck disable=SC2046,SC2086,SC2116
         gpg --chuid "${_USER}" $(echo ${_GPG}) "${i}"
         cksum -a blake2b "${i}" >> b2sum.txt
