@@ -203,7 +203,7 @@ _create_iso() {
         mkdir img
         mv ./*.img img/
     else
-        echo "Creating iso/ and uki directories..."
+        echo "Creating iso/ and uki/ directories..."
         mkdir iso uki
         mv ./*.iso iso/
         mv boot/*.efi uki/
