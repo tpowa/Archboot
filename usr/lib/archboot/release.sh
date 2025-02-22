@@ -212,6 +212,6 @@ _create_iso() {
     fi
     echo "Generating b2sum..."
     for i in $(fd -t f | sort); do
-            cksum -a blake2b "${i}" >> b2sum.txt
+        cksum -a blake2b "${i}" >> b2sum.txt
     done
 }
