@@ -1,5 +1,6 @@
 On the road to 2025.02:
 - kernel 6.13.x
+- grub 2:2.12.r212.g4dc616657-2
 Environment:
 - cleaned up firmware
 - cleaned up network, sata and wireless modules
@@ -17,6 +18,8 @@ init.sh:
 network:
 - improved suggestions for ipv4 static setup
 - improved error handling on missing netmask on ipv4 static setup
+release:
+- new boot/ layout
 setup:
 - fixed BIOS_boot partition detection
 - fixed startup on running system
