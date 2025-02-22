@@ -206,10 +206,10 @@ _create_iso() {
         echo "Creating iso/ directory..."
         mkdir iso
         mv ./*.iso iso/
+        echo "Creating uki/ directory..."
+        mkdir uki
+        mv boot/*.efi uki/
     fi
-    echo "Creating uki/ directory..."
-    mkdir uki
-    mv boot/*.efi uki/
     echo "Generating b2sum..."
     for i in $(fd -t f | sort); do
             cksum -a blake2b "${i}" >> b2sum.txt
