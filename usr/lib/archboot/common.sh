@@ -312,8 +312,8 @@ _pacman_parameters() {
     # building for running architecture
     else
         _PACMAN="pacman --root ${1}"
-        _PACMAN_CACHEDIR="--cachedir ${1}/${_CACHEDIR}"
-        _PACMAN_DB="--dbpath ${1}/blankdb"
+        _PACMAN_CACHEDIR="--cachedir ${_CACHEDIR}"
+        _PACMAN_DB="--dbpath blankdb"
     fi
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     # defaults used on every pacman call
