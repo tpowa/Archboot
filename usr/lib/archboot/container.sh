@@ -88,7 +88,7 @@ _prepare_pacman() {
     echo "Creating directories in ${1}..."
     mkdir -p "${1}${_PACMAN_LIB}"
     mkdir -p "${1}/${_CACHEDIR}"
-    for i in dev proc sys run; do
+    for i in dev proc sys; do
     [[ -e "${1}/${i}" ]] || mkdir -m 555 "${1}/${i}"
     done
     # mount special filesystems to ${1}
@@ -98,7 +98,6 @@ _prepare_pacman() {
     mount udev "${1}/dev" -t devtmpfs -o mode=0755,nosuid
     mount devpts "${1}/dev/pts" -t devpts -o mode=0620,gid=5,nosuid,noexec
     mount shm "${1}/dev/shm" -t tmpfs -o mode=1777,nosuid,nodev
-    mount /run "${1}/run" -t tmpfs -o bind,make-private
     echo "Removing Archboot repository sync db..."
     rm -f "${_PACMAN_LIB}"/sync/archboot.db
     echo "Updating Arch Linux keyring..."
@@ -167,7 +166,7 @@ _change_pacman_conf() {
 # umount special filesystems
 _umount_special() {
     echo "Unmounting special filesystems in ${1}..."
-    umount -R "${1}"/{proc,sys,dev,run}
+    umount -R "${1}"/{proc,sys,dev}
 }
 
 _install_base_packages() {
