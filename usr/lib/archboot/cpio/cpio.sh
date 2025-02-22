@@ -265,7 +265,7 @@ _cpio_fw() {
                     echo "${i}" | rg -q ath9k_htc && mv "${_FW_SRC}"/htc_* "${_FW_TMP_SRC}/"
                     echo "${i}" | rg -q ath11k && mv "${_FW_SRC}"/wil6210* "${_FW_TMP_SRC}/"
                     mv "${_FW_SRC}/${i}" "${_FW_TMP_SRC}/"
-                    echo "Preparing firmware ${i}.img..."
+                    echo "Preparing  ${i}.img firmware..."
                     _create_cpio "${_FW_TMP}" "${_FW_DEST}/${i}.img" &>"${_NO_LOG}" || exit 1
                     # remove directory
                     rm -r "${_FW_TMP_SRC:?}"/*
@@ -282,7 +282,7 @@ _cpio_fw() {
             # intel wireless
             if ls "${_FW_SRC}"/iwl* &>"${_NO_LOG}"; then
                 if [[ -n ${_GENERATE_IMAGE} ]]; then
-                    echo "Preparing firmware iwlwifi.img..."
+                    echo "Preparing iwlwifi.img firmware..."
                     mv "${_FW_SRC}"/iwl* "${_FW_TMP_SRC}/"
                     _create_cpio "${_FW_TMP}" "${_FW_DEST}/iwlwifi.img" &>"${_NO_LOG}" || exit 1
                 elif [[ -n "${_TARGET_DIR}" ]]; then
@@ -294,7 +294,7 @@ _cpio_fw() {
             # ralink wireless
             if ls "${_FW_SRC}"/rt* &>"${_NO_LOG}"; then
                 if [[ -n ${_GENERATE_IMAGE} ]]; then
-                    echo "Preparing firmware ralink.img..."
+                    echo "Preparing ralink.img firmware..."
                     mv "${_FW_SRC}"/rt* "${_FW_TMP_SRC}/"
                     _create_cpio "${_FW_TMP}" "${_FW_DEST}/ralink.img" &>"${_NO_LOG}" || exit 1
                 elif [[ -n "${_TARGET_DIR}" ]]; then
