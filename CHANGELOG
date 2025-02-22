@@ -12,14 +12,16 @@ ISO images:
 - On latest image reduced needed RAM by 10% 
   to boot from 2300M down to 2100M!
 - maximized boot speed!
+container.sh:
+- fixed _CACHEDIR must be full path 
 init.sh:
 - added commandline early userspace debug parameter: archboot-early-debug
 - autodetect needed firmware files from lspci output
+release.sh:
+- new boot/ layout
 network:
 - improved suggestions for ipv4 static setup
 - improved error handling on missing netmask on ipv4 static setup
-release:
-- new boot/ layout
 setup:
 - fixed BIOS_boot partition detection
 - fixed startup on running system
