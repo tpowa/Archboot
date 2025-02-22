@@ -130,53 +130,55 @@ _clean_fw() {
     _VGA="VGA compatible controller"
     _ETH="Ethernet controller"
     _WIFI="Network controller"
+    _PCI=/tmp/lspci.txt
     mkdir -p new/firmware
-    if lspci -mm | rg -q "${_VGA}"; then
-        if lspci -mm | rg "${_VGA}" | rg -q 'AMD'; then
+    lspci -mm >"${_PCI}"
+    if rg -q "${_VGA} "${_PCI}""; then
+        if rg "${_VGA}" "${_PCI}" | rg -q 'AMD'; then
             mv "${_FW}"/amd* ${_FW_NEW}/
         fi
-        if lspci -mm | rg "${_VGA}" | rg -q 'Intel'; then
-            if lspci -mm | rg "${_VGA}" | rg 'Intel' | rg -q 'Xe'; then
+        if rg "${_VGA}" "${_PCI}" | rg -q 'Intel'; then
+            if rg "${_VGA}" "${_PCI}" | rg 'Intel' | rg -q 'Xe'; then
                 mv "${_FW}"/xe ${_FW_NEW}/
             else
                 mv "${_FW}"/i915 ${_FW_NEW}/
             fi
         fi
-        if lspci -mm | rg "${_VGA}" | rg -q 'NVIDIA'; then
+        if rg "${_VGA}" "${_PCI}" | rg -q 'NVIDIA'; then
              mv "${_FW}"/nvidia ${_FW_NEW}/
         fi
-        if lspci -mm | rg "${_VGA}" | rg -q 'RADEON|Radeon'; then
+        if rg "${_VGA}" "${_PCI}" | rg -q 'RADEON|Radeon'; then
             mv "${_FW}"/radeon ${_FW_NEW}/
         fi
     fi
-    if lspci -mm | rg -q "${_ETH}"; then
-        if lspci -mm | rg "${_ETH}" | rg -q 'Broadcom'; then
+    if rg -q "${_ETH}" "${_PCI}"; then
+        if rg "${_ETH}" "${_PCI}" | rg -q 'Broadcom'; then
             mv "${_FW}"/{bnx2,tigon} ${_FW_NEW}/
         fi
-        if lspci -mm | rg "${_ETH}" | rg -q 'Realtek'; then
+        if rg "${_ETH}" "${_PCI}" | rg -q 'Realtek'; then
             mv "${_FW}"/rtl_nic ${_FW_NEW}/
         fi
     fi
-    if lspci -mm | rg -q "${_WIFI}"; then
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Atheros'; then
+    if rg -q "${_WIFI}" "${_PCI}"; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Atheros'; then
             mv "${_FW}"/{ath*,htc_*,wil6210*} ${_FW_NEW}/
         fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Intel'; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Intel'; then
             mv "${_FW}"/iwl* ${_FW_NEW}/
         fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Marvell'; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Marvell'; then
             mv "${_FW}"/{mwl*,libertas,mrvl} ${_FW_NEW}/
         fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Mediatek'; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Mediatek'; then
             mv "${_FW}"/{mt76*,mediatek,vpu_*} ${_FW_NEW}/
         fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Ralink'; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Ralink'; then
             mv "${_FW}"/rt*bin* ${_FW_NEW}/
         fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Realtek'; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Realtek'; then
             mv "${_FW}"/{rtw*,rtlwifi} ${_FW_NEW}/
         fi
-        if lspci -mm | rg "${_WIFI}" | rg -q 'Texas'; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Texas'; then
             mv "${_FW}"/ti-connectivity ${_FW_NEW}/
         fi
     fi
