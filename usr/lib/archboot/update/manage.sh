@@ -133,7 +133,7 @@ _clean_fw() {
     _PCI=/tmp/lspci.txt
     mkdir -p new/firmware
     lspci -mm >"${_PCI}"
-    if rg -q "${_VGA} "${_PCI}""; then
+    if rg -q "${_VGA}" "${_PCI}"; then
         if rg "${_VGA}" "${_PCI}" | rg -q 'AMD'; then
             mv "${_FW}"/amd* ${_FW_NEW}/
         fi
