@@ -265,7 +265,7 @@ _cpio_fw() {
                     echo "${i}" | rg -q ath9k_htc && mv "${_FW_SRC}"/htc_* "${_FW_TMP_SRC}/"
                     echo "${i}" | rg -q ath11k && mv "${_FW_SRC}"/wil6210* "${_FW_TMP_SRC}/"
                     mv "${_FW_SRC}/${i}" "${_FW_TMP_SRC}/"
-                    echo "Preparing  ${i}.img firmware..."
+                    echo "Preparing ${i}.img firmware..."
                     _create_cpio "${_FW_TMP}" "${_FW_DEST}/${i}.img" &>"${_NO_LOG}" || exit 1
                     # remove directory
                     rm -r "${_FW_TMP_SRC:?}"/*
