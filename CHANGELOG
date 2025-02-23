@@ -17,6 +17,7 @@ container.sh:
 init.sh:
 - added commandline early userspace debug parameter: archboot-early-debug
 - autodetect needed firmware files from lspci output
+- added timeout if /dev/console does not show up
 release.sh:
 - new boot/ layout
 network:
