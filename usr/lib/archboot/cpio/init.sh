@@ -218,11 +218,18 @@ if [[ -e /sys/class/graphics/fb0/modes ]]; then
     fi
 fi
 # it needs one echo before, in order to reset the consolefont!
+_TIMEOUT=""
 while true; do
-    _msg "Initializing Console..."
+    _msg "Initializing Console /dev/console..."
     _clear
     setfont -C /dev/console ter-v${_SIZE}n && break
     sleep 0.1
+    # break if /dev/console does not show up, after 5 seconds
+    _TIMEOUT=$((_TIMEOUT + 1))
+    if [[ "${_TIMEOUT}" = 50 ]]; then
+        _msg "Console /dev/console timeout reached."
+        break
+    fi
 done
 _initrd_stage | _dialog --title " Initializing System " --gauge "\n${_KEEP}\n\nSearching rootfs on blockdevices..." 9 60 0
 _clear
