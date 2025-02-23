@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="https://archboot.com/gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2025 Fundraise: 0% <progress max="100" value="0">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2025 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 20.02.2025 10:39</strong></p>
+<strong>Last update: 23.02.2025 21:37</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -69,8 +69,9 @@
 </ul>
 </nav>
 <h2 data-number="1" id="introduction"><span class="header-section-number">1.</span> Introduction</h2>
-<p><strong>Archboot</strong> is a most advanced, modular <a href="https://archlinux.org/"><strong>Arch Linux</strong></a> boot/install image creation utility to generate<br><strong>reproducible</strong> bootable media for <strong>UKI/CD/USB/PXE</strong>, designed for <strong>installation</strong> or <strong>rescue</strong> operation.
-<br>The <strong><a href="#archiso">additional</a> ISOs</strong> and <strong>UKIs</strong> focus on being <strong>small, fast</strong> and <strong>(power)user friendly</strong>.</p>
+<p><strong>Archboot</strong> is a most advanced, modular <a href="https://archlinux.org/"><strong>Arch Linux</strong></a> boot/install image creation
+utility to generate <strong>reproducible</strong> bootable media for <strong>UKI/CD/USB/PXE</strong>, designed for <strong>installation</strong> or <strong>rescue</strong> operation.The <strong><a href="#archiso">additional</a> ISOs</strong> and <strong>UKIs</strong> focus on being <strong>small, fast</strong> and <strong>(power)user friendly</strong>.</p>
+<p style="page-break-after: always"></p>
 <h2 data-number="2" id="releases"><span class="header-section-number">2.</span> Releases</h2>
 <ul>
 <li><a href="https://www.reddit.com/r/archboot/"><strong>Latest News</strong></a>, <a href="https://gitlab.archlinux.org/tpowa/archboot/-/blob/master/CHANGELOG"><strong>Changelog</strong></a>, <a href="https://source.archboot.com"><strong>Build Sources</strong></a></li>
@@ -161,6 +162,7 @@
 <li>For <strong>rescue booting</strong>, add an entry pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initrd</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> and <strong>Firmware</strong> to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a>.</li>
 <li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting, add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initrd</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> and <strong>Firmware</strong> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong></a> setup.</li>
 </ul>
+<p style="page-break-after: always"></p>
 <h3 data-number="2.1" id="image-types"><span class="header-section-number">2.1</span> <strong>ISO / Initrd / UKI Types</strong></h3>
 <table>
 <thead>
@@ -198,8 +200,8 @@
 </table>
 <ul>
 <li>During boot, all <strong>ethernet</strong> network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Network_configuration#DHCP" title="DHCP"><strong>DHCP</strong></a>, <strong>except</strong> -local image files.</li>
-<li><strong>With</strong> a fast <strong>ethernet</strong> internet connection <strong>and</strong> a running <a href="https://wiki.archlinux.org/title/DHCP" title="DHCP"><strong>DHCP</strong></a> server, go for the <strong>latest</strong> image.<br>If your system holds at least 4G RAM the package cache will be preserved.</li>
-<li><strong>Without</strong> an internet connection you should use the <strong>local</strong> image. It includes a <strong>local package repository</strong> for installation.<br>It will <strong>not</strong> use any network interfaces/services, until you explicitly switch to <strong>Online</strong> mode.</li>
+<li><strong>With</strong> a fast <strong>ethernet</strong> internet connection <strong>and</strong> a running <a href="https://wiki.archlinux.org/title/DHCP" title="DHCP"><strong>DHCP</strong></a> server, go for the <strong>latest</strong> image. If your system holds at least 4G RAM the package cache will be preserved.</li>
+<li><strong>Without</strong> an internet connection you should use the <strong>local</strong> image. It includes a <strong>local package repository</strong> for installation. It will <strong>not</strong> use any network interfaces/services, until you explicitly switch to <strong>Online</strong> mode.</li>
 </ul>
 <h3 data-number="2.2" id="boot-modes"><span class="header-section-number">2.2</span> <strong>ISO Boot Modes</strong></h3>
 <table>
@@ -245,6 +247,7 @@
 </tbody>
 </table>
 <p>* Firmware 32bit / OS 64bit</p>
+<p style="page-break-after: always"></p>
 <h3 data-number="2.3" id="writing-to-usb-cd"><span class="header-section-number">2.3</span> <strong>ISO Writing To USB / CD</strong></h3>
 <p>A hybrid image file is a standard CD/DVD-burnable image and also a raw disk image.</p>
 <ul>
@@ -267,6 +270,7 @@
 <li>In <a href="https://rufus.ie" title="Rufus for Windows"><strong>Rufus for Windows</strong></a> use <strong>dd-Mode</strong> to write the image.</li>
 <li><strong>Power users</strong> might consider using a <a href="https://www.ventoy.net" title="ventoy"><strong>Ventoy</strong></a> boot stick. One stick to boot everything, without reformat the stick all the time.</li>
 </ul>
+<p style="page-break-after: always"></p>
 <h2 data-number="3" id="archboot-in-a-nutshell"><span class="header-section-number">3.</span> Features In A Nutshell</h2>
 <h3 data-number="3.1" id="secure-boot-support"><span class="header-section-number">3.1</span> <strong>Secure Boot - MOK / Machine Owner Key</strong></h3>
 <table>
@@ -325,6 +329,7 @@
 </tr>
 </tbody>
 </table>
+<p style="page-break-after: always"></p>
 <h4 data-number="3.1.4" id="secure-boot-reset-mok"><span class="header-section-number">3.1.4</span> <strong>Secure Boot - Reset MOK</strong></h4>
 <p>In order to <strong>reset</strong> the MOK setup:</p>
 <ul>
@@ -363,11 +368,11 @@
 <tbody>
 <tr class="odd">
 <td><strong>Usage</strong></td>
-<td>Login Consoles</td>
-<td><a href="https://github.com/imsnif/bandwhich" title="Network Status"><strong>Network Status</strong></a></td>
-<td><a href="https://github.com/ClementTsang/bottom" title="System Status"><strong>System Status</strong></a></td>
-<td>Log Messages</td>
-<td><a href="https://wiki.archlinux.org/title/Journal" title="Systemd Journal"><strong>Systemd Journal</strong></a></td>
+<td>Login<br>Consoles</td>
+<td><a href="https://github.com/imsnif/bandwhich" title="Network Status"><strong>Network<br>Status</strong></a></td>
+<td><a href="https://github.com/ClementTsang/bottom" title="System Status"><strong>System<br>Status</strong></a></td>
+<td>Log<br>Messages</td>
+<td><a href="https://wiki.archlinux.org/title/Journal" title="Systemd Journal"><strong>Systemd<br>Journal</strong></a></td>
 </tr>
 <tr class="even">
 <td><strong>Terminal Keys</strong></td>
@@ -379,11 +384,11 @@
 </tr>
 <tr class="odd">
 <td><strong>Graphical Keys</strong></td>
-<td>CTRL+ALT+F1-F6</td>
-<td>CTRL+ALT+F5</td>
-<td>CTRL+ALT+F6</td>
-<td>CTRL+ALT+F11</td>
-<td>CTRL+ALT+F12</td>
+<td>CTRL+ALT<br>+F1-F6</td>
+<td>CTRL+ALT<br>+F5</td>
+<td>CTRL+ALT<br>+F6</td>
+<td>CTRL+ALT<br>+F11</td>
+<td>CTRL+ALT<br>+F12</td>
 </tr>
 </tbody>
 </table>
@@ -391,6 +396,7 @@
 </p>
 <h4 data-number="3.2.2" id="serial-console"><span class="header-section-number">3.2.2</span> <strong>Serial Console</strong></h4>
 <p><a href="https://wiki.archlinux.org/title/Serial_console" title="Serial console"><strong>Serial console</strong></a> is enabled on <strong>ttyS0</strong>, <strong>ttyAMA0</strong> and <strong>ttyUSB0</strong>.</p>
+<p style="page-break-after: always"></p>
 <h3 data-number="3.3" id="remote-terminal-access"><span class="header-section-number">3.3</span> <strong>Remote Terminal Access</strong></h3>
 <h4 data-number="3.3.1" id="remote-access-openssh"><span class="header-section-number">3.3.1</span> <strong>OpenSSH Terminal</strong></h4>
 <p>Access the terminal with <a href="https://wiki.archlinux.org/title/OpenSSH" title="Remote Connection"><strong>OpenSSH</strong></a>. The port number is <strong>Arch</strong> in numbers.</p>
@@ -454,6 +460,7 @@
 </tbody>
 </table>
 <p><a href="https://wiki.archlinux.org/title/GNU_Screen" title="GNU_screen"><strong>GNU screen</strong></a> is launched on login and <strong>last</strong> session will be reattached.</p>
+<p style="page-break-after: always"></p>
 <h3 data-number="3.4" id="interactive-basic-setup"><span class="header-section-number">3.4</span> <strong>Interactive Basic Setup</strong></h3>
 <p>The interactive <strong>scripts</strong> are launched on <strong>first</strong> login.</p>
 <h4 data-number="3.4.1" id="localization"><span class="header-section-number">3.4.1</span> <strong>Localization</strong></h4>
@@ -476,6 +483,7 @@
 <li>Latest <a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>pacman</strong></a> <a href="https://wiki.archlinux.org/title/Mirror" title="Mirror"><strong>mirrors</strong></a> will be <a href="http://ip-api.com" title="GeoIP"><strong>GeoIP</strong></a> synced and you have to select your <strong>favourite</strong> mirror.</li>
 <li>If a new kernel is online available, you can decide to load the latest Archboot Environment <strong>&lt;default=no&gt;</strong>.</li>
 </ul>
+<p style="page-break-after: always"></p>
 <h3 data-number="3.5" id="interactive-launcher"><span class="header-section-number">3.5</span> <strong>Interactive Launcher</strong></h3>
 <ul>
 <li>The interactive <strong>launcher</strong> script for quick navigation is launched on <strong>first</strong> login.</li>
@@ -519,19 +527,20 @@
 <h5 data-number="3.5.2.1" id="full-arch-linux-system"><span class="header-section-number">3.5.2.1</span> <strong>Full Arch Linux System</strong></h5>
 <ul>
 <li>The <strong>Archboot</strong> system is stripped down to <strong>minimal</strong> space usage.</li>
-<li>Though <strong>perl, python, man/info pages, includes, additional kernel modules (eg. sound)</strong><br>and other things are <strong>not</strong> provided by default.</li>
+<li>Though <strong>perl, python, man/info pages, includes, additional kernel modules (eg. sound)</strong> and other things are <strong>not</strong> provided by default.</li>
 <li>This will also <strong>stop</strong> cleaning the system, while running other <strong>update</strong> tasks.</li>
 </ul>
-<h5 data-number="3.6.2.2" id="update-archboot-environment"><span class="header-section-number">3.5.2.2</span> <strong>Update Archboot Environment</strong></h5>
+<h5 data-number="3.5.2.2" id="update-archboot-environment"><span class="header-section-number">3.5.2.2</span> <strong>Update Archboot Environment</strong></h5>
 <ul>
 <li>The <strong>Archboot Environment</strong> will be updated to <strong>latest</strong> packages.</li>
 <li>Depending on the available <strong>RAM</strong>, you will get the new system with <strong>or</strong> without package cache.</li>
 <li>The new system will be booted through <a href="https://wiki.archlinux.org/title/Kexec" title="kexec"><strong>kexec</strong></a>.</li>
 </ul>
-<h5 data-number="3.6.2.3" id="create-new-images"><span class="header-section-number">3.5.2.3</span> <strong>Create New Images</strong></h5>
+<h5 data-number="3.5.2.3" id="create-new-images"><span class="header-section-number">3.5.2.3</span> <strong>Create New Images</strong></h5>
 <ul>
 <li>You will get <strong>new</strong> images with <strong>latest</strong> packages.</li>
 </ul>
+<p style="page-break-after: always"></p>
 <h3 data-number="3.6" id="interactive-setup"><span class="header-section-number">3.6</span> <strong>Interactive Setup</strong></h3>
 <ul>
 <li>The interactive <strong>setup</strong> script is used for installation.</li>
@@ -542,7 +551,7 @@
 <h4 data-number="3.6.1" id="prepare-storage-drive"><span class="header-section-number">3.6.1</span> <strong>Prepare Storage Drive</strong></h4>
 <ul>
 <li>You prepare your storage drive, <a href="https://wiki.archlinux.org/title/Filesystems" title="Filesystems"><strong>filesystems</strong></a> and define your mountpoints.</li>
-<li>Quick Setup, manual <a href="https://wiki.archlinux.org/title/Partitioning" title="Partitioning"><strong>partitioning</strong></a>, <a href="https://wiki.archlinux.org/title/GUID" title="GUID"><strong>GUID</strong></a> (GPT) support, <a href="https://wiki.archlinux.org/title/MBR" title="MBR"><strong>MBR</strong></a> (BIOS) support,<br><a href="https://wiki.archlinux.org/title/Advanced_Format" title="Advanced Format"><strong>Advanced Format</strong></a> 4k sector drive support etc.</li>
+<li>Quick Setup, manual <a href="https://wiki.archlinux.org/title/Partitioning" title="Partitioning"><strong>partitioning</strong></a>, <a href="https://wiki.archlinux.org/title/GUID" title="GUID"><strong>GUID</strong></a> (GPT) support, <a href="https://wiki.archlinux.org/title/MBR" title="MBR"><strong>MBR</strong></a> (BIOS) support, <a href="https://wiki.archlinux.org/title/Advanced_Format" title="Advanced Format"><strong>Advanced Format</strong></a> 4k sector drive support</li>
 <li><a href="https://wiki.archlinux.org/title/Persistent_block_device_naming" title="Persistent block device naming"><strong>Persistent block device naming</strong></a> support: <a href="https://wiki.archlinux.org/title/PARTUUID" title="PARTUUID"><strong>PARTUUID</strong></a>, <a href="https://wiki.archlinux.org/title/PARTLABEL" title="PARTLABEL"><strong>PARTLABEL</strong></a>, <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd-gpt-auto-generator.html" title="SD_GPT_AUTO_GENERATOR"><strong>SD_GPT_AUTO_GENERATOR</strong></a>, UUID, LABEL and KERNEL</li>
 <li>Creation of software <a href="https://wiki.archlinux.org/title/RAID" title="RAID"><strong>RAID</strong></a>, RAID_partitions, <a href="https://wiki.archlinux.org/title/LVM" title="LVM"><strong>LVM</strong></a> devices and <a href="https://wiki.archlinux.org/title/LUKS" title="LUKS"><strong>LUKS</strong></a> encrypted devices</li>
 <li>Supports standard linux, <a href="https://wiki.archlinux.org/title/RAID" title="RAID"><strong>RAID</strong></a>, RAID_partitions, <a href="https://wiki.archlinux.org/title/Fakeraid" title="Fakeraid"><strong>dmraid/fakeraid</strong></a>, <a href="https://wiki.archlinux.org/title/LVM" title="LVM"><strong>LVM</strong></a> and <a href="https://wiki.archlinux.org/title/LUKS" title="LUKS"><strong>LUKS</strong></a> encrypted devices</li>
@@ -552,7 +561,7 @@
 <ul>
 <li>You can modify the packages to install in <strong>/etc/archboot/defaults</strong>.</li>
 <li><a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>Pacman</strong></a> will install the packages for the first boot to your storage drive.</li>
-<li>Autoconfiguration of basic system will be done:<br> <a href="https://wiki.archlinux.org/title/Locale" title="Locale"><strong>Locale</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console" title="Linux_Console"><strong>Linux console</strong></a>, <a href="https://wiki.archlinux.org/title/Bash" title="Bash"><strong>Bash</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console/Keyboard_configuration" title="Keymap"><strong>Keymap</strong></a>, <a href="https://wiki.archlinux.org/title/System_time#Time_zone" title="Time_Zone"><strong>Timezone</strong></a>, <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>Fstab</strong></a>, <a href="https://wiki.archlinux.org/title/SSD" title="SSD"><strong>SSD performance</strong></a>, <a href="https://wiki.archlinux.org/title/Swap" title="Swap"><strong>Swap performance</strong></a>, <a href="https://wiki.archlinux.org/title/Systemd" title="Systemd"><strong>Systemd</strong></a>,<br><a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>Pacman</strong></a>,  <a href="https://wiki.archlinux.org/title/systemd-networkd" title="Network"><strong>Network</strong></a>, <a href="https://wiki.archlinux.org/title/Crypttab" title="Crypttab"><strong>Crypttab</strong></a> and <a href="https://wiki.archlinux.org/title/Mdadm" title="Mdadm"><strong>Mdadm</strong></a></li>
+<li>Autoconfiguration of basic system will be done:<br> <a href="https://wiki.archlinux.org/title/Locale" title="Locale"><strong>Locale</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console" title="Linux_Console"><strong>Linux console</strong></a>, <a href="https://wiki.archlinux.org/title/Bash" title="Bash"><strong>Bash</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console/Keyboard_configuration" title="Keymap"><strong>Keymap</strong></a>, <a href="https://wiki.archlinux.org/title/System_time#Time_zone" title="Time_Zone"><strong>Timezone</strong></a>, <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>Fstab</strong></a>, <a href="https://wiki.archlinux.org/title/SSD" title="SSD"><strong>SSD performance</strong></a>, <a href="https://wiki.archlinux.org/title/Swap" title="Swap"><strong>Swap performance</strong></a>, <a href="https://wiki.archlinux.org/title/Systemd" title="Systemd"><strong>Systemd</strong></a>, <a href="https://wiki.archlinux.org/title/Pacman" title="Pacman"><strong>Pacman</strong></a>,  <a href="https://wiki.archlinux.org/title/systemd-networkd" title="Network"><strong>Network</strong></a>, <a href="https://wiki.archlinux.org/title/Crypttab" title="Crypttab"><strong>Crypttab</strong></a> and <a href="https://wiki.archlinux.org/title/Mdadm" title="Mdadm"><strong>Mdadm</strong></a></li>
 </ul>
 <h4 data-number="3.6.3" id="configure-system"><span class="header-section-number">3.6.3</span> <strong>Configure System</strong></h4>
 <ul>
@@ -562,6 +571,7 @@
 <li>Choose your text editor: <a href="https://wiki.archlinux.org/title/nano" title="nano"><strong>Nano</strong></a> or <a href="https://wiki.archlinux.org/title/neovim" title="neovim"><strong>Neovim</strong></a></li>
 <li>Configuration of basic system:<br><a href="https://wiki.archlinux.org/title/Users_and_groups" title="User Management"><strong>User Management</strong></a>, <a href="https://wiki.archlinux.org/title/Linux_console" title="Linux console"><strong>Linux console</strong></a>, <a href="https://wiki.archlinux.org/title/Locale.conf" title="Locale.conf"><strong>locale.conf</strong></a>,  <a href="https://wiki.archlinux.org/title/Locale" title="Locale"><strong>Locale</strong></a>, <a href="https://wiki.archlinux.org/title/Fstab" title="Fstab"><strong>fstab</strong></a>, <a href="https://wiki.archlinux.org/title/Mkinitcpio.conf" title="Mkinitcpio.conf"><strong>mkinitcpio.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Modprobe.conf" title="Modprobe.conf"><strong>modprobe.conf</strong></a>,<br><a href="https://wiki.archlinux.org/title/Hostname" title="Hostname"><strong>hostname</strong></a>, <a href="https://wiki.archlinux.org/title/Resolv.conf" title="Resolv.conf"><strong>resolv.conf</strong></a>, <a href="https://wiki.archlinux.org/title/Hosts" title="Hosts"><strong>hosts</strong></a>, <a href="https://wiki.archlinux.org/title/Mirrors" title="Mirrors"><strong>mirrors</strong></a>, <a href="https://wiki.archlinux.org/title/Pacman.conf" title="Pacman.conf"><strong>pacman.conf</strong></a></li>
 </ul>
+<p style="page-break-after: always"></p>
 <h4 data-number="3.6.4" id="install-bootloader"><span class="header-section-number">3.6.4</span> <strong>Install Bootloader</strong></h4>
 <ul>
 <li>You configure your preferred <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a>.</li>
@@ -606,9 +616,10 @@
 <h3 data-number="3.9" id="autorun"><span class="header-section-number">3.9</span> <strong>For Experts: Custom Autorun Script</strong></h3>
 <p>A custom autorun script at the end of bootup can be executed with the following options:</p>
 <ul>
-<li>Customization at runtime:<br>Remote scripts can be inserted with <strong>autorun=&lt;remotepath&gt;</strong> on bootloader commandline.<br>Any remote path <strong>curl</strong> can handle is supported. Local image does <strong>not</strong> support that feature.</li>
+<li>Customization at runtime:<br>Remote scripts can be inserted with <strong>autorun=&lt;remotepath&gt;</strong> on bootloader commandline. Any remote path <strong>curl</strong> can handle is supported. Local image does <strong>not</strong> support that feature.</li>
 <li>Customization at build time:<br><strong>/etc/archboot/run/autorun.sh</strong> will be inserted into the images.</li>
 </ul>
+<p style="page-break-after: always"></p>
 <h3 data-number="3.10" id="tools-for-backup-and-copying-of-an-existing-system"><span class="header-section-number">3.10</span> <strong>Tools For Backup And Copying Of An Existing System</strong></h3>
 <p>Archboot provides 2 additional scripts for doing those tasks.</p>
 <ul>
@@ -676,13 +687,14 @@
 # nvme format -s1 &lt;device(s)&gt;</code></td></tr>
 </tbody>
 </table>
+<p style="page-break-after: always"></p>
 <h3 data-number="3.13" id="debug-early-userspace"><span class="header-section-number">3.13</span> Debug Early Userspace</h3>
-<p>You can add <strong>archboot-early-debug</strong> on <strong>kernel commandline</strong> to debug the early userspace.</p>
-<p>To debug the rootfs you can simply mount <strong>/dev/zram0</strong> to <strong>/sysroot</strong> to analyze the rootfs.</p>
-<p>To continue boot, after debugging you can simply mount <strong>/dev/zram0</strong> to <strong>/sysroot</strong> and exit the bash shell.</p>
+<p>In order to debug the early userspace add <strong>archboot-early-debug</strong> on <strong>kernel commandline</strong>.
+Mount <strong>/dev/zram0</strong> to <strong>/sysroot</strong> and analyze the rootfs or <strong>exit</strong> the bash shell to <strong>continue</strong> the boot process.</p>
 <h3 data-number="3.14" id="system-configuration"><span class="header-section-number">3.14</span> System Configuration On Installed System</h3>
-<p>You can also run <strong>archboot-setup.sh</strong> for <strong>system configuration</strong> on an installed system.</p>
-<p><a href="#package-installation" title="Installation"><strong>Install</strong></a> your corresponding Archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
+<p>You can also run <strong>archboot-setup.sh</strong> for <strong>system configuration</strong> on an installed system.
+<a href="#package-installation" title="Installation"><strong>Install</strong></a> your corresponding Archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
+<p style="page-break-after: always"></p>
 <h2 data-number="4." id="faq-known-issues-and-limitations"><span class="header-section-number">4.</span> <strong>FAQ / Known Issues / Limitations</strong></h2>
 <p>Please <strong>check</strong> the forum threads or project page for posted <strong>fixes</strong> and <strong>workarounds</strong>.</p>
 <table>
@@ -710,7 +722,7 @@ Some hardware does not like the <a href="https://wiki.archlinux.org/title/KMS" t
 <ul>
 <li><strong>Package</strong> XYZ is <strong>missing</strong> in Archboot Environment.<br>
 <a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the missing package as needed.
-For example, <a href="https://wiki.archlinux.org/title/Archinstall" title="Archinstall"><strong>archinstall</strong></a> is not included by default.<br>It needs python3, which is a large dependency.
+For example, <a href="https://wiki.archlinux.org/title/Archinstall" title="Archinstall"><strong>archinstall</strong></a> is not included by default. It needs python3, which is a large dependency.
 </li>
 </ul>
 <ul>
@@ -739,6 +751,7 @@ The calculated size to boot the image follows the formula:<br>
 <strong>Initrd + Kernel + Unpackedkernel + Unpackedinitrd = minimum RAM to boot</strong>
 </li>
 </ul>
+<p style="page-break-after: always"></p>
 <h2 data-number="5." id="archiso"><span class="header-section-number">5. </span>Comparison To Archiso Image</h2>
 <table>
 <thead>
@@ -1006,8 +1019,7 @@ The calculated size to boot the image follows the formula:<br>
 </tr>
 </tbody>
 </table>
-<p> &#9733; Optional | <sup>1</sup> Only local image |  <sup>2</sup> Acer R11 Chromebook 4GB RAM</p>
-<p> <sup>3</sup> QEMU (4GB RAM, kvm and virtio backend), normal image</p>
+<p> &#9733; Optional | <sup>1</sup> Only local image | <sup>2</sup> Acer R11 Chromebook 4GB RAM | <sup>3</sup> QEMU (4GB RAM, kvm and virtio backend), normal image</p>
 <h2 data-number="6." id="development"><span class="header-section-number">6.</span> <strong>Development: GIT And Bugtracker</strong></h2>
 <ul>
 <li>GIT repository can be found at <a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Arch Linux Gitlab</strong></a> or <a href="https://github.com/tpowa/Archboot"><strong>Github</strong></a> .</li>
@@ -1054,6 +1066,7 @@ The calculated size to boot the image follows the formula:<br>
 </tbody>
 </table>
 <p>Add your used <strong>kernel</strong> and <strong>initrd</strong> to your bootloader.</p>
+<p style="page-break-after: always"></p>
 <h2 data-number="7.2" id="create-image-files"><span class="header-section-number">7.2</span> Create Image Files</h2>
 <h3 data-number="7.2.1" id="requirements"><span class="header-section-number">7.2.1</span> <strong>Requirement</strong></h3>
 <p>In order to build images you will need around <strong>3G</strong> free space on disk.</p>
@@ -1112,6 +1125,7 @@ The calculated size to boot the image follows the formula:<br>
 </tbody>
 </table>
 <p>Modify your container to your needs. Then run <strong>archboot-x86_64-iso.sh</strong> for image creation in container.</p>
+<p style="page-break-after: always"></p>
 <h4 data-number="7.2.3.2" id="configuration-files-for-image-creation"><span class="header-section-number">7.2.3.2</span> <strong>Configuration Files For Image Creation:</strong></h4>
 There are the following configuration files for ISO creation:
 <ul>
@@ -1169,6 +1183,7 @@ Options supported in <strong>/etc/archboot/&lt;profile&gt;.conf</strong> files:<
 </tr>
 </tbody>
 </table>
+<p style="page-break-after: always"></p>
 Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong> files:<br>
 <table>
 <thead>
@@ -1261,6 +1276,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tr>
 </tbody>
 </table>
+<p style="page-break-after: always"></p>
 <h2 data-number="7.3" id="setting-up-an-archboot-image-server"><span class="header-section-number">7.3.</span> Setting Up An Image Server</h2>
 <h3 data-number="7.3.1" id="requirements-1"><span class="header-section-number">7.3.1</span> <strong>Requirements</strong></h3>
 <ul>
@@ -1321,6 +1337,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tr>
 </tbody>
 </table>
+<p style="page-break-after: always"></p>
 <h4 data-number="7.3.3.3" id="automatic-server-update"><span class="header-section-number">7.3.3.3</span> <strong>Automatic Server Update</strong></h4>
 <p>The <strong>/etc/archboot/server-update.conf</strong> file defines architectures and update trigger packages.</p>
 <table>
@@ -1339,6 +1356,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tbody>
 </table>
 <p>You can skip the automatic generation, by adding a <strong>MASK</strong> file to the directory, which includes the containers.</p>
+<p style="page-break-after: always"></p>
 <h2 data-number="8" id="testing-image-and-files-with-qemu"><span class="header-section-number">8.</span> Testing Image And Files With QEMU</h2>
 <p>You can run <a href="https://wiki.archlinux.org/title/QEMU" title="QEMU"><strong>QEMU</strong></a> tests at different stages of ISO creation.</p>
 <h3 data-number="8.1" id="running-aarch64"><span class="header-section-number">8.1</span> <strong>Running AARCH64:</strong></h3>
@@ -1386,6 +1404,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 <table>
 <thead>
 <tr class="header">
+<p style="page-break-after: always"></p>
 <th>BIOS MBR mode:</th>
 </tr>
 </thead>
@@ -1450,6 +1469,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 <table>
 <thead>
 <tr class="header">
+<p style="page-break-after: always"></p>
 <th>32bit UEFI / 64bit running system:</th>
 </tr>
 </thead>
@@ -1509,6 +1529,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tr>
 </tbody>
 </table>
+<p style="page-break-after: always"></p>
 <h2 data-number="9" id="arch-linux-wiki"><span class="header-section-number">9.</span> Arch Linux Wiki</h2>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Installation_Guide" title="Installation Guide"><strong>Installation Guide</strong></a></li>
@@ -1543,6 +1564,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 <li><a href="https://www.youtube.com/watch?v=cOobSmI-XgA"><strong>UTM installation on Macbook M1</strong></a></li>
 <li><a href="https://www.youtube.com/watch?v=mb3ykTklnWU"><strong>Running local image</strong></a></li>
 </ul>
+<p style="page-break-after: always"></p>
 <h2 data-number="12" id="history"><span class="header-section-number">12.</span> History</h2>
 <ul>
 <li>Official <a href="https://archlinux.org/"><strong>Arch Linux</strong></a> install medium from <strong>Release 0.7</strong> till <strong>2008.03</strong>.</li>

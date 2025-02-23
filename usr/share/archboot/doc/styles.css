@@ -7,9 +7,9 @@ html {
 }
 body {
     margin: 0 auto;
-    max-width: 75em;
-    padding-left: 50px;
-    padding-right: 50px;
+    max-width: 58em;
+    padding-left: 20px;
+    padding-right: 20px;
     padding-top: 50px;
     padding-bottom: 50px;
     hyphens: auto;
