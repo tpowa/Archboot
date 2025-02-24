@@ -30,6 +30,7 @@ if echo "${_BASENAME}" | rg -qw 'aarch64' || echo "${_BASENAME}" | rg -qw 'x86_6
     _prepare_background || exit 1
     _reproducibility "${_ISODIR}"
     _prepare_uefi_image || exit 1
+    _prepare_release_txt || exit 1
     _reproducibility "${_ISODIR}"
     _grub_mkrescue || exit 1
     _unify_gpt_partitions || exit 1
