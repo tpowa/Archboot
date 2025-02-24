@@ -250,6 +250,7 @@ _grub_mkrescue() {
     # --set_all_file_dates for all files
     # --modification-date= for boot.catalog
     # --volid set ISO label ARCHBOOT
+    # -J enbable Joliet filesystem for correct file names on Windows
     # -- -rm_r /efi .disk/ /boot/grub/{roms,locale} ${_RESCUE_REMOVE} for removing reproducibility breakers
     echo "Generating ${_ARCH} hybrid ISO..."
     [[ "${_ARCH}" == "x86_64" ]] && _RESCUE_REMOVE="mach_kernel /System /boot/grub/i386-efi /boot/grub/x86_64-efi"
@@ -260,7 +261,7 @@ _grub_mkrescue() {
                   --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ \
                   "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" \
                   "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" \
-                  -volid "ARCHBOOT" -- -rm_r /boot/{firmware,grub/{roms,locale}} /efi .disk/ \
+                  -volid "ARCHBOOT" -J -- -rm_r /boot/{firmware,grub/{roms,locale}} /efi .disk/ \
                   ${_RESCUE_REMOVE} &> "${_IMAGENAME}.log"
 }
 
