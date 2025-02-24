@@ -12,6 +12,7 @@ ISO images:
 - On latest image reduced needed RAM by 10% 
   to boot from 2300M down to 2100M!
 - maximized boot speed!
+- added doc directory to ISO base directory
 container.sh:
 - fixed _CACHEDIR must be full path 
 init.sh:
