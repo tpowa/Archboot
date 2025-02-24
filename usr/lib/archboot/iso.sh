@@ -217,6 +217,7 @@ EOF
 }
 
 _prepare_release_txt() {
+    pacman -Sy &>"${_NO_LOG}"
     echo "Preparing Release.txt..."
     (echo "ARCHBOOT - ARCH LINUX INSTALLATION / RESCUE SYSTEM"
     echo "archboot.com | (c) 2006 - $(date +%Y)"
