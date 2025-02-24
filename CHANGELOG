@@ -30,7 +30,7 @@ network:
 setup:
 - fixed BIOS_boot partition detection
 - fixed startup on running system
-- added root check
+- added root user check
 - fixed blockdevice listing of /dev/mapper devices
 - check on available devices in mountpoints
 - fixed btrfs subvolume creation on fresh devices
