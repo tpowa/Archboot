@@ -135,10 +135,6 @@ _create_iso() {
             fi
             rm efi.img
         done
-        # add ucode licenses
-        mkdir licenses
-        mv "${_W_DIR}/usr/share/licenses/amd-ucode" licenses/
-        [[ "${_ARCH}" == "x86_64" ]] && mv "${_W_DIR}/usr/share/licenses/intel-ucode" licenses/
         echo "Generating Unified Kernel Images..."
         _KERNEL="boot/kernel/${_KERNEL##*/}"
         [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=/boot/ucode/intel-ucode.img"

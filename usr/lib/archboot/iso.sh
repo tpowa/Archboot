@@ -112,15 +112,11 @@ _prepare_ucode() {
     if [[ "${_ARCH}" == "x86_64" ]]; then
         echo "Preparing intel-ucode..."
         cp "/${_INTEL_UCODE}" "${_ISODIR}/boot/"
-        mkdir -p "${_ISODIR}"/licenses/intel-ucode
-        cp /usr/share/licenses/intel-ucode/LICENSE "${_ISODIR}/licenses/intel-ucode"
     fi
     # both x86_64 and aarch64
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
         echo "Preparing amd-ucode..."
         cp "/${_AMD_UCODE}" "${_ISODIR}/boot/"
-        mkdir -p "${_ISODIR}"/licenses/amd-ucode
-        cp /usr/share/licenses/amd-ucode/LICENSE.amd-ucode "${_ISODIR}/licenses/amd-ucode/"
     fi
 }
 
