@@ -241,6 +241,7 @@ _prepare_release_txt() {
     echo "---Complete Package List---"
     pacman -Q | sd '\r|\x1b\[[0-9;]*m|\x1b\[.[0-9]+[h;l]' '') >${_ISODIR}/Release.txt
 }
+
 # https://github.com/CoelacanthusHex/archriscv-scriptlet/blob/master/mkimg
 # https://checkmk.com/linux-knowledge/mounting-partition-loop-device
 # calculate mountpoint offset: sector*start
