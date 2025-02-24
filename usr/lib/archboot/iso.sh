@@ -217,7 +217,6 @@ EOF
 }
 
 _prepare_release_txt() {
-    pacman -Sy &>"${_NO_LOG}"
     echo "Preparing Release.txt..."
     (echo "ARCHBOOT - ARCH LINUX INSTALLATION / RESCUE SYSTEM"
     echo "archboot.com | (c) 2006 - $(date +%Y)"
@@ -225,22 +224,22 @@ _prepare_release_txt() {
     echo ""
     echo "The release is based on these main packages:"
     echo "Archboot: $(pacman -Qi "${_ARCHBOOT}" |\
-    rg -o 'Version.* (.*)\r' -r '$1')"
+    rg -o 'Version.* (.*)' -r '$1')"
     [[ "${_ARCH}" == "riscv64" ]] || echo "Grub: $(pacman -Qi grub |\
                                      rg -o 'Version.* (.*)\r' -r '$1')"
     echo "Linux: $(pacman -Qi linux |\
-    rg -o 'Version.* (.*)\r' -r '$1')"
+    rg -o 'Version.* (.*)' -r '$1')"
     echo "Pacman: $(pacman -Qi pacman |\
-    rg -o 'Version.* (.*)\r' -r '$1')"
+    rg -o 'Version.* (.*)' -r '$1')"
     echo "Systemd: $(pacman -Qi systemd |\
-    rg -o 'Version.* (.*)\r' -r '$1')"
+    rg -o 'Version.* (.*)' -r '$1')"
     echo ""
     if [[ -f /etc/archboot/ssh/archboot-key ]]; then
         cat /etc/archboot/ssh/archboot-key
     fi
     echo ""
     echo "---Complete Package List---"
-    pacman -Q | sd '\r|\x1b\[[0-9;]*m|\x1b\[.[0-9]+[h;l]' '') >${_ISODIR}/Release.txt
+    pacman -Q | sd '\r|\x1b\[[0-9;]*m|\x1b\[.[0-9]+[h;l]' '') >"${_ISODIR}/Release.txt"
 }
 
 # https://github.com/CoelacanthusHex/archriscv-scriptlet/blob/master/mkimg
