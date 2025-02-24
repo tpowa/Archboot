@@ -256,7 +256,7 @@ _grub_mkrescue() {
                   --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ \
                   "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" \
                   "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" \
-                  -volid "ARCHBOOT" -- -rm_r /boot/grub/{roms,locale} /efi .disk/ \
+                  -volid "ARCHBOOT" -- -rm_r /boot/{firmware,grub/{roms,locale}} /efi .disk/ \
                   ${_RESCUE_REMOVE} &> "${_IMAGENAME}.log"
 }
 
