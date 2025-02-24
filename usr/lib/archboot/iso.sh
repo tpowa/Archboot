@@ -226,7 +226,7 @@ _prepare_release_txt() {
     echo "Archboot: $(pacman -Qi "${_ARCHBOOT}" |\
     rg -o 'Version.* (.*)' -r '$1')"
     [[ "${_ARCH}" == "riscv64" ]] || echo "Grub: $(pacman -Qi grub |\
-                                     rg -o 'Version.* (.*)\r' -r '$1')"
+                                     rg -o 'Version.* (.*)' -r '$1')"
     echo "Linux: $(pacman -Qi linux |\
     rg -o 'Version.* (.*)' -r '$1')"
     echo "Pacman: $(pacman -Qi pacman |\
