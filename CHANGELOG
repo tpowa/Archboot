@@ -13,6 +13,7 @@ ISO images:
   to boot from 2300M down to 2100M!
 - maximized boot speed!
 - added doc directory to ISO base directory
+- added Joliet filesystem for correct names on Windows 
 doc:
 - added page breaks to have a nice A4 printout of documentation
 container.sh:
