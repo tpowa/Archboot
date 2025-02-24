@@ -15,6 +15,7 @@ ISO images:
 - added doc directory to ISO base directory
 - added Joliet filesystem for correct filenames on Windows
 - added Release.txt to ISO base directory
+- removed license directory from ISO base directories
 doc:
 - added page breaks to have a nice A4 printout of documentation
 container.sh:
