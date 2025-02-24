@@ -103,6 +103,10 @@ _prepare_kernel_initrd_files() {
     fi
 }
 
+_prepare_doc() {
+    cp -r /usr/share/archboot/doc "${_ISODIR}/"
+}
+
 _prepare_ucode() {
     # only x86_64
     if [[ "${_ARCH}" == "x86_64" ]]; then

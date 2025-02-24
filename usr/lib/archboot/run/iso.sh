@@ -14,6 +14,7 @@ if echo "${_BASENAME}" | rg -qw 'aarch64' || echo "${_BASENAME}" | rg -qw 'x86_6
     # running system = aarch64 or x86_64
     echo "Starting ISO creation..."
     _prepare_kernel_initrd_files || exit 1
+    _prepare_doc || exit 1
     _prepare_ucode || exit 1
     if echo "${_BASENAME}" | rg -qw 'aarch64'; then
         _prepare_fedora_shim_bootloaders_aarch64 || exit 1
@@ -36,6 +37,7 @@ else
     # running system = riscv64
     echo "Starting Image creation..."
     _prepare_kernel_initrd_files || exit 1
+    _prepare_doc || exit 1
     _prepare_extlinux_conf || exit 1
     _reproducibility "${_ISODIR}"
     _uboot || exit 1
