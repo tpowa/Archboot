@@ -91,8 +91,9 @@ EOF
         sd 'position top' 'a mode invisible' /etc/sway/config
         # diable not usable plugins
         echo "exec waybar" >> /etc/sway/config
-        sd ', "custom/media"' '' /etc/xdg/waybar/config
-        sd '"mpd", "idle_inhibitor", "pulseaudio",' '' /etc/xdg/waybar/config
+        for i in custom/media mpd idle_inhibitor pulseaudio
+            sd '"${i}",' '' /etc/xdg/waybar/config.jsonc
+        done
     fi
     echo "Configuring wayvnc..."
      if ! rg -q wayvnc /etc/sway/config; then
