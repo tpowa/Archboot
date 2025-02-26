@@ -6,7 +6,7 @@ _configure_sway() {
     echo "Configuring Sway..."
     echo "Configuring bemenu..."
     #shellcheck disable=SC2016
-    sd '^set \$menu.*' 'set $menu j4-dmenu-desktop --dmenu=\x27bemenu -i --tf "#00ff00" --hf "#00ff00" --nf "#dcdccc" --fn "pango:Terminus 12" -H 30\x27 --no-generic --term="foot"' \
+    sd '^set \$menu.*' 'set \\$menu j4-dmenu-desktop --dmenu=\x27bemenu -i --tf "#00ff00" --hf "#00ff00" --nf "#dcdccc" --fn "pango:Terminus 12" -H 30\x27 --no-generic --term="foot"' \
     /etc/sway/config
     echo "Configuring wallpaper..."
     sd '^output .*' 'output * bg /usr/share/archboot/grub/archboot-background.png fill' /etc/sway/config
@@ -77,7 +77,7 @@ GenericName=Installer
 Exec=foot -- /usr/bin/setup
 Icon=system-software-install
 EOF
-    _HIDE_MENU="avahi-discover bssh bvnc fluid org.codeberg.dnkl.foot-server org.codeberg.dnkl.footclient lstopo qvidcap qv4l2 vncviewer"
+    _HIDE_MENU="avahi-discover bssh bvnc fluid foot-server footclient lstopo qvidcap qv4l2 vncviewer"
     echo "Hiding ${_HIDE_MENU} menu entries..."
     for i in ${_HIDE_MENU}; do
         if [[ -f /usr/share/applications/"${i}".desktop ]]; then
