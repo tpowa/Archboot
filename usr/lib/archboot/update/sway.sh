@@ -91,7 +91,7 @@ EOF
         sd 'position top' 'a mode invisible' /etc/sway/config
         # diable not usable plugins
         echo "exec waybar" >> /etc/sway/config
-        for i in custom/media mpd idle_inhibitor pulseaudio
+        for i in custom/media mpd idle_inhibitor pulseaudio; do
             sd '"${i}",' '' /etc/xdg/waybar/config.jsonc
         done
     fi
