@@ -17,7 +17,7 @@ _cleanup() {
     fd -u -t f -E 'UTF-8.gz' . /usr/share/i18n/charmaps -X rm &>"${_NO_LOG}"
     # remove packages from cache
     #shellcheck disable=SC2013
-    for i in $(rg -o ' (\w+) \(' -r '$1' /var/log/pacman.log); do
+    for i in $(rg -o '.* (.*) \(' -r '$1' /var/log/pacman.log); do
         rm -rf "${_CACHEDIR}/${i}"-*
     done
 }
