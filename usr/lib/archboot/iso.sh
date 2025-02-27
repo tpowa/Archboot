@@ -272,7 +272,7 @@ _grub_mkrescue() {
     # --set_all_file_dates for all files
     # --modification-date= for boot.catalog
     # --volid set ISO label ARCHBOOT
-    # -J enbable Joliet filesystem for correct file names on Windows
+    # -J enable Joliet filesystem for correct file names on Windows
     # -- -rm_r /efi .disk/ /boot/grub/{roms,locale} ${_RESCUE_REMOVE} for removing reproducibility breakers
     echo "Generating ${_ARCH} hybrid ISO..."
     [[ "${_ARCH}" == "x86_64" ]] && _RESCUE_REMOVE="mach_kernel /System /boot/grub/i386-efi /boot/grub/x86_64-efi"
