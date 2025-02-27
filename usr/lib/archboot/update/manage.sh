@@ -400,8 +400,6 @@ _full_system() {
 }
 
 _new_image() {
-    _PRESET_LATEST="${_RUNNING_ARCH}-latest"
-    _PRESET_LOCAL="${_RUNNING_ARCH}-local"
     _ISONAME="archboot-$(date +%Y.%m.%d-%H.%M)"
     _progress "1" "Removing files from /..."
     _clean_archboot
@@ -424,13 +422,13 @@ _new_image() {
         ${_NSPAWN} "${_W_DIR}" pacman -Rdd lvm2 --noconfirm &>"${_NO_LOG}"
         # generate local iso in container, umount tmp it's a tmpfs and weird things could happen then
         : > "${_W_DIR}"/.archboot
-        (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_RUNNING_ARCH}-iso.sh -g -s -p=${_PRESET_LOCAL} \
+        (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*; archboot-${_RUNNING_ARCH}-iso.sh -g -s -c=${_CONFIG_LOCAL} \
         -i=${_ISONAME}-local-${_RUNNING_ARCH}" > "${_LOG}"; rm -rf "${_W_DIR:?}${_CACHEDIR:?}"/*; rm "${_W_DIR}"/.archboot) &
         _ram_check
         _progress_wait "23" "55" "Generating local ISO..." "10"
         # generate latest iso in container
         : > "${_W_DIR}"/.archboot
-        (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_RUNNING_ARCH}-iso.sh -g -s -p=${_PRESET_LATEST} \
+        (${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount /tmp;rm -rf /tmp/*;archboot-${_RUNNING_ARCH}-iso.sh -g -s -c=${_CONFIG_LATEST} \
         -i=${_ISONAME}-latest-${_RUNNING_ARCH}" > "${_LOG}"; rm "${_W_DIR}"/.archboot) &
         _progress_wait "56" "69" "Generating latest ISO..." "10"
         _progress "70" "Installing lvm2 to container..."
