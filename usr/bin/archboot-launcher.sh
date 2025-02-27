@@ -15,7 +15,7 @@ _check_desktop() {
 _check_manage() {
     _MANAGE=()
     update | rg -q 'full' && _MANAGE+=( "FULL" "Switch To Full Arch Linux System" )
-    update | rg -q 'latest archboot' && _MANAGE+=( "UPDATE" "Update Archboot Environment" )
+    update | rg -q 'latest Archboot' && _MANAGE+=( "UPDATE" "Update Archboot Environment" )
     update | rg -q 'image' && _MANAGE+=( "IMAGE" "Create Archboot Images" )
 }
 

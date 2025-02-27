@@ -42,6 +42,8 @@ setup:
 - added btrfs raid1c3 and raid1c4 selection support
 - allow reconfiguring of btrfs raid devices
 - removed btrfs raid0 selection
+launcher:
+- fixed latest Archboot environment option
 manage:
 - fixed ISO creation parameters
 desktop:
