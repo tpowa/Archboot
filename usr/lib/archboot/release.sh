@@ -6,8 +6,6 @@ _INITRD="boot/initrd-${_ARCH}.img"
 _INITRD_NORMAL="boot/initrd/initrd-${_ARCH}.img"
 _INITRD_LATEST="boot/initrd/initrd-latest-${_ARCH}.img"
 _INITRD_LOCAL="boot/initrd/initrd-local-${_ARCH}.img"
-_CONFIG_LATEST="${_ARCH}-latest.conf"
-_CONFIG_LOCAL="${_ARCH}-local.conf"
 _W_DIR="$(mktemp -u archboot-release.XXX)"
 
 _usage () {

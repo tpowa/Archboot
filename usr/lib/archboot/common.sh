@@ -65,6 +65,8 @@ else
     _ARCHBOOT="archboot"
     _ARCH="x86_64"
 fi
+_CONFIG_LATEST="${_ARCH}-latest.conf"
+_CONFIG_LOCAL="${_ARCH}-local.conf"
 # chromium is now working on riscv64
 [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _STANDARD_BROWSER="firefox"
 if [[ -d "${_ISO_HOME}" ]]; then
