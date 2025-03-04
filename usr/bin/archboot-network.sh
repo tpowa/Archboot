@@ -108,6 +108,8 @@ _wireless() {
     fi
     # write to template file
     echo "### wireless authentification start" >> ${_TEMPLATE}
+    echo "rfkill unblock all" >> ${_TEMPLATE}
+    echo "iwctl station \"${_INTERFACE}\" disconnect &>\"${_NO_LOG}\"" >> ${_TEMPLATE}
     if [[ -z "${_WLAN_KEY}" ]]; then
         echo "echo \"\" | iwctl station \"${_INTERFACE}\" \"${_WLAN_CONNECT}\" \"${_WLAN_SSID}\" &>\"${_NO_LOG}\"" >> ${_TEMPLATE}
     else
@@ -272,9 +274,7 @@ _network() {
             echo "chmod a+x \"${_DESTDIR}\"/etc/profile.d/proxy.sh" >> ${_TEMPLATE}
         done
     fi
-    if [[ -e /etc/systemd/network/10-wired-auto-dhcp.network ]]; then
-        echo "rm /etc/systemd/network/10-wired-auto-dhcp.network" >> ${_TEMPLATE}
-    fi
+    echo "rm -f /etc/systemd/network/10-wired-auto-dhcp.network" >> ${_TEMPLATE}
     echo "systemctl restart systemd-networkd" >> ${_TEMPLATE}
     echo "systemctl restart systemd-resolved" >> ${_TEMPLATE}
     echo "sleep 10" >> ${_TEMPLATE}
