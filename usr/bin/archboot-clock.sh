@@ -80,6 +80,7 @@ _task_clock() {
     echo "timedatectl set-local-rtc 0" >> ${_TEMPLATE}
     echo "systemctl restart systemd-timesyncd" >> ${_TEMPLATE}
     echo "timedatectl set-ntp 1" >> ${_TEMPLATE}
+    echo ": > /.clock" >> ${_TEMPLATE}
     echo "### clock end"
     rm /.archboot
 }

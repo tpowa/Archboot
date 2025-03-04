@@ -101,6 +101,7 @@ _localize_task() {
     echo "systemctl restart systemd-vconsole-setup" >> ${_TEMPLATE}
     # set running VC too
     echo "export LANG=\"${_LOCALE}.UTF-8\"" >> ${_TEMPLATE}
+    echo ": > /.localize" >> ${_TEMPLATE}
     echo "### localize end" >> ${_TEMPLATE}
     rm /.archboot
 }

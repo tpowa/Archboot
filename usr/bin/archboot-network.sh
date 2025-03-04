@@ -280,6 +280,7 @@ _network() {
     echo "systemctl restart systemd-resolved" >> ${_TEMPLATE}
     echo "echo Waiting 10 seconds for network link..." >> ${_TEMPLATE}
     echo "sleep 10" >> ${_TEMPLATE}
+    echo ": > /.network" >> ${_TEMPLATE}
     echo "### network profile end" >> ${_TEMPLATE}
 }
 
