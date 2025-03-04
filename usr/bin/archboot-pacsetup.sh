@@ -56,6 +56,7 @@ _select_mirror() {
     fi
     # write to template
     echo "### pacman mirror start" >> ${_TEMPLATE}
+    echo "echo Pacman Server..." >> ${_TEMPLATE}
     echo "sd '^Server' '#Server' "${_PACMAN_MIRROR}"" >> ${_TEMPLATE}
     echo "echo \"Server = \"${_SYNC_URL}\"\" >> \"${_PACMAN_MIRROR}\"" >> ${_TEMPLATE}
     echo "### pacman mirror end" >> ${_TEMPLATE}
@@ -81,7 +82,7 @@ _task_pacman_keyring_install() {
     pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>"${_LOG}"
     # write to template
     echo "### pacman keyring start" >> ${_TEMPLATE}
-    echo "Pacman keyring..." >> ${_TEMPLATE}
+    echo "echo Pacman keyring..." >> ${_TEMPLATE}
     echo "_pacman_keyring" >> ${_TEMPLATE}
     #shellcheck disable=SC2068
     echo "pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>\"${_LOG}\"" >> ${_TEMPLATE}

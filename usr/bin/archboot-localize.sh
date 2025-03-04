@@ -87,7 +87,7 @@ _localize_task() {
         echo ". /usr/lib/archboot/common.sh" >> ${_TEMPLATE}
     fi
     echo "### localize start" >> ${_TEMPLATE}
-    echo "Localization..." >> ${_TEMPLATE}
+    echo "echo Localization..." >> ${_TEMPLATE}
     echo "echo \"LANG=${_LOCALE}.UTF-8\" > /etc/locale.conf" >> ${_TEMPLATE}
     echo "echo \"LANG=${_LOCALE}.UTF-8\" > /.localize" >> ${_TEMPLATE}
     echo "echo LC_COLLATE=C >> /etc/locale.conf" >> ${_TEMPLATE}
