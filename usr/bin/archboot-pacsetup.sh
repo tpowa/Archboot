@@ -54,6 +54,11 @@ _select_mirror() {
         sleep 3
         _SYNC_URL=""
     fi
+    # write to template
+    echo "### pacman mirror start" >> ${_TEMPLATE}
+    echo "sd '^Server' '#Server' "${_PACMAN_MIRROR}"" >> ${_TEMPLATE}
+    echo "echo \"Server = \"${_SYNC_URL}\"\" >> \"${_PACMAN_MIRROR}\"" >> ${_TEMPLATE}
+    echo "### pacman mirror end" >> ${_TEMPLATE}
 }
 
 #shellcheck disable=SC2120

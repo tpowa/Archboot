@@ -46,6 +46,7 @@ _STANDARD_PACKAGES=(
   noto-fonts
   xorg-xhost
 )
+_TEMPLATE="/tmp/archboot-autorun.template"
 _VNC_PACKAGE="tigervnc"
 _WAYLAND_PACKAGE="egl-wayland"
 _XORG_PACKAGE="xorg"
