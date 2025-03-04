@@ -277,6 +277,7 @@ _network() {
     echo "rm -f /etc/systemd/network/10-wired-auto-dhcp.network" >> ${_TEMPLATE}
     echo "systemctl restart systemd-networkd" >> ${_TEMPLATE}
     echo "systemctl restart systemd-resolved" >> ${_TEMPLATE}
+    echo "Waiting 10 seconds for network link..." >> ${_TEMPLATE}
     echo "sleep 10" >> ${_TEMPLATE}
     echo "### network profile end" >> ${_TEMPLATE}
 }
