@@ -52,11 +52,11 @@ _select_mirror() {
         _SYNC_URL=""
     fi
     # write to template
-    echo "### pacman mirror start" >> ${_TEMPLATE}
-    echo "echo Pacman Server..." >> ${_TEMPLATE}
-    echo "sd '^Server' '#Server' "${_PACMAN_MIRROR}"" >> ${_TEMPLATE}
-    echo "echo \"Server = \"${_SYNC_URL}\"\" >> \"${_PACMAN_MIRROR}\"" >> ${_TEMPLATE}
-    echo "### pacman mirror end" >> ${_TEMPLATE}
+    echo "### pacman mirror start" >> "${_TEMPLATE}"
+    echo "echo Pacman Server..." >> "${_TEMPLATE}"
+    echo "sd '^Server' '#Server' \"${_PACMAN_MIRROR}\"" >> "${_TEMPLATE}"
+    echo "echo \"Server = \"${_SYNC_URL}\"\" >> \"${_PACMAN_MIRROR}\"" >> "${_TEMPLATE}"
+    echo "### pacman mirror end" >> "${_TEMPLATE}"
 }
 #shellcheck disable=SC2120
 _enable_testing() {
@@ -66,9 +66,9 @@ _enable_testing() {
             #shellcheck disable=SC2016
             sd '^#(\[[c,e].*-testing\]\n)#' '$1' "${1}/etc/pacman.conf"
             # write to template
-            echo "### pacman testing repository start" >> ${_TEMPLATE}
-            echo "sd '^#(\[[c,e].*-testing\]\\\n)#' '$1' \"${1}/etc/pacman.conf\"" >> ${_TEMPLATE}
-            echo "### pacman testing repository end" >> ${_TEMPLATE}
+            echo "### pacman testing repository start" >> "${_TEMPLATE}"
+            echo "sd '^#(\[[c,e].*-testing\]\\\n)#' '$1' \"${1}/etc/pacman.conf\"" >> "${_TEMPLATE}"
+            echo "### pacman testing repository end" >> "${_TEMPLATE}"
             _DOTESTING=1
         fi
     else
@@ -80,13 +80,13 @@ _task_pacman_keyring_install() {
     #shellcheck disable=SC2068
     pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>"${_LOG}"
     # write to template
-    echo "### pacman keyring start" >> ${_TEMPLATE}
-    echo "echo Pacman keyring..." >> ${_TEMPLATE}
-    echo "_pacman_keyring" >> ${_TEMPLATE}
+    echo "### pacman keyring start" >> "${_TEMPLATE}"
+    echo "echo Pacman keyring..." >> "${_TEMPLATE}"
+    echo "_pacman_keyring" >> "${_TEMPLATE}"
     #shellcheck disable=SC2068
-    echo "pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>\"${_LOG}\"" >> ${_TEMPLATE}
-    echo ": > /.pacsetup" >> ${_TEMPLATE}
-    echo "### pacman keyring end" >> ${_TEMPLATE}
+    echo "pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+    echo ": > /.pacsetup" >> "${_TEMPLATE}"
+    echo "### pacman keyring end" >> "${_TEMPLATE}"
     rm /.archboot
 }
 _prepare_pacman() {

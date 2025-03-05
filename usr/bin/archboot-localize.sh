@@ -83,26 +83,26 @@ _localize_task() {
     export LANG="${_LOCALE}.UTF-8"
     # write to template file
     if [[ ! -e "${_TEMPLATE}" ]] then
-        echo "#!/bin/bash" > ${_TEMPLATE}
-        echo ". /usr/lib/archboot/common.sh" >> ${_TEMPLATE}
+        echo "#!/bin/bash" > "${_TEMPLATE}"
+        echo ". /usr/lib/archboot/common.sh" >> "${_TEMPLATE}"
     fi
-    echo "### localize start" >> ${_TEMPLATE}
-    echo "echo Localization..." >> ${_TEMPLATE}
-    echo "echo \"LANG=${_LOCALE}.UTF-8\" > /etc/locale.conf" >> ${_TEMPLATE}
-    echo "echo \"LANG=${_LOCALE}.UTF-8\" > /.localize" >> ${_TEMPLATE}
-    echo "echo LC_COLLATE=C >> /etc/locale.conf" >> ${_TEMPLATE}
-    echo "localectl set-locale \"${_LOCALE}.UTF-8\" &>\"${_NO_LOG}\"" >> ${_TEMPLATE}
+    echo "### localize start" >> "${_TEMPLATE}"
+    echo "echo Localization..." >> "${_TEMPLATE}"
+    echo "echo \"LANG=${_LOCALE}.UTF-8\" > /etc/locale.conf" >> "${_TEMPLATE}"
+    echo "echo \"LANG=${_LOCALE}.UTF-8\" > /.localize" >> "${_TEMPLATE}"
+    echo "echo LC_COLLATE=C >> /etc/locale.conf" >> "${_TEMPLATE}"
+    echo "localectl set-locale \"${_LOCALE}.UTF-8\" &>\"${_NO_LOG}\"" >> "${_TEMPLATE}"
     #shellcheck disable=SC2016
-    echo "sd '(^[a-z])' '#\$1' /etc/locale.gen" >> ${_TEMPLATE}
-    echo "sd \"^#${_LOCALE}.UTF-8\" \"${_LOCALE}.UTF-8\" /etc/locale.gen" >> ${_TEMPLATE}
-    echo "locale-gen &>\"${_NO_LOG}\"" >> ${_TEMPLATE}
-    echo "echo KEYMAP=\"${_KEYMAP}\" > /etc/vconsole.conf" >> ${_TEMPLATE}
-    echo "echo FONT=\"${_FONT}\" >> /etc/vconsole.conf" >> ${_TEMPLATE}
-    echo "systemctl restart systemd-vconsole-setup" >> ${_TEMPLATE}
+    echo "sd '(^[a-z])' '#\$1' /etc/locale.gen" >> "${_TEMPLATE}"
+    echo "sd \"^#${_LOCALE}.UTF-8\" \"${_LOCALE}.UTF-8\" /etc/locale.gen" >> "${_TEMPLATE}"
+    echo "locale-gen &>\"${_NO_LOG}\"" >> "${_TEMPLATE}"
+    echo "echo KEYMAP=\"${_KEYMAP}\" > /etc/vconsole.conf" >> "${_TEMPLATE}"
+    echo "echo FONT=\"${_FONT}\" >> /etc/vconsole.conf" >> "${_TEMPLATE}"
+    echo "systemctl restart systemd-vconsole-setup" >> "${_TEMPLATE}"
     # set running VC too
-    echo "export LANG=\"${_LOCALE}.UTF-8\"" >> ${_TEMPLATE}
-    echo ": > /.localize" >> ${_TEMPLATE}
-    echo "### localize end" >> ${_TEMPLATE}
+    echo "export LANG=\"${_LOCALE}.UTF-8\"" >> "${_TEMPLATE}"
+    echo ": > /.localize" >> "${_TEMPLATE}"
+    echo "### localize end" >> "${_TEMPLATE}"
     rm /.archboot
 }
 

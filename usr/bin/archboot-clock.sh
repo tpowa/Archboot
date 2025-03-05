@@ -43,7 +43,7 @@ _timezone () {
     timedatectl set-timezone "${_ZONE}"
     sleep 2
     # write to template
-    echo "timedatectl set-timezone \"${_ZONE}\"" >> ${_TEMPLATE}
+    echo "timedatectl set-timezone \"${_ZONE}\"" >> "${_TEMPLATE}"
 }
 
 _timeset() {
@@ -73,16 +73,16 @@ _task_clock() {
     # enable background syncing
     timedatectl set-ntp 1
     # write to template
-    echo "### clock start" >> ${_TEMPLATE}
-    echo "echo Clock..." >> ${_TEMPLATE}
-    echo "timedatectl set-timezone \"${_ZONE}\"" >> ${_TEMPLATE}
-    echo "echo 0.0 0 0.0 > /etc/adjtime" >> ${_TEMPLATE}
-    echo "echo 0 >> /etc/adjtime" >> ${_TEMPLATE}
-    echo "echo UTC >> /etc/adjtime" >> ${_TEMPLATE}
-    echo "timedatectl set-local-rtc 0" >> ${_TEMPLATE}
-    echo "systemctl restart systemd-timesyncd" >> ${_TEMPLATE}
-    echo "timedatectl set-ntp 1" >> ${_TEMPLATE}
-    echo ": > /.clock" >> ${_TEMPLATE}
+    echo "### clock start" >> "${_TEMPLATE}"
+    echo "echo Clock..." >> "${_TEMPLATE}"
+    echo "timedatectl set-timezone \"${_ZONE}\"" >> "${_TEMPLATE}"
+    echo "echo 0.0 0 0.0 > /etc/adjtime" >> "${_TEMPLATE}"
+    echo "echo 0 >> /etc/adjtime" >> "${_TEMPLATE}"
+    echo "echo UTC >> /etc/adjtime" >> "${_TEMPLATE}"
+    echo "timedatectl set-local-rtc 0" >> "${_TEMPLATE}"
+    echo "systemctl restart systemd-timesyncd" >> "${_TEMPLATE}"
+    echo "timedatectl set-ntp 1" >> "${_TEMPLATE}"
+    echo ": > /.clock" >> "${_TEMPLATE}"
     echo "### clock end"
     rm /.archboot
 }
