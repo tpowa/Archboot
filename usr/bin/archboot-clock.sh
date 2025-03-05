@@ -73,17 +73,18 @@ _task_clock() {
     # enable background syncing
     timedatectl set-ntp 1
     # write to template
-    echo "### clock start" >> "${_TEMPLATE}"
-    echo "echo Clock..." >> "${_TEMPLATE}"
-    echo "timedatectl set-timezone \"${_ZONE}\"" >> "${_TEMPLATE}"
-    echo "echo 0.0 0 0.0 > /etc/adjtime" >> "${_TEMPLATE}"
-    echo "echo 0 >> /etc/adjtime" >> "${_TEMPLATE}"
-    echo "echo UTC >> /etc/adjtime" >> "${_TEMPLATE}"
-    echo "timedatectl set-local-rtc 0" >> "${_TEMPLATE}"
-    echo "systemctl restart systemd-timesyncd" >> "${_TEMPLATE}"
-    echo "timedatectl set-ntp 1" >> "${_TEMPLATE}"
-    echo ": > /.clock" >> "${_TEMPLATE}"
+    { echo "### clock start"
+    echo "echo Clock..."
+    echo "timedatectl set-timezone \"${_ZONE}\""
+    echo "echo 0.0 0 0.0 > /etc/adjtime"
+    echo "echo 0 >> /etc/adjtime"
+    echo "echo UTC >> /etc/adjtime"
+    echo "timedatectl set-local-rtc 0"
+    echo "systemctl restart systemd-timesyncd"
+    echo "timedatectl set-ntp 1"
+    echo ": > /.clock"
     echo "### clock end"
+    } >> "${_TEMPLATE}"
     rm /.archboot
 }
 

@@ -52,11 +52,12 @@ _select_mirror() {
         _SYNC_URL=""
     fi
     # write to template
-    echo "### pacman mirror start" >> "${_TEMPLATE}"
-    echo "echo Pacman Server..." >> "${_TEMPLATE}"
-    echo "sd '^Server' '#Server' \"${_PACMAN_MIRROR}\"" >> "${_TEMPLATE}"
-    echo "echo \"Server = \"${_SYNC_URL}\"\" >> \"${_PACMAN_MIRROR}\"" >> "${_TEMPLATE}"
-    echo "### pacman mirror end" >> "${_TEMPLATE}"
+    { echo "### pacman mirror start"
+    echo "echo Pacman Server..."
+    echo "sd '^Server' '#Server' \"${_PACMAN_MIRROR}\""
+    echo "echo \"Server = \"${_SYNC_URL}\"\" >> \"${_PACMAN_MIRROR}\""
+    echo "### pacman mirror end"
+    } >> "${_TEMPLATE}"
 }
 #shellcheck disable=SC2120
 _enable_testing() {
@@ -66,9 +67,10 @@ _enable_testing() {
             #shellcheck disable=SC2016
             sd '^#(\[[c,e].*-testing\]\n)#' '$1' "${1}/etc/pacman.conf"
             # write to template
-            echo "### pacman testing repository start" >> "${_TEMPLATE}"
-            echo "sd '^#(\[[c,e].*-testing\]\\\n)#' '$1' \"${1}/etc/pacman.conf\"" >> "${_TEMPLATE}"
-            echo "### pacman testing repository end" >> "${_TEMPLATE}"
+            { echo "### pacman testing repository start"
+            echo "sd '^#(\[[c,e].*-testing\]\\\n)#' '$1' \"${1}/etc/pacman.conf\""
+            echo "### pacman testing repository end"
+            } >> "${_TEMPLATE}"
             _DOTESTING=1
         fi
     else
@@ -80,13 +82,14 @@ _task_pacman_keyring_install() {
     #shellcheck disable=SC2068
     pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>"${_LOG}"
     # write to template
-    echo "### pacman keyring start" >> "${_TEMPLATE}"
-    echo "echo Pacman keyring..." >> "${_TEMPLATE}"
-    echo "_pacman_keyring" >> "${_TEMPLATE}"
+    { echo "### pacman keyring start"
+    echo "echo Pacman keyring..."
+    echo "_pacman_keyring"
     #shellcheck disable=SC2068
-    echo "pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>\"${_LOG}\"" >> "${_TEMPLATE}"
-    echo ": > /.pacsetup" >> "${_TEMPLATE}"
-    echo "### pacman keyring end" >> "${_TEMPLATE}"
+    echo "pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>\"${_LOG}\""
+    echo ": > /.pacsetup"
+    echo "### pacman keyring end"
+    } >> "${_TEMPLATE}"
     rm /.archboot
 }
 _prepare_pacman() {
@@ -160,16 +163,17 @@ Server = file:///var/cache/pacman/pkg
 EOF
         pacman -Sy >>"${_LOG}"
         # write to template
-        echo "### local pacman repository start" >> "${_TEMPLATE}"
-        echo "cat << EOF > \"${_PACMAN_CONF}\"" >> "${_TEMPLATE}"
-        echo "[options]" >> "${_TEMPLATE}"
-        echo "Architecture = auto" >> "${_TEMPLATE}"
-        echo "SigLevel    = Required DatabaseOptional" >> "${_TEMPLATE}"
-        echo "LocalFileSigLevel = Optional" >> "${_TEMPLATE}"
-        echo "[archboot]" >> "${_TEMPLATE}"
-        echo "Server = file:///var/cache/pacman/pkg" >> "${_TEMPLATE}"
-        echo "EOF" >> "${_TEMPLATE}"
-        echo "### local pacman repository end" >> "${_TEMPLATE}"
+        { echo "### local pacman repository start"
+        echo "cat << EOF > \"${_PACMAN_CONF}\""
+        echo "[options]"
+        echo "Architecture = auto"
+        echo "SigLevel    = Required DatabaseOptional"
+        echo "LocalFileSigLevel = Optional"
+        echo "[archboot]"
+        echo "Server = file:///var/cache/pacman/pkg"
+        echo "EOF"
+        echo "### local pacman repository end"
+        } >> "${_TEMPLATE}"
         sleep 2
         break
     else
