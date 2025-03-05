@@ -82,7 +82,7 @@ _localize_task() {
     # set running VC too
     export LANG="${_LOCALE}.UTF-8"
     # write to template file
-    if [[ ! -e "${_TEMPLATE}" ]] then
+    if [[ ! -e "${_TEMPLATE}" ]]; then
         echo "#!/bin/bash" > "${_TEMPLATE}"
         echo ". /usr/lib/archboot/common.sh" >> "${_TEMPLATE}"
     fi

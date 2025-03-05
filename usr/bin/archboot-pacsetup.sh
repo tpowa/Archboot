@@ -159,6 +159,17 @@ LocalFileSigLevel = Optional
 Server = file:///var/cache/pacman/pkg
 EOF
         pacman -Sy >>"${_LOG}"
+        # write to template
+        echo "### local pacman repository start" >> "${_TEMPLATE}"
+        echo "cat << EOF > \"${_PACMAN_CONF}\"" >> "${_TEMPLATE}"
+        echo "[options]" >> "${_TEMPLATE}"
+        echo "Architecture = auto" >> "${_TEMPLATE}"
+        echo "SigLevel    = Required DatabaseOptional" >> "${_TEMPLATE}"
+        echo "LocalFileSigLevel = Optional" >> "${_TEMPLATE}"
+        echo "[archboot]" >> "${_TEMPLATE}"
+        echo "Server = file:///var/cache/pacman/pkg" >> "${_TEMPLATE}"
+        echo "EOF" >> "${_TEMPLATE}"
+        echo "### local pacman repository end" >> "${_TEMPLATE}"
         sleep 2
         break
     else
