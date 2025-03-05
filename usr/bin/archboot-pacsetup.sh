@@ -55,7 +55,7 @@ _select_mirror() {
     { echo "### pacman mirror start"
     echo "echo Pacman Server..."
     echo "sd '^Server' '#Server' \"${_PACMAN_MIRROR}\""
-    echo "echo \'Server = \"${_SYNC_URL}\"\' >> \"${_PACMAN_MIRROR}\""
+    echo "echo 'Server = \"${_SYNC_URL}\"' >> \"${_PACMAN_MIRROR}\""
     echo "### pacman mirror end"
     } >> "${_TEMPLATE}"
 }
