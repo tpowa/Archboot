@@ -3,12 +3,10 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Pacman Configuration"
-
 _task_download_mirror() {
     ${_DLPROG} -o /tmp/pacman_mirrorlist.txt "https://www.archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on"
     rm /.archboot
 }
-
 _download_mirror() {
     : > /.archboot
     _task_download_mirror &
@@ -16,7 +14,6 @@ _download_mirror() {
     _progress "100" "${_DOWNLOAD}"
     sleep 2
 }
-
 _select_mirror() {
     # Download updated mirrorlist, if possible (only on x86_64)
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
@@ -61,7 +58,6 @@ _select_mirror() {
     echo "echo \"Server = \"${_SYNC_URL}\"\" >> \"${_PACMAN_MIRROR}\"" >> ${_TEMPLATE}
     echo "### pacman mirror end" >> ${_TEMPLATE}
 }
-
 #shellcheck disable=SC2120
 _enable_testing() {
     _DOTESTING=""
@@ -69,13 +65,16 @@ _enable_testing() {
         if _dialog --title " Testing Repositories " --defaultno --yesno "Do you want to enable testing repositories?\n\nOnly enable this if you need latest\navailable packages for testing purposes!" 8 50; then
             #shellcheck disable=SC2016
             sd '^#(\[[c,e].*-testing\]\n)#' '$1' "${1}/etc/pacman.conf"
+            # write to template
+            echo "### pacman testing repository start" >> ${_TEMPLATE}
+            echo "sd '^#(\[[c,e].*-testing\]\\\n)#' '$1' \"${1}/etc/pacman.conf\"" >> ${_TEMPLATE}
+            echo "### pacman testing repository end" >> ${_TEMPLATE}
             _DOTESTING=1
         fi
     else
         _DOTESTING=1
     fi
 }
-
 _task_pacman_keyring_install() {
     _pacman_keyring
     #shellcheck disable=SC2068

@@ -42,6 +42,8 @@ _timezone () {
     _dialog --title " Clock Configuration " --no-mouse --infobox "Setting Timezone to ${_ZONE}..." 3 50
     timedatectl set-timezone "${_ZONE}"
     sleep 2
+    # write to template
+    echo "timedatectl set-timezone \"${_ZONE}\"" >> ${_TEMPLATE}
 }
 
 _timeset() {
