@@ -4,14 +4,7 @@
 _cfdisk() {
     clear
     cfdisk "${_DISK}"
-    # write to template
-    { echo "### partition start"
-    echo "Partitioning \"${_DISK}\"..."
-    echo "sfdisk \"${_DISK}\" << EOF"
-    sfdisk -d "${_DISK}"
-    echo "EOF"
-    echo "### partition end"
-    } >> "${_TEMPLATE}"
+    _write_partition_template
 }
 
 _check_gpt() {
