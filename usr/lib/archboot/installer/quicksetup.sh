@@ -103,6 +103,8 @@ _auto_create_filesystems() {
         # set default subvolume for systemd-gpt-autogenerator
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             btrfs subvolume set-default "${_DESTDIR}"/"${_MP}" || return 1
+            # write to template
+            echo "btrfs subvolume set-default \"${_DESTDIR}\"/\"${_MP}\"" >> "${_TEMPLATE}"
         fi
         _COUNT=$((_COUNT+_PROGRESS_COUNT))
     done
@@ -322,6 +324,8 @@ _autoprepare() {
     _printk on
     ## wait until /dev initialized correct devices
     udevadm settle
+    # write to template
+    echo "udevadm settle" >> "${_TEMPLATE}"
     ## FSSPECS - default filesystem specs
     ## <partnum>|<fstype>|<mountpoint>|<labelname>
     ## The partitions in FSSPECS list should be listed in the "mountpoint" order.

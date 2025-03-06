@@ -4,6 +4,8 @@
 # scan and update btrfs devices
 _btrfs_scan() {
     btrfs device scan &>"${_NO_LOG}"
+    # write to template
+    echo "btrfs device scan &>\"${_NO_LOG}\"" >> "${_TEMPLATE}"
 }
 
 # mount btrfs for checks
@@ -11,12 +13,20 @@ _mount_btrfs() {
     _btrfs_scan
     _BTRFSMP="$(mktemp -d /tmp/btrfsmp.XXXX)"
     mount "${_DEV}" "${_BTRFSMP}"
+    # write to template
+    { echo "_BTRFSMP=\"$(mktemp -d /tmp/btrfsmp.XXXX)\""
+    echo "mount \"${_DEV}\" \"${_BTRFSMP}\""
+    } >> "${_TEMPLATE}"
 }
 
 # unmount btrfs after checks done
 _umount_btrfs() {
     umount "${_BTRFSMP}"
     rm -r "${_BTRFSMP}"
+    # write to template
+    { echo "umount \"${_BTRFSMP}\""
+    echo "rm -r \"${_BTRFSMP}\""
+    } >> "${_TEMPLATE}"
 }
 
 # Set _BTRFS_DEVS on detected btrfs devices
@@ -224,6 +234,8 @@ _create_btrfs_subvolume() {
     _mount_btrfs
     if ! btrfs subvolume list "${_BTRFSMP}" | rg -q "${_BTRFS_SUBVOLUME}$"; then
         btrfs subvolume create "${_BTRFSMP}"/"${_BTRFS_SUBVOLUME}" &>"${_LOG}"
+        # write to template
+        echo "btrfs subvolume create \"${_BTRFSMP}\"/\"${_BTRFS_SUBVOLUME}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
     fi
     _umount_btrfs
 }

@@ -122,8 +122,12 @@ _enter_mountpoint() {
 _check_filesystem_fstab() {
     if [[ "${2}" == "swap" || "${2}" == "btrfs" ]]; then
         echo 0 >>/tmp/.fstab
+        # write to template
+        echo "echo 0 >>/tmp/.fstab" >> "${_TEMPLATE}"
     else
         echo 1 >>/tmp/.fstab
+        # write to template
+         echo "echo 1 >>/tmp/.fstab" >> "${_TEMPLATE}"
     fi
 }
 
@@ -453,14 +457,19 @@ _mkfs() {
     if [[ "${4}" == "1" ]]; then
         if [[ "${2}" == "swap" ]]; then
             _progress "${_COUNT}" "Creating and activating swapspace on ${1}..."
+            # write to template
+            echo "echo \"Creating and activating swapspace on ${1}...\"" >> "${_TEMPLATE}"
         else
             _progress "${_COUNT}" "Creating ${2} on ${1}, mounting to ${3}${5}..."
+            echo "echo \"Creating ${2} on ${1}, mounting to ${3}${5}...\"" >> "${_TEMPLATE}"
         fi
     else
         if [[ "${2}" == "swap" ]]; then
             _progress "${_COUNT}" "Activating swapspace on ${1}..."
+            echo "echo \"Activating swapspace on ${1}...\"" >> "${_TEMPLATE}"
         else
             _progress "${_COUNT}" "Mounting ${2} on ${1} to ${3}${5}..." 0 0
+            echo "echo \"Mounting ${2} on ${1} to ${3}${5}...\"" >> "${_TEMPLATE}"
         fi
     fi
     # add btrfs raid level, if needed
@@ -470,18 +479,40 @@ _mkfs() {
         swapoff -a &>"${_NO_LOG}"
         if [[ "${4}" == "1" ]]; then
             if echo "${1}" | rg -q '^/dev'; then
-                mkswap -L "${6}" "${1}" &>"${_LOG}" || : >/tmp/.mp-error
+                if mkswap -L "${6}" "${1}" &>"${_LOG}"; then
+                    # write to template
+                    echo "mkswap -L \"${6}\" \"${1}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                else
+                    : >/tmp/.mp-error
+                fi
             else
-                [[ -d $(dirname "${3}${1}") ]] || mkdir -p "$(dirname "${3}${1}")"
+                if ! [[ -d $(dirname "${3}${1}") ]]; then
+                    mkdir -p "$(dirname "${3}${1}")"
+                    # write to template
+                    echo "mkdir -p \"$(dirname \"${3}${1}\")\"" >> "${_TEMPLATE}"
+                fi
                 # remove existing swap file
-                [[ -f "${3}${1}" ]] && rm "${3}${1}"
+                if [[ -f "${3}${1}" ]]; then
+                    rm "${3}${1}"
+                    # write to template
+                    echo "rm \"${3}${1}\"" >> "${_TEMPLATE}"
+                fi
                 # btrfs needs NO_COW attribute
                 truncate -s 0 "${3}${1}" &>"${_LOG}"
                 chattr +C "${3}${1}" &>"${_LOG}"
                 fallocate "${7}" "${3}${1}" &>"${_LOG}"
                 chmod 0600 "${3}${1}" &>"${_LOG}"
-                mkswap -U clear -L "${6}" "${3}${1}" &>"${_LOG}" || : >/tmp/.mp-error
-
+                # write to template
+                { echo " truncate -s 0 \"${3}${1}\" &>\"${_LOG}\""
+                echo "chattr +C \"${3}${1}\" &>\"${_LOG}\""
+                echo "chmod 0600 \"${3}${1}\" &>\"${_LOG}\""
+                } >> "${_TEMPLATE}"
+                if mkswap -U clear -L "${6}" "${3}${1}" &>"${_LOG}"; then
+                    # write to template
+                    echo "mkswap -U clear -L \"${6}\" \"${3}${1}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                else
+                    : >/tmp/.mp-error
+                fi
             fi
             #shellcheck disable=SC2181
             if [[ -f "/tmp/.mp-error" ]]; then
@@ -491,9 +522,19 @@ _mkfs() {
             fi
         fi
         if echo "${1}" | rg -q '^/dev'; then
-            swapon "${1}" &>"${_LOG}" || : >/tmp/.mp-error
+            if swapon "${1}" &>"${_LOG}";then
+                # write to template
+                echo "swapon \"${1}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
+            else
+                : >/tmp/.mp-error
+            fi
         else
-            swapon "${3}${1}" &>"${_LOG}" || : >/tmp/.mp-error
+            if swapon "${3}${1}" &>"${_LOG}";then
+                # write to template
+                echo "swapon \"${3}${1}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
+            else
+                : >/tmp/.mp-error
+            fi
         fi
         if [[ -f "/tmp/.mp-error" ]]; then
             _progress "100" "ERROR: Activating swap ${1}"
@@ -506,11 +547,36 @@ _mkfs() {
             #shellcheck disable=SC2086
             case ${2} in
                 # don't handle anything else here, we will error later
-                bcachefs) mkfs.bcachefs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}" || : >/tmp/.mp-error ;;
-                btrfs)    mkfs.btrfs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}" || : >/tmp/.mp-error ;;
-                ext4)     mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}" || : >/tmp/.mp-error ;;
-                vfat)     mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}" || : >/tmp/.mp-error ;;
-                xfs)      mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"|| : >/tmp/.mp-error ;;
+                bcachefs) if mkfs.bcachefs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}"; then
+                            # write to template
+                            echo "mkfs.bcachefs -f ${7} -L \"${6}\" ${8} ${9} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                          else
+                            : >/tmp/.mp-error
+                          fi ;;
+                btrfs)    if mkfs.btrfs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}"; then
+                            # write to template
+                            echo "mkfs.btrfs -f ${7} -L \"${6}\" ${8} ${9} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                          else
+                            : >/tmp/.mp-error
+                          fi ;;
+                ext4)     if mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}"; then
+                            # write to template
+                            echo "mke2fs -F ${7} -L \"${6}\" -t ext4 ${1} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                          else
+                            : >/tmp/.mp-error
+                          fi ;;
+                vfat)     if mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}"; then
+                            # write to template
+                            echo "mkfs.vfat -F32 ${7} -n \"${6}\" ${1} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                          else
+                            : >/tmp/.mp-error
+                          fi ;;
+                xfs)      if mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"; then
+                            # write to template
+                            echo "mkfs.xfs ${7} -L \"${6}\" -f ${1} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                          else
+                            : >/tmp/.mp-error
+                          fi ;;
             esac
             if [[ -f "/tmp/.mp-error" ]]; then
                 _progress "100" "ERROR: Creating filesystem ${2} on ${1}" 0 0
@@ -524,8 +590,12 @@ _mkfs() {
         fi
         _btrfs_scan
         sleep 2
+        # write to template
+        echo "sleep 2" >> "${_TEMPLATE}"
         # create our mount directory
         mkdir -p "${3}""${5}"
+        # write to template
+        echo "mkdir -p \"${3}\"\"${5}\"" >> "${_TEMPLATE}"
         # add ssd optimization before mounting
         _ssd_optimization
         # prepare btrfs mount options
@@ -535,7 +605,12 @@ _mkfs() {
         # eleminate spaces at beginning and end, replace other spaces with ,
         _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sd '^ *| *$' '' | sd ' ' ',')"
         # mount the bad boy
-        mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" &>"${_LOG}" || : >/tmp/.mp-error
+        if mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" &>"${_LOG}"; then
+            # write to template
+            echo "mount -t \"${2}\" -o \"${_MOUNTOPTIONS}\" \"${1}\" \"${3}\"\"${5}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
+        else
+            : >/tmp/.mp-error
+        fi
         #shellcheck disable=SC2181
         if [[ -f "/tmp/.mp-error" ]]; then
             _progress "100" "ERROR: Mounting ${3}${5}"
@@ -545,9 +620,15 @@ _mkfs() {
         # create /EFI directory on ESP
         if [[ -n "${_CREATE_MOUNTPOINTS}" && "${5}" = "/efi" && ! -d "${3}${5}/EFI" ]]; then
             mkdir "${3}${5}/EFI"
+            # write to template
+            echo "mkdir \"${3}${5}/EFI\"" >> "${_TEMPLATE}"
         fi
         if [[ -n "${_CREATE_MOUNTPOINTS}" && "${5}" = "/boot" && -n "${_UEFI_BOOT}" && ! -d "${3}${5}/EFI" ]]; then
-            mountpoint -q "${3}/efi" || mkdir "${3}${5}/EFI"
+            if ! mountpoint -q "${3}/efi"; then
+                mkdir "${3}${5}/EFI"
+                # write to template
+                echo "mkdir \"${3}${5}/EFI\"" >> "${_TEMPLATE}"
+            fi
         fi
         # check if /boot exists on ROOT DEVICE
         if [[ -z "${_CREATE_MOUNTPOINTS}" && "${5}" = "/" && ! -d "${3}${5}/boot" ]]; then
@@ -576,7 +657,11 @@ _mkfs() {
             fi
         fi
         # btrfs needs balancing on fresh created raid, else weird things could happen
-        [[ "${2}" == "btrfs" && "${4}" == "1" ]] && btrfs balance start --full-balance "${3}""${5}" &>"${_LOG}"
+        if [[ "${2}" == "btrfs" && "${4}" == "1" ]]; then
+            btrfs balance start --full-balance "${3}""${5}" &>"${_LOG}"
+            # write to template
+            echo "btrfs balance start --full-balance \"${3}\"\"${5}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
+        fi
     fi
     # add to .device-names for config files
     #shellcheck disable=SC2155
@@ -588,6 +673,8 @@ _mkfs() {
     #shellcheck disable=SC2155
     _PARTLABEL="$(_getpartlabel "${1}")"
     echo "# DEVICE DETAILS: ${1} PARTUUID=${_PARTUUID} PARTLABEL=${_PARTLABEL} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
+    # write to template
+    echo "echo \"# DEVICE DETAILS: ${1} PARTUUID=${_PARTUUID} PARTLABEL=${_PARTLABEL} UUID=${_FSUUID} LABEL=${_FSLABEL}\" >> /tmp/.device-names" >> "${_TEMPLATE}"
     # add to temp fstab
     if [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
         if [[ -n "${_FSUUID}" ]]; then
@@ -634,15 +721,21 @@ _mkfs() {
                     "${_GUID_VALUE}" == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" && "${5}" == "/boot" ||\
                     "${_GUID_VALUE}" == "bc13c2ff-59e6-4262-a352-b275fd6f7172" && "${5}" == "/boot" ]]; then
                     echo -n "${_DEV} ${5} ${2} defaults 0 " >>/tmp/.fstab
+                    # write to template
+                    echo "echo -n \"${_DEV} ${5} ${2} defaults 0 \" >>/tmp/.fstab" >> "${_TEMPLATE}"
                     _check_filesystem_fstab "$@"
                 fi
             else
                 echo -n "${_DEV} ${5} ${2} defaults 0 " >>/tmp/.fstab
+                # write to template
+                echo "echo -n \"${_DEV} ${5} ${2} defaults 0 \" >>/tmp/.fstab" >> "${_TEMPLATE}"
                 _check_filesystem_fstab "$@"
             fi
         fi
     else
         echo -n "${_DEV} ${5} ${2} defaults,${_MOUNTOPTIONS} 0 " >>/tmp/.fstab
+        # write to template
+        echo "echo -n \"${_DEV} ${5} ${2} defaults,${_MOUNTOPTIONS} 0 \" >>/tmp/.fstab" >> "${_TEMPLATE}"
         _check_filesystem_fstab "$@"
     fi
 }
