@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
+_cfdisk() {
+    clear
+    cfdisk "${_DISK}"
+    # write to template
+    { echo "sfdisk \"${_DISK}\" << EOF"
+    echo "sfdisk -d \"${_DISK}\""
+    echo "EOF"
+    } >> "${_TEMPLATE}"
+}
+
 _check_gpt() {
     _GUID_DETECTED=""
     [[ "$(${_LSBLK} PTTYPE -d "${_DISK}")" == "gpt" ]] && _GUID_DETECTED=1
@@ -22,8 +32,7 @@ _check_gpt() {
     fi
     if [[ -n "${_RUN_CFDISK}" ]]; then
         _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/guid-partition.txt)" 0 0
-        clear
-        cfdisk "${_DISK}"
+        _cfdisk
         _RUN_CFDISK=""
     fi
 }
@@ -63,8 +72,7 @@ _partition() {
                 fi
                 # Partition disc
                 _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/mbr-partition.txt)" 0 0
-                clear
-                cfdisk "${_DISK}"
+                _cfdisk
             fi
         fi
     done
