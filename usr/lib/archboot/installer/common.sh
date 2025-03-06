@@ -144,3 +144,14 @@ _locale_gen() {
     ${_NSPAWN} locale-gen &>"${_NO_LOG}"
     [[ -e /.archboot ]] && rm /.archboot
 }
+
+_write_partition_template() {
+    # write to template
+    { echo "### partition start"
+    echo "Partitioning \"${_DISK}\"..."
+    echo "sfdisk \"${_DISK}\" << EOF"
+    sfdisk -d "${_DISK}"
+    echo "EOF"
+    echo "### partition end"
+    } >> "${_TEMPLATE}"
+}

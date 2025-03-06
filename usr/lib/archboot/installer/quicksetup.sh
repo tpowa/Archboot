@@ -56,6 +56,7 @@ _auto_partition() {
         fi
     fi
     _progress "100" "Partitions created successfully."
+    _write_partition_template
     sleep 2
 }
 
