@@ -5,9 +5,12 @@ _cfdisk() {
     clear
     cfdisk "${_DISK}"
     # write to template
-    { echo "sfdisk \"${_DISK}\" << EOF"
+    { echo "### partition start"
+    echo "Partitioning \"${_DISK}\"..."
+    echo "sfdisk \"${_DISK}\" << EOF"
     echo "sfdisk -d \"${_DISK}\""
     echo "EOF"
+    echo "### partition end"
     } >> "${_TEMPLATE}"
 }
 
