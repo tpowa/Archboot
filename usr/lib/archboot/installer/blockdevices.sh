@@ -201,6 +201,10 @@ _activate_lvm2()
         lvm vgscan --ignorelockingfailure &>"${_NO_LOG}"
         _dialog --no-mouse --infobox "Activating logical volumes..." 0 0
         lvm vgchange --ignorelockingfailure --ignoremonitoring -ay &>"${_NO_LOG}"
+        # write to template
+        { echo " lvm vgscan --ignorelockingfailure &>\"${_NO_LOG}\""
+        echo "lvm vgchange --ignorelockingfailure --ignoremonitoring -ay &>\"${_NO_LOG}\""
+        } >> "${_TEMPLATE}"
         _LVM2_GROUPS="$(vgs -o vg_name --noheading 2>"${_NO_LOG}")"
         _LVM2_VOLUMES="$(lvs -o vg_name,lv_name --noheading --separator - 2>"${_NO_LOG}")"
         [[ "${_OLD_LVM2_GROUPS}" == "${_LVM2_GROUPS}" && "${_OLD_LVM2_VOLUMES}" == "${_LVM2_VOLUMES}" ]] && _LVM2_READY=1
@@ -213,6 +217,8 @@ _activate_md()
     if [[ -e /usr/bin/mdadm ]]; then
         _dialog --no-mouse --infobox "Activating RAID arrays..." 0 0
         mdadm --assemble --scan &>"${_NO_LOG}" || _RAID_READY=1
+        # write to template
+        echo "mdadm --assemble --scan &>\"${_NO_LOG}\"" >> "${_TEMPLATE}"
     fi
 }
 
@@ -275,6 +281,11 @@ _clean_disk() {
     # really clear everything MBR/GPT at the beginning of the device!
     dd if=/dev/zero of="${1}" bs=1M count=10 &>"${_NO_LOG}"
     sync
+    # write to template
+    { echo "wipefs -a -f \"${1}\" &>\"${_NO_LOG}\""
+    echo "dd if=/dev/zero of=\"${1}\" bs=1M count=10 &>\"${_NO_LOG}\""
+    echo "sync"
+    } >> "${_TEMPLATE}"
 }
 
 # Disable swap and all mounted partitions for the destination system. Unmount
@@ -286,6 +297,10 @@ _umountall()
         umount -R "${_DESTDIR}"
         _dialog --no-mouse --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR}..." 4 70
         sleep 3
+        # write to template
+        { echo "swapoff -a &>\"${_NO_LOG}\""
+        echo "umount -R \"${_DESTDIR}\""
+        } >> "${_TEMPLATE}"
     fi
 }
 
@@ -300,6 +315,10 @@ _stopmd()
             for dev in $(rg -o '(^md.*) :' -r '$1' /proc/mdstat); do
                 wipefs -a -f "/dev/${dev}" &>"${_NO_LOG}"
                 mdadm --manage --stop "/dev/${dev}" &>"${_LOG}"
+                # write to template
+                { echo "wipefs -a -f \"/dev/${dev}\" &>\"${_NO_LOG}\""
+                echo "mdadm --manage --stop \"/dev/${dev}\" &>\"${_LOG}\""
+                } >> "${_TEMPLATE}"
             done
             _dialog --no-mouse --infobox "Removing software raid device(s) done." 3 50
             sleep 3
@@ -338,12 +357,17 @@ _stoplvm()
         _umountall
         for dev in ${_LV_VOLUMES}; do
             lvremove -f "/dev/mapper/${dev}" 2>"${_NO_LOG}">"${_LOG}"
+            # write to template
+            echo "lvremove -f \"/dev/mapper/${dev}\" 2>\"${_NO_LOG}\">\"${_LOG}\"" >> "${_TEMPLATE}"
         done
         for dev in ${_LV_GROUPS}; do
-            vgremove -f "${dev}" 2>"${_NO_LOG}" >"${_LOG}"
+            # write to template
+            echo "vgremove -f \"${dev}\" 2>\"${_NO_LOG}\" >\"${_LOG}\"" >> "${_TEMPLATE}"
         done
         for dev in ${_LV_PHYSICAL}; do
             pvremove -f "${dev}" 2>"${_NO_LOG}" >"${_LOG}"
+            # write to template
+            echo "pvremove -f \"${dev}\" 2>\"${_NO_LOG}\" >\"${_LOG}\"" >> "${_TEMPLATE}"
         done
         _dialog --no-mouse --infobox "Removing logical volume(s), logical group(s)\nand physical volume(s) done." 3 60
         sleep 3
@@ -368,6 +392,10 @@ _stopluks()
             cryptsetup remove "${dev}" >"${_LOG}"
             # delete header from device
             wipefs -a "${_LUKS_REAL_DEV}" &>"${_NO_LOG}"
+            # write to template
+            { echo "cryptsetup remove \"${dev}\" >\"${_LOG}\""
+            echo "wipefs -a \"${_LUKS_REAL_DEV}\" &>\"${_NO_LOG}\""
+            } >> "${_TEMPLATE}"
         done
         _dialog --no-mouse --infobox "Removing luks encrypted device(s) done." 3 50
         sleep 3
@@ -383,6 +411,8 @@ _stopluks()
         for dev in $(${_LSBLK} NAME,FSTYPE | rg '(.*) crypto_LUKS$' -r '$1'); do
            # delete header from device
            wipefs -a "${dev}" &>"${_NO_LOG}"
+           # write to template
+           echo "wipefs -a \"${dev}\" &>\"${_NO_LOG}\"" >> "${_TEMPLATE}"
         done
         _dialog --no-mouse --infobox "Removing not running luks encrypted device(s) done." 3 60
         sleep 3
@@ -500,6 +530,7 @@ _createmd()
     if mdadm --create ${_RAIDDEV} ${_RAIDOPTIONS} ${_DEVS} &>"${_LOG}"; then
         _dialog --no-mouse --infobox "${_RAIDDEV} created successfully." 3 50
         sleep 3
+        echo "mdadm --create ${_RAIDDEV} ${_RAIDOPTIONS} ${_DEVS} &>\"${_LOG}\"" >> "${_TEMPLATE}"
     else
         _dialog --title " ERROR " --no-mouse --infobox "Creating ${_RAIDDEV} failed." 3 60
         sleep 5
@@ -508,11 +539,11 @@ _createmd()
     if [[ -n "${_RAID_PARTITION}" ]]; then
         # switch for mbr usage
         _set_guid
+        _DISK="${_RAIDDEV}"
         if [[ -z "${_GUIDPARAMETER}" ]]; then
             _dialog --msgbox "Now you'll be put into the cfdisk program where you can partition your raiddevice to your needs." 6 70
-            cfdisk "${_RAIDDEV}"
+            _cfdisk
         else
-            _DISK="${_RAIDDEV}"
             _RUN_CFDISK=1
             _CHECK_BIOS_BOOT_GRUB=""
             _check_gpt
@@ -574,6 +605,8 @@ _createpv()
     #shellcheck disable=SC2086
     if pvcreate -y ${_DEV} &>"${_LOG}"; then
         _dialog --no-mouse --infobox "Creating physical volume on ${_DEV} was successful." 3 75
+        # write to template
+        echo "pvcreate -y ${_DEV} &>\"${_LOG}\"" >> "${_TEMPLATE}"
         sleep 3
     else
         _dialog --title " ERROR " --no-mouse --infobox "Creating physical volume on ${_DEV} failed." 3 60
@@ -583,6 +616,9 @@ _createpv()
     # run udevadm to get values exported
     udevadm trigger
     udevadm settle
+    { echo "udevadm trigger"
+    echo "udevadm settle"
+    } >> "${_TEMPLATE}"
 }
 
 #find physical volumes that are not in use
@@ -658,6 +694,8 @@ _createvg()
     #shellcheck disable=SC2086
     if vgcreate ${_VGDEV} ${_PV} &>"${_LOG}"; then
         _dialog --no-mouse --infobox "Creating Volume Group ${_VGDEV} was successful." 3 60
+        # write to template
+        echo "vgcreate ${_VGDEV} ${_PV} &>\"${_LOG}\"" >> "${_TEMPLATE}"
         sleep 3
     else
         _dialog --msgbox "Error while creating Volume Group ${_VGDEV} (see ${_LOG} for details)." 0 0
@@ -726,6 +764,8 @@ _createlv()
         #shellcheck disable=SC2086
         if lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
             _dialog --no-mouse --infobox "Creating Logical Volume ${_LVDEV} was successful." 3 60
+            # write to template
+            echo "lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEV} &>\"${_LOG}\"" >> "${_TEMPLATE}"
             sleep 3
         else
             _dialog --msgbox "Error while creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
@@ -735,6 +775,8 @@ _createlv()
         #shellcheck disable=SC2086
         if lvcreate ${_LV_EXTRA} -L ${_LV_SIZE} ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
             _dialog --no-mouse --infobox "Creating Logical Volume ${_LVDEV} was successful." 3 60
+            # write to template
+            echo "lvcreate ${_LV_EXTRA} -L ${_LV_SIZE} ${_LV} -n ${_LVDEV} &>\"${_LOG}\"" >> "${_TEMPLATE}"
             sleep 3
         else
             _dialog --msgbox "Error while creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
@@ -770,7 +812,12 @@ _enter_luks_passphrase () {
         if [[ "${_LUKSPASS}" == "${_LUKSPASS2}" ]]; then
             _LUKSPASSPHRASE=${_LUKSPASS}
             echo "${_LUKSPASSPHRASE}" > "/tmp/passphrase-${_LUKSDEV}"
+            # write to template
             _LUKSPASSPHRASE="/tmp/passphrase-${_LUKSDEV}"
+            # write to template
+            { echo "echo \"${_LUKSPASSPHRASE}\" > \"/tmp/passphrase-${_LUKSDEV}\""
+            echo "_LUKSPASSPHRASE=\"/tmp/passphrase-${_LUKSDEV}\""
+            } >> "${_TEMPLATE}"
             break
         else
              _dialog --no-mouse --infobox "Passphrases didn't match, please enter again." 0 0
@@ -784,13 +831,19 @@ _enter_luks_passphrase () {
 _opening_luks() {
     _dialog --no-mouse --infobox "Opening encrypted ${_DEV}..." 0 0
     while true; do
-        cryptsetup luksOpen "${_DEV}" "${_LUKSDEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}" && break
+        if cryptsetup luksOpen "${_DEV}" "${_LUKSDEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}"; then
+            # write to template
+            echo "cryptsetup luksOpen \"${_DEV}\" \"${_LUKSDEV}\" <\"${_LUKSPASSPHRASE}\" >\"${_LOG}\"" >> "${_TEMPLATE}"
+            break
+        fi
         _dialog --no-mouse --infobox "Error: Passphrase didn't match, please enter again" 0 0
         sleep 5
         _enter_luks_passphrase || return 1
     done
     if _dialog --yesno "Would you like to save the passphrase of luks device in /etc/$(basename "${_LUKSPASSPHRASE}")?\nName:${_LUKSDEV}" 0 0; then
         echo "${_LUKSDEV}" "${_DEV}" "/etc/$(basename "${_LUKSPASSPHRASE}")" >> /tmp/.crypttab
+        # write to template
+        echo "echo \"${_LUKSDEV}\" \"${_DEV}\" \"/etc/$(basename \"${_LUKSPASSPHRASE}\")\" >> /tmp/.crypttab" >> "${_TEMPLATE}"
     fi
 }
 
@@ -835,5 +888,7 @@ _createluks()
     _umountall
     _dialog --no-mouse --infobox "Encrypting ${_DEV}..." 0 0
     cryptsetup -q luksFormat "${_DEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}"
+    # write to template
+    echo "cryptsetup -q luksFormat \"${_DEV}\" <\"${_LUKSPASSPHRASE}\" >\"${_LOG}\"" >> "${_TEMPLATE}"
     _opening_luks
 }
