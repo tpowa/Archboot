@@ -85,6 +85,7 @@ _localize_task() {
     if [[ ! -e "${_TEMPLATE}" ]]; then
         echo "#!/bin/bash" > "${_TEMPLATE}"
         echo ". /usr/lib/archboot/common.sh" >> "${_TEMPLATE}"
+        echo ". /usr/lib/archboot/installer/common.sh" >> "${_TEMPLATE}"
     fi
     { echo "### localize start"
     echo "echo Localization..."

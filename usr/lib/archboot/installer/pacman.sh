@@ -5,15 +5,28 @@
 
 _pacman() {
     #shellcheck disable=SC2086,SC2068
-    ${_PACMAN} -Sy ${_PACKAGES[@]} &>"${_LOG}" && : > /tmp/.pacman-success
+    if ${_PACMAN} -Sy ${_PACKAGES[@]} &>"${_LOG}"; then
+        # write to template
+        echo "${_PACMAN} -Sy ${_PACKAGES[@]} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+        : > /tmp/.pacman-success
+    fi
     rm /.archboot
 }
 
 _run_pacman(){
     _chroot_mount
+    echo "_chroot_mount" >> "${_TEMPLATE}"
     # Set up the necessary directories for pacman use
-    [[ ! -d "${_DESTDIR}${_CACHEDIR}" ]] && mkdir -p "${_DESTDIR}${_CACHEDIR}"
-    [[ ! -d "${_DESTDIR}${_PACMAN_LIB}" ]] && mkdir -p "${_DESTDIR}${_PACMAN_LIB}"
+    if [[ ! -d "${_DESTDIR}${_CACHEDIR}" ]]; then
+        mkdir -p "${_DESTDIR}${_CACHEDIR}"
+        # write to template
+        echo "mkdir -p \"${_DESTDIR}${_CACHEDIR}\"" >> "${_TEMPLATE}"
+    fi
+    if [[ ! -d "${_DESTDIR}${_PACMAN_LIB}" ]]; then
+        mkdir -p "${_DESTDIR}${_PACMAN_LIB}"
+        # write to template
+        echo "mkdir -p \"${_DESTDIR}${_PACMAN_LIB}\"" >> "${_TEMPLATE}"
+    fi
     : > /.archboot
     _pacman &
     #shellcheck disable=SC2116,SC2068
@@ -29,6 +42,10 @@ _run_pacman(){
     # ensure the disk is synced
     sync
     _chroot_umount
+    # write to template
+    { echo "sync"
+    echo "_chroot_umount"
+    } >> "${_TEMPLATE}"
 }
 
 _pacman_error() {
@@ -70,8 +87,12 @@ _install_packages() {
     _pacman_error || return 1
     _NEXTITEM=3
     _chroot_mount
+    # write to template
+    echo "_chroot_mount" >> "${_TEMPLATE}"
     # automagic time!
     _run_autoconfig | _dialog --title " Autoconfiguration " --no-mouse --gauge "Writing base configuration..." 6 75 0
     _chroot_umount
+    # write to template
+    echo "_chroot_umount" >> "${_TEMPLATE}"
     _run_locale_gen | _dialog --title " Locales " --no-mouse --gauge "Rebuilding glibc locales on installed system..." 6 75 0
 }
