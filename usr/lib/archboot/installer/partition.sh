@@ -8,7 +8,7 @@ _cfdisk() {
     { echo "### partition start"
     echo "Partitioning \"${_DISK}\"..."
     echo "sfdisk \"${_DISK}\" << EOF"
-    sfdisk -d \"${_DISK}\"
+    sfdisk -d "${_DISK}"
     echo "EOF"
     echo "### partition end"
     } >> "${_TEMPLATE}"
