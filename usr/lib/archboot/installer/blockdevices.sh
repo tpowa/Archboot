@@ -361,6 +361,7 @@ _stoplvm()
             echo "lvremove -f \"/dev/mapper/${dev}\" 2>\"${_NO_LOG}\">\"${_LOG}\"" >> "${_TEMPLATE}"
         done
         for dev in ${_LV_GROUPS}; do
+            vgremove -f "${dev}" 2>"${_NO_LOG}" >"${_LOG}"
             # write to template
             echo "vgremove -f \"${dev}\" 2>\"${_NO_LOG}\" >\"${_LOG}\"" >> "${_TEMPLATE}"
         done
@@ -812,7 +813,6 @@ _enter_luks_passphrase () {
         if [[ "${_LUKSPASS}" == "${_LUKSPASS2}" ]]; then
             _LUKSPASSPHRASE=${_LUKSPASS}
             echo "${_LUKSPASSPHRASE}" > "/tmp/passphrase-${_LUKSDEV}"
-            # write to template
             _LUKSPASSPHRASE="/tmp/passphrase-${_LUKSDEV}"
             # write to template
             { echo "echo \"${_LUKSPASSPHRASE}\" > \"/tmp/passphrase-${_LUKSDEV}\""
