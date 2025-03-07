@@ -243,10 +243,6 @@ EOF
     _dialog --msgbox "You must now review the GRUB(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 8 55
     _geteditor || return 1
     _editor "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
-    # write to template
-    { echo ": > \"${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
-    sd '^' 'echo "' < "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}" | sd '$' "\" >> \"${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
-    } >> "${_TEMPLATE}"
 }
 
 _grub_install_bios() {
