@@ -5,7 +5,11 @@ _uboot() {
     _common_bootloader_checks
     _check_bootpart
     _abort_uboot
-    [[ -d "${_DESTDIR}/boot/extlinux" ]] || mkdir -p "${_DESTDIR}/boot/extlinux"
+    if ! [[ -d "${_DESTDIR}/boot/extlinux" ]]; then
+        mkdir -p "${_DESTDIR}/boot/extlinux"
+        # write to template
+        echo "mkdir -p "${_DESTDIR}/boot/extlinux"" >> "${_TEMPLATE}"
+    fi
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTDEV} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_LUKSSETUP}"
     _KERNEL_PARAMS_COMMON_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sd ' +' ' ')"
     [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _TITLE="ARM 64"
@@ -22,6 +26,7 @@ label linux
     initrd ${_SUBDIR}/${_INITRAMFS}
     append ${_KERNEL_PARAMS_COMMON_MOD}
 EOF
+    _editor "${_DESTDIR}/boot/extlinux/extlinux.conf"
     _dialog --no-mouse --infobox "UBOOT has been installed successfully." 3 55
     sleep 3
 }
