@@ -14,8 +14,8 @@ _mount_btrfs() {
     _BTRFSMP="$(mktemp -d /tmp/btrfsmp.XXXX)"
     mount "${_DEV}" "${_BTRFSMP}"
     # write to template
-    { echo "_BTRFSMP=\"$(mktemp -d /tmp/btrfsmp.XXXX)\""
-    echo "mount \"${_DEV}\" \"${_BTRFSMP}\""
+    { echo '_BTRFSMP=$(mktemp -d /tmp/btrfsmp.XXXX)'
+    echo 'mount ${_DEV} ${_BTRFSMP}'
     } >> "${_TEMPLATE}"
 }
 
@@ -24,8 +24,8 @@ _umount_btrfs() {
     umount "${_BTRFSMP}"
     rm -r "${_BTRFSMP}"
     # write to template
-    { echo "umount \"${_BTRFSMP}\""
-    echo "rm -r \"${_BTRFSMP}\""
+    { echo "umount '${_BTRFSMP}'"
+    echo 'rm -r ${_BTRFSMP}'
     } >> "${_TEMPLATE}"
 }
 
