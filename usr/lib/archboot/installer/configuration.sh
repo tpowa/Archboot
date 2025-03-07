@@ -111,7 +111,6 @@ _prepare_password() {
             # write to template
             { echo "echo \"${_PASSWORD}\" > /tmp/.password"
             echo "echo \"${_PASSWORD}\" >> /tmp/.password"
-            echo "PASSWORD=/tmp/.password"
             } >> "${_TEMPLATE}"
             _PASSWORD=/tmp/.password
             break
