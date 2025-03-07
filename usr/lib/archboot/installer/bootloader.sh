@@ -162,10 +162,15 @@ _uefi_efibootmgr() {
     # delete existing entry
     for _bootnum in $(efibootmgr | rg -F -i "${_BOOTMGR_LABEL}" | rg -o '^Boot(\d+)' -r '$1'); do
         efibootmgr --quiet -b "${_bootnum}" -B >> "${_LOG}"
+        # write to template
+        echo "efibootmgr --quiet -b \"${_bootnum}\" -B >> \"${_LOG}\"" >> "${_TEMPLATE}"
     done
     _BOOTMGRDEV=$(${_LSBLK} PKNAME "${_UEFISYSDEV}" 2>"${_NO_LOG}")
     _BOOTMGRNUM=$(echo "${_UEFISYSDEV}" | sd "${_BOOTMGRDEV}" '' | sd 'p' '')
     efibootmgr --quiet --create --disk "${_BOOTMGRDEV}" --part "${_BOOTMGRNUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" >> "${_LOG}"
+    # write to template
+    echo "efibootmgr --quiet --create --disk \"${_BOOTMGRDEV}\" --part \"${_BOOTMGRNUM}\" --loader \"${_BOOTMGR_LOADER_PATH}\" --label \"${_BOOTMGR_LABEL}\" >> \"${_LOG}\"" >> "${_TEMPLATE}"
+
 }
 
 _apple_efi_hfs_bless() {
