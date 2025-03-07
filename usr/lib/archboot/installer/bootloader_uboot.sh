@@ -8,7 +8,7 @@ _uboot() {
     if ! [[ -d "${_DESTDIR}/boot/extlinux" ]]; then
         mkdir -p "${_DESTDIR}/boot/extlinux"
         # write to template
-        echo "mkdir -p "${_DESTDIR}/boot/extlinux"" >> "${_TEMPLATE}"
+        echo "mkdir -p \"${_DESTDIR}/boot/extlinux\"" >> "${_TEMPLATE}"
     fi
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTDEV} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_LUKSSETUP}"
     _KERNEL_PARAMS_COMMON_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sd ' +' ' ')"
