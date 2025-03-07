@@ -169,4 +169,6 @@ _file_to_template() {
     { echo ": > \"${1}\""
     sd '^' "echo \'" < "${1}" | sd '$' "\' >> ${1}"
     } >> "${_TEMPLATE}"
+    # new line is not added by default on last line
+    echo -n $'\n' >> "${_TEMPLATE}"
 }
