@@ -167,6 +167,6 @@ _editor() {
 _file_to_template() {
     # write to template
     { echo ": > \"${1}\""
-    sd '^' 'echo "' < "${1}" | sd '$' "\" >> ${1}"
+    sd '^' "echo \'" < "${1}" | sd '$' "\' >> ${1}"
     } >> "${_TEMPLATE}"
 }
