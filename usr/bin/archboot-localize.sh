@@ -81,12 +81,6 @@ _localize_task() {
     systemctl restart systemd-vconsole-setup
     # set running VC too
     export LANG="${_LOCALE}.UTF-8"
-    # write to template file
-    if [[ ! -e "${_TEMPLATE}" ]]; then
-        echo "#!/bin/bash" > "${_TEMPLATE}"
-        echo ". /usr/lib/archboot/common.sh" >> "${_TEMPLATE}"
-        echo ". /usr/lib/archboot/installer/common.sh" >> "${_TEMPLATE}"
-    fi
     { echo "### localize start"
     echo "echo Localization..."
     echo "echo \"LANG=${_LOCALE}.UTF-8\" > /etc/locale.conf"

@@ -47,6 +47,11 @@ _STANDARD_PACKAGES=(
   xorg-xhost
 )
 _TEMPLATE="/tmp/archboot-autorun.template"
+if [[ ! -e "${_TEMPLATE}" ]]; then
+    echo "#!/bin/bash" > "${_TEMPLATE}"
+    echo ". /usr/lib/archboot/common.sh" >> "${_TEMPLATE}"
+    echo ". /usr/lib/archboot/installer/common.sh" >> "${_TEMPLATE}"
+fi
 _VNC_PACKAGE="tigervnc"
 _WAYLAND_PACKAGE="egl-wayland"
 _XORG_PACKAGE="xorg"
