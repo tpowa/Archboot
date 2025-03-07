@@ -150,7 +150,7 @@ _locale_gen() {
 _write_partition_template() {
     # write to template
     { echo "### partition start"
-    echo "Partitioning \"${_DISK}\"..."
+    echo "echo \"Partitioning \"${_DISK}\"...\""
     echo "sfdisk \"${_DISK}\" << EOF"
     sfdisk -d "${_DISK}"
     echo "EOF"
