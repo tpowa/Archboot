@@ -8,10 +8,18 @@ _freeze_xfs() {
         if mount | rg -q "${_DESTDIR}/boot type xfs"; then
             xfs_freeze -f "${_DESTDIR}"/boot &>"${_NO_LOG}"
             xfs_freeze -u "${_DESTDIR}"/boot &>"${_NO_LOG}"
+            # write to template
+            { echo "xfs_freeze -f \"${_DESTDIR}\"/boot &>\"${_NO_LOG}\""
+            echo "xfs_freeze -u \"${_DESTDIR}\"/boot &>\"${_NO_LOG}\""
+            } >> "${_TEMPLATE}"
         fi
         if mount | rg -q "${_DESTDIR} type xfs"; then
             xfs_freeze -f "${_DESTDIR}" &>"${_NO_LOG}"
             xfs_freeze -u "${_DESTDIR}" &>"${_NO_LOG}"
+            # write to template
+            { echo "xfs_freeze -f \"${_DESTDIR}\" &>\"${_NO_LOG}\""
+            echo "xfs_freeze -u \"${_DESTDIR}\" &>\"${_NO_LOG}\""
+            } >> "${_TEMPLATE}"
         fi
     fi
 }
@@ -229,16 +237,24 @@ EOF
     ## copy ter-u16n.pf2 font file
     [[ -d ${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts ]] || mkdir -p "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts"
     cp -f "${_DESTDIR}/usr/share/grub/ter-u16n.pf2" "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts/ter-u16n.pf2"
+    # write to template
+    echo "cp -f \"${_DESTDIR}/usr/share/grub/ter-u16n.pf2\" \"${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts/ter-u16n.pf2\"" >> "${_TEMPLATE}"
     ## Edit grub.cfg config file
     _dialog --msgbox "You must now review the GRUB(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 8 55
     _geteditor || return 1
     "${_EDITOR}" "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
+    # write to template
+    { echo ": > \"${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
+    sd '^' 'echo "' < "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}" | sd '$' '\" >> \"${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\"'
+    } >> "${_TEMPLATE}"
 }
 
 _grub_install_bios() {
     # freeze and unfreeze xfs filesystems to enable grub(2) installation on xfs filesystems
     _freeze_xfs
     _chroot_mount
+    # write to template
+    echo "_chroot_mount" >> "${_TEMPLATE}"
     chroot "${_DESTDIR}" grub-install \
         --directory="/usr/lib/grub/i386-pc" \
         --target="i386-pc" \
@@ -247,11 +263,16 @@ _grub_install_bios() {
         "${_BOOTDEV}" &>"/tmp/grub_bios_install.log"
     cat "/tmp/grub_bios_install.log" >>"${_LOG}"
     _chroot_umount
+    # write to template
+    echo "chroot \"${_DESTDIR}\" grub-install --directory=\"/usr/lib/grub/i386-pc\" --target=\"i386-pc\" --boot-directory=\"/boot\" --recheck \"${_BOOTDEV}\" >>\"${_LOG}\""
+    echo "_chroot_umount" >> "${_TEMPLATE}"
     rm /.archboot
 }
 
 _setup_grub_bios() {
     : > /.archboot
+    # write to template
+    echo "echo \"Setting up GRUB(2) BIOS...\"" >> "${_TEMPLATE}"
     _grub_install_bios &
     _progress_wait "11" "99" "Setting up GRUB(2) BIOS..." "0.15"
     _progress "100" "Setting up GRUB(2) BIOS completed."
@@ -344,6 +365,8 @@ _grub_install_uefi() {
         --recheck \
         --debug &> "/tmp/grub_uefi_${_UEFI_ARCH}_install.log"
     cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >>"${_LOG}"
+    # write to template
+    echo "chroot \"${_DESTDIR}\" grub-install --directory=\"/usr/lib/grub/${_GRUB_ARCH}-efi\" --target=\"${_GRUB_ARCH}-efi\" --efi-directory=\"/${_UEFISYS_MP}\" --bootloader-id=\"GRUB\" --recheck --debug &>\"${_LOG}\"" >> "${_TEMPLATE}"
     rm /.archboot
 }
 
@@ -351,6 +374,8 @@ _grub_install_uefi_sb() {
     ### Hint: https://src.fedoraproject.org/rpms/grub2/blob/rawhide/f/grub.macros#_407
     if [[ "${_RUNNING_ARCH}" == "aarch64" || "${_RUNNING_ARCH}" == "x86_64" ]]; then
         ${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/"${_GRUB_ARCH}"-efi -O "${_GRUB_ARCH}"-efi --sbat=/usr/share/grub/sbat.csv --fonts="ter-u16n" --locales="en@quot" --themes="" -o "/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" "boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
+        # write to template
+        echo "${_NSPAWN} grub-mkstandalone -d /usr/lib/grub/\"${_GRUB_ARCH}\"-efi -O \"${_GRUB_ARCH}\"-efi --sbat=/usr/share/grub/sbat.csv --fonts=\"ter-u16n\" --locales="en@quot" --themes=\"\" -o \"/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi\" \"boot/grub/grub.cfg=/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\"" >> "${_TEMPLATE}"
     fi
     rm /.archboot
 }
@@ -358,17 +383,31 @@ _grub_install_uefi_sb() {
 _setup_grub_uefi() {
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         _progress "50" "Installing fedora's shim and mokmanager..."
+        # write to template
+        echo "echo \"Installing fedora's shim and mokmanager...\"" >> "${_TEMPLATE}"
         sleep 2
         # install fedora shim
-        [[ -d  ${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT ]] || mkdir -p "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT
+        if ! [[ -d  ${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT ]]; then
+            mkdir -p "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT
+            # write to template
+            echo "mkdir -p \"${_DESTDIR}\"/\"${_UEFISYS_MP}\"/EFI/BOOT" >> "${_TEMPLATE}"
+        fi
         cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".EFI
         cp -f /usr/share/archboot/bootloader/mm"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/
+        # write to template
+        { echo "cp -f /usr/share/archboot/bootloader/shim\"${_SPEC_UEFI_ARCH}\".efi \"${_DESTDIR}\"/\"${_UEFISYS_MP}\"/EFI/BOOT/BOOT\"${_UEFI_ARCH}\".EFI"
+        echo "cp -f /usr/share/archboot/bootloader/mm\"${_SPEC_UEFI_ARCH}\".efi \"${_DESTDIR}\"/\"${_UEFISYS_MP}\"/EFI/BOOT/"
+        } >> "${_TEMPLATE}"
         _progress "100" "Installing fedora's shim and mokmanager completed."
         sleep 2
     else
         ## Install GRUB
         _progress "10" "Setting up GRUB(2) UEFI..."
         _chroot_mount
+        # write to template
+        { echo "_chroot_mount"
+         echo "echo \"Setting up GRUB(2) UEFI...\""
+        } >> "${_TEMPLATE}"
         : > /.archboot
         _grub_install_uefi &
         _progress_wait "11" "99" "Setting up GRUB(2) UEFI..." "0.1"
@@ -382,9 +421,15 @@ _setup_grub_uefi() {
 _setup_grub_uefi_sb() {
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         _progress "10" "Setting up GRUB(2) UEFI Secure Boot..."
+        # write to template
+        echo "echo \"Setting up GRUB(2) UEFI Secure Boot...\"" >> "${_TEMPLATE}"
         # generate GRUB with config embeded
         #remove existing, else weird things are happening
-        [[ -f "${_DESTDIR}/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]] && rm "${_DESTDIR}"/"${_GRUB_PREFIX_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi
+        if [[ -f "${_DESTDIR}/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]]; then
+            rm "${_DESTDIR}"/"${_GRUB_PREFIX_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi
+            # write to template
+            echo "rm \"${_DESTDIR}\"/\"${_GRUB_PREFIX_DIR}\"/grub\"${_SPEC_UEFI_ARCH}\".efi" >> "${_TEMPLATE}"
+        fi
         : > /.archboot
         _grub_install_uefi_sb &
         _progress_wait "11" "99" "Setting up GRUB(2) UEFI Secure Boot..." "0.1"
@@ -413,6 +458,11 @@ _grub_uefi() {
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        # write to template
+        { echo "mkdir -p \"${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT\""
+        echo "rm -f \"${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+        echo "cp -f \"${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi\" \"${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+        } >> "${_TEMPLATE}"
         _dialog --title " Success " --no-mouse --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully." 3 60
         sleep 3
         _S_BOOTLOADER=1
