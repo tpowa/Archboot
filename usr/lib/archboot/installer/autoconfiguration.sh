@@ -68,8 +68,7 @@ _auto_network()
            "${_DESTDIR}"/etc/systemd/network.conf.d/ipv6-privacy-extensions.conf
         # write to template
         { echo "mkdir -p \"${_DESTDIR}/etc/systemd/network.conf.d\""
-        echo "cp /etc/systemd/network.conf.d/ipv6-privacy-extensions.conf \
-           \"${_DESTDIR}\"/etc/systemd/network.conf.d/ipv6-privacy-extensions.conf"
+        echo "cp /etc/systemd/network.conf.d/ipv6-privacy-extensions.conf \"${_DESTDIR}\"/etc/systemd/network.conf.d/ipv6-privacy-extensions.conf"
         } >> "${_TEMPLATE}"
     fi
     sleep 2
