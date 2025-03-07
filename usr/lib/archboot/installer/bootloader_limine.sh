@@ -45,8 +45,15 @@ _limine_bios() {
     _PARENT_BOOTDEV="$(${_LSBLK} PKNAME "${_BOOTDEV}")"
     _chroot_mount
     cp "${_DESTDIR}/usr/share/limine/limine-bios.sys" "${_DESTDIR}/boot/"
+    # write to template
+    { echo "echo \"Setting up LIMINE BIOS now...\""
+    echo "_chroot_mount"
+    echo "cp \"${_DESTDIR}/usr/share/limine/limine-bios.sys\" \"${_DESTDIR}/boot/\""
+    } >> "${_TEMPLATE}"
     if chroot "${_DESTDIR}" limine bios-install "${_PARENT_BOOTDEV}" &>"${_LOG}"; then
         _pacman_hook_limine_bios
+        # write to template
+        echo "chroot \"${_DESTDIR}\" limine bios-install \"${_PARENT_BOOTDEV}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
         _dialog --title " Success " --no-mouse --infobox "LIMINE BIOS has been setup successfully." 3 50
         sleep 3
         _S_BOOTLOADER=1
@@ -55,22 +62,35 @@ _limine_bios() {
         _dialog --title " ERROR " --msgbox "Setting up LIMINE BIOS failed." 5 40
     fi
     _chroot_umount
+    # write to template
+    echo "_chroot_umount" >> "${_TEMPLATE}"
 }
 
 _limine_uefi() {
     _limine_common
     _dialog --no-mouse --infobox "Setting up LIMINE now..." 3 60
-    [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT" ]] || mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
+    if ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT" ]]; then
+        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
+        # write to template
+        echo "mkdir -p \"${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/\"" >> "${_TEMPLATE}"
+    fi
     cp -f "${_DESTDIR}/usr/share/limine/BOOT${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI"
+    # write to template
+    { echo "echo \"Setting up LIMINE now...\""
+    echo "cp -f \"${_DESTDIR}/usr/share/limine/BOOT${_UEFI_ARCH}.EFI\" \"${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI\""
+    } >> "${_TEMPLATE}"
     _LIMINE_CONFIG="${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine.conf"
     _limine_config
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI" ]]; then
         _BOOTMGR_LABEL="LIMINE"
         _BOOTMGR_LOADER_PATH="/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI"
         _uefi_bootmgr_setup
-        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        # write to template
+        { echo "rm -f \"${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+        echo "cp -f \"${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI\" \"${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+        } >> "${_TEMPLATE}"
         sleep 2
         _pacman_hook_limine_uefi
         _dialog --title " Success " --no-mouse --infobox "LIMINE has been setup successfully." 3 50
