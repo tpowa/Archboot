@@ -245,7 +245,7 @@ EOF
     "${_EDITOR}" "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
     # write to template
     { echo ": > \"${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
-    sd '^' 'echo "' < "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}" | sd '$' '\" >> \"${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\"'
+    sd '^' 'echo "' < "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}" | sd '$' "\" >> \"${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
     } >> "${_TEMPLATE}"
 }
 

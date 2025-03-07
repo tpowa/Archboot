@@ -190,7 +190,7 @@ _configure_system() {
             ${_EDITOR} "${_DESTDIR}""${_FILE}"
             # write to template
             { echo ": > \"${_DESTDIR}\"\"${_FILE}\""
-            sd '^' 'echo "' < "${_DESTDIR}""${_FILE}" | sd '$' '\" >> \"${_DESTDIR}\"\"${_FILE}\"'
+            sd '^' 'echo "' < "${_DESTDIR}""${_FILE}" | sd '$' "\" >> \"${_DESTDIR}\"\"${_FILE}\""
             } >> "${_TEMPLATE}"
         fi
     done
