@@ -7,16 +7,18 @@ _mkinitcpio() {
         sd ' add_checked_modules_from_symbol' ' #add_checked_modules_from_symbol' \
             "${_DESTDIR}"/usr/lib/initcpio/install/kms
         if chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}"-"${_RUNNING_ARCH}" &>"${_LOG}"; then
-        : > /tmp/.mkinitcpio-success
-         # write to template
-        { echo "sd ' add_checked_modules_from_symbol' ' #add_checked_modules_from_symbol' \"${_DESTDIR}\"/usr/lib/initcpio/install/kms"
-        echo "chroot \"${_DESTDIR}\" mkinitcpio -p \"${_KERNELPKG}\"-\"${_RUNNING_ARCH}\" &>\"${_LOG}\""
-        } >> "${_TEMPLATE}"
+            : > /tmp/.mkinitcpio-success
+            # write to template
+            { echo "sd ' add_checked_modules_from_symbol' ' #add_checked_modules_from_symbol' \"${_DESTDIR}\"/usr/lib/initcpio/install/kms"
+            echo "chroot \"${_DESTDIR}\" mkinitcpio -p \"${_KERNELPKG}\"-\"${_RUNNING_ARCH}\" &>\"${_LOG}\""
+            } >> "${_TEMPLATE}"
+        fi
     else
         if chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}" &>"${_LOG}"; then
         : > /tmp/.mkinitcpio-success
         # write to template
-        echo "chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}" &>"${_LOG}"" >> "${_TEMPLATE}"
+        echo "chroot \"${_DESTDIR}\" mkinitcpio -p \"${_KERNELPKG}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
+        fi
     fi
     rm /.archboot
 }
@@ -108,8 +110,8 @@ _prepare_password() {
             echo "${_PASSWORD}" >> /tmp/.password
             _PASSWORD=/tmp/.password
             # write to template
-            { echo "echo "${_PASSWORD}" > /tmp/.password"
-            echo "echo "${_PASSWORD}" >> /tmp/.password"
+            { echo "echo \"${_PASSWORD}\" > /tmp/.password"
+            echo "echo \"${_PASSWORD}\" >> /tmp/.password"
             echo "PASSWORD=/tmp/.password"
             } >> "${_TEMPLATE}"
             break
