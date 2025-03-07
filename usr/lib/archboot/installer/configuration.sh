@@ -6,17 +6,29 @@ _mkinitcpio() {
         # disable error out on kms install hook
         sd ' add_checked_modules_from_symbol' ' #add_checked_modules_from_symbol' \
             "${_DESTDIR}"/usr/lib/initcpio/install/kms
-        chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}"-"${_RUNNING_ARCH}" &>"${_LOG}" && : > /tmp/.mkinitcpio-success
+        if chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}"-"${_RUNNING_ARCH}" &>"${_LOG}"; then
+        : > /tmp/.mkinitcpio-success
+         # write to template
+        { echo "sd ' add_checked_modules_from_symbol' ' #add_checked_modules_from_symbol' \"${_DESTDIR}\"/usr/lib/initcpio/install/kms"
+        echo "chroot \"${_DESTDIR}\" mkinitcpio -p \"${_KERNELPKG}\"-\"${_RUNNING_ARCH}\" &>\"${_LOG}\""
+        } >> "${_TEMPLATE}"
     else
-        chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}" &>"${_LOG}" && : > /tmp/.mkinitcpio-success
+        if chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}" &>"${_LOG}"; then
+        : > /tmp/.mkinitcpio-success
+        # write to template
+        echo "chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}" &>"${_LOG}"" >> "${_TEMPLATE}"
     fi
     rm /.archboot
 }
 
 _run_mkinitcpio() {
     _chroot_mount
+    # write to template
+    echo "_chroot_mount" >> "${_TEMPLATE}"
     echo "Mkinitcpio progress..." > /tmp/mkinitcpio.log
     : > /.archboot
+    # write to template
+    echo "echo \"Running mkinitcpio on installed system...\"" >> "${_TEMPLATE}"
     _mkinitcpio &
     _progress_wait "0" "99" "Running mkinitcpio on installed system..." "0.1"
     if [[ -e "/tmp/.mkinitcpio-success" ]]; then
@@ -27,6 +39,8 @@ _run_mkinitcpio() {
         sleep 2
     fi
     _chroot_umount
+     # write to template
+    echo "_chroot_umount" >> "${_TEMPLATE}"
 }
 
 _mkinitcpio_error() {
@@ -39,6 +53,8 @@ _mkinitcpio_error() {
 
 _run_locale_gen() {
     : > /.archboot
+     # write to template
+     echo "echo \"Rebuilding glibc locales on installed system...\"" >> "${_TEMPLATE}"
     _locale_gen &
     _progress_wait "0" "99" "Rebuilding glibc locales on installed system..." "0.05"
     _progress "100" "Rebuilding glibc locales on installed system complete." 6 75
@@ -91,6 +107,11 @@ _prepare_password() {
             echo "${_PASSWORD}" > /tmp/.password
             echo "${_PASSWORD}" >> /tmp/.password
             _PASSWORD=/tmp/.password
+            # write to template
+            { echo "echo "${_PASSWORD}" > /tmp/.password"
+            echo "echo "${_PASSWORD}" >> /tmp/.password"
+            echo "PASSWORD=/tmp/.password"
+            } >> "${_TEMPLATE}"
             break
         else
             _dialog --title " ERROR " --no-mouse --infobox "Password didn't match, please enter again." 3 50
@@ -102,6 +123,11 @@ _prepare_password() {
 _set_password() {
     passwd -R "${_DESTDIR}" "${_USER}" < /tmp/.password &>"${_NO_LOG}"
     rm /tmp/.password
+    # write to template
+    { echo "passwd -R \"${_DESTDIR}\" \"${_USER}\" < /tmp/.password &>\"${_NO_LOG}\""
+    echo "echo \"New password set for ${_USER}.\""
+    echo "rm /tmp/.password"
+    } >> "${_TEMPLATE}"
     _dialog --title " Success " --no-mouse --infobox "New password set for ${_USER}." 3 50
     sleep 2
 }
@@ -158,8 +184,14 @@ _user_management() {
                     esac
                     # change default shell for root and all users >= UID 1000
                     sd '^SHELL=.*' "SHELL=/usr/bin/${_SHELL}" "${_DESTDIR}"/etc/default/useradd
+                    # write to template
+                    echo "sd '^SHELL=.*' \"SHELL=/usr/bin/${_SHELL}\" \"${_DESTDIR}\"/etc/default/useradd" >> "${_TEMPLATE}"
                     for i in root $(rg -o '(.*):x:10[0-9][0-9]' -r '$1' "${_DESTDIR}"/etc/passwd); do
                         usermod -R "${_DESTDIR}" -s "/usr/bin/${_SHELL}" "${i}" &>"${_LOG}"
+                        # write to template
+                        { echo "usermod -R \"${_DESTDIR}\" -s \"/usr/bin/${_SHELL}\" \"${i}\" &>\"${_LOG}\""
+                        echo "echo \"Default shell set to ${_SHELL}.\""
+                        } >> "${_TEMPLATE}"
                     done
                     _dialog --title " Success " --no-mouse --infobox "Default shell set to ${_SHELL}." 3 50
                     sleep 3
@@ -181,6 +213,10 @@ _user_management() {
                          _prepare_password User || break
                          #shellcheck disable=SC2086
                          if useradd -R "${_DESTDIR}" ${_ADMIN_ATTR} -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
+                            # write to template
+                            { echo "useradd -R \"${_DESTDIR}\" ${_ADMIN_ATTR} -c \"${_FN}\" -m \"${_USER}\" &>\"${_LOG}\""
+                            echo "echo "User Account ${_USER} created succesfully.""
+                            } >> "${_TEMPLATE}"
                             _set_password
                             _dialog --title " Success " --no-mouse --infobox "User Account ${_USER} created succesfully." 3 50
                             sleep 2
@@ -234,10 +270,18 @@ _user_management() {
                                      if [[ -n "${_ADMIN_ATTR}" ]]; then
                                          usermod -R "${_DESTDIR}" -rG wheel "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "User ${_USER} removed as Administrator and removed from wheel group." 3 70
+                                         # write to template
+                                         { echo "usermod -R \"${_DESTDIR}\" -rG wheel \"${_USER}\""
+                                         echo "echo \"User ${_USER} removed as Administrator and removed from wheel group.\""
+                                         } >> "${_TEMPLATE}"
                                          sleep 2
                                      else
                                          usermod -R "${_DESTDIR}" -aG wheel "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "User ${_USER} switched to Administrator and added to wheel group." 3 70
+                                         # write to template
+                                         { echo "usermod -R \"${_DESTDIR}\" -aG wheel \"${_USER}\""
+                                         echo "echo \"User ${_USER} switched to Administrator and added to wheel group.\""
+                                         } >> "${_TEMPLATE}"
                                          sleep 2
                                      fi ;;
                                 "2") _NEXTITEM=2
@@ -248,12 +292,20 @@ _user_management() {
                                      if _set_comment; then
                                          usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "New comment set for ${_USER}." 3 50
+                                         # write to template
+                                         { echo "usermod -R \"${_DESTDIR}\" -c \"${_FN}\" \"${_USER}\""
+                                         echo "echo \"New comment set for ${_USER}.\""
+                                         } >> "${_TEMPLATE}"
                                          sleep 2
                                      fi ;;
                                 "4") if _NEXTITEM=4
                                         _dialog --defaultno --yesno \
                                             "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
                                         userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}"; then
+                                        # write to template
+                                         { echo "userdel -R \"${_DESTDIR}\" -r \"${_USER}\" &>\"${_LOG}\""
+                                         echo "echo \"User ${_USER} deleted succesfully.\""
+                                         } >> "${_TEMPLATE}"
                                         _dialog --title " Success " --no-mouse --infobox "User ${_USER} deleted succesfully." 3 50
                                         sleep 3
                                         break

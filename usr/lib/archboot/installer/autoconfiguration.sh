@@ -367,6 +367,7 @@ _auto_mkinitcpio() {
         # remove fallback initramfs
         if [[ -e "${_DESTDIR}/boot/initramfs-linux-fallback.img" ]]; then
             rm -f "${_DESTDIR}/boot/initramfs-linux-fallback.img"
+            # write to template
             echo "rm -f \"${_DESTDIR}/boot/initramfs-linux-fallback.img\"" >> "${_TEMPLATE}"
         fi
         sleep 2

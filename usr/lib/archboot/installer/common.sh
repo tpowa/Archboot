@@ -142,6 +142,8 @@ _auto_packages() {
 # enable at least C.UTF-8 if nothing was changed, else weird things happen on reboot!
 _locale_gen() {
     ${_NSPAWN} locale-gen &>"${_NO_LOG}"
+    # write to template
+    echo "${_NSPAWN} locale-gen &>\"${_NO_LOG}\"" >> "${_TEMPLATE}"
     [[ -e /.archboot ]] && rm /.archboot
 }
 
