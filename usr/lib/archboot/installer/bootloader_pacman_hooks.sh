@@ -3,7 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 _pacman_hook_common() {
-    if [[ -d "${_DESTDIR}/etc/pacman.d/hooks" ]]; then
+    if ! [[ -d "${_DESTDIR}/etc/pacman.d/hooks" ]]; then
         mkdir -p "${_DESTDIR}"/etc/pacman.d/hooks
         # write to template
         echo "mkdir -p \"${_DESTDIR}\"/etc/pacman.d/hooks" >> "${_TEMPLATE}"
