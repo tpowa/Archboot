@@ -108,12 +108,12 @@ _prepare_password() {
             _PASSWORD=${_PASS}
             echo "${_PASSWORD}" > /tmp/.password
             echo "${_PASSWORD}" >> /tmp/.password
-            _PASSWORD=/tmp/.password
             # write to template
             { echo "echo \"${_PASSWORD}\" > /tmp/.password"
             echo "echo \"${_PASSWORD}\" >> /tmp/.password"
             echo "PASSWORD=/tmp/.password"
             } >> "${_TEMPLATE}"
+            _PASSWORD=/tmp/.password
             break
         else
             _dialog --title " ERROR " --no-mouse --infobox "Password didn't match, please enter again." 3 50
