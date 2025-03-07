@@ -26,7 +26,7 @@ _abort_running_system() {
 }
 
 _geteditor() {
-    if ! [[ "${_EDITOR}" ]]; then
+    if [[ -z "${_EDITOR}" ]]; then
         _dialog --title " Text Editor " --no-cancel --menu "" 8 45 2 \
         "NANO" "Easier for newbies" \
         "NEOVIM" "VIM variant for experts" 2>"${_ANSWER}" || return 1
@@ -180,14 +180,14 @@ _configure_system() {
         elif [[ "${_FILE}" = "/etc/locale.gen" ]]; then
             _auto_set_locale |\
             _dialog --title " Locales " --no-mouse --gauge "Enable glibc locales based on locale.conf on installed system..."  6 75 0
-            ${_EDITOR} "${_DESTDIR}""${_FILE}"
+            _editor "${_DESTDIR}${_FILE}"
             _run_locale_gen |\
             _dialog --title " Locales " --no-mouse --gauge "Rebuilding glibc locales on installed system..." 6 75 0
         elif [[ "${_FILE}" = "> User Management" ]]; then
             _user_management
             _FILE=""
         else
-            ${_EDITOR} "${_DESTDIR}""${_FILE}"
+            _editor "${_DESTDIR}${_FILE}"
             # write to template
             { echo ": > \"${_DESTDIR}\"\"${_FILE}\""
             sd '^' 'echo "' < "${_DESTDIR}""${_FILE}" | sd '$' "\" >> \"${_DESTDIR}\"\"${_FILE}\""

@@ -64,7 +64,7 @@ _run_locale_gen() {
 }
 
 _set_mkinitcpio() {
-    ${_EDITOR} "${_DESTDIR}""${_FILE}"
+    _editor "${_DESTDIR}${_FILE}"
     _run_mkinitcpio | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Running mkinitcpio on installed system..." 6 75 0
     _mkinitcpio_error
 }

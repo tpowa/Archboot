@@ -43,8 +43,8 @@ _uki_uefi() {
     fi
     _uki_config
     _geteditor || return 1
-    "${_EDITOR}" "${_CMDLINE}"
-    "${_EDITOR}" "${_UKIFY_CONFIG}"
+    _editor "${_CMDLINE}"
+    _editor "${_UKIFY_CONFIG}"
     # enable uki handling in presets
     sd '#default_uki' 'default_uki' "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
     _run_mkinitcpio | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Running mkinitcpio on installed system..." 6 75 0

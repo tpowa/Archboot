@@ -26,8 +26,8 @@ BOOTDEOF
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
         _dialog --msgbox "You will now be put into the editor to edit:\nloader.conf and menu entry files\n\nAfter you save your changes, exit the editor." 8 50
         _geteditor || return 1
-        "${_EDITOR}" "${_DESTDIR}/${_MAIN_CFG}"
-        "${_EDITOR}" "${_DESTDIR}/${_LOADER_CFG}"
+        _editor "${_DESTDIR}/${_MAIN_CFG}"
+        _editor "${_DESTDIR}/${_LOADER_CFG}"
         _pacman_hook_systemd_bootd
         _dialog --title " Success " --no-mouse --infobox "SYSTEMD-BOOT has been setup successfully." 3 50
         sleep 3

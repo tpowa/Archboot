@@ -157,3 +157,11 @@ _write_partition_template() {
     echo "### partition end"
     } >> "${_TEMPLATE}"
 }
+
+_editor() {
+    ${_EDITOR} "$1"
+     # write to template
+    { echo ": > \"${1}\""
+    sd '^' 'echo "' < "${1}" | sd '$' "\" >> ${1}"
+    } >> "${_TEMPLATE}"
+}

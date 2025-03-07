@@ -24,7 +24,7 @@ CONFEOF
     ## Edit limine.conf config file
     _dialog --msgbox "You will now be put into the editor to edit:\nlimine.conf\n\nAfter you save your changes, exit the editor." 8 50
     _geteditor || return 1
-    "${_EDITOR}" "${_LIMINE_CONFIG}"
+    _editor "${_LIMINE_CONFIG}"
 }
 
 _limine_bios() {
