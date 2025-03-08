@@ -279,14 +279,14 @@ _set_device_name_scheme() {
 # the destination root partition last!
 _umountall()
 {
-    if [[ "${_DESTDIR}" == "/mnt/install" ]] && mountpoint -q "${_DESTDIR}"; then
+    if [[ "${_DESTDIR}" == "/mnt/install" ]]; then
         swapoff -a &>"${_NO_LOG}"
-        umount -R "${_DESTDIR}"
+        umount -R "${_DESTDIR}" &>"${_NO_LOG}"
         _dialog --no-mouse --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR}..." 4 70
         sleep 3
         # write to template
         { echo "swapoff -a &>\"${_NO_LOG}\""
-        echo "umount -R \"${_DESTDIR}\""
+        echo "umount -R \"${_DESTDIR}\" &>\"${_NO_LOG}\""
         } >> "${_TEMPLATE}"
     fi
 }
