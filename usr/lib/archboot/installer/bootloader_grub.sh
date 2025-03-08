@@ -163,11 +163,7 @@ EOF
             _GRUB_ROOT_DRIVE="set root=${_BOOTDEV_DRIVE}"
         fi
     fi
-    if [[ -n "${_GRUB_UEFI}" ]]; then
-        _LINUX_UNMOD_COMMAND="linux ${_SUBDIR}/${_VMLINUZ} ${_KERNEL_PARAMS_MOD}"
-    else
-        _LINUX_UNMOD_COMMAND="linux ${_SUBDIR}/${_VMLINUZ} ${_KERNEL_PARAMS_MOD}"
-    fi
+    _LINUX_UNMOD_COMMAND="linux ${_SUBDIR}/${_VMLINUZ} ${_KERNEL_PARAMS_MOD}"
     _LINUX_MOD_COMMAND=$(echo "${_LINUX_UNMOD_COMMAND}" | sd ' +' ' ')
     ## create default kernel entry
     _NUMBER=0
@@ -297,6 +293,7 @@ _setup_grub_bios() {
 }
 
 _grub_bios() {
+    _GRUB_UEFI=""
     _grub_common_before
     # try to auto-configure GRUB(2)...
     _check_bootpart
@@ -398,7 +395,6 @@ _grub_install_uefi_sb() {
 }
 
 _setup_grub_uefi() {
-    _GRUB_UEFI=1
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
         _progress "50" "Installing fedora's shim and mokmanager..."
         # write to template
@@ -456,7 +452,7 @@ _setup_grub_uefi_sb() {
 }
 
 _grub_uefi() {
-    _GRUB_UEFI=""
+    _GRUB_UEFI="1"
     _uefi_common || return 1
     [[ "${_UEFI_ARCH}" == "X64" ]] && _GRUB_ARCH="x86_64"
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
