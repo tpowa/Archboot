@@ -850,7 +850,6 @@ _enter_luks_passphrase () {
             # write to template
             { echo "### luks device"
             echo "echo \"${_LUKSPASSPHRASE}\" > \"/tmp/passphrase-${_LUKSDEV}\""
-            echo "_LUKSPASSPHRASE=\"/tmp/passphrase-${_LUKSDEV}\""
             } >> "${_TEMPLATE}"
             _LUKSPASSPHRASE="/tmp/passphrase-${_LUKSDEV}"
             break
