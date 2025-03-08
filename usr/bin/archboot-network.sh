@@ -110,6 +110,7 @@ _wireless() {
             echo "iwctl --passphrase=\"${_WLAN_KEY}\" station \"${_INTERFACE}\" \"${_WLAN_CONNECT}\" \"${_WLAN_SSID}\" &>\"${_NO_LOG}\""
         fi
         echo "### wireless authentification end"
+        echo ""
         } >> "${_TEMPLATE}"
         return 0
     else
@@ -283,6 +284,7 @@ _network() {
     echo "sleep 10"
     echo ": > /.network"
     echo "### network profile end"
+    echo ""
     } >> "${_TEMPLATE}"
 }
 

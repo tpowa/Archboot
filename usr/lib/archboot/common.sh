@@ -51,8 +51,13 @@ if [[ ! -e "${_TEMPLATE}" ]]; then
     { echo "#!/bin/bash"
     echo ". /usr/lib/archboot/common.sh"
     echo ". /usr/lib/archboot/installer/common.sh"
+    echo ""
     echo "echo \"Automatic Archboot - Arch Linux Installation:\""
     echo "echo \"Logging is done on ${_LOG}...\""
+    echo ""
+    echo "echo \"10 seconds to stop the process with CTRL-C...\""
+    echo "sleep 10"
+    echo ""
     } >> "${_TEMPLATE}"
 fi
 _VNC_PACKAGE="tigervnc"

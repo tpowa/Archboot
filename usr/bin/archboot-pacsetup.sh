@@ -173,6 +173,7 @@ EOF
         echo "Server = file:///var/cache/pacman/pkg"
         echo "EOF"
         echo "### local pacman repository end"
+        echo ""
         } >> "${_TEMPLATE}"
         sleep 2
         break

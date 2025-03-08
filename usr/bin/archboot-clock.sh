@@ -84,6 +84,7 @@ _task_clock() {
     echo "timedatectl set-ntp 1"
     echo ": > /.clock"
     echo "### clock end"
+    echo ""
     } >> "${_TEMPLATE}"
     rm /.archboot
 }

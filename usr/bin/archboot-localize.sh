@@ -97,6 +97,7 @@ _localize_task() {
     echo "export LANG=\"${_LOCALE}.UTF-8\""
     echo ": > /.localize"
     echo "### localize end"
+    echo ""
     } >> "${_TEMPLATE}"
     rm /.archboot
 }
