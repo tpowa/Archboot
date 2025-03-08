@@ -280,7 +280,8 @@ _set_device_name_scheme() {
 _umountall()
 {
     if [[ "${_DESTDIR}" == "/mnt/install" ]]; then
-        if swapoff -a &>"${_NO_LOG}"; then
+        if rg 'partition' /proc/swaps || rg 'file' /proc/swaps; then
+            swapoff -a &>"${_NO_LOG}"
             _dialog --no-mouse --infobox "Disabled swapspace..." 3 70
             # write to template
             echo "swapoff -a &>\"${_NO_LOG}\"" >> "${_TEMPLATE}"
