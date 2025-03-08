@@ -413,6 +413,7 @@ _stopluks()
             # write to template
             { echo "cryptsetup remove \"${dev}\" >\"${_LOG}\""
             echo "wipefs -a \"${_LUKS_REAL_DEV}\" &>\"${_NO_LOG}\""
+            echo ""
             } >> "${_TEMPLATE}"
         done
         _dialog --no-mouse --infobox "Removing luks encrypted device(s) done." 3 50
@@ -879,7 +880,7 @@ _opening_luks() {
         # write to template
         { echo "echo \"${_LUKSDEV}\" \"${_DEV}\" \"/etc/$(basename \"${_LUKSPASSPHRASE}\")\" >> /tmp/.crypttab"
         echo ""
-        }>> "${_TEMPLATE}"
+        } >> "${_TEMPLATE}"
     fi
 }
 
