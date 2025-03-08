@@ -877,7 +877,9 @@ _opening_luks() {
     if _dialog --yesno "Would you like to save the passphrase of luks device in /etc/$(basename "${_LUKSPASSPHRASE}")?\nName:${_LUKSDEV}" 0 0; then
         echo "${_LUKSDEV}" "${_DEV}" "/etc/$(basename "${_LUKSPASSPHRASE}")" >> /tmp/.crypttab
         # write to template
-        echo "echo \"${_LUKSDEV}\" \"${_DEV}\" \"/etc/$(basename \"${_LUKSPASSPHRASE}\")\" >> /tmp/.crypttab" >> "${_TEMPLATE}"
+        { echo "echo \"${_LUKSDEV}\" \"${_DEV}\" \"/etc/$(basename \"${_LUKSPASSPHRASE}\")\" >> /tmp/.crypttab"
+        echo ""
+        }>> "${_TEMPLATE}"
     fi
 }
 
@@ -924,7 +926,7 @@ _createluks()
     cryptsetup -q luksFormat "${_DEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}"
     # write to template
     { echo "cryptsetup -q luksFormat \"${_DEV}\" <\"${_LUKSPASSPHRASE}\" >\"${_LOG}\""
-    echo ""
+    echo "" >> "${_TEMPLATE}"
     } >> "${_TEMPLATE}"
     _opening_luks
 }
