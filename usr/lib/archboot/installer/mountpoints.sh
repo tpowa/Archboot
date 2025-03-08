@@ -674,7 +674,7 @@ _mkfs() {
     _PARTLABEL="$(_getpartlabel "${1}")"
     echo "# DEVICE DETAILS: ${1} PARTUUID=${_PARTUUID} PARTLABEL=${_PARTLABEL} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
     # write to template
-    echo "echo \"# DEVICE DETAILS: ${1} PARTUUID=${_PARTUUID} PARTLABEL=${_PARTLABEL} UUID=${_FSUUID} LABEL=${_FSLABEL}\" >> /tmp/.device-names" >> "${_TEMPLATE}"
+    echo "echo \"# DEVICE DETAILS: ${1} PARTUUID=${_PARTUUID} PARTLABEL=${_PARTLABEL} UUID=\$(${_LSBLK} UUID ${1}) LABEL=${_FSLABEL}\" >> /tmp/.device-names" >> "${_TEMPLATE}"
     # add to temp fstab
     if [[ "${_NAME_SCHEME_PARAMETER}" == "FSUUID" ]]; then
         if [[ -n "${_FSUUID}" ]]; then
