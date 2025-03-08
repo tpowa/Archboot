@@ -63,7 +63,6 @@ _vconsole_keymap() {
 
 _localize_task() {
     echo "LANG=${_LOCALE}.UTF-8" > /etc/locale.conf
-    echo "LANG=${_LOCALE}.UTF-8" > /.localize
     echo LC_COLLATE=C >> /etc/locale.conf
     localectl set-locale "${_LOCALE}.UTF-8" &>"${_NO_LOG}"
     #shellcheck disable=SC2016
@@ -81,10 +80,10 @@ _localize_task() {
     systemctl restart systemd-vconsole-setup
     # set running VC too
     export LANG="${_LOCALE}.UTF-8"
+    : > /.localize
     { echo "### localize start"
     echo "echo Localization..."
     echo "echo \"LANG=${_LOCALE}.UTF-8\" > /etc/locale.conf"
-    echo "echo \"LANG=${_LOCALE}.UTF-8\" > /.localize"
     echo "echo LC_COLLATE=C >> /etc/locale.conf"
     echo "localectl set-locale \"${_LOCALE}.UTF-8\" &>\"${_NO_LOG}\""
     #shellcheck disable=SC2016
