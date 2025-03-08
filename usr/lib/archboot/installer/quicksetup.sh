@@ -120,7 +120,9 @@ _autoprepare() {
     # switch for mbr usage
     _set_guid
     : >/tmp/.device-names
-    echo ": > /tmp/.device-names" >> "${_TEMPLATE}"
+    { echo "### quicksetup"
+    echo ": > /tmp/.device-names"
+    } >> "${_TEMPLATE}"
     _DISKS=$(_blockdevices)
     if [[ "$(echo "${_DISKS}" | wc -w)" -gt 1 ]]; then
         #shellcheck disable=SC2046
@@ -320,7 +322,6 @@ _autoprepare() {
     : > /tmp/.fstab
     # write to template
     echo ": > /tmp/.fstab" >> "${_TEMPLATE}"
-    _umountall
     # disable swap and all mounted partitions, umount / last!
     _printk off
     _auto_partition | _dialog --title " Partitioning " --no-mouse --gauge "Partitioning ${_DISK}..." 6 75 0
@@ -348,6 +349,7 @@ _autoprepare() {
         _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_BOOTDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
     fi
     _auto_create_filesystems | _dialog --title " Filesystems " --no-mouse --gauge "Creating Filesystems on ${_DISK}..." 6 75 0
+    echo "" "${_TEMPLATE}"
     _dialog --title " Success " --no-mouse --infobox "Quick Setup was successful." 3 40
     sleep 3
 }
