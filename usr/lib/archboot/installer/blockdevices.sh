@@ -280,20 +280,26 @@ _set_device_name_scheme() {
 _umountall()
 {
     if [[ "${_DESTDIR}" == "/mnt/install" ]]; then
-        swapoff -a &>"${_NO_LOG}"
-        umount -R "${_DESTDIR}" &>"${_NO_LOG}"
-        _dialog --no-mouse --infobox "Disabled swapspace,\nunmounted already mounted disk devices in ${_DESTDIR}..." 4 70
-        sleep 3
-        # write to template
-        { echo "swapoff -a &>\"${_NO_LOG}\""
-        echo "umount -R \"${_DESTDIR}\" &>\"${_NO_LOG}\""
-        } >> "${_TEMPLATE}"
+        if swapoff -a &>"${_NO_LOG}"; then
+            _dialog --no-mouse --infobox "Disabled swapspace..." 3 70
+            # write to template
+            echo "swapoff -a &>\"${_NO_LOG}\"" >> "${_TEMPLATE}"
+            sleep 2
+        fi
+        if mountpoint -q "/mnt/install"; then
+            umount -R "${_DESTDIR}" &>"${_NO_LOG}"
+            _dialog --no-mouse --infobox "Unmounted already mounted disk devices in ${_DESTDIR}..." 3 70
+            # write to template
+            echo "umount -R \"${_DESTDIR}\" &>\"${_NO_LOG}\"" >> "${_TEMPLATE}"
+            sleep 2
+        fi
     fi
 }
 
 _clean_disk() {
     _umountall
-    # clear all magic strings/signatures - mdadm, lvm, partition tables etc
+    # clear all magic strings/signatures - mdadm, lvm, pa
+    rtition tables etc
     wipefs -a -f "${1}" &>"${_NO_LOG}"
     # really clear everything MBR/GPT at the beginning of the device!
     dd if=/dev/zero of="${1}" bs=1M count=10 &>"${_NO_LOG}"
