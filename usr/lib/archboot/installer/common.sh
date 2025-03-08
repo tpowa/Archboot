@@ -166,9 +166,12 @@ _editor() {
 
 _file_to_template() {
     # write to template
-    { echo ": > \"${1}\""
+    { echo "### ${1} file"
+    echo ": > \"${1}\""
     sd '^' "echo \'" < "${1}" | sd '$' "\' >> ${1}"
     } >> "${_TEMPLATE}"
     # new line is not added by default on last line
-    echo -n $'\n' >> "${_TEMPLATE}"
+    { echo -n $'\n'
+    echo ""
+    } >> "${_TEMPLATE}"
 }
