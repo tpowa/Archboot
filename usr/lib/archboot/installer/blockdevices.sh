@@ -925,8 +925,6 @@ _createluks()
     _dialog --no-mouse --infobox "Encrypting ${_DEV}..." 0 0
     cryptsetup -q luksFormat "${_DEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}"
     # write to template
-    { echo "cryptsetup -q luksFormat \"${_DEV}\" <\"${_LUKSPASSPHRASE}\" >\"${_LOG}\""
-    echo "" >> "${_TEMPLATE}"
-    } >> "${_TEMPLATE}"
+    echo "cryptsetup -q luksFormat \"${_DEV}\" <\"${_LUKSPASSPHRASE}\" >\"${_LOG}\"" >> "${_TEMPLATE}"
     _opening_luks
 }
