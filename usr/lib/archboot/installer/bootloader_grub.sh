@@ -249,13 +249,13 @@ EOF
     echo "_BOOTDEV_FS_UUID_OLD=\"${_BOOTDEV_FS_UUID}\""
     echo "_ROOTDEV_FS_UUID_OLD=\"${_ROOTDEV_FS_UUID}\""
     echo "_USRDEV_FS_UUID_OLD=\"${_USRDEV_FS_UUID}\""
-    echo "_BOOTDEV_FS_UUID=\"$(${_GRUB_PROBE} --target=\"fs_uuid\" \"/boot\" 2>\"${_NO_LOG}\")\""
-    echo "_ROOTDEV_FS_UUID=\"$(${_GRUB_PROBE} --target=\"fs_uuid\" \"/\" 2>\"${_NO_LOG}\")\""
-    echo "_USRDEV_FS_UUID=\"$(${_GRUB_PROBE} --target=\"fs_uuid\" \"/usr\" 2>\"${_NO_LOG}\")\""
+    echo "_BOOTDEV_FS_UUID=\"\$(${_GRUB_PROBE} --target=\"fs_uuid\" \"/boot\" 2>\"${_NO_LOG}\")\""
+    echo "_ROOTDEV_FS_UUID=\"\$(${_GRUB_PROBE} --target=\"fs_uuid\" \"/\" 2>\"${_NO_LOG}\")\""
+    echo "_USRDEV_FS_UUID=\"\$(${_GRUB_PROBE} --target=\"fs_uuid\" \"/usr\" 2>\"${_NO_LOG}\")\""
     } >> "${_TEMPLATE}"
     if [[ -n "${_GRUB_UEFI}" ]]; then
         { echo "_UEFISYSDEV_FS_UUID_OLD=\"${_UEFISYSDEV_FS_UUID}\""
-        echo "_UEFISYSDEV_FS_UUID=\"$(${_GRUB_PROBE} --target=\"fs_uuid\" \"/${_UEFISYS_MP}\" 2>\"${_NO_LOG}\")\""
+        echo "_UEFISYSDEV_FS_UUID=\"\$(${_GRUB_PROBE} --target=\"fs_uuid\" \"/${_UEFISYS_MP}\" 2>\"${_NO_LOG}\")\""
         echo "sd \"${_UEFISYSDEV_FS_UUID_OLD}\" \"${_UEFISYSDEV_FS_UUID}\" \"${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
         } >> "${_TEMPLATE}"
     fi
