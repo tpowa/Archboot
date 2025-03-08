@@ -241,6 +241,10 @@ _mountpoints() {
         : >/tmp/.device-names
         : >/tmp/.fstab
         : >/tmp/.parts
+        # write to template
+        { echo ": >/tmp/.device-names"
+        echo ": >/tmp/.fstab"
+        } >> "${_TEMPLATE}"
         if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
             _set_device_name_scheme || return 1
         fi
