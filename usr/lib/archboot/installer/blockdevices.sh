@@ -363,6 +363,8 @@ _stoplvm()
     fi
     if [[ -n "${_DISABLELVM}" ]]; then
         _umountall
+        # write to template
+        echo "### remove all lvm devices" >> "${_TEMPLATE}"
         for dev in ${_LV_VOLUMES}; do
             lvremove -f "/dev/mapper/${dev}" 2>"${_NO_LOG}">"${_LOG}"
             # write to template
@@ -378,6 +380,8 @@ _stoplvm()
             # write to template
             echo "pvremove -f \"${dev}\" 2>\"${_NO_LOG}\" >\"${_LOG}\"" >> "${_TEMPLATE}"
         done
+        # write to template
+        echo "" >> "${_TEMPLATE}"
         _dialog --no-mouse --infobox "Removing logical volume(s), logical group(s)\nand physical volume(s) done." 3 60
         sleep 3
     fi
