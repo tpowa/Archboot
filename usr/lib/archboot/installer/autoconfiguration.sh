@@ -80,7 +80,7 @@ _auto_fstab(){
     if [[ -f /tmp/.device-names ]]; then
         sort /tmp/.device-names >>"${_DESTDIR}"/etc/fstab
         # write to template
-        { echo \"echo "Create new fstab on installed system...\""
+        { echo "echo \"Create new fstab on installed system...\""
         echo "sort /tmp/.device-names >>\"${_DESTDIR}\"/etc/fstab"
         } >> "${_TEMPLATE}"
     fi
