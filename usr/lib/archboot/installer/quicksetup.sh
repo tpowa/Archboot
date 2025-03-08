@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _auto_partition() {
-    _umountall
     sleep 2
     _progress "10" "Cleaning ${_DISK}..."
     _clean_disk "${_DISK}"
