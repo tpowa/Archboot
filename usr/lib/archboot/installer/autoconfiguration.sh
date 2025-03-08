@@ -86,10 +86,10 @@ _auto_fstab(){
     fi
     if [[ -f /tmp/.fstab ]]; then
         # clean fstab first from entries
-        sd -p '^[^#]*' '' "${_DESTDIR}"/etc/fstab
+        sd '^[^#]*' '' "${_DESTDIR}"/etc/fstab
         sort /tmp/.fstab >>"${_DESTDIR}"/etc/fstab
         # write to template
-        { echo "sd -p '^[^#]*' '' \"${_DESTDIR}\"/etc/fstab"
+        { echo "sd '^[^#]*' '' \"${_DESTDIR}\"/etc/fstab"
         echo "sort /tmp/.fstab >>\"${_DESTDIR}\"/etc/fstab"
         } >> "${_TEMPLATE}"
     fi
