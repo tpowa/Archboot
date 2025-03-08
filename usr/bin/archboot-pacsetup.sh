@@ -89,6 +89,7 @@ _task_pacman_keyring_install() {
     echo "pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>\"${_LOG}\""
     echo ": > /.pacsetup"
     echo "### pacman keyring end"
+    echo ""
     } >> "${_TEMPLATE}"
     rm /.archboot
 }
