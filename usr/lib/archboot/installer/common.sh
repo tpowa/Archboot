@@ -151,7 +151,7 @@ _write_partition_template() {
     # write to template
     { echo "### partition start"
     echo "echo \"Partitioning \"${_DISK}\"...\""
-    echo "sfdisk \"${_DISK}\" << EOF"
+    echo "sfdisk \"${_DISK}\" << EOF >> \"${_LOG}\""
     sfdisk -d "${_DISK}"
     echo "EOF"
     echo "### partition end"
