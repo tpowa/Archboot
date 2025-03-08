@@ -242,7 +242,8 @@ _mountpoints() {
         : >/tmp/.fstab
         : >/tmp/.parts
         # write to template
-        { echo ": >/tmp/.device-names"
+        { echo "### mountpoints"
+        echo ": >/tmp/.device-names"
         echo ": >/tmp/.fstab"
         } >> "${_TEMPLATE}"
         if [[ -z "${_NAME_SCHEME_PARAMETER_RUN}" ]]; then
@@ -451,6 +452,8 @@ _mountpoints() {
     _printk on
     # bcachefs uses : array for raid devices, kill this one
      _ROOTDEV="$(mount | rg -o "(.*)[:.*, ]on ${_DESTDIR} " -r '$1')"
+     # write to template
+     echo "" >> "${_TEMPLATE}"
 }
 
 # _mkfs()
