@@ -620,7 +620,6 @@ _createpv()
         # write to template
         { echo "### pv device"
         echo "pvcreate -y ${_DEV} &>\"${_LOG}\""
-        echo ""
         } >> "${_TEMPLATE}"
         sleep 3
     else
@@ -633,6 +632,7 @@ _createpv()
     udevadm settle
     { echo "udevadm trigger"
     echo "udevadm settle"
+    echo ""
     } >> "${_TEMPLATE}"
 }
 
