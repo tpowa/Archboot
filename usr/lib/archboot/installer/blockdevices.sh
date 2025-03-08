@@ -532,7 +532,10 @@ _createmd()
     if mdadm --create ${_RAIDDEV} ${_RAIDOPTIONS} ${_DEVS} &>"${_LOG}"; then
         _dialog --no-mouse --infobox "${_RAIDDEV} created successfully." 3 50
         sleep 3
-        echo "mdadm --create ${_RAIDDEV} ${_RAIDOPTIONS} ${_DEVS} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+        { echo "### mdadm device"
+        echo "mdadm --create ${_RAIDDEV} ${_RAIDOPTIONS} ${_DEVS} &>\"${_LOG}\""
+        echo ""
+        } >> "${_TEMPLATE}"
     else
         _dialog --title " ERROR " --no-mouse --infobox "Creating ${_RAIDDEV} failed." 3 60
         sleep 5
@@ -608,7 +611,10 @@ _createpv()
     if pvcreate -y ${_DEV} &>"${_LOG}"; then
         _dialog --no-mouse --infobox "Creating physical volume on ${_DEV} was successful." 3 75
         # write to template
-        echo "pvcreate -y ${_DEV} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+        { echo "### pv device"
+        echo "pvcreate -y ${_DEV} &>\"${_LOG}\""
+        echo ""
+        } >> "${_TEMPLATE}"
         sleep 3
     else
         _dialog --title " ERROR " --no-mouse --infobox "Creating physical volume on ${_DEV} failed." 3 60
@@ -697,7 +703,10 @@ _createvg()
     if vgcreate ${_VGDEV} ${_PV} &>"${_LOG}"; then
         _dialog --no-mouse --infobox "Creating Volume Group ${_VGDEV} was successful." 3 60
         # write to template
-        echo "vgcreate ${_VGDEV} ${_PV} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+        { echo "### vg device"
+        echo "vgcreate ${_VGDEV} ${_PV} &>\"${_LOG}\""
+        echo ""
+        } >> "${_TEMPLATE}"
         sleep 3
     else
         _dialog --msgbox "Error while creating Volume Group ${_VGDEV} (see ${_LOG} for details)." 0 0
@@ -767,7 +776,10 @@ _createlv()
         if lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
             _dialog --no-mouse --infobox "Creating Logical Volume ${_LVDEV} was successful." 3 60
             # write to template
-            echo "lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEV} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+            { echo "### lv device"
+            echo "lvcreate ${_LV_EXTRA} -l +100%FREE ${_LV} -n ${_LVDEV} &>\"${_LOG}\""
+            echo ""
+            } >> "${_TEMPLATE}"
             sleep 3
         else
             _dialog --msgbox "Error while creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
@@ -778,7 +790,10 @@ _createlv()
         if lvcreate ${_LV_EXTRA} -L ${_LV_SIZE} ${_LV} -n ${_LVDEV} &>"${_LOG}"; then
             _dialog --no-mouse --infobox "Creating Logical Volume ${_LVDEV} was successful." 3 60
             # write to template
-            echo "lvcreate ${_LV_EXTRA} -L ${_LV_SIZE} ${_LV} -n ${_LVDEV} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+            { echo "### lv device"
+            echo "lvcreate ${_LV_EXTRA} -L ${_LV_SIZE} ${_LV} -n ${_LVDEV} &>\"${_LOG}\""
+            echo ""
+            } >> "${_TEMPLATE}"
             sleep 3
         else
             _dialog --msgbox "Error while creating Logical Volume ${_LVDEV} (see ${_LOG} for details)." 0 0
@@ -816,7 +831,8 @@ _enter_luks_passphrase () {
             echo "${_LUKSPASSPHRASE}" > "/tmp/passphrase-${_LUKSDEV}"
             _LUKSPASSPHRASE="/tmp/passphrase-${_LUKSDEV}"
             # write to template
-            { echo "echo \"${_LUKSPASSPHRASE}\" > \"/tmp/passphrase-${_LUKSDEV}\""
+            { echo "### luks device"
+            echo "echo \"${_LUKSPASSPHRASE}\" > \"/tmp/passphrase-${_LUKSDEV}\""
             echo "_LUKSPASSPHRASE=\"/tmp/passphrase-${_LUKSDEV}\""
             } >> "${_TEMPLATE}"
             break
@@ -890,6 +906,8 @@ _createluks()
     _dialog --no-mouse --infobox "Encrypting ${_DEV}..." 0 0
     cryptsetup -q luksFormat "${_DEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}"
     # write to template
-    echo "cryptsetup -q luksFormat \"${_DEV}\" <\"${_LUKSPASSPHRASE}\" >\"${_LOG}\"" >> "${_TEMPLATE}"
+    { echo "cryptsetup -q luksFormat \"${_DEV}\" <\"${_LUKSPASSPHRASE}\" >\"${_LOG}\""
+    echo ""
+    } >> "${_TEMPLATE}"
     _opening_luks
 }
