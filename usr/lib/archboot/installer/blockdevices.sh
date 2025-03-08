@@ -847,12 +847,12 @@ _enter_luks_passphrase () {
         if [[ "${_LUKSPASS}" == "${_LUKSPASS2}" ]]; then
             _LUKSPASSPHRASE=${_LUKSPASS}
             echo "${_LUKSPASSPHRASE}" > "/tmp/passphrase-${_LUKSDEV}"
-            _LUKSPASSPHRASE="/tmp/passphrase-${_LUKSDEV}"
             # write to template
             { echo "### luks device"
             echo "echo \"${_LUKSPASSPHRASE}\" > \"/tmp/passphrase-${_LUKSDEV}\""
             echo "_LUKSPASSPHRASE=\"/tmp/passphrase-${_LUKSDEV}\""
             } >> "${_TEMPLATE}"
+            _LUKSPASSPHRASE="/tmp/passphrase-${_LUKSDEV}"
             break
         else
              _dialog --no-mouse --infobox "Passphrases didn't match, please enter again." 0 0
