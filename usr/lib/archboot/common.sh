@@ -48,9 +48,12 @@ _STANDARD_PACKAGES=(
 )
 _TEMPLATE="/tmp/archboot-autorun.template"
 if [[ ! -e "${_TEMPLATE}" ]]; then
-    echo "#!/bin/bash" > "${_TEMPLATE}"
-    echo ". /usr/lib/archboot/common.sh" >> "${_TEMPLATE}"
-    echo ". /usr/lib/archboot/installer/common.sh" >> "${_TEMPLATE}"
+    { echo "#!/bin/bash"
+    echo ". /usr/lib/archboot/common.sh"
+    echo ". /usr/lib/archboot/installer/common.sh"
+    echo "echo \"Automatic Archboot - Arch Linux Installation:\""
+    echo "echo \"Logging is done on ${_LOG}...\""
+    } >> "${_TEMPLATE}"
 fi
 _VNC_PACKAGE="tigervnc"
 _WAYLAND_PACKAGE="egl-wayland"
