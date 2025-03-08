@@ -81,7 +81,7 @@ _localize_task() {
     # set running VC too
     export LANG="${_LOCALE}.UTF-8"
     : > /.localize
-    { echo "### localize start"
+    { echo "### localize"
     echo "echo Localization..."
     echo "echo \"LANG=${_LOCALE}.UTF-8\" > /etc/locale.conf"
     echo "echo LC_COLLATE=C >> /etc/locale.conf"
@@ -96,7 +96,6 @@ _localize_task() {
     # set running VC too
     echo "export LANG=\"${_LOCALE}.UTF-8\""
     echo ": > /.localize"
-    echo "### localize end"
     echo ""
     } >> "${_TEMPLATE}"
     rm /.archboot

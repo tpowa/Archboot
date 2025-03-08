@@ -594,8 +594,6 @@ _mkfs() {
         fi
         _btrfs_scan
         sleep 2
-        # write to template
-        echo "sleep 2" >> "${_TEMPLATE}"
         # create our mount directory
         mkdir -p "${3}""${5}"
         # write to template

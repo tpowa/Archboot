@@ -52,11 +52,11 @@ _select_mirror() {
         _SYNC_URL=""
     fi
     # write to template
-    { echo "### pacman mirror start"
+    { echo "### pacman mirror"
     echo "echo Pacman Server..."
     echo "sd '^Server' '#Server' \"${_PACMAN_MIRROR}\""
     echo "echo 'Server = ${_SYNC_URL}' >> \"${_PACMAN_MIRROR}\""
-    echo "### pacman mirror end"
+    echo ""
     } >> "${_TEMPLATE}"
 }
 #shellcheck disable=SC2120
@@ -67,9 +67,9 @@ _enable_testing() {
             #shellcheck disable=SC2016
             sd '^#(\[[c,e].*-testing\]\n)#' '$1' "${1}/etc/pacman.conf"
             # write to template
-            { echo "### pacman testing repository start"
+            { echo "### pacman testing repository"
             echo "sd '^#(\[[c,e].*-testing\]\\\n)#' '$1' \"${1}/etc/pacman.conf\""
-            echo "### pacman testing repository end"
+            echo ""
             } >> "${_TEMPLATE}"
             _DOTESTING=1
         fi
@@ -82,13 +82,12 @@ _task_pacman_keyring_install() {
     #shellcheck disable=SC2068
     pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>"${_LOG}"
     # write to template
-    { echo "### pacman keyring start"
+    { echo "### pacman keyring"
     echo "echo Pacman keyring..."
     echo "_pacman_keyring"
     #shellcheck disable=SC2068
     echo "pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>\"${_LOG}\""
     echo ": > /.pacsetup"
-    echo "### pacman keyring end"
     echo ""
     } >> "${_TEMPLATE}"
     rm /.archboot
@@ -164,7 +163,7 @@ Server = file:///var/cache/pacman/pkg
 EOF
         pacman -Sy >>"${_LOG}"
         # write to template
-        { echo "### local pacman repository start"
+        { echo "### local pacman repository"
         echo "cat << EOF > \"${_PACMAN_CONF}\""
         echo "[options]"
         echo "Architecture = auto"
@@ -173,7 +172,6 @@ EOF
         echo "[archboot]"
         echo "Server = file:///var/cache/pacman/pkg"
         echo "EOF"
-        echo "### local pacman repository end"
         echo ""
         } >> "${_TEMPLATE}"
         sleep 2
