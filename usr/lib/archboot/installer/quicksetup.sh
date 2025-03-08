@@ -120,7 +120,7 @@ _autoprepare() {
     # switch for mbr usage
     _set_guid
     : >/tmp/.device-names
-    echo ": >/tmp/.device-names" >> "${_TEMPLATE}"
+    echo ": > /tmp/.device-names" >> "${_TEMPLATE}"
     _DISKS=$(_blockdevices)
     if [[ "$(echo "${_DISKS}" | wc -w)" -gt 1 ]]; then
         #shellcheck disable=SC2046
