@@ -349,7 +349,7 @@ _autoprepare() {
         _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_BOOTDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
     fi
     _auto_create_filesystems | _dialog --title " Filesystems " --no-mouse --gauge "Creating Filesystems on ${_DISK}..." 6 75 0
-    echo "" "${_TEMPLATE}"
+    echo "" >> "${_TEMPLATE}"
     _dialog --title " Success " --no-mouse --infobox "Quick Setup was successful." 3 40
     sleep 3
 }
