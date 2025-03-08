@@ -120,6 +120,7 @@ _autoprepare() {
     # switch for mbr usage
     _set_guid
     : >/tmp/.device-names
+    echo ": >/tmp/.device-names" >> "${_TEMPLATE}"
     _DISKS=$(_blockdevices)
     if [[ "$(echo "${_DISKS}" | wc -w)" -gt 1 ]]; then
         #shellcheck disable=SC2046
@@ -316,7 +317,9 @@ _autoprepare() {
         _DEFAULTFS=1
     done
     _dialog --defaultno --yesno "${_DISK} will be COMPLETELY ERASED!\nALL DATA ON ${_DISK} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 || return 1
-    [[ -e /tmp/.fstab ]] && rm -f /tmp/.fstab
+    : > /tmp/.fstab
+    # write to template
+    echo ": > /tmp/.fstab" >> "${_TEMPLATE}"
     _umountall
     # disable swap and all mounted partitions, umount / last!
     _printk off
