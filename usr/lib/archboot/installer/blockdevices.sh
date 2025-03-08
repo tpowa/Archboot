@@ -299,8 +299,7 @@ _umountall()
 
 _clean_disk() {
     _umountall
-    # clear all magic strings/signatures - mdadm, lvm, pa
-    rtition tables etc
+    # clear all magic strings/signatures - mdadm, lvm, partition tables etc
     wipefs -a -f "${1}" &>"${_NO_LOG}"
     # really clear everything MBR/GPT at the beginning of the device!
     dd if=/dev/zero of="${1}" bs=1M count=10 &>"${_NO_LOG}"
@@ -319,6 +318,8 @@ _stopmd()
         _dialog --defaultno --yesno "Setup detected already running software raid device(s)...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLEMD=1
         if [[ -n "${_DISABLEMD}" ]]; then
             _umountall
+            # write to template
+            echo "### remove all md devices" >> "${_TEMPLATE}"
             # shellcheck disable=SC2013
             for dev in $(rg -o '(^md.*) :' -r '$1' /proc/mdstat); do
                 wipefs -a -f "/dev/${dev}" &>"${_NO_LOG}"
@@ -343,6 +344,8 @@ _stopmd()
         for dev in $(${_LSBLK} NAME,FSTYPE | rg '(.*) linux_raid_member$' -r '$1'); do
             _clean_disk "${dev}"
         done
+        # write to template
+        echo "" >> "${_TEMPLATE}"
         _dialog --no-mouse --infobox "Removing superblock(s) on software raid devices done." 3 60
         sleep 3
     fi
@@ -399,6 +402,8 @@ _stopluks()
         _dialog --defaultno --yesno "Setup detected running luks encrypted device(s)...\n\nDo you want to delete ALL of them completely?\nWARNING: ALL DATA ON THEM WILL BE LOST!" 0 0 && _DISABLELUKS=1
     fi
     if [[ -n "${_DISABLELUKS}" ]]; then
+        # write to template
+        echo "### remove all luks devices" >> "${_TEMPLATE}"
         _umountall
         for dev in ${_LUKSDEV}; do
             _LUKS_REAL_DEV="$(${_LSBLK} NAME,FSTYPE -s "${_LUKSDEV}" 2>"${_NO_LOG}" | rg '(.*) crypto_LUKS$' -r '$1')"
@@ -428,9 +433,11 @@ _stopluks()
            echo "wipefs -a \"${dev}\" &>\"${_NO_LOG}\"" >> "${_TEMPLATE}"
         done
         _dialog --no-mouse --infobox "Removing not running luks encrypted device(s) done." 3 60
+        # write to template
+        echo "" >> "${_TEMPLATE}"
         sleep 3
     fi
-    [[ -e /tmp/.crypttab ]] && rm /tmp/.crypttab
+    : > /tmp/.crypttab
 }
 
 _helpmd()
