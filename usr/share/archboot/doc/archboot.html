@@ -15,9 +15,9 @@
 <body>
 <p><span><img src="logo.png" alt="Logo"></span></p>
 <h1>Archboot Home | <a href="gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
-<h2>2025 Fundraise: 0% <progress max="100" value="25">0%</progress> 100%</h2>
+<h2>2025 Fundraise: 0% <progress max="100" value="30">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2025 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 28.02.2025 07:15</strong></p>
+<strong>Last update: 09.03.2025 21:15</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -38,11 +38,12 @@
 <li><a href="#for-experts-quickinst-installation" id="toc-for-experts-quickinst-installation"><span class="toc-section-number">3.7</span> For Experts: Quickinst Installation</a></li>
 <li><a href="#cli-manage-archboot" id="toc-manage-archboot"><span class="toc-section-number">3.8</span> For Experts: CLI Manage Environment</a></li>
 <li><a href="#autorun" id="toc-autorun"><span class="toc-section-number">3.9</span> For Experts: Custom Autorun Script</a></li>
-<li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">3.10</span> Tools For Backup And Copying Of An Existing System</a></li>
-<li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">3.11</span> Restoring An USB Device To FAT32 State</a></li>
-<li><a href="#clean-blockdevice" id="toc-clean-blockdevice"><span class="toc-section-number">3.12</span> Clean Blockdevice</a></li>
-<li><a href="#debug-early-userspace" id="toc-debug-early-userspace"><span class="toc-section-number">3.13</span> Debug Early Userspace</a></li>
-<li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.14</span> System Configuration On Installed System</a></li>
+<li><a href="#automatic-install" id="toc-automatic-install"><span class="toc-section-number">3.10</span> For Experts: Automatic Installation</a></li>
+<li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">3.11</span> Tools For Backup And Copying Of An Existing System</a></li>
+<li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">3.12</span> Restoring An USB Device To FAT32 State</a></li>
+<li><a href="#clean-blockdevice" id="toc-clean-blockdevice"><span class="toc-section-number">3.13</span> Clean Blockdevice</a></li>
+<li><a href="#debug-early-userspace" id="toc-debug-early-userspace"><span class="toc-section-number">3.14</span> Debug Early Userspace</a></li>
+<li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.15</span> System Configuration On Installed System</a></li>
 </ul></li>
 <li><strong><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><span class="toc-section-number">4.</span> FAQ / Known Issues / Limitations</a></strong></li>
 <li><strong><a href="#archiso" id="toc-archiso"><span class="toc-section-number">5.</span> Comparison To Archiso Image</a></strong></li>
@@ -620,7 +621,9 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 <li>Customization at build time:<br><strong>/etc/archboot/run/autorun.sh</strong> will be inserted into the images.</li>
 </ul>
 <p style="page-break-after: always"></p>
-<h3 data-number="3.10" id="tools-for-backup-and-copying-of-an-existing-system"><span class="header-section-number">3.10</span> <strong>Tools For Backup And Copying Of An Existing System</strong></h3>
+<h3 data-number="3.10" id="automatic-install"><span class="header-section-number">3.10</span> <strong>For Experts: Automatic Installation</strong></h3>
+<p>Archboot provides a template creation routine. All commands to setup your system will be saved to <strong>/tmp/archboot-autorun.template</strong>. To do an automatic installation simply run <strong>one</strong> full installation and save the created template file. Afterwards use the method from point <a href="#autorun" title="3.9">3.9</a> to load the script during boot. This is also an easy way to do mass installations through PXE on your network. An example how such a template script may look like is <a href="./archboot-autorun.txt" title="here">here</a>.</p>
+<h3 data-number="3.11" id="tools-for-backup-and-copying-of-an-existing-system"><span class="header-section-number">3.11</span> <strong>Tools For Backup And Copying Of An Existing System</strong></h3>
 <p>Archboot provides 2 additional scripts for doing those tasks.</p>
 <ul>
 </ul>
@@ -648,7 +651,7 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.11" id="restoring-an-usb-device-to-fat32-state"><span class="header-section-number">3.11</span> <strong>Restoring An USB Device To FAT32 State</strong></h3>
+<h3 data-number="3.12" id="restoring-an-usb-device-to-fat32-state"><span class="header-section-number">3.12</span> <strong>Restoring An USB Device To FAT32 State</strong></h3>
 <ul>
 <li>When you have used the .iso image to create an USB installer, your USB stick is no longer useful for anything else.</li>
 <li>Any remaining space on the stick (supposing you used a larger-than the .img file) is inaccessible.</li>
@@ -666,7 +669,7 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.12" id="clean-blockdevice"><span class="header-section-number">3.12</span> Clean Blockdevice</h3>
+<h3 data-number="3.13" id="clean-blockdevice"><span class="header-section-number">3.13</span> Clean Blockdevice</h3>
 <p>You can use <strong>clean-blockdevice.sh</strong> for cleaning partition table and filesystem signatures of any blockdevice.</p>
 <table>
 <thead>
@@ -688,10 +691,10 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 </tbody>
 </table>
 <p style="page-break-after: always"></p>
-<h3 data-number="3.13" id="debug-early-userspace"><span class="header-section-number">3.13</span> Debug Early Userspace</h3>
+<h3 data-number="3.14" id="debug-early-userspace"><span class="header-section-number">3.14</span> Debug Early Userspace</h3>
 <p>In order to debug the early userspace add <strong>archboot-early-debug</strong> on <strong>kernel commandline</strong>.
 Mount <strong>/dev/zram0</strong> to <strong>/sysroot</strong> and analyze the rootfs or <strong>exit</strong> the bash shell to <strong>continue</strong> the boot process.</p>
-<h3 data-number="3.14" id="system-configuration"><span class="header-section-number">3.14</span> System Configuration On Installed System</h3>
+<h3 data-number="3.15" id="system-configuration"><span class="header-section-number">3.15</span> System Configuration On Installed System</h3>
 <p>You can also run <strong>archboot-setup.sh</strong> for <strong>system configuration</strong> on an installed system.
 <a href="#package-installation" title="Installation"><strong>Install</strong></a> your corresponding Archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
 <p style="page-break-after: always"></p>

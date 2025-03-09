@@ -17,7 +17,7 @@ _systemd_boot_uefi() {
         echo "mkdir -p \"\${_DESTDIR}/${_UEFISYS_MP}/loader\"" >> "${_TEMPLATE}"
     fi
     _MAIN_CFG="boot/loader/entries/archlinux-core-main.conf"
-    _LOADER_CFG="/${_UEFISYS_MP}/loader/loader.conf"
+    _LOADER_CFG="${_UEFISYS_MP}/loader/loader.conf"
     cat << BOOTDEOF > "${_DESTDIR}/${_MAIN_CFG}"
 title    Arch Linux
 linux    /${_VMLINUZ}
