@@ -8,7 +8,7 @@ _pacman() {
     if ${_PACMAN} -Sy ${_PACKAGES[@]} &>"${_LOG}"; then
         # write to template
         { echo "echo \"Installing ${_PACKAGES[@]}...\""
-        echo "${_PACMAN} -Sy ${_PACKAGES[@]} &>\"${_LOG}\""
+        echo "${_PACMAN} -Sy ${_PACKAGES[@]} &>\"\${_LOG}\""
         } >> "${_TEMPLATE}"
         : > /tmp/.pacman-success
     fi

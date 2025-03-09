@@ -371,17 +371,17 @@ _stoplvm()
         for dev in ${_LV_VOLUMES}; do
             lvremove -f "/dev/mapper/${dev}" 2>"${_NO_LOG}">"${_LOG}"
             # write to template
-            echo "lvremove -f \"/dev/mapper/${dev}\" 2>\"${_NO_LOG}\">\"\${_LOG}\"" >> "${_TEMPLATE}"
+            echo "lvremove -f \"/dev/mapper/${dev}\" 2>\"\${_NO_LOG}\">\"\${_LOG}\"" >> "${_TEMPLATE}"
         done
         for dev in ${_LV_GROUPS}; do
             vgremove -f "${dev}" 2>"${_NO_LOG}" >"${_LOG}"
             # write to template
-            echo "vgremove -f \"${dev}\" 2>\"${_NO_LOG}\" >\"\${_LOG}\"" >> "${_TEMPLATE}"
+            echo "vgremove -f \"${dev}\" 2>\"\${_NO_LOG}\" >\"\${_LOG}\"" >> "${_TEMPLATE}"
         done
         for dev in ${_LV_PHYSICAL}; do
             pvremove -f "${dev}" 2>"${_NO_LOG}" >"${_LOG}"
             # write to template
-            echo "pvremove -f \"${dev}\" 2>\"${_NO_LOG}\" >\"\${_LOG}\"" >> "${_TEMPLATE}"
+            echo "pvremove -f \"${dev}\" 2>\"\${_NO_LOG}\" >\"\${_LOG}\"" >> "${_TEMPLATE}"
         done
         # write to template
         echo "" >> "${_TEMPLATE}"

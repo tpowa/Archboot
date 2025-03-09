@@ -42,7 +42,7 @@ _auto_network()
         # write to template
         { echo "echo \"Enable network and proxy settings on installed system...\""
         echo "cp -r /var/lib/iwd \"\${_DESTDIR}\"/var/lib"
-        echo "chroot \"\${_DESTDIR}\" systemctl enable iwd &>\"${_NO_LOG}\""
+        echo "chroot \"\${_DESTDIR}\" systemctl enable iwd &>\"\${_NO_LOG}\""
         } >> "${_TEMPLATE}"
     fi
     # copy network profiles
@@ -52,8 +52,8 @@ _auto_network()
         chroot "${_DESTDIR}" systemctl enable systemd-networkd &>"${_NO_LOG}"
         chroot "${_DESTDIR}" systemctl enable systemd-resolved &>"${_NO_LOG}"
         # write to template
-        { echo "cp /etc/systemd/network/* \"\${_DESTDIR}\"/etc/systemd/network/ &>\"${_NO_LOG}\""
-        echo "chroot \"\${_DESTDIR}\" systemctl enable systemd-networkd &>\"${_NO_LOG}\""
+        { echo "cp /etc/systemd/network/* \"\${_DESTDIR}\"/etc/systemd/network/ &>\"\${_NO_LOG}\""
+        echo "chroot \"\${_DESTDIR}\" systemctl enable systemd-networkd &>\"\${_NO_LOG}\""
         echo "chroot \"\${_DESTDIR}" systemctl enable systemd-resolved &>"${_NO_LOG}\""
         } >> "${_TEMPLATE}"
     fi
@@ -153,8 +153,8 @@ _auto_luks() {
         { echo "echo \"Enable luks settings on installed system...\""
         echo "sd \"^\$(basename \"${_ROOTDEV}\").*\n\" '' /tmp/.crypttab"
         echo "cat /tmp/.crypttab >> \"\${_DESTDIR}\"/etc/crypttab"
-        echo "chmod 700 /tmp/passphrase-* 2>\"${_NO_LOG}\""
-        echo "cp /tmp/passphrase-* \"\${_DESTDIR}\"/etc/ 2>\"${_NO_LOG}\""
+        echo "chmod 700 /tmp/passphrase-* 2>\"\${_NO_LOG}\""
+        echo "cp /tmp/passphrase-* \"\${_DESTDIR}\"/etc/ 2>\"\${_NO_LOG}\""
         } >> "${_TEMPLATE}"
         sleep 2
     fi
@@ -167,7 +167,7 @@ _auto_pacman_keyring()
         cp -ar /etc/pacman.d/gnupg "${_DESTDIR}"/etc/pacman.d &>"${_NO_LOG}"
         # write to template
         { echo "echo \"Enable pacman's GPG keyring files on installed system...\""
-        echo "cp -ar /etc/pacman.d/gnupg \"\${_DESTDIR}\"/etc/pacman.d &>\"${_NO_LOG}\""
+        echo "cp -ar /etc/pacman.d/gnupg \"\${_DESTDIR}\"/etc/pacman.d &>\"\${_NO_LOG}\""
         } >> "${_TEMPLATE}"
         sleep 2
     fi
@@ -280,7 +280,7 @@ _auto_windowkeys() {
         # write to template
         { echo "echo \"Enable windowkeys in console on installed system...\""
         echo "cp \"/etc/systemd/system/windowkeys.service\" \"\${_DESTDIR}/etc/systemd/system/windowkeys.service\""
-        echo "chroot \"\${_DESTDIR}\" systemctl enable windowkeys &>\"${_NO_LOG}\""
+        echo "chroot \"\${_DESTDIR}\" systemctl enable windowkeys &>\"\${_NO_LOG}\""
         } >> "${_TEMPLATE}"
     fi
 }
