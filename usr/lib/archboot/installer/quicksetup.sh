@@ -329,7 +329,9 @@ _autoprepare() {
     ## wait until /dev initialized correct devices
     udevadm settle
     # write to template
-    echo "udevadm settle" >> "${_TEMPLATE}"
+    { echo "### quicksetup mountpoints"
+    echo "udevadm settle"
+    } >> "${_TEMPLATE}"
     ## FSSPECS - default filesystem specs
     ## <partnum>|<fstype>|<mountpoint>|<labelname>
     ## The partitions in FSSPECS list should be listed in the "mountpoint" order.
