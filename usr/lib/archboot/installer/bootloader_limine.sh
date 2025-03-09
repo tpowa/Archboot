@@ -46,14 +46,17 @@ _limine_bios() {
     _chroot_mount
     cp "${_DESTDIR}/usr/share/limine/limine-bios.sys" "${_DESTDIR}/boot/"
     # write to template
-    { echo "echo \"Setting up LIMINE BIOS now...\""
+    { echo "### limine bios"
+    echo "echo \"Setting up LIMINE BIOS now...\""
     echo "_chroot_mount"
     echo "cp \"\${_DESTDIR}/usr/share/limine/limine-bios.sys\" \"\${_DESTDIR}/boot/\""
     } >> "${_TEMPLATE}"
     if chroot "${_DESTDIR}" limine bios-install "${_PARENT_BOOTDEV}" &>"${_LOG}"; then
         _pacman_hook_limine_bios
         # write to template
-        echo "chroot \"\${_DESTDIR}\" limine bios-install \"${_PARENT_BOOTDEV}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
+        { echo "chroot \"\${_DESTDIR}\" limine bios-install \"${_PARENT_BOOTDEV}\" &>\"\${_LOG}\""
+        echo ""
+        } >> "${_TEMPLATE}"
         _dialog --title " Success " --no-mouse --infobox "LIMINE BIOS has been setup successfully." 3 50
         sleep 3
         _S_BOOTLOADER=1
@@ -76,7 +79,8 @@ _limine_uefi() {
     fi
     cp -f "${_DESTDIR}/usr/share/limine/BOOT${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI"
     # write to template
-    { echo "echo \"Setting up LIMINE now...\""
+    { echo "### limine uefi"
+    echo "echo \"Setting up LIMINE now...\""
     echo "cp -f \"\${_DESTDIR}/usr/share/limine/BOOT${_UEFI_ARCH}.EFI\" \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI\""
     } >> "${_TEMPLATE}"
     _LIMINE_CONFIG="${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine.conf"
@@ -90,6 +94,7 @@ _limine_uefi() {
         # write to template
         { echo "rm -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
         echo "cp -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI\" \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+        echo ""
         } >> "${_TEMPLATE}"
         sleep 2
         _pacman_hook_limine_uefi
