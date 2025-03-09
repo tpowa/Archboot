@@ -10,7 +10,7 @@ _auto_timesetting() {
         cp -a /etc/localtime "${_DESTDIR}"/etc/localtime
         # write to template
         { echo "echo \"Enable timezone setting on installed system...\""
-        echo " cp -a /etc/localtime \"${_DESTDIR}\"/etc/localtime"
+        echo " cp -a /etc/localtime \\"\\$\{_DESTDIR}\"/etc/localtime"
         } >> "${_TEMPLATE}"
         sleep 2
     fi
@@ -19,7 +19,7 @@ _auto_timesetting() {
         cp /etc/adjtime "${_DESTDIR}"/etc/adjtime
         # write to template
         { echo "echo \"Enable clock setting on installed system...\""
-        echo "cp /etc/adjtime \"${_DESTDIR}\"/etc/adjtime"
+        echo "cp /etc/adjtime \\"\\$\{_DESTDIR}\"/etc/adjtime"
         } >> "${_TEMPLATE}"
         sleep 2
     fi
@@ -41,8 +41,8 @@ _auto_network()
         chroot "${_DESTDIR}" systemctl enable iwd &>"${_NO_LOG}"
         # write to template
         { echo "echo \"Enable network and proxy settings on installed system...\""
-        echo "cp -r /var/lib/iwd \"${_DESTDIR}\"/var/lib"
-        echo "chroot \"${_DESTDIR}\" systemctl enable iwd &>\"${_NO_LOG}\""
+        echo "cp -r /var/lib/iwd \\"\\$\{_DESTDIR}\"/var/lib"
+        echo "chroot \\"\\$\{_DESTDIR}\" systemctl enable iwd &>\"${_NO_LOG}\""
         } >> "${_TEMPLATE}"
     fi
     # copy network profiles
@@ -52,16 +52,16 @@ _auto_network()
         chroot "${_DESTDIR}" systemctl enable systemd-networkd &>"${_NO_LOG}"
         chroot "${_DESTDIR}" systemctl enable systemd-resolved &>"${_NO_LOG}"
         # write to template
-        { echo "cp /etc/systemd/network/* \"${_DESTDIR}\"/etc/systemd/network/ &>\"${_NO_LOG}\""
-        echo "chroot \"${_DESTDIR}\" systemctl enable systemd-networkd &>\"${_NO_LOG}\""
-        echo "chroot \"${_DESTDIR}" systemctl enable systemd-resolved &>"${_NO_LOG}\""
+        { echo "cp /etc/systemd/network/* \\"\\$\{_DESTDIR}\"/etc/systemd/network/ &>\"${_NO_LOG}\""
+        echo "chroot \\"\\$\{_DESTDIR}\" systemctl enable systemd-networkd &>\"${_NO_LOG}\""
+        echo "chroot \\"\\$\{_DESTDIR}" systemctl enable systemd-resolved &>"${_NO_LOG}\""
         } >> "${_TEMPLATE}"
     fi
     # copy proxy settings
     if [[ -e "/etc/profile.d/proxy.sh" ]]; then
         cp /etc/profile.d/proxy.sh "${_DESTDIR}"/etc/profile.d/proxy.sh
         # write to template
-        echo "cp /etc/profile.d/proxy.sh \"${_DESTDIR}\"/etc/profile.d/proxy.sh" >> "${_TEMPLATE}"
+        echo "cp /etc/profile.d/proxy.sh \\"\\$\{_DESTDIR}\"/etc/profile.d/proxy.sh" >> "${_TEMPLATE}"
     fi
     # enable ipv6 privacy extensions
     if ! [[ -d ${_DESTDIR}/etc/systemd/network.conf.d ]]; then
@@ -69,8 +69,8 @@ _auto_network()
         cp /etc/systemd/network.conf.d/ipv6-privacy-extensions.conf \
            "${_DESTDIR}"/etc/systemd/network.conf.d/ipv6-privacy-extensions.conf
         # write to template
-        { echo "mkdir -p \"${_DESTDIR}/etc/systemd/network.conf.d\""
-        echo "cp /etc/systemd/network.conf.d/ipv6-privacy-extensions.conf \"${_DESTDIR}\"/etc/systemd/network.conf.d/ipv6-privacy-extensions.conf"
+        { echo "mkdir -p \\"\\$\{_DESTDIR}/etc/systemd/network.conf.d\""
+        echo "cp /etc/systemd/network.conf.d/ipv6-privacy-extensions.conf \\"\\$\{_DESTDIR}\"/etc/systemd/network.conf.d/ipv6-privacy-extensions.conf"
         } >> "${_TEMPLATE}"
     fi
     sleep 2
@@ -83,7 +83,7 @@ _auto_fstab(){
         sort /tmp/.device-names >>"${_DESTDIR}"/etc/fstab
         # write to template
         { echo "echo \"Create new fstab on installed system...\""
-        echo "sort /tmp/.device-names >>\"${_DESTDIR}\"/etc/fstab"
+        echo "sort /tmp/.device-names >>\\"\\$\{_DESTDIR}\"/etc/fstab"
         } >> "${_TEMPLATE}"
     fi
     if [[ -f /tmp/.fstab ]]; then
@@ -91,8 +91,8 @@ _auto_fstab(){
         sd '^[^#]*' '' "${_DESTDIR}"/etc/fstab
         sort /tmp/.fstab >>"${_DESTDIR}"/etc/fstab
         # write to template
-        { echo "sd '^[^#]*' '' \"${_DESTDIR}\"/etc/fstab"
-        echo "sort /tmp/.fstab >>\"${_DESTDIR}\"/etc/fstab"
+        { echo "sd '^[^#]*' '' \\"\\$\{_DESTDIR}\"/etc/fstab"
+        echo "sort /tmp/.fstab >>\\"\\$\{_DESTDIR}\"/etc/fstab"
         } >> "${_TEMPLATE}"
     fi
     sleep 2
@@ -105,7 +105,7 @@ _auto_scheduler () {
         cp /etc/udev/rules.d/60-ioschedulers.rules "${_DESTDIR}"/etc/udev/rules.d/60-ioschedulers.rules
         # write to template
         { echo "echo \"Enable performance ioscheduler settings on installed system...\""
-        echo "cp /etc/udev/rules.d/60-ioschedulers.rules \"${_DESTDIR}\"/etc/udev/rules.d/60-ioschedulers.rules"
+        echo "cp /etc/udev/rules.d/60-ioschedulers.rules \\"\\$\{_DESTDIR}\"/etc/udev/rules.d/60-ioschedulers.rules"
         } >> "${_TEMPLATE}"
         sleep 2
     fi
@@ -118,7 +118,7 @@ _auto_swap () {
         cp /etc/sysctl.d/99-sysctl.conf "${_DESTDIR}"/etc/sysctl.d/99-sysctl.conf
         # write to template
         { echo "echo \"Enable sysctl swap settings on installed system...\""
-        echo "cp /etc/sysctl.d/99-sysctl.conf \"${_DESTDIR}\"/etc/sysctl.d/99-sysctl.conf"
+        echo "cp /etc/sysctl.d/99-sysctl.conf \\"\\$\{_DESTDIR}\"/etc/sysctl.d/99-sysctl.conf"
         } >> "${_TEMPLATE}"
         sleep 2
     fi
@@ -133,7 +133,7 @@ _auto_mdadm()
             mdadm -Ds >> "${_DESTDIR}"/etc/mdadm.conf
             # write to template
             { echo "echo \"Enable mdadm settings on installed system...\""
-            echo "mdadm -Ds >> \"${_DESTDIR}\"/etc/mdadm.conf"
+            echo "mdadm -Ds >> \\"\\$\{_DESTDIR}\"/etc/mdadm.conf"
             } >> "${_TEMPLATE}"
         fi
         sleep 2
@@ -152,9 +152,9 @@ _auto_luks() {
         # write to template
         { echo "echo \"Enable luks settings on installed system...\""
         echo "sd \"^\$(basename \"${_ROOTDEV}\").*\n\" '' /tmp/.crypttab"
-        echo "cat /tmp/.crypttab >> \"${_DESTDIR}\"/etc/crypttab"
+        echo "cat /tmp/.crypttab >> \\"\\$\{_DESTDIR}\"/etc/crypttab"
         echo "chmod 700 /tmp/passphrase-* 2>\"${_NO_LOG}\""
-        echo "cp /tmp/passphrase-* \"${_DESTDIR}\"/etc/ 2>\"${_NO_LOG}\""
+        echo "cp /tmp/passphrase-* \\"\\$\{_DESTDIR}\"/etc/ 2>\"${_NO_LOG}\""
         } >> "${_TEMPLATE}"
         sleep 2
     fi
@@ -167,7 +167,7 @@ _auto_pacman_keyring()
         cp -ar /etc/pacman.d/gnupg "${_DESTDIR}"/etc/pacman.d &>"${_NO_LOG}"
         # write to template
         { echo "echo \"Enable pacman's GPG keyring files on installed system...\""
-        echo "cp -ar /etc/pacman.d/gnupg \"${_DESTDIR}\"/etc/pacman.d &>\"${_NO_LOG}\""
+        echo "cp -ar /etc/pacman.d/gnupg \\"\\$\{_DESTDIR}\"/etc/pacman.d &>\"${_NO_LOG}\""
         } >> "${_TEMPLATE}"
         sleep 2
     fi
@@ -180,7 +180,7 @@ _auto_testing()
         #shellcheck disable=SC2016
         sd '^#(\[[c,e].*-testing\]\n)#' '$1' "${_DESTDIR}"/etc/pacman.conf
         { echo "echo \"Enable [testing] repository on installed system...\""
-        echo "sd '^#(\[[c,e].*-testing\]\n)#' '$1' \"${_DESTDIR}\"/etc/pacman.conf"
+        echo "sd '^#(\[[c,e].*-testing\]\n)#' '$1' \\"\\$\{_DESTDIR}\"/etc/pacman.conf"
         } >> "${_TEMPLATE}"
         sleep 2
     fi
@@ -205,8 +205,8 @@ EOF
         echo "# Mirror used during installation"
         echo "Server = ${_SYNC_URL}"
         echo "EOF"
-        echo "cat \"${_DESTDIR}\"/etc/pacman.d/mirrorlist >> /tmp/inst-mirrorlist"
-        echo "mv /tmp/inst-mirrorlist \"${_DESTDIR}/etc/pacman.d/mirrorlist\""
+        echo "cat \\"\\$\{_DESTDIR}\"/etc/pacman.d/mirrorlist >> /tmp/inst-mirrorlist"
+        echo "mv /tmp/inst-mirrorlist \\"\\$\{_DESTDIR}/etc/pacman.d/mirrorlist\""
         } >> "${_TEMPLATE}"
         sleep 2
     fi
@@ -218,7 +218,7 @@ _auto_vconsole() {
         cp /etc/vconsole.conf "${_DESTDIR}"/etc/vconsole.conf
         # write to template
         { echo "echo \"Setting keymap and font on installed system...\""
-        echo "cp /etc/vconsole.conf \"${_DESTDIR}\"/etc/vconsole.conf"
+        echo "cp /etc/vconsole.conf \\"\\$\{_DESTDIR}\"/etc/vconsole.conf"
         } >> "${_TEMPLATE}"
         sleep 2
     fi
@@ -230,7 +230,7 @@ _auto_hostname() {
         echo "myhostname" > "${_DESTDIR}"/etc/hostname
         # write to template
         { echo "echo \"Set default hostname on installed system...\""
-        echo "echo \"myhostname\" > \"${_DESTDIR}\"/etc/hostname"
+        echo "echo \"myhostname\" > \\"\\$\{_DESTDIR}\"/etc/hostname"
         } >> "${_TEMPLATE}"
         sleep 2
     fi
@@ -244,13 +244,13 @@ _auto_locale() {
         if [[ -n ${_DESTDIR} && -e /.localize ]]; then
             cp /etc/locale.conf "${_DESTDIR}"/etc/locale.conf
             # write to template
-            echo "cp /etc/locale.conf \"${_DESTDIR}\"/etc/locale.conf" >> "${_TEMPLATE}"
+            echo "cp /etc/locale.conf \\"\\$\{_DESTDIR}\"/etc/locale.conf" >> "${_TEMPLATE}"
         else
             echo "LANG=C.UTF-8" > "${_DESTDIR}"/etc/locale.conf
             echo "LC_COLLATE=C" >> "${_DESTDIR}"/etc/locale.conf
             # write to template
-            { echo "echo \"LANG=C.UTF-8\" > \"${_DESTDIR}\"/etc/locale.conf"
-            echo "echo \"LC_COLLATE=C\" >> \"${_DESTDIR}\"/etc/locale.conf"
+            { echo "echo \"LANG=C.UTF-8\" > \\"\\$\{_DESTDIR}\"/etc/locale.conf"
+            echo "echo \"LC_COLLATE=C\" >> \\"\\$\{_DESTDIR}\"/etc/locale.conf"
             } >> "${_TEMPLATE}"
             sleep 2
         fi
@@ -266,7 +266,7 @@ _auto_set_locale() {
     for i in $(rg -o "^LANG=(.*)\..*" -r '$1' "${_DESTDIR}"/etc/locale.conf); do
         sd "^#${i}" "${i}" "${_DESTDIR}"/etc/locale.gen
         # write to template
-        echo "sd \"^#${i}\" \"${i}\" \"${_DESTDIR}\"/etc/locale.gen" >> "${_TEMPLATE}"
+        echo "sd \"^#${i}\" \"${i}\" \\"\\$\{_DESTDIR}\"/etc/locale.gen" >> "${_TEMPLATE}"
     done
     sleep 2
 }
@@ -279,8 +279,8 @@ _auto_windowkeys() {
         chroot "${_DESTDIR}" systemctl enable windowkeys &>"${_NO_LOG}"
         # write to template
         { echo "echo \"Enable windowkeys in console on installed system...\""
-        echo "cp \"/etc/systemd/system/windowkeys.service\" \"${_DESTDIR}/etc/systemd/system/windowkeys.service\""
-        echo "chroot \"${_DESTDIR}\" systemctl enable windowkeys &>\"${_NO_LOG}\""
+        echo "cp \"/etc/systemd/system/windowkeys.service\" \\"\\$\{_DESTDIR}/etc/systemd/system/windowkeys.service\""
+        echo "chroot \\"\\$\{_DESTDIR}\" systemctl enable windowkeys &>\"${_NO_LOG}\""
         } >> "${_TEMPLATE}"
     fi
 }
@@ -291,21 +291,21 @@ _auto_bash(){
         cp "${_DESTDIR}"/etc/skel/.bash* "${_DESTDIR}"/root/
         # write to template
         { echo "echo \"Setup bash with custom options on installed system...\""
-        echo "cp \"${_DESTDIR}\"/etc/skel/.bash* \"${_DESTDIR}\"/root/"
+        echo "cp \\"\\$\{_DESTDIR}\"/etc/skel/.bash* \\"\\$\{_DESTDIR}\"/root/"
         } >> "${_TEMPLATE}"
         if ! rg -qw 'custom-bash-options.sh' "${_DESTDIR}/etc/skel/.bashrc"; then
             echo ". /etc/profile.d/custom-bash-options.sh" >> "${_DESTDIR}/etc/skel/.bashrc"
             # write to template
-            echo "echo \". /etc/profile.d/custom-bash-options.sh\" >> \"${_DESTDIR}/etc/skel/.bashrc\"" >> "${_TEMPLATE}"
+            echo "echo \". /etc/profile.d/custom-bash-options.sh\" >> \\"\\$\{_DESTDIR}/etc/skel/.bashrc\"" >> "${_TEMPLATE}"
         fi
         if ! rg -qw 'custom-bash-options.sh' "${_DESTDIR}/root/.bashrc"; then
             echo ". /etc/profile.d/custom-bash-options.sh" >> "${_DESTDIR}/root/.bashrc"
             # write to template
-            echo "echo \". /etc/profile.d/custom-bash-options.sh\" >> \"${_DESTDIR}/root/.bashrc\"" >> "${_TEMPLATE}"
+            echo "echo \". /etc/profile.d/custom-bash-options.sh\" >> \\"\\$\{_DESTDIR}/root/.bashrc\"" >> "${_TEMPLATE}"
         fi
         cp /etc/profile.d/custom-bash-options.sh "${_DESTDIR}"/etc/profile.d/
         # write to template
-        echo "cp /etc/profile.d/custom-bash-options.sh \"${_DESTDIR}\"/etc/profile.d/" >> "${_TEMPLATE}"
+        echo "cp /etc/profile.d/custom-bash-options.sh \\"\\$\{_DESTDIR}\"/etc/profile.d/" >> "${_TEMPLATE}"
         sleep 2
     fi
 }
@@ -332,12 +332,12 @@ _auto_hwdetect() {
     if [[ -n "${_HWDETECTMODULES}" ]]; then
         sd "^MODULES=.*" "${_HWDETECTMODULES}" "${_DESTDIR}"/etc/mkinitcpio.conf
         # write to template
-        echo "sd \"^MODULES=.*\" \"${_HWDETECTMODULES}\" \"${_DESTDIR}\"/etc/mkinitcpio.conf" >> "${_TEMPLATE}"
+        echo "sd \"^MODULES=.*\" \"${_HWDETECTMODULES}\" \\"\\$\{_DESTDIR}\"/etc/mkinitcpio.conf" >> "${_TEMPLATE}"
     fi
     if [[ -n "${_HWDETECTHOOKS}" ]]; then
         sd "^HOOKS=.*" "${_HWDETECTHOOKS}" "${_DESTDIR}"/etc/mkinitcpio.conf
         # write to template
-        echo "sd \"^HOOKS=.*\" \"${_HWDETECTHOOKS}\" \"${_DESTDIR}\"/etc/mkinitcpio.conf" >> "${_TEMPLATE}"
+        echo "sd \"^HOOKS=.*\" \"${_HWDETECTHOOKS}\" \\"\\$\{_DESTDIR}\"/etc/mkinitcpio.conf" >> "${_TEMPLATE}"
     fi
     _progress "100" "Preconfiguring mkinitcpio settings on installed system..."
 }
@@ -363,12 +363,12 @@ _auto_mkinitcpio() {
         # disable fallpack preset
         sd " 'fallback'" '' "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
         # write to template
-        echo "sd \" 'fallback'\" '' \"${_DESTDIR}\"/etc/mkinitcpio.d/*.preset" >> "${_TEMPLATE}"
+        echo "sd \" 'fallback'\" '' \\"\\$\{_DESTDIR}\"/etc/mkinitcpio.d/*.preset" >> "${_TEMPLATE}"
         # remove fallback initramfs
         if [[ -e "${_DESTDIR}/boot/initramfs-linux-fallback.img" ]]; then
             rm -f "${_DESTDIR}/boot/initramfs-linux-fallback.img"
             # write to template
-            echo "rm -f \"${_DESTDIR}/boot/initramfs-linux-fallback.img\"" >> "${_TEMPLATE}"
+            echo "rm -f \\"\\$\{_DESTDIR}/boot/initramfs-linux-fallback.img\"" >> "${_TEMPLATE}"
         fi
         sleep 2
         _AUTO_MKINITCPIO=1

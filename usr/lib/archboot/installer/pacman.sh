@@ -25,12 +25,12 @@ _run_pacman(){
     if [[ ! -d "${_DESTDIR}${_CACHEDIR}" ]]; then
         mkdir -p "${_DESTDIR}${_CACHEDIR}"
         # write to template
-        echo "mkdir -p \"${_DESTDIR}${_CACHEDIR}\"" >> "${_TEMPLATE}"
+        echo "mkdir -p \\"\\$\{_DESTDIR}${_CACHEDIR}\"" >> "${_TEMPLATE}"
     fi
     if [[ ! -d "${_DESTDIR}${_PACMAN_LIB}" ]]; then
         mkdir -p "${_DESTDIR}${_PACMAN_LIB}"
         # write to template
-        echo "mkdir -p \"${_DESTDIR}${_PACMAN_LIB}\"" >> "${_TEMPLATE}"
+        echo "mkdir -p \\"\\$\{_DESTDIR}${_PACMAN_LIB}\"" >> "${_TEMPLATE}"
     fi
     : > /.archboot
     _pacman &

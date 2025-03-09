@@ -18,7 +18,7 @@ _secureboot_keys() {
         done
         secureboot-keys.sh -name="${_CN}" "${_DESTDIR}/${_KEYDIR}" &>"${_LOG}" || return 1
         # write to template
-        { echo "secureboot-keys.sh -name=\"${_CN}\" \"${_DESTDIR}/${_KEYDIR}\" &>\"\${_LOG}\""
+        { echo "secureboot-keys.sh -name=\"${_CN}\" \\"\\$\{_DESTDIR}/${_KEYDIR}\" &>\"\${_LOG}\""
         echo "echo \"Common name(CN) ${_CN} used for your keys in ${_DESTDIR}/${_KEYDIR}\""
         } >> "${_TEMPLATE}"
          _dialog --title " Setup Keys " --no-mouse --infobox "Common name(CN) ${_CN}\nused for your keys in ${_DESTDIR}/${_KEYDIR}" 4 60
@@ -56,7 +56,7 @@ _mok_sign () {
     mokutil -i "${_DESTDIR}"/"${_KEYDIR}"/MOK/MOK.cer < ${_MOK_PW} >"${_LOG}"
     rm /tmp/.password
     # write to template
-    { echo "mokutil -i \"${_DESTDIR}\"/\"${_KEYDIR}\"/MOK/MOK.cer < ${_MOK_PW} >\"\${_LOG}\""
+    { echo "mokutil -i \\"\\$\{_DESTDIR}\"/\"${_KEYDIR}\"/MOK/MOK.cer < ${_MOK_PW} >\"\${_LOG}\""
     echo "rm /tmp/.password"
     echo "echo \"Machine Owner Key has been installed successfully.\""
     } >> "${_TEMPLATE}"

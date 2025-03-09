@@ -291,7 +291,7 @@ _umountall()
             umount -R "${_DESTDIR}" &>"${_NO_LOG}"
             _dialog --no-mouse --infobox "Unmounted already mounted disk devices in ${_DESTDIR}..." 3 70
             # write to template
-            echo "umount -R \"${_DESTDIR}\" &>\"\${_NO_LOG}\"" >> "${_TEMPLATE}"
+            echo "umount -R \\"\\$\{_DESTDIR}\" &>\"\${_NO_LOG}\"" >> "${_TEMPLATE}"
             sleep 2
         fi
     fi

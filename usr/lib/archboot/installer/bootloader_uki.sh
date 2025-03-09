@@ -27,19 +27,19 @@ _uki_install() {
     if ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT" ]]; then
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
         # write to template
-        echo "mkdir -p \"${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT\"" >> "${_TEMPLATE}"
+        echo "mkdir -p \\"\\$\{_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT\"" >> "${_TEMPLATE}"
     fi
     if ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux" ]]; then
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux"
         # write to template
-        echo "mkdir -p \"${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux\"" >> "${_TEMPLATE}"
+        echo "mkdir -p \\"\\$\{_DESTDIR}/${_UEFISYS_MP}/EFI/Linux\"" >> "${_TEMPLATE}"
     fi
     rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
     cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
     sync
     # write to template
-    { echo "rm -f \"${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
-    echo "cp -f \"${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi\" \"${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+    { echo "rm -f \\"\\$\{_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+    echo "cp -f \\"\\$\{_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi\" \\"\\$\{_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
     echo "sync"
     } >> "${_TEMPLATE}"
     sleep 2
