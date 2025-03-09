@@ -9,16 +9,20 @@ _freeze_xfs() {
             xfs_freeze -f "${_DESTDIR}"/boot &>"${_NO_LOG}"
             xfs_freeze -u "${_DESTDIR}"/boot &>"${_NO_LOG}"
             # write to template
-            { echo "xfs_freeze -f \"\${_DESTDIR}\"/boot &>\"\${_NO_LOG}\""
+            { echo "### xfs freeze"
+            echo "xfs_freeze -f \"\${_DESTDIR}\"/boot &>\"\${_NO_LOG}\""
             echo "xfs_freeze -u \"\${_DESTDIR}\"/boot &>\"\${_NO_LOG}\""
+            echo ""
             } >> "${_TEMPLATE}"
         fi
         if mount | rg -q "${_DESTDIR} type xfs"; then
             xfs_freeze -f "${_DESTDIR}" &>"${_NO_LOG}"
             xfs_freeze -u "${_DESTDIR}" &>"${_NO_LOG}"
             # write to template
-            { echo "xfs_freeze -f \"\${_DESTDIR}\" &>\"\${_NO_LOG}\""
+            { echo "### xfs freeze"
+            echo "xfs_freeze -f \"\${_DESTDIR}\" &>\"\${_NO_LOG}\""
             echo "xfs_freeze -u \"\${_DESTDIR}\" &>\"\${_NO_LOG}\""
+            echo ""
             } >> "${_TEMPLATE}"
         fi
     fi
@@ -281,8 +285,10 @@ _grub_install_bios() {
     cat "/tmp/grub_bios_install.log" >>"${_LOG}"
     _chroot_umount
     # write to template
-    echo "chroot \"\${_DESTDIR}\" grub-install --directory=\"/usr/lib/grub/i386-pc\" --target=\"i386-pc\" --boot-directory=\"/boot\" --recheck \"${_BOOTDEV}\" >>\"\${_LOG}\""
-    echo "_chroot_umount" >> "${_TEMPLATE}"
+    { echo "chroot \"\${_DESTDIR}\" grub-install --directory=\"/usr/lib/grub/i386-pc\" --target=\"i386-pc\" --boot-directory=\"/boot\" --recheck \"${_BOOTDEV}\" >>\"\${_LOG}\""
+    echo "_chroot_umount"
+    echo ""
+    } >> "${_TEMPLATE}"
     rm /.archboot
 }
 
