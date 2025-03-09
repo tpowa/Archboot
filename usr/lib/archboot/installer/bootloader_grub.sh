@@ -243,7 +243,7 @@ EOF
     _editor "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
     # write to template
     # all FS_UUID needs to change to new value, cause FS_UUID cannot be preserved!
-    { echo "### Fixing grub UUIDs"
+    { echo "### fixing grub uuids"
     echo "_chroot_mount"
     echo "_BOOTDEV_FS_UUID_OLD=\"${_BOOTDEV_FS_UUID}\""
     echo "_ROOTDEV_FS_UUID_OLD=\"${_ROOTDEV_FS_UUID}\""
@@ -262,6 +262,7 @@ EOF
     echo "sd \"\${_ROOTDEV_FS_UUID_OLD}\" \"\${_ROOTDEV_FS_UUID}\" \"\${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
     echo "sd \"\${_USRDEV_FS_UUID_OLD}\" \"\${_USRDEV_FS_UUID}\" \"\${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
     echo "_chroot_umount"
+    echo ""
     } >> "${_TEMPLATE}"
 }
 
@@ -478,7 +479,7 @@ _grub_uefi() {
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         # write to template
-        { echo "### Default UEFI bootloader"
+        { echo "### default uefi bootloader"
         echo "mkdir -p \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT\""
         echo "rm -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
         echo "cp -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi\" \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
