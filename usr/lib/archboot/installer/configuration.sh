@@ -222,10 +222,10 @@ _user_management() {
                          if useradd -R "${_DESTDIR}" ${_ADMIN_ATTR} -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
                             # write to template
                             { echo "useradd -R \"\${_DESTDIR}\" ${_ADMIN_ATTR} -c \"${_FN}\" -m \"${_USER}\" &>\"\${_LOG}\""
-                            echo "echo "User Account ${_USER} created succesfully.""
+                            echo "echo "User account ${_USER} created succesfully.""
                             } >> "${_TEMPLATE}"
                             _set_password
-                            _dialog --title " Success " --no-mouse --infobox "User Account ${_USER} created succesfully." 3 50
+                            _dialog --title " Success " --no-mouse --infobox "User account ${_USER} created succesfully." 3 50
                             sleep 2
                             _NEXTITEM=2
                             break
