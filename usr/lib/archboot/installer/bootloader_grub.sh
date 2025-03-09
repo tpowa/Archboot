@@ -234,14 +234,17 @@ EOF
     [[ -d ${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts ]] || mkdir -p "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts"
     cp -f "${_DESTDIR}/usr/share/grub/ter-u16n.pf2" "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts/ter-u16n.pf2"
     # write to template
-    echo "cp -f \"\${_DESTDIR}/usr/share/grub/ter-u16n.pf2\" \"\${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts/ter-u16n.pf2\"" >> "${_TEMPLATE}"
+    { echo "cp -f \"\${_DESTDIR}/usr/share/grub/ter-u16n.pf2\" \"\${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts/ter-u16n.pf2\""
+    echo ""
+    } >> "${_TEMPLATE}"
     ## Edit grub.cfg config file
     _dialog --msgbox "You must now review the GRUB(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 8 55
     _geteditor || return 1
     _editor "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
     # write to template
     # all FS_UUID needs to change to new value, cause FS_UUID cannot be preserved!
-    { echo "_chroot_mount"
+    { echo "### Fixing grub UUIDs"
+    echo "_chroot_mount"
     echo "_BOOTDEV_FS_UUID_OLD=\"${_BOOTDEV_FS_UUID}\""
     echo "_ROOTDEV_FS_UUID_OLD=\"${_ROOTDEV_FS_UUID}\""
     echo "_USRDEV_FS_UUID_OLD=\"${_USRDEV_FS_UUID}\""
@@ -285,7 +288,9 @@ _grub_install_bios() {
 _setup_grub_bios() {
     : > /.archboot
     # write to template
-    echo "echo \"Setting up GRUB(2) BIOS...\"" >> "${_TEMPLATE}"
+    { echo "### grub bios"
+    echo "echo \"Setting up GRUB(2) BIOS...\""
+    } >> "${_TEMPLATE}"
     _grub_install_bios &
     _progress_wait "11" "99" "Setting up GRUB(2) BIOS..." "0.15"
     _progress "100" "Setting up GRUB(2) BIOS completed."
@@ -419,8 +424,9 @@ _setup_grub_uefi() {
         _progress "10" "Setting up GRUB(2) UEFI..."
         _chroot_mount
         # write to template
-        { echo "_chroot_mount"
+        { echo "### grub uefi"
          echo "echo \"Setting up GRUB(2) UEFI...\""
+         echo "_chroot_mount"
         } >> "${_TEMPLATE}"
         : > /.archboot
         _grub_install_uefi &
@@ -472,7 +478,8 @@ _grub_uefi() {
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         # write to template
-        { echo "mkdir -p \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT\""
+        { echo "### Default UEFI bootloader"
+        echo "mkdir -p \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT\""
         echo "rm -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
         echo "cp -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi\" \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
         } >> "${_TEMPLATE}"
