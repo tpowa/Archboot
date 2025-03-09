@@ -88,7 +88,7 @@ _check_root_password() {
     # check if account is locked
     if passwd -R "${_DESTDIR}" -S root | rg -q ' L '; then
         _dialog --title " Root Account " --no-mouse --infobox "Setup detected locked account for root user.\nPlease set new password to unlock account now." 4 50
-        if _prepare_password Root; then
+        if _prepare_password root; then
             _set_password
         else
             return 1
