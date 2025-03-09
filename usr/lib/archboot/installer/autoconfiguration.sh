@@ -142,7 +142,7 @@ _auto_mdadm()
 
 _auto_luks() {
     # remove root device from crypttab
-    if [[ -e /tmp/.crypttab && "$(rg -v '^#' "${_DESTDIR}"/etc/crypttab)" == "" ]]; then
+    if [[ -f /tmp/.crypttab && "$(rg -v '^#' "${_DESTDIR}"/etc/crypttab)" == "" ]]; then
         _progress "40" "Enable luks settings on installed system..."
         # add to temp crypttab
         sd "^$(basename "${_ROOTDEV}").*\n" '' /tmp/.crypttab

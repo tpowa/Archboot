@@ -435,10 +435,12 @@ _stopluks()
         done
         _dialog --no-mouse --infobox "Removing not running luks encrypted device(s) done." 3 60
         # write to template
-        echo "" >> "${_TEMPLATE}"
+        { echo ": > /tmp/.crypttab"
+        echo ""
+        } >> "${_TEMPLATE}"
+        : > /tmp/.crypttab
         sleep 3
     fi
-    : > /tmp/.crypttab
 }
 
 _helpmd()
