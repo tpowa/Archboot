@@ -192,15 +192,17 @@ _user_management() {
                     # change default shell for root and all users >= UID 1000
                     sd '^SHELL=.*' "SHELL=/usr/bin/${_SHELL}" "${_DESTDIR}"/etc/default/useradd
                     # write to template
-                    echo "sd '^SHELL=.*' \"SHELL=/usr/bin/${_SHELL}\" \"\${_DESTDIR}\"/etc/default/useradd" >> "${_TEMPLATE}"
+                    { echo "### default shell"
+                    echo "sd '^SHELL=.*' \"SHELL=/usr/bin/${_SHELL}\" \"\${_DESTDIR}\"/etc/default/useradd"
+                    } >> "${_TEMPLATE}"
                     for i in root $(rg -o '(.*):x:10[0-9][0-9]' -r '$1' "${_DESTDIR}"/etc/passwd); do
                         usermod -R "${_DESTDIR}" -s "/usr/bin/${_SHELL}" "${i}" &>"${_LOG}"
                         # write to template
-                        { echo "usermod -R \"\${_DESTDIR}\" -s \"/usr/bin/${_SHELL}\" \"${i}\" &>\"\${_LOG}\""
-                        echo "echo \"Default shell set to ${_SHELL}.\""
-                        } >> "${_TEMPLATE}"
+                        echo "usermod -R \"\${_DESTDIR}\" -s \"/usr/bin/${_SHELL}\" \"${i}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
                     done
                     _dialog --title " Success " --no-mouse --infobox "Default shell set to ${_SHELL}." 3 50
+                    # write to template
+                    echo "echo \"Default shell set to ${_SHELL}.\"" >> "${_TEMPLATE}"
                     sleep 3
                     _NEXTITEM=2
                 else
