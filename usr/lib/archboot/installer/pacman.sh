@@ -101,8 +101,8 @@ _install_packages() {
     _run_autoconfig | _dialog --title " Autoconfiguration " --no-mouse --gauge "Writing base configuration..." 6 75 0
     _chroot_umount
     # write to template
-    { echo "_chroot_umount"
-    echo ""
-    } >> "${_TEMPLATE}"
+    echo "_chroot_umount" >> "${_TEMPLATE}"
     _run_locale_gen | _dialog --title " Locales " --no-mouse --gauge "Rebuilding glibc locales on installed system..." 6 75 0
+    # write to template
+    echo "" >> "${_TEMPLATE}"
 }
