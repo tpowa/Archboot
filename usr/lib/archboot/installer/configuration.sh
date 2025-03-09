@@ -26,7 +26,9 @@ _mkinitcpio() {
 _run_mkinitcpio() {
     _chroot_mount
     # write to template
-    echo "_chroot_mount" >> "${_TEMPLATE}"
+    { echo "### mkinitcpio"
+    echo "_chroot_mount"
+    } >> "${_TEMPLATE}"
     echo "Mkinitcpio progress..." > /tmp/mkinitcpio.log
     : > /.archboot
     # write to template
@@ -42,7 +44,9 @@ _run_mkinitcpio() {
     fi
     _chroot_umount
      # write to template
-    echo "_chroot_umount" >> "${_TEMPLATE}"
+    { echo "_chroot_umount"
+    echo ""
+    } >> "${_TEMPLATE}"
 }
 
 _mkinitcpio_error() {

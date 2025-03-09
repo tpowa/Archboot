@@ -319,7 +319,9 @@ _auto_hwdetect() {
     rg -q "^nouveau" /proc/modules && _FBPARAMETER="--nvidia-kms"
     _progress "66" "Preconfiguring mkinitcpio settings on installed system..."
     # write to template
-    echo "echo \"Preconfiguring mkinitcpio settings on installed system...\"" >> "${_TEMPLATE}"
+    { echo "### hwdetect"
+    echo "echo \"Preconfiguring mkinitcpio settings on installed system...\""
+    } >> "${_TEMPLATE}"
     # arrange MODULES for mkinitcpio.conf
     _HWDETECTMODULES="$(hwdetect --root_directory="${_DESTDIR}" --hostcontroller --filesystem "${_FBPARAMETER}")"
     # arrange HOOKS for mkinitcpio.conf
@@ -339,6 +341,8 @@ _auto_hwdetect() {
         # write to template
         echo "sd \"^HOOKS=.*\" \"${_HWDETECTHOOKS}\" \"\${_DESTDIR}\"/etc/mkinitcpio.conf" >> "${_TEMPLATE}"
     fi
+    # write to template
+    echo "" >> "${_TEMPLATE}"
     _progress "100" "Preconfiguring mkinitcpio settings on installed system..."
 }
 
