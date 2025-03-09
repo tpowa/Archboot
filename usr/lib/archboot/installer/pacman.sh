@@ -94,11 +94,15 @@ _install_packages() {
     _NEXTITEM=3
     _chroot_mount
     # write to template
-    echo "_chroot_mount" >> "${_TEMPLATE}"
+    { echo "### autoconfiguration"
+    echo "_chroot_mount"
+    } >> "${_TEMPLATE}"
     # automagic time!
     _run_autoconfig | _dialog --title " Autoconfiguration " --no-mouse --gauge "Writing base configuration..." 6 75 0
     _chroot_umount
     # write to template
-    echo "_chroot_umount" >> "${_TEMPLATE}"
+    { echo "_chroot_umount"
+    echo ""
+    } >> "${_TEMPLATE}"
     _run_locale_gen | _dialog --title " Locales " --no-mouse --gauge "Rebuilding glibc locales on installed system..." 6 75 0
 }
