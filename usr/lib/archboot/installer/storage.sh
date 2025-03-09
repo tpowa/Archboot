@@ -12,7 +12,7 @@ _create_raid_menu() {
         fi
         _CANCEL=""
         #shellcheck disable=SC2086
-        _dialog --title " Manage Software Raid " ${_DEFAULT} --menu "" 11 60 5 \
+        _dialog --title " Manage Software Raid " --no-cancel ${_DEFAULT} --menu "" 11 60 5 \
             "1" "Create Software Raid" \
             "2" "Create Partitionable Software Raid" \
             "3" "Reset Software Raid" \
@@ -43,7 +43,7 @@ _create_lvm_menu() {
         fi
         _CANCEL=""
         #shellcheck disable=SC2086
-        _dialog --title " Manage Physical Volume, Volume Group Or Logical Volume " ${_DEFAULT} --menu "" 12 60 6 \
+        _dialog --title " Manage Physical Volume, Volume Group Or Logical Volume " --no-cancel ${_DEFAULT} --menu "" 12 60 6 \
             "1" "Create Physical Volume" \
             "2" "Create Volume Group" \
             "3" "Create Logical Volume" \
@@ -74,7 +74,7 @@ _create_luks_menu() {
         fi
         _CANCEL=""
         #shellcheck disable=SC2086
-        _dialog --title " Manage Luks Encryption " ${_DEFAULT} --menu "" 10 60 4 \
+        _dialog --title " Manage Luks Encryption " --no-cancel ${_DEFAULT} --menu "" 10 60 4 \
             "1" "Create Luks" \
             "2" "Reset Luks Encryption" \
             "3" "Luks Help" \
