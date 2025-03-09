@@ -57,7 +57,7 @@ _uki_uefi() {
     # enable uki handling in presets
     sd '#default_uki' 'default_uki' "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
     # write to template
-    echo "sd '#default_uki' 'default_uki' \"\${_DESTDIR\"/etc/mkinitcpio.d/*.preset" >> "${_TEMPLATE}"
+    echo "sd '#default_uki' 'default_uki' \"\${_DESTDIR}\"/etc/mkinitcpio.d/*.preset" >> "${_TEMPLATE}"
     if ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux" ]]; then
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux"
         # write to template
