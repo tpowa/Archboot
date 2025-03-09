@@ -33,7 +33,8 @@ _uki_install() {
     cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
     sync
     # write to template
-    { echo "rm -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+    { echo "### default uefi bootloader"
+    echo "rm -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
     echo "cp -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi\" \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
     echo "sync"
     echo ""
@@ -59,6 +60,7 @@ _uki_uefi() {
     sd '#default_uki' 'default_uki' "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
     # write to template
     { echo "### mkinitcpio uki"
+    echo "echo \"Enable uki in mkinitcpio config...\""
     echo "sd '#default_uki' 'default_uki' \"\${_DESTDIR}\"/etc/mkinitcpio.d/*.preset"
     echo ""
     } >> "${_TEMPLATE}"
