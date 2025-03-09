@@ -33,6 +33,8 @@ _auto_network()
         return 1
     fi
     _progress "13" "Enable network and proxy settings on installed system..."
+    # write to template
+    echo "echo \"Enable network and proxy settings on installed system...\"" >> "${_TEMPLATE}"
     # copy iwd keys and enable iwd
     if rg -q 'wlan' /.network-interface 2>"${_NO_LOG}"; then
         cp -r /var/lib/iwd "${_DESTDIR}"/var/lib
