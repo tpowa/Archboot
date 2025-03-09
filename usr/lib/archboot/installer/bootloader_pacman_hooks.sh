@@ -54,8 +54,8 @@ _pacman_hook_limine_uefi() {
     cat << EOF >> "${_HOOKNAME}"
 Description = Update Limine after upgrade...
 When = PostTransaction
-Exec = /usr/bin/sh -c "/usr/bin/cp /usr/share/limine/BOOT${_UEFI_ARCH}.EFI /${_UEFISYS_MP}/EFI/BOOT/;\
-/usr/bin/cp /usr/share/limine/BOOT${_UEFI_ARCH}.EFI /${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI"
+Exec = /usr/bin/sh -c "/usr/bin/cp /usr/share/limine/BOOT${_UEFI_ARCH}.EFI /${_ESP_MP}/EFI/BOOT/;\
+/usr/bin/cp /usr/share/limine/BOOT${_UEFI_ARCH}.EFI /${_ESP_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI"
 EOF
     # write to template
     _file_to_template "${_HOOKNAME}"
@@ -69,7 +69,7 @@ _pacman_hook_refind() {
     cat << EOF >> "${_HOOKNAME}"
 Description = Update rEFInd after upgrade...
 When = PostTransaction
-Exec = /usr/bin/sh -c "/usr/bin/cp /usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi /${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI;/usr/bin/refind-install"
+Exec = /usr/bin/sh -c "/usr/bin/cp /usr/share/refind/refind_${_SPEC_UEFI_ARCH}.efi /${_ESP_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI;/usr/bin/refind-install"
 EOF
     # write to template
     _file_to_template "${_HOOKNAME}"
@@ -97,7 +97,7 @@ _pacman_hook_grub_uefi() {
     cat << EOF >> "${_HOOKNAME}"
 Description = Update GRUB after upgrade...
 When = PostTransaction
-Exec = /usr/bin/sh -c "grub-install --directory='/usr/lib/grub/${_GRUB_ARCH}-efi' --target='${_GRUB_ARCH}-efi' --efi-directory='/${_UEFISYS_MP}' --bootloader-id='GRUB' --recheck"
+Exec = /usr/bin/sh -c "grub-install --directory='/usr/lib/grub/${_GRUB_ARCH}-efi' --target='${_GRUB_ARCH}-efi' --efi-directory='/${_ESP_MP}' --bootloader-id='GRUB' --recheck"
 EOF
     # write to template
     _file_to_template "${_HOOKNAME}"

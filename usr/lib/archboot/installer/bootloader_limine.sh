@@ -72,28 +72,28 @@ _limine_bios() {
 _limine_uefi() {
     _limine_common
     _dialog --no-mouse --infobox "Setting up LIMINE now..." 3 60
-    if ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT" ]]; then
-        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
+    if ! [[ -d "${_DESTDIR}/${_ESP_MP}/EFI/BOOT" ]]; then
+        mkdir -p "${_DESTDIR}/${_ESP_MP}/EFI/BOOT/"
         # write to template
-        echo "mkdir -p \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/\"" >> "${_TEMPLATE}"
+        echo "mkdir -p \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT/\"" >> "${_TEMPLATE}"
     fi
-    cp -f "${_DESTDIR}/usr/share/limine/BOOT${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI"
+    cp -f "${_DESTDIR}/usr/share/limine/BOOT${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_ESP_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI"
     # write to template
     { echo "### limine uefi"
     echo "echo \"Setting up LIMINE now...\""
-    echo "cp -f \"\${_DESTDIR}/usr/share/limine/BOOT${_UEFI_ARCH}.EFI\" \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI\""
+    echo "cp -f \"\${_DESTDIR}/usr/share/limine/BOOT${_UEFI_ARCH}.EFI\" \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI\""
     } >> "${_TEMPLATE}"
-    _LIMINE_CONFIG="${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/limine.conf"
+    _LIMINE_CONFIG="${_DESTDIR}/${_ESP_MP}/EFI/BOOT/limine.conf"
     _limine_config
-    if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI" ]]; then
+    if [[ -e "${_DESTDIR}/${_ESP_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI" ]]; then
         _BOOTMGR_LABEL="LIMINE"
         _BOOTMGR_LOADER_PATH="/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI"
         _uefi_bootmgr_setup
-        rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        rm -f "${_DESTDIR}/${_ESP_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        cp -f "${_DESTDIR}/${_ESP_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI" "${_DESTDIR}/${_ESP_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         # write to template
-        { echo "rm -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
-        echo "cp -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI\" \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+        { echo "rm -f \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+        echo "cp -f \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT/LIMINE${_UEFI_ARCH}.EFI\" \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
         echo ""
         } >> "${_TEMPLATE}"
         sleep 2

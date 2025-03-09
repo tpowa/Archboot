@@ -11,13 +11,13 @@ _systemd_boot_uefi() {
         # write to template
         echo "mkdir -p \"\${_DESTDIR}/boot/loader/entries\"" >> "${_TEMPLATE}"
     fi
-    if [[ ! -d "${_DESTDIR}/${_UEFISYS_MP}/loader" ]]; then
-        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/loader"
+    if [[ ! -d "${_DESTDIR}/${_ESP_MP}/loader" ]]; then
+        mkdir -p "${_DESTDIR}/${_ESP_MP}/loader"
         # write to template
-        echo "mkdir -p \"\${_DESTDIR}/${_UEFISYS_MP}/loader\"" >> "${_TEMPLATE}"
+        echo "mkdir -p \"\${_DESTDIR}/${_ESP_MP}/loader\"" >> "${_TEMPLATE}"
     fi
     _MAIN_CFG="boot/loader/entries/archlinux-core-main.conf"
-    _LOADER_CFG="${_UEFISYS_MP}/loader/loader.conf"
+    _LOADER_CFG="${_ESP_MP}/loader/loader.conf"
     cat << BOOTDEOF > "${_DESTDIR}/${_MAIN_CFG}"
 title    Arch Linux
 linux    /${_VMLINUZ}
@@ -38,7 +38,7 @@ BOOTDEOF
     echo "chroot \"\${_DESTDIR}\" bootctl install &>\"\${_LOG}\""
     echo "_chroot_umount"
     } >> "${_TEMPLATE}"
-    if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
+    if [[ -e "${_DESTDIR}/${_ESP_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
         _dialog --msgbox "You will now be put into the editor to edit:\nloader.conf and menu entry files\n\nAfter you save your changes, exit the editor." 8 50
         _geteditor || return 1
         _editor "${_DESTDIR}/${_MAIN_CFG}"

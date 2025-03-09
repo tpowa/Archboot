@@ -24,18 +24,18 @@ _uki_install() {
     _BOOTMGR_LABEL="Arch Linux - Unified Kernel Image"
     _BOOTMGR_LOADER_PATH="/EFI/Linux/arch-linux.efi"
     _uefi_bootmgr_setup
-    if ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT" ]]; then
-        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
+    if ! [[ -d "${_DESTDIR}/${_ESP_MP}/EFI/BOOT" ]]; then
+        mkdir -p "${_DESTDIR}/${_ESP_MP}/EFI/BOOT"
         # write to template
-        echo "mkdir -p \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT\"" >> "${_TEMPLATE}"
+        echo "mkdir -p \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT\"" >> "${_TEMPLATE}"
     fi
-    rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-    cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+    rm -f "${_DESTDIR}/${_ESP_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+    cp -f "${_DESTDIR}/${_ESP_MP}/EFI/Linux/arch-linux.efi" "${_DESTDIR}/${_ESP_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
     sync
     # write to template
     { echo "### default uefi bootloader"
-    echo "rm -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
-    echo "cp -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi\" \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+    echo "rm -f \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+    echo "cp -f \"\${_DESTDIR}/${_ESP_MP}/EFI/Linux/arch-linux.efi\" \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
     echo "sync"
     echo ""
     } >> "${_TEMPLATE}"
@@ -69,14 +69,14 @@ _uki_uefi() {
     echo "sd '#default_uki' 'default_uki' \"\${_DESTDIR}\"/etc/mkinitcpio.d/*.preset"
     echo ""
     } >> "${_TEMPLATE}"
-    if ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux" ]]; then
-        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux"
+    if ! [[ -d "${_DESTDIR}/${_ESP_MP}/EFI/Linux" ]]; then
+        mkdir -p "${_DESTDIR}/${_ESP_MP}/EFI/Linux"
         # write to template
-        echo "mkdir -p \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux\"" >> "${_TEMPLATE}"
+        echo "mkdir -p \"\${_DESTDIR}/${_ESP_MP}/EFI/Linux\"" >> "${_TEMPLATE}"
     fi
     _run_mkinitcpio | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Running mkinitcpio on installed system..." 6 75 0
     _mkinitcpio_error
-    if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi" ]]; then
+    if [[ -e "${_DESTDIR}/${_ESP_MP}/EFI/Linux/arch-linux.efi" ]]; then
         _uki_install | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Setting up Unified Kernel Image..." 6 75 0
     else
         _dialog --title " ERROR " --no-mouse --infobox "Setting up Unified Kernel Image failed!" 3 60

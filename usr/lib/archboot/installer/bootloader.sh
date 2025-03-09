@@ -150,12 +150,12 @@ _uefi_common() {
     ls "${_DESTDIR}/efi" &>"${_NO_LOG}"
     _BOOTDEV="$(${_FINDMNT} "${_DESTDIR}/boot" | rg -vw 'systemd-1')"
     if mountpoint -q "${_DESTDIR}/efi" ; then
-        _UEFISYS_MP=efi
+        _ESP_MP=efi
     else
-        _UEFISYS_MP=boot
+        _ESP_MP=boot
     fi
-    _UEFISYSDEV="$(${_FINDMNT} "${_DESTDIR}/${_UEFISYS_MP}" | rg -vw 'systemd-1')"
-    _UEFISYSDEV_FS_UUID="$(_getfsuuid "${_UEFISYSDEV}")"
+    _ESP_DEV="$(${_FINDMNT} "${_DESTDIR}/${_ESP_MP}" | rg -vw 'systemd-1')"
+    _ESP_DEV_FS_UUID="$(_getfsuuid "${_ESP_DEV}")"
 }
 
 _uefi_efibootmgr() {
@@ -167,8 +167,8 @@ _uefi_efibootmgr() {
         echo "efibootmgr --quiet -b \"${_bootnum}\" -B >> \"\${_LOG}\""
         } >> "${_TEMPLATE}"
     done
-    _BOOTMGRDEV=$(${_LSBLK} PKNAME "${_UEFISYSDEV}" 2>"${_NO_LOG}")
-    _BOOTMGRNUM=$(echo "${_UEFISYSDEV}" | sd "${_BOOTMGRDEV}" '' | sd 'p' '')
+    _BOOTMGRDEV=$(${_LSBLK} PKNAME "${_ESP_DEV}" 2>"${_NO_LOG}")
+    _BOOTMGRNUM=$(echo "${_ESP_DEV}" | sd "${_BOOTMGRDEV}" '' | sd 'p' '')
     efibootmgr --quiet --create --disk "${_BOOTMGRDEV}" --part "${_BOOTMGRNUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" >> "${_LOG}"
     # write to template
      { echo "efibootmgr --quiet --create --disk \"${_BOOTMGRDEV}\" --part \"${_BOOTMGRNUM}\" --loader \"${_BOOTMGR_LOADER_PATH}\" --label \"${_BOOTMGR_LABEL}\" >> \"\${_LOG}\""

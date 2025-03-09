@@ -66,8 +66,8 @@ _grub_config() {
     _USRDEV_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/usr" 2>"${_NO_LOG}")"
     _USRDEV_FS="$(${_GRUB_PROBE} --target="fs" "/usr" 2>"${_NO_LOG}")"
     if [[ -n "${_GRUB_UEFI}" ]]; then
-        _UEFISYSDEV_FS_UUID="$(${_GRUB_PROBE} --target="fs_uuid" "/${_UEFISYS_MP}" 2>"${_NO_LOG}")"
-        _UEFISYSDEV_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/${_UEFISYS_MP}" 2>"${_NO_LOG}")"
+        _ESP_DEV_FS_UUID="$(${_GRUB_PROBE} --target="fs_uuid" "/${_ESP_MP}" 2>"${_NO_LOG}")"
+        _ESP_DEV_HINTS_STRING="$(${_GRUB_PROBE} --target="hints_string" "/${_ESP_MP}" 2>"${_NO_LOG}")"
     fi
     _chroot_umount
     if [[ "${_ROOTDEV_FS_UUID}" == "${_BOOTDEV_FS_UUID}" ]]; then
@@ -194,7 +194,7 @@ if [ "\${grub_platform}" == "efi" ]; then
         #    insmod fat
         #    insmod search_fs_uuid
         #    insmod chain
-        #    search --fs-uuid --no-floppy --set=root ${_UEFISYSDEV_HINTS_STRING} ${_UEFISYSDEV_FS_UUID}
+        #    search --fs-uuid --no-floppy --set=root ${_ESP_DEV_HINTS_STRING} ${_ESP_DEV_FS_UUID}
         #    chainloader /EFI/Microsoft/Boot/bootmgfw.efi
         #}
     fi
@@ -257,9 +257,9 @@ EOF
     echo "_USRDEV_FS_UUID=\"\$(${_GRUB_PROBE} --target=\"fs_uuid\" \"/usr\" 2>\"\${_NO_LOG}\")\""
     } >> "${_TEMPLATE}"
     if [[ -n "${_GRUB_UEFI}" ]]; then
-        { echo "_UEFISYSDEV_FS_UUID_OLD=\"${_UEFISYSDEV_FS_UUID}\""
-        echo "_UEFISYSDEV_FS_UUID=\"\$(${_GRUB_PROBE} --target=\"fs_uuid\" \"/${_UEFISYS_MP}\" 2>\"\${_NO_LOG}\")\""
-        echo "sd \"\${_UEFISYSDEV_FS_UUID_OLD}\" \"\${_UEFISYSDEV_FS_UUID}\" \"\${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
+        { echo "_ESP_DEV_FS_UUID_OLD=\"${_ESP_DEV_FS_UUID}\""
+        echo "_ESP_DEV_FS_UUID=\"\$(${_GRUB_PROBE} --target=\"fs_uuid\" \"/${_ESP_MP}\" 2>\"\${_NO_LOG}\")\""
+        echo "sd \"\${_ESP_DEV_FS_UUID_OLD}\" \"\${_ESP_DEV_FS_UUID}\" \"\${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
         } >> "${_TEMPLATE}"
     fi
     { echo "sd \"\${_BOOTDEV_FS_UUID_OLD}\" \"\${_BOOTDEV_FS_UUID}\" \"\${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
@@ -386,13 +386,13 @@ _grub_install_uefi() {
     chroot "${_DESTDIR}" grub-install \
         --directory="/usr/lib/grub/${_GRUB_ARCH}-efi" \
         --target="${_GRUB_ARCH}-efi" \
-        --efi-directory="/${_UEFISYS_MP}" \
+        --efi-directory="/${_ESP_MP}" \
         --bootloader-id="GRUB" \
         --recheck \
         --debug &> "/tmp/grub_uefi_${_UEFI_ARCH}_install.log"
     cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >>"${_LOG}"
     # write to template
-    echo "chroot \"\${_DESTDIR}\" grub-install --directory=\"/usr/lib/grub/${_GRUB_ARCH}-efi\" --target=\"${_GRUB_ARCH}-efi\" --efi-directory=\"/${_UEFISYS_MP}\" --bootloader-id=\"GRUB\" --recheck --debug &>\"\${_LOG}\"" >> "${_TEMPLATE}"
+    echo "chroot \"\${_DESTDIR}\" grub-install --directory=\"/usr/lib/grub/${_GRUB_ARCH}-efi\" --target=\"${_GRUB_ARCH}-efi\" --efi-directory=\"/${_ESP_MP}\" --bootloader-id=\"GRUB\" --recheck --debug &>\"\${_LOG}\"" >> "${_TEMPLATE}"
     rm /.archboot
 }
 
@@ -413,16 +413,16 @@ _setup_grub_uefi() {
         echo "echo \"Installing fedora's shim and mokmanager...\"" >> "${_TEMPLATE}"
         sleep 2
         # install fedora shim
-        if ! [[ -d  ${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT ]]; then
-            mkdir -p "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT
+        if ! [[ -d  ${_DESTDIR}/${_ESP_MP}/EFI/BOOT ]]; then
+            mkdir -p "${_DESTDIR}"/"${_ESP_MP}"/EFI/BOOT
             # write to template
-            echo "mkdir -p \"\${_DESTDIR}\"/\"${_UEFISYS_MP}\"/EFI/BOOT" >> "${_TEMPLATE}"
+            echo "mkdir -p \"\${_DESTDIR}\"/\"${_ESP_MP}\"/EFI/BOOT" >> "${_TEMPLATE}"
         fi
-        cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".EFI
-        cp -f /usr/share/archboot/bootloader/mm"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/
+        cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_ESP_MP}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".EFI
+        cp -f /usr/share/archboot/bootloader/mm"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_ESP_MP}"/EFI/BOOT/
         # write to template
-        { echo "cp -f /usr/share/archboot/bootloader/shim\"${_SPEC_UEFI_ARCH}\".efi \"\${_DESTDIR}\"/\"${_UEFISYS_MP}\"/EFI/BOOT/BOOT\"${_UEFI_ARCH}\".EFI"
-        echo "cp -f /usr/share/archboot/bootloader/mm\"${_SPEC_UEFI_ARCH}\".efi \"\${_DESTDIR}\"/\"${_UEFISYS_MP}\"/EFI/BOOT/"
+        { echo "cp -f /usr/share/archboot/bootloader/shim\"${_SPEC_UEFI_ARCH}\".efi \"\${_DESTDIR}\"/\"${_ESP_MP}\"/EFI/BOOT/BOOT\"${_UEFI_ARCH}\".EFI"
+        echo "cp -f /usr/share/archboot/bootloader/mm\"${_SPEC_UEFI_ARCH}\".efi \"\${_DESTDIR}\"/\"${_ESP_MP}\"/EFI/BOOT/"
         } >> "${_TEMPLATE}"
         _progress "100" "Installing fedora's shim and mokmanager completed."
         sleep 2
@@ -471,7 +471,7 @@ _grub_uefi() {
     [[ "${_UEFI_ARCH}" == "IA32" ]] && _GRUB_ARCH="i386"
     [[ "${_UEFI_ARCH}" == "AA64" ]] && _GRUB_ARCH="arm64"
     if [[ -n "${_UEFI_SECURE_BOOT}" ]]; then
-        _GRUB_PREFIX_DIR="${_UEFISYS_MP}/EFI/BOOT"
+        _GRUB_PREFIX_DIR="${_ESP_MP}/EFI/BOOT"
     else
         _GRUB_PREFIX_DIR="boot/grub"
     fi
@@ -479,21 +479,21 @@ _grub_uefi() {
     _setup_grub_uefi | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Setting up GRUB(2) UEFI..." 6 75 0
     _grub_config || return 1
     _setup_grub_uefi_sb | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Setting up GRUB(2) UEFI Secure Boot..." 6 75 0
-    if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" && -z "${_UEFI_SECURE_BOOT}" && -e "${_DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
+    if [[ -e "${_DESTDIR}/${_ESP_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" && -z "${_UEFI_SECURE_BOOT}" && -e "${_DESTDIR}/boot/grub/${_GRUB_ARCH}-efi/core.efi" ]]; then
         _pacman_hook_grub_uefi
-        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
-        rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
-        cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        mkdir -p "${_DESTDIR}/${_ESP_MP}/EFI/BOOT"
+        rm -f "${_DESTDIR}/${_ESP_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
+        cp -f "${_DESTDIR}/${_ESP_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_ESP_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         # write to template
         { echo "### default uefi bootloader"
-        echo "mkdir -p \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT\""
-        echo "rm -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
-        echo "cp -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi\" \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+        echo "mkdir -p \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT\""
+        echo "rm -f \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+        echo "cp -f \"\${_DESTDIR}/${_ESP_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi\" \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
         } >> "${_TEMPLATE}"
         _dialog --title " Success " --no-mouse --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully." 3 60
         sleep 3
         _S_BOOTLOADER=1
-    elif [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && -n "${_UEFI_SECURE_BOOT}" ]]; then
+    elif [[ -e "${_DESTDIR}/${_ESP_MP}/EFI/BOOT/grub${_SPEC_UEFI_ARCH}.efi" && -n "${_UEFI_SECURE_BOOT}" ]]; then
         _secureboot_keys || return 1
         _mok_sign
         _pacman_sign

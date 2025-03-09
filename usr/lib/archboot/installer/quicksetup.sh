@@ -15,9 +15,9 @@ _auto_partition() {
         echo "size=+${_GPT_BIOS_GRUB_DEV_SIZE}M, type=21686148-6449-6E6F-744E-656564454649, name=BIOS_GRUB" | sfdisk -a "${_DISK}" &>"${_LOG}"
         if [[ -n "${_UEFI_BOOT}" ]]; then
             _progress "25" "Creating EFI System partition..."
-            echo "size=+${_UEFISYSDEV_SIZE}M, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B, name=ESP" | sfdisk -a "${_DISK}" &>"${_LOG}"
+            echo "size=+${_ESP_DEV_SIZE}M, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B, name=ESP" | sfdisk -a "${_DISK}" &>"${_LOG}"
         fi
-        if [[ -z "${_UEFISYS_BOOTDEV}" ]]; then
+        if [[ -z "${_ESP_BOOTDEV}" ]]; then
             _progress "40" "Creating Extended Boot Loader partition..."
             echo "size=+${_BOOTDEV_SIZE}M, type=BC13C2FF-59E6-4262-A352-B275FD6F7172, name=XBOOTLDR" | sfdisk -a "${_DISK}" &>"${_LOG}"
         fi
@@ -138,14 +138,14 @@ _autoprepare() {
     _DEV=""
     _DEFAULTFS=""
     _CHOSENFS=""
-    _UEFISYS_BOOTDEV=""
-    _UEFISYS_MP=""
-    _UEFISYSDEV_SET=""
+    _ESP_BOOTDEV=""
+    _ESP_MP=""
+    _ESP_DEV_SET=""
     _BOOTDEV_SET=""
     _SWAPDEV_SET=""
     _ROOTDEV_SET=""
     _BOOTDEV_SIZE=""
-    _UEFISYSDEV_SIZE=""
+    _ESP_DEV_SIZE=""
     _SKIP_SWAP=""
     _SKIP_HOME=""
     # get just the disk size in M/MiB 1024*1024
@@ -174,49 +174,49 @@ _autoprepare() {
         # only create ESP on UEFI systems
         if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
             _dialog --title " EFI SYSTEM PARTITION (ESP) " --no-cancel --menu "" 8 40 2 "/efi" "MULTIBOOT" "/boot" "SINGLEBOOT" 2>"${_ANSWER}" || return 1
-            _UEFISYS_MP=$(cat "${_ANSWER}")
-            if [[ "${_UEFISYS_MP}" == "/boot" ]]; then
-                _UEFISYS_BOOTDEV=1
+            _ESP_MP=$(cat "${_ANSWER}")
+            if [[ "${_ESP_MP}" == "/boot" ]]; then
+                _ESP_BOOTDEV=1
             fi
-            if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
-                while [[ -z "${_UEFISYSDEV_SET}" ]]; do
+            if [[ -n "${_ESP_BOOTDEV}" ]]; then
+                while [[ -z "${_ESP_DEV_SET}" ]]; do
                     _dialog --title " EFI SYSTEM PARTITION (ESP) in MiB " --no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | Minimum value is 260" 8 65 "512" 2>"${_ANSWER}" || return 1
-                    _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
-                    if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
+                    _ESP_DEV_SIZE="$(cat "${_ANSWER}")"
+                    if [[ -z "${_ESP_DEV_SIZE}" ]]; then
                         _dialog --title " ERROR " --no-mouse --infobox "You have entered a invalid size, please enter again." 3 60
                         sleep 5
                     else
-                        if [[ "${_UEFISYSDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_UEFISYSDEV_SIZE}" -lt "260" || "${_UEFISYSDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
+                        if [[ "${_ESP_DEV_SIZE}" -ge "${_DISK_SIZE}" || "${_ESP_DEV_SIZE}" -lt "260" || "${_ESP_DEV_SIZE}" == "${_DISK_SIZE}" ]]; then
                             _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
                             sleep 5
                         else
                             _BOOTDEV_SET=1
-                            _UEFISYSDEV_SET=1
-                            _UEFISYSDEV_NUM="$((_DEV_NUM+1))"
-                            _DEV_NUM="${_UEFISYSDEV_NUM}"
+                            _ESP_DEV_SET=1
+                            _ESP_DEV_NUM="$((_DEV_NUM+1))"
+                            _DEV_NUM="${_ESP_DEV_NUM}"
                         fi
                     fi
                 done
             else
-                while [[ -z "${_UEFISYSDEV_SET}" ]]; do
+                while [[ -z "${_ESP_DEV_SET}" ]]; do
                     _dialog --title " EFI SYSTEM PARTITION (ESP) in MiB " --no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | Minimum value is 260" 8 65 "1024" 2>"${_ANSWER}" || return 1
-                    _UEFISYSDEV_SIZE="$(cat "${_ANSWER}")"
-                    if [[ -z "${_UEFISYSDEV_SIZE}" ]]; then
+                    _ESP_DEV_SIZE="$(cat "${_ANSWER}")"
+                    if [[ -z "${_ESP_DEV_SIZE}" ]]; then
                         _dialog --title " ERROR " --no-mouse --infobox "You have entered a invalid size, please enter again." 3 60
                         sleep 5
                     else
-                        if [[ "${_UEFISYSDEV_SIZE}" -ge "${_DISK_SIZE}" || "${_UEFISYSDEV_SIZE}" -lt "260" || "${_UEFISYSDEV_SIZE}" == "${_DISK_SIZE}" ]]; then
+                        if [[ "${_ESP_DEV_SIZE}" -ge "${_DISK_SIZE}" || "${_ESP_DEV_SIZE}" -lt "260" || "${_ESP_DEV_SIZE}" == "${_DISK_SIZE}" ]]; then
                             _dialog --title " ERROR " --no-mouse --infobox "You have entered an invalid size, please enter again." 3 60
                             sleep 5
                         else
-                            _UEFISYSDEV_SET=1
-                            _UEFISYSDEV_NUM="$((_DEV_NUM+1))"
-                            _DEV_NUM=${_UEFISYSDEV_NUM}
+                            _ESP_DEV_SET=1
+                            _ESP_DEV_NUM="$((_DEV_NUM+1))"
+                            _DEV_NUM=${_ESP_DEV_NUM}
                         fi
                     fi
                 done
             fi
-            _DISK_SIZE="$((_DISK_SIZE-_UEFISYSDEV_SIZE))"
+            _DISK_SIZE="$((_DISK_SIZE-_ESP_DEV_SIZE))"
             while [[ -z "${_BOOTDEV_SET}" ]]; do
                 _dialog --title " Extended Boot Loader Partition (XBOOTLDR) in MiB " --no-cancel --inputbox "Disk space left: ${_DISK_SIZE}M | Minimum value is 100" 8 65 "512" 2>"${_ANSWER}" || return 1
                 _BOOTDEV_SIZE="$(cat "${_ANSWER}")"
@@ -340,12 +340,12 @@ _autoprepare() {
     _FSSPEC_ROOTDEV="${_ROOTDEV_NUM}|${_FSTYPE}|/|ARCH_ROOT"
     _FSSPEC_BOOTDEV="${_BOOTDEV_NUM}|vfat|/boot|XBOOTLDR"
     [[ -z "${_SKIP_HOME}" ]] &&_FSSPEC_HOMEDEV="${_HOMEDEV_NUM}|${_FSTYPE}|/home|ARCH_HOME"
-    _FSSPEC_UEFISYSDEV="${_UEFISYSDEV_NUM}|vfat|${_UEFISYS_MP}|ESP"
+    _FSSPEC_ESP_DEV="${_ESP_DEV_NUM}|vfat|${_ESP_MP}|ESP"
     if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
-        if [[ -n "${_UEFISYS_BOOTDEV}" ]]; then
-            _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_UEFISYSDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
+        if [[ -n "${_ESP_BOOTDEV}" ]]; then
+            _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_ESP_DEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
         else
-            _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_UEFISYSDEV} ${_FSSPEC_BOOTDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
+            _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_ESP_DEV} ${_FSSPEC_BOOTDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
         fi
     else
         _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_BOOTDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"

@@ -37,7 +37,7 @@ _secureboot_keys() {
 }
 
 _mok_sign () {
-    _UEFI_BOOTLOADER_DIR="${_UEFISYS_MP}/EFI/BOOT"
+    _UEFI_BOOTLOADER_DIR="${_ESP_MP}/EFI/BOOT"
     _INSTALL_MOK=""
     _MOK_PW=""
     while [[ -z "${_MOK_PW}" ]]; do
