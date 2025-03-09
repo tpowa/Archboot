@@ -29,11 +29,6 @@ _uki_install() {
         # write to template
         echo "mkdir -p \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT\"" >> "${_TEMPLATE}"
     fi
-    if ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux" ]]; then
-        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux"
-        # write to template
-        echo "mkdir -p \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux\"" >> "${_TEMPLATE}"
-    fi
     rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
     cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
     sync
@@ -63,6 +58,11 @@ _uki_uefi() {
     sd '#default_uki' 'default_uki' "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
     # write to template
     echo "sd '#default_uki' 'default_uki' \"\${_DESTDIR\"/etc/mkinitcpio.d/*.preset" >> "${_TEMPLATE}"
+    if ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux" ]]; then
+        mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux"
+        # write to template
+        echo "mkdir -p \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux\"" >> "${_TEMPLATE}"
+    fi
     _run_mkinitcpio | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Running mkinitcpio on installed system..." 6 75 0
     _mkinitcpio_error
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi" ]]; then
