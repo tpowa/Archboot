@@ -367,12 +367,16 @@ _auto_mkinitcpio() {
         # disable fallpack preset
         sd " 'fallback'" '' "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
         # write to template
-        echo "sd \" 'fallback'\" '' \"\${_DESTDIR}\"/etc/mkinitcpio.d/*.preset" >> "${_TEMPLATE}"
+        { echo "### mkinitcpio"
+        echo "sd \" 'fallback'\" '' \"\${_DESTDIR}\"/etc/mkinitcpio.d/*.preset"
+        } >> "${_TEMPLATE}"
         # remove fallback initramfs
         if [[ -e "${_DESTDIR}/boot/initramfs-linux-fallback.img" ]]; then
             rm -f "${_DESTDIR}/boot/initramfs-linux-fallback.img"
             # write to template
-            echo "rm -f \"\${_DESTDIR}/boot/initramfs-linux-fallback.img\"" >> "${_TEMPLATE}"
+            { echo "rm -f \"\${_DESTDIR}/boot/initramfs-linux-fallback.img\""
+            echo ""
+            } >> "${_TEMPLATE}"
         fi
         sleep 2
         _AUTO_MKINITCPIO=1
