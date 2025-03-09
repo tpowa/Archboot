@@ -149,7 +149,7 @@ _auto_luks() {
         cp /tmp/passphrase-* "${_DESTDIR}"/etc/ 2>"${_NO_LOG}"
         # write to template
         { echo "echo \"Enable luks settings on installed system...\""
-        echo "sd '^$(basename \"${_ROOTDEV}\").*\n' '' /tmp/.crypttab"
+        echo "sd \"^$(basename \"${_ROOTDEV}\").*\n\" '' /tmp/.crypttab"
         echo "cat /tmp/.crypttab >> \"${_DESTDIR}\"/etc/crypttab"
         echo "chmod 700 /tmp/passphrase-* 2>\"${_NO_LOG}\""
         echo "cp /tmp/passphrase-* \"${_DESTDIR}\"/etc/ 2>\"${_NO_LOG}\""
