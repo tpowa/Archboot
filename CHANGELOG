@@ -1,4 +1,19 @@
 On the road to 2025.03:
+Environment:
+- added archboot-autorun.template support
+localize:
+- added write to template file
+network:
+- added write to template file
+clock:
+- added write to template file
+pacsetup:
+- added write to template file
+setup:
+- added write to template file
+- added unmount everything before cleaning disk
+- fixed directory creation before UKI writing
+- added check on running swaps
 ---
 Highlights 2025.02:
 - On normal image reduced needed RAM by 30%,
