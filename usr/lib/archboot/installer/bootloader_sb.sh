@@ -18,13 +18,19 @@ _secureboot_keys() {
         done
         secureboot-keys.sh -name="${_CN}" "${_DESTDIR}/${_KEYDIR}" &>"${_LOG}" || return 1
         # write to template
-        { echo "secureboot-keys.sh -name=\"${_CN}\" \"\${_DESTDIR}/${_KEYDIR}\" &>\"\${_LOG}\""
+        { echo "### secureboot keys"
+        echo "secureboot-keys.sh -name=\"${_CN}\" \"\${_DESTDIR}/${_KEYDIR}\" &>\"\${_LOG}\""
         echo "echo \"Common name(CN) ${_CN} used for your keys in ${_DESTDIR}/${_KEYDIR}\""
+        echo ""
         } >> "${_TEMPLATE}"
          _dialog --title " Setup Keys " --no-mouse --infobox "Common name(CN) ${_CN}\nused for your keys in ${_DESTDIR}/${_KEYDIR}" 4 60
          sleep 3
     else
-        echo "echo \"Directory ${_DESTDIR}/${_KEYDIR} exists. Assuming keys are already created. Trying to use existing keys now.\"" >> "${_TEMPLATE}"
+        # write to template
+        { echo "### secureboot keys"
+        echo "echo \"Directory ${_DESTDIR}/${_KEYDIR} exists. Assuming keys are already created. Trying to use existing keys now.\""
+        echo ""
+        } >> "${_TEMPLATE}"
          _dialog --title " Setup Keys " --no-mouse --infobox "-Directory ${_DESTDIR}/${_KEYDIR} exists\n-assuming keys are already created\n-trying to use existing keys now" 5 50
          sleep 3
     fi
@@ -44,7 +50,8 @@ _mok_sign () {
             echo "${_MOK_PW}" > /tmp/.password
             echo "${_MOK_PW}" >> /tmp/.password
             # write to template
-            { echo "echo \"${_MOK_PW}\" > /tmp/.password"
+            { echo "### mokutils"
+            echo "echo \"${_MOK_PW}\" > /tmp/.password"
             echo "echo \"${_MOK_PW}\" >> /tmp/.password"
             } >> "${_TEMPLATE}"
             _MOK_PW=/tmp/.password
@@ -59,6 +66,7 @@ _mok_sign () {
     { echo "mokutil -i \"\${_DESTDIR}\"/\"${_KEYDIR}\"/MOK/MOK.cer < ${_MOK_PW} >\"\${_LOG}\""
     echo "rm /tmp/.password"
     echo "echo \"Machine Owner Key has been installed successfully.\""
+    echo ""
     } >> "${_TEMPLATE}"
     _dialog --title " Machine Owner Key " --no-mouse --infobox "Machine Owner Key has been installed successfully." 3 70
     sleep 3
@@ -73,9 +81,11 @@ _mok_sign () {
                --output="${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi \
                sign "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
     # write to template
-    { echo "${_NSPAWN} /usr/lib/systemd/systemd-sbsign --private-key=/\"${_KEYDIR}\"/MOK/MOK.key --certificate=/\"${_KEYDIR}\"/MOK/MOK.crt --output=/boot/\"${_VMLINUZ}\" sign /boot/\"${_VMLINUZ}\" &>\"\${_LOG}\""
+    { echo "### sign kernel and grub"
+    echo "${_NSPAWN} /usr/lib/systemd/systemd-sbsign --private-key=/\"${_KEYDIR}\"/MOK/MOK.key --certificate=/\"${_KEYDIR}\"/MOK/MOK.crt --output=/boot/\"${_VMLINUZ}\" sign /boot/\"${_VMLINUZ}\" &>\"\${_LOG}\""
     echo "${_NSPAWN} /usr/lib/systemd/systemd-sbsign --private-key=/\"${_KEYDIR}\"/MOK/MOK.key --certificate=/\"${_KEYDIR}\"/MOK/MOK.crt --output=\"${_UEFI_BOOTLOADER_DIR}\"/grub\"${_SPEC_UEFI_ARCH}\".efi sign \"${_UEFI_BOOTLOADER_DIR}\"/grub\"${_SPEC_UEFI_ARCH}\".efi &>\"\${_LOG}\""
     echo "echo \"/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi have been signed successfully.\""
+    echo ""
     } >> "${_TEMPLATE}"
     _dialog --title " Kernel And Bootloader Signing " --no-mouse --infobox "/boot/${_VMLINUZ} and ${_UEFI_BOOTLOADER_DIR}/grub${_SPEC_UEFI_ARCH}.efi\n\nhave been signed successfully." 5 60
     sleep 3
