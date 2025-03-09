@@ -217,12 +217,12 @@ _user_management() {
                              _ADMIN_ATTR="-G wheel"
                          fi
                          _set_comment || break
-                         _prepare_password User || break
+                         _prepare_password user || break
                          #shellcheck disable=SC2086
                          if useradd -R "${_DESTDIR}" ${_ADMIN_ATTR} -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
                             # write to template
                             { echo "useradd -R \"\${_DESTDIR}\" ${_ADMIN_ATTR} -c \"${_FN}\" -m \"${_USER}\" &>\"\${_LOG}\""
-                            echo "echo "User account ${_USER} created succesfully.""
+                            echo "echo "user account ${_USER} created succesfully.""
                             } >> "${_TEMPLATE}"
                             _set_password
                             _dialog --title " Success " --no-mouse --infobox "User account ${_USER} created succesfully." 3 50
@@ -246,7 +246,7 @@ _user_management() {
                      _USER=$(cat "${_ANSWER}")
                      _NEXTITEM="${_USER}"
                      if [[ "${_USER}" = "root" ]]; then
-                         if _prepare_password Root; then
+                         if _prepare_password root; then
                             _set_password
                          fi
                      elif [[ "${_USER}" = "< Back" ]]; then
