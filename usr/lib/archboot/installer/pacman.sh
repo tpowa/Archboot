@@ -17,7 +17,10 @@ _pacman() {
 
 _run_pacman(){
     _chroot_mount
-    echo "_chroot_mount" >> "${_TEMPLATE}"
+    { echo "### pacman installation"
+    echo "_chroot_mount"
+    } >> "${_TEMPLATE}"
+
     # Set up the necessary directories for pacman use
     if [[ ! -d "${_DESTDIR}${_CACHEDIR}" ]]; then
         mkdir -p "${_DESTDIR}${_CACHEDIR}"
@@ -47,6 +50,7 @@ _run_pacman(){
     # write to template
     { echo "sync"
     echo "_chroot_umount"
+    echo ""
     } >> "${_TEMPLATE}"
 }
 
