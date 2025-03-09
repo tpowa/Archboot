@@ -54,6 +54,10 @@ _uki_uefi() {
     fi
     _uki_config
     _geteditor || return 1
+    # write to template
+    { echo "### uki firmware"
+    echo "echo \"Setting up Unified Kernel Image...\""
+    } >> "${_TEMPLATE}"
     _editor "${_CMDLINE}"
     _editor "${_UKIFY_CONFIG}"
     # enable uki handling in presets
@@ -72,10 +76,6 @@ _uki_uefi() {
     _run_mkinitcpio | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Running mkinitcpio on installed system..." 6 75 0
     _mkinitcpio_error
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi" ]]; then
-        # write to template
-        { echo "### uki firmware"
-        echo "echo \"Setting up Unified Kernel Image...\""
-        } >> "${_TEMPLATE}"
         _uki_install | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Setting up Unified Kernel Image..." 6 75 0
     else
         _dialog --title " ERROR " --no-mouse --infobox "Setting up Unified Kernel Image failed!" 3 60
