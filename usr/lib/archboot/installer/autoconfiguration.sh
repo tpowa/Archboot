@@ -238,9 +238,9 @@ _auto_hostname() {
 
 _auto_locale() {
     _progress "83" "Set default locale on installed system..."
-    # write to template
-    echo "echo \"Set default locale on installed system...\"" >> "${_TEMPLATE}"
     if [[ ! -f ${_DESTDIR}/etc/locale.conf ]]; then
+        # write to template
+        echo "echo \"Set default locale on installed system...\"" >> "${_TEMPLATE}"
         if [[ -n ${_DESTDIR} && -e /.localize ]]; then
             cp /etc/locale.conf "${_DESTDIR}"/etc/locale.conf
             # write to template
