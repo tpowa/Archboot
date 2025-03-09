@@ -39,15 +39,15 @@ CONFEOF
         if ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT" ]]; then
             mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT"
             # write to template
-            echo "mkdir -p \"\$\{_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT\"" >> "${_TEMPLATE}"
+            echo "mkdir -p \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT\"" >> "${_TEMPLATE}"
         fi
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         rm -f "${_DESTDIR}"/boot/refind_linux.conf
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         # write to template
-        { echo "rm -f \"\$\{_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+        { echo "rm -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
         echo "rm -f \"\${_DESTDIR}\"/boot/refind_linux.conf"
-        echo "cp -f \"\$\{_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi\" \"\$\{_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+        echo "cp -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi\" \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
         } >> "${_TEMPLATE}"
         sleep 2
         _dialog --msgbox "You will now be put into the editor to edit:\nrefind.conf\n\nAfter you save your changes, exit the editor." 8 50
@@ -55,7 +55,7 @@ CONFEOF
         _editor "${_REFIND_CONFIG}"
         cp -f "${_REFIND_CONFIG}" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/"
         # write to template
-        echo "cp -f \"${_REFIND_CONFIG}\" \"\$\{_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/\"" >> "${_TEMPLATE}"
+        echo "cp -f \"${_REFIND_CONFIG}\" \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/\"" >> "${_TEMPLATE}"
         _pacman_hook_refind
         _dialog --title " Success " --no-mouse --infobox "rEFInd has been setup successfully." 3 50
         sleep 3

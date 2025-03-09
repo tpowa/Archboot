@@ -9,12 +9,12 @@ _systemd_boot_uefi() {
     if [[ ! -d "${_DESTDIR}/boot/loader/entries" ]]; then
         mkdir -p "${_DESTDIR}/boot/loader/entries"
         # write to template
-        echo "mkdir -p \"\$\{_DESTDIR}/boot/loader/entries\"" >> "${_TEMPLATE}"
+        echo "mkdir -p \"\${_DESTDIR}/boot/loader/entries\"" >> "${_TEMPLATE}"
     fi
     if [[ ! -d "${_DESTDIR}/${_UEFISYS_MP}/loader" ]]; then
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/loader"
         # write to template
-        echo "mkdir -p \"\$\{_DESTDIR}/${_UEFISYS_MP}/loader\"" >> "${_TEMPLATE}"
+        echo "mkdir -p \"\${_DESTDIR}/${_UEFISYS_MP}/loader\"" >> "${_TEMPLATE}"
     fi
     _MAIN_CFG="boot/loader/entries/archlinux-core-main.conf"
     _LOADER_CFG="/${_UEFISYS_MP}/loader/loader.conf"

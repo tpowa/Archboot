@@ -9,16 +9,16 @@ _freeze_xfs() {
             xfs_freeze -f "${_DESTDIR}"/boot &>"${_NO_LOG}"
             xfs_freeze -u "${_DESTDIR}"/boot &>"${_NO_LOG}"
             # write to template
-            { echo "xfs_freeze -f \"\$\{_DESTDIR}\"/boot &>\"\${_NO_LOG}\""
-            echo "xfs_freeze -u \"\$\{_DESTDIR}\"/boot &>\"\${_NO_LOG}\""
+            { echo "xfs_freeze -f \"\${_DESTDIR}\"/boot &>\"\${_NO_LOG}\""
+            echo "xfs_freeze -u \"\${_DESTDIR}\"/boot &>\"\${_NO_LOG}\""
             } >> "${_TEMPLATE}"
         fi
         if mount | rg -q "${_DESTDIR} type xfs"; then
             xfs_freeze -f "${_DESTDIR}" &>"${_NO_LOG}"
             xfs_freeze -u "${_DESTDIR}" &>"${_NO_LOG}"
             # write to template
-            { echo "xfs_freeze -f \"\$\{_DESTDIR}\" &>\"\${_NO_LOG}\""
-            echo "xfs_freeze -u \"\$\{_DESTDIR}\" &>\"\${_NO_LOG}\""
+            { echo "xfs_freeze -f \"\${_DESTDIR}\" &>\"\${_NO_LOG}\""
+            echo "xfs_freeze -u \"\${_DESTDIR}\" &>\"\${_NO_LOG}\""
             } >> "${_TEMPLATE}"
         fi
     fi
@@ -234,7 +234,7 @@ EOF
     [[ -d ${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts ]] || mkdir -p "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts"
     cp -f "${_DESTDIR}/usr/share/grub/ter-u16n.pf2" "${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts/ter-u16n.pf2"
     # write to template
-    echo "cp -f \"\$\{_DESTDIR}/usr/share/grub/ter-u16n.pf2\" \"\$\{_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts/ter-u16n.pf2\"" >> "${_TEMPLATE}"
+    echo "cp -f \"\${_DESTDIR}/usr/share/grub/ter-u16n.pf2\" \"\${_DESTDIR}/${_GRUB_PREFIX_DIR}/fonts/ter-u16n.pf2\"" >> "${_TEMPLATE}"
     ## Edit grub.cfg config file
     _dialog --msgbox "You must now review the GRUB(2) configuration file.\n\nYou will now be put into the editor.\nAfter you save your changes, exit the editor." 8 55
     _geteditor || return 1
@@ -252,12 +252,12 @@ EOF
     if [[ -n "${_GRUB_UEFI}" ]]; then
         { echo "_UEFISYSDEV_FS_UUID_OLD=\"${_UEFISYSDEV_FS_UUID}\""
         echo "_UEFISYSDEV_FS_UUID=\"\$(${_GRUB_PROBE} --target=\"fs_uuid\" \"/${_UEFISYS_MP}\" 2>\"${_NO_LOG}\")\""
-        echo "sd \"\${_UEFISYSDEV_FS_UUID_OLD}\" \"\${_UEFISYSDEV_FS_UUID}\" \"\$\{_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
+        echo "sd \"\${_UEFISYSDEV_FS_UUID_OLD}\" \"\${_UEFISYSDEV_FS_UUID}\" \"\${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
         } >> "${_TEMPLATE}"
     fi
-    { echo "sd \"\${_BOOTDEV_FS_UUID_OLD}\" \"\${_BOOTDEV_FS_UUID}\" \"\$\{_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
-    echo "sd \"\${_ROOTDEV_FS_UUID_OLD}\" \"\${_ROOTDEV_FS_UUID}\" \"\$\{_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
-    echo "sd \"\${_USRDEV_FS_UUID_OLD}\" \"\${_USRDEV_FS_UUID}\" \"\$\{_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
+    { echo "sd \"\${_BOOTDEV_FS_UUID_OLD}\" \"\${_BOOTDEV_FS_UUID}\" \"\${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
+    echo "sd \"\${_ROOTDEV_FS_UUID_OLD}\" \"\${_ROOTDEV_FS_UUID}\" \"\${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
+    echo "sd \"\${_USRDEV_FS_UUID_OLD}\" \"\${_USRDEV_FS_UUID}\" \"\${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}\""
     echo "_chroot_umount"
     } >> "${_TEMPLATE}"
 }
@@ -277,7 +277,7 @@ _grub_install_bios() {
     cat "/tmp/grub_bios_install.log" >>"${_LOG}"
     _chroot_umount
     # write to template
-    echo "chroot \"\$\{_DESTDIR}\" grub-install --directory=\"/usr/lib/grub/i386-pc\" --target=\"i386-pc\" --boot-directory=\"/boot\" --recheck \"${_BOOTDEV}\" >>\"\${_LOG}\""
+    echo "chroot \"\${_DESTDIR}\" grub-install --directory=\"/usr/lib/grub/i386-pc\" --target=\"i386-pc\" --boot-directory=\"/boot\" --recheck \"${_BOOTDEV}\" >>\"\${_LOG}\""
     echo "_chroot_umount" >> "${_TEMPLATE}"
     rm /.archboot
 }
@@ -380,7 +380,7 @@ _grub_install_uefi() {
         --debug &> "/tmp/grub_uefi_${_UEFI_ARCH}_install.log"
     cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >>"${_LOG}"
     # write to template
-    echo "chroot \"\$\{_DESTDIR}\" grub-install --directory=\"/usr/lib/grub/${_GRUB_ARCH}-efi\" --target=\"${_GRUB_ARCH}-efi\" --efi-directory=\"/${_UEFISYS_MP}\" --bootloader-id=\"GRUB\" --recheck --debug &>\"\${_LOG}\"" >> "${_TEMPLATE}"
+    echo "chroot \"\${_DESTDIR}\" grub-install --directory=\"/usr/lib/grub/${_GRUB_ARCH}-efi\" --target=\"${_GRUB_ARCH}-efi\" --efi-directory=\"/${_UEFISYS_MP}\" --bootloader-id=\"GRUB\" --recheck --debug &>\"\${_LOG}\"" >> "${_TEMPLATE}"
     rm /.archboot
 }
 
@@ -404,13 +404,13 @@ _setup_grub_uefi() {
         if ! [[ -d  ${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT ]]; then
             mkdir -p "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT
             # write to template
-            echo "mkdir -p \"\$\{_DESTDIR}\"/\"${_UEFISYS_MP}\"/EFI/BOOT" >> "${_TEMPLATE}"
+            echo "mkdir -p \"\${_DESTDIR}\"/\"${_UEFISYS_MP}\"/EFI/BOOT" >> "${_TEMPLATE}"
         fi
         cp -f /usr/share/archboot/bootloader/shim"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/BOOT"${_UEFI_ARCH}".EFI
         cp -f /usr/share/archboot/bootloader/mm"${_SPEC_UEFI_ARCH}".efi "${_DESTDIR}"/"${_UEFISYS_MP}"/EFI/BOOT/
         # write to template
-        { echo "cp -f /usr/share/archboot/bootloader/shim\"${_SPEC_UEFI_ARCH}\".efi \"\$\{_DESTDIR}\"/\"${_UEFISYS_MP}\"/EFI/BOOT/BOOT\"${_UEFI_ARCH}\".EFI"
-        echo "cp -f /usr/share/archboot/bootloader/mm\"${_SPEC_UEFI_ARCH}\".efi \"\$\{_DESTDIR}\"/\"${_UEFISYS_MP}\"/EFI/BOOT/"
+        { echo "cp -f /usr/share/archboot/bootloader/shim\"${_SPEC_UEFI_ARCH}\".efi \"\${_DESTDIR}\"/\"${_UEFISYS_MP}\"/EFI/BOOT/BOOT\"${_UEFI_ARCH}\".EFI"
+        echo "cp -f /usr/share/archboot/bootloader/mm\"${_SPEC_UEFI_ARCH}\".efi \"\${_DESTDIR}\"/\"${_UEFISYS_MP}\"/EFI/BOOT/"
         } >> "${_TEMPLATE}"
         _progress "100" "Installing fedora's shim and mokmanager completed."
         sleep 2
@@ -441,7 +441,7 @@ _setup_grub_uefi_sb() {
         if [[ -f "${_DESTDIR}/${_GRUB_PREFIX_DIR}/grub${_SPEC_UEFI_ARCH}.efi" ]]; then
             rm "${_DESTDIR}"/"${_GRUB_PREFIX_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi
             # write to template
-            echo "rm \"\$\{_DESTDIR}\"/\"${_GRUB_PREFIX_DIR}\"/grub\"${_SPEC_UEFI_ARCH}\".efi" >> "${_TEMPLATE}"
+            echo "rm \"\${_DESTDIR}\"/\"${_GRUB_PREFIX_DIR}\"/grub\"${_SPEC_UEFI_ARCH}\".efi" >> "${_TEMPLATE}"
         fi
         : > /.archboot
         _grub_install_uefi_sb &
@@ -472,9 +472,9 @@ _grub_uefi() {
         rm -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         # write to template
-        { echo "mkdir -p \"\$\{_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT\""
-        echo "rm -f \"\$\{_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
-        echo "cp -f \"\$\{_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi\" \"\$\{_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+        { echo "mkdir -p \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT\""
+        echo "rm -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+        echo "cp -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi\" \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
         } >> "${_TEMPLATE}"
         _dialog --title " Success " --no-mouse --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully." 3 60
         sleep 3
