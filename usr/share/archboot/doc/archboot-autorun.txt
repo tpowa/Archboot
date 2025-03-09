@@ -248,11 +248,11 @@ echo 'initrd   /initramfs-linux.img' >> /mnt/install/boot/loader/entries/archlin
 echo 'options  root=PARTUUID=51fe15d6-8085-4810-968a-5229c91f58f6 rootfstype=btrfs rw rootflags=rw,relatime,compress=zstd:3,discard=async,space_cache=v2,subvolid=256,subvol=/root ' >> /mnt/install/boot/loader/entries/archlinux-core-main.conf
 echo '' >> /mnt/install/boot/loader/entries/archlinux-core-main.conf
 
-### /mnt/install//efi/loader/loader.conf file
-: > "/mnt/install//efi/loader/loader.conf"
-echo 'timeout 5' >> /mnt/install//efi/loader/loader.conf
-echo 'default archlinux-core-main' >> /mnt/install//efi/loader/loader.conf
-echo '' >> /mnt/install//efi/loader/loader.conf
+### /mnt/install/efi/loader/loader.conf file
+: > "/mnt/install/efi/loader/loader.conf"
+echo 'timeout 5' >> /mnt/install/efi/loader/loader.conf
+echo 'default archlinux-core-main' >> /mnt/install/efi/loader/loader.conf
+echo '' >> /mnt/install/efi/loader/loader.conf
 
 ### pacman hook
 mkdir -p "${_DESTDIR}"/etc/pacman.d/hooks
