@@ -79,7 +79,7 @@ _check_root_password() {
     if passwd -R "${_DESTDIR}" -S root | rg -q ' NP '; then
         _dialog --title " Root Account " --no-mouse --infobox "Setup detected no password set for root user.\nPlease set new password now." 4 50
         sleep 3
-        if _prepare_password Root; then
+        if _prepare_password root; then
             _set_password
         else
             return 1
