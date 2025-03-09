@@ -202,7 +202,9 @@ _user_management() {
                     done
                     _dialog --title " Success " --no-mouse --infobox "Default shell set to ${_SHELL}." 3 50
                     # write to template
-                    echo "echo \"Default shell set to ${_SHELL}.\"" >> "${_TEMPLATE}"
+                    { echo "echo \"Default shell set to ${_SHELL}.\""
+                    echo ""
+                    } >> "${_TEMPLATE}"
                     sleep 3
                     _NEXTITEM=2
                 else
