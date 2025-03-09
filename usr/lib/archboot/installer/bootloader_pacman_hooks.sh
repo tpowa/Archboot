@@ -6,7 +6,7 @@ _pacman_hook_common() {
     if ! [[ -d "${_DESTDIR}/etc/pacman.d/hooks" ]]; then
         mkdir -p "${_DESTDIR}"/etc/pacman.d/hooks
         # write to template
-        echo "mkdir -p \\"\\$\{_DESTDIR}\"/etc/pacman.d/hooks" >> "${_TEMPLATE}"
+        echo "mkdir -p \"\$\{_DESTDIR}\"/etc/pacman.d/hooks" >> "${_TEMPLATE}"
     fi
     cat << EOF > "${_HOOKNAME}"
 [Trigger]

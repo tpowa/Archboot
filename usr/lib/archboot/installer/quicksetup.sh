@@ -104,7 +104,7 @@ _auto_create_filesystems() {
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             btrfs subvolume set-default "${_DESTDIR}"/"${_MP}" || return 1
             # write to template
-            echo "btrfs subvolume set-default \\"\\$\{_DESTDIR}\"/\"${_MP}\"" >> "${_TEMPLATE}"
+            echo "btrfs subvolume set-default \"\$\{_DESTDIR}\"/\"${_MP}\"" >> "${_TEMPLATE}"
         fi
         _COUNT=$((_COUNT+_PROGRESS_COUNT))
     done
