@@ -36,6 +36,7 @@ _uki_install() {
     { echo "rm -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
     echo "cp -f \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi\" \"\${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
     echo "sync"
+    echo ""
     } >> "${_TEMPLATE}"
     sleep 2
     _progress "100" "Unified Kernel Image has been setup successfully."
@@ -57,7 +58,10 @@ _uki_uefi() {
     # enable uki handling in presets
     sd '#default_uki' 'default_uki' "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
     # write to template
-    echo "sd '#default_uki' 'default_uki' \"\${_DESTDIR}\"/etc/mkinitcpio.d/*.preset" >> "${_TEMPLATE}"
+    { echo "### mkinitcpio uki"
+    echo "sd '#default_uki' 'default_uki' \"\${_DESTDIR}\"/etc/mkinitcpio.d/*.preset"
+    echo ""
+    } >> "${_TEMPLATE}"
     if ! [[ -d "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux" ]]; then
         mkdir -p "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux"
         # write to template
@@ -67,7 +71,9 @@ _uki_uefi() {
     _mkinitcpio_error
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi" ]]; then
         # write to template
-        echo "echo \"Setting up Unified Kernel Image...\"" >> "${_TEMPLATE}"
+        { echo "### uki firmware"
+        echo "echo \"Setting up Unified Kernel Image...\""
+        } >> "${_TEMPLATE}"
         _uki_install | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Setting up Unified Kernel Image..." 6 75 0
     else
         _dialog --title " ERROR " --no-mouse --infobox "Setting up Unified Kernel Image failed!" 3 60
