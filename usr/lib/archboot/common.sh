@@ -55,7 +55,7 @@ if [[ ! -e "${_TEMPLATE}" ]]; then
     echo "echo \"Automatic Archboot - Arch Linux Installation:\""
     echo "echo \"Logging is done on ${_LOG}...\""
     echo ""
-    echo "echo \"10 seconds to stop the process with CTRL-C...\""
+    echo "echo \"10 seconds to stop the process with CTRL-C now...\""
     echo "sleep 10"
     echo ""
     } >> "${_TEMPLATE}"
