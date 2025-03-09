@@ -199,7 +199,6 @@ EOF
         mv /tmp/inst-mirrorlist "${_DESTDIR}/etc/pacman.d/mirrorlist"
         # write to template
         { echo "echo \"Enable pacman mirror on installed system...\""
-        echo "_SYNC_URL=$(rg '^Server.* (.*)' -r '$1' /etc/pacman.d/mirrorlist)"
         echo "cat << EOF > /tmp/inst-mirrorlist"
         echo "# Mirror used during installation"
         echo "Server = ${_SYNC_URL}"
