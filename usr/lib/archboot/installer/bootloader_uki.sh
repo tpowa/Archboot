@@ -57,6 +57,7 @@ _uki_uefi() {
     # write to template
     { echo "### uki firmware"
     echo "echo \"Setting up Unified Kernel Image...\""
+    echo ""
     } >> "${_TEMPLATE}"
     _editor "${_CMDLINE}"
     _editor "${_UKIFY_CONFIG}"
