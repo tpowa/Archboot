@@ -109,7 +109,8 @@ _prepare_password() {
             echo "${_PASSWORD}" > /tmp/.password
             echo "${_PASSWORD}" >> /tmp/.password
             # write to template
-            { echo "echo \"${_PASSWORD}\" > /tmp/.password"
+            { echo "### set ${1} password"
+            echo "echo \"${_PASSWORD}\" > /tmp/.password"
             echo "echo \"${_PASSWORD}\" >> /tmp/.password"
             } >> "${_TEMPLATE}"
             _PASSWORD=/tmp/.password
@@ -128,6 +129,7 @@ _set_password() {
     { echo "passwd -R \"\${_DESTDIR}\" \"${_USER}\" < /tmp/.password &>\"\${_NO_LOG}\""
     echo "echo \"New password set for ${_USER}.\""
     echo "rm /tmp/.password"
+    echo ""
     } >> "${_TEMPLATE}"
     _dialog --title " Success " --no-mouse --infobox "New password set for ${_USER}." 3 50
     sleep 2
