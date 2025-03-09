@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2025 Fundraise: 0% <progress max="100" value="30">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2025 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 09.03.2025 21:15</strong></p>
+<strong>Last update: 09.03.2025 22:05</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -676,6 +676,7 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 </tr>
 </tbody>
 </table>
+<p style="page-break-after: always"></p>
 <h3 data-number="3.13" id="clean-blockdevice"><span class="header-section-number">3.13</span> Clean Blockdevice</h3>
 <p>You can use <strong>clean-blockdevice.sh</strong> for cleaning partition table and filesystem signatures of any blockdevice.</p>
 <table>
@@ -697,7 +698,6 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 # nvme format -s1 &lt;device(s)&gt;</code></td></tr>
 </tbody>
 </table>
-<p style="page-break-after: always"></p>
 <h3 data-number="3.14" id="debug-early-userspace"><span class="header-section-number">3.14</span> Debug Early Userspace</h3>
 <p>In order to debug the early userspace add <strong>archboot-early-debug</strong> on <strong>kernel commandline</strong>.
 Mount <strong>/dev/zram0</strong> to <strong>/sysroot</strong> and analyze the rootfs or <strong>exit</strong> the bash shell to <strong>continue</strong> the boot process.</p>
