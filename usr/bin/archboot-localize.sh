@@ -85,11 +85,11 @@ _localize_task() {
     echo "echo Localization..."
     echo "echo \"LANG=${_LOCALE}.UTF-8\" > /etc/locale.conf"
     echo "echo LC_COLLATE=C >> /etc/locale.conf"
-    echo "localectl set-locale \"${_LOCALE}.UTF-8\" &>\"${_NO_LOG}\""
+    echo "localectl set-locale \"${_LOCALE}.UTF-8\" &>\"\${_NO_LOG}\""
     #shellcheck disable=SC2016
     echo "sd '(^[a-z])' '#\$1' /etc/locale.gen"
     echo "sd \"^#${_LOCALE}.UTF-8\" \"${_LOCALE}.UTF-8\" /etc/locale.gen"
-    echo "locale-gen &>\"${_NO_LOG}\""
+    echo "locale-gen &>\"\${_NO_LOG}\""
     echo "echo KEYMAP=\"${_KEYMAP}\" > /etc/vconsole.conf"
     echo "echo FONT=\"${_FONT}\" >> /etc/vconsole.conf"
     echo "systemctl restart systemd-vconsole-setup"

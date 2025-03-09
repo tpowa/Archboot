@@ -189,8 +189,8 @@ _configure_system() {
         else
             _editor "${_DESTDIR}${_FILE}"
             # write to template
-            { echo ": > \"${_DESTDIR}\"\"${_FILE}\""
-            sd '^' 'echo "' < "${_DESTDIR}""${_FILE}" | sd '$' "\" >> \"${_DESTDIR}\"\"${_FILE}\""
+            { echo ": > \"\${_DESTDIR}\"\"${_FILE}\""
+            sd '^' 'echo "' < "${_DESTDIR}""${_FILE}" | sd '$' "\" >> \"\${_DESTDIR}\"\"${_FILE}\""
             } >> "${_TEMPLATE}"
         fi
     done

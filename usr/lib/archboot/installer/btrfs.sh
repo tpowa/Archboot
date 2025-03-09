@@ -5,7 +5,7 @@
 _btrfs_scan() {
     btrfs device scan &>"${_NO_LOG}"
     # write to template
-    echo "btrfs device scan &>\"${_NO_LOG}\"" >> "${_TEMPLATE}"
+    echo "btrfs device scan &>\"\${_NO_LOG}\"" >> "${_TEMPLATE}"
 }
 
 # mount btrfs for checks
@@ -235,7 +235,7 @@ _create_btrfs_subvolume() {
     if ! btrfs subvolume list "${_BTRFSMP}" | rg -q "${_BTRFS_SUBVOLUME}$"; then
         btrfs subvolume create "${_BTRFSMP}"/"${_BTRFS_SUBVOLUME}" &>"${_LOG}"
         # write to template
-        echo "btrfs subvolume create \"${_BTRFSMP}\"/\"${_BTRFS_SUBVOLUME}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
+        echo "btrfs subvolume create \"${_BTRFSMP}\"/\"${_BTRFS_SUBVOLUME}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
     fi
     _umount_btrfs
 }

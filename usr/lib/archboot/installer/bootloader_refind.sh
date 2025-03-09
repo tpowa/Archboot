@@ -17,8 +17,8 @@ _refind_uefi() {
     # write to template
     { echo "echo \"Setting up rEFInd now...\""
     echo "_chroot_mount"
-    echo "umount -q \"${_DESTDIR}\"/{boot,efi}"
-    echo "chroot \"${_DESTDIR}\" refind-install &>\"${_LOG}\""
+    echo "umount -q \"\${_DESTDIR}\"/{boot,efi}"
+    echo "chroot \"\${_DESTDIR}\" refind-install &>\"\${_LOG}\""
     echo "_chroot_umount"
     } >> "${_TEMPLATE}"
     _REFIND_CONFIG="${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind.conf"
@@ -46,7 +46,7 @@ CONFEOF
         cp -f "${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi" "${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI"
         # write to template
         { echo "rm -f \"${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
-        echo "rm -f \"${_DESTDIR}\"/boot/refind_linux.conf"
+        echo "rm -f \"\${_DESTDIR}\"/boot/refind_linux.conf"
         echo "cp -f \"${_DESTDIR}/${_UEFISYS_MP}/EFI/refind/refind_${_SPEC_UEFI_ARCH}.efi\" \"${_DESTDIR}/${_UEFISYS_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
         } >> "${_TEMPLATE}"
         sleep 2

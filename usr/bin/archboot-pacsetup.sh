@@ -86,7 +86,7 @@ _task_pacman_keyring_install() {
     echo "echo Pacman keyring..."
     echo "_pacman_keyring"
     #shellcheck disable=SC2068
-    echo "pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>\"${_LOG}\""
+    echo "pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>\"\${_LOG}\""
     echo ": > /.pacsetup"
     echo ""
     } >> "${_TEMPLATE}"

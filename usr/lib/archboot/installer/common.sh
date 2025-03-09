@@ -143,7 +143,7 @@ _auto_packages() {
 _locale_gen() {
     ${_NSPAWN} locale-gen &>"${_NO_LOG}"
     # write to template
-    echo "${_NSPAWN} locale-gen &>\"${_NO_LOG}\"" >> "${_TEMPLATE}"
+    echo "${_NSPAWN} locale-gen &>\"\${_NO_LOG}\"" >> "${_TEMPLATE}"
     [[ -e /.archboot ]] && rm /.archboot
 }
 
@@ -151,7 +151,7 @@ _write_partition_template() {
     # write to template
     { echo "### partition"
     echo "echo \"Partitioning \"${_DISK}\"...\""
-    echo "sfdisk \"${_DISK}\" << EOF &>\"${_LOG}\""
+    echo "sfdisk \"${_DISK}\" << EOF &>\"\${_LOG}\""
     sfdisk -d "${_DISK}"
     echo "EOF"
     echo ""

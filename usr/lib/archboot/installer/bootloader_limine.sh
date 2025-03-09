@@ -53,7 +53,7 @@ _limine_bios() {
     if chroot "${_DESTDIR}" limine bios-install "${_PARENT_BOOTDEV}" &>"${_LOG}"; then
         _pacman_hook_limine_bios
         # write to template
-        echo "chroot \"${_DESTDIR}\" limine bios-install \"${_PARENT_BOOTDEV}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
+        echo "chroot \"${_DESTDIR}\" limine bios-install \"${_PARENT_BOOTDEV}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
         _dialog --title " Success " --no-mouse --infobox "LIMINE BIOS has been setup successfully." 3 50
         sleep 3
         _S_BOOTLOADER=1

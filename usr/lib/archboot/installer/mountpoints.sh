@@ -488,7 +488,7 @@ _mkfs() {
             if echo "${1}" | rg -q '^/dev'; then
                 if mkswap -L "${6}" "${1}" &>"${_LOG}"; then
                     # write to template
-                    echo "mkswap -L \"${6}\" \"${1}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                    echo "mkswap -L \"${6}\" \"${1}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
                 else
                     : >/tmp/.mp-error
                 fi
@@ -510,13 +510,13 @@ _mkfs() {
                 fallocate "${7}" "${3}${1}" &>"${_LOG}"
                 chmod 0600 "${3}${1}" &>"${_LOG}"
                 # write to template
-                { echo " truncate -s 0 \"${3}${1}\" &>\"${_LOG}\""
-                echo "chattr +C \"${3}${1}\" &>\"${_LOG}\""
-                echo "chmod 0600 \"${3}${1}\" &>\"${_LOG}\""
+                { echo " truncate -s 0 \"${3}${1}\" &>\"\${_LOG}\""
+                echo "chattr +C \"${3}${1}\" &>\"\${_LOG}\""
+                echo "chmod 0600 \"${3}${1}\" &>\"\${_LOG}\""
                 } >> "${_TEMPLATE}"
                 if mkswap -U clear -L "${6}" "${3}${1}" &>"${_LOG}"; then
                     # write to template
-                    echo "mkswap -U clear -L \"${6}\" \"${3}${1}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                    echo "mkswap -U clear -L \"${6}\" \"${3}${1}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
                 else
                     : >/tmp/.mp-error
                 fi
@@ -531,14 +531,14 @@ _mkfs() {
         if echo "${1}" | rg -q '^/dev'; then
             if swapon "${1}" &>"${_LOG}";then
                 # write to template
-                echo "swapon \"${1}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                echo "swapon \"${1}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
             else
                 : >/tmp/.mp-error
             fi
         else
             if swapon "${3}${1}" &>"${_LOG}";then
                 # write to template
-                echo "swapon \"${3}${1}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                echo "swapon \"${3}${1}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
             else
                 : >/tmp/.mp-error
             fi
@@ -556,31 +556,31 @@ _mkfs() {
                 # don't handle anything else here, we will error later
                 bcachefs) if mkfs.bcachefs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}"; then
                             # write to template
-                            echo "mkfs.bcachefs -f ${7} -L \"${6}\" ${8} ${9} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                            echo "mkfs.bcachefs -f ${7} -L \"${6}\" ${8} ${9} &>\"\${_LOG}\"" >> "${_TEMPLATE}"
                           else
                             : >/tmp/.mp-error
                           fi ;;
                 btrfs)    if mkfs.btrfs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}"; then
                             # write to template
-                            echo "mkfs.btrfs -f ${7} -L \"${6}\" ${8} ${9} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                            echo "mkfs.btrfs -f ${7} -L \"${6}\" ${8} ${9} &>\"\${_LOG}\"" >> "${_TEMPLATE}"
                           else
                             : >/tmp/.mp-error
                           fi ;;
                 ext4)     if mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}"; then
                             # write to template
-                            echo "mke2fs -F ${7} -L \"${6}\" -t ext4 ${1} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                            echo "mke2fs -F ${7} -L \"${6}\" -t ext4 ${1} &>\"\${_LOG}\"" >> "${_TEMPLATE}"
                           else
                             : >/tmp/.mp-error
                           fi ;;
                 vfat)     if mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}"; then
                             # write to template
-                            echo "mkfs.vfat -F32 ${7} -n \"${6}\" ${1} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                            echo "mkfs.vfat -F32 ${7} -n \"${6}\" ${1} &>\"\${_LOG}\"" >> "${_TEMPLATE}"
                           else
                             : >/tmp/.mp-error
                           fi ;;
                 xfs)      if mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"; then
                             # write to template
-                            echo "mkfs.xfs ${7} -L \"${6}\" -f ${1} &>\"${_LOG}\"" >> "${_TEMPLATE}"
+                            echo "mkfs.xfs ${7} -L \"${6}\" -f ${1} &>\"\${_LOG}\"" >> "${_TEMPLATE}"
                           else
                             : >/tmp/.mp-error
                           fi ;;
@@ -612,7 +612,7 @@ _mkfs() {
         # mount the bad boy
         if mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" &>"${_LOG}"; then
             # write to template
-            echo "mount -t \"${2}\" -o \"${_MOUNTOPTIONS}\" \"${1}\" \"${3}\"\"${5}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
+            echo "mount -t \"${2}\" -o \"${_MOUNTOPTIONS}\" \"${1}\" \"${3}\"\"${5}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
         else
             : >/tmp/.mp-error
         fi
@@ -665,7 +665,7 @@ _mkfs() {
         if [[ "${2}" == "btrfs" && "${4}" == "1" ]]; then
             btrfs balance start --full-balance "${3}""${5}" &>"${_LOG}"
             # write to template
-            echo "btrfs balance start --full-balance \"${3}\"\"${5}\" &>\"${_LOG}\"" >> "${_TEMPLATE}"
+            echo "btrfs balance start --full-balance \"${3}\"\"${5}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
         fi
     fi
     # add to .device-names for config files

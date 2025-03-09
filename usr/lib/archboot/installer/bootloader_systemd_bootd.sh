@@ -35,7 +35,7 @@ BOOTDEOF
     _chroot_umount
     # write to template
     { echo "_chroot_mount"
-    echo "chroot \"${_DESTDIR}\" bootctl install &>\"${_LOG}\""
+    echo "chroot \"\${_DESTDIR}\" bootctl install &>\"\${_LOG}\""
     echo "_chroot_umount"
     } >> "${_TEMPLATE}"
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then

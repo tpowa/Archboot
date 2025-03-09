@@ -62,7 +62,7 @@ _uki_uefi() {
     # enable uki handling in presets
     sd '#default_uki' 'default_uki' "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
     # write to template
-    echo "sd '#default_uki' 'default_uki' \"${_DESTDIR}\"/etc/mkinitcpio.d/*.preset" >> "${_TEMPLATE}"
+    echo "sd '#default_uki' 'default_uki' \"\${_DESTDIR\"/etc/mkinitcpio.d/*.preset" >> "${_TEMPLATE}"
     _run_mkinitcpio | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Running mkinitcpio on installed system..." 6 75 0
     _mkinitcpio_error
     if [[ -e "${_DESTDIR}/${_UEFISYS_MP}/EFI/Linux/arch-linux.efi" ]]; then

@@ -103,11 +103,11 @@ _wireless() {
         # write to template file
         { echo "### wireless authentification"
         echo "rfkill unblock all"
-        echo "iwctl station \"${_INTERFACE}\" disconnect &>\"${_NO_LOG}\""
+        echo "iwctl station \"${_INTERFACE}\" disconnect &>\"\${_NO_LOG}\""
         if [[ -z "${_WLAN_KEY}" ]]; then
-            echo "echo \"\" | iwctl station \"${_INTERFACE}\" \"${_WLAN_CONNECT}\" \"${_WLAN_SSID}\" &>\"${_NO_LOG}\""
+            echo "echo \"\" | iwctl station \"${_INTERFACE}\" \"${_WLAN_CONNECT}\" \"${_WLAN_SSID}\" &>\"\${_NO_LOG}\""
         else
-            echo "iwctl --passphrase=\"${_WLAN_KEY}\" station \"${_INTERFACE}\" \"${_WLAN_CONNECT}\" \"${_WLAN_SSID}\" &>\"${_NO_LOG}\""
+            echo "iwctl --passphrase=\"${_WLAN_KEY}\" station \"${_INTERFACE}\" \"${_WLAN_CONNECT}\" \"${_WLAN_SSID}\" &>\"\${_NO_LOG}\""
         fi
         echo ""
         } >> "${_TEMPLATE}"
