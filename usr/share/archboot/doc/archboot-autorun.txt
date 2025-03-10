@@ -77,7 +77,7 @@ wipefs -a -f "/dev/vdb" &>"${_NO_LOG}"
 dd if=/dev/zero of="/dev/vdb" bs=1M count=10 &>"${_NO_LOG}"
 sync
 ### partition
-echo "Partitioning "/dev/vdb"..."
+echo "Partitioning /dev/vdb..."
 sfdisk "/dev/vdb" << EOF &>"${_LOG}"
 label: gpt
 label-id: E4E29768-0CE2-49A3-BB15-F6EFA15CFCF7
