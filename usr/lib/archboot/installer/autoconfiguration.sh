@@ -367,7 +367,7 @@ _auto_mkinitcpio() {
         # disable fallpack preset
         sd " 'fallback'" '' "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
         # write to template
-        { echo "### mkinitcpio"
+        { echo "### mkinitcpio disable fallback"
         echo "sd \" 'fallback'\" '' \"\${_DESTDIR}\"/etc/mkinitcpio.d/*.preset"
         } >> "${_TEMPLATE}"
         # remove fallback initramfs
