@@ -240,6 +240,7 @@ mkdir -p "${_DESTDIR}/efi/loader"
 _chroot_mount
 chroot "${_DESTDIR}" bootctl install &>"${_LOG}"
 _chroot_umount
+
 ### /mnt/install/boot/loader/entries/archlinux-core-main.conf file
 : > "/mnt/install/boot/loader/entries/archlinux-core-main.conf"
 echo 'title    Arch Linux' >> /mnt/install/boot/loader/entries/archlinux-core-main.conf

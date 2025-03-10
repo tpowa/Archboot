@@ -37,6 +37,7 @@ BOOTDEOF
     { echo "_chroot_mount"
     echo "chroot \"\${_DESTDIR}\" bootctl install &>\"\${_LOG}\""
     echo "_chroot_umount"
+    echo ""
     } >> "${_TEMPLATE}"
     if [[ -e "${_DESTDIR}/${_ESP_MP}/EFI/systemd/systemd-boot${_SPEC_UEFI_ARCH}.efi" ]]; then
         _dialog --msgbox "You will now be put into the editor to edit:\nloader.conf and menu entry files\n\nAfter you save your changes, exit the editor." 8 50
