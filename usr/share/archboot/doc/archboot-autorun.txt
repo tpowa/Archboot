@@ -234,6 +234,7 @@ pacman --root /mnt/install --cachedir=/mnt/install/var/cache/pacman/pkg --noconf
 sync
 _chroot_umount
 
+### systemd-boot
 echo "Setting up SYSTEMD-BOOT now..."
 mkdir -p "${_DESTDIR}/boot/loader/entries"
 mkdir -p "${_DESTDIR}/efi/loader"
