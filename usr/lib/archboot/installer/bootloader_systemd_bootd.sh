@@ -5,7 +5,7 @@ _systemd_boot_uefi() {
     _dialog --no-mouse --infobox "Setting up SYSTEMD-BOOT now..." 3 40
     # write to template
     { echo "### systemd-boot"
-    "echo \"Setting up SYSTEMD-BOOT now...\""
+    echo "echo \"Setting up SYSTEMD-BOOT now...\""
     } >> "${_TEMPLATE}"
     # create directory structure, if it doesn't exist
     if [[ ! -d "${_DESTDIR}/boot/loader/entries" ]]; then
