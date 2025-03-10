@@ -68,6 +68,7 @@ _enable_testing() {
             sd '^#(\[[c,e].*-testing\]\n)#' '$1' "${1}/etc/pacman.conf"
             # write to template
             { echo "### pacman testing repository"
+            #shellcheck disable=SC2028
             echo "sd '^#(\[[c,e].*-testing\]\\\n)#' '$1' \"${1}/etc/pacman.conf\""
             echo ""
             } >> "${_TEMPLATE}"
@@ -79,14 +80,13 @@ _enable_testing() {
 }
 _task_pacman_keyring_install() {
     _pacman_keyring
-    #shellcheck disable=SC2068
-    pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>"${_LOG}"
+    pacman -Sy --noconfirm --noprogressbar "${_KEYRING[@]}" &>"${_LOG}"
     # write to template
     { echo "### pacman keyring"
     echo "echo \"Pacman keyring...\""
     echo "_pacman_keyring"
-    #shellcheck disable=SC2068
-    echo "pacman -Sy --noconfirm --noprogressbar ${_KEYRING[@]} &>\"\${_LOG}\""
+    #shellcheck disable=SC2145
+    echo "pacman -Sy --noconfirm --noprogressbar \"${_KEYRING[@]}\" &>\"\${_LOG}\""
     echo ": > /.pacsetup"
     echo ""
     } >> "${_TEMPLATE}"
