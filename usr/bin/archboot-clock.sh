@@ -74,7 +74,7 @@ _task_clock() {
     timedatectl set-ntp 1
     # write to template
     { echo "### clock"
-    echo "echo Clock..."
+    echo "echo \"Clock...\""
     echo "timedatectl set-timezone \"${_ZONE}\""
     echo "echo 0.0 0 0.0 > /etc/adjtime"
     echo "echo 0 >> /etc/adjtime"

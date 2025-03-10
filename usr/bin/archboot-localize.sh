@@ -82,7 +82,7 @@ _localize_task() {
     export LANG="${_LOCALE}.UTF-8"
     : > /.localize
     { echo "### localize"
-    echo "echo Localization..."
+    echo "echo \"Localization...\""
     echo "echo \"LANG=${_LOCALE}.UTF-8\" > /etc/locale.conf"
     echo "echo LC_COLLATE=C >> /etc/locale.conf"
     echo "localectl set-locale \"${_LOCALE}.UTF-8\" &>\"\${_NO_LOG}\""
