@@ -210,7 +210,7 @@ echo "Preconfiguring mkinitcpio settings on installed system..."
 sd "^MODULES=.*" "MODULES=(virtio_blk btrfs vfat crc32c)" "${_DESTDIR}"/etc/mkinitcpio.conf
 sd "^HOOKS=.*" "HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck)" "${_DESTDIR}"/etc/mkinitcpio.conf
 
-### mkinitcpio
+### mkinitcpio disable fallback
 sd " 'fallback'" '' "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
 rm -f "${_DESTDIR}/boot/initramfs-linux-fallback.img"
 
