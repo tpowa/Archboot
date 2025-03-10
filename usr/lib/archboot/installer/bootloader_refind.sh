@@ -56,7 +56,8 @@ CONFEOF
         _editor "${_REFIND_CONFIG}"
         cp -f "${_REFIND_CONFIG}" "${_DESTDIR}/${_ESP_MP}/EFI/BOOT/"
         # write to template
-        { echo "cp -f \"${_REFIND_CONFIG}\" \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT/\""
+        { echo "### fix refind config for default uefi bootloader"
+        echo "cp -f \"${_REFIND_CONFIG}\" \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT/\""
         echo ""
         } >> "${_TEMPLATE}"
         _pacman_hook_refind
