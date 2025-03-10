@@ -12,7 +12,7 @@ _uboot() {
         echo "echo \"Installing UBOOT...\""
         echo "mkdir -p \"\${_DESTDIR}/boot/extlinux\""
         echo ""
-        }>> "${_TEMPLATE}"
+        } >> "${_TEMPLATE}"
     fi
     _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTDEV} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_LUKSSETUP}"
     _KERNEL_PARAMS_COMMON_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sd ' +' ' ')"
