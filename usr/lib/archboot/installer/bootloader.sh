@@ -163,15 +163,17 @@ _uefi_efibootmgr() {
     for _bootnum in $(efibootmgr | rg -F -i "${_BOOTMGR_LABEL}" | rg -o '^Boot(\d+)' -r '$1'); do
         efibootmgr --quiet -b "${_bootnum}" -B >> "${_LOG}"
         # write to template
-        { echo "### efibootmgr"
+        { echo "### efibootmgr delete entry"
         echo "efibootmgr --quiet -b \"${_bootnum}\" -B >> \"\${_LOG}\""
+        echo ""
         } >> "${_TEMPLATE}"
     done
     _BOOTMGRDEV=$(${_LSBLK} PKNAME "${_ESP_DEV}" 2>"${_NO_LOG}")
     _BOOTMGRNUM=$(echo "${_ESP_DEV}" | sd "${_BOOTMGRDEV}" '' | sd 'p' '')
     efibootmgr --quiet --create --disk "${_BOOTMGRDEV}" --part "${_BOOTMGRNUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" >> "${_LOG}"
     # write to template
-     { echo "efibootmgr --quiet --create --disk \"${_BOOTMGRDEV}\" --part \"${_BOOTMGRNUM}\" --loader \"${_BOOTMGR_LOADER_PATH}\" --label \"${_BOOTMGR_LABEL}\" >> \"\${_LOG}\""
+     { echo "### efibootmgr"
+     echo "efibootmgr --quiet --create --disk \"${_BOOTMGRDEV}\" --part \"${_BOOTMGRNUM}\" --loader \"${_BOOTMGR_LOADER_PATH}\" --label \"${_BOOTMGR_LABEL}\" >> \"\${_LOG}\""
      echo ""
      } >> "${_TEMPLATE}"
 }
