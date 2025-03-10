@@ -489,6 +489,7 @@ _grub_uefi() {
         echo "mkdir -p \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT\""
         echo "rm -f \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
         echo "cp -f \"\${_DESTDIR}/${_ESP_MP}/EFI/grub/grub${_SPEC_UEFI_ARCH}.efi\" \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT/BOOT${_UEFI_ARCH}.EFI\""
+        echo ""
         } >> "${_TEMPLATE}"
         _dialog --title " Success " --no-mouse --infobox "GRUB(2) for ${_UEFI_ARCH} UEFI has been installed successfully." 3 60
         sleep 3
