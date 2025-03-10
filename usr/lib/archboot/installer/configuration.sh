@@ -225,8 +225,10 @@ _user_management() {
                          #shellcheck disable=SC2086
                          if useradd -R "${_DESTDIR}" ${_ADMIN_ATTR} -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
                             # write to template
-                            { echo "useradd -R \"\${_DESTDIR}\" ${_ADMIN_ATTR} -c \"${_FN}\" -m \"${_USER}\" &>\"\${_LOG}\""
+                            { echo "### add user"
+                            echo "useradd -R \"\${_DESTDIR}\" ${_ADMIN_ATTR} -c \"${_FN}\" -m \"${_USER}\" &>\"\${_LOG}\""
                             echo "echo "user account ${_USER} created succesfully.""
+                            echo ""
                             } >> "${_TEMPLATE}"
                             _set_password
                             _dialog --title " Success " --no-mouse --infobox "User account ${_USER} created succesfully." 3 50
@@ -282,16 +284,20 @@ _user_management() {
                                          usermod -R "${_DESTDIR}" -rG wheel "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "User ${_USER} removed as Administrator and removed from wheel group." 3 70
                                          # write to template
-                                         { echo "usermod -R \"\${_DESTDIR}\" -rG wheel \"${_USER}\""
+                                         { echo "### remove administrator"
+                                         echo "usermod -R \"\${_DESTDIR}\" -rG wheel \"${_USER}\""
                                          echo "echo \"User ${_USER} removed as Administrator and removed from wheel group.\""
+                                         echo ""
                                          } >> "${_TEMPLATE}"
                                          sleep 2
                                      else
                                          usermod -R "${_DESTDIR}" -aG wheel "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "User ${_USER} switched to Administrator and added to wheel group." 3 70
                                          # write to template
-                                         { echo "usermod -R \"\${_DESTDIR}\" -aG wheel \"${_USER}\""
+                                         { echo "### add administrator"
+                                         echo "usermod -R \"\${_DESTDIR}\" -aG wheel \"${_USER}\""
                                          echo "echo \"User ${_USER} switched to Administrator and added to wheel group.\""
+                                         echo ""
                                          } >> "${_TEMPLATE}"
                                          sleep 2
                                      fi ;;
@@ -304,8 +310,10 @@ _user_management() {
                                          usermod -R "${_DESTDIR}" -c "${_FN}" "${_USER}"
                                          _dialog --title " Success " --no-mouse --infobox "New comment set for ${_USER}." 3 50
                                          # write to template
-                                         { echo "usermod -R \"\${_DESTDIR}\" -c \"${_FN}\" \"${_USER}\""
+                                         { echo "### set comment"
+                                         echo "usermod -R \"\${_DESTDIR}\" -c \"${_FN}\" \"${_USER}\""
                                          echo "echo \"New comment set for ${_USER}.\""
+                                         echo ""
                                          } >> "${_TEMPLATE}"
                                          sleep 2
                                      fi ;;
@@ -314,8 +322,10 @@ _user_management() {
                                             "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
                                         userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}"; then
                                         # write to template
-                                         { echo "userdel -R \"\${_DESTDIR}\" -r \"${_USER}\" &>\"\${_LOG}\""
+                                         { echo "### delete user"
+                                         echo "userdel -R \"\${_DESTDIR}\" -r \"${_USER}\" &>\"\${_LOG}\""
                                          echo "echo \"User ${_USER} deleted succesfully.\""
+                                         echo ""
                                          } >> "${_TEMPLATE}"
                                         _dialog --title " Success " --no-mouse --infobox "User ${_USER} deleted succesfully." 3 50
                                         sleep 3
