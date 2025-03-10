@@ -4,12 +4,13 @@
 
 
 _pacman() {
-    #shellcheck disable=SC2068
-    if ${_PACMAN} -Sy ${_PACKAGES[*]} &>"${_LOG}"; then
+    #shellcheck disable=SC2086,SC2068
+    if ${_PACMAN} -Sy ${_PACKAGES[@]} &>"${_LOG}"; then
         # write to template
-        {
-        echo "echo \"Installing ${_PACKAGES[*]}...\""
-        echo "${_PACMAN} -Sy ${_PACKAGES[*]} &>\"\${_LOG}\""
+        { #shellcheck disable=SC2145
+        echo "echo \"Installing ${_PACKAGES[@]}...\""
+        #shellcheck disable=SC2145
+        echo "${_PACMAN} -Sy ${_PACKAGES[@]} &>\"\${_LOG}\""
         } >> "${_TEMPLATE}"
         : > /tmp/.pacman-success
     fi
