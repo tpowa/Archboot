@@ -15,7 +15,8 @@ _refind_uefi() {
     chroot "${_DESTDIR}" refind-install &>"${_LOG}"
     _chroot_umount
     # write to template
-    { echo "echo \"Setting up rEFInd now...\""
+    { echo "### refind"
+    echo "echo \"Setting up rEFInd now...\""
     echo "_chroot_mount"
     echo "umount -q \"\${_DESTDIR}\"/{boot,efi}"
     echo "chroot \"\${_DESTDIR}\" refind-install &>\"\${_LOG}\""
@@ -55,7 +56,9 @@ CONFEOF
         _editor "${_REFIND_CONFIG}"
         cp -f "${_REFIND_CONFIG}" "${_DESTDIR}/${_ESP_MP}/EFI/BOOT/"
         # write to template
-        echo "cp -f \"${_REFIND_CONFIG}\" \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT/\"" >> "${_TEMPLATE}"
+        { echo "cp -f \"${_REFIND_CONFIG}\" \"\${_DESTDIR}/${_ESP_MP}/EFI/BOOT/\""
+        echo ""
+        } >> "${_TEMPLATE}"
         _pacman_hook_refind
         _dialog --title " Success " --no-mouse --infobox "rEFInd has been setup successfully." 3 50
         sleep 3

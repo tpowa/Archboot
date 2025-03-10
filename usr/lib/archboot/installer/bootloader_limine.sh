@@ -66,7 +66,9 @@ _limine_bios() {
     fi
     _chroot_umount
     # write to template
-    echo "_chroot_umount" >> "${_TEMPLATE}"
+    { echo "_chroot_umount"
+    echo ""
+    } >> "${_TEMPLATE}"
 }
 
 _limine_uefi() {
