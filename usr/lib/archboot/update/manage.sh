@@ -201,6 +201,7 @@ _create_initramfs() {
 
 _download_latest_task() {
     # config
+    #shellcheck disable=SC2153
     ${_DLPROG} -o "${_ETC}/defaults" "${_SOURCE}${_ETC}/defaults?inline=false"
     # helper binaries
     # main binaries
