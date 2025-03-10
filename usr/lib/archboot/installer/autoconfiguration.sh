@@ -151,6 +151,7 @@ _auto_luks() {
         cp /tmp/passphrase-* "${_DESTDIR}"/etc/ 2>"${_NO_LOG}"
         # write to template
         { echo "echo \"Enable luks settings on installed system...\""
+        #shellcheck disable=SC2028
         echo "sd \"^\$(basename \"${_ROOTDEV}\").*\n\" '' /tmp/.crypttab"
         echo "cat /tmp/.crypttab >> \"\${_DESTDIR}\"/etc/crypttab"
         echo "chmod 700 /tmp/passphrase-* 2>\"\${_NO_LOG}\""
@@ -180,6 +181,7 @@ _auto_testing()
         #shellcheck disable=SC2016
         sd '^#(\[[c,e].*-testing\]\n)#' '$1' "${_DESTDIR}"/etc/pacman.conf
         { echo "echo \"Enable [testing] repository on installed system...\""
+        #shellcheck disable=SC2016,SC2028
         echo "sd '^#(\[[c,e].*-testing\]\n)#' '$1' \"\${_DESTDIR}\"/etc/pacman.conf"
         } >> "${_TEMPLATE}"
         sleep 2

@@ -496,6 +496,7 @@ _mkfs() {
                 if ! [[ -d $(dirname "${3}${1}") ]]; then
                     mkdir -p "$(dirname "${3}${1}")"
                     # write to template
+                    #shellcheck disable=SC2086
                     echo "mkdir -p \"$(dirname \"${3}${1}\")\"" >> "${_TEMPLATE}"
                 fi
                 # remove existing swap file
