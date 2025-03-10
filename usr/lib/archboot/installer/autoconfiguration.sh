@@ -174,6 +174,7 @@ _auto_pacman_keyring()
     fi
 }
 
+#shellcheck disable=SC2120
 _auto_testing()
 {
     if rg -q '^\[core-testing' /etc/pacman.conf; then

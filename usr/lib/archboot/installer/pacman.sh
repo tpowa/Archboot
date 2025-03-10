@@ -75,6 +75,7 @@ _run_autoconfig() {
     _auto_mdadm
     _auto_luks
     _auto_pacman_keyring
+    #shellcheck disable=SC2119
     _auto_testing
     _auto_pacman_mirror
     _auto_vconsole
