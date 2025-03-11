@@ -21,8 +21,7 @@ _download_packages() {
     fi
     #shellcheck disable=SC2206
     _PACKAGES+=(${_KEYRING[@]} ${_ARCHBOOT} ${_MAN_INFO_PACKAGES[@]})
-    #shellcheck disable=SC2145
-    echo "Downloading ${_PACKAGES[@]} to ${1}..."
+    echo "Downloading ${_PACKAGES[*]} to ${1}..."
     #shellcheck disable=SC2086,SC2068
     ${_PACMAN} -Syw ${_PACKAGES[@]} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
 }
