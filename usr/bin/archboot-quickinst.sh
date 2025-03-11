@@ -27,10 +27,7 @@ _usage() {
 # params: none
 # returns: 1 on error
 _prepare_pacman() {
-    # Set up the necessary directories for pacman use
-    if [[ ! -d "${_DESTDIR}${_CACHEDIR}" ]]; then
-        mkdir -p "${_DESTDIR}${_CACHEDIR}"
-    fi
+    # Set up the necessary directory for pacman use
     if [[ ! -d "${_DESTDIR}${_PACMAN_LIB}" ]]; then
         mkdir -p "${_DESTDIR}${_PACMAN_LIB}"
     fi

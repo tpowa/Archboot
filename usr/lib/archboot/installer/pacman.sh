@@ -23,12 +23,7 @@ _run_pacman(){
     echo "_chroot_mount"
     } >> "${_TEMPLATE}"
 
-    # Set up the necessary directories for pacman use
-    if [[ ! -d "${_DESTDIR}${_CACHEDIR}" ]]; then
-        mkdir -p "${_DESTDIR}${_CACHEDIR}"
-        # write to template
-        echo "mkdir -p \"\${_DESTDIR}${_CACHEDIR}\"" >> "${_TEMPLATE}"
-    fi
+    # Set up the necessary directory for pacman use
     if [[ ! -d "${_DESTDIR}${_PACMAN_LIB}" ]]; then
         mkdir -p "${_DESTDIR}${_PACMAN_LIB}"
         # write to template
