@@ -330,12 +330,12 @@ _pacman_parameters() {
         _PACMAN="pacman --root ${1}"
         # needs to be full path
         #shellcheck disable=SC2086
-        _PACMAN_CACHEDIR="--cachedir $(realpath "${1}"${_CACHEDIR})"
+        _PACMAN_CACHEDIR="--cachedir $(pwd)/"${1}"${_CACHEDIR})"
         _PACMAN_DB="--dbpath ${1}/blankdb"
     fi
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     # defaults used on every pacman call
-    _PACMAN_DEFAULTS="--config ${_PACMAN_CONF} ${_PACMAN_CACHEDIR} --disable-download-timeout --ignore systemd-resolvconf --noconfirm"
+    _PACMAN_DEFAULTS="--config ${_PACMAN_CONF} ${_PACMAN_CACHEDIR} --ignore systemd-resolvconf --noconfirm"
 }
 
 _pacman_key() {
