@@ -292,8 +292,6 @@ _x86_64_pacman_restore() {
 
 _fix_network() {
     echo "Fix network settings in ${1}..."
-    # enable parallel downloads
-    sd '^#ParallelDownloads' 'ParallelDownloads' "${1}"/etc/pacman.conf
     # fix network in container
     rm "${1}"/etc/resolv.conf
     echo "nameserver 8.8.8.8" > "${1}"/etc/resolv.conf
