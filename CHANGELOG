@@ -1,6 +1,7 @@
 On the road to 2025.03:
 Environment:
 - added archboot-autorun.template support
+- cleanup pacman config and options
 localize:
 - added write to template file
 network:
