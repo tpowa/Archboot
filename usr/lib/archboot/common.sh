@@ -335,7 +335,7 @@ _pacman_parameters() {
     fi
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     # defaults used on every pacman call
-    _PACMAN_DEFAULTS="--config ${_PACMAN_CONF} ${_PACMAN_CACHEDIR} --ignore systemd-resolvconf --noconfirm"
+    _PACMAN_DEFAULTS="--config ${_PACMAN_CONF} ${_PACMAN_CACHEDIR} --disable-download-timeout --ignore systemd-resolvconf --noconfirm"
 }
 
 _pacman_key() {
