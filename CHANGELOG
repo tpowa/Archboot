@@ -14,6 +14,8 @@ setup:
 - added unmount everything before cleaning disk
 - fixed directory creation before UKI writing
 - added check on running swaps
+buildchain:
+- added --disable-download-timeout option to pacman defaults
 ---
 Highlights 2025.02:
 - On normal image reduced needed RAM by 30%,
