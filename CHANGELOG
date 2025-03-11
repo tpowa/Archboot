@@ -14,7 +14,7 @@ setup:
 - added unmount everything before cleaning disk
 - fixed directory creation before UKI writing
 - added check on running swaps
-buildchain:
+common:
 - added --disable-download-timeout option to pacman defaults
 ---
 Highlights 2025.02:
