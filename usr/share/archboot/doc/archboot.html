@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2025 Fundraise: 0% <progress max="100" value="30">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2025 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 09.03.2025 22:05</strong></p>
+<strong>Last update: 11.03.2025 18:21</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -623,12 +623,13 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 <p style="page-break-after: always"></p>
 <h3 data-number="3.10" id="automatic-install"><span class="header-section-number">3.10</span> <strong>For Experts: Automatic Installation</strong></h3>
 <ul>
-<li>Archboot provides a template creation routine for automatic installations.</li>
-<li>All commands to setup your system will be saved to file: <strong>/tmp/archboot-autorun.template</strong></li>
-<li>To do an automatic installation simply run <strong>one</strong> full installation and <strong>save</strong> the created template file.</li>
-<li>Afterwards use the method from <a href="#autorun" title="here">here</a> to load the script during boot.</li>
-<li>An example how such a template script may look like is <a href="./archboot-autorun.txt" title="here">here</a>.</li>
-<li>This is also an easy way to do mass installations through PXE on your network.</li>
+<li>Archboot provides a <strong>template creation routine</strong> for automatic installations.</li>
+<li>This will provide an easy way to do <strong>mass installations</strong> through PXE on your network or through prepared media.</li>
+<li>Simply run <strong>one</strong> installation until the end on your favourite template system.
+<li>All commands to setup your system will be saved to this file: <strong>/tmp/archboot-autorun.template</strong></li>
+<li><strong>Save</strong> the created file and <strong>customize</strong> this script to your additional needs.</li>
+<li>Afterwards run the script during boot, using this <strong><a href="#autorun" title="method">method</a></strong> or execute it by hand on booted media.</li>
+<li>Here is an <strong><a href="./archboot-autorun.txt" title="template script">example script</a></strong>, to show how the result may look like.</li>
 </ul>
 <h3 data-number="3.11" id="tools-for-backup-and-copying-of-an-existing-system"><span class="header-section-number">3.11</span> <strong>Tools For Backup And Copying Of An Existing System</strong></h3>
 <p>Archboot provides 2 additional scripts for doing those tasks.</p>
