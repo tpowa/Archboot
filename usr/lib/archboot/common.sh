@@ -330,7 +330,7 @@ _pacman_parameters() {
         _PACMAN="pacman --root ${1}"
         # needs to be full path
         #shellcheck disable=SC2086
-        _PACMAN_CACHEDIR="--cachedir $(pwd)/"${1}"${_CACHEDIR})"
+        _PACMAN_CACHEDIR="--cachedir $(pwd)/${1}${_CACHEDIR}"
         _PACMAN_DB="--dbpath ${1}/blankdb"
     fi
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
