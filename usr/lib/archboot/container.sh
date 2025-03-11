@@ -157,8 +157,7 @@ _ssh_keys() {
 }
 
 _change_pacman_conf() {
-    # enable parallel downloads
-    sd '^#ParallelDownloads' 'ParallelDownloads' "${1}"/etc/pacman.conf
+    # enable pacman color support
     sd '^#Color' 'Color' "${1}"/etc/pacman.conf
 }
 
