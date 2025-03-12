@@ -4,6 +4,8 @@ Environment:
 - cleanup pacman config and options
 common:
 - added --disable-download-timeout option to pacman defaults
+bootloader:
+- added check on successful container creation
 localize:
 - added write to template file
 network:
