@@ -44,8 +44,13 @@ unset "RSYNC_PROXY"
 rm -f /etc/systemd/network/10-wired-auto-dhcp.network
 systemctl restart systemd-networkd
 systemctl restart systemd-resolved
-echo "Waiting 10 seconds for network link..."
-sleep 10
+while true; do
+  if getent hosts www.google.com &>"${_LOG}"; then
+      break
+    else
+      sleep 1
+    fi
+done
 : > /.network
 
 ### clock
@@ -136,7 +141,6 @@ echo "# DEVICE DETAILS: /dev/vdb4 PARTUUID=981191ff-9c0f-4305-b693-b2c42b418ae7 
 
 ### pacman installation
 _chroot_mount
-mkdir -p "${_DESTDIR}/var/cache/pacman/pkg"
 mkdir -p "${_DESTDIR}/var/lib/pacman"
 echo "Installing base linux polkit btrfs-progs dosfstools terminus-font linux-firmware..."
 pacman --root /mnt/install --cachedir=/mnt/install/var/cache/pacman/pkg --noconfirm -Sy base linux polkit btrfs-progs dosfstools terminus-font linux-firmware &>"${_LOG}"
