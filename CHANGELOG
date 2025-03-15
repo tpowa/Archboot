@@ -2,6 +2,7 @@ On the road to 2025.03:
 Environment:
 - added archboot-autorun.template support
 - cleanup pacman config and options
+- added IPXE - Netboot support for aarch64 and x86_64
 common:
 - added --disable-download-timeout option to pacman defaults
 bootloader:
