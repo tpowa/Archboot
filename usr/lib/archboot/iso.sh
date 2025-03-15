@@ -165,17 +165,17 @@ _prepare_grub_AA64() {
 
 _prepare_ipxe_IA32() {
     echo "Preparing IA32 IPXE..."
-    cp "${_BOOTLOADER}/ipxe-i386.efi" "${_ISODIR}/EFI/BOOT/IPXEIA32.EFI"
+    cp "${_BOOTLOADER}/ipxeia32.efi" "${_ISODIR}/EFI/BOOT/IPXEIA32.EFI"
 }
 
 _prepare_ipxe_X64() {
     echo "Preparing X64 IPXE..."
-    cp "${_BOOTLOADER}/ipxe-x86_64.efi" "${_ISODIR}/EFI/BOOT/IPXEX64.EFI"
+    cp "${_BOOTLOADER}/ipxex64.efi" "${_ISODIR}/EFI/BOOT/IPXEX64.EFI"
 }
 
 _prepare_ipxe_AA64() {
     echo "Preparing AA64 IPXE..."
-    cp "${_BOOTLOADER}/ipxe-aarch64.efi" "${_ISODIR}/EFI/BOOT/IPXEAA64.EFI"
+    cp "${_BOOTLOADER}/ipxeaa64.efi" "${_ISODIR}/EFI/BOOT/IPXEAA64.EFI"
 }
 
 _prepare_ipxe() {
