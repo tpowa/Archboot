@@ -17,15 +17,16 @@
 <h1>Archboot Home | <a href="gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2025 Fundraise: 0% <progress max="100" value="30">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2025 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 13.03.2025 07:17</strong></p>
+<strong>Last update: 15.03.2025 15:37</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
 <li><a href="#releases" id="toc-releases"><strong><span class="toc-section-number">2.</span> Releases</strong></a></li>
 <li><ul>
 <li><a href="#image-types" id="toc-features-of-the-images"><span class="toc-section-number">2.1</span> ISO / Initrd / UKI Types</a></li>
-<li><a href="#boot-modes" id="toc-boot-modes"><span class="toc-section-number">2.2</span> ISO Boot Modes</a></li>
-<li><a href="#writing-to-usb-cd" id="toc-writing-to-usb-cd"><span class="toc-section-number">2.3</span> ISO Writing To USB / CD</a></li>
+<li><a href="#ipxe-boot" id="toc-ipxe-boot"><span class="toc-section-number">2.2</span> IPXE - Netboot</a></li>
+<li><a href="#boot-modes" id="toc-boot-modes"><span class="toc-section-number">2.3</span> Boot Modes</a></li>
+<li><a href="#writing-to-usb-cd" id="toc-writing-to-usb-cd"><span class="toc-section-number">2.4</span> ISO Writing To USB / CD</a></li>
 </ul></li>
 <li><a href="#archboot-in-a-nutshell" id="toc-archboot-in-a-nutshell"><strong><span class="toc-section-number">3.</span> Features In A Nutshell</strong></a></li>
 <li><ul>
@@ -204,7 +205,17 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 <li><strong>With</strong> a fast <strong>ethernet</strong> internet connection <strong>and</strong> a running <a href="https://wiki.archlinux.org/title/DHCP" title="DHCP"><strong>DHCP</strong></a> server, go for the <strong>latest</strong> image. If your system holds at least 4G RAM the package cache will be preserved.</li>
 <li><strong>Without</strong> an internet connection you should use the <strong>local</strong> image. It includes a <strong>local package repository</strong> for installation. It will <strong>not</strong> use any network interfaces/services, until you explicitly switch to <strong>Online</strong> mode.</li>
 </ul>
-<h3 data-number="2.2" id="boot-modes"><span class="header-section-number">2.2</span> <strong>ISO Boot Modes</strong></h3>
+<h3 data-number="2.2" id="ipxe-boot"><span class="header-section-number">2.2</span> <strong>IPXE - Netboot</strong></h3>
+<ul>
+<li>Archboot provides <strong>precompiled</strong> <a href="https://ipxe.org" title="IPXE"><strong>IPXE</strong></a> binaries for <strong><a href="https://release.archboot.com/aarch64/ipxe" title="aarch64">aarch64</a></strong> and <strong><a href="https://release.archboot.com/x86_64/ipxe" title="x86_64">x86_64</a></strong>.</li>
+<li>Launch the <strong>&lt;EFI&gt;</strong> file from your favourite bootloader, UEFI firmware or PXE setup.
+<li>The binaries will <strong>verify</strong> downloads against Archboot's signature and boot the <strong>normal</strong> UKI image from network.</li>
+<p><strong>Attention</strong>:</p>
+<li>The binaries rely on <a href="https://ca.ipxe.org" title="IPXE CA infrastructure"><strong>IPXE CA infrastructure</strong></a>, which is <strong>not</strong> available in certain countries.</li>
+<li><strong>Aarch64</strong> is work in progress at the moment. I haven't found a working combination of emulator and options to get this working out of the box yet.</li>
+</ul>
+<p style="page-break-after: always"></p>
+<h3 data-number="2.3" id="boot-modes"><span class="header-section-number">2.3</span> <strong>Boot Modes</strong></h3>
 <table>
 <thead>
 <tr class="header">
@@ -216,8 +227,20 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 </thead>
 <tbody>
 <tr class="even">
+<td><a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a><br>with the included<br><strong>fedora</strong> signed <a href="https://wiki.archlinux.org/title/Secure_Boot#shim" title="Secure Boot"><strong>shim</strong></a></td>
+<td class="MyYes">&#10004;</td>
+<td class="MyNo">&#10006;</td>
+<td class="MyYes">&#10004;</td>
+</tr>
+<tr class="even">
 <td><a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a>/UEFI_CD<br>booting with <a href="https://wiki.archlinux.org/title/GRUB" title="GRUB"><strong>GRUB</strong></a></td>
 <td class="MyYes">&#10004;</td>
+<td class="MyNo">&#10006;</td>
+<td class="MyYes">&#10004;</td>
+</tr>
+<tr class="odd">
+<td><a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a><br><a href="https://ipxe.org" title="IPXE"><strong>IPXE</strong></a> - Netboot</td>
+<td class="MyOpt"><strong>WIP</strong></td>
 <td class="MyNo">&#10006;</td>
 <td class="MyYes">&#10004;</td>
 </tr>
@@ -227,9 +250,9 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 <td class="MyNo">&#10006;</td>
 <td class="MyYes">&#10004;</td>
 </tr>
-<tr class="even">
-<td><a href="https://wiki.archlinux.org/title/Secure_Boot" title="Secure Boot"><strong>Secure Boot</strong></a><br>with the included<br><strong>fedora</strong> signed <a href="https://wiki.archlinux.org/title/Secure_Boot#shim" title="Secure Boot"><strong>shim</strong></a></td>
-<td class="MyYes">&#10004;</td>
+<tr class="odd">
+<td><strong>UEFI_MIX*</strong><br><a href="https://ipxe.org" title="IPXE"><strong>IPXE</strong></a> - Netboot<strong></a></td>
+<td class="MyNo">&#10006;</td>
 <td class="MyNo">&#10006;</td>
 <td class="MyYes">&#10004;</td>
 </tr>
@@ -248,8 +271,7 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 </tbody>
 </table>
 <p>* Firmware 32bit / OS 64bit</p>
-<p style="page-break-after: always"></p>
-<h3 data-number="2.3" id="writing-to-usb-cd"><span class="header-section-number">2.3</span> <strong>ISO Writing To USB / CD</strong></h3>
+<h3 data-number="2.4" id="writing-to-usb-cd"><span class="header-section-number">2.4</span> <strong>ISO Writing To USB / CD</strong></h3>
 <p>A hybrid image file is a standard CD/DVD-burnable image and also a raw disk image.</p>
 <ul>
 <li>Can be burned to CD/DVD(RW) media using most <a href="https://wiki.archlinux.org/title/CD_Burning" title="CD Burning"><strong>CD Burning</strong></a> utilities.</li>
