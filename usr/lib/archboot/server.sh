@@ -121,6 +121,13 @@ _server_release() {
         archboot-ipxe-sign.sh "uki/archboot-${_ARCH}.netboot"
         chown -R "${_USER}:${_GROUP}" uki/
     fi
+    # BIOS ipxe symlinks
+    if [[ "${_ARCH}" == "x86_64" ]]; then
+        ln -s boot/kernel/vmlinuz "boot/kernel/vmlinuz-${_ARCH}.netboot"
+        archboot-ipxe-sign.sh "boot/kernel/vmlinuz-${_ARCH}.netboot"
+        ln -s "boot/initrd/initrd-${_ARCH}.img" "boot/initrd/initrd-${_ARCH}.img.netboot"
+        archboot-ipxe-sign.sh "boot/kernel/vmlinuz-${_ARCH}.netboot"
+    fi
     # recreate and sign b2sums
     rm b2sum.txt
     for i in $(fd -t f -t l); do

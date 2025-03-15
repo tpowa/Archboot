@@ -24,6 +24,18 @@ poweroff
 exit
 :_archboot
 imgfree
+iseq ${platform} pcbios && goto _pcbios || goto _efi
+:_pcbios
+echo Please wait...
+echo Downloading files...
+kernel ${_base}/vmlinuz-${_arch}.netboot || shell
+imgverify vmlinuz-${_arch}.netboot ${_base}/vmlinuz-${_arch}.netboot.sig || shell
+initrd ${_base}/initrd-${_arch}.img.netboot || shell
+imgverify initrd-${_arch}.img.netboot ${_base}/initrd-${_arch}.img.netboot.sig || shell
+boot || shell
+:_efi
+echo Please wait...
+echo Dowloading files...
 kernel ${_base}/archboot-${_arch}.netboot || shell
 imgverify archboot-${_arch}.netboot ${_base}/archboot-${_arch}.netboot.sig || shell
 # clear all images before booting uki
