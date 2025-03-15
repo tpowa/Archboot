@@ -109,22 +109,26 @@ _server_release() {
     chmod 755 "${_ISO_BUILD_DIR}"
     chown -R "${_USER}:${_GROUP}" "${_ISO_BUILD_DIR}"
     cd "${_ISO_BUILD_DIR}" || exit 1
-    # recreate b2sum and sign files
-    rm b2sum.txt
+    # sign files
     for i in $(fd -t f); do
         #shellcheck disable=SC2046,SC2086,SC2116
         gpg --chuid "${_USER}" $(echo ${_GPG}) "${i}"
+    done
+    # ipxe symlink and sign the symlink
+    if [[ -d "uki" ]]; then
+        ln -s "$(fd --base-directory uki/ -E '*local*' -E '*latest*' '.efi$')" \
+               "uki/archboot-${_ARCH}.netboot"
+        archboot-ipxe-sign.sh "uki/archboot-${_ARCH}.netboot"
+        chown -R "${_USER}:${_GROUP}" uki/
+    fi
+    # recreate and sign b2sums
+    rm b2sum.txt
+    for i in $(fd -t f -t l); do
         cksum -a blake2b "${i}" >> b2sum.txt
         cksum -a blake2b "${i}.sig" >> b2sum.txt
         chown -R "${_USER}:${_GROUP}" "${i}"
         touch "${i}"
     done
-    # ipxe
-    if [[ -d "uki" ]]; then
-        ln -s "$(fd --base-directory uki/ -E '*local*' -E '*latest*' '.efi$')" \
-               "uki/archboot-${_ARCH}.netboot"
-        archboot-ipxe-sign-sh "uki/archboot-${_ARCH}.netboot"
-    fi
     #shellcheck disable=SC2046,SC2086,SC2116
     gpg --chuid "${_USER}" $(echo ${_GPG}) b2sum.txt
     cd ..
