@@ -3,13 +3,18 @@ set base https://ipxe.archboot.com
 iseq ${buildarch} x86_64 && set arch x86_64 ||
 iseq ${buildarch} i386 && set arch x86_64 ||
 iseq ${buildarch} arm64 && set arch aarch64 ||
-console --keep --picture https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/share/archboot/grub/archboot-background.png
-menu Archboot ${arch} | Arch Linux | Netboot
-item archboot Boot Archboot
-item reboot Reboot System
-item poweroff Poweroff System
-item exit Abort Netboot 
-choose --default archboot --timeout 5000 target && goto ${target}
+console --keep --picture https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/share/archboot/grub/archboot-background.png ||
+cpair --foreground 7 --background 6 2
+menu Archboot ${arch} | Arch Linux | IPXE - Netboot
+item archboot Archboot - Arch Linux
+item _shell IPXE Shell
+item --gap -- -- System Options --
+item reboot Reboot
+item poweroff Poweroff
+item exit Abort IPXE - Netboot
+choose --default archboot --timeout 5000 target && goto ${target} || shell
+:_shell
+shell
 :reboot
 reboot
 :poweroff
@@ -18,9 +23,8 @@ poweroff
 exit
 :archboot
 imgfree
-sync
 kernel ${base}/archboot-${arch}.netboot || shell
 imgverify archboot-${arch}.netboot ${base}/archboot-${arch}.netboot.sig || shell
 # clear all images before booting uki
 # https://github.com/ipxe/ipxe/discussions/915#discussion-4942530
-boot
+boot || shell
