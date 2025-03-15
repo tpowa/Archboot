@@ -147,20 +147,40 @@ _prepare_uefi_shell_tianocore() {
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
-_prepare_uefi_X64() {
+_prepare_grub_X64() {
     echo "Preparing X64 grub..."
     cp "${_BOOTLOADER}/grubx64.efi" "${_ISODIR}/EFI/BOOT/GRUBX64.EFI"
 }
 
-_prepare_uefi_IA32() {
+_prepare_grub_IA32() {
     echo "Preparing IA32 grub..."
     cp "${_BOOTLOADER}/grubia32.efi" "${_ISODIR}/EFI/BOOT/GRUBIA32.EFI"
 }
 
 # build grubXXX with all modules: http://bugs.archlinux.org/task/71382
-_prepare_uefi_AA64() {
+_prepare_grub_AA64() {
     echo "Preparing AA64 grub..."
     cp "${_BOOTLOADER}/grubaa64.efi" "${_ISODIR}/EFI/BOOT/GRUBAA64.EFI"
+}
+
+_prepare_ipxe_IA32() {
+    echo "Preparing IA32 IPXE..."
+    cp "${_BOOTLOADER}/ipxe-i386.efi" "${_ISODIR}/EFI/BOOT/IPXEIA32.EFI"
+}
+
+_prepare_ipxe_X64() {
+    echo "Preparing X64 IPXE..."
+    cp "${_BOOTLOADER}/ipxe-x86_64.efi" "${_ISODIR}/EFI/BOOT/IPXEX64.EFI"
+}
+
+_prepare_ipxe_AA64() {
+    echo "Preparing AA64 IPXE..."
+    cp "${_BOOTLOADER}/ipxe-aarch64.efi" "${_ISODIR}/EFI/BOOT/IPXEAA64.EFI"
+}
+
+_prepare_ipxe() {
+    echo "Preparing IPXE..."
+    cp "${_BOOTLOADER}/ipxe.lkrn" "${_ISODIR}/boot/"
 }
 
 _prepare_memtest() {
