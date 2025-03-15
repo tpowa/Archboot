@@ -6,13 +6,14 @@ iseq ${buildarch} arm64 && set _arch aarch64 ||
 console --keep --picture https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/share/archboot/grub/archboot-background.png ||
 cpair --foreground 7 --background 6 2
 menu Archboot | Arch Linux ${_arch} | IPXE - Netboot
+item --gap -- -- Boot Options --
 item _archboot Archboot - Arch Linux ${_arch}
 item _shell IPXE Shell
 item --gap -- -- System Options --
 item _reboot Reboot
 item _poweroff Poweroff
 item _exit Abort IPXE - Netboot
-choose --default archboot --timeout 5000 target && goto ${target} || shell
+choose --default archboot --timeout 10000 target && goto ${target} || shell
 :_shell
 shell
 :_reboot
