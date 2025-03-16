@@ -3,6 +3,8 @@ set _base https://ipxe.archboot.com
 iseq ${buildarch} x86_64 && set _arch x86_64 ||
 iseq ${buildarch} i386 && set _arch x86_64 ||
 iseq ${buildarch} arm64 && set _arch aarch64 ||
+iseq ${_arch} x86_64 && set _cmdline console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto ||
+iseq ${_arch} aarch64 && set _cmdline nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto ||
 iseq ${_arch} x86_64 && goto _console || goto _menu
 :_console
 console --keep --picture https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/share/archboot/grub/archboot-background.png ||
@@ -32,7 +34,7 @@ iseq ${platform} pcbios && goto _pcbios || goto _efi
 :_pcbios
 echo Please wait...
 echo Downloading files...
-kernel ${_base}/vmlinuz-${_arch}.netboot || goto _shell
+kernel ${_base}/vmlinuz-${_arch}.netboot ${_cmdline} || goto _shell
 imgverify vmlinuz-${_arch}.netboot ${_base}/vmlinuz-${_arch}.netboot.sig || goto _shell
 initrd ${_base}/initrd-${_arch}.img.netboot || goto _shell
 imgverify initrd-${_arch}.img.netboot ${_base}/initrd-${_arch}.img.netboot.sig || goto _shell
@@ -41,7 +43,7 @@ goto _exit
 :_efi
 echo Please wait...
 echo Dowloading files...
-kernel ${_base}/archboot-${_arch}.netboot || goto _shell
+kernel ${_base}/archboot-${_arch}.netboot ${_cmdline} || goto _shell
 imgverify archboot-${_arch}.netboot ${_base}/archboot-${_arch}.netboot.sig || goto _shell
 # clear all images before booting uki
 # https://github.com/ipxe/ipxe/discussions/915#discussion-4942530
