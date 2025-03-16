@@ -1,10 +1,13 @@
 #!ipxe
 set _base https://ipxe.archboot.com
 iseq ${buildarch} x86_64 && set _arch x86_64 ||
-iseq ${buildarch} i386 && set _arch x86_64 ||
+# UEFI Mix Mode check
+iseq ${buildarch} i386 && set _arch x86_64 && set _mixmode _IA32_UEFI=1 ||
 iseq ${buildarch} arm64 && set _arch aarch64 ||
+# cmdline from UKI is not used!
 iseq ${_arch} x86_64 && set _cmdline console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto ||
 iseq ${_arch} aarch64 && set _cmdline nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto ||
+# aarch64 framebuffer breaks parallels
 iseq ${_arch} x86_64 && goto _console || goto _menu
 :_console
 console --keep --picture https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/share/archboot/grub/archboot-background.png ||
@@ -30,17 +33,22 @@ poweroff
 exit
 :_archboot
 imgfree
-iseq ${platform} pcbios && goto _pcbios || goto _efi
-:_pcbios
+# pcbios and mix mode need kernel and initrd
+iseq ${platform} pcbios && goto _fallback_boot || 
+iseq ${buildarch} i386 && goto _fallback_boot ||
+# 64bit uefi boot uki
+iseq ${buildarch} x86_64 && goto _boot ||
+iseq ${buildarch} arm64 && goto _boot ||
+:_fallback_boot
 echo Please wait...
 echo Downloading files...
-kernel ${_base}/vmlinuz-${_arch}.netboot ${_cmdline} || goto _shell
+kernel ${_base}/vmlinuz-${_arch}.netboot ${_cmdline} ${_mixmode} || goto _shell
 imgverify vmlinuz-${_arch}.netboot ${_base}/vmlinuz-${_arch}.netboot.sig || goto _shell
 initrd ${_base}/initrd-${_arch}.img.netboot || goto _shell
 imgverify initrd-${_arch}.img.netboot ${_base}/initrd-${_arch}.img.netboot.sig || goto _shell
 boot || goto _shell
 goto _exit
-:_efi
+:_boot
 echo Please wait...
 echo Dowloading files...
 kernel ${_base}/archboot-${_arch}.netboot ${_cmdline} || goto _shell
