@@ -123,9 +123,9 @@ _server_release() {
     fi
     # BIOS ipxe symlinks
     if [[ "${_ARCH}" == "x86_64" ]]; then
-        ln -s boot/kernel/vmlinuz "boot/kernel/vmlinuz-${_ARCH}.netboot"
+        ln -s vmlinuz "boot/kernel/vmlinuz-${_ARCH}.netboot"
         archboot-ipxe-sign.sh "boot/kernel/vmlinuz-${_ARCH}.netboot"
-        ln -s "boot/initrd/initrd-${_ARCH}.img" "boot/initrd/initrd-${_ARCH}.img.netboot"
+        ln -s "initrd-${_ARCH}.img" "boot/initrd/initrd-${_ARCH}.img.netboot"
         archboot-ipxe-sign.sh "boot/initrd/initrd-${_ARCH}.img.netboot"
     fi
     # recreate and sign b2sums
