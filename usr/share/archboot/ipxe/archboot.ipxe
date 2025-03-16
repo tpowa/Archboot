@@ -3,8 +3,11 @@ set _base https://ipxe.archboot.com
 iseq ${buildarch} x86_64 && set _arch x86_64 ||
 iseq ${buildarch} i386 && set _arch x86_64 ||
 iseq ${buildarch} arm64 && set _arch aarch64 ||
+iseq ${_arch} x86_64 && goto _console || goto _menu
+:_console
 console --keep --picture https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/share/archboot/grub/archboot-background.png ||
 cpair --foreground 7 --background 6 2
+:_menu
 menu Archboot | Arch Linux ${_arch} | IPXE - Netboot
 item --gap -- -- Boot Options --
 item _archboot Archboot - Arch Linux ${_arch}
