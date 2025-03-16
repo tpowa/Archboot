@@ -32,11 +32,13 @@ poweroff
 :_exit
 exit
 :_archboot
+# clear all images before booting uki
+# https://github.com/ipxe/ipxe/discussions/915#discussion-4942530
 imgfree
 # pcbios and mix mode need kernel and initrd
 iseq ${platform} pcbios && goto _fallback_boot || 
 iseq ${buildarch} i386 && goto _fallback_boot ||
-# 64bit uefi boot uki
+# 64bit UEFI boot UKI
 iseq ${buildarch} x86_64 && goto _boot ||
 iseq ${buildarch} arm64 && goto _boot ||
 :_fallback_boot
@@ -53,7 +55,5 @@ echo Please wait...
 echo Dowloading files...
 kernel ${_base}/archboot-${_arch}.netboot ${_cmdline} || goto _shell
 imgverify archboot-${_arch}.netboot ${_base}/archboot-${_arch}.netboot.sig || goto _shell
-# clear all images before booting uki
-# https://github.com/ipxe/ipxe/discussions/915#discussion-4942530
 boot || goto _shell
 goto _exit
