@@ -22,11 +22,11 @@ _usage_sign() {
 }
 _cert_dir_check() {
     if [[ -d "${_CERT_DIR}" ]]; then
-        echo ""${_CERT_DIR}" already exists! Do you want to create a new Archboot IPXE chain of trust (y/N)?"
-        read _NEW
+        echo "${_CERT_DIR} already exists! Do you want to create a new Archboot IPXE chain of trust (y/N)?"
+        read -r _NEW
         if [[ "${_NEW}" == "y" ]]; then
             echo "Backup old certificates to /etc/archboot/ipxe.backup.$(date -I)"
-            mv /etc/archboot/ipxe /etc/archboot/ipxe.backup.$(date -I)
+            mv /etc/archboot/ipxe "/etc/archboot/ipxe.backup.$(date -I)"
         else
             exit 1
         fi
@@ -36,7 +36,7 @@ _chain_of_trust() {
     # instructions from https://ipxe.org/crypto
     # create own private root CA, only personal change to 1000 days
     mkdir -p "${_CERT_DIR}"
-    pushd "${_CERT_DIR}"
+    pushd "${_CERT_DIR}" || exit 1
     openssl req -x509 -newkey rsa:2048 -out ca.crt -keyout ca.key -days 1000 || exit 1
     echo 01 > ca.srl
     touch ca.idx
@@ -77,5 +77,5 @@ EOF
     openssl ca -config ca.cnf -in server.req -out server.crt || exit 1
     openssl req -newkey rsa -keyout codesign.key -out codesign.req || exit 1
     openssl ca -config ca.cnf -extensions codesigning -in codesign.req -out codesign.crt || exit 1
-    popd
+    popd || exit 1
 }
