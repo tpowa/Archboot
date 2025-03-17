@@ -7,4 +7,3 @@
 _root_check
 _cert_dir_check || exit 1
 _chain_of_trust || exit 1
-

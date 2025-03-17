@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
+
 _CODESIGN_CERT="${_CERT_DIR}/codesign.crt"
 _CODESIGN_KEY="${_CERT_DIR}/codesign.key"
 _CA_CERT="${_CERT_DIR}/ca.crt"
+
 _usage_certs() {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - IPXE Certs\e[m"
     echo -e "\e[1m---------------------\e[m"
@@ -12,6 +14,7 @@ _usage_certs() {
     echo -e "Usage: \e[1m${_BASENAME} run\e[m"
     exit 0
 }
+
 _usage_sign() {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Sign IPXE File\e[m"
     echo -e "\e[1m---------------------\e[m"
@@ -20,6 +23,7 @@ _usage_sign() {
     echo -e "Usage: \e[1m${_BASENAME} <file>\e[m"
     exit 0
 }
+
 _cert_dir_check() {
     if [[ -d "${_CERT_DIR}" ]]; then
         echo "${_CERT_DIR} already exists! Do you want to create a new Archboot IPXE chain of trust (y/N)?"
@@ -32,6 +36,7 @@ _cert_dir_check() {
         fi
     fi
 }
+
 _chain_of_trust() {
     # instructions from https://ipxe.org/crypto
     # create own private root CA, only personal change to 1000 days
