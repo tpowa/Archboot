@@ -35,6 +35,9 @@ exit
 # clear all images before booting uki
 # https://github.com/ipxe/ipxe/discussions/915#discussion-4942530
 imgfree
+# edit kernel cmdline
+echo -n Boot cmdline: ${}
+read --timeout 10000 _cmdline ||
 # pcbios and mix mode need kernel and initrd
 iseq ${platform} pcbios && goto _fallback_boot || 
 iseq ${buildarch} i386 && goto _fallback_boot ||
