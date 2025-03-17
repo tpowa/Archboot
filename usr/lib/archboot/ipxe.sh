@@ -16,7 +16,7 @@ _usage_certs() {
 }
 
 _usage_sign() {
-    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Sign IPXE File\e[m"
+    echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create IPXE Signature\e[m"
     echo -e "\e[1m---------------------\e[m"
     echo "Create IPXE signature file with custom chain of trust."
     echo ""
