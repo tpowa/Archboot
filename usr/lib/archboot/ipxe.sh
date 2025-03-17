@@ -9,7 +9,7 @@ _CA_CERT="${_CERT_DIR}/ca.crt"
 _usage_certs() {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - IPXE Certs\e[m"
     echo -e "\e[1m---------------------\e[m"
-    echo "Create Archboot -IPXE Root Certs for a chain of trust."
+    echo "Create Archboot -IPXE Root Certs for a custom chain of trust."
     echo ""
     echo -e "Usage: \e[1m${_BASENAME} run\e[m"
     exit 0

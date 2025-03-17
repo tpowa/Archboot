@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Tobias Powalowski <tpowa@archlinux.org>
-# create IPXE chain of trust
+# create IPXE Root Certs for custom chain of trust
 . /etc/archboot/defaults
 . /usr/lib/archboot/ipxe.sh
 [[ -z "${1}" || "${1}" != "run" ]] && _usage_certs
