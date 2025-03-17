@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Tobias Powalowski <tpowa@archlinux.org>
-# archboot wrapper for signing ipxe files
+# Create IPXE signature file with custom chain of trust
 . /etc/archboot/defaults
 . /usr/lib/archboot/ipxe.sh
 [[ -z "${1}" ]] && _usage_sign
