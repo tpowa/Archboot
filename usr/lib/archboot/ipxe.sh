@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
-
+. /usr/lib/archboot/common.sh
 _CODESIGN_CERT="${_CERT_DIR}/codesign.crt"
 _CODESIGN_KEY="${_CERT_DIR}/codesign.key"
 _CA_CERT="${_CERT_DIR}/ca.crt"

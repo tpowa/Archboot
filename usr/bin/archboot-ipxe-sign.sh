@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Tobias Powalowski <tpowa@archlinux.org>
 # create IPXE signature file with custom chain of trust
-. /etc/archboot/defaults
 . /usr/lib/archboot/ipxe.sh
 [[ -z "${1}" ]] && _usage_sign
 openssl cms -sign -binary -noattr -in "${1}" \
