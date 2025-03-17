@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2025 Fundraise: 0% <progress max="100" value="30">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2025 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 16.03.2025 22:36</strong></p>
+<strong>Last update: 17.03.2025 18:31</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -1315,7 +1315,34 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 <h3 data-number="7.3.2" id="configuration-file"><span class="header-section-number">7.3.2</span> <strong>Configuration File</strong></h3>
 <p>You need to configure all your settings in the configuration file: <strong>/etc/archboot/defaults</strong></p>
 <h3 data-number="7.3.3" id="running-commands"><span class="header-section-number">7.3.3</span> <strong>Running Commands</strong></h3>
-<h4 data-number="7.3.3.1" id="x86_64-architecture"><span class="header-section-number">7.3.3.1</span> <strong>X86_64 Architecture</strong></h4>
+<h4 data-number="7.3.3.1" id="IPXE-chain"><span class="header-section-number">7.3.3.1</span> <strong>IPXE - ROOT CA - Chain Of Trust</strong></h4>
+<table>
+<thead>
+<tr class="header">
+<th>Create the ROOT CA certs in directory: /etc/archboot/ipxe</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code># archboot-ipxe-certs.sh run</code></td>
+</tr>
+</tbody>
+</table>
+<li><strong>Build</strong> the package according to the comments with the created certs.</li>
+<li><strong>Install</strong> your custom <strong><a href="https://gitlab.archlinux.org/tpowa/archboot-repository/-/tree/main/archboot-ipxe" title="archboot-ipxe">archboot-ipxe</strong></a> bootloader package.</li>
+<table>
+<thead>
+<tr class="header">
+<th>Edit /etc/pacman.conf to include:</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>IgnorePkg = archboot-ipxe</code></td>
+</tr>
+</tbody>
+</table>
+<h4 data-number="7.3.3.2" id="x86_64-architecture"><span class="header-section-number">7.3.3.2</span> <strong>X86_64 Architecture</strong></h4>
 <table>
 <thead>
 <tr class="header">
@@ -1328,7 +1355,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tr>
 </tbody>
 </table>
-<h4 data-number="7.3.3.2" id="aarch64riscv64-architecture"><span class="header-section-number">7.3.3.2</span> <strong>Aarch64/Riscv64 Architecture</strong></h4>
+<h4 data-number="7.3.3.3" id="aarch64riscv64-architecture"><span class="header-section-number">7.3.3.3</span> <strong>Aarch64/Riscv64 Architecture</strong></h4>
 <ul>
 <li>You have to skip the tarball creation step, on <strong>aarch64</strong> or <strong>riscv64</strong> hardware.</li>
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <a href="https://archlinux.org/packages/?name=qemu-user-static"><strong>qemu-user-static</strong></a> package, for building on <strong>x86_64</strong> hardware.</li>
@@ -1366,7 +1393,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tbody>
 </table>
 <p style="page-break-after: always"></p>
-<h4 data-number="7.3.3.3" id="automatic-server-update"><span class="header-section-number">7.3.3.3</span> <strong>Automatic Server Update</strong></h4>
+<h4 data-number="7.3.3.4" id="automatic-server-update"><span class="header-section-number">7.3.3.4</span> <strong>Automatic Server Update</strong></h4>
 <p>The <strong>/etc/archboot/server-update.conf</strong> file defines architectures and update trigger packages.</p>
 <table>
 <thead>
