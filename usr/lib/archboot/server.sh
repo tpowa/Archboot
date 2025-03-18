@@ -111,9 +111,9 @@ _server_release() {
     cd "${_ISO_BUILD_DIR}" || exit 1
     # ipxe symlinks and ipxe sign the symlinks
     mkdir ipxe
-    for i in $(fd -t f -E '*.sig' -E 'init-*'); do
+    for i in $(fd -t f -E '*.sig' -E '*.txt' -E 'archboot*' -E 'init-*'); do
         ln -s "../${i}" "ipxe/$(basename ${i})"
-        archboot-ipxe-sign.sh "${i}"
+        archboot-ipxe-sign.sh ipxe/"$(basename ${i})"
     done
     chown -R "${_USER}:${_GROUP}" ipxe/
     # sign files and no symlinks
