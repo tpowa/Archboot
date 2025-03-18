@@ -36,8 +36,8 @@ exit
 # https://github.com/ipxe/ipxe/discussions/915#discussion-4942530
 imgfree
 # edit kernel cmdline
-echo Boot will continue in 10 seconds automatically,
-echo change defaults or hit ENTER to proceed immediatly.
+echo Boot will continue in 10 seconds automatically.
+echo Change defaults or hit ENTER to proceed immediatly.
 echo
 echo -n Boot cmdline: ${}
 read --timeout 10000 _cmdline ||
