@@ -6,7 +6,7 @@ iseq ${buildarch} arm64 && set _arch aarch64 ||
 set _base https://ipxe.archboot.com/${_arch}
 # cmdline from UKI is not used!
 iseq ${_arch} x86_64 && set _kernel vmlinuz && set _cmdline console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto ||
-iseq ${_arch} aarch64 && set et _kernel Image.gz && _cmdline nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto ||
+iseq ${_arch} aarch64 && set _kernel Image.gz && _cmdline nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto ||
 # aarch64 framebuffer breaks parallels
 iseq ${_arch} x86_64 && goto _console || goto _menu
 :_console
