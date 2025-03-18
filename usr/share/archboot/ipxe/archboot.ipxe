@@ -1,12 +1,12 @@
 #!ipxe
-set _base https://ipxe.archboot.com
 iseq ${buildarch} x86_64 && set _arch x86_64 ||
 # UEFI Mix Mode check
 iseq ${buildarch} i386 && set _arch x86_64 && set _mixmode _IA32_UEFI=1 ||
 iseq ${buildarch} arm64 && set _arch aarch64 ||
+set _base https://ipxe.archboot.com/${_arch}
 # cmdline from UKI is not used!
-iseq ${_arch} x86_64 && set _cmdline console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto ||
-iseq ${_arch} aarch64 && set _cmdline nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto ||
+iseq ${_arch} x86_64 && set _kernel vmlinuz && set _cmdline console=ttyS0,115200 console=tty0 audit=0 systemd.show_status=auto ||
+iseq ${_arch} aarch64 && set et _kernel Image.gz && _cmdline nr_cpus=1 console=ttyAMA0,115200 console=tty0 loglevel=4 audit=0 systemd.show_status=auto ||
 # aarch64 framebuffer breaks parallels
 iseq ${_arch} x86_64 && goto _console || goto _menu
 :_console
@@ -32,31 +32,78 @@ poweroff
 :_exit
 exit
 :_archboot
-# clear all images before booting uki
+# clear all images before booting
 # https://github.com/ipxe/ipxe/discussions/915#discussion-4942530
 imgfree
 # edit kernel cmdline
+echo Boot will continue in 10 seconds automatically or change defaults and hit ENTER
 echo -n Boot cmdline: ${}
 read --timeout 10000 _cmdline ||
-# pcbios and mix mode need kernel and initrd
-iseq ${platform} pcbios && goto _fallback_boot || 
-iseq ${buildarch} i386 && goto _fallback_boot ||
-# 64bit UEFI boot UKI
-iseq ${buildarch} x86_64 && goto _boot ||
-iseq ${buildarch} arm64 && goto _boot ||
-:_fallback_boot
 echo Please wait...
-echo Downloading files...
-kernel ${_base}/vmlinuz-${_arch}.netboot ${_cmdline} ${_mixmode} || goto _shell
-imgverify vmlinuz-${_arch}.netboot ${_base}/vmlinuz-${_arch}.netboot.sig || goto _shell
-initrd ${_base}/initrd-${_arch}.img.netboot || goto _shell
-imgverify initrd-${_arch}.img.netboot ${_base}/initrd-${_arch}.img.netboot.sig || goto _shell
+echo Downloading kernel...
+kernel ${_base}/${_kernel} ${_cmdline} ${_mixmode} || goto _shell
+imgverify ${_kernel} ${_base}/${_kernel}.sig || goto _shell
+echo Downloading microcode...
+iseq ${_arch} x86_64 && initrd ${_base}/intel-ucode.img ||
+iseq ${_arch} x86_64 && imgverify intel-ucode.img ${_base}/intel-ucode.img.sig || || goto _shell
+initrd ${_base}/amd-ucode.img
+imgverify amd-ucode.img ${_base}/amd-ucode.img.sig || goto _shell
+echo Downloading initrd...
+initrd ${_base}/initrd-${_arch}.img || goto _shell
+imgverify initrd-${_arch}.img ${_base}/initrd-${_arch}.img.sig || goto _shell
+echo Downloading firmware...
+initrd ${_base}/amd.img || goto _shell
+imgverify amd.img ${_base}/amd.img.sig || goto _shell
+initrd ${_base}/amdgpu.img || goto _shell
+imgverify amdgpu.img ${_base}/amdgpu.img.sig || goto _shell
+initrd ${_base}/amdnpu.img || goto _shell
+imgverify amdnpu.img ${_base}/amdnpu.img.sig || goto _shell
+initrd ${_base}/ath10k.img || goto _shell
+imgverify ath10k.img ${_base}/ath10k.img.sig || goto _shell
+initrd ${_base}/ath11k.img || goto _shell
+imgverify ath11k.img ${_base}/ath11k.img.sig || goto _shell
+initrd ${_base}/ath12k.img || goto _shell
+imgverify ath12k.img ${_base}/ath12k.img.sig || goto _shell
+initrd ${_base}/ath6k.img || goto _shell
+imgverify ath6k.img ${_base}/ath6k.img.sig || goto _shell
+initrd ${_base}/ath9k_htc.img || goto _shell
+imgverify ath9k_htc.img ${_base}/ath9k_htc.img.sig || goto _shell
+initrd ${_base}/bnx2.img || goto _shell
+imgverify bnx2.img ${_base}/bnx2.img.sig || goto _shell
+initrd ${_base}/i915.img || goto _shell
+imgverify i915.img ${_base}/i915.img.sig || goto _shell
+initrd ${_base}/iwlwifi.img || goto _shell
+imgverify iwlwifi.img ${_base}/iwlwifi.img.sig || goto _shell
+initrd ${_base}/libertas.img || goto _shell
+imgverify libertas.img ${_base}/libertas.img.sig || goto _shell
+initrd ${_base}/mediatek.img || goto _shell
+imgverify mediatek.img ${_base}/mediatek.img.sig || goto _shell
+initrd ${_base}/mrvl.img || goto _shell
+imgverify mrvl.img ${_base}/mrvl.img.sig || goto _shell
+initrd ${_base}/mwl8k.img || goto _shell
+imgverify mwl8k.img ${_base}/mwl8k.img.sig || goto _shell
+initrd ${_base}/mwlwifi.img || goto _shell
+imgverify mwlwifi.img ${_base}/mwlwifi.img.sig || goto _shell
+initrd ${_base}/nvidia.img || goto _shell
+imgverify nvidia.img ${_base}/nvidia.img.sig || goto _shell
+initrd ${_base}/radeon.img || goto _shell
+imgverify radeon.img ${_base}/radeon.img.sig || goto _shell
+initrd ${_base}/ralink.img || goto _shell
+imgverify ralink.img ${_base}/ralink.img.sig || goto _shell
+initrd ${_base}/rtl_nic.img || goto _shell
+imgverify rtl_nic.img ${_base}/rtl_nic.img.sig || goto _shell
+initrd ${_base}/rtlwifi.img || goto _shell
+imgverify rtlwifi.img ${_base}/rtlwifi.img.sig || goto _shell
+initrd ${_base}/rtw88.img || goto _shell
+imgverify rtw88.img ${_base}/rtw88.img.sig || goto _shell
+initrd ${_base}/rtw89.img || goto _shell
+imgverify rtw89.img ${_base}/rtw89.img.sig || goto _shell
+initrd ${_base}/ti-connectivity.img || goto _shell
+imgverify ti-connectivity.img ${_base}/ti-connectivity.img.sig || goto _shell
+initrd ${_base}/tigon.img || goto _shell
+imgverify tigon.img ${_base}/tigon.img.sig || goto _shell
+initrd ${_base}/xe.img || goto _shell
+imgverify xe.img ${_base}/xe.img.sig || goto _shell
 boot || goto _shell
 goto _exit
-:_boot
-echo Please wait...
-echo Dowloading files...
-kernel ${_base}/archboot-${_arch}.netboot ${_cmdline} || goto _shell
-imgverify archboot-${_arch}.netboot ${_base}/archboot-${_arch}.netboot.sig || goto _shell
-boot || goto _shell
-goto _exit
+
