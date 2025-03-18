@@ -109,25 +109,18 @@ _server_release() {
     chmod 755 "${_ISO_BUILD_DIR}"
     chown -R "${_USER}:${_GROUP}" "${_ISO_BUILD_DIR}"
     cd "${_ISO_BUILD_DIR}" || exit 1
-    # sign files
+    # ipxe symlinks and ipxe sign the symlinks
+    mkdir ipxe
+    for i in $(fd -t f -E '*.sig' -E 'init-*'); do
+        ln -s "../${i}" "ipxe/$(basename ${i})"
+        archboot-ipxe-sign.sh "${i}"
+    done
+    chown -R "${_USER}:${_GROUP}" ipxe/
+    # sign files and no symlinks
     for i in $(fd -t f); do
         #shellcheck disable=SC2046,SC2086,SC2116
         gpg --chuid "${_USER}" $(echo ${_GPG}) "${i}"
     done
-    # ipxe symlink and sign the symlink
-    if [[ -d "uki" ]]; then
-        ln -s "$(fd --base-directory uki/ -E '*local*' -E '*latest*' '.efi$')" \
-               "uki/archboot-${_ARCH}.netboot"
-        archboot-ipxe-sign.sh "uki/archboot-${_ARCH}.netboot"
-        chown -R "${_USER}:${_GROUP}" uki/
-    fi
-    # BIOS ipxe symlinks
-    if [[ "${_ARCH}" == "x86_64" ]]; then
-        ln -s vmlinuz "boot/kernel/vmlinuz-${_ARCH}.netboot"
-        archboot-ipxe-sign.sh "boot/kernel/vmlinuz-${_ARCH}.netboot"
-        ln -s "initrd-${_ARCH}.img" "boot/initrd/initrd-${_ARCH}.img.netboot"
-        archboot-ipxe-sign.sh "boot/initrd/initrd-${_ARCH}.img.netboot"
-    fi
     # recreate and sign b2sums
     rm b2sum.txt
     for i in $(fd -t f -t l); do
