@@ -109,15 +109,17 @@ _server_release() {
     chmod 755 "${_ISO_BUILD_DIR}"
     chown -R "${_USER}:${_GROUP}" "${_ISO_BUILD_DIR}"
     cd "${_ISO_BUILD_DIR}" || exit 1
-    # ipxe symlinks and ipxe sign the symlinks
-    mkdir ipxe
-    for i in $(fd -t f -E '*.sig' -E '*.txt' -E 'archboot*' -E 'init-*'); do
-        ln -s "../${i}" "ipxe/$(basename ${i})"
-        archboot-ipxe-sign.sh ipxe/"$(basename ${i})"
-    done
-    chown -R "${_USER}:${_GROUP}" ipxe/
+     # ipxe symlinks and ipxe sign the symlinks
+    if [[ -d "${_CERT_DIR}" ]]; then
+        mkdir ipxe
+        for i in $(fd -t f -E '*.sig' -E '*.txt' -E 'archboot*' -E 'init-*'); do
+            ln -s "../${i}" "ipxe/$(basename ${i})"
+            archboot-ipxe-sign.sh ipxe/"$(basename ${i})"
+        done
+        chown -R "${_USER}:${_GROUP}" ipxe/
+    fi
     # sign files and no symlinks
-    for i in $(fd -t f); do
+    for i in $(fd -t f -E 'ipxe'); do
         #shellcheck disable=SC2046,SC2086,SC2116
         gpg --chuid "${_USER}" $(echo ${_GPG}) "${i}"
     done
