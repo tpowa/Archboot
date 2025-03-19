@@ -118,7 +118,7 @@ _server_release() {
         done
         chown -R "${_USER}:${_GROUP}" ipxe/
     fi
-    # sign files and no symlinks
+    # sign files and no symlinks, exclude ipxe directory
     for i in $(fd -t f -E 'ipxe'); do
         #shellcheck disable=SC2046,SC2086,SC2116
         gpg --chuid "${_USER}" $(echo ${_GPG}) "${i}"
