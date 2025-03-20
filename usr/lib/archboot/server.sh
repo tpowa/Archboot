@@ -118,8 +118,8 @@ _server_release() {
         done
         chown -R "${_USER}:${_GROUP}" ipxe/
     fi
-    # sign files and no symlinks, exclude ipxe directory
-    for i in $(fd -t f -E 'ipxe'); do
+    # sign files and no symlinks, exclude ipxe directory and b2sum.txt
+    for i in $(fd -t f -E 'ipxe' -E 'b2sum.txt'); do
         #shellcheck disable=SC2046,SC2086,SC2116
         gpg --chuid "${_USER}" $(echo ${_GPG}) "${i}"
     done
@@ -127,7 +127,6 @@ _server_release() {
     rm b2sum.txt
     for i in $(fd -t f -t l); do
         cksum -a blake2b "${i}" >> b2sum.txt
-        cksum -a blake2b "${i}.sig" >> b2sum.txt
         chown -R "${_USER}:${_GROUP}" "${i}"
         touch "${i}"
     done
