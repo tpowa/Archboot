@@ -4,7 +4,7 @@ servers:
       port: 6697
       tls: true
       realname: yourname
-      nicks: [Archboot-User]
+      nicks: [archboot_user]
 
       # Server alias to show in the tab line.
       # alias: OFTC
@@ -56,7 +56,7 @@ servers:
 
 # Defaults used when connecting to a server with the `/connect` command.
 defaults:
-  nicks: [tiny_user]
+    nicks: [archboot_user]
     realname: yourname
     join: []
     tls: false
@@ -64,7 +64,7 @@ defaults:
     # notify: [off|mentions|messages]
 
 # Location for chat logs.
-log_dir: "/home/tobias/tiny_logs"
+log_dir: "/root/tiny_logs"
 
 # Limits the maximum number of messages stored in each tab. Default is
 # unlimited.
