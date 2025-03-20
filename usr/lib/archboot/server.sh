@@ -113,8 +113,8 @@ _server_release() {
     if [[ -d "${_CERT_DIR}" ]]; then
         mkdir ipxe
         for i in $(fd -t f -E '*.sig' -E '*.txt' -E 'archboot*' -E 'init-*'); do
-            ln -s "../${i}" "ipxe/$(basename ${i})"
-            archboot-ipxe-sign.sh ipxe/"$(basename ${i})"
+            ln -s "../${i}" ipxe/"$(basename "${i}")"
+            archboot-ipxe-sign.sh ipxe/"$(basename "${i}")"
         done
         chown -R "${_USER}:${_GROUP}" ipxe/
     fi
