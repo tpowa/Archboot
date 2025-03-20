@@ -1,0 +1,230 @@
+# Servers to automatically connect.
+servers:
+    - addr: irc.libera.chat
+      port: 6697
+      tls: true
+      realname: yourname
+      nicks: [Archboot-User]
+
+      # Server alias to show in the tab line.
+      # alias: OFTC
+
+      # Channels to automatically join.
+      join:
+          - "#archboot"
+
+      # You can specify channel settings:
+      #
+      # - `ignore: true` for disabling join/part lines.
+      # - `notify: [off|mentions|messages]` for the notification setting.
+      #
+      # Example:
+      #
+      # join:
+      #   - name: "#tiny"
+      #     ignore: true
+      #     notify: mentions
+
+      # tiny supports three authentication methods.
+      #
+      # - `pass`: Sends `PASS` IRC command when connecting.
+      # - `sasl`: For SASL authentication.
+      #    You can either authenticate using a password or use a certificate
+      #    with SASL EXTERNAL. Choose either `username` and `password`
+      #    _or_ `pem`.
+      # - `nickserv_ident`: Sends command `PRIVMSG NickServ identify ...` after
+      #   connecting, before joining channels.
+      #
+      # All of these are optional and you probably need only one of these.
+      # Examples for each below.
+
+      # pass: hunter2
+
+      # sasl:
+      #   username: tiny_user
+      #   password: hunter2
+      #   pem: "/home/user/.config/tiny/oftc.pem"
+
+      # nickserv_ident: hunter2
+
+      # Sets /ignore for this server and all its tabs. Default is false.
+      # ignore: true
+
+      # Sets notifications for this server and all its tabs, Default is
+      # mentions.
+      # notify: [off|mentions|messages]
+
+# Defaults used when connecting to a server with the `/connect` command.
+defaults:
+  nicks: [tiny_user]
+    realname: yourname
+    join: []
+    tls: false
+    # ignore: true
+    # notify: [off|mentions|messages]
+
+# Location for chat logs.
+log_dir: "/home/tobias/tiny_logs"
+
+# Limits the maximum number of messages stored in each tab. Default is
+# unlimited.
+# scrollback: 512
+
+# UI layout: `compact` or `aligned`. Default is `compact`.
+# layout: compact
+
+# Nick length in 'aligned' layout. Default is 12.
+# max_nick_length: 12
+
+# Color theme based on 256 colors. Colors can be defined as color indices
+# (0-255) or with their names.
+#
+# Below are the defaults. You can delete them if you don't want to change any
+# colors.
+#
+# Accepted color names are:
+# default (0), black (0), maroon (1), green (2), olive (3), navy (4),
+# purple (5), teal (6), silver (7), gray (8), red (9), lime (10),
+# yellow (11), blue (12), magenta (13), cyan (14), white (15)
+#
+# Attributes can be combined (e.g [bold, underline]). valid values are: bold,
+# underline, italic, strikethrough.
+colors:
+    nick: [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14]
+
+    clear:
+        fg: default
+        bg: default
+
+    user_msg:
+        fg: black
+        bg: default
+
+    err_msg:
+        fg: black
+        bg: maroon
+        attrs: [bold]
+
+    topic:
+        fg: cyan
+        bg: default
+        attrs: [bold]
+
+    cursor:
+        fg: black
+        bg: default
+
+    join:
+        fg: lime
+        bg: default
+        attrs: [bold]
+
+    part:
+        fg: maroon
+        bg: default
+        attrs: [bold]
+
+    nick_change:
+        fg: lime
+        bg: default
+        attrs: [bold]
+
+    faded:
+        fg: 242
+        bg: default
+
+    exit_dialogue:
+        fg: default
+        bg: navy
+
+    highlight:
+        fg: red
+        bg: default
+        attrs: [bold]
+
+    completion:
+        fg: 84
+        bg: default
+
+    timestamp:
+        fg: 242
+        bg: default
+
+    tab_active:
+        fg: default
+        bg: default
+        attrs: [bold]
+
+    tab_normal:
+        fg: gray
+        bg: default
+
+    tab_new_msg:
+        fg: purple
+        bg: default
+
+    tab_highlight:
+        fg: red
+        bg: default
+        attrs: [bold]
+
+    tab_joinpart:
+        fg: 11
+        bg: default
+
+# Custom key mappings. Syntax is:
+#
+# [key_name]: [key_action]
+#
+# Set a key to `disable` to disable it.
+#
+# See also: https://github.com/osa1/tiny/wiki/Configuring-key-bindings.
+#
+# key_map:
+    ### Defaults ###
+    # ctrl_c: exit
+    # ctrl_x: run_editor
+
+    # alt_1:
+    #     tab_goto: 1
+    # alt_2:
+    #     tab_goto: 2
+    # alt_3:
+    #     tab_goto: 3
+    # alt_4:
+    #     tab_goto: 4
+    # alt_5:
+    #     tab_goto: 5
+    # alt_6:
+    #     tab_goto: 6
+    # alt_7:
+    #     tab_goto: 7
+    # alt_8:
+    #     tab_goto: 8
+    # alt_9:
+    #     tab_goto: 9
+    # alt_0:
+    #     tab_goto: 0
+    # ctrl_n:     tab_next
+    # ctrl_p:     tab_prev
+
+    # shift_up:   messages_scroll_up
+    # shift_down: messages_scroll_down
+    # ctrl_u:     messages_page_up
+    # ctrl_d:     messages_page_down
+    # pgup:       messages_page_up
+    # pgdown:     messages_page_down
+    # home:       messages_scroll_top
+    # end:        messages_scroll_bottom
+
+    # left:       input_move_curs_left
+    # right:      input_move_curs_right
+    # ctrl_a:     input_move_curs_start
+    # ctrl_e:     input_move_curs_end
+    # ctrl_left:  input_move_word_left
+    # ctrl_right: input_move_word_right
+    # ctrl_k:     input_delete_to_end
+    # ctrl_w:     input_delete_prev_word
+    # backspace:  input_delete_prev_char
+    # del:        input_delete_next_char
+    # tab:        input_auto_complete
