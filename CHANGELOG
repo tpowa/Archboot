@@ -4,7 +4,7 @@ Environment:
 - cleanup pacman config and options
 - added Netboot - IPXE support for aarch64 and x86_64
 - added tiny package as preconfigured IRC client
-- added Libera Chat IRC Support Channel: #archboot
+- added IRC Support Channel: #archboot on irc.libera.chat
 common:
 - added --disable-download-timeout option to pacman defaults
 bootloader:
