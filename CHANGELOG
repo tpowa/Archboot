@@ -3,7 +3,7 @@ Environment:
 - added archboot-autorun.template support
 - cleanup pacman config and options
 - added Netboot - IPXE support for aarch64 and x86_64
-- added tiny IRC client
+- added tiny package as preconfigured IRC client
 - added Libera Chat IRC Support Channel: #archboot
 common:
 - added --disable-download-timeout option to pacman defaults
