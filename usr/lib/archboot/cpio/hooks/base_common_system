@@ -36,9 +36,9 @@ usr/share/{locale/{be,bg,cs,da,de,en_US,el,es,fi,fr,hu,it,lt,lv,mk,nl,nn,pl,pt,r
 var/lib/pacman/local \
 | tar -C "${_ROOTFS}" -xpf -
     fi
-    _map _binary agetty archlinux-keyring-wkd-sync awk bat basename brotli bsdtar \
+    _map _binary agetty archlinux-keyring-wkd-sync awk bat basename bits brotli bsdtar \
                  {bus,coredump,hostname,journal,locale,login,machine,network,\
-system,timedate,userdb,home,oom,portable}ctl btm certutil chmod choose clear cmsutil crlutil curl date \
+system,timedate,userdb,home,oom,portable}ctl btm certutil chmod choose clear cmsutil coresched crlutil curl date \
                  dbus-{broker{,-launch},cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
 update-activation-environment,uuidgen} dd df dir du dust dysk exa eza faillock false fd fzf fzf-tmux gawk gpg{,-agent,conf,-connect-agent} \
                  gpgme-{tool,json} hugetop insmod install kernel-install kill{,all} loadkeys ldconfig \
