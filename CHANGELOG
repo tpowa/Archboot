@@ -1,10 +1,13 @@
-On the road to 2025.03:
-Environment:
-- added archboot-autorun.template support
-- cleanup pacman config and options
+On the road to 2025.04:
+---
+Highlights 2025.03:
+- added automatic installation archboot-autorun.template support
 - added Netboot - IPXE support for aarch64 and x86_64
-- added tiny package as preconfigured IRC client
 - added IRC Support Channel: #archboot on irc.libera.chat
+Environment:
+- cleanup pacman config and options
+- added tiny package as preconfigured IRC client
+- 3cpio 0.4.0
 common:
 - added --disable-download-timeout option to pacman defaults
 bootloader:
