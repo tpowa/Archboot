@@ -17,16 +17,12 @@ _archboot_check
 # added those directories with _full_dir
 rm -r /usr/share/{licenses,locale} /usr/lib/{systemd,tmpfiles.d}
 pacman -Sy
-#shellcheck disable=SC2013
 for i in $(pacman -Q | choose 0); do
-    #shellcheck disable=SC2086
-    rm -r "${_PACMAN_LIB}"/local/"$(pacman -Q ${i} | sd ' ' '-')"
-    #shellcheck disable=SC2086
-    if pacman -Sdd ${i} --noconfirm >>pacman.log; then
+    rm -r "${_PACMAN_LIB}"/local/"$(pacman -Q "${i}" | sd ' ' '-')"
+    if pacman -Sdd "${i}" --noconfirm >>pacman.log; then
         echo "${i}" >> not-installed.orig.log
     else
-        #shellcheck disable=SC2086
-        pacman -Sdd ${i} --noconfirm --overwrite '*'
+        pacman -Sdd "${i}" --noconfirm --overwrite '*'
     fi
 done
 # remove false positives:
