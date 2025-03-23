@@ -61,8 +61,8 @@ _clean_container() {
     if [[ "${_CLEANUP_CONTAINER}" ==  "1" ]]; then
         echo "Cleaning container, delete not needed files from ${1}..."
         rm -r "${1}"/usr/include
-        rm -r "${1}"/usr/share/{aclocal,applications,audit-rules,awk,common-lisp,emacs,et,fish,gettext,gettext-[0-9]*,glib-[0-9]*,gnupg,gtk-doc,iana-etc,icons,icu,keyutils,libalpm,libgpg-error,makepkg-template,misc,pixmaps,pkgconfig,screen,smartmontools,ss,tabset,vala,xml,man,info,xtables}
-        rm -r "${1}"/usr/lib/{audit,awk,binfmt.d,cmake,dracut,e2fsprogs,environment.d,gawk,getconf,gettext,glib-[0-9]*,gnupg,gssproxy,icu,krb5,ldscripts,libnl,pkgconfig,siconv,tar,xfsprogs,xtables}
+        rm -r "${1}"/usr/share/{aclocal,applications,audit-rules,awk,common-lisp,emacs,et,fish,gettext,gettext-[0-9]*,glib-[0-9]*,gnupg,gtk-doc,iana-etc,icons,icu,keyutils,libalpm,libgpg-error,makepkg-template,misc,pixmaps,pkgconfig,screen,smartmontools,ss,tabset,vala,xml,man,info}
+        rm -r "${1}"/usr/lib/{audit,awk,binfmt.d,cmake,dracut,e2fsprogs,environment.d,gawk,getconf,gettext,glib-[0-9]*,gnupg,gssproxy,icu,krb5,ldscripts,libnl,pkgconfig,siconv,tar,xfsprogs}
         # locale cleaning
         fd -u --min-depth 2 -E '/be/' -E '/bg/' \
              -E '/cs/' -E '/da/' -E '/de/' -E '/en/' \
