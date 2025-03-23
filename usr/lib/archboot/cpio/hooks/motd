@@ -21,7 +21,8 @@ _run ()
 if  echo "${_HOOKS[@]}" | rg -qw net; then
     #shellcheck disable=SC2129
     echo -e "\e[1mFor Additional Wi-Fi Authentification Or Online Help:\e[m" >> "${_MOTD}"
-    echo -e "  - Use the \e[1;92m'elinks'\e[m text mode browser." >> "${_MOTD}"
+    echo -e "  - Use the \e[1;92m'elinks'\e[m web browser." >> "${_MOTD}"
+    echo -e "  - Use the \e[1;92m'tiny'\e[m IRC client." >> "${_MOTD}"
 fi
 if  echo "${_HOOKS[@]}" | rg -qw installer; then
     #shellcheck disable=SC2129
