@@ -128,15 +128,14 @@ _create_pacman_conf() {
     else
         echo "Using custom pacman.conf..."
         _PACMAN_CONF="$(mktemp "${1}"/pacman.conf.XXX)"
-        #shellcheck disable=SC2129
-        echo "[options]" >> "${_PACMAN_CONF}"
-        echo "Architecture = auto" >> "${_PACMAN_CONF}"
-        echo "SigLevel    = Required DatabaseOptional" >> "${_PACMAN_CONF}"
-        echo "LocalFileSigLevel = Optional" >> "${_PACMAN_CONF}"
-        echo "ParallelDownloads = 5" >> "${_PACMAN_CONF}"
-        echo "Color" >> "${_PACMAN_CONF}"
-        echo "[archboot]" >> "${_PACMAN_CONF}"
-        echo "Server = ${_INSTALL_SOURCE}" >> "${_PACMAN_CONF}"
+        { echo "[options]"
+        echo "Architecture = auto"
+        echo "SigLevel    = Required DatabaseOptional"
+        echo "LocalFileSigLevel = Optional"
+        echo "ParallelDownloads = 5"
+        echo "Color"
+        echo "[archboot]"
+        echo "Server = ${_INSTALL_SOURCE}" } >> "${_PACMAN_CONF}"
         [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(basename "${_PACMAN_CONF}")"
     fi
 }
