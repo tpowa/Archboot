@@ -20,11 +20,6 @@ _online_switch() {
     fi
 }
 
-_net_interfaces() {
-    #shellcheck disable=SC2016
-    fd -E '/lo' . '/sys/class/net' -x rg '(.*)' -r '{/} $1' {}/address | sort -u
-}
-
 _essid_scan() {
     iwctl station "${_INTERFACE}" scan &>"${_NO_LOG}"
     _COUNT=0
@@ -54,7 +49,7 @@ _wireless() {
         _essid_scan | _dialog --title " Network Configuration " --no-mouse --gauge "Scanning 5 second(s) for SSIDs with interface ${_INTERFACE}..." 6 60
         # only show lines with signal '*'
         # kill spaces from the end and replace spaces with + between
-        #shellcheck disable=SC2086,SC2046
+        #shellcheck disable=SC2046
         if _dialog --cancel-label "${_LABEL}" --title " SSID Scan Result " --menu "Empty spaces in your SSID are replaced by '+' char" 13 60 6 \
             "RESCAN" "SSIDs" "HIDDEN" "SSID" $(iwctl station "${_INTERFACE}" get-networks |\
             rg -o ' {6}(.{34}).*\*' -r '$1' |\
@@ -78,10 +73,8 @@ _wireless() {
         _WLAN_HIDDEN=1
     fi
     # replace # with spaces again
-    #shellcheck disable=SC2001,SC2086
-    _WLAN_SSID="$(echo ${_WLAN_SSID} | sd '\+' ' ')"
+    _WLAN_SSID="$(echo "${_WLAN_SSID}" | sd '\+' ' ')"
     # expect hidden network has a WLAN_KEY
-    #shellcheck disable=SC2143
     if ! [[ "$(iwctl station "${_INTERFACE}" get-networks | rg -q "${_WLAN_SSID}.*open")" ]] \
     || [[ "${_WLAN_CONNECT}" == "connect-hidden" ]]; then
         _dialog --no-cancel --title " Connection Key " --inputbox "" 7 50 "Secret-WirelessKey" 2>"${_ANSWER}"
@@ -125,12 +118,15 @@ _network() {
     fi
     _NETPARAMETERS=""
     while [[ -z "${_NETPARAMETERS}" ]]; do
+        _INTERFACES=()
+        #shellcheck disable=SC2016
+        for i in $(fd -E '/lo' . '/sys/class/net' -x rg '(.*)' -r '{/} $1' {}/address | sort -u); do
+            _INTERFACES+=("${i}")
+        done
         # select network interface
         _INTERFACE=""
-        _INTERFACES=$(_net_interfaces)
         while [[ -z "${_INTERFACE}" ]]; do
-            #shellcheck disable=SC2086
-            if _dialog --cancel-label "${_LABEL}" --title " Network Interface " --menu "" 11 40 5 ${_INTERFACES} 2>"${_ANSWER}"; then
+            if _dialog --cancel-label "${_LABEL}" --title " Network Interface " --menu "" 11 40 5 "${_INTERFACES[@]}" 2>"${_ANSWER}"; then
                 _INTERFACE=$(cat "${_ANSWER}")
             else
                 _abort
