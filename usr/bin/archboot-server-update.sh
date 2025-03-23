@@ -30,8 +30,7 @@ for i in ${_SERVER_ARCH}; do
     # update container to latest packages
     systemd-nspawn -q -D "${i}" pacman --noconfirm -Syu
     rg -o 'upgraded (.*) \(' -r '$1' "${i}"/var/log/pacman.log > upgrade-"${i}".log
-    #shellcheck disable=SC2068
-    for k in ${_TRIGGER[@]}; do
+    for k in "${_TRIGGER[@]}"; do
         # if trigger successful, release new image to server
         if rg -qw "${k}" upgrade-"${i}".log; then
             archboot-"${i}"-server-release.sh run || echo "Error: ${i} release!" >> error.log
