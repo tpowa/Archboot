@@ -17,12 +17,11 @@ _archboot_check
 pacman --noconfirm -Sy
 if [[ "${1}" == "base" ]]; then
     pacman --noconfirm -S base
-    _PACKAGE="$(LANG=C.UTF-8 pacman -Qi base | rg -o 'Depends.*: (.*)' -r '$1')"
+    _PACKAGE+=("$(LANG=C.UTF-8 pacman -Qi base | rg -o 'Depends.*: (.*)' -r '$1')")
 else
-    _PACKAGE="${1}"
+    _PACKAGE+=("${1}")
 fi
-echo "${_PACKAGE}" >binary.log
-#shellcheck disable=SC2086
-for i in $(pacman -Ql ${_PACKAGE} | rg -o '/usr/bin/..*$'); do
+echo "${_PACKAGE[@]}" >binary.log
+for i in $(pacman -Ql "${_PACKAGE[@]}" | rg -o '/usr/bin/..*$'); do
 	command -v "${i}" &>"${_NO_LOG}" || echo "${i}" >>binary.log
 done
