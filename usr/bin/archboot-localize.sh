@@ -11,12 +11,10 @@ _locale_menu() {
         _LOCALES="en_US English de_DE German es_ES Spanish fr_FR French pt_PT Portuguese OTHER Other"
         _OTHER_LOCALES="be_BY Belarusian bg_BG Bulgarian cs_CZ Czech da_DK Dansk fi_FI Finnish el_GR Greek hu_HU Hungarian it_IT Italian lt_LT Lithuanian lv_LV Latvian mk_MK Macedonian nl_NL Dutch nn_NO Norwegian pl_PL Polish ro_RO Romanian ru_RU Russian sk_SK Slovak sr_RS Serbian sv_SE Swedish tr_TR Turkish uk_UA Ukrainian"
         _CANCEL=""
-        #shellcheck disable=SC2086
-        _dialog --cancel-label "${_LABEL}" --title " Locale " --menu "" 12 35 5 ${_LOCALES} 2>${_ANSWER} || _abort
+        _dialog --cancel-label "${_LABEL}" --title " Locale " --menu "" 12 35 5 "${_LOCALES[@]}" 2>"${_ANSWER}" || _abort
         _LOCALE=$(cat "${_ANSWER}")
         if [[ "${_LOCALE}" == "OTHER" ]]; then
-            #shellcheck disable=SC2086
-            if _dialog  --title " Other Locale " --menu "" 17 35 11 ${_OTHER_LOCALES} 2>${_ANSWER}; then
+            if _dialog  --title " Other Locale " --menu "" 17 35 11 "${_OTHER_LOCALES[@]}" 2>"${_ANSWER}"; then
                 _LOCALE=$(cat ${_ANSWER})
             else
                 _LOCALE=""
