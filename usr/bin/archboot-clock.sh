@@ -16,24 +16,22 @@ _timezone () {
     while [[ -z "${_SET_ZONE}" ]]; do
         _CONTINUE=""
         while [[ -z "${_CONTINUE}" ]]; do
-            _REGIONS="America - Europe - Africa - Asia - Australia -"
-            #shellcheck disable=SC2086
-            if _dialog --cancel-label "${_LABEL}" --title " Timezone Region " --menu "" 11 30 6 ${_REGIONS} 2>${_ANSWER}; then
-                _REGION=$(cat ${_ANSWER})
+            _REGIONS=(America - Europe - Africa - Asia - Australia -)
+            if _dialog --cancel-label "${_LABEL}" --title " Timezone Region " --menu "" 11 30 6 "${_REGIONS[@]}" 2>"${_ANSWER}"; then
+                _REGION=$(cat "${_ANSWER}")
                 _ZONES=""
                 _CONTINUE=1
             else
                 _abort
             fi
         done
-        _ZONES=""
+        _ZONES=()
         for i in $(timedatectl --no-pager list-timezones | rg "${_REGION}" | sd '.*/' '' | sort -u); do
-            _ZONES="${_ZONES} ${i} -"
+            _ZONES+=("${i}" -)
         done
-        #shellcheck disable=SC2086
-        if _dialog  --title " Timezone " --menu "" 21 30 16 ${_ZONES} 2>${_ANSWER}; then
+        if _dialog  --title " Timezone " --menu "" 21 30 16 "${_ZONES[@]}" 2>"${_ANSWER}"; then
             _SET_ZONE="1"
-            _ZONE=$(cat ${_ANSWER})
+            _ZONE=$(cat "${_ANSWER}")
             [[ "${_ZONE}" == "${_REGION}" ]] || _ZONE="${_REGION}/${_ZONE}"
         else
             _SET_ZONE=""
@@ -50,15 +48,14 @@ _timeset() {
     _hwclock
     if [[ -z "${_SET_TIME}" ]]; then
         timedatectl set-ntp 0
+        _DATETIME=()
         # display and ask to set date/time
         _dialog --title " Date " --no-cancel --date-format '%F' --calendar "Use <TAB> to navigate and arrow keys to change values." 0 0 0 0 0 2>"${_ANSWER}"
-        _DATE="$(cat "${_ANSWER}")"
+        IFS=" " read -r -a _DATETIME <<< "$(cat "${_ANSWER}")"
         _dialog --title " Time " --no-cancel --timebox "Use <TAB> to navigate and up/down to change values." 0 0 2>"${_ANSWER}"
-        _TIME="$(cat "${_ANSWER}")"
+        IFS=" " read -r -a _DATETIME <<< "$(cat "${_ANSWER}")"
         # save the time
-        #shellcheck disable=SC2027
-        _DATETIME=""${_DATE}" "${_TIME}""
-        timedatectl set-time "${_DATETIME}"
+        timedatectl set-time "${_DATETIME[@]}"
         _SET_TIME="1"
     fi
     _dialog --title " Clock Configuration " --no-mouse --infobox "Clock configuration completed successfully." 3 50
