@@ -100,7 +100,7 @@ _task_update_environment() {
     _LOCAL_KERNEL=""
     _ONLINE_KERNEL=""
     pacman -Sy &>"${_LOG}"
-    _LOCAL_KERNEL="$(pacman -Qi "${_KERNELPKG[@]}" | rg 'Version.*: (.*)' -r '$1')"
+    _LOCAL_KERNEL="$(pacman -Qi "${_KERNELPKG}" | rg 'Version.*: (.*)' -r '$1')"
     if  [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         _ONLINE_KERNEL="$(pacman -Si "${_KERNELPKG}"-"${_RUNNING_ARCH}" | rg 'Version.*: (.*)' -r '$1')"
     else
