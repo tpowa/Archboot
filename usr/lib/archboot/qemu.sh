@@ -57,13 +57,12 @@ _upload_files() {
     for i in *; do
         #shellcheck disable=SC2086
         if [[ -f "${i}" ]]; then
-            #shellcheck disable=SC2046,SC2086,SC2116
-            gpg --chuid "${_USER}" $(echo ${_GPG}) "${i}" || exit 1
+            #shellcheck disable=SC2046,SC2116
+            gpg --chuid "${_USER}" $(echo "${_GPG[@]}") "${i}" || exit 1
         fi
     done
     chown "${_USER}:${_GROUP}" ./*
-    #shellcheck disable=SC2086
-    run0 -u "${_USER}" -D ./ ${_RSYNC} ./* "${_SERVER}:.${_ARCH_SERVERDIR}/" || exit 1
+    run0 -u "${_USER}" -D ./ "${_RSYNC[@]}" ./* "${_SERVER}:.${_ARCH_SERVERDIR}/" || exit 1
     cd ..
 }
 

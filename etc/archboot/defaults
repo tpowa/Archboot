@@ -111,7 +111,7 @@ _ARCHBOOT_RISCV64_CHROOT_PUBLIC="${_ARCHBOOT_PUBLIC}/${_PACMAN_RISCV64}"
 _USER="tobias"
 _GROUP="users"
 # gpg setup
-_GPG="--detach-sign --no-armor --batch --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F"
+_GPG=(--detach-sign --no-armor --batch --passphrase-file /etc/archboot/gpg.passphrase --pinentry-mode loopback -u 7EDF681F)
 # use this public gpg key to verify
 _GPG_KEY="/usr/share/archboot/gpg/tpowa.gpg"
 _GPG_KEY_ID="5B7E3FB71B7F10329A1C03AB771DF6627EDF681F"
