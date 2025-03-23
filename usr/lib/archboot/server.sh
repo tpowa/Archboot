@@ -37,7 +37,6 @@ _update_pacman_container() {
         echo "Using local pacman ${_ARCH} container..."
     fi
     # verify download
-    #shellcheck disable=SC2024
     gpg --chuid "${_USER}" --verify "${_PACMAN_CHROOT}.sig" &>"${_NO_LOG}" || exit 1
     bsdtar -C "${_ARCH_DIR}" -xf "${_PACMAN_CHROOT}" &>"${_NO_LOG}"
     echo "Removing installation tarball..."
@@ -57,8 +56,7 @@ _update_pacman_container() {
     rm -r "${_ARCH_DIR}"
     echo "Finished container tarball."
     echo "Sign tarball..."
-    #shellcheck disable=SC2046,SC2116
-    gpg --chuid "${_USER}" $(echo "${_GPG[@]}") "${_PACMAN_CHROOT}" || exit 1
+    gpg --chuid "${_USER}" "${_GPG[@]}" "${_PACMAN_CHROOT}" || exit 1
     chown "${_USER}:${_GROUP}" "${_PACMAN_CHROOT}"{,.sig} || exit 1
     echo "Syncing files to ${_SERVER}:${_PUB}/.${_SERVER_PACMAN}..."
     run0 -u "${_USER}" -D "${_ISO_HOME}" "${_RSYNC[@]}" "${_PACMAN_CHROOT}"{,.sig} "${_SERVER}:${_PUB}/.${_SERVER_PACMAN}/" || exit 1
@@ -120,8 +118,7 @@ _server_release() {
     fi
     # sign files and no symlinks, exclude ipxe directory and b2sum.txt
     for i in $(fd -t f -E 'ipxe' -E 'b2sum.txt'); do
-        #shellcheck disable=SC2046,SC2086,SC2116
-        gpg --chuid "${_USER}" $(echo ${_GPG}) "${i}"
+        gpg --chuid "${_USER}" "${_GPG[@]}" "${i}"
     done
     # recreate and sign b2sums
     rm b2sum.txt
@@ -130,8 +127,7 @@ _server_release() {
         chown -R "${_USER}:${_GROUP}" "${i}"
         touch "${i}"
     done
-    #shellcheck disable=SC2046,SC2086,SC2116
-    gpg --chuid "${_USER}" $(echo ${_GPG}) b2sum.txt
+    gpg --chuid "${_USER}" "${_GPG[@]}" b2sum.txt
     cd ..
     _create_archive
     mv "${_ISO_BUILD_DIR}" "${_DIR}"
