@@ -89,7 +89,8 @@ _local_pacman_conf() {
     echo "SigLevel    = Required DatabaseOptional"
     echo "LocalFileSigLevel = Optional"
     echo "[archboot]"
-    echo "Server = file://${_CACHEDIR}" } >> "${_PACMAN_CONF}"
+    echo "Server = file://${_CACHEDIR}"
+    } >> "${_PACMAN_CONF}"
     _PACMAN_CONF="--config ${_PACMAN_CONF}"
     _PACMAN="pacman --root ${_DESTDIR} ${_PACMAN_CONF} --cachedir=${_DESTDIR}${_CACHEDIR} --noconfirm"
 }
