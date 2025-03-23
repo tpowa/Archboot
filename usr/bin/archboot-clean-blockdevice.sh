@@ -21,8 +21,7 @@ _root_check
 echo -e "\e[1mCleaning blockdevice(s) $*...\e[m"
 echo -e "\e[91mWARNING: 10 seconds for hitting CTRL+C to stop the process on $* now! \e[m"
 sleep 10
-#shellcheck disable=SC2068
-for i in $@; do
+for i in "$@"; do
     if [[ -b "${i}" ]]; then
         echo -e "\e[1mSTEP 1/2:\e[m Cleaning ${i} filesystem signatures..."
         wipefs -f -a "${i}"
