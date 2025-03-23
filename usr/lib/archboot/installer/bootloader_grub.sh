@@ -114,7 +114,6 @@ set locale_dir="\${prefix}/locale"
 EOF
     [[ -n "${_USE_RAID}" ]] && echo "insmod raid" >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
     [[ -n "${_RAID_ON_LVM}" ]] && echo "insmod lvm" >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
-    #shellcheck disable=SC2129
     cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
 if [ "\${grub_platform}" == "efi" ]; then
     insmod all_video
