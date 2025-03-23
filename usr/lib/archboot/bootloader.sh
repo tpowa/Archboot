@@ -104,8 +104,7 @@ _upload_efi_files() {
     for i in *.efi; do
         #shellcheck disable=SC2086
         if [[ -f "${i}" ]]; then
-            #shellcheck disable=SC2046,SC2116
-            gpg --chuid "${_USER}" $(echo "${_GPG[@]}") "${i}" || exit 1
+            gpg --chuid "${_USER}" "${_GPG[@]}" "${i}" || exit 1
         fi
     done
     run0 -u "${_USER}" -D ./ "${_RSYNC[@]}" ./* "${_SERVER}:.${_ARCH_SERVERDIR}/" || exit 1

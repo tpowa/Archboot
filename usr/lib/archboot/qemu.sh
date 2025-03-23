@@ -50,15 +50,12 @@ _prepare_files () {
 _upload_files() {
     # sign files
     echo "Sign files and upload..."
-    #shellcheck disable=SC2086
-    cd ${1}/ || exit 1
+    cd "${1}"/ || exit 1
     chmod 644 ./*
     chown "${_USER}:${_GROUP}" ./*
     for i in *; do
-        #shellcheck disable=SC2086
         if [[ -f "${i}" ]]; then
-            #shellcheck disable=SC2046,SC2116
-            gpg --chuid "${_USER}" $(echo "${_GPG[@]}") "${i}" || exit 1
+            gpg --chuid "${_USER}" "${_GPG[@]}" "${i}" || exit 1
         fi
     done
     chown "${_USER}:${_GROUP}" ./*
