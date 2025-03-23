@@ -120,8 +120,9 @@ _create_pacman_conf() {
         fi
         if ! rg -qw "\[archboot\]" "${_PACMAN_CONF}"; then
             echo "Adding Archboot repository to ${_PACMAN_CONF}..."
-            echo "[archboot]" >> "${_PACMAN_CONF}"
-            echo "Server = https://pkg.archboot.com" >> "${_PACMAN_CONF}"
+            { echo "[archboot]"
+              echo "Server = https://pkg.archboot.com"
+            } >> "${_PACMAN_CONF}"
         fi
         #shellcheck disable=SC2001
         [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(echo "${_PACMAN_CONF}" | sd "^${1}" '')"
@@ -129,13 +130,14 @@ _create_pacman_conf() {
         echo "Using custom pacman.conf..."
         _PACMAN_CONF="$(mktemp "${1}"/pacman.conf.XXX)"
         { echo "[options]"
-        echo "Architecture = auto"
-        echo "SigLevel    = Required DatabaseOptional"
-        echo "LocalFileSigLevel = Optional"
-        echo "ParallelDownloads = 5"
-        echo "Color"
-        echo "[archboot]"
-        echo "Server = ${_INSTALL_SOURCE}" } >> "${_PACMAN_CONF}"
+          echo "Architecture = auto"
+          echo "SigLevel    = Required DatabaseOptional"
+          echo "LocalFileSigLevel = Optional"
+          echo "ParallelDownloads = 5"
+          echo "Color"
+          echo "[archboot]"
+          echo "Server = ${_INSTALL_SOURCE}"
+        } >> "${_PACMAN_CONF}"
         [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(basename "${_PACMAN_CONF}")"
     fi
 }
