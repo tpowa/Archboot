@@ -23,10 +23,8 @@ _cleanup() {
 }
 
 _run_pacman() {
-    #shellcheck disable=2068
-    for i in $@; do
-        #shellcheck disable=SC2086
-        LC_ALL=C.UTF-8 pacman -Sy ${i} --noconfirm &>"${_LOG}"
+    for i in "$@"; do
+        LC_ALL=C.UTF-8 pacman -Sy "${i}" --noconfirm &>"${_LOG}"
         if [[ ! -e "/.full_system" ]]; then
             _cleanup
         fi
@@ -36,16 +34,13 @@ _run_pacman() {
 
 _update_packages() {
     _IGNORE=()
-    #shellcheck disable=SC2128
     if [[ -n "${_GRAPHIC_IGNORE}" ]]; then
-        #shellcheck disable=SC2068
-        for i in ${_GRAPHIC_IGNORE[@]}; do
+        for i in "${_GRAPHIC_IGNORE[@]}"; do
             #shellcheck disable=SC2206
             _IGNORE+=(--ignore ${i})
         done
     fi
-    #shellcheck disable=SC2086,SC2068
-    LC_ALL=C.UTF-8 pacman -Syu ${_IGNORE[@]} --noconfirm &>"${_LOG}"
+    LC_ALL=C.UTF-8 pacman -Syu "${_IGNORE[@]}" --noconfirm &>"${_LOG}"
     if [[ ! -e "/.full_system" ]]; then
         _cleanup
     fi
@@ -53,8 +48,7 @@ _update_packages() {
 }
 
 _install_fix_packages() {
-    #shellcheck disable=SC2068
-    _run_pacman ${_FIX_PACKAGES[@]}
+    _run_pacman "${_FIX_PACKAGES[@]}"
     rm /.archboot
 }
 
@@ -63,8 +57,7 @@ _install_graphic() {
     if rg -q qxl /proc/modules; then
         _GRAPHIC+=(xf86-video-qxl)
     fi
-    #shellcheck disable=SC2068
-    _run_pacman ${_GRAPHIC[@]}
+    _run_pacman "${_GRAPHIC[@]}"
     rm /.archboot
 }
 
@@ -87,7 +80,7 @@ _prepare_graphic() {
     _install_graphic &
     _progress_wait "${_COUNT}" "97" "Installing ${_ENVIRONMENT}..." "3"
     _progress "98" "Restart dbus..."
-    systemd-sysusers >"${_LOG}" 2>&1
+    systemd-sysusers &>"${_LOG}"
     # add --boot to really create all tmpfiles!
     # Check: /tmp/.X11-unix, may have wrong permission on startup error!
     systemd-tmpfiles --boot --create >"${_LOG}" 2>&1
@@ -134,14 +127,12 @@ _custom_wayland_xorg() {
     if [[ -n "${_CUSTOM_WL}" ]]; then
         echo -e "\e[1mStep 1/2:\e[m Installing custom wayland..."
         echo "          This will need some time..."
-        #shellcheck disable=SC2068,SC2086
-        _prepare_graphic ${_WAYLAND_PACKAGE} ${_CUSTOM_WAYLAND[@]} > "${_LOG}" 2>&1
+        _prepare_graphic "${_WAYLAND_PACKAGE[@]}" "${_CUSTOM_WAYLAND[@]}" &>"${_LOG}"
     fi
     if [[ -n "${_CUSTOM_X}" ]]; then
         echo -e "\e[1mStep 1/2:\e[m Installing custom xorg..."
         echo "          This will need some time..."
-        #shellcheck disable=SC2068,SC2086
-        _prepare_graphic ${_XORG_PACKAGE} ${_CUSTOM_XORG[@]} > "${_LOG}" 2>&1
+        _prepare_graphic "${_XORG_PACKAGE[@]}" "${_CUSTOM_XORG[@]}" &>"${_LOG}"
     fi
     echo -e "\e[1mStep 2/2:\e[m Setting up browser...\e[m"
     command -v firefox &>"${_NO_LOG}"  && _firefox_flags

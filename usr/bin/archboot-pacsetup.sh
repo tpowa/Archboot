@@ -27,12 +27,10 @@ _select_mirror() {
     fi
     # This regex doesn't honor commenting
     _MIRRORS="$(rg -o '(https://[^/]*)' -r '$1 _' ${_PACMAN_MIRROR})"
-    [[ -z ${_MIRRORS} ]] && _MIRRORS="$(rg -o '(http://[^/]*)' -r '$1 _' ${_PACMAN_MIRROR})"
-    #shellcheck disable=SC2086
+    [[ -z ${_MIRRORS} ]] && _MIRRORS="($(rg -o '(http://[^/]*)' -r '$1 _' ${_PACMAN_MIRROR}))"
     _dialog --cancel-label "${_LABEL}" --title " Package Mirror " --menu "" 13 55 7 \
-    "Custom Mirror" "_"  ${_MIRRORS} 2>${_ANSWER} || return 1
-    #shellcheck disable=SC2155
-    local _SERVER=$(cat "${_ANSWER}")
+    "Custom Mirror" "_"  "${_MIRRORS[@]}" 2>"${_ANSWER}" || return 1
+    _SERVER=$(cat "${_ANSWER}")
     if [[ "${_SERVER}" == "Custom Mirror" ]]; then
         _dialog  --inputbox "Enter the full URL to repositories." 8 65 \
             "" 2>"${_ANSWER}" || _SYNC_URL=""
@@ -44,7 +42,6 @@ _select_mirror() {
     echo "Using mirror: ${_SYNC_URL}" >"${_LOG}"
     # comment already existing entries
     sd '^Server' '#Server' "${_PACMAN_MIRROR}"
-    #shellcheck disable=SC2027,SC2086
     echo "Server = "${_SYNC_URL}"" >> "${_PACMAN_MIRROR}"
     if ! pacman -Sy &>${_LOG}; then
         _dialog --title " ERROR " --no-mouse --infobox "Your selected mirror is not working correctly, please configure again!" 3 75
@@ -59,7 +56,6 @@ _select_mirror() {
     echo ""
     } >> "${_TEMPLATE}"
 }
-#shellcheck disable=SC2120
 _enable_testing() {
     _DOTESTING=""
     if ! rg -q "^\[.*testing\]" /etc/pacman.conf; then
@@ -104,19 +100,15 @@ _task_update_environment() {
     _LOCAL_KERNEL=""
     _ONLINE_KERNEL=""
     pacman -Sy &>"${_LOG}"
-    #shellcheck disable=SC2086
-    _LOCAL_KERNEL="$(pacman -Qi ${_KERNELPKG} | rg 'Version.*: (.*)' -r '$1')"
+    _LOCAL_KERNEL="$(pacman -Qi "${_KERNELPKG[@]}" | rg 'Version.*: (.*)' -r '$1')"
     if  [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        #shellcheck disable=SC2086
-        _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG}-${_RUNNING_ARCH} | rg 'Version.*: (.*)' -r '$1')"
+        _ONLINE_KERNEL="$(pacman -Si "${_KERNELPKG}"-"${_RUNNING_ARCH}" | rg 'Version.*: (.*)' -r '$1')"
     else
         if [[ -n "${_DOTESTING}" ]]; then
-            #shellcheck disable=SC2086
-            _ONLINE_KERNEL="$(pacman -Si core-testing/${_KERNELPKG} 2>${_NO_LOG} | rg 'Version.*: (.*)' -r '$1')"
+            _ONLINE_KERNEL="$(pacman -Si core-testing/"${_KERNELPKG}" 2>${_NO_LOG} | rg 'Version.*: (.*)' -r '$1')"
         fi
         if [[ -z "${_ONLINE_KERNEL}" ]]; then
-            #shellcheck disable=SC2086
-            _ONLINE_KERNEL="$(pacman -Si ${_KERNELPKG} | rg 'Version.*: (.*)' -r '$1')"
+            _ONLINE_KERNEL="$(pacman -Si "${_KERNELPKG}" | rg 'Version.*: (.*)' -r '$1')"
         fi
     fi
     echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"

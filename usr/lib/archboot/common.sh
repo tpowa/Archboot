@@ -62,9 +62,9 @@ if [[ ! -e "${_TEMPLATE}" ]]; then
     echo ""
     } >> "${_TEMPLATE}"
 fi
-_VNC_PACKAGE="tigervnc"
-_WAYLAND_PACKAGE="egl-wayland"
-_XORG_PACKAGE="xorg"
+_VNC_PACKAGE=(tigervnc)
+_WAYLAND_PACKAGE=(egl-wayland)
+_XORG_PACKAGE=(xorg)
 
 _BASENAME=${0##*/}
 _ANSWER="/.${_BASENAME}"

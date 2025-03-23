@@ -37,9 +37,8 @@ _config() {
     _CONFIG="${_CONFIG_DIR}/${_CONFIG}"
     #shellcheck disable=SC1090
     . "${_CONFIG}"
-    #shellcheck disable=SC2116,2086
     # aarch64 .gz kernel is not supported!
-    _KERNEL="$(echo ${_KERNEL} | sd '\.gz' '')"
+    _KERNEL="$(echo "${_KERNEL}" | sd '\.gz' '')"
     #shellcheck disable=SC2154
     [[ -z "${_UKI}" ]] && _UKI="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver "${_KERNEL}")-${_ARCH}"
 }
@@ -49,7 +48,6 @@ _prepare_initramfs() {
     echo "Preparing initramfs..."
     _INITRD="${_UKIDIR}/initrd.img"
     echo "Running archboot-cpio.sh for ${_INITRD}..."
-    #shellcheck disable=SC2154
     archboot-cpio.sh -c "${_CONFIG}" -k "${_KERNEL}" \
                      -g "${_INITRD}" || exit 1
 }

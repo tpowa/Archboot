@@ -28,8 +28,7 @@ EOF
 
 _install_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
-        #shellcheck disable=SC2086,SC2068
-        _prepare_graphic ${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES[@]} ${_GNOME_PACKAGES[@]}
+        _prepare_graphic "${_WAYLAND_PACKAGE[@]}" "${_STANDARD_PACKAGES[@]}" "${_GNOME_PACKAGES[@]}"
     fi
     _prepare_browser >"${_LOG}" 2>&1
     _configure_gnome >"${_LOG}" 2>&1
