@@ -117,7 +117,6 @@ _BASE_BLACKLIST=(
   xtrace
 )
 archboot-binary-check.sh base &>>"${_LOG}"
-#shellcheck disable=SC2013
 for i in $(rg '/usr/bin/(.*)' -r '$1' binary.log | rg -v gawk-*); do
     if ! echo "${_BASE_BLACKLIST[@]}" | rg -qw "${i}"; then
         echo "${i}" >> base-binary-error.log
@@ -130,7 +129,7 @@ _result fw-error.log
 # uninstall base again!
 pacman --noconfirm -Rdd base gettext &>>"${_LOG}"
 _run_test "licenses"
-IFS=" " read -r -a _ALL_PACKAGES <<< $(pacman -Q | sd ' .*' '')
+IFS=" " read -r -a _ALL_PACKAGES <<< "$(pacman -Q | sd ' .*' '')"
 for i in $(pacman -Ql "${_ALL_PACKAGES[@]}" | rg -o '/usr/share/licenses/.*'); do
     [[ -e "${i}" ]] || echo "${i}" >> license-error.log
 done
