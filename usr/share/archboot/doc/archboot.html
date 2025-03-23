@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="gallery.html">Gallery</a> | <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=Z7GXKW4MKHK7C"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2025 Fundraise: 0% <progress max="100" value="30">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2025 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 22.03.2025 10:42</strong></p>
+<strong>Last update: 23.03.2025 09:16</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -36,38 +36,40 @@
 <li><a href="#interactive-basic-setup" id="toc-interactive-basic-setup"><span class="toc-section-number">3.4</span> Interactive Basic Setup</a></li>
 <li><a href="#interactive-launcher" id="toc-interactive-launcher"><span class="toc-section-number">3.5</span> Interactive Launcher</a></li>
 <li><a href="#interactive-setup" id="toc-interactive-setup"><span class="toc-section-number">3.6</span> Interactive Setup</a></li>
-<li><a href="#for-experts-quickinst-installation" id="toc-for-experts-quickinst-installation"><span class="toc-section-number">3.7</span> For Experts: Quickinst Installation</a></li>
-<li><a href="#cli-manage-archboot" id="toc-manage-archboot"><span class="toc-section-number">3.8</span> For Experts: CLI Manage Environment</a></li>
-<li><a href="#autorun" id="toc-autorun"><span class="toc-section-number">3.9</span> For Experts: Custom Autorun Script</a></li>
-<li><a href="#automatic-install" id="toc-automatic-install"><span class="toc-section-number">3.10</span> For Experts: Automatic Installation</a></li>
-<li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">3.11</span> Tools For Backup And Copying Of An Existing System</a></li>
-<li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">3.12</span> Restoring An USB Device To FAT32 State</a></li>
-<li><a href="#clean-blockdevice" id="toc-clean-blockdevice"><span class="toc-section-number">3.13</span> Clean Blockdevice</a></li>
-<li><a href="#debug-early-userspace" id="toc-debug-early-userspace"><span class="toc-section-number">3.14</span> Debug Early Userspace</a></li>
-<li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.15</span> System Configuration On Installed System</a></li>
-</ul></li>
-<li><strong><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><span class="toc-section-number">4.</span> FAQ / Known Issues / Limitations</a></strong></li>
-<li><strong><a href="#archiso" id="toc-archiso"><span class="toc-section-number">5.</span> Comparison To Archiso Image</a></strong></li>
-<li><strong><a href="#development" id="toc-development"><span class="toc-section-number">6.</span> Development: GIT And Bugtracker</a></strong></li>
-<li><a href="#package-installation" id="toc-usage"><strong><span class="toc-section-number">7.</span> Package - Repository / Installation / Usage</strong></a>
+<li><a href="#system-configuration" id="toc-system-configuration"><span class="toc-section-number">3.7</span> System Configuration On Installed System</a></li></ul>
+<li><a href="#for-experts" id="toc-for-experts"><strong><span class="toc-section-number">4.</span> For Experts / Powerusers</strong></a></li>
 <li><ul>
-<li><a href="#create-rescue-system" id="toc-create-rescue-system"><span class="toc-section-number">7.1</span> Create Rescue System Out Of The Running System</a></li>
-<li><a href="#create-image-files" id="toc-create-image-files"><span class="toc-section-number">7.2</span> Create Image Files</a>
-<li><a href="#setting-up-an-archboot-image-server" id="toc-setting-up-an-archboot-image-server"><span class="toc-section-number">7.3</span> Setting Up An Image Server</a></li>
+<li><a href="#quickinst-installation" id="toc-quickinst-installation"><span class="toc-section-number">4.1</span> Quickinst Installation</a></li>
+<li><a href="#cli-manage-archboot" id="toc-manage-archboot"><span class="toc-section-number">4.2</span> CLI Manage Environment</a></li>
+<li><a href="#autorun" id="toc-autorun"><span class="toc-section-number">4.3</span> Custom Autorun Script</a></li>
+<li><a href="#automatic-install" id="toc-automatic-install"><span class="toc-section-number">4.4</span> Automatic Installation</a></li>
+<li><a href="#tools-for-backup-and-copying-of-an-existing-system" id="toc-tools-for-backup-and-copying-of-an-existing-system"><span class="toc-section-number">4.5</span> Tools For Backup And Copying Of An Existing System</a></li>
+<li><a href="#restoring-an-usb-device-to-fat32-state" id="toc-restoring-an-usb-device-to-fat32-state"><span class="toc-section-number">4.6</span> Restoring An USB Device To FAT32 State</a></li>
+<li><a href="#clean-blockdevice" id="toc-clean-blockdevice"><span class="toc-section-number">4.7</span> Clean Blockdevice</a></li>
+<li><a href="#debug-early-userspace" id="toc-debug-early-userspace"><span class="toc-section-number">4.8</span> Debug Early Userspace</a></li>
 </ul></li>
-<li><a href="#testing-image-and-files-with-qemu" id="toc-testing-image-and-files-with-qemu"><strong><span class="toc-section-number">8.</span> Testing Image And Files With QEMU</strong></a></li>
+<li><strong><a href="#faq-known-issues-and-limitations" id="toc-faq-known-issues-and-limitations"><span class="toc-section-number">5.</span> FAQ / Known Issues / Limitations</a></strong></li>
+<li><strong><a href="#archiso" id="toc-archiso"><span class="toc-section-number">6.</span> Comparison To Archiso Image</a></strong></li>
+<li><strong><a href="#development" id="toc-development"><span class="toc-section-number">7.</span> Development: GIT And Bugtracker</a></strong></li>
+<li><a href="#package-installation" id="toc-usage"><strong><span class="toc-section-number">8.</span> Package - Repository / Installation / Usage</strong></a>
 <li><ul>
-<li><a href="#running-aarch64" id="toc-running-aarch64"><span class="toc-section-number">8.1</span> Running AARCH64</a></li>
-<li><a href="#running-riscv64" id="toc-running-riscv64"><span class="toc-section-number">8.2</span> Running RISCV64</a></li>
-<li><a href="#running-x86_64" id="toc-running-x86-64"><span class="toc-section-number">8.3</span> Running X86_64</a></li>
-<li><a href="#additional-qemu-parameters" id="toc-additional-qemu-parameters"><span class="toc-section-number">8.4</span> Additional Qemu Parameters</a></li>
-<li><a href="#hwsim" id="toc-hwsim"><span class="toc-section-number">8.5</span> Setting Up A Hwsim SSID</a></li>
+<li><a href="#create-rescue-system" id="toc-create-rescue-system"><span class="toc-section-number">8.1</span> Create Rescue System Out Of The Running System</a></li>
+<li><a href="#create-image-files" id="toc-create-image-files"><span class="toc-section-number">8.2</span> Create Image Files</a>
+<li><a href="#setting-up-an-archboot-image-server" id="toc-setting-up-an-archboot-image-server"><span class="toc-section-number">8.3</span> Setting Up An Image Server</a></li>
 </ul></li>
-<li><strong><a href="#arch-linux-wiki" id="toc-arch-linux-wiki"><span class="toc-section-number">9.</span> Arch Linux Wiki</a></strong></li>
-<li><strong><a href="#project-links" id="toc-project-links"><span class="toc-section-number">10.</span> Project Links</a></strong></li>
-<li><strong><a href="#videos" id="toc-videos"><span class="toc-section-number">11.</span> Videos</a></strong></li>
-<li><strong><a href="#history" id="toc-history"><span class="toc-section-number">12.</span> History</a></strong></li>
-<li><strong><a href="#references" id="toc-references"><span class="toc-section-number">12.</span> References</a></strong></li>
+<li><a href="#testing-image-and-files-with-qemu" id="toc-testing-image-and-files-with-qemu"><strong><span class="toc-section-number">9.</span> Testing Image And Files With QEMU</strong></a></li>
+<li><ul>
+<li><a href="#running-aarch64" id="toc-running-aarch64"><span class="toc-section-number">9.1</span> Running AARCH64</a></li>
+<li><a href="#running-riscv64" id="toc-running-riscv64"><span class="toc-section-number">9.2</span> Running RISCV64</a></li>
+<li><a href="#running-x86_64" id="toc-running-x86-64"><span class="toc-section-number">9.3</span> Running X86_64</a></li>
+<li><a href="#additional-qemu-parameters" id="toc-additional-qemu-parameters"><span class="toc-section-number">9.4</span> Additional Qemu Parameters</a></li>
+<li><a href="#hwsim" id="toc-hwsim"><span class="toc-section-number">9.5</span> Setting Up A Hwsim SSID</a></li>
+</ul></li>
+<li><strong><a href="#arch-linux-wiki" id="toc-arch-linux-wiki"><span class="toc-section-number">10.</span> Arch Linux Wiki</a></strong></li>
+<li><strong><a href="#project-links" id="toc-project-links"><span class="toc-section-number">11.</span> Project Links</a></strong></li>
+<li><strong><a href="#videos" id="toc-videos"><span class="toc-section-number">12.</span> Videos</a></strong></li>
+<li><strong><a href="#history" id="toc-history"><span class="toc-section-number">13.</span> History</a></strong></li>
+<li><strong><a href="#references" id="toc-references"><span class="toc-section-number">14.</span> References</a></strong></li>
 </ul>
 </nav>
 <h2 data-number="1" id="introduction"><span class="header-section-number">1.</span> Introduction</h2>
@@ -593,7 +595,12 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 <li>The selected <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> will be installed to your system and you can modify the configuration file(s) afterwards.</li>
 <li><a href="https://wiki.archlinux.org/title/Pacman#Hooks" title="Hooks"><strong> Pacman hooks</strong></a> for automatic bootloader upgrade will be enabled by default.</li>
 </ul>
-<h3 data-number="3.7" id="for-experts-quickinst-installation"><span class="header-section-number">3.7</span> <strong>For Experts: Quickinst Installation</strong></h3>
+<h3 data-number="3.7" id="system-configuration"><span class="header-section-number">3.7</span> System Configuration On Installed System</h3>
+<p>You can also run <strong>archboot-setup.sh</strong> for <strong>system configuration</strong> on an installed system.
+<a href="#package-installation" title="Installation"><strong>Install</strong></a> your corresponding Archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
+<p style="page-break-after: always"></p>
+<h2 data-number="4." id="for-experts"><span class="header-section-number">4.</span> <strong>For Experts / Powerusers</strong></h2>
+<h3 data-number="4.1" id="quickinst-installation"><span class="header-section-number">4.1</span> <strong> Quickinst Installation</strong></h3>
 <ul>
 <li>This script is for <strong>experts</strong>, who assemble the filesystems first and mount them in a directory.</li>
 <li><strong>quickinst</strong> will autodetect the packages to install for a minimal system.</li>
@@ -610,7 +617,7 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.8" id="cli-manage-archboot"><span class="header-section-number">3.8</span> <strong>For Experts: CLI Manage Environment</strong></h3>
+<h3 data-number="4.2" id="cli-manage-archboot"><span class="header-section-number">4.2</span> <strong> CLI Manage Environment</strong></h3>
 <p>You can always bump your image to <strong>latest</strong> available possibilities.</p>
 <table>
 <thead>
@@ -624,14 +631,13 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.9" id="autorun"><span class="header-section-number">3.9</span> <strong>For Experts: Custom Autorun Script</strong></h3>
+<h3 data-number="4.3" id="autorun"><span class="header-section-number">4.3</span> <strong> Custom Autorun Script</strong></h3>
 <p>A custom autorun script at the end of bootup can be executed with the following options:</p>
 <ul>
 <li>Customization at runtime:<br>Remote scripts can be inserted with <strong>autorun=&lt;remotepath&gt;</strong> on bootloader commandline. Any remote path <strong>curl</strong> can handle is supported. Local image does <strong>not</strong> support that feature.</li>
 <li>Customization at build time:<br><strong>/etc/archboot/run/autorun.sh</strong> will be inserted into the images.</li>
 </ul>
-<p style="page-break-after: always"></p>
-<h3 data-number="3.10" id="automatic-install"><span class="header-section-number">3.10</span> <strong>For Experts: Automatic Installation</strong></h3>
+<h3 data-number="4.4" id="automatic-install"><span class="header-section-number">4.4</span> <strong> Automatic Installation</strong></h3>
 <ul>
 <li>Archboot provides a <strong>template creation routine</strong> for automatic installations.</li>
 <li>This provides an easy way to do <strong>mass installations</strong> through PXE on your network or with prepared media.</li>
@@ -641,7 +647,7 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 <li>Afterwards run the script during boot by using <strong><a href="#autorun" title="custom autorun">custom autorun</a></strong> or by executing it by hand on booted media.</li>
 <li>Here is an <strong><a href="./archboot-autorun.txt" title="template script">example template</a></strong>, to show how the result may look like.</li>
 </ul>
-<h3 data-number="3.11" id="tools-for-backup-and-copying-of-an-existing-system"><span class="header-section-number">3.11</span> <strong>Tools For Backup And Copying Of An Existing System</strong></h3>
+<h3 data-number="4.5" id="tools-for-backup-and-copying-of-an-existing-system"><span class="header-section-number">4.5</span> <strong>Tools For Backup And Copying Of An Existing System</strong></h3>
 <p>Archboot provides 2 additional scripts for doing those tasks.</p>
 <ul>
 </ul>
@@ -669,7 +675,7 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 </tr>
 </tbody>
 </table>
-<h3 data-number="3.12" id="restoring-an-usb-device-to-fat32-state"><span class="header-section-number">3.12</span> <strong>Restoring An USB Device To FAT32 State</strong></h3>
+<h3 data-number="4.6" id="restoring-an-usb-device-to-fat32-state"><span class="header-section-number">4.6</span> <strong>Restoring An USB Device To FAT32 State</strong></h3>
 <ul>
 <li>When you have used the .iso image to create an USB installer, your USB stick is no longer useful for anything else.</li>
 <li>Any remaining space on the stick (supposing you used a larger-than the .img file) is inaccessible.</li>
@@ -687,8 +693,7 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 </tr>
 </tbody>
 </table>
-<p style="page-break-after: always"></p>
-<h3 data-number="3.13" id="clean-blockdevice"><span class="header-section-number">3.13</span> Clean Blockdevice</h3>
+<h3 data-number="4.7" id="clean-blockdevice"><span class="header-section-number">4.7</span> Clean Blockdevice</h3>
 <p>You can use <strong>clean-blockdevice.sh</strong> for cleaning partition table and filesystem signatures of any blockdevice.</p>
 <table>
 <thead>
@@ -709,14 +714,11 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 # nvme format -s1 &lt;device(s)&gt;</code></td></tr>
 </tbody>
 </table>
-<h3 data-number="3.14" id="debug-early-userspace"><span class="header-section-number">3.14</span> Debug Early Userspace</h3>
+<p style="page-break-after: always"></p>
+<h3 data-number="4.8" id="debug-early-userspace"><span class="header-section-number">4.8</span> Debug Early Userspace</h3>
 <p>In order to debug the early userspace add <strong>archboot-early-debug</strong> on <strong>kernel commandline</strong>.
 Mount <strong>/dev/zram0</strong> to <strong>/sysroot</strong> and analyze the rootfs or <strong>exit</strong> the bash shell to <strong>continue</strong> the boot process.</p>
-<h3 data-number="3.15" id="system-configuration"><span class="header-section-number">3.15</span> System Configuration On Installed System</h3>
-<p>You can also run <strong>archboot-setup.sh</strong> for <strong>system configuration</strong> on an installed system.
-<a href="#package-installation" title="Installation"><strong>Install</strong></a> your corresponding Archboot package for getting the <strong>archboot-setup.sh</strong> script.</p>
-<p style="page-break-after: always"></p>
-<h2 data-number="4." id="faq-known-issues-and-limitations"><span class="header-section-number">4.</span> <strong>FAQ / Known Issues / Limitations</strong></h2>
+<h2 data-number="5." id="faq-known-issues-and-limitations"><span class="header-section-number">5.</span> <strong>FAQ / Known Issues / Limitations</strong></h2>
 <p>Please <strong>check</strong> the forum threads or project page for posted <strong>fixes</strong> and <strong>workarounds</strong>.</p>
 <table>
 <thead>
@@ -773,7 +775,7 @@ The calculated size to boot the image follows the formula:<br>
 </li>
 </ul>
 <p style="page-break-after: always"></p>
-<h2 data-number="5." id="archiso"><span class="header-section-number">5. </span>Comparison To Archiso Image</h2>
+<h2 data-number="6." id="archiso"><span class="header-section-number">6. </span>Comparison To Archiso Image</h2>
 <table>
 <thead>
 <tr class="header">
@@ -1051,12 +1053,12 @@ The calculated size to boot the image follows the formula:<br>
 </tbody>
 </table>
 <p> &#9733; Optional | <sup>1</sup> Only local image | <sup>2</sup> Acer R11 Chromebook 4GB RAM | <sup>3</sup> QEMU (4GB RAM, kvm and virtio backend), normal image</p>
-<h2 data-number="6." id="development"><span class="header-section-number">6.</span> <strong>Development: GIT And Bugtracker</strong></h2>
+<h2 data-number="7." id="development"><span class="header-section-number">7.</span> <strong>Development: GIT And Bugtracker</strong></h2>
 <ul>
 <li>GIT repository can be found at <a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Arch Linux Gitlab</strong></a> or <a href="https://github.com/tpowa/Archboot"><strong>Github</strong></a> .</li>
 <li>Use the Arch Linux Gitlab <a href="https://gitlab.archlinux.org/tpowa/archboot/-/issues"><strong>Bugtracker</strong></a> for filling bugs.</li>
 </ul>
-<h2 data-number="7." id="package-installation"><span class="header-section-number">7.</span> <strong>Package - Repository / Installation / Usage</strong></h2>
+<h2 data-number="8." id="package-installation"><span class="header-section-number">8.</span> <strong>Package - Repository / Installation / Usage</strong></h2>
 <table>
 <thead>
 <tr class="header">
@@ -1083,7 +1085,7 @@ The calculated size to boot the image follows the formula:<br>
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <strong>qemu-user-static</strong> package for building <strong>aarch64</strong> or <strong>riscv64</strong> images on <strong>x86_64</strong> hardware.</li>
 </ul>
 <p>If you want to build <strong>aarch64</strong> or <strong>riscv64</strong> images replace <strong>x86_64</strong> with the architecture of your choice in the commands and files below.</p>
-<h2 data-number="7.1" id="create-rescue-system"><span class="header-section-number">7.1</span> <strong>Create Rescue System Out Of The Running System</strong></h2>
+<h2 data-number="8.1" id="create-rescue-system"><span class="header-section-number">8.1</span> <strong>Create Rescue System Out Of The Running System</strong></h2>
 <table>
 <thead>
 <tr class="header">
@@ -1098,10 +1100,10 @@ The calculated size to boot the image follows the formula:<br>
 </table>
 <p>Add your used <strong>kernel</strong> and <strong>initrd</strong> to your bootloader.</p>
 <p style="page-break-after: always"></p>
-<h2 data-number="7.2" id="create-image-files"><span class="header-section-number">7.2</span> Create Image Files</h2>
-<h3 data-number="7.2.1" id="requirements"><span class="header-section-number">7.2.1</span> <strong>Requirement</strong></h3>
+<h2 data-number="8.2" id="create-image-files"><span class="header-section-number">8.2</span> Create Image Files</h2>
+<h3 data-number="8.2.1" id="requirements"><span class="header-section-number">8.2.1</span> <strong>Requirement</strong></h3>
 <p>In order to build images you will need around <strong>3G</strong> free space on disk.</p>
-<h3 data-number="7.2.2" id="create-image-files-without-modifications"><span class="header-section-number">7.2.2</span> <strong>Create Image Files Without Modifications</strong></h3>
+<h3 data-number="8.2.2" id="create-image-files-without-modifications"><span class="header-section-number">8.2.2</span> <strong>Create Image Files Without Modifications</strong></h3>
 <p>This script creates every installation media with latest available core/extra packages and boot/ directory with kernel and initrds.</p>
 <strong>Custom OpenSSH Key</strong>: Place your public key to <strong>/etc/archboot/ssh/archboot-key.pub</strong>
 <table>
@@ -1128,9 +1130,9 @@ The calculated size to boot the image follows the formula:<br>
 </tr>
 </tbody>
 </table>
-<h3 data-number="7.2.3" id="create-image-files-with-modifications"><span class="header-section-number">7.2.3</span> <strong>Create Image Files With Modifications:</strong></h3>
+<h3 data-number="8.2.3" id="create-image-files-with-modifications"><span class="header-section-number">8.2.3</span> <strong>Create Image Files With Modifications:</strong></h3>
 <p>Explanation of the image tools / toolchain.</p>
-<h4 data-number="7.2.3.1" id="archboot-x86_64-create-container.sh"><span class="header-section-number">7.2.3.1</span> <strong>archboot-x86_64-create-container.sh</strong></h4>
+<h4 data-number="8.2.3.1" id="archboot-x86_64-create-container.sh"><span class="header-section-number">8.2.3.1</span> <strong>archboot-x86_64-create-container.sh</strong></h4>
 <table>
 <thead>
 <tr class="header">
@@ -1157,13 +1159,13 @@ The calculated size to boot the image follows the formula:<br>
 </table>
 <p>Modify your container to your needs. Then run <strong>archboot-x86_64-iso.sh</strong> for image creation in container.</p>
 <p style="page-break-after: always"></p>
-<h4 data-number="7.2.3.2" id="configuration-files-for-image-creation"><span class="header-section-number">7.2.3.2</span> <strong>Configuration Files For Image Creation:</strong></h4>
+<h4 data-number="8.2.3.2" id="configuration-files-for-image-creation"><span class="header-section-number">8.2.3.2</span> <strong>Configuration Files For Image Creation:</strong></h4>
 There are the following configuration files for ISO creation:
 <ul>
 <li><strong>/etc/archboot/defaults</strong>: defaults for packages, bootloader config and server setup.</li>
 <li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the _KERNEL and the _HOOKS, which are used for the initrd.</li>
 </ul>
-<h4 data-number="7.2.3.3" id="archboot-cpio.sh"><span class="header-section-number">7.2.3.3</span> <strong>archboot-cpio.sh</strong></h4>
+<h4 data-number="8.2.3.3" id="archboot-cpio.sh"><span class="header-section-number">8.2.3.3</span> <strong>archboot-cpio.sh</strong></h4>
 The Archboot initramfs toolchain uses its <strong>own</strong> cpio generator. Some differences to other initcpio creators:
 <ul>
 <li><strong>objdump</strong> is used for library detection. It's faster than ldd!</li>
@@ -1261,7 +1263,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tr>
 </tbody>
 </table>
-<h4 data-number="7.2.3.4" id="archboot-x86_64-iso.sh"><span class="header-section-number">7.2.3.4</span> <strong>archboot-x86_64-iso.sh</strong></h4>
+<h4 data-number="8.2.3.4" id="archboot-x86_64-iso.sh"><span class="header-section-number">8.2.3.4</span> <strong>archboot-x86_64-iso.sh</strong></h4>
 <p>Script for ISO creation from running system or for use in Archboot container.</p>
 <table>
 <thead>
@@ -1284,7 +1286,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tr>
 </tbody>
 </table>
-<h4 data-number="7.2.3.5" id="archboot-x86_64-uki.sh"><span class="header-section-number">7.2.3.5</span> <strong>archboot-x86_64-uki.sh</strong></h4>
+<h4 data-number="8.2.3.5" id="archboot-x86_64-uki.sh"><span class="header-section-number">8.2.3.5</span> <strong>archboot-x86_64-uki.sh</strong></h4>
 <p>Script for UKI creation from running system or for use in Archboot container.</p>
 <table>
 <thead>
@@ -1308,17 +1310,17 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tbody>
 </table>
 <p style="page-break-after: always"></p>
-<h2 data-number="7.3" id="setting-up-an-archboot-image-server"><span class="header-section-number">7.3.</span> Setting Up An Image Server</h2>
-<h3 data-number="7.3.1" id="requirements-1"><span class="header-section-number">7.3.1</span> <strong>Requirements</strong></h3>
+<h2 data-number="8.3" id="setting-up-an-archboot-image-server"><span class="header-section-number">8.3.</span> Setting Up An Image Server</h2>
+<h3 data-number="8.3.1" id="requirements-1"><span class="header-section-number">8.3.1</span> <strong>Requirements</strong></h3>
 <ul>
 <li>You have a normal user, which has access to a working gpg setup with own signature.</li>
 <li>You have a normal user with ssh access to the server, on which the images should upload.</li>
 <li>Add the directories on the remote server, you want to upload to.</li>
 </ul>
-<h3 data-number="7.3.2" id="configuration-file"><span class="header-section-number">7.3.2</span> <strong>Configuration File</strong></h3>
+<h3 data-number="8.3.2" id="configuration-file"><span class="header-section-number">8.3.2</span> <strong>Configuration File</strong></h3>
 <p>You need to configure all your settings in the configuration file: <strong>/etc/archboot/defaults</strong></p>
-<h3 data-number="7.3.3" id="running-commands"><span class="header-section-number">7.3.3</span> <strong>Running Commands</strong></h3>
-<h4 data-number="7.3.3.1" id="IPXE-chain"><span class="header-section-number">7.3.3.1</span> <strong>IPXE - ROOT CA - Chain Of Trust (optional)</strong></h4>
+<h3 data-number="8.3.3" id="running-commands"><span class="header-section-number">8.3.3</span> <strong>Running Commands</strong></h3>
+<h4 data-number="8.3.3.1" id="IPXE-chain"><span class="header-section-number">8.3.3.1</span> <strong>IPXE - ROOT CA - Chain Of Trust (optional)</strong></h4>
 <table>
 <thead>
 <tr class="header">
@@ -1347,7 +1349,8 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tr>
 </tbody>
 </table>
-<h4 data-number="7.3.3.2" id="x86_64-architecture"><span class="header-section-number">7.3.3.2</span> <strong>X86_64 Architecture</strong></h4>
+<p style="page-break-after: always"></p>
+<h4 data-number="8.3.3.2" id="x86_64-architecture"><span class="header-section-number">8.3.3.2</span> <strong>X86_64 Architecture</strong></h4>
 <table>
 <thead>
 <tr class="header">
@@ -1360,7 +1363,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tr>
 </tbody>
 </table>
-<h4 data-number="7.3.3.3" id="aarch64riscv64-architecture"><span class="header-section-number">7.3.3.3</span> <strong>Aarch64/Riscv64 Architecture</strong></h4>
+<h4 data-number="8.3.3.3" id="aarch64riscv64-architecture"><span class="header-section-number">8.3.3.3</span> <strong>Aarch64/Riscv64 Architecture</strong></h4>
 <ul>
 <li>You have to skip the tarball creation step, on <strong>aarch64</strong> or <strong>riscv64</strong> hardware.</li>
 <li><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <a href="https://archlinux.org/packages/?name=qemu-user-static"><strong>qemu-user-static</strong></a> package, for building on <strong>x86_64</strong> hardware.</li>
@@ -1397,8 +1400,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tr>
 </tbody>
 </table>
-<p style="page-break-after: always"></p>
-<h4 data-number="7.3.3.4" id="automatic-server-update"><span class="header-section-number">7.3.3.4</span> <strong>Automatic Server Update</strong></h4>
+<h4 data-number="8.3.3.4" id="automatic-server-update"><span class="header-section-number">8.3.3.4</span> <strong>Automatic Server Update</strong></h4>
 <p>The <strong>/etc/archboot/server-update.conf</strong> file defines architectures and update trigger packages.</p>
 <table>
 <thead>
@@ -1417,9 +1419,9 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </table>
 <p>You can skip the automatic generation, by adding a <strong>MASK</strong> file to the directory, which includes the containers.</p>
 <p style="page-break-after: always"></p>
-<h2 data-number="8" id="testing-image-and-files-with-qemu"><span class="header-section-number">8.</span> Testing Image And Files With QEMU</h2>
+<h2 data-number="9" id="testing-image-and-files-with-qemu"><span class="header-section-number">9.</span> Testing Image And Files With QEMU</h2>
 <p>You can run <a href="https://wiki.archlinux.org/title/QEMU" title="QEMU"><strong>QEMU</strong></a> tests at different stages of ISO creation.</p>
-<h3 data-number="8.1" id="running-aarch64"><span class="header-section-number">8.1</span> <strong>Running AARCH64:</strong></h3>
+<h3 data-number="9.1" id="running-aarch64"><span class="header-section-number">9.1</span> <strong>Running AARCH64:</strong></h3>
 <p><a href="https://wiki.archlinux.org/title/Install" title="Install"><strong>Install</strong></a> the <a href="https://archlinux.org/packages/?name=edk2-aarch64"><strong>edk2-aarch64</strong></a> package.</p>
 <table>
 <thead>
@@ -1433,7 +1435,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tr>
 </tbody>
 </table>
-<h3 data-number="8.2" id="running-riscv64"><span class="header-section-number">8.2</span> <strong>Running RISCV64:</strong></h3>
+<h3 data-number="9.2" id="running-riscv64"><span class="header-section-number">9.2</span> <strong>Running RISCV64:</strong></h3>
 <table>
 <thead>
 <tr class="header">
@@ -1447,8 +1449,8 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tbody>
 </table>
 <p>Use <strong>ssh root@localhost -p 2222</strong> to connect to machine from your running host.</p>
-<h3 data-number="8.3" id="running-x86_64"><span class="header-section-number">8.3</span> <strong>Running X86_64:</strong></h3>
-<h4 data-number="8.3.1" id="uefi-gpt"><span class="header-section-number">8.3.1</span> <strong>Running Kernel, BIOS MBR, UEFI GPT Without Secure Boot:</strong></h4>
+<h3 data-number="9.3" id="running-x86_64"><span class="header-section-number">9.3</span> <strong>Running X86_64:</strong></h3>
+<h4 data-number="9.3.1" id="uefi-gpt"><span class="header-section-number">9.3.1</span> <strong>Running Kernel, BIOS MBR, UEFI GPT Without Secure Boot:</strong></h4>
 <table>
 <thead>
 <tr class="header">
@@ -1498,7 +1500,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tr>
 </tbody>
 </table>
-<h4 data-number="8.3.2" id="uefi-gpt-secure-boot"><span class="header-section-number">8.3.2</span> <strong>UEFI GPT Secure Boot</strong></h4>
+<h4 data-number="9.3.2" id="uefi-gpt-secure-boot"><span class="header-section-number">9.3.2</span> <strong>UEFI GPT Secure Boot</strong></h4>
 <table>
 <thead>
 <tr class="header">
@@ -1539,7 +1541,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tr>
 </tbody>
 </table>
-<h3 data-number="8.4" id="additional-qemu-parameters"><span class="header-section-number">8.4</span> <strong>Additional Qemu Parameters</strong></h3>
+<h3 data-number="9.4" id="additional-qemu-parameters"><span class="header-section-number">9.4</span> <strong>Additional Qemu Parameters</strong></h3>
 <table>
 <thead>
 <tr class="header">
@@ -1576,7 +1578,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tr>
 </tbody>
 </table>
-<h3 data-number="8.5" id="hwsim"><span class="header-section-number">8.5</span> <strong>Setting Up A Hwsim SSID</strong></h3>
+<h3 data-number="9.5" id="hwsim"><span class="header-section-number">9.5</span> <strong>Setting Up A Hwsim SSID</strong></h3>
 <table>
 <thead>
 <tr class="header">
@@ -1590,7 +1592,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 </tbody>
 </table>
 <p style="page-break-after: always"></p>
-<h2 data-number="9" id="arch-linux-wiki"><span class="header-section-number">9.</span> Arch Linux Wiki</h2>
+<h2 data-number="10" id="arch-linux-wiki"><span class="header-section-number">10.</span> Arch Linux Wiki</h2>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Installation_Guide" title="Installation Guide"><strong>Installation Guide</strong></a></li>
 <li><a href="https://wiki.archlinux.org/title/Improving_performance" title="Improving performance"><strong>Improving performance</strong></a></li>
@@ -1608,7 +1610,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 <li><a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a></li>
 <li><a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a></li>
 </ul>
-<h2 data-number="10" id="project-links"><span class="header-section-number">10.</span> Project Links</h2>
+<h2 data-number="11" id="project-links"><span class="header-section-number">11.</span> Project Links</h2>
 <ul>
 <li><a href="https://www.reddit.com/r/archboot"><strong>Blog</strong></a></li>
 <li><a href="https://gitlab.archlinux.org/tpowa/archboot"><strong>Development</strong></a></li>
@@ -1617,7 +1619,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 <li><a href="https://source.archboot.com"><strong>Build Sources</strong></a></li>
 <li><a href="https://gitlab.archlinux.org/tpowa/archboot-repository"><strong>Repository</strong></a></li>
 </ul>
-<h2 data-number="11" id="videos"><span class="header-section-number">11.</span> Videos</h2>
+<h2 data-number="12" id="videos"><span class="header-section-number">12.</span> Videos</h2>
 <ul>
 <li><a href="https://www.youtube.com/watch?v=2r0SG2XTaQQ"><strong>VMware Fusion on Macbook M1</strong></a></li>
 <li><a href="https://www.youtube.com/watch?v=xo_PlJHloqk"><strong>Parallels installation on Macbook M1</strong></a></li>
@@ -1625,7 +1627,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 <li><a href="https://www.youtube.com/watch?v=mb3ykTklnWU"><strong>Running local image</strong></a></li>
 </ul>
 <p style="page-break-after: always"></p>
-<h2 data-number="12" id="history"><span class="header-section-number">12.</span> History</h2>
+<h2 data-number="13" id="history"><span class="header-section-number">13.</span> History</h2>
 <ul>
 <li>Official <a href="https://archlinux.org/"><strong>Arch Linux</strong></a> install medium from <strong>Release 0.7</strong> till <strong>2008.03</strong>.</li>
 <li>Provided <strong>i686</strong> and <strong>x86_64</strong> on one ISO until <strong>2018</strong>.</li>
@@ -1634,7 +1636,7 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 <li>Since 10-2022 <strong>riscv64</strong> support.</li>
 <li>Since 03-2025 <strong>Netboot - IPXE</strong> support.</li>
 </ul>
-<h2 data-number="13" id="references"><span class="header-section-number">13.</span> References</h2>
+<h2 data-number="14" id="references"><span class="header-section-number">14.</span> References</h2>
 <ul>
 <li><a href="https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/"><strong>Qemu display devices</strong></a></li>
 <li><a href="https://colatkinson.site/linux/riscv/2021/01/27/riscv-qemu/"><strong>Qemu on RISC-V</strong></a></li>
