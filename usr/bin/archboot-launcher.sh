@@ -23,10 +23,9 @@ _desktop () {
     _dialog  --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>"${_ANSWER}" || return 1
     [[ -e /.launcher-running ]] && rm /.launcher-running
     _EXIT=$(cat "${_ANSWER}")
-    #shellcheck disable=SC2086
     _dialog  --title " Internet Browser " --menu "" 8 40 4 \
     "chromium" "Browser From Google" \
-    "firefox" "Browser From Mozilla" 2>${_ANSWER} || return 1
+    "firefox" "Browser From Mozilla" 2>"${_ANSWER}" || return 1
     _BROWSER=$(cat "${_ANSWER}")
     sd "STANDARD_BROWSER=.*" "STANDARD_BROWSER=${_BROWSER}" /etc/archboot/defaults
     source /etc/locale.conf
@@ -51,11 +50,10 @@ _manage() {
 }
 
 _exit() {
-    #shellcheck disable=SC2086
     _dialog  --title " Exit Menu " --menu "" 9 30 5 \
     "1" "Exit Program" \
     "2" "Reboot System" \
-    "3" "Poweroff System" 2>${_ANSWER} || return 1
+    "3" "Poweroff System" 2>"${_ANSWER}" || return 1
         _EXIT=$(cat "${_ANSWER}")
     if [[ "${_EXIT}" == "1" ]]; then
         [[ -e /.launcher-running ]] && rm /.launcher-running
