@@ -6,30 +6,27 @@ _run ()
 {
     ### generate motd
     _MOTD="${_ROOTFS}/etc/motd"
-    #shellcheck disable=SC2129
-    echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux ${_RUNNING_ARCH^^}\e[m" >> "${_MOTD}"
-    echo -e "\e[1m----------------------------------------\e[m" >> "${_MOTD}"
-    echo -e "\e[1mVconsole Layout:\e[m" >> "${_MOTD}"
-    echo -e "-----------------------------------------------------" >> "${_MOTD}"
-    echo -e "| Login     | Network | System | Log      | Systemd |" >> "${_MOTD}"
-    echo -e "| Consoles  | Status  | Status | Messages | Journal |" >> "${_MOTD}"
-    echo -e "|-----------|---------|--------|----------|---------|" >> "${_MOTD}"
-    echo -e "| VC 1 - 4  | VC 5    | VC 6   | VC 11    | VC 12   |" >> "${_MOTD}"
-    echo -e "|-----------|---------|--------|----------|---------|" >> "${_MOTD}"
-    echo -e "| \e[1;92mALT+F1-F4\e[m | \e[1;92mALT+F5\e[m  | \e[1;92mALT+F6\e[m | \e[1;92mALT+F11\e[m  | \e[1;92mALT+F12\e[m |" >> "${_MOTD}"
-    echo -e "-----------------------------------------------------" >> "${_MOTD}"
+    { echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux ${_RUNNING_ARCH^^}\e[m"
+    echo -e "\e[1m----------------------------------------\e[m"
+    echo -e "\e[1mVconsole Layout:\e[m"
+    echo -e "-----------------------------------------------------"
+    echo -e "| Login     | Network | System | Log      | Systemd |"
+    echo -e "| Consoles  | Status  | Status | Messages | Journal |"
+    echo -e "|-----------|---------|--------|----------|---------|"
+    echo -e "| VC 1 - 4  | VC 5    | VC 6   | VC 11    | VC 12   |"
+    echo -e "|-----------|---------|--------|----------|---------|"
+    echo -e "| \e[1;92mALT+F1-F4\e[m | \e[1;92mALT+F5\e[m  | \e[1;92mALT+F6\e[m | \e[1;92mALT+F11\e[m  | \e[1;92mALT+F12\e[m |"
+    echo -e "-----------------------------------------------------"} >> "${_MOTD}"
 if  echo "${_HOOKS[@]}" | rg -qw net; then
-    #shellcheck disable=SC2129
-    echo -e "\e[1mFor Additional Wi-Fi Authentification Or Online Help:\e[m" >> "${_MOTD}"
-    echo -e "  - Use the \e[1;92m'elinks'\e[m web browser." >> "${_MOTD}"
-    echo -e "  - Use the \e[1;92m'tiny'\e[m IRC client." >> "${_MOTD}"
+    { echo -e "\e[1mFor Additional Wi-Fi Authentification Or Online Help:\e[m"
+    echo -e "  - Use the \e[1;92m'elinks'\e[m web browser."
+    echo -e "  - Use the \e[1;92m'tiny'\e[m IRC client."} >> "${_MOTD}"
 fi
 if  echo "${_HOOKS[@]}" | rg -qw installer; then
-    #shellcheck disable=SC2129
-    echo -e "\e[1mManage Archboot Environment:\e[m" >> "${_MOTD}"
-    echo -e "  - Use the \e[1;92m'launcher'\e[m or the expert \e[1;92m'update'\e[m script." >> "${_MOTD}"
-    echo -e "\e[1mInstallation:\e[m" >> "${_MOTD}"
-    echo -e "  - Use the \e[1;92m'setup'\e[m or the expert \e[1;92m'quickinst'\e[m script." >> "${_MOTD}"
+    { echo -e "\e[1mManage Archboot Environment:\e[m"
+    echo -e "  - Use the \e[1;92m'launcher'\e[m or the expert \e[1;92m'update'\e[m script."
+    echo -e "\e[1mInstallation:\e[m"
+    echo -e "  - Use the \e[1;92m'setup'\e[m or the expert \e[1;92m'quickinst'\e[m script."} >> "${_MOTD}"
 fi
 }
 
