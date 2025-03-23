@@ -4,7 +4,6 @@
 . /etc/archboot/defaults
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/container.sh
-#shellcheck disable=SC1094
 . /usr/lib/archboot/update/update.sh
 . /usr/lib/archboot/update/manage.sh
 . /usr/lib/archboot/update/desktop.sh
@@ -60,7 +59,6 @@ if [[ -n "${_G_RELEASE}" ]]; then
     clear
 fi
 # install custom xorg or wayland
-#shellcheck disable=SC2128
 if [[ -n "${_CUSTOM_X}" || -n "${_CUSTOM_WL}" ]]; then
     _custom_wayland_xorg
 fi
