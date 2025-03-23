@@ -77,7 +77,6 @@ _prepare_uefi_AA64() {
     _GRUB_ARCH="arm64-efi"
     _GRUB_EFI="grubaa64.efi"
     mkdir "${1}"/grub-efi
-    #shellcheck disable=SC2086
     _grub_mkstandalone "${_NSPAWN}" "${1}"
     mv "${1}/grub-efi/${_GRUB_EFI}" grub-efi/
 }
@@ -89,7 +88,6 @@ _prepare_uefi_RISCV64() {
     _GRUB_ARCH="riscv64-efi"
     _GRUB_EFI="grubriscv64.efi"
     mkdir "${1}"/grub-efi
-    #shellcheck disable=SC2086
     _grub_mkstandalone "${_NSPAWN}" "${1}"
     mv "${1}/grub-efi/${_GRUB_EFI}" grub-efi/
 }
@@ -97,12 +95,10 @@ _prepare_uefi_RISCV64() {
 _upload_efi_files() {
     # sign files
     echo "Sign files and upload..."
-    #shellcheck disable=SC2086
-    cd ${1}/ || exit 1
+    cd "${1}"/ || exit 1
     chmod 644 ./*
     chown "${_USER}:${_GROUP}" ./*
     for i in *.efi; do
-        #shellcheck disable=SC2086
         if [[ -f "${i}" ]]; then
             gpg --chuid "${_USER}" "${_GPG[@]}" "${i}" || exit 1
         fi
