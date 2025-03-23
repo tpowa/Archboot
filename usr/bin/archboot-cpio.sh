@@ -12,7 +12,7 @@ if [[ -z "${1}" ]]; then
 fi
 _root_check
 _parameters "$@"
-#shellcheck disable="SC1090"
+#shellcheck disable=SC1090
 . "${_CONFIG}" 2>"${_NO_LOG}" || _abort "Failed to read ${_CONFIG} configuration file"
 echo "Using config: ${_CONFIG}"
 if [[ -z "${_KERNEL}" ]]; then
