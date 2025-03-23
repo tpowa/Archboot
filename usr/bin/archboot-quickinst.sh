@@ -33,15 +33,13 @@ _prepare_pacman() {
     fi
     _pacman_keyring
     ${_PACMAN} -Sy
-    #shellcheck disable=SC2086,SC2068
-    pacman -Sy ${_PACMAN_CONF} --noconfirm --noprogressbar ${_KEYRING[@]} || exit 1
+    pacman -Sy "${_PACMAN_CONF[@]}" --noconfirm --noprogressbar "${_KEYRING[@]}" || exit 1
 }
 
 # package_installation
 _install_packages() {
     _auto_packages
-    #shellcheck disable=SC2068
-    ${_PACMAN} -S ${_PACKAGES[@]}
+    ${_PACMAN} -S "${_PACKAGES[@]}"
 }
 
 _post_installation() {
@@ -70,7 +68,7 @@ fi
 if [[ -e "${_LOCAL_DB}" ]]; then
     _local_pacman_conf
 else
-    _PACMAN_CONF=""
+    _PACMAN_CONF=()
 fi
 if ! _prepare_pacman; then
     echo -e "Pacman preparation \e[91mFAILED\e[m."
