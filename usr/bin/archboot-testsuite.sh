@@ -130,8 +130,8 @@ _result fw-error.log
 # uninstall base again!
 pacman --noconfirm -Rdd base gettext &>>"${_LOG}"
 _run_test "licenses"
-#shellcheck disable=SC2046
-for i in $(pacman -Ql $(pacman -Q | sd ' .*' '') | rg -o '/usr/share/licenses/.*'); do
+IFS=" " read -r -a _ALL_PACKAGES <<< $(pacman -Q | sd ' .*' '')
+for i in $(pacman -Ql "${_ALL_PACKAGES[@]}" | rg -o '/usr/share/licenses/.*'); do
     [[ -e "${i}" ]] || echo "${i}" >> license-error.log
 done
 _result license-error.log
