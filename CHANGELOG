@@ -8,7 +8,7 @@ Environment:
 - cleanup pacman config and options
 - added tiny package as preconfigured IRC client
 - 3cpio 0.4.0
-- set iptables-nft as default iptables
+- added iptables-nft as default iptables
 common:
 - added --disable-download-timeout option to pacman defaults
 bootloader:
