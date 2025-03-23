@@ -3,6 +3,7 @@
 # packages to install (eg. firmware, kernel packages)
 _PACKAGES=(
   base
+  iptables-nft
   linux
   linux-firmware
   linux-firmware-marvell
