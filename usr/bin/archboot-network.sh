@@ -258,7 +258,6 @@ _network() {
         echo "echo \"IgnoreCarrierLoss=3s\""
     fi
     if [[ "${_IP}" == "static" ]]; then
-        #shellcheck disable=SC2129
         echo "echo \"Address=${_IPADDR}\""
         echo "echo \"Gateway=${_GW}\""
         echo "echo \"DNS=${_DNS}\""
