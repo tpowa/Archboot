@@ -27,11 +27,11 @@ _select_mirror() {
     fi
     _MIRRORS=()
     # This regex doesn't honor commenting
-    for i in $(rg -o '(http://[^/]*)' -r '$1 _' ${_PACMAN_MIRROR}); do
+    for i in $(rg -o '(https://[^/]*)' -r '$1 _' "${_PACMAN_MIRROR}"); do
         _MIRRORS+=("${i}")
     done
     _dialog --cancel-label "${_LABEL}" --title " Package Mirror " --menu "" 13 55 7 \
-    "Custom Mirror" "_"  "${_MIRRORS[@]}" 2>"${_ANSWER}" || return 1
+    "Custom Mirror" "_" "${_MIRRORS[@]}" 2>"${_ANSWER}" || return 1
     _SERVER=$(cat "${_ANSWER}")
     if [[ "${_SERVER}" == "Custom Mirror" ]]; then
         _dialog  --inputbox "Enter the full URL to repositories." 8 65 \
@@ -45,7 +45,7 @@ _select_mirror() {
     # comment already existing entries
     sd '^Server' '#Server' "${_PACMAN_MIRROR}"
     repo=\$repo arch=\$arch echo "Server = ${_SYNC_URL}" >> "${_PACMAN_MIRROR}"
-    if ! pacman -Sy &>${_LOG}; then
+    if ! pacman -Sy &>"${_LOG}"; then
         _dialog --title " ERROR " --no-mouse --infobox "Your selected mirror is not working correctly, please configure again!" 3 75
         sleep 3
         _SYNC_URL=""
@@ -108,7 +108,7 @@ _task_update_environment() {
         _ONLINE_KERNEL="$(pacman -Si "${_KERNELPKG}"-"${_RUNNING_ARCH}" | rg 'Version.*: (.*)' -r '$1')"
     else
         if [[ -n "${_DOTESTING}" ]]; then
-            _ONLINE_KERNEL="$(pacman -Si core-testing/"${_KERNELPKG}" 2>${_NO_LOG} | rg 'Version.*: (.*)' -r '$1')"
+            _ONLINE_KERNEL="$(pacman -Si core-testing/"${_KERNELPKG}" 2>"${_NO_LOG}" | rg 'Version.*: (.*)' -r '$1')"
         fi
         if [[ -z "${_ONLINE_KERNEL}" ]]; then
             _ONLINE_KERNEL="$(pacman -Si "${_KERNELPKG}" | rg 'Version.*: (.*)' -r '$1')"
