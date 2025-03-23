@@ -26,10 +26,16 @@ _select_mirror() {
         fi
     fi
     _MIRRORS=()
-    # This regex doesn't honor commenting
+    # add https mirrors
     for i in $(rg -o '(https://[^/]*)' -r '$1 _' "${_PACMAN_MIRROR}"); do
         _MIRRORS+=("${i}")
     done
+    # add http servers
+    if [[ -z ${_MIRRORS} ]]; then
+        for i in $(rg -o '(http://[^/]*)' -r '$1 _' "${_PACMAN_MIRROR}"); do
+            _MIRRORS+=("${i}")
+        done
+    fi
     _dialog --cancel-label "${_LABEL}" --title " Package Mirror " --menu "" 13 55 7 \
     "Custom Mirror" "_" "${_MIRRORS[@]}" 2>"${_ANSWER}" || return 1
     _SERVER=$(cat "${_ANSWER}")
