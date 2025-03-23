@@ -25,9 +25,11 @@ _select_mirror() {
             cp /tmp/pacman_mirrorlist.txt "${_PACMAN_MIRROR}"
         fi
     fi
+    _MIRRORS=()
     # This regex doesn't honor commenting
-    _MIRRORS="$(rg -o '(https://[^/]*)' -r '$1 _' ${_PACMAN_MIRROR})"
-    [[ -z ${_MIRRORS} ]] && _MIRRORS="($(rg -o '(http://[^/]*)' -r '$1 _' ${_PACMAN_MIRROR}))"
+    for i in $(rg -o '(http://[^/]*)' -r '$1 _' ${_PACMAN_MIRROR}); do
+        _MIRRORS+=("${i}")
+    done
     _dialog --cancel-label "${_LABEL}" --title " Package Mirror " --menu "" 13 55 7 \
     "Custom Mirror" "_"  "${_MIRRORS[@]}" 2>"${_ANSWER}" || return 1
     _SERVER=$(cat "${_ANSWER}")
@@ -42,7 +44,7 @@ _select_mirror() {
     echo "Using mirror: ${_SYNC_URL}" >"${_LOG}"
     # comment already existing entries
     sd '^Server' '#Server' "${_PACMAN_MIRROR}"
-    echo "Server = "${_SYNC_URL}"" >> "${_PACMAN_MIRROR}"
+    repo=\$repo arch=\$arch echo "Server = ${_SYNC_URL}" >> "${_PACMAN_MIRROR}"
     if ! pacman -Sy &>${_LOG}; then
         _dialog --title " ERROR " --no-mouse --infobox "Your selected mirror is not working correctly, please configure again!" 3 75
         sleep 3
@@ -56,6 +58,7 @@ _select_mirror() {
     echo ""
     } >> "${_TEMPLATE}"
 }
+#shellcheck disable=SC2120
 _enable_testing() {
     _DOTESTING=""
     if ! rg -q "^\[.*testing\]" /etc/pacman.conf; then
