@@ -17,7 +17,9 @@ _archboot_check
 pacman --noconfirm -Sy
 if [[ "${1}" == "base" ]]; then
     pacman --noconfirm -S base
-    _PACKAGE+=("$(LANG=C.UTF-8 pacman -Qi base | rg -o 'Depends.*: (.*)' -r '$1')")
+    for i in $(LANG=C.UTF-8 pacman -Qi base | rg -o 'Depends.*: (.*)' -r '$1'); do
+        _PACKAGE+=("${i}")
+    done
 else
     _PACKAGE+=("${1}")
 fi
