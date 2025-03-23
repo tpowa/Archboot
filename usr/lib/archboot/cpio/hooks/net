@@ -9,6 +9,13 @@ _run ()
                  rtacct rtmon rtstat rustscan ss ssh tc tiny tipc tracepath trip vdpa
     # add iproute 2, add openssl helper libraries
     _map _full_dir /usr/lib/engines-3 /usr/share/tc
+    # iptables-nft
+    _map _binary arptables{,-nft,-nft-restore,-nft-save,-restore,-save,-translate} \
+    ebtables{,-nft,-nft-restore,-nft-save,-restore,-save,-translate} \
+    ip{,6}tables{,-apply,-legacy,-legacy-restore,-legacy-save,-nft,-nft-restore,-nft-save,-restore,-restore-translate,-save,-translate} \
+    iptables-xml nfbpf_compile nfnl_osf xtables-{legacy-multi,monitor,nft-multi}
+    _map _full_dir /usr/lib/xtables /etc/iptables /usr/share/{iptables,xtables}
+    _map _file /etc/{arptables.conf,ebtables.conf,ethertypes}
     # add config for rustmap, no nmap available
     echo "ulimit = 5000" >> "${_ROOTFS}"/root/.rustscan.toml
     echo "scripts = \"None\"" >> "${_ROOTFS}"/root/.rustscan.toml
