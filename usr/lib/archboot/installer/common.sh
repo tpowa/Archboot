@@ -84,13 +84,12 @@ _chroot_umount()
 
 _local_pacman_conf() {
     _PACMAN_CONF="$(mktemp /tmp/pacman.conf.XXX)"
-    #shellcheck disable=SC2129
-    echo "[options]" >> "${_PACMAN_CONF}"
-    echo "Architecture = auto" >> "${_PACMAN_CONF}"
-    echo "SigLevel    = Required DatabaseOptional" >> "${_PACMAN_CONF}"
-    echo "LocalFileSigLevel = Optional" >> "${_PACMAN_CONF}"
-    echo "[archboot]" >> "${_PACMAN_CONF}"
-    echo "Server = file://${_CACHEDIR}" >> "${_PACMAN_CONF}"
+    { echo "[options]"
+    echo "Architecture = auto"
+    echo "SigLevel    = Required DatabaseOptional"
+    echo "LocalFileSigLevel = Optional"
+    echo "[archboot]"
+    echo "Server = file://${_CACHEDIR}" } >> "${_PACMAN_CONF}"
     _PACMAN_CONF="--config ${_PACMAN_CONF}"
     _PACMAN="pacman --root ${_DESTDIR} ${_PACMAN_CONF} --cachedir=${_DESTDIR}${_CACHEDIR} --noconfirm"
 }
