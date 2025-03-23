@@ -14,7 +14,7 @@ _run ()
                  ebtables{,-nft,-nft-restore,-nft-save,-restore,-save,-translate} \
                  ip{,6}tables{,-apply,-legacy,-legacy-restore,-legacy-save,-nft,-nft-restore,-nft-save,-restore,-restore-translate,-save,-translate} \
                  iptables-xml nfbpf_compile nfnl_osf xtables-{legacy-multi,monitor,nft-multi}
-    _map _full_dir /usr/lib/xtables /etc/iptables /usr/share/{iptables,xtables}
+    _map _full_dir /etc/iptables /usr/lib/xtables /usr/share/{iptables,xtables}
     _map _file /etc/{arptables.conf,ebtables.conf,ethertypes}
     # add config for rustmap, no nmap available
     echo "ulimit = 5000" >> "${_ROOTFS}"/root/.rustscan.toml
