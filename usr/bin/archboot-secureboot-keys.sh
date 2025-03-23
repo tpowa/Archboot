@@ -12,7 +12,6 @@ _usage () {
     echo -e "Backup of your existing keys are put to \e[1mBACKUP\e[m directory."
     echo ""
     echo -e "Usage: \e[1m${_BASENAME} -name=<your name> <directory>\e[m"
-    exit 0
 }
 [[ -z "${1}" || -z "${2}" ]] && _usage
 _DIR="${2}"
@@ -26,7 +25,6 @@ done
 if [[ -z "${_NAME}" ]]; then
     echo "ERROR: no name specified"
     _usage
-    #shellcheck disable=2317
     exit 1
 fi
 _root_check
@@ -89,6 +87,5 @@ if [[ -n "${_DIR}" ]]; then
 else
     echo "ERROR: no directory specified"
     _usage
-    #shellcheck disable=2317
     exit 1
 fi
