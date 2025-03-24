@@ -239,7 +239,7 @@ _prepare_release_txt() {
     echo "Tobias Powalowski <tpowa@archlinux.org>"
     echo ""
     echo "The release is based on these main packages:"
-    echo "Archboot: $(pacman -Qi "${_ARCHBOOT}" |\
+    echo "Archboot: $(pacman -Qi "${_ARCHBOOT[@]}" |\
     rg -o 'Version.* (.*)' -r '$1')"
     [[ "${_ARCH}" == "riscv64" ]] || echo "Grub: $(pacman -Qi grub |\
                                      rg -o 'Version.* (.*)' -r '$1')"

@@ -19,11 +19,9 @@ _download_packages() {
     else
         _pacman_key_system
     fi
-    #shellcheck disable=SC2206
-    _PACKAGES+=(${_KEYRING[@]} ${_ARCHBOOT} ${_MAN_INFO_PACKAGES[@]})
+    _PACKAGES+=("${_KEYRING[@]}" "${_ARCHBOOT[@]}" "${_MAN_INFO_PACKAGES[@]}")
     echo "Downloading ${_PACKAGES[*]} to ${1}..."
-    #shellcheck disable=SC2086,SC2068
-    ${_PACMAN} -Syw ${_PACKAGES[@]} ${_PACMAN_DEFAULTS} ${_PACMAN_DB} &>"${_NO_LOG}" || exit 1
+    ${_PACMAN} -Syw "${_PACKAGES[@]}" "${_PACMAN_DEFAULTS[@]}" "${_PACMAN_DB[@]}" &>"${_NO_LOG}" || exit 1
 }
 
 _move_packages() {

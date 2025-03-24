@@ -71,14 +71,14 @@ _ANSWER="/.${_BASENAME}"
 _VC_NUM="${_LOG/\/dev\/tty/}"
 _VC="VC${_VC_NUM}"
 if echo "${_BASENAME}" | rg -qw aarch64; then
-    _ARCHBOOT="archboot-arm"
+    _ARCHBOOT=(archboot-arm)
     _KEYRING+=(archlinuxarm-keyring)
     _ARCH="aarch64"
 elif echo "${_BASENAME}" | rg -qw riscv64; then
-    _ARCHBOOT="archboot-riscv"
+    _ARCHBOOT=(archboot-riscv)
     _ARCH="riscv64"
 else
-    _ARCHBOOT="archboot"
+    _ARCHBOOT=(archboot)
     _ARCH="x86_64"
 fi
 _CONFIG_LATEST="${_ARCH}-latest.conf"
@@ -300,7 +300,6 @@ _fix_network() {
 _create_archboot_db() {
     echo "Creating reproducible repository db..."
     pushd "${1}" >"${_NO_LOG}" || return 1
-    #shellcheck disable=SC2046
     LC_ALL=C.UTF-8 fd -u -t f -E '*.sig' . -X repo-add -q archboot.db.tar
     for i in archboot.{db.tar,files.tar}; do
         mkdir repro
@@ -323,19 +322,18 @@ _pacman_parameters() {
     # building for different architecture using binfmt
     if [[ "${2}" == "use_binfmt" ]]; then
         _PACMAN="${_NSPAWN} ${1} pacman"
-        _PACMAN_CACHEDIR=""
-        _PACMAN_DB="--dbpath /blankdb"
+        _PACMAN_CACHEDIR=()
+        _PACMAN_DB=(--dbpath /blankdb)
     # building for running architecture
     else
         _PACMAN="pacman --root ${1}"
         # needs to be full path
-        #shellcheck disable=SC2086
-        _PACMAN_CACHEDIR="--cachedir $(pwd)/${1}${_CACHEDIR}"
-        _PACMAN_DB="--dbpath ${1}/blankdb"
+        _PACMAN_CACHEDIR=(--cachedir "$(pwd)"/"${1}""${_CACHEDIR}")
+        _PACMAN_DB=(--dbpath "${1}"/blankdb)
     fi
     [[ -d "${1}"/blankdb ]] || mkdir "${1}"/blankdb
     # defaults used on every pacman call
-    _PACMAN_DEFAULTS="--config ${_PACMAN_CONF} ${_PACMAN_CACHEDIR} --disable-download-timeout --ignore systemd-resolvconf --noconfirm"
+    _PACMAN_DEFAULTS=(--config "${_PACMAN_CONF}" "${_PACMAN_CACHEDIR[@]}" --disable-download-timeout --ignore systemd-resolvconf --noconfirm)
 }
 
 _pacman_key() {
