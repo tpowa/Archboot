@@ -39,7 +39,6 @@ _config() {
     . "${_CONFIG}"
     # aarch64 .gz kernel is not supported!
     _KERNEL="$(echo "${_KERNEL}" | sd '\.gz' '')"
-    #shellcheck disable=SC2154
     [[ -z "${_UKI}" ]] && _UKI="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver "${_KERNEL}")-${_ARCH}"
 }
 
@@ -54,11 +53,11 @@ _prepare_initramfs() {
 
 _systemd_ukify() {
     echo "Generating ${_ARCH} UKI image..."
-    [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE="--initrd=/${_INTEL_UCODE}"
-    _AMD_UCODE="--initrd=/${_AMD_UCODE}"
+    [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE=(--initrd=/"${_INTEL_UCODE}")
+    _AMD_UCODE=(--initrd=/"${_AMD_UCODE}")
     #shellcheck disable=SC2086
     /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
-        ${_INTEL_UCODE} ${_AMD_UCODE} --initrd="${_INITRD}" --cmdline="${_CMDLINE}" \
+        "${_INTEL_UCODE[@]}" "${_AMD_UCODE[@]}" --initrd="${_INITRD}" --cmdline="${_CMDLINE}" \
         --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}.efi" &>"${_NO_LOG}" || exit 1
 }
 
