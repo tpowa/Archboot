@@ -104,8 +104,7 @@ EOF
 
 _install_sway() {
     if ! [[ -e /usr/bin/sway ]]; then
-        #shellcheck disable=SC2086,SC2068
-        _prepare_graphic ${_WAYLAND_PACKAGE} ${_STANDARD_PACKAGES[@]} ${_SWAY_PACKAGES[@]}
+        _prepare_graphic "${_WAYLAND_PACKAGE[@]}" "${_STANDARD_PACKAGES[@]}" "${_SWAY_PACKAGES[@]}"
     fi
     _prepare_browser >"${_LOG}" 2>&1
     _configure_sway >"${_LOG}" 2>&1

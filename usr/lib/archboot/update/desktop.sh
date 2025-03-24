@@ -16,7 +16,6 @@ _cleanup() {
              . /usr/share/locale/ -X rm &>"${_NO_LOG}"
     fd -u -t f -E 'UTF-8.gz' . /usr/share/i18n/charmaps -X rm &>"${_NO_LOG}"
     # remove packages from cache
-    #shellcheck disable=SC2013
     for i in $(rg -o '.* (.*) \(' -r '$1' /var/log/pacman.log); do
         rm -rf "${_CACHEDIR}/${i}"-*
     done
@@ -36,8 +35,7 @@ _update_packages() {
     _IGNORE=()
     if [[ -n "${_GRAPHIC_IGNORE}" ]]; then
         for i in "${_GRAPHIC_IGNORE[@]}"; do
-            #shellcheck disable=SC2206
-            _IGNORE+=(--ignore ${i})
+            _IGNORE+=(--ignore "${i}")
         done
     fi
     LC_ALL=C.UTF-8 pacman -Syu "${_IGNORE[@]}" --noconfirm &>"${_LOG}"
@@ -64,8 +62,7 @@ _install_graphic() {
 
 _prepare_graphic() {
     # fix libs first, then install packages from defaults
-    #shellcheck disable=SC2206
-    _GRAPHIC=($@)
+    _GRAPHIC=("$@")
     if [[ ! -e "/.full_system" ]]; then
         _progress "1" "Removing firmware files..."
         rm -rf /usr/lib/firmware
@@ -116,8 +113,11 @@ _prepare_browser() {
         fi
         _firefox_flags
     else
-        #shellcheck disable=SC2046
-        pacman -Q firefox &>"${_NO_LOG}" && pacman -R --noconfirm $(pacman -Q | rg -o 'firefox.* ') &>"${_LOG}"
+        _FIREFOX=()
+        for i in $(pacman -Q | rg -o 'firefox.* '); do
+            _FIREFOX+=("${i}")
+        done
+        pacman -Q firefox &>"${_NO_LOG}" && pacman -R --noconfirm "${_FIREFOX[@]}" &>"${_LOG}"
         pacman -Q chromium &>"${_NO_LOG}" || _run_pacman chromium
         _chromium_flags
     fi

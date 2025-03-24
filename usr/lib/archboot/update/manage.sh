@@ -119,8 +119,7 @@ _clean_archboot() {
     rm -rf /usr/lib/modules
     _SHARE_DIRS="bash-completion efitools fonts kbd licenses lshw nano nvim pacman systemd tc zoneinfo"
     for i in ${_SHARE_DIRS}; do
-        #shellcheck disable=SC2115
-        rm -rf "/usr/share/${i}"
+        rm -rf "/usr/share/${i:?}"
     done
 }
 
@@ -361,8 +360,10 @@ _new_environment() {
 _full_system() {
     _progress "1" "Refreshing pacman package database..."
     pacman -Sy &>"${_LOG}" || exit 1
-    #shellcheck disable=SC2207
-    _PACKAGES=($(pacman -Qqn))
+    _PACKAGES=()
+    for i in $(pacman -Qqn); do
+        _PACKAGES+=("${i}")
+    done
     _COUNT=0
     _PACKAGE_COUNT="$(pacman -Qqn | wc -l)"
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
@@ -370,13 +371,11 @@ _full_system() {
     else
         _MKINITCPIO="initramfs"
     fi
-    #shellcheck disable=SC2068
-    for i in ${_PACKAGES[@]}; do
+    for i in "${_PACKAGES[@]}"; do
         if [[ "$((_COUNT*100/_PACKAGE_COUNT-4))" -gt 1 ]]; then
             _progress "$((_COUNT*100/_PACKAGE_COUNT-4))" "Reinstalling all packages, installing ${i} now..."
         fi
-        #shellcheck disable=SC2086
-        pacman -S --assume-installed ${_MKINITCPIO} --noconfirm ${i} &>"${_LOG}" || exit 1
+        pacman -S --assume-installed "${_MKINITCPIO}" --noconfirm "${i}" &>"${_LOG}" || exit 1
         _COUNT="$((_COUNT+1))"
     done
     : >/tmp/60-mkinitcpio-remove.hook
