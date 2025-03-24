@@ -109,8 +109,7 @@ _filter_mods() {
 }
 
 _all_mods() {
-    #shellcheck disable=SC2046
-    _map _mod $(_filter_mods "$@")
+    _map _mod "$(_filter_mods "$@")"
 }
 
 _mod() {
