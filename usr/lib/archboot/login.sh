@@ -137,8 +137,7 @@ _run_autorun() {
         echo "Waiting for pacman keyring..."
         _pacman_keyring
         echo "Updating pacman keyring..."
-        #shellcheck disable=SC2086,SC2068
-        pacman -Sy --noconfirm ${_KEYRING[@]} &>"${_LOG}"
+        pacman -Sy --noconfirm "${_KEYRING[@]}" &>"${_LOG}"
         chmod 755 /etc/archboot/run/autorun.sh
         echo "Running custom autorun.sh..."
         /etc/archboot/run/./autorun.sh
