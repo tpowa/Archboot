@@ -87,16 +87,14 @@ _task() {
     fi
     if [[ "${1}" == system ]]; then
         rm -r /lib/modules
-        #shellcheck disable=SC2164
-        cd /sysroot
+        cd /sysroot || exit 1
         # fastest uncompression of zstd cpio format
         3cpio -x "/mnt/efi/boot/initrd-${_ARCH}.img"
         rm -r sysroot
         rm init
     fi
     if [[ "${1}" == fw_run ]]; then
-        #shellcheck disable=SC2164
-        cd /sysroot
+        cd /sysroot || exit 1
         3cpio -x --force "${2}" &>"${_NO_LOG}"
     fi
     if [[ "${1}" == unmount ]]; then
@@ -190,8 +188,7 @@ _initrd_stage() {
             _FW_RUN+=("${_FW}/ti-connectivity.img")
         fi
     fi
-    #shellcheck disable=SC2068
-    for i in ${_FW_RUN[@]}; do
+    for i in "${_FW_RUN[@]}"; do
         : >/.archboot
         _task fw_run "${i}" &
         _progress_wait "0" "99" "\n${_KEEP}\n\nCopying $(basename -s '.img' "${i}") firmware to /sysroot..."
