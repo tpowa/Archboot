@@ -139,7 +139,6 @@ _file() {
 }
 
 _install_files() {
-    echo "${_FILES[@]}" >>/bla.txt
     tar --hard-dereference -C / -cpf - "${_FILES[@]}" | tar -C "${_ROOTFS}" -xpf -
     _FILES=()
 }
