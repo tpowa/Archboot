@@ -63,7 +63,6 @@ _cleanup() {
 
 _map() {
     for i in "${@:2}"; do
-        # shellcheck disable=SC1105,SC2210,SC2035
         "${1}" "${i}"
     done
 }
