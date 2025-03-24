@@ -13,6 +13,9 @@ Environment:
 - updated MOTD
 common:
 - added --disable-download-timeout option to pacman defaults
+cpio.sh:
+- removed softdeps checks
+- implemented cleaner array handling
 bootloader:
 - added check on successful container creation
 localize:
