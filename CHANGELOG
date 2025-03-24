@@ -10,6 +10,7 @@ Environment:
 - 3cpio 0.4.0
 - added iptables-nft as default iptables
 - added nftables
+- updated MOTD
 common:
 - added --disable-download-timeout option to pacman defaults
 bootloader:
