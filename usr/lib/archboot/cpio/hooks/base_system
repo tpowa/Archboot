@@ -13,7 +13,7 @@ _run ()
                  id info{cmp,tocap} ionice ipc{mk,rm,s} irqtop isosize join keyctl last{,b} ldattach ldd \
                  link linux{32,64} logname look losetup ls{cpu,fd,ipc,irq,locks,logins,mem,ns} \
                  lz4{,c,cat} lz{cat,cmp,diff,egrep,fgrep,grep,less,more,ma,madec,mainfo,op} \
-                 mcookie md5sum mesg mk{fifo,fs,nod} modinfo namei new{grp,gid_map,uid_map} \
+                 mcookie md5sum mesg mk{fifo,fs,nod} modinfo namei new{grp,gidmap,uidmap} \
                  ncursesw6-config nice nl nohup nproc nsenter numfmt partx paste pathchk pidwait pinky \
                  pg pipesz pkill pmap pr printenv prlimit prtstat pslog \
                  pstree ptx pwdx pzstd read{link,profile} rename renice request-key \

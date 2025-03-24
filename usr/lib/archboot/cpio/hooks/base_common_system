@@ -46,10 +46,9 @@ update-activation-environment,uuidgen} dd df dir du dust dysk exa eza faillock f
                  passwd pgrep pidof pinentry{,-curses} pk{action,check,exec,ttyagent} pwhistory_helper pluginviewer printf procs ps pwd \
                  rmdir sasldblistusers2 saslpasswd2 tr true repo-{add,elephant,remove} rbash rg rmmod sd sed secret-tool \
                  shlibsign sign{tool,ver} sort ssltap stat symkeyutil systemd-{ac-power,analyze,ask-password,cat,\
-cgls,cgtop,confextdelta,detect-virt,escape,firstboot,hwdb,inhibit,machine-id-setup,mount,notify,nspawn,path,\
-resolve,repartrun,socket-activate,stdio-bridge,sysusers,tty-ask-password-agent,umount,creds,cryptenroll,dissect,\
-id128,sysext} tar tee testpkg top touch trust tty unix_chkpwd /usr/lib/dbus-1.0/dbus-daemon-launch-helper \
-                 umount.nfs{,4} update-ca-trust vercmp wc yes zoxide
+cgls,cgtop,confext,delta,detect-virt,escape,firstboot,hwdb,inhibit,machine-id-setup,mount,notify,nspawn,path,\
+resolve,repart,run,socket-activate,stdio-bridge,sysusers,tty-ask-password-agent,umount,creds,cryptenroll,dissect,\
+id128,sysext} tar tee testpkg top touch trust tty unix_chkpwd umount.nfs{,4} update-ca-trust vercmp wc yes zoxide
     # add C.UTF-8 locale
     _dir /usr/lib/locale
     [[ -d /usr/lib/locale/C.utf8 ]] && _full_dir /usr/lib/locale/C.utf8
