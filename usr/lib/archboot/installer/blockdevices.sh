@@ -621,17 +621,17 @@ _createpv()
         # final step ask if everything is ok?
         _dialog --yesno "Would you like to create physical volume on devices below?\n$(rg '(.*$)' -r '$1\n' /tmp/.pvs-create)" 0 0 && break
     done
-    mapfile -t _DEV < <(cat /tmp/.pvs-create)
+    mapfile -t _PV_CREATE < <(cat /tmp/.pvs-create)
     _umountall
     if pvcreate -y "${_DEV[@]}" &>"${_LOG}"; then
-        _dialog --no-mouse --infobox "Creating physical volume on ${_DEV} was successful." 3 75
+        _dialog --no-mouse --infobox "Creating physical volume on ${_PV_CREATE[*]} was successful." 3 75
         # write to template
         { echo "### pv device"
         echo "pvcreate -y ${_DEV[*]} &>\"\${_LOG}\""
         } >> "${_TEMPLATE}"
         sleep 3
     else
-        _dialog --title " ERROR " --no-mouse --infobox "Creating physical volume on ${_DEV} failed." 3 60
+        _dialog --title " ERROR " --no-mouse --infobox "Creating physical volume on ${_PV_CREATE[*]} failed." 3 60
         sleep 5
         return 1
     fi
@@ -818,10 +818,10 @@ _createlv()
 
 _enter_luks_name() {
     _LUKSDEV=""
-    while [[ -z "${_LUKSDEV}" ]]; do
-        _dialog --no-cancel --inputbox "Enter the name for luks encrypted device ${_DEV}:\nfooname\n<yourname>\n\n" 10 65 "fooname" 2>"${_ANSWER}" || return 1
+    while [[ -z "${_LUKSNAME}" ]]; do
+        _dialog --no-cancel --inputbox "Enter the name for luks encrypted device ${_LUKSDEVICE}:\nfooname\n<yourname>\n\n" 10 65 "fooname" 2>"${_ANSWER}" || return 1
         _LUKSDEV=$(cat "${_ANSWER}")
-        if ! cryptsetup status "${_LUKSDEV}" | rg -q 'inactive'; then
+        if ! cryptsetup status "${_LUKSNAME}" | rg -q 'inactive'; then
             _dialog --msgbox "ERROR: You have defined 2 identical luks encryption device names! Please enter another name." 8 65
             _LUKSDEV=""
         fi
@@ -833,21 +833,21 @@ _enter_luks_passphrase () {
     _LUKSPASS2=""
     while true; do
         while [[ -z "${_LUKSPASS}" ]]; do
-            _dialog --no-cancel --insecure --passwordbox "Enter passphrase for luks encrypted device ${_LUKSDEV}:" 8 70 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --insecure --passwordbox "Enter passphrase for luks encrypted device ${_LUKSNAME}:" 8 70 2>"${_ANSWER}" || return 1
             _LUKSPASS=$(cat "${_ANSWER}")
         done
         while [[ -z "${_LUKSPASS2}" ]]; do
-            _dialog --no-cancel --insecure --passwordbox "Retype passphrase for luks encrypted device ${_LUKSDEV}:" 8 70 2>"${_ANSWER}" || return 1
+            _dialog --no-cancel --insecure --passwordbox "Retype passphrase for luks encrypted device ${_LUKSNAME}:" 8 70 2>"${_ANSWER}" || return 1
             _LUKSPASS2=$(cat "${_ANSWER}")
         done
         if [[ "${_LUKSPASS}" == "${_LUKSPASS2}" ]]; then
             _LUKSPASSPHRASE=${_LUKSPASS}
-            echo "${_LUKSPASSPHRASE}" > "/tmp/passphrase-${_LUKSDEV}"
+            echo "${_LUKSPASSPHRASE}" > "/tmp/passphrase-${_LUKSNAME}"
             # write to template
             { echo "### luks device"
-            echo "echo \"${_LUKSPASSPHRASE}\" > \"/tmp/passphrase-${_LUKSDEV}\""
+            echo "echo \"${_LUKSPASSPHRASE}\" > \"/tmp/passphrase-${_LUKSNAME}\""
             } >> "${_TEMPLATE}"
-            _LUKSPASSPHRASE="/tmp/passphrase-${_LUKSDEV}"
+            _LUKSPASSPHRASE="/tmp/passphrase-${_LUKSNAME}"
             break
         else
              _dialog --no-mouse --infobox "Passphrases didn't match, please enter again." 0 0
@@ -859,21 +859,21 @@ _enter_luks_passphrase () {
 }
 
 _opening_luks() {
-    _dialog --no-mouse --infobox "Opening encrypted ${_DEV}..." 0 0
+    _dialog --no-mouse --infobox "Opening encrypted ${_LUKSDEVICE}..." 0 0
     while true; do
-        if cryptsetup luksOpen "${_DEV}" "${_LUKSDEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}"; then
+        if cryptsetup luksOpen "${_LUKSDEVICE}" "${_LUKSNAME}" <"${_LUKSPASSPHRASE}" >"${_LOG}"; then
             # write to template
-            echo "cryptsetup luksOpen \"${_DEV}\" \"${_LUKSDEV}\" <\"${_LUKSPASSPHRASE}\" >\"\${_LOG}\"" >> "${_TEMPLATE}"
+            echo "cryptsetup luksOpen \"${_LUKSDEVICE}\" \"${_LUKSNAME}\" <\"${_LUKSPASSPHRASE}\" >\"\${_LOG}\"" >> "${_TEMPLATE}"
             break
         fi
         _dialog --no-mouse --infobox "Error: Passphrase didn't match, please enter again" 0 0
         sleep 5
         _enter_luks_passphrase || return 1
     done
-    if _dialog --yesno "Would you like to save the passphrase of luks device in /etc/$(basename "${_LUKSPASSPHRASE}")?\nName:${_LUKSDEV}" 0 0; then
-        echo "${_LUKSDEV}" "${_DEV}" "/etc/$(basename "${_LUKSPASSPHRASE}")" >> /tmp/.crypttab
+    if _dialog --yesno "Would you like to save the passphrase of luks device in /etc/$(basename "${_LUKSPASSPHRASE}")?\nName:${_LUKSNAME}" 0 0; then
+        echo "${_LUKSNAME}" "${_LUKSDEVICE}" "/etc/$(basename "${_LUKSPASSPHRASE}")" >> /tmp/.crypttab
         # write to template
-        { echo "echo \"${_LUKSDEV}\" \"${_DEV}\" \"/etc/\$(basename \"${_LUKSPASSPHRASE}\")\" >> /tmp/.crypttab"
+        { echo "echo \"${_LUKSNAME}\" \"${_LUKSDEVICE}\" \"/etc/\$(basename \"${_LUKSPASSPHRASE}\")\" >> /tmp/.crypttab"
         echo ""
         } >> "${_TEMPLATE}"
     fi
@@ -914,13 +914,13 @@ _createluks()
         ### TODO: offer more options for encrypt!
         ###       defaults are used only
         # final step ask if everything is ok?
-        _dialog --yesno "Would you like to encrypt luks device below?\nName:${_LUKSDEV}\nDevice:${_DEV}\n" 0 0 && break
+        _dialog --yesno "Would you like to encrypt luks device below?\nName:${_LUKSNAME}\nDevice:${_LUKSDEVICE}\n" 0 0 && break
     done
     _enter_luks_passphrase || return 1
     _umountall
-    _dialog --no-mouse --infobox "Encrypting ${_DEV}..." 0 0
-    cryptsetup -q luksFormat "${_DEV}" <"${_LUKSPASSPHRASE}" >"${_LOG}"
+    _dialog --no-mouse --infobox "Encrypting ${_LUKSDEVICE}..." 0 0
+    cryptsetup -q luksFormat "${_LUKSDEVICE}" <"${_LUKSPASSPHRASE}" >"${_LOG}"
     # write to template
-    echo "cryptsetup -q luksFormat \"${_DEV}\" <\"${_LUKSPASSPHRASE}\" >\"\${_LOG}\"" >> "${_TEMPLATE}"
+    echo "cryptsetup -q luksFormat \"${_LUKSDEVICE}\" <\"${_LUKSPASSPHRASE}\" >\"\${_LOG}\"" >> "${_TEMPLATE}"
     _opening_luks
 }
