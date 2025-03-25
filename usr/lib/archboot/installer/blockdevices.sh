@@ -619,15 +619,15 @@ _createpv()
             echo "${_DEV}" >>/tmp/.pvs-create
         done
         # final step ask if everything is ok?
-        _dialog --yesno "Would you like to create physical volume on devices below?\n$(rg '(.*$)' -r '$1\n' /tmp/.pvs-create)" 0 0 && break
+        mapfile -t _PV_CREATE < <(cat /tmp/.pvs-create)
+        _dialog --yesno "Would you like to create physical volume on devices below?\n${_PV_CREATE[*]})" 0 0 && break
     done
-    mapfile -t _PV_CREATE < <(cat /tmp/.pvs-create)
     _umountall
-    if pvcreate -y "${_DEV[@]}" &>"${_LOG}"; then
+    if pvcreate -y "${_PV_CREATE[@]}" &>"${_LOG}"; then
         _dialog --no-mouse --infobox "Creating physical volume on ${_PV_CREATE[*]} was successful." 3 75
         # write to template
         { echo "### pv device"
-        echo "pvcreate -y ${_DEV[*]} &>\"\${_LOG}\""
+        echo "pvcreate -y ${_PV_CREATE[*]} &>\"\${_LOG}\""
         } >> "${_TEMPLATE}"
         sleep 3
     else
