@@ -63,7 +63,6 @@ _auto_create_filesystems() {
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     ## make and mount filesystems
     for fsspec in "${_FSSPECS[@]}"; do
-        [[ -z "$fsspec" ]] || return 1
         _DEV="${_DISK}$(echo "${fsspec}" | tr -d ' ' | choose -f '\|' 0)"
         # Add check on nvme or mmc controller:
         # NVME uses /dev/nvme0n1pX name scheme
@@ -333,19 +332,19 @@ _autoprepare() {
     ## <partnum>|<fstype>|<mountpoint>|<labelname>
     ## The partitions in FSSPECS list should be listed in the "mountpoint" order.
     ## Make sure the "root" partition is defined first in the FSSPECS list
-    [[ -z "${_SKIP_SWAP}" ]] && _FSSPEC_SWAPDEV="${_SWAPDEV_NUM}|swap|swap|SWAP"
-    _FSSPEC_ROOTDEV="${_ROOTDEV_NUM}|${_FSTYPE}|/|ARCH_ROOT"
-    _FSSPEC_BOOTDEV="${_BOOTDEV_NUM}|vfat|/boot|XBOOTLDR"
-    [[ -z "${_SKIP_HOME}" ]] &&_FSSPEC_HOMEDEV="${_HOMEDEV_NUM}|${_FSTYPE}|/home|ARCH_HOME"
-    _FSSPEC_ESP_DEV="${_ESP_DEV_NUM}|vfat|${_ESP_MP}|ESP"
+    _FSSPEC=()
+    [[ -z "${_SKIP_SWAP}" ]] && _FSSPEC+=("${_SWAPDEV_NUM}|swap|swap|SWAP")
+    _FSSPEC+=("${_ROOTDEV_NUM}|${_FSTYPE}|/|ARCH_ROOT")
+    [[ -z "${_SKIP_HOME}" ]] &&_FSSPEC+=("${_HOMEDEV_NUM}|${_FSTYPE}|/home|ARCH_HOME")
     if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
         if [[ -n "${_ESP_BOOTDEV}" ]]; then
-            _FSSPECS=("${_FSSPEC_ROOTDEV}" "${_FSSPEC_ESP_DEV}" "${_FSSPEC_HOMEDEV}" "${_FSSPEC_SWAPDEV}")
+            _FSSPEC+=("${_ESP_DEV_NUM}|vfat|${_ESP_MP}|ESP")
         else
-            _FSSPECS=("${_FSSPEC_ROOTDEV}" "${_FSSPEC_ESP_DEV}" "${_FSSPEC_BOOTDEV}" "${_FSSPEC_HOMEDEV}" "${_FSSPEC_SWAPDEV}")
+            _FSSPEC+=("${_ESP_DEV_NUM}|vfat|${_ESP_MP}|ESP")
+            _FSSPEC+=("${_BOOTDEV_NUM}|vfat|/boot|XBOOTLDR")
         fi
     else
-        _FSSPECS=("${_FSSPEC_ROOTDEV}" "${_FSSPEC_BOOTDEV}" "${_FSSPEC_HOMEDEV}" "${_FSSPEC_SWAPDEV}")
+        _FSSPEC+=("${_BOOTDEV_NUM}|vfat|/boot|BOOT")
     fi
     _auto_create_filesystems | _dialog --title " Filesystems " --no-mouse --gauge "Creating Filesystems on ${_DISK}..." 6 75 0
     echo "" >> "${_TEMPLATE}"
