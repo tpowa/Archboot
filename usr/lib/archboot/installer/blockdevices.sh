@@ -530,18 +530,12 @@ _createmd()
                 fi
             fi
         done
-        while read -r _RAIDDEVS;do
-            echo -e "${_RAIDDEVS}\n"
-        done < /tmp/.raid
-        while read -r _SPAREDEVS; do
-            echo -e "${_SPAREDEVS}\n"
-        done < tmp/.raid-spare
-        # final step ask if everything is ok?
-        _dialog --yesno "Would you like to create ${_RAIDDEV} like this?\n\nLEVEL:\n${_LEVEL}\n\nDEVICES:\n${_RAIDDEVS}\nSPARES:\n${_SPAREDEVS}" 0 0 && break
-    done
-    _umountall
     mapfile -t _DEVS < <(cat /tmp/.raid)
     mapfile -t _SPARES < <(cat /tmp/.raid-spare)
+        # final step ask if everything is ok?
+        _dialog --yesno "Would you like to create ${_RAIDDEV} like this?\n\nLEVEL:\n${_LEVEL}\n\nDEVICES:\n${_DEVS}\nSPARES:\n${_SPARES}" 0 0 && break
+    done
+    _umountall
     # get number of devices
     _RAID_DEVS="${#_DEVS[@]}"
     _SPARE_DEVS="${#_SPARES[@]}"
