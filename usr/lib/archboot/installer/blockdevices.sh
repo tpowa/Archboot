@@ -463,7 +463,7 @@ _createmd()
         done
         if [[ -n "${_RAID_BLACKLIST}" ]]; then
             for dev in ${_RAID_BLACKLIST}; do
-                _DEVS=("$(echo "${_DEVS[*]}" | sd "$(${_LSBLK} NAME,SIZE -d "${dev}" 2>"${_NO_LOG}")" '')")
+                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${dev}")" "")"
             done
         fi
         # break if all devices are in use
@@ -501,7 +501,7 @@ _createmd()
             _RAIDNUMBER=$((_RAIDNUMBER + 1))
             if [[ -n "${_DEV}" ]]; then
                 # clean loop from used partition and options
-                _DEVS=("$(echo "${_DEVS[*]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")" '')")
+                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_DEV}")" "")"
             fi
             # add more devices
             # raid0 doesn't support missing devices
