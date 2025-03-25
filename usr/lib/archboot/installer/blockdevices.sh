@@ -620,7 +620,7 @@ _createpv()
         done
         # final step ask if everything is ok?
         mapfile -t _PV_CREATE < <(cat /tmp/.pvs-create)
-        _dialog --yesno "Would you like to create physical volume on devices below?\n${_PV_CREATE[*]})" 0 0 && break
+        _dialog --yesno "Would you like to create physical volume on devices below?\n${_PV_CREATE[*]}" 0 0 && break
     done
     _umountall
     if pvcreate -y "${_PV_CREATE[@]}" &>"${_LOG}"; then
