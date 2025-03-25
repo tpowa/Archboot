@@ -533,7 +533,7 @@ _createmd()
     mapfile -t _DEVS < <(cat /tmp/.raid)
     mapfile -t _SPARES < <(cat /tmp/.raid-spare)
         # final step ask if everything is ok?
-        _dialog --yesno "Would you like to create ${_RAIDDEV} like this?\n\nLEVEL:\n${_LEVEL}\n\nDEVICES:\n${_DEVS}\nSPARES:\n${_SPARES}" 0 0 && break
+        _dialog --yesno "Would you like to create ${_RAIDDEV} like this?\n\nLEVEL:\n${_LEVEL}\n\nDEVICES:\n${_DEVS[*]}\nSPARES:\n${_SPARES[*]}" 0 0 && break
     done
     _umountall
     # get number of devices
