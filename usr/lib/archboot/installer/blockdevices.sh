@@ -895,7 +895,7 @@ _createluks()
         _dialog --no-mouse --infobox "Scanning blockdevices... This may need some time." 3 60
         # Remove all crypt devices with children
         _LUKS_BLACKLIST=()
-        for dev in $(${_LSBLK} NAME,TYPE | rg '(.*) crypt$' -r '$1' | sort -u); do
+        for i in $(${_LSBLK} NAME,TYPE | rg '(.*) crypt$' -r '$1' | sort -u); do
             _LUKS_BLACKLIST+=("${i}")
         done
         _DEVS=()
