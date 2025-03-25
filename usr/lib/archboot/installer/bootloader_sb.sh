@@ -8,8 +8,7 @@ _secureboot_keys() {
     while [[ -z "${_KEYDIR}" ]]; do
         _dialog --title " Setup Keys " --no-cancel --inputbox "Enter the directory to store the keys on ${_DESTDIR}." 8 65 "/etc/secureboot/keys" 2>"${_ANSWER}" || return 1
         _KEYDIR=$(cat "${_ANSWER}")
-        #shellcheck disable=SC2086,SC2001
-        _KEYDIR="$(echo ${_KEYDIR} | sd '^/' '')"
+        _KEYDIR="$(echo "${_KEYDIR}" | sd '^/' '')"
     done
     if [[ ! -d "${_DESTDIR}/${_KEYDIR}" ]]; then
         while [[ -z "${_CN}" ]]; do
