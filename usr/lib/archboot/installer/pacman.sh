@@ -4,11 +4,10 @@
 
 
 _pacman() {
-    #shellcheck disable=SC2086,SC2068
-    if ${_PACMAN} -Sy ${_PACKAGES[@]} &>"${_LOG}"; then
+    if ${_PACMAN} -Sy "${_PACKAGES[@]}" &>"${_LOG}"; then
         # write to template
         { echo "echo \"Installing ${_PACKAGES[*]}...\""
-        echo "${_PACMAN} -Sy  ${_PACKAGES[*]} &>\"\${_LOG}\""
+        echo "${_PACMAN} -Sy ${_PACKAGES[*]} &>\"\${_LOG}\""
         } >> "${_TEMPLATE}"
         : > /tmp/.pacman-success
     fi
@@ -29,8 +28,7 @@ _run_pacman(){
     fi
     : > /.archboot
     _pacman &
-    #shellcheck disable=SC2116,SC2068
-    _progress_wait "0" "99" "Installing package(s):\n$(echo ${_PACKAGES[@]})..." "2"
+    _progress_wait "0" "99" "Installing package(s):\n${_PACKAGES[*]}..." "2"
     # pacman finished, display scrollable output
     if [[ -e "/tmp/.pacman-success" ]]; then
         _progress "100" "Package installation complete." 6 75
@@ -68,7 +66,6 @@ _run_autoconfig() {
     _auto_mdadm
     _auto_luks
     _auto_pacman_keyring
-    #shellcheck disable=SC2119
     _auto_testing
     _auto_pacman_mirror
     _auto_vconsole
@@ -82,10 +79,8 @@ _run_autoconfig() {
 _install_packages() {
     _destdir_mounts || return 1
     _auto_packages
-    #shellcheck disable=SC2116,SC2068
-    _dialog --title " Summary " --yesno "Next step will install the following packages for a minimal system:\n$(echo ${_PACKAGES[@]})\n\nYou can watch the progress on your ${_VC} console." 9 75 || return 1
-    #shellcheck disable=SC2116,SC2068
-    _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n$(echo ${_PACKAGES[@]})..." 8 75 0
+    _dialog --title " Summary " --yesno "Next step will install the following packages for a minimal system:\n${_PACKAGES[*]}\n\nYou can watch the progress on your ${_VC} console." 9 75 || return 1
+    _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[*]}..." 8 75 0
     _pacman_error || return 1
     _NEXTITEM=3
     _chroot_mount
