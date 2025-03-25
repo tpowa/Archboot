@@ -59,10 +59,10 @@ _auto_partition() {
 
 _auto_create_filesystems() {
     _COUNT=0
-    _MAX_COUNT=${#_FSSPECS[@]}
+    _MAX_COUNT=${#_FSSPEC[@]}
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     ## make and mount filesystems
-    for fsspec in "${_FSSPECS[@]}"; do
+    for fsspec in "${_FSSPEC[@]}"; do
         _DEV="${_DISK}$(echo "${fsspec}" | tr -d ' ' | choose -f '\|' 0)"
         # Add check on nvme or mmc controller:
         # NVME uses /dev/nvme0n1pX name scheme
