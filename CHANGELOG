@@ -31,6 +31,7 @@ setup:
 - added unmount everything before cleaning disk
 - fixed directory creation before UKI writing
 - added check on running swaps
+- fixed raid0 / linear setup
 ---
 Highlights 2025.02:
 - On normal image reduced needed RAM by 30%,
