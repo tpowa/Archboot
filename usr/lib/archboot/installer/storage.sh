@@ -6,13 +6,12 @@ _create_raid_menu() {
     _MDDONE=""
     while [[ -z "${_MDDONE}" ]]; do
         if [[ -n "${_NEXTITEM}" ]]; then
-            _DEFAULT="--default-item ${_NEXTITEM}"
+            _DEFAULT=(--default-item "${_NEXTITEM}")
         else
-            _DEFAULT=""
+            _DEFAULT=()
         fi
         _CANCEL=""
-        #shellcheck disable=SC2086
-        _dialog --title " Manage Software Raid " --no-cancel ${_DEFAULT} --menu "" 11 60 5 \
+        _dialog --title " Manage Software Raid " --no-cancel "${_DEFAULT[@]}" --menu "" 11 60 5 \
             "1" "Create Software Raid" \
             "2" "Create Partitionable Software Raid" \
             "3" "Reset Software Raid" \
@@ -37,13 +36,12 @@ _create_lvm_menu() {
     _LVMDONE=""
     while [[ -z "${_LVMDONE}" ]]; do
         if [[ -n "${_NEXTITEM}" ]]; then
-            _DEFAULT="--default-item ${_NEXTITEM}"
+            _DEFAULT=(--default-item "${_NEXTITEM}")
         else
-            _DEFAULT=""
+            _DEFAULT=()
         fi
         _CANCEL=""
-        #shellcheck disable=SC2086
-        _dialog --title " Manage Physical Volume, Volume Group Or Logical Volume " --no-cancel ${_DEFAULT} --menu "" 12 60 6 \
+        _dialog --title " Manage Physical Volume, Volume Group Or Logical Volume " --no-cancel "${_DEFAULT[@]}" --menu "" 12 60 6 \
             "1" "Create Physical Volume" \
             "2" "Create Volume Group" \
             "3" "Create Logical Volume" \
@@ -68,13 +66,12 @@ _create_luks_menu() {
     _LUKSDONE=""
     while [[ -z "${_LUKSDONE}" ]]; do
         if [[ -n "${_NEXTITEM}" ]]; then
-            _DEFAULT="--default-item ${_NEXTITEM}"
+            _DEFAULT=(--default-item "${_NEXTITEM}")
         else
-            _DEFAULT=""
+            _DEFAULT=()
         fi
         _CANCEL=""
-        #shellcheck disable=SC2086
-        _dialog --title " Manage Luks Encryption " --no-cancel ${_DEFAULT} --menu "" 10 60 4 \
+        _dialog --title " Manage Luks Encryption " --no-cancel "${_DEFAULT[@]}" --menu "" 10 60 4 \
             "1" "Create Luks" \
             "2" "Reset Luks Encryption" \
             "3" "Luks Help" \
@@ -95,13 +92,12 @@ _create_special() {
     _SPECIALDONE=""
     while [[ -z "${_SPECIALDONE}" ]]; do
         if [[ -n "${_NEXTITEM}" ]]; then
-            _DEFAULT="--default-item ${_NEXTITEM}"
+            _DEFAULT=(--default-item "${_NEXTITEM}")
         else
-            _DEFAULT=""
+            _DEFAULT=()
         fi
         _CANCEL=""
-        #shellcheck disable=SC2086
-        _dialog --title " Manage Software Raid, LVM2 And LUKS Encryption " --no-cancel ${_DEFAULT} --menu "" 10 60 4 \
+        _dialog --title " Manage Software Raid, LVM2 And LUKS Encryption " --no-cancel "${_DEFAULT[@]}" --menu "" 10 60 4 \
             "1" "Manage Software Raid" \
             "2" "Manage Logical Volume Manager" \
             "3" "Manage LUKS Encryption" \
