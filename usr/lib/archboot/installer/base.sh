@@ -105,9 +105,8 @@ _set_guid() {
 _prepare_storagedrive() {
     _NEXTITEM=1
     while true; do
-        [[ -n "${_NEXTITEM}" ]] && _DEFAULT="--default-item ${_NEXTITEM}"
-        #shellcheck disable=SC2086
-        if ! _dialog --title " Prepare Storage Device " --no-cancel ${_DEFAULT} --menu "" 11 60 5 \
+        [[ -n "${_NEXTITEM}" ]] && _DEFAULT=(--default-item "${_NEXTITEM}")
+        if ! _dialog --title " Prepare Storage Device " --no-cancel "${_DEFAULT[@]}" --menu "" 11 60 5 \
             "1" "Quick Setup (erases the ENTIRE storage device)" \
             "2" "Partition Storage Device" \
             "3" "Manage Software Raid, LVM2 And LUKS Encryption" \
@@ -152,9 +151,8 @@ _configure_system() {
     _NEXTITEM=""
     # main menu loop
     while true; do
-        [[ -n "${_FILE}" ]] && _DEFAULT="--default-item ${_FILE}"
-        #shellcheck disable=SC2086
-        if ! _dialog --title " System Configuration " --no-cancel ${_DEFAULT} --menu "" 19 60 13 \
+        [[ -n "${_FILE}" ]] && _DEFAULT=(--default-item "${_FILE}")
+        if ! _dialog --title " System Configuration " --no-cancel "${_DEFAULT[@]}" --menu "" 19 60 13 \
                 "> User Management"             "User Configuration" \
                 "/etc/vconsole.conf"            "Virtual Console" \
                 "/etc/locale.conf"              "Locale Setting" \
@@ -194,10 +192,9 @@ _configure_system() {
 
 _mainmenu() {
     if [[ -n "${_NEXTITEM}" ]]; then
-        _DEFAULT="--default-item ${_NEXTITEM}"
+        _DEFAULT=(--default-item "${_NEXTITEM}")
     fi
-    #shellcheck disable=SC2086
-    _dialog --no-cancel ${_DEFAULT} --title " Setup Menu " \
+    _dialog --no-cancel "${_DEFAULT[@]}" --title " Setup Menu " \
     --menu "" 11 45 7 \
     "1" "Prepare Storage Device" \
     "2" "Install Packages" \
