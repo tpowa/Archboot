@@ -119,14 +119,16 @@ _autoprepare() {
     { echo "### quicksetup"
     echo ": > /tmp/.device-names"
     } >> "${_TEMPLATE}"
-    _DISKS=$(_blockdevices)
-    if [[ "$(echo "${_DISKS}" | wc -w)" -gt 1 ]]; then
-        #shellcheck disable=SC2046
-        _dialog --title " Storage Device " --menu "" 11 40 5 $(_finddisks) 2>"${_ANSWER}" || return 1
+    _DISKS=()
+    for i in $(_blockdevices); do
+        _DISKS+=("${i}")
+    done
+    if [[ "${#_DISKS[@]}" -gt 1 ]]; then
+        _dialog --title " Storage Device " --menu "" 11 40 5 "${_DISKS[@]}" 2>"${_ANSWER}" || return 1
         _DISK=$(cat "${_ANSWER}")
     else
-        _DISK="${_DISKS}"
-        if [[ -z "${_DISK}" ]]; then
+        _DISK="${_DISKS[*]}"
+        if [[ -z "${_DISK[*]}" ]]; then
             _dialog --msgbox "ERROR: Setup cannot find available disk device, please use normal installation routine for partitioning and mounting devices." 0 0
             return 1
         fi
