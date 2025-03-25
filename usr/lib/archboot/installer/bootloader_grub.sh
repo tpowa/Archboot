@@ -39,7 +39,6 @@ _grub_common_before() {
     _abort_bcachefs_bootpart || return 1
     if [[ ! -d "${_DESTDIR}/usr/lib/grub" ]]; then
         _PACKAGES=(grub)
-        #shellcheck disable=SC2116,SC2068
         _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[*]}..." 7 75 0
         _pacman_error
     fi
@@ -350,7 +349,6 @@ _grub_bios() {
         _dialog --msgbox "No storage drives were found" 0 0
         return 1
     fi
-    #shellcheck disable=SC2086
     _dialog --title " Grub Boot Device " --no-cancel --menu "" 14 55 7 "${_DEVS[@]}" 2>"${_ANSWER}" || return 1
     _BOOTDEV=$(cat "${_ANSWER}")
     if [[ "$(${_LSBLK} PTTYPE -d "${_BOOTDEV}")" == "gpt" ]]; then
