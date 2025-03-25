@@ -58,9 +58,8 @@ echo "Removing ${1}..."
 rm -r "${1}"
 echo "Finished container tarball."
 echo "Signing tarball..."
-run0 -u "${_USER}" gpg "${_GPG[@]}" ${_PACMAN_ARCH_CHROOT} || exit 1
+run0 -u "${_USER}" gpg "${_GPG[@]}" "${_PACMAN_ARCH_CHROOT}" || exit 1
 chown "${_USER}":"${_GROUP}" "${_PACMAN_ARCH_CHROOT}"{,.sig} || exit 1
 echo "Syncing tarball to ${_SERVER}:${_PUB}/.${_SERVER_PACMAN_ARCH}..."
-#shellcheck disable=SC2086
 run0 -u "${_USER}" "${_RSYNC[@]}" "${_PACMAN_ARCH_CHROOT}"{,.sig} "${_SERVER}:${_PUB}/.${_SERVER_PACMAN_ARCH}" || exit 1
 echo "Finished."
