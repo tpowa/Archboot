@@ -2,9 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _auto_partition() {
-    sleep 2
-    _progress "10" "Cleaning ${_DISK}..."
-    _clean_disk "${_DISK}"
     # we assume a /dev/sdX,/dev/vdX or /dev/nvmeXnY format
     if [[ -n "${_GUIDPARAMETER}" ]]; then
         # create fresh GPT
@@ -322,6 +319,7 @@ _autoprepare() {
     echo ": > /tmp/.fstab" >> "${_TEMPLATE}"
     # disable swap and all mounted partitions, umount / last!
     _printk off
+    _clean_disk "${_DISK}"
     _auto_partition | _dialog --title " Partitioning " --no-mouse --gauge "Partitioning ${_DISK}..." 6 75 0
     _printk on
     ## wait until /dev initialized correct devices
