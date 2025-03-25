@@ -122,7 +122,6 @@ _auto_packages() {
     if ${_LSBLK} FSTYPE | rg -qw 'crypto_LUKS'; then
         ! echo "${_PACKAGES[@]}" | rg -qw 'cryptsetup' && _PACKAGES+=(cryptsetup)
     fi
-    #shellcheck disable=SC2010
     # Add iwd, if wlan is detected
     if fd . /sys/class/net | rg -q 'wlan'; then
         ! echo "${_PACKAGES[@]}" | rg -qw 'iwd' && _PACKAGES+=(iwd)
