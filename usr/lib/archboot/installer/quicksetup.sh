@@ -59,7 +59,7 @@ _auto_partition() {
 
 _auto_create_filesystems() {
     _COUNT=0
-    _MAX_COUNT=${#_FSSPECS}
+    _MAX_COUNT=${#_FSSPECS[@]}
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     ## make and mount filesystems
     for fsspec in "${_FSSPECS[@]}"; do
