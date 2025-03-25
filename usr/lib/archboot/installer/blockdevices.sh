@@ -584,17 +584,18 @@ _createpv()
         _activate_special_devices
         : >/tmp/.pvs-create
         _dialog --no-mouse --infobox "Scanning blockdevices... This may need some time." 3 60
+        _LVM_BLACKLIST=()
         # Remove all lvm devices with children
-        _LVM_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | rg '(.*) lvm$' -r '$1' | sort -u); do
-                    echo "${dev}"
-                    done)"
+        for i in $(${_LSBLK} NAME,TYPE | rg '(.*) lvm$' -r '$1' | sort -u); do
+            _LVM_BLACKLIST+=("${i}")
+        done
         _DEVS=()
         for i in $(_finddevices); do
             _DEVS+=("${i}")
         done
-        if [[ -n "${_LVM_BLACKLIST}" ]]; then
-            for dev in ${_LVM_BLACKLIST}; do
-                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${dev}")" "")"
+        if [[ -n "${_LVM_BLACKLIST[*]}" ]]; then
+            for i in "${_LVM_BLACKLIST[@]}"; do
+                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${i}")" "")"
             done
         fi
         # break if all devices are in use
@@ -890,15 +891,17 @@ _createluks()
         _activate_special_devices
         _dialog --no-mouse --infobox "Scanning blockdevices... This may need some time." 3 60
         # Remove all crypt devices with children
-        _LUKS_BLACKLIST="$(for dev in $(${_LSBLK} NAME,TYPE | rg '(.*) crypt$' -r '$1' | sort -u); do
-                    echo "${dev}"
-                    done)"
+        _LUKS_BLACKLIST=()
+        for dev in $(${_LSBLK} NAME,TYPE | rg '(.*) crypt$' -r '$1' | sort -u); do
+            _LUKS_BLACKLIST+=("${i}")
+        done
+        _DEVS=()
         for i in $(_finddevices); do
             _DEVS+=("${i}")
         done
-        if [[ -n "${_LUKS_BLACKLIST}" ]]; then
-            for dev in ${_LUKS_BLACKLIST}; do
-                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${dev}")" "")"
+        if [[ -n "${_LUKS_BLACKLIST[*]}" ]]; then
+            for i in "${_LUKS_BLACKLIST[@]}"; do
+                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${i}")" "")"
             done
         fi
         # break if all devices are in use
