@@ -456,14 +456,17 @@ _createmd()
         # check for devices
         # Remove all raid devices with children
         _dialog --no-mouse --infobox "Scanning blockdevices... This may need some time." 3 60
-        _RAID_BLACKLIST="$(_raid_devices;_partitionable_raid_devices_partitions)"
+        _RAID_BLACKLIST=()
+        for i in $(_raid_devices) $(_partitionable_raid_devices_partitions); do
+            _RAID_BLACKLIST+=("${i}")
+        done
         _DEVS=()
         for i in $(_finddevices); do
             _DEVS+=("${i}")
         done
-        if [[ -n "${_RAID_BLACKLIST}" ]]; then
-            for dev in ${_RAID_BLACKLIST}; do
-                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${dev}")" "")"
+        if [[ -n "${_RAID_BLACKLIST[*]}" ]]; then
+            for i in "${_RAID_BLACKLIST[@]}"; do
+                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${i}")" "")"
             done
         fi
         # break if all devices are in use
