@@ -78,9 +78,9 @@ _find_btrfs_bootloader_subvolume() {
 
 # subvolumes already in use
 _subvolumes_in_use() {
-    _SUBVOLUME_IN_USE=""
+    _SUBVOLUME_IN_USE=()
     while read -r i; do
-        echo "${i}" | rg -F -q "|btrfs|" && _SUBVOLUME_IN_USE="${_SUBVOLUME_IN_USE} $(echo "${i}" | choose -f '\|' 8)"
+        echo "${i}" | rg -F -q "|btrfs|" && _SUBVOLUME_IN_USE+=("$(echo "${i}" | choose -f '\|' 8)")
     done < /tmp/.parts
 }
 
@@ -88,7 +88,6 @@ _subvolumes_in_use() {
 _check_btrfs_filesystem_creation() {
     _DETECT_CREATE_FILESYSTEM=""
     _SKIP_FILESYSTEM=""
-    #shellcheck disable=SC2013
     for i in $(rg "${_DEV}[|#]" /tmp/.parts); do
         if echo "${i}" | rg -F -q "|btrfs|"; then
             _FSTYPE="btrfs"
@@ -119,7 +118,6 @@ _btrfsraid_level() {
     _BTRFS_LEVEL=""
     : >/tmp/.btrfs-devices
     while [[ "${_BTRFS_RAID_FINISH}" != "DONE" ]]; do
-        #shellcheck disable=SC2086
         _dialog --no-cancel --title " Raid Data Level " --menu "" 13 50 7 \
             "> NONE" "No Raid Device" \
             "single" "Single Device" \
@@ -149,43 +147,39 @@ _select_btrfsraid_devices () {
     # select the second device to use, no missing option available!
     : >/tmp/.btrfs-devices
     echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
-    _BTRFS_DEVS=""
-    #shellcheck disable=SC2001,SC2086
-    for i in ${_DEVS}; do
-        echo "${i}" | rg -q '/dev' && _BTRFS_DEVS="${_BTRFS_DEVS} ${i} _ "
+    _BTRFS_DEVS=()
+    for i in "${_DEVS[@]}"; do
+        echo "${i}" | rg -q '/dev' && _BTRFS_DEVS+=("${i} _")
     done
-    _BTRFS_DEVS=${_BTRFS_DEVS//${_BTRFS_DEV} _/}
+    IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "${_BTRFS_DEV} _" "")"
     _RAIDNUMBER=2
-    #shellcheck disable=SC2086
-    _dialog --title " Select Device ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 ${_BTRFS_DEVS} 2>"${_ANSWER}" || return 1
+    _dialog --title " Select Device ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 "${_BTRFS_DEVS[@]}" 2>"${_ANSWER}" || return 1
     _BTRFS_DEV=$(cat "${_ANSWER}")
     echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
     while true; do
         _BTRFS_DONE=""
         _RAIDNUMBER=$((_RAIDNUMBER + 1))
         # clean loop from used partition and options
-        _BTRFS_DEVS=${_BTRFS_DEVS//${_BTRFS_DEV} _/}
+        IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "${_BTRFS_DEV} _" "")"
         # add more devices
         # raid1c3 and RAID5 need 3 devices
         # raid1c4, RAID6 and RAID10 need 4 devices!
         if [[ "${_RAIDNUMBER}" -ge 3 && ! "${_BTRFS_LEVEL}" == raid1c[3,4] && ! "${_BTRFS_LEVEL}" == raid[5,6] && ! "${_BTRFS_LEVEL}" == "raid10" ]] ||\
             [[ "${_RAIDNUMBER}" -ge 4 && "${_BTRFS_LEVEL}" == "raid5" ]] || [[ "${_RAIDNUMBER}" -ge 4 && "${_BTRFS_LEVEL}" == "raid1c3" ]] ||\
             [[ "${_RAIDNUMBER}" -ge 5 ]]; then
-                #shellcheck disable=SC2086
                 _dialog --title " Device ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
-                    ${_BTRFS_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
+                    "${_BTRFS_DEVS[@]}" "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
         else
-            #shellcheck disable=SC2086
             _dialog --title " Device ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
-                ${_BTRFS_DEVS} 2>"${_ANSWER}" || return 1
+                "${_BTRFS_DEVS[@]}" 2>"${_ANSWER}" || return 1
         fi
         _BTRFS_DEV=$(cat "${_ANSWER}")
         [[ "${_BTRFS_DEV}" == "> DONE" ]] && break
         echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
     done
     # final step ask if everything is ok?
-    #shellcheck disable=SC2028
-    _dialog --title " Summary " --yesno "LEVEL:\n${_BTRFS_LEVEL}\n\nDEVICES:\n$(while read -r i; do echo "${i}\n"; done </tmp/.btrfs-devices)" 0 0 && _BTRFS_RAID_FINISH="DONE"
+    mapfile -t _BTRFS_RAID_DEVS < <(cat /tmp/.btrfs-devices)
+    _dialog --title " Summary " --yesno "LEVEL:\n${_BTRFS_LEVEL}\n\nDEVICES:\n${_BTRFS_RAID_DEVS[*]}" 0 0 && _BTRFS_RAID_FINISH="DONE"
 }
 
 # prepare new btrfs device
@@ -221,7 +215,7 @@ _check_btrfs_subvolume(){
     else
         # existing subvolumes
         _subvolumes_in_use
-        if echo "${_SUBVOLUME_IN_USE}" | rg -q "${_BTRFS_SUBVOLUME}"; then
+        if echo "${_SUBVOLUME_IN_USE[@]}" | rg -q "${_BTRFS_SUBVOLUME}"; then
             _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical SUBVOLUMES!\nPlease enter another name." 4 45
             sleep 3
             _BTRFS_SUBVOLUME=""
@@ -243,21 +237,22 @@ _create_btrfs_subvolume() {
 # choose btrfs subvolume from list
 _choose_btrfs_subvolume () {
     _SUBVOLUMES_DETECTED=""
-    _SUBVOLUMES=$(_find_btrfs_subvolume _)
+    _SUBVOLUMES=()
+    for i in $(_find_btrfs_subvolume _); do
+        _SUBVOLUMES+=("${i}")
+    done
     # check if subvolumes are present
-    [[ -n "${_SUBVOLUMES}" ]] && _SUBVOLUMES_DETECTED=1
+    [[ -n "${_SUBVOLUMES[*]}" ]] && _SUBVOLUMES_DETECTED=1
     _subvolumes_in_use
     # add echo to kill hidden escapes from btrfs call
-    #shellcheck disable=SC2116,2086
-    _SUBVOLUMES="$(echo ${_SUBVOLUMES})"
-    for i in ${_SUBVOLUME_IN_USE}; do
-        _SUBVOLUMES="${_SUBVOLUMES//${i} _/}"
+    #_SUBVOLUMES="$(echo ${_SUBVOLUMES})"
+    for i in "${_SUBVOLUME_IN_USE[@]}"; do
+        IFS=" " read -r -a _SUBVOLUMES <<< "$(echo "${_SUBVOLUMES[@]}" | sd "${i} _" "")"
     done
     # clear end spaces
-    _SUBVOLUMES="$(echo "${_SUBVOLUMES}" | sd ' +$' '')"
-    if [[ -n "${_SUBVOLUMES}" ]]; then
-        #shellcheck disable=SC2086
-        _dialog --title " Subvolume " --no-cancel --menu "" 15 50 13 ${_SUBVOLUMES} 2>"${_ANSWER}" || return 1
+    #_SUBVOLUMES="$(echo "${_SUBVOLUMES}" | sd ' +$' '')"
+    if [[ -n "${_SUBVOLUMES[*]}" ]]; then
+        _dialog --title " Subvolume " --no-cancel --menu "" 15 50 13 "${_SUBVOLUMES[@]}" 2>"${_ANSWER}" || return 1
         _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
         _btrfs_compress || return 1
     else
@@ -284,7 +279,6 @@ _btrfs_subvolume() {
 
 # ask for btrfs compress option
 _btrfs_compress() {
-    #shellcheck disable=SC2086
     _dialog --no-cancel --title " ${_DEV} subvolume=${_BTRFS_SUBVOLUME} " --menu "" 10 50 4 \
     "zstd" "Use ZSTD Compression" \
     "lzo" "Use LZO Compression" \
