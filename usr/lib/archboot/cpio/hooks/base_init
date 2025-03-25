@@ -15,8 +15,9 @@ _run ()
     _map _file /usr/lib/systemd/{lib*,system-generators/systemd-fstab-generator} /usr/share/hwdata/pci.ids
     # only take services from systemd package
     pacman -Sy &>"${_NO_LOG}"
-    #shellcheck disable=SC2046
-    _map _file $(pacman -Ql systemd | rg '/usr/lib/systemd/system/.' | choose 1)
+    for i in $(pacman -Ql systemd | rg '/usr/lib/systemd/system/.' | choose 1); do
+        _file "${i}"
+    done
     _map _file /usr/lib/sysusers.d/{arch,basic}.conf
     # disable systemd services:
     for i in lvm2-{lvmpolld,monitor} systemd-{boot,random-seed,sysusers\
