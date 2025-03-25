@@ -96,6 +96,8 @@ _auto_packages() {
     . /etc/archboot/defaults
     # remove linux-firmware packages first
     _PACKAGES=("${_PACKAGES[@]/linux-firmware*}")
+    # remove double spaces
+    _PACKAGES=("${_PACKAGES[@]}")
     # Add filesystem packages
     if ${_LSBLK} FSTYPE | rg -q 'bcachefs'; then
         ! echo "${_PACKAGES[@]}" | rg -qw 'bcachefs-tools' && _PACKAGES+=(bcachefs-tools)
