@@ -4,8 +4,7 @@
 _refind_uefi() {
     if [[ ! -f "${_DESTDIR}/usr/bin/refind-install" ]]; then
         _PACKAGES=(refind)
-        #shellcheck disable=SC2116,SC2068
-        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n$(echo ${_PACKAGES[@]})..." 7 75 0
+        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[*]}..." 7 75 0
         _pacman_error
     fi
     _dialog --no-mouse --infobox "Setting up rEFInd now..." 3 60
