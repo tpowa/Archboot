@@ -525,6 +525,8 @@ _createmd()
                     else
                         echo "${_DEV}" >>/tmp/.raid
                     fi
+                else
+                    echo "${_DEV}" >>/tmp/.raid
                 fi
             fi
         done
