@@ -34,8 +34,7 @@ _geteditor() {
             "NANO") _EDITOR="nano"
                 if ! [[ -f "${_DESTDIR}/usr/bin/nano" ]]; then
                     _PACKAGES=(nano)
-                    #shellcheck disable=SC2116,2068
-                    _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n$(echo ${_PACKAGES[@]})..." 7 75 0
+                    _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[*]}..." 7 75 0
                     _pacman_error
                     _dialog --no-mouse --title " Autoconfiguration " --infobox "Enable nano's syntax highlighting on installed system..." 3 70
                     rg -q '^include' "${_DESTDIR}/etc/nanorc" || \
@@ -46,8 +45,7 @@ _geteditor() {
             "NEOVIM") _EDITOR="nvim"
                 if ! [[ -f "${_DESTDIR}/usr/bin/nvim" ]]; then
                     _PACKAGES=(neovim)
-                    #shellcheck disable=SC2116,2068
-                    _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n$(echo ${_PACKAGES[@]})..." 7 75 0
+                    _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[*]}..." 7 75 0
                     _pacman_error
                 fi
                 ;;
@@ -97,7 +95,6 @@ _set_guid() {
         ## Lenovo BIOS-GPT issues - in Fedora - https://bugzilla.redhat.com/show_bug.cgi?id=735733,
         ## https://bugzilla.redhat.com/show_bug.cgi?id=749325,
         ## http://git.fedorahosted.org/git/?p=anaconda.git;a=commit;h=ae74cebff312327ce2d9b5ac3be5dbe22e791f09
-        #shellcheck disable=SC2034
         _dialog --yesno "$(cat /usr/lib/archboot/installer/help/guid.txt)" 0 0 && _GUIDPARAMETER=1
     fi
 }
@@ -216,8 +213,7 @@ _mainmenu() {
              fi ;;
         "3") _configure_system ;;
         "4") _install_bootloader ;;
-        "<") #shellcheck disable=SC2086
-             _dialog --title " Exit Menu " --menu "" 9 30 5 \
+        "<") _dialog --title " Exit Menu " --menu "" 9 30 5 \
              "1" "Exit Program" \
              "2" "Reboot System" \
              "3" "Poweroff System" 2>"${_ANSWER}"
