@@ -4,8 +4,7 @@
 _limine_common() {
     if [[ ! -f "${_DESTDIR}/usr/bin/limine" ]]; then
         _PACKAGES=(limine)
-        #shellcheck disable=SC2116,SC2068
-        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n$(echo ${_PACKAGES[@]})..." 7 75 0
+        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[*]})..." 7 75 0
         _pacman_error
     fi
 }
