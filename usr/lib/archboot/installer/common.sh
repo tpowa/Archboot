@@ -23,14 +23,12 @@ fi
 [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="vmlinuz-${_KERNELPKG}"
 if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
     _VMLINUZ="Image.gz"
-    #shellcheck disable=SC2034
     _VMLINUZ_EFISTUB="Image"
 fi
 # abstract the common pacman args
 _PACMAN="pacman --root ${_DESTDIR} --cachedir=${_DESTDIR}${_CACHEDIR} --noconfirm"
 
 _linux_firmware() {
-    #shellcheck disable=SC2013
     for i in $(choose 0 </proc/modules); do
         if modinfo "${i}" | rg -qw 'firmware:'; then
             _PACKAGES+=(linux-firmware)
@@ -41,13 +39,11 @@ _linux_firmware() {
 
 _marvell_firmware() {
     _MARVELL=()
-    for i in $(fd -t f . /lib/modules/"${_RUNNING_KERNEL}" | rg -w 'wireless/marvell'); do
-        #shellcheck disable=SC2207
-        _MARVELL+=($(basename "${i}" | sd '.ko.*$' ''))
+    for i in $(fd -t f . /lib/modules/ | rg -w 'wireless/marvell' | sd '.*/' '' | sd '.ko.*$' ''); do
+        _MARVELL+=("${i}")
     done
     # check marvell modules if already loaded
-    #shellcheck disable=SC2068
-    for i in ${_MARVELL[@]}; do
+    for i in "${_MARVELL[@]}"; do
         if lsmod | rg -qw "${i}"; then
             _PACKAGES+=(linux-firmware-marvell)
             break
@@ -99,8 +95,7 @@ _auto_packages() {
     # add packages from Archboot defaults
     . /etc/archboot/defaults
     # remove linux-firmware packages first
-    #shellcheck disable=SC2206
-    _PACKAGES=(${_PACKAGES[@]/linux-firmware*})
+    _PACKAGES=("${_PACKAGES[@]/linux-firmware*}")
     # Add filesystem packages
     if ${_LSBLK} FSTYPE | rg -q 'bcachefs'; then
         ! echo "${_PACKAGES[@]}" | rg -qw 'bcachefs-tools' && _PACKAGES+=(bcachefs-tools)
