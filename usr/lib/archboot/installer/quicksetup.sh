@@ -62,11 +62,10 @@ _auto_partition() {
 
 _auto_create_filesystems() {
     _COUNT=0
-    #shellcheck disable=SC2086
-    _MAX_COUNT=$(echo ${_FSSPECS} | wc -w)
+    _MAX_COUNT=${#_FSSPECS}
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     ## make and mount filesystems
-    for fsspec in ${_FSSPECS}; do
+    for fsspec in "${_FSSPECS[@]}"; do
         _DEV="${_DISK}$(echo "${fsspec}" | tr -d ' ' | choose -f '\|' 0)"
         # Add check on nvme or mmc controller:
         # NVME uses /dev/nvme0n1pX name scheme
@@ -158,11 +157,11 @@ _autoprepare() {
         _set_device_name_scheme || return 1
     fi
     while [[ -z "${_DEFAULTFS}" ]]; do
-        _FSOPTS=""
-        command -v mkfs.btrfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} btrfs Btrfs"
-        command -v mkfs.ext4 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext4 Ext4"
-        command -v mkfs.xfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} xfs XFS"
-        command -v mkfs.bcachefs &>"${_NO_LOG}" && modinfo bcachefs >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} bcachefs Bcachefs"
+        _FSOPTS=()
+        command -v mkfs.btrfs &>"${_NO_LOG}" && _FSOPTS+=(btrfs Btrfs)
+        command -v mkfs.ext4 &>"${_NO_LOG}" && _FSOPTS+=(ext4 Ext4)
+        command -v mkfs.xfs &>"${_NO_LOG}" && _FSOPTS+=(xfs XFS)
+        command -v mkfs.bcachefs &>"${_NO_LOG}" && modinfo bcachefs >"${_NO_LOG}" && _FSOPTS+=(bcachefs Bcachefs)
         _DEV_NUM=0
         # create 2M bios_grub partition for grub BIOS GPT support
         if [[ -n "${_GUIDPARAMETER}" ]]; then
@@ -277,8 +276,7 @@ _autoprepare() {
             fi
         done
         while [[ -z "${_CHOSENFS}" ]]; do
-            #shellcheck disable=SC2086
-            _dialog --title " Filesystem / and /home " --no-cancel --menu "" 10 45 8 ${_FSOPTS} 2>"${_ANSWER}" || return 1
+            _dialog --title " Filesystem / and /home " --no-cancel --menu "" 10 45 8 "${_FSOPTS[@]}" 2>"${_ANSWER}" || return 1
             _FSTYPE=$(cat "${_ANSWER}")
             _dialog --title " Confirmation " --yesno " Filesystem ${_FSTYPE} will be used for / and /home?" 5 65 && _CHOSENFS=1
         done
@@ -343,12 +341,12 @@ _autoprepare() {
     _FSSPEC_ESP_DEV="${_ESP_DEV_NUM}|vfat|${_ESP_MP}|ESP"
     if [[ -n "${_GUIDPARAMETER}" && -n "${_UEFI_BOOT}" ]]; then
         if [[ -n "${_ESP_BOOTDEV}" ]]; then
-            _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_ESP_DEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
+            _FSSPECS=("${_FSSPEC_ROOTDEV}" "${_FSSPEC_ESP_DEV}" "${_FSSPEC_HOMEDEV}" "${_FSSPEC_SWAPDEV}")
         else
-            _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_ESP_DEV} ${_FSSPEC_BOOTDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
+            _FSSPECS=("${_FSSPEC_ROOTDEV}" "${_FSSPEC_ESP_DEV}" "${_FSSPEC_BOOTDEV}" "${_FSSPEC_HOMEDEV}" "${_FSSPEC_SWAPDEV}")
         fi
     else
-        _FSSPECS="${_FSSPEC_ROOTDEV} ${_FSSPEC_BOOTDEV} ${_FSSPEC_HOMEDEV} ${_FSSPEC_SWAPDEV}"
+        _FSSPECS=("${_FSSPEC_ROOTDEV}" "${_FSSPEC_BOOTDEV}" "${_FSSPEC_HOMEDEV}" "${_FSSPEC_SWAPDEV}")
     fi
     _auto_create_filesystems | _dialog --title " Filesystems " --no-mouse --gauge "Creating Filesystems on ${_DISK}..." 6 75 0
     echo "" >> "${_TEMPLATE}"
