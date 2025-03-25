@@ -908,7 +908,7 @@ _createluks()
         fi
         # show all devices with sizes
         _dialog --menu "Select device for luks encryption:" 15 50 12 "${_DEVS[@]}" 2>"${_ANSWER}" || return 1
-        _DEV=$(cat "${_ANSWER}")
+        _LUKSDEVICE=$(cat "${_ANSWER}")
         # enter luks name
         _enter_luks_name || return 1
         ### TODO: offer more options for encrypt!
