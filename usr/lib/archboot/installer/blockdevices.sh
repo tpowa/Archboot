@@ -594,7 +594,7 @@ _createpv()
         done
         if [[ -n "${_LVM_BLACKLIST}" ]]; then
             for dev in ${_LVM_BLACKLIST}; do
-                _DEVS=("${_DEVS[@]//$(${_LSBLK} NAME,SIZE -d "${dev}" 2>"${_NO_LOG}")/}")
+                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${dev}")" "")"
             done
         fi
         # break if all devices are in use
@@ -610,7 +610,7 @@ _createpv()
         while [[ "${_DEV}" != "> DONE" ]]; do
             _DEVNUMBER="$((_DEVNUMBER + 1))"
             # clean loop from used partition and options
-            _DEVS=("${_DEVS[@]//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}")
+            IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_DEV}")" "")"
             # add more devices
             _dialog --no-cancel --menu "Select additional device number ${_DEVNUMBER} for physical volume:" 15 60 12 \
                 "${_DEVS[@]}" "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
@@ -701,7 +701,7 @@ _createvg()
         while [[ "${_PV}" != "> DONE" ]]; do
             _PVNUMBER=$((_PVNUMBER + 1))
             # clean loop from used partition and options
-            _PVS=("${_PVS[@]//$(${_LSBLK} NAME,SIZE -d "${_PV}" 2>"${_NO_LOG}")/}")
+            IFS=" " read -r -a _PVS <<< "$(echo "${_PVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_PV}")" "")"
             # add more devices
             _dialog --no-cancel --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 \
                 "${_PVS[@]}" "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
