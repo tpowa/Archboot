@@ -40,13 +40,12 @@ _grub_common_before() {
     if [[ ! -d "${_DESTDIR}/usr/lib/grub" ]]; then
         _PACKAGES=(grub)
         #shellcheck disable=SC2116,SC2068
-        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n$(echo ${_PACKAGES[@]})..." 7 75 0
+        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[*]}..." 7 75 0
         _pacman_error
     fi
     if [[ ! -f "${_DESTDIR}/usr/share/grub/ter-u16n.pf2" ]]; then
         _PACKAGES=(terminus-font)
-        #shellcheck disable=SC2116,SC2068
-        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n$(echo ${_PACKAGES[@]})..." 7 75 0
+        _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Installing package(s):\n${_PACKAGES[*]}..." 7 75 0
         _pacman_error
     fi
 }
@@ -343,13 +342,16 @@ _grub_bios() {
     # A switch is needed if complex ${_BOOTDEV} is used!
     # - LVM and RAID ${_BOOTDEV} needs the MBR of a device and cannot be used itself as ${_BOOTDEV}
     # -  grub BIOS install to partition is not supported
-    _DEVS="$(_findbootloaderdisks _)"
-    if [[ -z "${_DEVS}" ]]; then
+    _DEVS=()
+    for i in $(_findbootloaderdisks _); do
+        _DEVS+=("${i}")
+    done
+    if [[ -z "${_DEVS[*]}" ]]; then
         _dialog --msgbox "No storage drives were found" 0 0
         return 1
     fi
     #shellcheck disable=SC2086
-    _dialog --title " Grub Boot Device " --no-cancel --menu "" 14 55 7 ${_DEVS} 2>"${_ANSWER}" || return 1
+    _dialog --title " Grub Boot Device " --no-cancel --menu "" 14 55 7 "${_DEVS[@]}" 2>"${_ANSWER}" || return 1
     _BOOTDEV=$(cat "${_ANSWER}")
     if [[ "$(${_LSBLK} PTTYPE -d "${_BOOTDEV}")" == "gpt" ]]; then
         _CHECK_BIOS_BOOT_GRUB=1
