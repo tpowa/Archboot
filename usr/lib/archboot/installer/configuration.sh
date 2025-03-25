@@ -159,9 +159,8 @@ _set_comment() {
 _user_management() {
     _NEXTITEM=1
     while true; do
-        _DEFAULT="--default-item ${_NEXTITEM}"
-        #shellcheck disable=SC2086
-        _dialog --title " User Management " --no-cancel ${_DEFAULT} --menu "" 10 40 7 \
+        _DEFAULT=(--default-item "${_NEXTITEM}")
+        _dialog --title " User Management " --no-cancel "${_DEFAULT[@]}" --menu "" 10 40 7 \
             "1" "Set Default Shell" \
             "2" "Create User Account" \
             "3" "Modify User Account" \
@@ -260,19 +259,17 @@ _user_management() {
                      else
                         _NEXTITEM=1
                         while true; do
-                            _DEFAULT="--default-item ${_NEXTITEM}"
-                            #shellcheck disable=SC2086
+                            _DEFAULT=(--default-item "${_NEXTITEM}")
                             if rg wheel "${_DESTDIR}"/etc/group | rg -qw "${_USER}"; then
                                 _ADMIN_ATTR=1
-                                _USER_TITLE="${_USER} | Administrator | wheel group"
+                                _USER_TITLE"${_USER} | Administrator | wheel group"
                                 _USER_MENU="Change To Normal User"
                             else
                                 _ADMIN_ATTR=""
                                 _USER_TITLE="${_USER} | User | no wheel group"
                                 _USER_MENU="Change To Administrator"
                             fi
-                            #shellcheck disable=SC2086
-                            _dialog --title " Account ${_USER_TITLE} " --no-cancel ${_DEFAULT} --menu "" 11 60 5 \
+                            _dialog --title " Account ${_USER_TITLE} " --no-cancel "${_DEFAULT[@]}" --menu "" 11 60 5 \
                                 "1" "${_USER_MENU}" \
                                 "2" "Change Password" \
                                 "3" "Change Comment" \

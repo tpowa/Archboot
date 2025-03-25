@@ -40,12 +40,14 @@ _partition() {
     _stopmd
     _set_guid
     # Select disk to partition
-    _DISKS=$(_finddisks)
+    _DISKS=()
+    for i in $(_finddisks); do
+        _DISKS+=("${i}")
+    done
     _DISK=""
     while true; do
         # Prompt the user with a list of known disks
-        #shellcheck disable=SC2086
-        _dialog --title " Partition Device " --no-cancel --menu "" 13 45 6 ${_DISKS} "> CUSTOM" "Custom Device" "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || return 1
+        _dialog --title " Partition Device " --no-cancel --menu "" 13 45 6 "${_DISKS[@]}" "> CUSTOM" "Custom Device" "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || return 1
         _DISK=$(cat "${_ANSWER}")
         if [[ "${_DISK}" == "> CUSTOM" ]]; then
             _dialog --inputbox "Enter the full path to the device you wish to partition" 8 65 "/dev/sda" 2>"${_ANSWER}" || _DISK=""
