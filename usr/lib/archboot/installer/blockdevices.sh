@@ -624,14 +624,14 @@ _createpv()
     done
     _umountall
     if pvcreate -y "${_PV_CREATE[@]}" &>"${_LOG}"; then
-        _dialog --no-mouse --infobox "Creating physical volume on ${_PV_CREATE[*]} was successful." 3 75
+        _dialog --no-mouse --infobox "Creating physical volume on ${_PV_CREATE[*]} was successful." 5 75
         # write to template
         { echo "### pv device"
         echo "pvcreate -y ${_PV_CREATE[*]} &>\"\${_LOG}\""
         } >> "${_TEMPLATE}"
         sleep 3
     else
-        _dialog --title " ERROR " --no-mouse --infobox "Creating physical volume on ${_PV_CREATE[*]} failed." 3 60
+        _dialog --title " ERROR " --no-mouse --infobox "Creating physical volume on ${_PV_CREATE[*]} failed." 5 60
         sleep 5
         return 1
     fi
