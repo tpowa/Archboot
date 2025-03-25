@@ -63,7 +63,7 @@ _auto_create_filesystems() {
     _PROGRESS_COUNT=$((100/_MAX_COUNT))
     ## make and mount filesystems
     for fsspec in "${_FSSPECS[@]}"; do
-        [[ -z "$fsspec" ]] && break
+        [[ -z "$fsspec" ]] || return 1
         _DEV="${_DISK}$(echo "${fsspec}" | tr -d ' ' | choose -f '\|' 0)"
         # Add check on nvme or mmc controller:
         # NVME uses /dev/nvme0n1pX name scheme
