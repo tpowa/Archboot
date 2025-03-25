@@ -320,7 +320,7 @@ _autoprepare() {
     echo ": > /tmp/.fstab" >> "${_TEMPLATE}"
     # disable swap and all mounted partitions, umount / last!
     _printk off
-    _clean_disk "${_DISK}"
+    _clean_disk "${_DISK}" | _dialog --title " Cleaning " --no-mouse --gauge "Cleaning ${_DISK}..." 6 75 0
     _auto_partition | _dialog --title " Partitioning " --no-mouse --gauge "Partitioning ${_DISK}..." 6 75 0
     _printk on
     ## wait until /dev initialized correct devices
