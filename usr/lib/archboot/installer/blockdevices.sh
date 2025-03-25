@@ -898,7 +898,7 @@ _createluks()
         done
         if [[ -n "${_LUKS_BLACKLIST}" ]]; then
             for dev in ${_LUKS_BLACKLIST}; do
-                _DEVS=("${_DEVS[@]//$(${_LSBLK} NAME,SIZE -d "${dev}" 2>"${_NO_LOG}")/}")
+                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${dev}")" "")"
             done
         fi
         # break if all devices are in use
