@@ -426,7 +426,7 @@ _mountpoints() {
                          IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_DEV}")" "")"
                         if [[ -n "${_ESP_DONE}" && -z "${_XBOOTLDR}" && -n ${_ROOT_BTRFS} ]]; then
                             _DEVS=("${_ROOT_BTRFS}" "${_DEVS[@]}")
-                            IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sort)"
+                            mapfile -t _DEVS < <(printf '%s\n' "${_DEVS[@]}" | sort)
                             _ROOT_BTRFS=""
                         fi
                     else
