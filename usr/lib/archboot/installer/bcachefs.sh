@@ -46,18 +46,17 @@ _bcfs_options() {
 # select bcfs raid devices
 _bcfs_select_raid_devices () {
     # select the second device to use, no missing option available!
-    _BCFS_RAID_DEVS=""
-    #shellcheck disable=SC2001,SC2086
-    for i in ${_DEVS}; do
-        echo "${i}" | rg -q '/dev' && _BCFS_RAID_DEVS="${_BCFS_RAID_DEVS} ${i} _ "
+    _BCFS_RAID_DEVS=()
+    for i in "${_DEVS[@]}"; do
+        _BCFS_RAID_DEVS+=("${i}")
     done
-    _BCFS_RAID_DEVS=${_BCFS_RAID_DEVS//${_BCFS_RAID_DEV} _/}
+    IFS=" " read -r -a _BCFS_RAID_DEVS <<< "$(echo "${_BCFS_RAID_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BCFS_RAID_DEV}")" "")"
     _RAIDNUMBER=1
     while [[ "${_BCFS_RAID_DEV}" != "> DONE" ]]; do
         _BCFS_DONE=""
         _RAIDNUMBER=$((_RAIDNUMBER + 1))
         # clean loop from used partition and options
-        _BCFS_RAID_DEVS=${_BCFS_RAID_DEVS//${_BCFS_RAID_DEV} _/}
+        IFS=" " read -r -a _BCFS_RAID_DEVS <<< "$(echo "${_BCFS_RAID_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BCFS_RAID_DEV}")" "")"
         ### RAID5/6 is not ready atm 23052024
         # RAID5/6 need ec option!
         # RAID5 needs 3 devices
@@ -70,13 +69,11 @@ _bcfs_select_raid_devices () {
             [[ "$((_RAIDNUMBER + _DUR_COUNT))" -ge "$((_BCFS_REP_COUNT + 3))" &&\
                 "${_BCFS_LEVEL}" == "raid10" || "${_BCFS_LEVEL}" == "raid6" ]]; then
             # add more devices
-            #shellcheck disable=SC2086
             _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
-                ${_BCFS_RAID_DEVS} "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
+                "${_BCFS_RAID_DEVS[@]}" "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
         else
-            #shellcheck disable=SC2086
             _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
-                ${_BCFS_RAID_DEVS} 2>"${_ANSWER}" || return 1
+                "${_BCFS_RAID_DEVS[@]}" 2>"${_ANSWER}" || return 1
         fi
         _BCFS_RAID_DEV=$(cat "${_ANSWER}")
         [[ "${_BCFS_RAID_DEV}" == "> DONE" ]] && break
@@ -93,7 +90,6 @@ _bcfs_select_raid_devices () {
 _bcfs_raid_level() {
     while true ; do
         : >/tmp/.bcfs-raid-device
-        #shellcheck disable=SC2153
         _BCFS_RAID_DEV="${_DEV}"
         _BCFS_LEVEL=""
         _DUR_COUNT=0
@@ -101,7 +97,6 @@ _bcfs_raid_level() {
         _BCFS_HDD_OPTIONS=""
         _BCFS_SSD_COUNT=0
         _BCFS_SSD_OPTIONS=""
-        #shellcheck disable=SC2086
         _dialog --no-cancel --title " Raid Data Level " --menu "" 11 30 7 \
             "> NONE" "No Raid Setup" \
             "raid1" "Raid 1 Device" \
@@ -112,7 +107,6 @@ _bcfs_raid_level() {
             break
         else
             # replicas
-            #shellcheck disable=SC2086
             _dialog --no-cancel --title " Replication Level " --menu "" 9 30 5 \
                 "2" "Level 2" \
                 "3" "Level 3" \
@@ -127,10 +121,9 @@ _bcfs_raid_level() {
             _bcfs_options
             _bcfs_select_raid_devices || return 1
             # final step ask if everything is ok?
-            #shellcheck disable=SC2028,SC2027,SC2086
+            mapfile -t _BCFS_CREATE_RAID < <(cat /tmp/.bcfs-raid-device)
             if _dialog --title " Summary " --yesno \
-                "LEVEL:\n${_BCFS_LEVEL}\nDEVICES:\n$(while read -r i; do echo ""${i}"\n"; done </tmp/.bcfs-raid-device)" \
-                0 0; then
+                "LEVEL:\n${_BCFS_LEVEL}\nDEVICES:\n${_BCFS_CREATE_RAID[*]}" 0 0; then
                 while read -r i; do
                     _BCFS_DEVS="${_BCFS_DEVS} ${i}"
                     # cleanup _DEVS array from used devices
@@ -145,7 +138,6 @@ _bcfs_raid_level() {
 # ask for bcfs compress option
 _bcfs_compress() {
     _BCFS_COMPRESSLEVELS="NONE - zstd - lz4 - gzip -"
-    #shellcheck disable=SC2086
     _dialog --no-cancel --title " Compression on ${_DEV} " --menu "" 10 50 4 \
         "> NONE" "No Compression" \
         "zstd" "Use ZSTD Compression" \
