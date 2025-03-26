@@ -420,13 +420,15 @@ _mountpoints() {
                     else
                         echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}" >>/tmp/.parts
                     fi
-                    # btrfs is a special case! not really elegant
-                    # remove root btrfs on ESP selection menu, readd it on top aftwerwards
+                    # btrfs is a special case!
+                    # remove root btrfs on ESP selection menu, readd it aftwerwards
                     if [[ ! "${_FSTYPE}" == "btrfs" ]]; then
                          IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_DEV}")" "")"
                         if [[ -n "${_ESP_DONE}" && -z "${_XBOOTLDR}" && -n ${_ROOT_BTRFS} ]]; then
                             _DEVS=("${_ROOT_BTRFS}" "${_DEVS[@]}")
+                            # strip off SIZE and sort devices
                             mapfile -t _DEVS < <(printf '%s\n' "${_DEVS[@]}" | rg '/dev' | sort)
+                            # recreate array with SIZE
                             mapfile -t _DEVS < <(${_LSBLK} NAME,SIZE -d "${_DEVS[@]}")
                             _ROOT_BTRFS=""
                         fi
