@@ -174,7 +174,6 @@ _auto_pacman_keyring()
     fi
 }
 
-#shellcheck disable=SC2120
 _auto_testing()
 {
     if rg -q '^\[core-testing' /etc/pacman.conf; then
@@ -195,7 +194,6 @@ _auto_pacman_mirror() {
     if rg -q '^Server' /etc/pacman.d/mirrorlist; then
         _progress "62" "Enable pacman mirror on installed system..."
         _SYNC_URL=$(rg '^Server.* (.*)' -r '$1' /etc/pacman.d/mirrorlist)
-        #shellcheck disable=SC2027,SC2086
         cat << EOF > /tmp/inst-mirrorlist
 # Mirror used during installation
 Server = ${_SYNC_URL}
