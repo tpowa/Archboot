@@ -136,24 +136,21 @@ _btrfsraid_level() {
         fi
     done
     mapfile -t _BTRFS_BLACKLIST < <(cat /tmp/.btrfs-devices)
-    if [[ -n "${_BTRFS_BLACKLIST[*]}" ]]; then
-        for i in "${_BTRFS_BLACKLIST[@]}"; do
-            IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${i}")" "")"
-        done
-    fi
+    for i in "${_BTRFS_BLACKLIST[@]}"; do
+        IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${i}")" "")"
+    done
 }
 
 # select btrfs raid devices
 _select_btrfsraid_devices () {
     _BTRFS_DEV="${_DEV}"
     # select the second device to use, no missing option available!
-    : >/tmp/.btrfs-devices
-    echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
+    echo "${_BTRFS_DEV}" >/tmp/.btrfs-devices
     _BTRFS_DEVS=()
     for i in "${_DEVS[@]}"; do
-        echo "${i}" | rg -q '/dev' && _BTRFS_DEVS+=("${i}")
+        _BTRFS_DEVS+=("${i}")
     done
-    IFS=" " read -r -a _BTRFS_DEVS <<< "$(echo "${_BTRFS_DEVS[@]}" | sd "${_BTRFS_DEV} _" "")"
+    IFS=" " read -r -a _BTRFS_DEVS <<< "$(echo "${_BTRFS_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BTRFS_DEV}")" "")"
     _RAIDNUMBER=2
     _dialog --title " Select Device ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 "${_BTRFS_DEVS[@]}" 2>"${_ANSWER}" || return 1
     _BTRFS_DEV=$(cat "${_ANSWER}")
