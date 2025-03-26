@@ -174,17 +174,15 @@ _user_management() {
                         "BASH") _SHELL="bash"
                                 if ! [[ -f "${_DESTDIR}/usr/share/bash-completion/completions/arch" ]]; then
                                     _PACKAGES=(bash-completion)
-                                    #shellcheck disable=SC2116,SC2068
                                     _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " \
-                                        --gauge "Installing package(s):\n$(echo ${_PACKAGES[@]})..." 7 75 0
+                                        --gauge "Installing package(s):\n${_PACKAGES[*]}..." 7 75 0
                                     _pacman_error
                                 fi ;;
                         "ZSH") _SHELL="zsh"
                                 if ! [[ -f "${_DESTDIR}/usr/bin/zsh" ]]; then
                                     _PACKAGES=(grml-zsh-config)
-                                    #shellcheck disable=SC2116,SC2068
                                     _run_pacman | _dialog --title " Logging to ${_VC} | ${_LOG} " \
-                                        --gauge "Installing package(s):\n$(echo ${_PACKAGES[@]})..." 7 75 0
+                                        --gauge "Installing package(s):\n${_PACKAGES[*]}..." 7 75 0
                                     _pacman_error
                                 fi ;;
                     esac
@@ -221,12 +219,11 @@ _user_management() {
                          fi
                          _set_comment || break
                          _prepare_password user || break
-                         #shellcheck disable=SC2086
-                         if useradd -R "${_DESTDIR}" ${_ADMIN_ATTR} -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
+                         if useradd -R "${_DESTDIR}" "${_ADMIN_ATTR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
                             # write to template
                             { echo "### add user"
-                            echo "useradd -R \"\${_DESTDIR}\" ${_ADMIN_ATTR} -c \"${_FN}\" -m \"${_USER}\" &>\"\${_LOG}\""
-                            echo "echo "user account ${_USER} created succesfully.""
+                            echo "useradd -R \"\${_DESTDIR}\" \"${_ADMIN_ATTR}\" -c \"${_FN}\" -m \"${_USER}\" &>\"\${_LOG}\""
+                            echo "echo \"user account ${_USER} created succesfully.\""
                             echo ""
                             } >> "${_TEMPLATE}"
                             _set_password
@@ -243,11 +240,10 @@ _user_management() {
             "3") _USER="root"
                  while true; do
                      # root and all users with UID >= 1000
-                     _USERS="$(rg -o '(.*):x:10[0-9][0-9]:.*:(.*):.*:' -r '$1#$2' "${_DESTDIR}"/etc/passwd |\
-                               sd ' ' ':' | sd '#' ' ')"
-                     #shellcheck disable=SC2086
-                     _dialog --no-cancel --default-item ${_USER} --menu " User Account Selection " 15 40 10 \
-                        "root" "Super User" ${_USERS} "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || break
+                     _USERS=("$(rg -o '(.*):x:10[0-9][0-9]:.*:(.*):.*:' -r '$1#$2' "${_DESTDIR}"/etc/passwd |\
+                               sd ' ' ':' | sd '#' ' ')")
+                     _dialog --no-cancel --default-item "${_USER}" --menu " User Account Selection " 15 40 10 \
+                        "root" "Super User" "${_USERS[@]}" "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || break
                      _USER=$(cat "${_ANSWER}")
                      _NEXTITEM="${_USER}"
                      if [[ "${_USER}" = "root" ]]; then
