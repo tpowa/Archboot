@@ -124,8 +124,7 @@ _bcfs_raid_level() {
             mapfile -t _BCFS_CREATE_RAID < <(cat /tmp/.bcfs-raid-devices)
             if _dialog --title " Summary " --yesno \
                 "LEVEL:\n${_BCFS_LEVEL}\nDEVICES:\n${_BCFS_CREATE_RAID[*]}" 0 0; then
-                    mapfile -t _BCFS_BLACKLIST < <(cat /tmp/.bcfs-raid-devices)
-                    for i in $(rg -o '.* (/dev.*)' -r '$1'); do
+                    for i in $(rg -o '.* (/dev.*)' -r '$1' /tmp/.bcfs-raid-devices); do
                         IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${i}")" "")"
                     done
                 break
