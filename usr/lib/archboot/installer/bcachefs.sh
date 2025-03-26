@@ -103,7 +103,7 @@ _bcfs_raid_level() {
             "raid10" "Raid 10 Device" 2>"${_ANSWER}" || return 1
         _BCFS_LEVEL=$(cat "${_ANSWER}")
         if [[ "${_BCFS_LEVEL}" == "> NONE" ]]; then
-            _BCFS_DEVS="${_DEV}"
+            _BCFS_DEVS=("${_DEV}")
             break
         else
             # replicas
@@ -121,9 +121,10 @@ _bcfs_raid_level() {
             _bcfs_options
             _bcfs_select_raid_devices || return 1
             # final step ask if everything is ok?
-            mapfile -t _BCFS_CREATE_RAID < <(cat /tmp/.bcfs-raid-devices)
+            mapfile -t _BCFS_DEVS < <(cat /tmp/.bcfs-raid-devices)
             if _dialog --title " Summary " --yesno \
                 "LEVEL:\n${_BCFS_LEVEL}\nDEVICES:\n${_BCFS_CREATE_RAID[*]}" 0 0; then
+                    # remove raid devices from _DEVS
                     for i in $(rg -o '.* (/dev.*)' -r '$1' /tmp/.bcfs-raid-devices); do
                         IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${i}")" "")"
                     done
