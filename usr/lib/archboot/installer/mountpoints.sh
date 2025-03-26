@@ -558,46 +558,28 @@ _mkfs() {
     else
         # if we were tasked to create the filesystem, do so
         if [[ "${4}" == "1" ]]; then
-            #shellcheck disable=SC2086
-            case ${2} in
-                bcachefs) if mkfs.bcachefs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}"; then
-                            # write to template
-                            echo "mkfs.bcachefs -f ${7} -L \"${6}\" ${8} ${9} &>\"\${_LOG}\"" >> "${_TEMPLATE}"
-                          else
-                            : >/tmp/.mp-error
-                          fi ;;
-                btrfs)    if mkfs.btrfs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}"; then
-                            # write to template
-                            echo "mkfs.btrfs -f ${7} -L \"${6}\" ${8} ${9} &>\"\${_LOG}\"" >> "${_TEMPLATE}"
-                          else
-                            : >/tmp/.mp-error
-                          fi ;;
-                ext4)     if mke2fs -F ${7} -L "${6}" -t ext4 ${1} &>"${_LOG}"; then
-                            # write to template
-                            echo "mke2fs -F ${7} -L \"${6}\" -t ext4 ${1} &>\"\${_LOG}\"" >> "${_TEMPLATE}"
-                          else
-                            : >/tmp/.mp-error
-                          fi ;;
-                vfat)     if mkfs.vfat -F32 ${7} -n "${6}" ${1} &>"${_LOG}"; then
-                            # write to template
-                            echo "mkfs.vfat -F32 ${7} -n \"${6}\" ${1} &>\"\${_LOG}\"" >> "${_TEMPLATE}"
-                          else
-                            : >/tmp/.mp-error
-                          fi ;;
-                xfs)      if mkfs.xfs ${7} -L "${6}" -f ${1} &>"${_LOG}"; then
-                            # write to template
-                            echo "mkfs.xfs ${7} -L \"${6}\" -f ${1} &>\"\${_LOG}\"" >> "${_TEMPLATE}"
-                          else
-                            : >/tmp/.mp-error
-                          fi ;;
-            esac
-            if [[ -f "/tmp/.mp-error" ]]; then
-                _progress "100" "ERROR: Creating filesystem ${2} on ${1}" 0 0
-                sleep 5
-                return 1
+            if [[ "${2}" == "bcachefs" ]] || [[ "${2}" == "btrfs" ]]; then
+                _FS_CREATE=(-f "${7}" -L "${6}" "${8}" "${9}")
+            elif [[ "${2}" == "ext4" ]] ; then
+                _FS_CREATE=(-F "${7}" -L "${6}" "${1}")
+            elif  [[ "${2}" == "vfat" ]] ; then
+                _FS_CREATE=(-F32 "${7}" -n "${6}" "${1}")
+            elif  [[ "${2}" == "xfs" ]] ; then
+                _FS_CREATE=("${7}" -L "${6}" -f "${1}")
             fi
-            sleep 2
+            if mkfs."${2}" "${_FS_CREATE[@]}"  &>"${_LOG}"; then
+                # write to template
+                echo "mkfs.${2} ${_FS_CREATE[*]} &>\"\${_LOG}\"" >> "${_TEMPLATE}"
+            else
+                : >/tmp/.mp-error
+            fi
         fi
+        if [[ -f "/tmp/.mp-error" ]]; then
+            _progress "100" "ERROR: Creating filesystem ${2} on ${1}" 0 0
+            sleep 5
+            return 1
+        fi
+        sleep 2
         if [[ "${2}" == "btrfs" && -n "${10}" ]]; then
             _create_btrfs_subvolume
         fi
