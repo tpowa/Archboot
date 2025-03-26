@@ -213,13 +213,13 @@ _user_management() {
                          _dialog --title " ERROR " --no-mouse --infobox "Username already exists! Please choose an other one." 3 60
                          sleep 3
                      else
-                         _ADMIN_ATTR=()
+                         _WHEEL_ATTR=()
                          if _dialog --defaultno --yesno "Enable ${_USER} as Administrator and part of wheel group?" 5 60; then
-                             _ADMIN_ATTR=(-G wheel)
+                             _WHEEL_ATTR=(-G wheel)
                          fi
                          _set_comment || break
                          _prepare_password user || break
-                         if useradd -R "${_DESTDIR}" "${_ADMIN_ATTR[@]}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
+                         if useradd -R "${_DESTDIR}" "${_WHEEL_ATTR[@]}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
                             # write to template
                             { echo "### add user"
                             echo "useradd -R \"\${_DESTDIR}\" \"${_ADMIN_ATTR[*]}\" -c \"${_FN}\" -m \"${_USER}\" &>\"\${_LOG}\""
@@ -240,8 +240,8 @@ _user_management() {
             "3") _USER="root"
                  while true; do
                      # root and all users with UID >= 1000
-                     _USERS=("$(rg -o '(.*):x:10[0-9][0-9]:.*:(.*):.*:' -r '$1#$2' "${_DESTDIR}"/etc/passwd |\
-                               sd ' ' ':' | sd '#' ' ')")
+                     mapfile -t _USERS < <(rg -o '(.*):x:10[0-9][0-9]:.*:(.*):.*:' -r '$1#$2' "${_DESTDIR}"/etc/passwd |\
+                               sd ' ' ':' | sd '#' ' ')
                      _dialog --no-cancel --default-item "${_USER}" --menu " User Account Selection " 15 40 10 \
                         "root" "Super User" "${_USERS[@]}" "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || break
                      _USER=$(cat "${_ANSWER}")
