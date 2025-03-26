@@ -49,14 +49,13 @@ _ssd_optimization() {
 
 _select_filesystem() {
     # don't allow vfat as / filesystem, it will not work!
-    _FSOPTS=""
-    command -v mkfs.btrfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} btrfs Btrfs"
-    command -v mkfs.ext4 &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} ext4 Ext4"
-    command -v mkfs.xfs &>"${_NO_LOG}" && _FSOPTS="${_FSOPTS} xfs XFS"
-    command -v mkfs.vfat &>"${_NO_LOG}" && [[ ! ${_MP} == "/" ]] && _FSOPTS="${_FSOPTS} vfat FAT32"
-    command -v mkfs.bcachefs &>"${_NO_LOG}" && modinfo bcachefs >"${_NO_LOG}" && _FSOPTS="${_FSOPTS} bcachefs Bcachefs"
-    #shellcheck disable=SC2086
-    _dialog --title " Filesystem on ${_DEV} " --no-cancel --menu "" 12 50 10 ${_FSOPTS} 2>"${_ANSWER}" || return 1
+    _FSOPTS=()
+    command -v mkfs.btrfs &>"${_NO_LOG}" && _FSOPTS+=(btrfs Btrfs)
+    command -v mkfs.ext4 &>"${_NO_LOG}" && _FSOPTS+=(ext4 Ext4)
+    command -v mkfs.xfs &>"${_NO_LOG}" && _FSOPTS+=(xfs XFS)
+    command -v mkfs.vfat &>"${_NO_LOG}" && [[ ! ${_MP} == "/" ]] && _FSOPTS+=(vfat FAT32)
+    command -v mkfs.bcachefs &>"${_NO_LOG}" && modinfo bcachefs >"${_NO_LOG}" && _FSOPTS+=(bcachefs Bcachefs)
+    _dialog --title " Filesystem on ${_DEV} " --no-cancel --menu "" 12 50 10 "${_FSOPTS[@]}" 2>"${_ANSWER}" || return 1
     _FSTYPE=$(cat "${_ANSWER}")
 }
 
@@ -269,7 +268,6 @@ _mountpoints() {
             while [[ -z "${_MP_DONE}" ]]; do
                 # no double spaces!
                 IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "  " " ")"
-                #shellcheck disable=SC2086
                 if [[ -z "${_SWAP_DONE}" ]]; then
                     _check_devices || return 1
                     _dialog --title " Swap " --menu "" 14 55 8 "> NONE" "No Swap" "> FILE" "Swap File" "${_DEVS[@]}" 2>"${_ANSWER}" || return 1
@@ -426,7 +424,7 @@ _mountpoints() {
                          IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_DEV}")" "")"
                         if [[ -n "${_ESP_DONE}" && -z "${_XBOOTLDR}" && -n ${_ROOT_BTRFS} ]]; then
                             _DEVS=("${_ROOT_BTRFS}" "${_DEVS[@]}")
-                            # strip off SIZE and sort devices
+                            # strip off SIZE and sort devices: rg '/dev'| sort
                             mapfile -t _DEVS < <(printf '%s\n' "${_DEVS[@]}" | rg '/dev' | sort)
                             # recreate array with SIZE
                             mapfile -t _DEVS < <(${_LSBLK} NAME,SIZE -d "${_DEVS[@]}")
@@ -562,7 +560,6 @@ _mkfs() {
         if [[ "${4}" == "1" ]]; then
             #shellcheck disable=SC2086
             case ${2} in
-                # don't handle anything else here, we will error later
                 bcachefs) if mkfs.bcachefs -f ${7} -L "${6}" ${8} ${9} &>"${_LOG}"; then
                             # write to template
                             echo "mkfs.bcachefs -f ${7} -L \"${6}\" ${8} ${9} &>\"\${_LOG}\"" >> "${_TEMPLATE}"
@@ -625,7 +622,6 @@ _mkfs() {
         else
             : >/tmp/.mp-error
         fi
-        #shellcheck disable=SC2181
         if [[ -f "/tmp/.mp-error" ]]; then
             _progress "100" "ERROR: Mounting ${3}${5}"
             sleep 5
@@ -678,13 +674,9 @@ _mkfs() {
         fi
     fi
     # add to .device-names for config files
-    #shellcheck disable=SC2155
     _FSUUID="$(_getfsuuid "${1}")"
-    #shellcheck disable=SC2155
     _FSLABEL="$(_getfslabel "${1}")"
-    #shellcheck disable=SC2155
     _PARTUUID="$(_getpartuuid "${1}")"
-    #shellcheck disable=SC2155
     _PARTLABEL="$(_getpartlabel "${1}")"
     echo "# DEVICE DETAILS: ${1} PARTUUID=${_PARTUUID} PARTLABEL=${_PARTLABEL} UUID=${_FSUUID} LABEL=${_FSLABEL}" >> /tmp/.device-names
     # write to template
