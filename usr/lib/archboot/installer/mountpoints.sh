@@ -267,6 +267,8 @@ _mountpoints() {
         while [[ "${_DEV}" != "> DONE" ]]; do
             _MP_DONE=""
             while [[ -z "${_MP_DONE}" ]]; do
+                # no double spaces!
+                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "  " " ")"
                 #shellcheck disable=SC2086
                 if [[ -z "${_SWAP_DONE}" ]]; then
                     _check_devices || return 1
