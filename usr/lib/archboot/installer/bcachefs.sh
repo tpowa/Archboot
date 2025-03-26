@@ -45,6 +45,7 @@ _bcfs_options() {
 
 # select bcfs raid devices
 _bcfs_select_raid_devices () {
+    _BCFS_RAID_DEV="${_DEV}"
     # select the second device to use, no missing option available!
     _BCFS_RAID_DEVS=()
     for i in "${_DEVS[@]}"; do
@@ -90,7 +91,6 @@ _bcfs_select_raid_devices () {
 _bcfs_raid_level() {
     while true ; do
         : >/tmp/.bcfs-raid-devices
-        _BCFS_RAID_DEV="${_DEV}"
         _BCFS_LEVEL=""
         _DUR_COUNT=0
         _BCFS_HDD_COUNT=0
