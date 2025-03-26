@@ -213,16 +213,16 @@ _user_management() {
                          _dialog --title " ERROR " --no-mouse --infobox "Username already exists! Please choose an other one." 3 60
                          sleep 3
                      else
-                         _ADMIN_ATTR=""
+                         _ADMIN_ATTR=()
                          if _dialog --defaultno --yesno "Enable ${_USER} as Administrator and part of wheel group?" 5 60; then
-                             _ADMIN_ATTR="-G wheel"
+                             _ADMIN_ATTR=(-G wheel)
                          fi
                          _set_comment || break
                          _prepare_password user || break
-                         if useradd -R "${_DESTDIR}" "${_ADMIN_ATTR}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
+                         if useradd -R "${_DESTDIR}" "${_ADMIN_ATTR[@]}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
                             # write to template
                             { echo "### add user"
-                            echo "useradd -R \"\${_DESTDIR}\" \"${_ADMIN_ATTR}\" -c \"${_FN}\" -m \"${_USER}\" &>\"\${_LOG}\""
+                            echo "useradd -R \"\${_DESTDIR}\" \"${_ADMIN_ATTR[*]}\" -c \"${_FN}\" -m \"${_USER}\" &>\"\${_LOG}\""
                             echo "echo \"user account ${_USER} created succesfully.\""
                             echo ""
                             } >> "${_TEMPLATE}"
