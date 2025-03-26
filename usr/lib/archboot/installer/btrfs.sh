@@ -159,7 +159,7 @@ _select_btrfsraid_devices () {
         _BTRFS_DONE=""
         _RAIDNUMBER=$((_RAIDNUMBER + 1))
         # clean loop from used partition and options
-        IFS=" " read -r -a _BTRFS_DEVS <<< "$(echo "${_BTRFS_DEVS[@]}" | sd "${_BTRFS_DEV} _" "")"
+        IFS=" " read -r -a _BTRFS_DEVS <<< "$(echo "${_BTRFS_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BTRFS_DEV}")" "")"
         # add more devices
         # raid1c3 and RAID5 need 3 devices
         # raid1c4, RAID6 and RAID10 need 4 devices!
