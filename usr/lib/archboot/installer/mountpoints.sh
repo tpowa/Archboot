@@ -427,7 +427,7 @@ _mountpoints() {
                         if [[ -n "${_ESP_DONE}" && -z "${_XBOOTLDR}" && -n ${_ROOT_BTRFS} ]]; then
                             _DEVS=("${_ROOT_BTRFS}" "${_DEVS[@]}")
                             mapfile -t _DEVS < <(printf '%s\n' "${_DEVS[@]}" | rg '/dev' | sort)
-                            mapfile -t _DEVS < <(${_LSBLK} NAME,SIZE "${_DEVS[@]}")
+                            mapfile -t _DEVS < <(${_LSBLK} NAME,SIZE -d "${_DEVS[@]}")
                             _ROOT_BTRFS=""
                         fi
                     else
