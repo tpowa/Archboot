@@ -443,11 +443,11 @@ _mountpoints() {
         rg '/dev' /tmp/.parts >/tmp/.parts.tmp
         rg -v '/dev' /tmp/.parts >>/tmp/.parts.tmp
         mv /tmp/.parts.tmp /tmp/.parts
-        while read -r _MOINTPOINTS;do
+        while read -r _MOUNTPOINTS; do
             echo -e "${_MOUNTPOINTS}\n" | sd ' ' '#'
         done </tmp/.parts
-        mapfile -t _MOUNTPOINTS < <(cat /tmp/.parts)
-        _dialog --title " Summary " --defaultno --yesno "Syntax\n------\nDEVICE|FSTYPE|MOUNTPOINT|FORMAT|LABEL|FSOPTIONS|FS_DETAILS\n\n${_MOINTPOINTS}" 0 0 && _DEVFINISH="DONE"
+        #mapfile -t _MOUNTPOINTS < <(cat /tmp/.parts)
+        _dialog --title " Summary " --defaultno --yesno "Syntax\n------\nDEVICE|FSTYPE|MOUNTPOINT|FORMAT|LABEL|FSOPTIONS|FS_DETAILS\n\n${_MOUNTPOINTS}" 0 0 && _DEVFINISH="DONE"
     done
     # disable swap and all mounted devices
     _umountall
