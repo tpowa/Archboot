@@ -177,8 +177,7 @@ _auto_testing()
 {
     if rg -q '^\[core-testing' /etc/pacman.conf; then
         _progress "53"  "Enable [testing] repository on installed system..."
-        #shellcheck disable=SC2016
-        sd '^#(\[[c,e].*-testing\]\n)#' '$1' "${_DESTDIR}"/etc/pacman.conf
+        sd '^#(\[[c,e].*-testing\]\n)#' "$1" "${_DESTDIR}"/etc/pacman.conf
         { echo "echo \"Enable [testing] repository on installed system...\""
         echo -e "sd '^#(\[[c,e].*-testing\]\n)#' '$1' \"\${_DESTDIR}\"/etc/pacman.conf"
         } >> "${_TEMPLATE}"
