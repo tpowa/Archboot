@@ -319,7 +319,6 @@ _stopmd()
             _umountall
             # write to template
             echo "### remove all md devices" >> "${_TEMPLATE}"
-            # shellcheck disable=SC2013
             for dev in $(rg -o '(^md.*) :' -r '$1' /proc/mdstat); do
                 wipefs -a -f "/dev/${dev}" &>"${_NO_LOG}"
                 mdadm --manage --stop "/dev/${dev}" &>"${_LOG}"
