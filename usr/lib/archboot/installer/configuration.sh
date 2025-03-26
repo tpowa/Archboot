@@ -239,13 +239,12 @@ _user_management() {
                  done ;;
             "3") _USER="root"
                  while true; do
+                     _USERS=()
                      # root and all users with UID >= 1000
-                     mapfile -t _USERS < <(rg -o '(.*):x:10[0-9][0-9]:.*:(.*):.*:' -r '$1\n$2' "${_DESTDIR}"/etc/passwd |\
-                               sd ' ' ':' | sd '#' ' ')
-                     for i in "${_USERS[@]}"; do
-                        _USERS2+=("${i}")
+                     for i in $(rg -o '(.*):x:10[0-9][0-9]:.*:(.*):.*:' -r '$1#$2' \
+                                "${_DESTDIR}"/etc/passwd | sd ' ' ':' | sd '#' ' '); do
+                         _USERS+=("${i}")
                      done
-                     _USERS=("${_USERS2[@]}")
                      _dialog --no-cancel --default-item "${_USER}" --menu " User Account Selection " 15 40 10 \
                         "root" "Super User" "${_USERS[@]}" "< Back" "Return To Previous Menu" 2>"${_ANSWER}" || break
                      _USER=$(cat "${_ANSWER}")
