@@ -251,7 +251,10 @@ _mountpoints() {
         fi
         _DEV=""
         _dialog --no-mouse --infobox "Scanning blockdevices... This may need some time." 3 60
-        _DEVS=$(_finddevices)
+        _DEVS=()
+        for i in $(_finddevices); do
+            _DEVS+=("${i}")
+        done
         _SWAP_DONE=""
         _ROOT_DONE=""
         _ROOT_BTRFS=""
@@ -409,7 +412,7 @@ _mountpoints() {
                         if [[ "${_DOMKFS}" == "0" ]]; then
                             _BCFS_UUID="$(${_LSBLK} UUID -d "${_DEV}")"
                             for i in $(${_LSBLK} NAME,UUID | rg -o "(.*) ${_BCFS_UUID}" -r '$1'); do
-                                _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${i}" 2>"${_NO_LOG}")/}"
+                                 IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${i}")" "")"
                             done
                         fi
                     else
@@ -418,14 +421,14 @@ _mountpoints() {
                     # btrfs is a special case! not really elegant
                     # remove root btrfs on ESP selection menu, readd it on top aftwerwards
                     if [[ ! "${_FSTYPE}" == "btrfs" ]]; then
-                        _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
+                         IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_DEV}")" "")"
                         if [[ -n "${_ESP_DONE}" && -z "${_XBOOTLDR}" && -n ${_ROOT_BTRFS} ]]; then
-                            _DEVS="${_ROOT_BTRFS} ${_DEVS}"
+                            _DEVS+="${_ROOT_BTRFS}"
                             _ROOT_BTRFS=""
                         fi
                     else
                         if [[ "${_FSTYPE}" == "btrfs" && "${_MP}" == "/" ]]; then
-                            _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${_DEV}" 2>"${_NO_LOG}")/}"
+                            IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_DEV}")" "")"
                             _ROOT_BTRFS="$(${_LSBLK} NAME,SIZE -d "${_DEV}")"
                         fi
                     fi
