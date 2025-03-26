@@ -135,10 +135,12 @@ _btrfsraid_level() {
             _select_btrfsraid_devices
         fi
     done
-    while read -r i; do
-    # cleanup _DEVS array from used devices
-        _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "${i}" 2>"${_NO_LOG}")/}"
-    done </tmp/.btrfs-devices
+    mapfile -t _BTRFS_BLACKLIST < <(cat /tmp/.btrfs-devices)
+    if [[ -n "${_BTRFS_BLACKLIST[*]}" ]]; then
+        for i in "${_BTRFS_BLACKLIST[@]}"; do
+            IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${i}")" "")"
+        done
+    fi
 }
 
 # select btrfs raid devices
@@ -149,7 +151,7 @@ _select_btrfsraid_devices () {
     echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
     _BTRFS_DEVS=()
     for i in "${_DEVS[@]}"; do
-        echo "${i}" | rg -q '/dev' && _BTRFS_DEVS+=("${i} _")
+        echo "${i}" | rg -q '/dev' && _BTRFS_DEVS+=("${i}")
     done
     IFS=" " read -r -a _BTRFS_DEVS <<< "$(echo "${_BTRFS_DEVS[@]}" | sd "${_BTRFS_DEV} _" "")"
     _RAIDNUMBER=2
