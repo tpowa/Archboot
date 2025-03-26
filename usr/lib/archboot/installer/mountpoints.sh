@@ -567,7 +567,7 @@ _mkfs() {
             elif  [[ "${2}" == "xfs" ]] ; then
                 _FS_CREATE=("${7}" -L "${6}" -f "${1}")
             fi
-            # kill double spaces
+            # remove unused parameters
             IFS=" " read -r -a _FS_CREATE <<< "$(echo "${_FS_CREATE[@]}" | sd "  " " ")"
             if mkfs."${2}" "${_FS_CREATE[@]}" &>"${_LOG}"; then
                 # write to template
