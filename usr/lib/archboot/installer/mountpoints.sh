@@ -444,7 +444,7 @@ _mountpoints() {
         rg -v '/dev' /tmp/.parts >>/tmp/.parts.tmp
         mv /tmp/.parts.tmp /tmp/.parts
         while read -r _MOINTPOINTS;do
-            echo -e "${i}\n" | sd ' ' '#'
+            echo -e "${_MOUNTPOINTS}\n" | sd ' ' '#'
         done </tmp/.parts
         mapfile -t _MOUNTPOINTS < <(cat /tmp/.parts)
         _dialog --title " Summary " --defaultno --yesno "Syntax\n------\nDEVICE|FSTYPE|MOUNTPOINT|FORMAT|LABEL|FSOPTIONS|FS_DETAILS\n\n${_MOINTPOINTS}" 0 0 && _DEVFINISH="DONE"
