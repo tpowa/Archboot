@@ -531,7 +531,6 @@ _mkfs() {
                     : >/tmp/.mp-error
                 fi
             fi
-            #shellcheck disable=SC2181
             if [[ -f "/tmp/.mp-error" ]]; then
                 _progress "100" "ERROR: Creating swap ${1}"
                 sleep 5
