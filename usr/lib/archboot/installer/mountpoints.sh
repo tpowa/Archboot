@@ -423,7 +423,7 @@ _mountpoints() {
                     if [[ ! "${_FSTYPE}" == "btrfs" ]]; then
                          IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_DEV}")" "")"
                         if [[ -n "${_ESP_DONE}" && -z "${_XBOOTLDR}" && -n ${_ROOT_BTRFS} ]]; then
-                            _DEVS+="${_ROOT_BTRFS}"
+                            _DEVS+=("${_ROOT_BTRFS}")
                             _ROOT_BTRFS=""
                         fi
                     else
