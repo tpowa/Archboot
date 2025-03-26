@@ -37,9 +37,9 @@ _bcfs_raid_options() {
 
 _bcfs_options() {
     if [[ -n ${_DURABILITY} ]]; then
-        echo "${_DURABILITY} ${_BCFS_LABEL} ${_BCFS_RAID_DEV}" >>/tmp/.bcfs-raid-device
+        echo "${_DURABILITY} ${_BCFS_LABEL} ${_BCFS_RAID_DEV}" >>/tmp/.bcfs-raid-devices
     else
-        echo "${_BCFS_LABEL} ${_BCFS_RAID_DEV}" >>/tmp/.bcfs-raid-device
+        echo "${_BCFS_LABEL} ${_BCFS_RAID_DEV}" >>/tmp/.bcfs-raid-devices
     fi
 }
 
@@ -80,16 +80,16 @@ _bcfs_select_raid_devices () {
         _bcfs_raid_options || return 1
         _bcfs_options
     done
-    echo "--replicas=${_BCFS_REP_COUNT}" >> /tmp/.bcfs-raid-device
-    [[ -n "${_BCFS_SSD_OPTIONS}" ]] && echo "--foreground_target=ssd --promote_target=ssd" >> /tmp/.bcfs-raid-device
-    [[ -n "${_BCFS_HDD_OPTIONS}" ]] && echo "--background_target=hdd" >> /tmp/.bcfs-raid-device
+    echo "--replicas=${_BCFS_REP_COUNT}" >> /tmp/.bcfs-raid-devices
+    [[ -n "${_BCFS_SSD_OPTIONS}" ]] && echo "--foreground_target=ssd --promote_target=ssd" >> /tmp/.bcfs-raid-devices
+    [[ -n "${_BCFS_HDD_OPTIONS}" ]] && echo "--background_target=hdd" >> /tmp/.bcfs-raid-devices
     return 0
 }
 
 # choose raid level to use on bcfs device
 _bcfs_raid_level() {
     while true ; do
-        : >/tmp/.bcfs-raid-device
+        : >/tmp/.bcfs-raid-devices
         _BCFS_RAID_DEV="${_DEV}"
         _BCFS_LEVEL=""
         _DUR_COUNT=0
@@ -121,14 +121,13 @@ _bcfs_raid_level() {
             _bcfs_options
             _bcfs_select_raid_devices || return 1
             # final step ask if everything is ok?
-            mapfile -t _BCFS_CREATE_RAID < <(cat /tmp/.bcfs-raid-device)
+            mapfile -t _BCFS_CREATE_RAID < <(cat /tmp/.bcfs-raid-devices)
             if _dialog --title " Summary " --yesno \
                 "LEVEL:\n${_BCFS_LEVEL}\nDEVICES:\n${_BCFS_CREATE_RAID[*]}" 0 0; then
-                while read -r i; do
-                    _BCFS_DEVS="${_BCFS_DEVS} ${i}"
-                    # cleanup _DEVS array from used devices
-                    _DEVS="${_DEVS//$(${_LSBLK} NAME,SIZE -d "$(echo "${i}" | rg -o '/dev/.*')" 2>"${_NO_LOG}")/}"
-                done </tmp/.bcfs-raid-device
+                    mapfile -t _BCFS_BLACKLIST < <(cat /tmp/.bcfs-raid-devices)
+                    for i in $(rg -o '.* (/dev.*)' -r '$1'); do
+                        IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${i}")" "")"
+                    done
                 break
             fi
         fi
