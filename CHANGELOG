@@ -32,6 +32,7 @@ setup:
 - fixed directory creation before UKI writing
 - added check on running swaps
 - fixed raid0 / linear setup
+- fixed /boot detection
 ---
 Highlights 2025.02:
 - On normal image reduced needed RAM by 30%,
