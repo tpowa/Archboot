@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+ #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Created by Tobias Powalowski <tpowa@archlinux.org>
 
@@ -7,6 +7,6 @@ _run ()
     ! rg -qw 'archboot' /etc/hostname && return
     _install_files
     rm /usr/bin/{3cpio,blkid,gzip,journalctl,less,lsmod,mkfs.btrfs,\
-mountpoint,setfont,sulogin,systemctl}
+mountpoint,setfont,sulogin}
 }
 
