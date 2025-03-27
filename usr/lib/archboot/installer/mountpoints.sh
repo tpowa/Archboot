@@ -160,7 +160,7 @@ _run_mkfs() {
         [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
         # bcachefs, btrfs and other parameters
         if [[ ${_FSTYPE} == "bcachefs" ]]; then
-            _BCFS_DEVS=("$(echo "${line}" | choose -f '\|' 6)")
+            _BCFS_DEVS="$(echo "${line}" | choose -f '\|' 6)"
             _BCFS_COMPRESS=$(echo "${line}" | choose -f '\|' 7)
             if [[ "${_BCFS_COMPRESS}" == "NONE" ]]; then
                 _BCFS_COMPRESS=""
@@ -168,7 +168,7 @@ _run_mkfs() {
                 _BCFS_COMPRESS="--compression=${_BCFS_COMPRESS} --background_compression=${_BCFS_COMPRESS}"
             fi
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-                  "${_BCFS_DEVS[*]}" "${_BCFS_COMPRESS}" || return 1
+                  "${_BCFS_DEVS}" "${_BCFS_COMPRESS}" || return 1
         elif [[ ${_FSTYPE} == "btrfs" ]]; then
             _BTRFS_DEVS="$(echo "${line}" | choose -f '\|' 6)"
             # remove # from array
@@ -182,7 +182,7 @@ _run_mkfs() {
             _BTRFS_COMPRESS=$(echo "${line}" | choose -f '\|' 9)
             [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-                  "${_BTRFS_DEVS[@]}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+                  "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         else
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" || return 1
         fi
