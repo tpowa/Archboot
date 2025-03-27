@@ -160,7 +160,6 @@ _run_mkfs() {
         [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
         # bcachefs, btrfs and other parameters
         if [[ ${_FSTYPE} == "bcachefs" ]]; then
-            _BCFS_DEVS="${_BCFS_DEVS//#/ }"
             _BCFS_DEVS=$(echo "${line}" | choose -f '\|' 6)
             _BCFS_COMPRESS=$(echo "${line}" | choose -f '\|' 7)
             if [[ "${_BCFS_COMPRESS}" == "NONE" ]];then

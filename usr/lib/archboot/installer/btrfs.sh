@@ -105,10 +105,10 @@ _btrfs_parts() {
          while read -r i; do
              _BTRFS_DEVS="${_BTRFS_DEVS}#${i}"
              # remove device if no subvolume is used!
-             [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _DEVS="${_DEVS//${i} _/}"
+             [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _remove_from_devs "${i}"
          done < /tmp/.btrfs-devices
      else
-         [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _DEVS="${_DEVS//${_DEV} _/}"
+         [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _remove_from_devs "${_DEV}"
      fi
 }
 
