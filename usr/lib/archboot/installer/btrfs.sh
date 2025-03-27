@@ -137,7 +137,7 @@ _btrfsraid_level() {
     done
     mapfile -t _BTRFS_BLACKLIST < <(cat /tmp/.btrfs-devices)
     for i in "${_BTRFS_BLACKLIST[@]}"; do
-        IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${i}")" "")"
+        _remove_from_devs "${i}"
     done
 }
 

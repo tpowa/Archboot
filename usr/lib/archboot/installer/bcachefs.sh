@@ -126,7 +126,7 @@ _bcfs_raid_level() {
                 "LEVEL:\n${_BCFS_LEVEL}\nDEVICES:\n${_BCFS_DEVS[*]}" 0 0; then
                     # remove raid devices from _DEVS
                     for i in $(rg -o '.* (/dev.*)' -r '$1' /tmp/.bcfs-raid-devices); do
-                        IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${i}")" "")"
+                        _remove_from_devs "${i}"
                     done
                 break
             fi

@@ -465,7 +465,7 @@ _createmd()
         done
         if [[ -n "${_RAID_BLACKLIST[*]}" ]]; then
             for i in "${_RAID_BLACKLIST[@]}"; do
-                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${i}")" "")"
+                _remove_from_devs "${i}"
             done
         fi
         # break if all devices are in use
@@ -503,7 +503,7 @@ _createmd()
             _RAIDNUMBER=$((_RAIDNUMBER + 1))
             if [[ -n "${_DEV}" ]]; then
                 # clean loop from used partition and options
-                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_DEV}")" "")"
+                _remove_from_devs "${_DEV}"
             fi
             # add more devices
             # raid0 doesn't support missing devices
@@ -597,7 +597,7 @@ _createpv()
         done
         if [[ -n "${_LVM_BLACKLIST[*]}" ]]; then
             for i in "${_LVM_BLACKLIST[@]}"; do
-                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${i}")" "")"
+                _remove_from_devs "${i}"
             done
         fi
         # break if all devices are in use
@@ -613,7 +613,7 @@ _createpv()
         while [[ "${_DEV}" != "> DONE" ]]; do
             _DEVNUMBER="$((_DEVNUMBER + 1))"
             # clean loop from used partition and options
-            IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_DEV}")" "")"
+            _remove_from_devs "${_DEV}"
             # add more devices
             _dialog --no-cancel --menu "Select additional device number ${_DEVNUMBER} for physical volume:" 15 60 12 \
                 "${_DEVS[@]}" "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
@@ -903,7 +903,7 @@ _createluks()
         done
         if [[ -n "${_LUKS_BLACKLIST[*]}" ]]; then
             for i in "${_LUKS_BLACKLIST[@]}"; do
-                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${i}")" "")"
+                _remove_from_devs "${i}"
             done
         fi
         # break if all devices are in use
