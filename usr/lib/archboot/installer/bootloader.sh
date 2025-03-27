@@ -106,7 +106,7 @@ _common_bootloader_checks() {
 
 _check_bootpart() {
     _SUBDIR=""
-    _BOOTDEV="$(mount | rg -o "(.*) ${_DESTDIR}/boot .*" -r '$1')"
+    _BOOTDEV="$(mount | rg -o "(.*) on ${_DESTDIR}/boot .*" -r '$1')"
     if [[ -z "${_BOOTDEV}" ]]; then
         _SUBDIR="/boot"
         _BOOTDEV="${_ROOTDEV}"
