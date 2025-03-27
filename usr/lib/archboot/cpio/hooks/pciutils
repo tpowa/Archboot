@@ -6,4 +6,3 @@ _run ()
 {
     _map _binary pcilmr setpci update-pciids
 }
-
