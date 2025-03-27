@@ -188,7 +188,6 @@ _run_mkfs() {
         else
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" || return 1
         fi
-        sleep 1
         _COUNT=$((_COUNT+_PROGRESS_COUNT))
     done < /tmp/.parts
     _progress "100" "Mountpoints finished successfully."
