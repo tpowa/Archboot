@@ -33,7 +33,7 @@ _run_pacman() {
 
 _update_packages() {
     _IGNORE=()
-    if [[ -n "${_GRAPHIC_IGNORE}" ]]; then
+    if [[ -n "${_GRAPHIC_IGNORE[*]}" ]]; then
         for i in "${_GRAPHIC_IGNORE[@]}"; do
             _IGNORE+=(--ignore "${i}")
         done

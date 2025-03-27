@@ -31,7 +31,7 @@ _select_mirror() {
         _MIRRORS+=("${i}")
     done
     # add http servers
-    if [[ -z ${_MIRRORS} ]]; then
+    if [[ -z "${_MIRRORS[*]}" ]]; then
         for i in $(rg -o '(http://[^/]*)' -r '$1 _' "${_PACMAN_MIRROR}"); do
             _MIRRORS+=("${i}")
         done
