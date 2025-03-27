@@ -342,7 +342,7 @@ _grub_bios() {
     # - LVM and RAID ${_BOOTDEV} needs the MBR of a device and cannot be used itself as ${_BOOTDEV}
     # -  grub BIOS install to partition is not supported
     _DEVS=()
-    for i in $(_findbootloaderdisks _); do
+    for i in $(_findbootloaderdisks); do
         _DEVS+=("${i}")
     done
     if [[ -z "${_DEVS[*]}" ]]; then
