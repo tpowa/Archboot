@@ -25,7 +25,7 @@ _clear_fs_values() {
     _DOMKFS=0
     _LABEL_NAME=""
     _FS_OPTIONS=""
-    _BTRFS_DEVS=()
+    _BTRFS_DEVS=""
     _BTRFS_LEVEL=""
     _BTRFS_SUBVOLUME=""
     _BTRFS_COMPRESS=""
@@ -195,7 +195,7 @@ _run_mkfs() {
 _create_filesystem() {
     _LABEL_NAME=""
     _FS_OPTIONS=""
-    _BTRFS_DEVS=()
+    _BTRFS_DEVS=""
     _BTRFS_LEVEL=""
     _SKIP_FILESYSTEM=""
     [[ "${_DOMKFS}" == "0" ]] && _dialog --yesno "Would you like to create a filesystem on ${_DEV}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS=1
