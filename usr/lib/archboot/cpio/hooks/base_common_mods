@@ -11,7 +11,7 @@ _run ()
     ### platform modules
     _all_mods -f 'media' '/platform/'
     ### add init modules
-    _map _mod zram btrfs zstd libcrc32c
+    _map _mod zram btrfs zstd
     ### keyboard modules
     _all_mods -f '_cs|bcma-hcd|ssb-hcd' '/usb/host'
     _all_mods '/pinctrl/'
