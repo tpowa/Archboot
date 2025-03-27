@@ -139,7 +139,6 @@ _bcfs_raid_level() {
 
 # ask for bcfs compress option
 _bcfs_compress() {
-    _BCFS_COMPRESSLEVELS="NONE - zstd - lz4 - gzip -"
     _dialog --no-cancel --title " Compression on ${_BCFS_DEV} " --menu "" 10 50 4 \
         "> NONE" "No Compression" \
         "zstd" "Use ZSTD Compression" \
