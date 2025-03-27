@@ -143,23 +143,23 @@ _btrfsraid_level() {
 
 # select btrfs raid devices
 _select_btrfsraid_devices () {
-    _BTRFS_DEV="${_DEV}"
+    _BTRFS_RAID_DEV="${_DEV}"
     # select the second device to use, no missing option available!
-    echo "${_BTRFS_DEV}" >/tmp/.btrfs-devices
-    _BTRFS_DEVS=()
+    echo "${_BTRFS_RAID_DEV}" >/tmp/.btrfs-devices
+    _BTRFS_RAID_DEVS=()
     for i in "${_DEVS[@]}"; do
-        _BTRFS_DEVS+=("${i}")
+        _BTRFS_RAID_DEVS+=("${i}")
     done
-    IFS=" " read -r -a _BTRFS_DEVS <<< "$(echo "${_BTRFS_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BTRFS_DEV}")" "")"
+    IFS=" " read -r -a _BTRFS_RAID_DEVS <<< "$(echo "${_BTRFS_RAID_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BTRFS_RAID_DEV}")" "")"
     _RAIDNUMBER=2
-    _dialog --title " Select Device ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 "${_BTRFS_DEVS[@]}" 2>"${_ANSWER}" || return 1
-    _BTRFS_DEV=$(cat "${_ANSWER}")
-    echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
+    _dialog --title " Select Device ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 "${_BTRFS_RAID_DEVS[@]}" 2>"${_ANSWER}" || return 1
+    _BTRFS_RAID_DEV=$(cat "${_ANSWER}")
+    echo "${_BTRFS_RAID_DEV}" >>/tmp/.btrfs-devices
     while true; do
         _BTRFS_DONE=""
         _RAIDNUMBER=$((_RAIDNUMBER + 1))
         # clean loop from used partition and options
-        IFS=" " read -r -a _BTRFS_DEVS <<< "$(echo "${_BTRFS_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BTRFS_DEV}")" "")"
+        IFS=" " read -r -a _BTRFS_RAID_DEVS <<< "$(echo "${_BTRFS_RAID_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BTRFS_RAID_DEV}")" "")"
         # add more devices
         # raid1c3 and RAID5 need 3 devices
         # raid1c4, RAID6 and RAID10 need 4 devices!
@@ -167,17 +167,17 @@ _select_btrfsraid_devices () {
             [[ "${_RAIDNUMBER}" -ge 4 && "${_BTRFS_LEVEL}" == "raid5" ]] || [[ "${_RAIDNUMBER}" -ge 4 && "${_BTRFS_LEVEL}" == "raid1c3" ]] ||\
             [[ "${_RAIDNUMBER}" -ge 5 ]]; then
                 _dialog --title " Device ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
-                    "${_BTRFS_DEVS[@]}" "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
+                    "${_BTRFS_RAID_DEVS[@]}" "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
         else
             _dialog --title " Device ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
-                "${_BTRFS_DEVS[@]}" 2>"${_ANSWER}" || return 1
+                "${_BTRFS_RAID_DEVS[@]}" 2>"${_ANSWER}" || return 1
         fi
-        _BTRFS_DEV=$(cat "${_ANSWER}")
-        [[ "${_BTRFS_DEV}" == "> DONE" ]] && break
-        echo "${_BTRFS_DEV}" >>/tmp/.btrfs-devices
+        _BTRFS_RAID_DEV=$(cat "${_ANSWER}")
+        [[ "${_BTRFS_RAID_DEV}" == "> DONE" ]] && break
+        echo "${_BTRFS_RAID_DEV}" >>/tmp/.btrfs-devices
     done
     # final step ask if everything is ok?
-    mapfile -t _BTRFS_RAID_DEVS < <(cat /tmp/.btrfs-devices)
+    mapfile -t _BTRFS_DEVS < <(cat /tmp/.btrfs-devices)
     _dialog --title " Summary " --yesno "LEVEL:\n${_BTRFS_LEVEL}\n\nDEVICES:\n${_BTRFS_RAID_DEVS[*]}" 0 0 && _BTRFS_RAID_FINISH="DONE"
 }
 
