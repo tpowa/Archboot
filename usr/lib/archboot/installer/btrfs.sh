@@ -34,7 +34,7 @@ _find_btrfsraid_devices() {
     _btrfs_scan
     if [[ -z "${_DETECT_CREATE_FILESYSTEM}" && "${_FSTYPE}" == "btrfs" ]]; then
         for i in $(btrfs filesystem show "${_DEV}" | rg -o ' (/dev/.*)' -r '$1'); do
-            _BTRFS_DEVS="${_BTRFS_DEVS}#${i}"
+            _BTRFS_DEVS+=("${i}")
         done
     fi
 }
@@ -43,9 +43,9 @@ _find_btrfsraid_bootloader_devices() {
     _btrfs_scan
     _BTRFS_COUNT=1
     if [[ "$(${_LSBLK} FSTYPE "${_BOOTDEV}")" == "btrfs" ]]; then
-        _BTRFS_DEVS=""
+        _BTRFS_DEVS=()
         for i in $(btrfs filesystem show "${_BOOTDEV}" | rg -o ' (/dev/.*)' -r '$1'); do
-            _BTRFS_DEVS="${_BTRFS_DEVS}#${i}"
+            _BTRFS_DEVS+=("${i}")
             _BTRFS_COUNT=$((_BTRFS_COUNT+1))
         done
     fi
@@ -101,9 +101,9 @@ _check_btrfs_filesystem_creation() {
 # remove devices with no subvolume from list and generate raid device list
 _btrfs_parts() {
      if [[ -s /tmp/.btrfs-devices ]]; then
-         _BTRFS_DEVS=""
+         _BTRFS_DEVS=()
          while read -r i; do
-             _BTRFS_DEVS="${_BTRFS_DEVS}#${i}"
+             _BTRFS_DEVS+="(${i})"
              # remove device if no subvolume is used!
              [[ "${_BTRFS_SUBVOLUME}" == "NONE" ]] && _remove_from_devs "${i}"
          done < /tmp/.btrfs-devices

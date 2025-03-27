@@ -172,7 +172,6 @@ _run_mkfs() {
         elif [[ ${_FSTYPE} == "btrfs" ]]; then
             _BTRFS_DEVS=$(echo "${line}" | choose -f '\|' 6)
             # remove # from array
-            _BTRFS_DEVS="${_BTRFS_DEVS//#/ }"
             _BTRFS_LEVEL=$(echo "${line}" | choose -f '\|' 7)
             if [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]];then
                 _BTRFS_LEVEL="-m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
@@ -441,6 +440,7 @@ _mountpoints() {
         rg '/dev' /tmp/.parts >/tmp/.parts.tmp
         rg -v '/dev' /tmp/.parts >>/tmp/.parts.tmp
         mv /tmp/.parts.tmp /tmp/.parts
+        # replace space with # and add new lines
         mapfile -t _MOUNTPOINTS < <(sd ' ' '#' < /tmp/.parts | sd '$' '\\n')
         _dialog --title " Summary " --defaultno --yesno "Syntax\n------\nDEVICE|FSTYPE|MOUNTPOINT|FORMAT|LABEL|FSOPTIONS|FS_DETAILS\n\n ${_MOUNTPOINTS[*]}" 0 0 && _DEVFINISH="DONE"
     done
