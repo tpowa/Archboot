@@ -25,7 +25,7 @@ _clear_fs_values() {
     _DOMKFS=0
     _LABEL_NAME=""
     _FS_OPTIONS=""
-    _BTRFS_DEVS=""
+    _BTRFS_USE_DEVS=""
     _BTRFS_LEVEL=""
     _BTRFS_SUBVOLUME=""
     _BTRFS_COMPRESS=""
@@ -134,7 +134,6 @@ _check_filesystem_fstab() {
 _check_mkfs_values() {
     # Set values, to not confuse mkfs call!
     [[ -z "${_FS_OPTIONS}" ]] && _FS_OPTIONS="NONE"
-    [[ -z "${_BTRFS_DEVS[*]}" ]] && _BTRFS_DEVS="NONE"
     [[ -z "${_BTRFS_LEVEL}" ]] && _BTRFS_LEVEL="NONE"
     [[ -z "${_LABEL_NAME}" && -n "$(${_LSBLK} LABEL "${_DEV}")" ]] && _LABEL_NAME="$(${_LSBLK} LABEL "${_DEV}" 2>"${_NO_LOG}")"
     [[ -z "${_LABEL_NAME}" ]] && _LABEL_NAME="NONE"
@@ -160,7 +159,7 @@ _run_mkfs() {
         [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
         # bcachefs, btrfs and other parameters
         if [[ ${_FSTYPE} == "bcachefs" ]]; then
-            _BCFS_DEVS="$(echo "${line}" | choose -f '\|' 6)"
+            _BCFS_USE_DEVS="$(echo "${line}" | choose -f '\|' 6)"
             _BCFS_COMPRESS=$(echo "${line}" | choose -f '\|' 7)
             if [[ "${_BCFS_COMPRESS}" == "NONE" ]]; then
                 _BCFS_COMPRESS=""
@@ -168,9 +167,9 @@ _run_mkfs() {
                 _BCFS_COMPRESS="--compression=${_BCFS_COMPRESS} --background_compression=${_BCFS_COMPRESS}"
             fi
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-                  "${_BCFS_DEVS}" "${_BCFS_COMPRESS}" || return 1
+                  "${_BCFS_USE_DEVS}" "${_BCFS_COMPRESS}" || return 1
         elif [[ ${_FSTYPE} == "btrfs" ]]; then
-            _BTRFS_DEVS="$(echo "${line}" | choose -f '\|' 6)"
+            _BTRFS_USE_DEVS="$(echo "${line}" | choose -f '\|' 6)"
             # remove # from array
             _BTRFS_LEVEL="$(echo "${line}" | choose -f '\|' 7)"
             if [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]];then
@@ -182,7 +181,7 @@ _run_mkfs() {
             _BTRFS_COMPRESS=$(echo "${line}" | choose -f '\|' 9)
             [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-                  "${_BTRFS_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+                  "${_BTRFS_USE_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         else
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" || return 1
         fi
@@ -195,7 +194,7 @@ _run_mkfs() {
 _create_filesystem() {
     _LABEL_NAME=""
     _FS_OPTIONS=""
-    _BTRFS_DEVS=""
+    _BTRFS_USE_DEVS=""
     _BTRFS_LEVEL=""
     _SKIP_FILESYSTEM=""
     [[ "${_DOMKFS}" == "0" ]] && _dialog --yesno "Would you like to create a filesystem on ${_DEV}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS=1
