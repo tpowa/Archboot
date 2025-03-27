@@ -24,7 +24,7 @@ _bcfs_raid_options() {
         fi
         _DUR_COUNT=$((_DUR_COUNT + _BCFS_DURABILITY))
     fi
-    if [[ "$(cat /sys/block/"$(basename "${_BCFS_RAID_DEV}")"/queue/rotational 2>"${_NO_LOG}")" == 0 ]]; then
+    if [[ "$(cat /sys/block/"$(basename "${_BCFS_DEV}")"/queue/rotational 2>"${_NO_LOG}")" == 0 ]]; then
         _BCFS_SSD_COUNT=$((_BCFS_SSD_COUNT + 1))
         _BCFS_LABEL="--label ssd.ssd${_BCFS_SSD_COUNT}"
         _BCFS_SSD_OPTIONS=1
@@ -37,27 +37,26 @@ _bcfs_raid_options() {
 
 _bcfs_options() {
     if [[ -n ${_DURABILITY} ]]; then
-        echo "${_DURABILITY} ${_BCFS_LABEL} ${_BCFS_RAID_DEV}" >>/tmp/.bcfs-raid-devices
+        echo "${_DURABILITY} ${_BCFS_LABEL} ${_BCFS_DEV}" >>/tmp/.bcfs-raid-devices
     else
-        echo "${_BCFS_LABEL} ${_BCFS_RAID_DEV}" >>/tmp/.bcfs-raid-devices
+        echo "${_BCFS_LABEL} ${_BCFS_DEV}" >>/tmp/.bcfs-raid-devices
     fi
 }
 
 # select bcfs raid devices
 _bcfs_select_raid_devices () {
-    _BCFS_RAID_DEV="${_DEV}"
     # select the second device to use, no missing option available!
     _BCFS_RAID_DEVS=()
     for i in "${_DEVS[@]}"; do
         _BCFS_RAID_DEVS+=("${i}")
     done
-    IFS=" " read -r -a _BCFS_RAID_DEVS <<< "$(echo "${_BCFS_RAID_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BCFS_RAID_DEV}")" "")"
+    IFS=" " read -r -a _BCFS_RAID_DEVS <<< "$(echo "${_BCFS_RAID_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BCFS_DEV}")" "")"
     _RAIDNUMBER=1
-    while [[ "${_BCFS_RAID_DEV}" != "> DONE" ]]; do
+    while [[ "${_BCFS_DEV}" != "> DONE" ]]; do
         _BCFS_DONE=""
         _RAIDNUMBER=$((_RAIDNUMBER + 1))
         # clean loop from used partition and options
-        IFS=" " read -r -a _BCFS_RAID_DEVS <<< "$(echo "${_BCFS_RAID_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BCFS_RAID_DEV}")" "")"
+        IFS=" " read -r -a _BCFS_RAID_DEVS <<< "$(echo "${_BCFS_RAID_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BCFS_DEV}")" "")"
         ### RAID5/6 is not ready atm 23052024
         # RAID5/6 need ec option!
         # RAID5 needs 3 devices
@@ -76,8 +75,8 @@ _bcfs_select_raid_devices () {
             _dialog --title " Device  ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 \
                 "${_BCFS_RAID_DEVS[@]}" 2>"${_ANSWER}" || return 1
         fi
-        _BCFS_RAID_DEV=$(cat "${_ANSWER}")
-        [[ "${_BCFS_RAID_DEV}" == "> DONE" ]] && break
+        _BCFS_DEV=$(cat "${_ANSWER}")
+        [[ "${_BCFS_DEV}" == "> DONE" ]] && break
         _bcfs_raid_options || return 1
         _bcfs_options
     done
@@ -91,6 +90,7 @@ _bcfs_select_raid_devices () {
 _bcfs_raid_level() {
     while true ; do
         : >/tmp/.bcfs-raid-devices
+        _BCFS_DEV="${_DEV}"
         _BCFS_LEVEL=""
         _DUR_COUNT=0
         _BCFS_HDD_COUNT=0
@@ -137,7 +137,7 @@ _bcfs_raid_level() {
 # ask for bcfs compress option
 _bcfs_compress() {
     _BCFS_COMPRESSLEVELS="NONE - zstd - lz4 - gzip -"
-    _dialog --no-cancel --title " Compression on ${_DEV} " --menu "" 10 50 4 \
+    _dialog --no-cancel --title " Compression on ${_BCFS_DEV} " --menu "" 10 50 4 \
         "> NONE" "No Compression" \
         "zstd" "Use ZSTD Compression" \
         "lz4" "Use LZ4 Compression" \
