@@ -580,12 +580,10 @@ _mkfs() {
             sleep 5
             return 1
         fi
-        sleep 2
         if [[ "${2}" == "btrfs" && -n "${10}" ]]; then
             _create_btrfs_subvolume
         fi
         _btrfs_scan
-        sleep 2
         # create our mount directory
         mkdir -p "${3}""${5}"
         # write to template
