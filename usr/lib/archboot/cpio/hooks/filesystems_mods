@@ -6,5 +6,5 @@ _run ()
 {
     _all_mods '/fs/(bcachefs|btrfs|exfat|ext4|fat|nfsd|nls|ntfs3|smb|vboxsf|xfs)'
     _all_mods '/(lib/|kernel|arch/*)/crypto'
-    _map _mod crypto-crc32c crypto-crc32 libcrc32c configfs nls_cp437 nls_ascii
+    _map _mod crypto-crc32c crypto-crc32 configfs nls_cp437 nls_ascii
 }
