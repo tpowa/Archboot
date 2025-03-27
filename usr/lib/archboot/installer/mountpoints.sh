@@ -156,35 +156,35 @@ _run_mkfs() {
         _MP=$(echo "${line}" | choose -f '\|' 2)
         _DOMKFS=$(echo "${line}" | choose -f '\|' 3)
         _LABEL_NAME=$(echo "${line}" | choose -f '\|' 4)
-        _FS_OPTIONS=("$(echo "${line}" | choose -f '\|' 5)")
-        [[ "${_FS_OPTIONS[*]}" == "NONE" ]] && _FS_OPTIONS=()
+        _FS_OPTIONS=$(echo "${line}" | choose -f '\|' 5)
+        [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
         # bcachefs, btrfs and other parameters
         if [[ ${_FSTYPE} == "bcachefs" ]]; then
             _BCFS_DEVS=("$(echo "${line}" | choose -f '\|' 6)")
-            _BCFS_COMPRESS=("$(echo "${line}" | choose -f '\|' 7)")
-            if [[ "${_BCFS_COMPRESS[*]}" == "NONE" ]]; then
-                _BCFS_COMPRESS=()
+            _BCFS_COMPRESS=$(echo "${line}" | choose -f '\|' 7)
+            if [[ "${_BCFS_COMPRESS}" == "NONE" ]]; then
+                _BCFS_COMPRESS=""
             else
-                _BCFS_COMPRESS=(--compression="${_BCFS_COMPRESS[@]}" --background_compression="${_BCFS_COMPRESS[@]}")
+                _BCFS_COMPRESS="--compression=${_BCFS_COMPRESS} --background_compression=${_BCFS_COMPRESS}"
             fi
-            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS[@]}" \
-                  "${_BCFS_DEVS[@]}" "${_BCFS_COMPRESS[@]}" || return 1
+            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
+                  "${_BCFS_DEVS[*]}" "${_BCFS_COMPRESS}" || return 1
         elif [[ ${_FSTYPE} == "btrfs" ]]; then
-            _BTRFS_DEVS=("$(echo "${line}" | choose -f '\|' 6)")
+            _BTRFS_DEVS="$(echo "${line}" | choose -f '\|' 6)"
             # remove # from array
-            _BTRFS_LEVEL=("$(echo "${line}" | choose -f '\|' 7)")
-            if [[ ! "${_BTRFS_LEVEL[*]}" == "NONE" && "${_FSTYPE}" == "btrfs" ]];then
-                _BTRFS_LEVEL=(-m "${_BTRFS_LEVEL[@]}" -d "${_BTRFS_LEVEL[@]}")
+            _BTRFS_LEVEL="$(echo "${line}" | choose -f '\|' 7)"
+            if [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]];then
+                _BTRFS_LEVEL="-m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
             else
-                _BTRFS_LEVEL=()
+                _BTRFS_LEVEL=""
             fi
             _BTRFS_SUBVOLUME=$(echo "${line}" | choose -f '\|' 8)
             _BTRFS_COMPRESS=$(echo "${line}" | choose -f '\|' 9)
             [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
-            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS[@]}" \
-                  "${_BTRFS_DEVS[@]}" "${_BTRFS_LEVEL[@]}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
+            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
+                  "${_BTRFS_DEVS[@]}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
         else
-            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS[@]}" || return 1
+            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" || return 1
         fi
         _COUNT=$((_COUNT+_PROGRESS_COUNT))
     done < /tmp/.parts
@@ -194,9 +194,9 @@ _run_mkfs() {
 
 _create_filesystem() {
     _LABEL_NAME=""
-    _FS_OPTIONS=()
+    _FS_OPTIONS=""
     _BTRFS_DEVS=()
-    _BTRFS_LEVEL=()
+    _BTRFS_LEVEL=""
     _SKIP_FILESYSTEM=""
     [[ "${_DOMKFS}" == "0" ]] && _dialog --yesno "Would you like to create a filesystem on ${_DEV}?\n\n(This will overwrite existing data!)" 0 0 && _DOMKFS=1
     if [[ "${_DOMKFS}" == "1" ]]; then
@@ -218,7 +218,7 @@ _create_filesystem() {
             _prepare_bcfs || return 1
         fi
         _dialog --no-cancel --title " Custom Options " --inputbox "Options passed to filesystem creator, else just leave it empty." 8 70  2>"${_ANSWER}" || return 1
-        _FS_OPTIONS=("$(cat "${_ANSWER}")")
+        _FS_OPTIONS="$(cat "${_ANSWER}")"
     else
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             _SKIP_FILESYSTEM=1
@@ -402,9 +402,9 @@ _mountpoints() {
                     _btrfs_parts
                     _check_mkfs_values
                     if [[ "${_FSTYPE}" == "btrfs" ]]; then
-                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS[*]}|${_BTRFS_DEVS[*]}|${_BTRFS_LEVEL[*]}|${_BTRFS_SUBVOLUME}|${_BTRFS_COMPRESS[*]}" >>/tmp/.parts
+                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BTRFS_DEVS[*]}|${_BTRFS_LEVEL}|${_BTRFS_SUBVOLUME}|${_BTRFS_COMPRESS[*]}" >>/tmp/.parts
                     elif [[ "${_FSTYPE}" == "bcachefs" ]]; then
-                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS[*]}|${_BCFS_DEVS[*]}|${_BCFS_COMPRESS[*]}" >>/tmp/.parts
+                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BCFS_DEVS[*]}|${_BCFS_COMPRESS}" >>/tmp/.parts
                         # remove members of multi devices
                         if [[ "${_DOMKFS}" == "0" ]]; then
                             _BCFS_UUID="$(${_LSBLK} UUID -d "${_DEV}")"
@@ -413,7 +413,7 @@ _mountpoints() {
                             done
                         fi
                     else
-                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS[*]}" >>/tmp/.parts
+                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}" >>/tmp/.parts
                     fi
                     # btrfs is a special case!
                     # remove root btrfs on ESP selection menu, readd it aftwerwards
