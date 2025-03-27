@@ -33,6 +33,7 @@ _limine_bios() {
     _check_bootpart
     if ! ${_LSBLK} FSTYPE "${_BOOTDEV}" 2>"${_NO_LOG}" | rg -q 'vfat'; then
         _dialog --title " ERROR " --no-mouse --infobox "LIMINE BIOS can only boot from vfat partition with /boot on it." 3 70
+        sleep 5
         return 1
     fi
     _dialog --no-mouse --infobox "Setting up LIMINE BIOS now..." 3 60
