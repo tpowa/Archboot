@@ -54,7 +54,6 @@ _auto_partition() {
     fi
     _progress "100" "Partitions created successfully."
     _write_partition_template
-    sleep 2
 }
 
 _auto_create_filesystems() {
@@ -95,7 +94,6 @@ _auto_create_filesystems() {
         else
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" || return 1
         fi
-        sleep 1
         # set default subvolume for systemd-gpt-autogenerator
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             btrfs subvolume set-default "${_DESTDIR}"/"${_MP}" || return 1
