@@ -146,7 +146,7 @@ _select_btrfsraid_devices () {
     # select the second device to use, no missing option available!
     echo "${_BTRFS_RAID_DEV}" >/tmp/.btrfs-devices
     _BTRFS_RAID_DEVS=()
-    for i in "${_DEVS[@]}"; do
+    for i in "${_DEVS[@]:-$(_finddevices)}"; do
         _BTRFS_RAID_DEVS+=("${i}")
     done
     IFS=" " read -r -a _BTRFS_RAID_DEVS <<< "$(echo "${_BTRFS_RAID_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BTRFS_RAID_DEV}")" "")"

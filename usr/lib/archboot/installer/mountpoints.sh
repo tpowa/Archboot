@@ -25,10 +25,11 @@ _clear_fs_values() {
     _DOMKFS=0
     _LABEL_NAME=""
     _FS_OPTIONS=""
-    _BTRFS_USE_DEVS=""
+    _BTRFS_DEVS=()
     _BTRFS_LEVEL=""
     _BTRFS_SUBVOLUME=""
     _BTRFS_COMPRESS=""
+    _BCFS_DEVS=()
     _BCFS_COMPRESS=""
 }
 
