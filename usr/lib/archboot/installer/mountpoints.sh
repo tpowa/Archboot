@@ -25,7 +25,7 @@ _clear_fs_values() {
     _DOMKFS=0
     _LABEL_NAME=""
     _FS_OPTIONS=""
-    _BTRFS_DEVS=""
+    _BTRFS_DEVS=()
     _BTRFS_LEVEL=""
     _BTRFS_SUBVOLUME=""
     _BTRFS_COMPRESS=""
@@ -134,7 +134,7 @@ _check_filesystem_fstab() {
 _check_mkfs_values() {
     # Set values, to not confuse mkfs call!
     [[ -z "${_FS_OPTIONS}" ]] && _FS_OPTIONS="NONE"
-    [[ -z "${_BTRFS_DEVS}" ]] && _BTRFS_DEVS="NONE"
+    [[ -z "${_BTRFS_DEVS[*]}" ]] && _BTRFS_DEVS="NONE"
     [[ -z "${_BTRFS_LEVEL}" ]] && _BTRFS_LEVEL="NONE"
     [[ -z "${_LABEL_NAME}" && -n "$(${_LSBLK} LABEL "${_DEV}")" ]] && _LABEL_NAME="$(${_LSBLK} LABEL "${_DEV}" 2>"${_NO_LOG}")"
     [[ -z "${_LABEL_NAME}" ]] && _LABEL_NAME="NONE"

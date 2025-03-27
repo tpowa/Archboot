@@ -178,7 +178,7 @@ _select_btrfsraid_devices () {
     done
     # final step ask if everything is ok?
     mapfile -t _BTRFS_DEVS < <(cat /tmp/.btrfs-devices)
-    _dialog --title " Summary " --yesno "LEVEL:\n${_BTRFS_LEVEL}\n\nDEVICES:\n${_BTRFS_RAID_DEVS[*]}" 0 0 && _BTRFS_RAID_FINISH="DONE"
+    _dialog --title " Summary " --yesno "LEVEL:\n${_BTRFS_LEVEL}\n\nDEVICES:\n${_BTRFS_DEVS[*]}" 0 0 && _BTRFS_RAID_FINISH="DONE"
 }
 
 # prepare new btrfs device
