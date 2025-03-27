@@ -57,8 +57,7 @@ _find_btrfs_subvolume() {
         # existing btrfs subvolumes
         _mount_btrfs
         for i in $(btrfs subvolume list "${_BTRFSMP}" | choose 8 | rg -v 'var/lib/machines|var/lib/portables'); do
-            echo "${i}"
-            [[ "${1}" ]] && echo "${1}"
+            echo "${i} _"
         done
         _umount_btrfs
     fi
@@ -237,7 +236,7 @@ _create_btrfs_subvolume() {
 _choose_btrfs_subvolume () {
     _SUBVOLUMES_DETECTED=""
     _SUBVOLUMES=()
-    for i in $(_find_btrfs_subvolume _); do
+    for i in $(_find_btrfs_subvolume); do
         _SUBVOLUMES+=("${i}")
     done
     # check if subvolumes are present
