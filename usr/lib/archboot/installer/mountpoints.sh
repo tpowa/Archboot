@@ -402,7 +402,7 @@ _mountpoints() {
                     _btrfs_parts
                     _check_mkfs_values
                     if [[ "${_FSTYPE}" == "btrfs" ]]; then
-                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BTRFS_DEVS[*]}|${_BTRFS_LEVEL}|${_BTRFS_SUBVOLUME}|${_BTRFS_COMPRESS[*]}" >>/tmp/.parts
+                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BTRFS_DEVS[*]}|${_BTRFS_LEVEL}|${_BTRFS_SUBVOLUME}|${_BTRFS_COMPRESS}" >>/tmp/.parts
                     elif [[ "${_FSTYPE}" == "bcachefs" ]]; then
                         echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BCFS_DEVS[*]}|${_BCFS_COMPRESS}" >>/tmp/.parts
                         # remove members of multi devices
