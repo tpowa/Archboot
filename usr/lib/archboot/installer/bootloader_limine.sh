@@ -41,7 +41,7 @@ _limine_bios() {
     _VMLINUZ="${_SUBDIR}/${_VMLINUZ}"
     _INITRAMFS="${_SUBDIR}/${_INITRAMFS}"
     _limine_config
-    _geteditor
+    _geteditor || return 1
     _PARENT_BOOTDEV="$(${_LSBLK} PKNAME "${_BOOTDEV}")"
     _chroot_mount
     cp "${_DESTDIR}/usr/share/limine/limine-bios.sys" "${_DESTDIR}/boot/"
