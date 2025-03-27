@@ -13,9 +13,9 @@ _run ()
     _install_files
     rm /usr/bin/{login,nologin,mount.nfs{,4},umount.nfs{,4},loadkeys,dbus-{cleanup-sockets,\
 daemon,launch,monitor,run-session,send,test-tool,update-activation-environment,uuidgen},\
-kernel-install,systemctl,systemd-{analyze,ask-password,cat,cgls,cgtop,delta,detect-virt,escape,firstboot,\
+kernel-install,systemd-{analyze,ask-password,cat,cgls,cgtop,delta,detect-virt,escape,firstboot,\
 hwdb,inhibit,machine-id-setup,mount,notify,nspawn,path,resolve,run,umount,socket-activate,\
 stdio-bridge,sysusers,tty-ask-password-agent,repart,creds,cryptenroll,dissect,id128,sysext},\
-{bus,coredump,locale,login,machine,network,hostname,timedate,userdb,home,oom,portable}ctl,zoxide}
+{bus,coredump,journal,locale,login,machine,network,hostname,timedate,userdb,home,oom,portable,system}ctl,zoxide}
 }
 
