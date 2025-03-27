@@ -15,7 +15,7 @@ _locale_menu() {
         _LOCALE=$(cat "${_ANSWER}")
         if [[ "${_LOCALE}" == "OTHER" ]]; then
             if _dialog  --title " Other Locale " --menu "" 17 35 11 "${_OTHER_LOCALES[@]}" 2>"${_ANSWER}"; then
-                _LOCALE=$(cat ${_ANSWER})
+                _LOCALE=$(cat "${_ANSWER}")
             else
                 _LOCALE=""
             fi
