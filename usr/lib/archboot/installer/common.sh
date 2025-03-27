@@ -172,6 +172,4 @@ _file_to_template() {
 
 _remove_from_devs() {
     IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${1}")" "")"
-    # no double spaces!
-    IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "  " " ")"
 }

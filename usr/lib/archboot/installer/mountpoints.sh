@@ -265,6 +265,8 @@ _mountpoints() {
         while [[ "${_DEV}" != "> DONE" ]]; do
             _MP_DONE=""
             while [[ -z "${_MP_DONE}" ]]; do
+                # no double spaces!
+                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "  " " ")"
                 if [[ -z "${_SWAP_DONE}" ]]; then
                     _check_devices || return 1
                     _dialog --title " Swap " --menu "" 14 55 8 "> NONE" "No Swap" "> FILE" "Swap File" "${_DEVS[@]}" 2>"${_ANSWER}" || return 1
