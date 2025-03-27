@@ -81,9 +81,12 @@ _bcfs_select_raid_devices () {
         _bcfs_options
     done
     echo "--replicas=${_BCFS_REP_COUNT}" >> /tmp/.bcfs-raid-devices
-    [[ -n "${_BCFS_SSD_OPTIONS}" ]] && echo "--foreground_target=ssd --promote_target=ssd" >> /tmp/.bcfs-raid-devices
-    [[ -n "${_BCFS_HDD_OPTIONS}" ]] && echo "--background_target=hdd" >> /tmp/.bcfs-raid-devices
-    return 0
+    if [[ -n "${_BCFS_SSD_OPTIONS}" ]]; then
+        echo "--foreground_target=ssd --promote_target=ssd" >> /tmp/.bcfs-raid-devices
+    fi
+    if [[ -n "${_BCFS_HDD_OPTIONS}" ]]; then
+        echo "--background_target=hdd" >> /tmp/.bcfs-raid-devices
+    fi
 }
 
 # choose raid level to use on bcfs device
