@@ -152,7 +152,7 @@ _file_rename() {
 }
 
 _binary() {
-    if "$(type -P "${1}")"; then
+    if type -P "${1}"; then
         _file "${1}"
     else
         echo "Error:${1} not found in path!"
