@@ -226,10 +226,12 @@ _install_mods() {
 
 _install_libs() {
     # add libraries for binaries in bin/, /lib/systemd and /lib/security
+    # libsystemd files are added in base_common_system hook
+    # lua is added with _full_dir in neovim hook
     echo "Adding libraries..."
     mapfile -t _LIB_FILES < <(objdump -p "${_ROOTFS}"/bin/* "${_ROOTFS}"/lib/systemd/{systemd-*,libsystemd*} \
                                 "${_ROOTFS}"/lib/security/*.so 2>"${_NO_LOG}" |\
-                                rg ' *NEEDED *' -r '/lib/' | rg -v 'libsystemd-core|libsystemd-shared' | sort -u)
+                                rg ' *NEEDED *' -r '/lib/' | rg -v 'libsystemd-core|libsystemd-shared|lib/lua' | sort -u)
     _map _file "${_LIB_FILES[@]}"
     _install_files
     _LIB_COUNT="0"
