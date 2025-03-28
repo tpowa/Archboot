@@ -8,14 +8,14 @@ _run ()
     _install_files
     rm /usr/bin/{\[,addpart,attr,b2sum,base{32,64},basenc,blk{discard,pr,zone},blockdev,bunzip2,\
 bz{cat,diff,grep,ip2,ip2recover,more},cal,capsh,ch{acl,con,cpu,grp,mem,oom,own,root,rt},\
-cfdisk,cksum,col{,crt,rm,umn},comm,csplit,ctrlaltdel,delpart,diff,\
+cfdisk,cksum,col{,crt,rm,umn},comm,csplit,ctrlaltdel,delpart,depmod,diff,\
 dir{name,colors},dmesg,eject,egrep,expand,expr,fallocate,factor,fadvise,\
 fdisk,fgrep,file,fincore,findmnt,flock,fmt,fold,free,fuser,\
 get{cap,facl,fattr,opt,pcaps},gunzip,gzexe,hardlink,hdparm,hexdump,hostid,\
 id,ionice,ipc{mk,rm,s},irqtop,isosize,join,keyctl,last{,b},ldattach,ldd,\
 link,linux{32,64},logname,look,losetup,ls{cpu,fd,ipc,irq,locks,logins,mem,ns},\
 lz4{,c,cat},lz{cat,cmp,diff,egrep,fgrep,grep,less,more,ma,madec,mainfo,op},\
-mcookie,md5sum,mesg,mk{fifo,fs,nod},namei,new{grp,gidmap,uidmap},\
+mcookie,md5sum,mesg,mk{fifo,fs,nod},modinfo,namei,new{grp,gidmap,uidmap},\
 nice,nl,nohup,nproc,nsenter,numfmt,partx,paste,pathchk,pidwait,pinky,\
 pg,pipesz,pkill,pmap,pr,printenv,prlimit,prtstat,pslog,\
 pstree,ptx,pwdx,pzstd,read{link,profile},rename,renice,request-key,\
