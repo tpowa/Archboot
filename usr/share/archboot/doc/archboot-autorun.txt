@@ -150,7 +150,7 @@ _chroot_umount
 ### autoconfiguration
 _chroot_mount
 echo "Enable timezone setting on installed system..."
- cp -a /etc/localtime "${_DESTDIR}"/etc/localtime
+cp -a /etc/localtime "${_DESTDIR}"/etc/localtime
 echo "Enable clock setting on installed system..."
 cp /etc/adjtime "${_DESTDIR}"/etc/adjtime
 echo "Enable network and proxy settings on installed system..."
