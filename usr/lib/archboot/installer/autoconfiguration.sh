@@ -10,7 +10,7 @@ _auto_timesetting() {
         cp -a /etc/localtime "${_DESTDIR}"/etc/localtime
         # write to template
         { echo "echo \"Enable timezone setting on installed system...\""
-        echo " cp -a /etc/localtime \"\${_DESTDIR}\"/etc/localtime"
+        echo "cp -a /etc/localtime \"\${_DESTDIR}\"/etc/localtime"
         } >> "${_TEMPLATE}"
         sleep 2
     fi
