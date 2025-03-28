@@ -66,8 +66,9 @@ _server_upload() {
     # copy files to server
     echo "Syncing files to ${_SERVER}:${_PUB}/.${1}/${_ARCH}..."
     run0 -u "${_USER}" ssh "${_SERVER}" << EOF
-! [[ -d "${_PUB}"/."${1}"/"${_ARCH}" ]]; then
+if ! [[ -d "${_PUB}"/."${1}"/"${_ARCH}" ]]; then
 mkdir -p "${_PUB}"/."${1}"/"${_ARCH}"
+fi
 EOF
     run0 -u "${_USER}" -D "${2}" "${_RSYNC[@]}" "${_DIR}" "${_SERVER}":"${_PUB}/.${1}/${_ARCH}/" || exit 1
     # move files on server, create symlink and removing ${_PURGE_DATE} old release
