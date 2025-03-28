@@ -152,7 +152,11 @@ _file_rename() {
 }
 
 _binary() {
-    _file "$(type -P "${1}")" || echo "Error:${1} not found!"
+    if "$(type -P "${1}")"; then
+        _file "${1}"
+    else
+        echo "Error:${1} not found in path!"
+    fi
 }
 
 _init_rootfs() {
