@@ -7,5 +7,5 @@ _run ()
     ! rg -qw 'archboot' /etc/hostname && return
     _install_mods
     rm -r /lib/modules
-    _MODS="" _MOD_DEPS=""
+    _MODS=() _MOD_DEPS=()
 }
