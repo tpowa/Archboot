@@ -4,6 +4,7 @@
 
 _run ()
 {
-    _map _binary dmidecode biosdecode
+    _binary dmidecode
+    [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _binary biosdecode
 }
 
