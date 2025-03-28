@@ -131,7 +131,11 @@ _symlink() {
 }
 
 _file() {
-    _FILES+=("${1##/}")
+    if [[ -e "${1}" ]]; then
+        _FILES+=("${1##/}")
+    else
+        echo "Error: ${1} not found!"
+    fi
     if [[ -L "${1}" ]]; then
         _file  "$(realpath -- "${1}")"
     fi
