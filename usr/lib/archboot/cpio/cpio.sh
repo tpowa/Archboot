@@ -229,7 +229,7 @@ _install_libs() {
     echo "Adding libraries..."
     mapfile -t _LIB_FILES < <(objdump -p "${_ROOTFS}"/bin/* "${_ROOTFS}"/lib/systemd/{systemd-*,libsystemd*} \
                                 "${_ROOTFS}"/lib/security/*.so 2>"${_NO_LOG}" |\
-                                rg ' *NEEDED *' -r '/lib/' | rg -v 'libsystemd-core|libsystemd-share}' | sort -u)
+                                rg ' *NEEDED *' -r '/lib/' | rg -v 'libsystemd-core|libsystemd-shared' | sort -u)
     _map _file "${_LIB_FILES[@]}"
     _install_files
     _LIB_COUNT="0"
