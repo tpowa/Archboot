@@ -227,21 +227,19 @@ _install_mods() {
 _install_libs() {
     # add libraries for binaries in bin/, /lib/systemd and /lib/security
     echo "Adding libraries..."
-    while read -r i; do
-        [[ -e "${i}" ]] && _file "${i}"
-    done < <(objdump -p "${_ROOTFS}"/bin/* "${_ROOTFS}"/lib/systemd/{systemd-*,libsystemd*} "${_ROOTFS}"/lib/security/*.so 2>"${_NO_LOG}" |
-                rg ' *NEEDED *' -r '/lib/' | sort -u)
+    mapfile -t _LIB_FILES < <(objdump -p "${_ROOTFS}"/bin/* "${_ROOTFS}"/lib/systemd/{systemd-*,libsystemd*} \
+                                "${_ROOTFS}"/lib/security/*.so 2>"${_NO_LOG}" | rg ' *NEEDED *' -r '/lib/' | sort -u)
+    _map _file "${_LIB_FILES[@]}"
     _install_files
     _LIB_COUNT="0"
     while ! [[ "${_LIB_COUNT}" == "${_LIB_COUNT2}" ]]; do
         _LIB_COUNT="${_LIB_COUNT2}"
-        while read -r i; do
-            [[ -e "${i}" ]] && _file "${i}"
-        done < <(objdump -p "${_ROOTFS}"/lib/*.so* 2>"${_NO_LOG}" |
-                rg ' *NEEDED *' -r '/lib/' | sort -u)
+        mapfile -t _LIB_FILES < <(objdump -p "${_ROOTFS}"/lib/*.so* 2>"${_NO_LOG}" \
+                                    | rg ' *NEEDED *' -r '/lib/' | sort -u)
+        _map _file "${_LIB_FILES[@]}"
         _install_files
         # rerun loop if new libs were discovered, else break
-        _LIB_COUNT2="$(echo "${_ROOTFS}"/lib/*.so* | wc -w)"
+        _LIB_COUNT2="${#_LIB_FILES[@]}"
     done
 }
 
