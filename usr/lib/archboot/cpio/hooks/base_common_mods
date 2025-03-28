@@ -7,7 +7,7 @@ _run ()
     ### acpi
     _all_mods '/acpi/'
     ### add pcspkr
-    _mod pcspkr
+    ! [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _mod pcspkr
     ### platform modules
     _all_mods -f 'media' '/platform/'
     ### add init modules
