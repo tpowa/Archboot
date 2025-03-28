@@ -16,6 +16,8 @@ common:
 cpio.sh:
 - removed softdeps checks
 - implemented cleaner array handling
+- added file error check
+- fixed binary error check
 bootloader:
 - added check on successful container creation
 localize:
