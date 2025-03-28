@@ -135,8 +135,8 @@ _create_iso() {
         done
         echo "Generating Unified Kernel Images..."
         _KERNEL="boot/kernel/${_KERNEL##*/}"
-        [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE=(--initrd=/boot/ucode/intel-ucode.img)
-        _AMD_UCODE=(--initrd=/boot/ucode/amd-ucode.img)
+        [[ -n "${_INTEL_UCODE}" ]] && _UCODE+=(--initrd=/boot/ucode/intel-ucode.img)
+        _UCODE+=(--initrd=/boot/ucode/amd-ucode.img)
         rm -r "${_W_DIR:?}"/boot
         mv boot "${_W_DIR}"
         for initrd in ${_INITRD_NORMAL} ${_INITRD_LATEST} ${_INITRD_LOCAL}; do
@@ -157,7 +157,7 @@ _create_iso() {
                 done
             fi
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
-                "${_INTEL_UCODE[@]}" "${_AMD_UCODE[@]}" --initrd="${initrd}" "${_FW_IMG[@]}" --cmdline="${_CMDLINE}" \
+                "${_UCODE[@]}" --initrd="${initrd}" "${_FW_IMG[@]}" --cmdline="${_CMDLINE}" \
                 --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="/boot/${_UKI}.efi" &>"${_NO_LOG}" || exit 1
         done
         # fix permission and timestamp
