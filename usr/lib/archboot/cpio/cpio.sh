@@ -196,17 +196,17 @@ _run_hook() {
 _install_mods() {
     # softdeps are not honored, add them in _mod arrays!
     # remove duplicate modules:
-    IFS=" " read -r -a _MODS <<< "$(echo "${_MODS[@]}" | sd ' ' '\n' | sort -u | sd '\n' ' ')"
+    IFS=" " read -r -a _MODS <<< "$(sd ' ' '\n' <<< "${_MODS[@]}" | sort -u | sd '\n' ' ')"
     # Checking kernel module dependencies:
     # first try, pull in the easy modules
     _MOD_DEPS+=("$(modinfo -k "${_KERNELVERSION}" -F depends "${_MODS[@]}" | sd '\n' ' ')")
-    IFS=" " read -r -a _MOD_DEPS <<< "$(echo "${_MOD_DEPS[@]}" | sd ',' ' ' | sd ' ' '\n' | sort -u | sd '\n' ' ')"
+    IFS=" " read -r -a _MOD_DEPS <<< "$(sd ',' ' ' <<< "${_MOD_DEPS[@]}" | sd ' ' '\n' | sort -u | sd '\n' ' ')"
     _DEP_COUNT=0
     # next tries, ensure to catch all modules with depends
     while ! [[ "${_DEP_COUNT}" == "${_DEP_COUNT2}" ]]; do
         _DEP_COUNT="${_DEP_COUNT2}"
         _MOD_DEPS+=("$(modinfo -k "${_KERNELVERSION}" -F depends "${_MOD_DEPS[@]}" | sd '\n' ' ')")
-        IFS=" " read -r -a _MOD_DEPS <<< "$(echo "${_MOD_DEPS[@]}" | sd ',' ' ' | sd ' ' '\n' | sort -u | sd '\n' ' ')"
+        IFS=" " read -r -a _MOD_DEPS <<< "$(sd ',' ' ' <<< "${_MOD_DEPS[@]}" | sd ' ' '\n' | sort -u | sd '\n' ' ')"
         _DEP_COUNT2="${#_MOD_DEPS[@]}"
     done
     # Adding kernel modules:
@@ -264,9 +264,9 @@ _cpio_fw() {
             for i in $(fd --type d --base-directory "${_FW_SRC}" --path-separator '' -d 1); do
                 if [[ -n "${_GENERATE_IMAGE}" ]]; then
                     # those from firmware basedir belong to corresponding chipsets
-                    echo "${i}" | rg -q mediatek && mv "${_FW_SRC}"/{mt76*,vpu_*} "${_FW_TMP_SRC}/"
-                    echo "${i}" | rg -q ath9k_htc && mv "${_FW_SRC}"/htc_* "${_FW_TMP_SRC}/"
-                    echo "${i}" | rg -q ath11k && mv "${_FW_SRC}"/wil6210* "${_FW_TMP_SRC}/"
+                    rg -q mediatek <<< "${i}" && mv "${_FW_SRC}"/{mt76*,vpu_*} "${_FW_TMP_SRC}/"
+                    rg -q ath9k_htc <<< "${i}" && mv "${_FW_SRC}"/htc_* "${_FW_TMP_SRC}/"
+                    rg -q ath11k <<< "${i}" && mv "${_FW_SRC}"/wil6210* "${_FW_TMP_SRC}/"
                     mv "${_FW_SRC}/${i}" "${_FW_TMP_SRC}/"
                     echo "Preparing ${i}.img firmware..."
                     _create_cpio "${_FW_TMP}" "${_FW_DEST}/${i}.img" &>"${_NO_LOG}" || exit 1
@@ -276,9 +276,9 @@ _cpio_fw() {
                     echo "Saving firmware files to ${_FW_TMP}/${i}..."
                     [[ -d "${_FW_TMP}/${i}/${_FW}" ]] || mkdir -p "${_FW_TMP}/${i}/${_FW}"
                     # those from firmware basedir belong to corresponding chipsets
-                    echo "${i}" | rg -q mediatek && mv "${_FW_SRC}"/{mt76*,vpu_*} "${_FW_TMP}/${i}/${_FW}/"
-                    echo "${i}" | rg -q ath9k_htc && mv "${_FW_SRC}"/htc_* "${_FW_TMP}/${i}/${_FW}/"
-                    echo "${i}" | rg -q ath11k && mv "${_FW_SRC}"/wil6210* "${_FW_TMP}/${i}/${_FW}/"
+                    rg -q mediatek <<< "${i}" && mv "${_FW_SRC}"/{mt76*,vpu_*} "${_FW_TMP}/${i}/${_FW}/"
+                    rg -q ath9k_htc <<< "${i}" && mv "${_FW_SRC}"/htc_* "${_FW_TMP}/${i}/${_FW}/"
+                    rg -q ath11k <<< "${i}" && mv "${_FW_SRC}"/wil6210* "${_FW_TMP}/${i}/${_FW}/"
                     mv "${_FW_SRC}/${i}" "${_FW_TMP}/${i}/${_FW}/"
                 fi
             done
