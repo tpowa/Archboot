@@ -225,18 +225,16 @@ _install_mods() {
 _install_libs() {
     # add lib files for binaries and libraries
     echo "Adding libraries..."
-    mapfile -t _LIB_FILES < <(fd -t x -u -d 3 . "${_ROOTFS}/usr")
-    mapfile -t _LIB_FILES < <(objdump -p 2>/dev/null "${_LIB_FILES[@]}" | rg ' *NEEDED *' -r '' | sort -u)
-    mapfile -t _LIB_FILES < <(fd -t f -t l -d 3 "$(echo "${_LIB_FILES[@]}" | sd ' ' '|' | sd '\+' '\\+')" /lib)
+    mapfile -t _LIB_FILES < <(objdump -p "${_ROOTFS}"/usr/{bin,lib/{systemd,security}}/* 2>"${_NO_LOG}" |\
+                              rg ' *NEEDED *' -r '/lib/' | sort -u | sd '/lib//usr' '' | sd 'libsystemd-' 'systemd/libsystemd-')
     _map _file "${_LIB_FILES[@]}"
     _install_files
     # loop to ensure to catch all libraries
     _LIB_COUNT="0"
     while ! [[ "${_LIB_COUNT}" == "${_LIB_COUNT2}" ]]; do
         _LIB_COUNT="${_LIB_COUNT2}"
-        mapfile -t _LIB_FILES < <(fd -t x -u -d 3 . "${_ROOTFS}/lib")
-        mapfile -t _LIB_FILES < <(objdump -p 2>/dev/null "${_LIB_FILES[@]}" | rg ' *NEEDED *' -r '' | sort -u)
-        mapfile -t _LIB_FILES < <(fd -t f -t l -d 3 "$(echo "${_LIB_FILES[@]}" | sd ' ' '|' | sd '\+' '\\+')" /lib)
+        mapfile -t _LIB_FILES < <(objdump -p "${_ROOTFS}"/usr/lib/* 2>"${_NO_LOG}" |\
+                                  rg ' *NEEDED *' -r '/lib/' | sort -u  | sd '/lib//usr' '')
         _map _file "${_LIB_FILES[@]}"
         _install_files
         _LIB_COUNT2="${#_LIB_FILES[@]}"
