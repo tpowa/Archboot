@@ -98,33 +98,33 @@ _auto_packages() {
     IFS=" " read -r -a _PACKAGES <<< "$(echo "${_PACKAGES[@]}" | sd "linux-firmware.* " "")"
     # Add filesystem packages
     if ${_LSBLK} FSTYPE | rg -q 'bcachefs'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'bcachefs-tools' && _PACKAGES+=(bcachefs-tools)
+        ! rg -qw 'bcachefs-tools' <<< "${_PACKAGES[@]}" && _PACKAGES+=(bcachefs-tools)
     fi
     if ${_LSBLK} FSTYPE | rg -q 'btrfs'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'btrfs-progs' && _PACKAGES+=(btrfs-progs)
+        ! rg -qw 'btrfs-progs' <<< "${_PACKAGES[@]}" && _PACKAGES+=(btrfs-progs)
     fi
     if ${_LSBLK} FSTYPE | rg -q 'ext'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'e2fsprogs' && _PACKAGES+=(e2fsprogs)
+        ! rg -qw 'e2fsprogs' <<< "${_PACKAGES[@]}" && _PACKAGES+=(e2fsprogs)
     fi
     if ${_LSBLK} FSTYPE | rg -q 'xfs'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'xfsprogs' && _PACKAGES+=(xfsprogs)
+        ! rg -qw 'xfsprogs' <<< "${_PACKAGES[@]}" && _PACKAGES+=(xfsprogs)
     fi
     if ${_LSBLK} FSTYPE | rg -q 'vfat'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'dosfstools' && _PACKAGES+=(dosfstools)
+        ! rg -qw 'dosfstools' <<< "${_PACKAGES[@]}" && _PACKAGES+=(dosfstools)
     fi
     # Add packages for complex blockdevices
     if ${_LSBLK} FSTYPE | rg -qw 'linux_raid_member'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'mdadm' && _PACKAGES+=(mdadm)
+        ! rg -qw 'mdadm' <<< "${_PACKAGES[@]}" && _PACKAGES+=(mdadm)
     fi
     if ${_LSBLK} FSTYPE | rg -qw 'LVM2_member'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'lvm2' && _PACKAGES+=(lvm2)
+        ! rg -qw 'lvm2' <<< "${_PACKAGES[@]}" && _PACKAGES+=(lvm2)
     fi
     if ${_LSBLK} FSTYPE | rg -qw 'crypto_LUKS'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'cryptsetup' && _PACKAGES+=(cryptsetup)
+        ! rg -qw 'cryptsetup' <<< "${_PACKAGES[@]}" && _PACKAGES+=(cryptsetup)
     fi
     # Add iwd, if wlan is detected
     if fd . /sys/class/net | rg -q 'wlan'; then
-        ! echo "${_PACKAGES[@]}" | rg -qw 'iwd' && _PACKAGES+=(iwd)
+        ! rg -qw 'iwd' <<< "${_PACKAGES[@]}" && _PACKAGES+=(iwd)
     fi
     rg -q '^FONT=ter' /etc/vconsole.conf && _PACKAGES+=(terminus-font)
     # only add firmware if already used
