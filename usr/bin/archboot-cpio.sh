@@ -29,7 +29,7 @@ fi
 _KERNELVERSION="$(_kver "${_KERNEL}")"
 _MOD_DIR="/lib/modules/${_KERNELVERSION}"
 [[ -d "${_MOD_DIR}" ]] || _abort "${_MOD_DIR} is not a valid kernel module directory!"
-_ALL_MODS="$(fd -t f -u '.ko' "${_MOD_DIR}")"
+_ALL_MODS="$(fd -t f -u '\.ko' "${_MOD_DIR}")"
 _BUILD_DIR="$(_init_rootfs "${_KERNELVERSION}" "${_TARGET_DIR}")" || exit 1
 _ROOTFS="${_TARGET_DIR:-${_BUILD_DIR}/root}"
 if (( ${#_HOOKS[*]} == 0 )); then

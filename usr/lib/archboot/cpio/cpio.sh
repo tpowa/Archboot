@@ -108,9 +108,7 @@ _filter_mods() {
 }
 
 _all_mods() {
-    for i in $(_filter_mods "$@"); do
-        _mod "${i}"
-    done
+    _map _mod "$(_filter_mods "$@")"
 }
 
 _mod() {
