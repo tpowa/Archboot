@@ -79,7 +79,7 @@ _find_btrfs_bootloader_subvolume() {
 _subvolumes_in_use() {
     _SUBVOLUME_IN_USE=()
     while read -r i; do
-        rg -F -q "|btrfs|" <<< "${i}" && _SUBVOLUME_IN_USE+=("$(echo "${i}" | choose -f '\|' 8)")
+        rg -F -q "|btrfs|" <<< "${i}" && _SUBVOLUME_IN_USE+=("$(choose -f '\|' 8 <<< "${i}")")
     done < /tmp/.parts
 }
 
