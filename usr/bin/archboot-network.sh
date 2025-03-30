@@ -73,7 +73,7 @@ _wireless() {
         _WLAN_HIDDEN=1
     fi
     # replace # with spaces again
-    _WLAN_SSID="$(echo "${_WLAN_SSID}" | sd '\+' ' ')"
+    _WLAN_SSID="$(sd '\+' ' ' <<< "${_WLAN_SSID}")"
     # expect hidden network has a WLAN_KEY
     if ! [[ "$(iwctl station "${_INTERFACE}" get-networks | rg -q "${_WLAN_SSID}.*open")" ]] \
     || [[ "${_WLAN_CONNECT}" == "connect-hidden" ]]; then
@@ -134,7 +134,7 @@ _network() {
         done
         echo "${_INTERFACE}" >/.network-interface
         # iwd renames wireless devices to wlanX
-        if echo "${_INTERFACE}" | rg -q 'wlan'; then
+        if rg -q 'wlan' <<< "${_INTERFACE}"; then
             _CONNECTION="wireless"
         else
             _CONNECTION="ethernet"
@@ -164,14 +164,14 @@ _network() {
             while true; do
                 _dialog  --no-cancel --title " IP Address And Netmask " --inputbox "" 7 40 "192.168.1.23/24" 2>"${_ANSWER}"
                 _IPADDR=$(cat "${_ANSWER}")
-                if echo "${_IPADDR}" | rg -q '/'; then
+                if rg -q '/' <<< "${_IPADDR}"; then
                     break
                 else
                     _dialog --title " ERROR " --no-mouse --infobox "No netmask was given, please add netmask too like this:\n\n1.2.3.4/24, or 1.2.3.4/255.255.255.0" 5 60
                     sleep 5
                 fi
             done
-            _dialog --no-cancel --title " Gateway " --inputbox "" 7 40 "$(echo "${_IPADDR}" | choose 0 1 2 -f '\.' -o '.').1" 2>"${_ANSWER}"
+            _dialog --no-cancel --title " Gateway " --inputbox "" 7 40 "$(choose 0 1 2 -f '\.' -o '.' <<< "${_IPADDR}").1" 2>"${_ANSWER}"
             _GW=$(cat "${_ANSWER}")
             _dialog --no-cancel --title " Domain Name Server " --inputbox "" 7 40 "${_GW}" 2>"${_ANSWER}"
             _DNS=$(cat "${_ANSWER}")

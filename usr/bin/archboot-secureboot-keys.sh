@@ -17,7 +17,7 @@ _usage () {
 _DIR="${2}"
 while [ $# -gt 0 ]; do
     case ${1} in
-        -name=*|--name=*) _NAME="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
+        -name=*|--name=*) _NAME="$(rg -o '=(.*)' -r '$1' <<< "${1}")" ;;
         -h|--h|-help|--help|?) _usage ;;
         esac
     shift

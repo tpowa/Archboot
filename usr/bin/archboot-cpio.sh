@@ -45,7 +45,7 @@ else
     echo "Starting dry run..."
 fi
 _HOOK_COUNT=1
-_HOOKS_END_COUNT="$(echo "${_HOOKS[@]}" | wc -w)"
+_HOOKS_END_COUNT="${#_HOOKS[@]}"
 if [[ "${_HOOKS_END_COUNT}" -lt 10 ]]; then
     _ADD_ZERO=""
 else

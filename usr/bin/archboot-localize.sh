@@ -26,9 +26,9 @@ _locale_menu() {
 _vconsole_keymap() {
     _LIST_MAPS="localectl list-keymaps --no-pager"
     _KEYMAPS="us de es fr pt be bg br ca cz dk et fi gr hu it lt lv mk nl no pl ro ru sk sr sv tr ua"
-    _LOW_LOCALE="$(echo "${_LOCALE}" | tr "[:upper:]" "[:lower:]")"
+    _LOW_LOCALE="$(tr "[:upper:]" "[:lower:]" <<< "${_LOCALE}")"
     for i in ${_KEYMAPS}; do
-        echo "${_LOW_LOCALE}" | rg -q "${i}" && _DETECTED_KEYMAP="${i}"
+        rg -q "${i}" <<< "${_LOW_LOCALE}" && _DETECTED_KEYMAP="${i}"
         [[ -n ${_DETECTED_KEYMAP} ]] && break
     done
     _KEYMAP=""

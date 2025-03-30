@@ -118,7 +118,7 @@ _BASE_BLACKLIST=(
 )
 archboot-binary-check.sh base &>>"${_LOG}"
 for i in $(rg '/usr/bin/(.*)' -r '$1' binary.log | rg -v gawk-*); do
-    if ! echo "${_BASE_BLACKLIST[@]}" | rg -qw "${i}"; then
+    if ! rg -qw "${i}" <<< "${_BASE_BLACKLIST[@]}"; then
         echo "${i}" >> base-binary-error.log
     fi
 done
