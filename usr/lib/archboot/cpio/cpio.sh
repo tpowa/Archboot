@@ -100,10 +100,11 @@ _loaded_mods() {
 }
 
 _filter_mods() {
+    # only list the module name without extension and directory
     if [[ -z "${2}" ]]; then
-        rg "${1}" <<<"${_ALL_MODS}"
+        rg "${1}" <<<"${_ALL_MODS}" | sd '.*/' '' | sd '\.ko.*$' ''
     else
-        rg "${3}" <<<"${_ALL_MODS}" | rg -v "${2}"
+        rg "${3}" <<<"${_ALL_MODS}" | rg -v "${2}" | sd '.*/' '' | sd '\.ko.*$' ''
     fi
 }
 
