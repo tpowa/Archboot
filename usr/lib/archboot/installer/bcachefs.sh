@@ -50,13 +50,13 @@ _bcfs_select_raid_devices () {
     for i in "${_DEVS[@]}"; do
         _BCFS_RAID_DEVS+=("${i}")
     done
-    IFS=" " read -r -a _BCFS_RAID_DEVS <<< "$(echo "${_BCFS_RAID_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BCFS_DEV}")" "")"
+    IFS=" " read -r -a _BCFS_RAID_DEVS <<< "$(sd "$(${_LSBLK} NAME,SIZE -d "${_BCFS_DEV}")" "" <<< "${_BCFS_RAID_DEVS[@]}")"
     _RAIDNUMBER=1
     while [[ "${_BCFS_DEV}" != "> DONE" ]]; do
         _BCFS_DONE=""
         _RAIDNUMBER=$((_RAIDNUMBER + 1))
         # clean loop from used partition and options
-        IFS=" " read -r -a _BCFS_RAID_DEVS <<< "$(echo "${_BCFS_RAID_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BCFS_DEV}")" "")"
+        IFS=" " read -r -a _BCFS_RAID_DEVS <<< "$(sd "$(${_LSBLK} NAME,SIZE -d "${_BCFS_DEV}")" "" <<< "${_BCFS_RAID_DEVS[@]}")"
         ### RAID5/6 is not ready atm 23052024
         # RAID5/6 need ec option!
         # RAID5 needs 3 devices
