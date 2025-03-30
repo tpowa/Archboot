@@ -102,17 +102,14 @@ _loaded_mods() {
 _filter_mods() {
     # only list the module name without extension and directory
     if [[ -z "${2}" ]]; then
-        rg "${1}" <<<"${_ALL_MODS}" | sd '.*/|\.ko.*$' ''
+        rg "${1}" <<< "${_ALL_MODS}" | sd '.*/' '' | sd '\.ko.*$' '\n'
     else
-        rg "${3}" <<<"${_ALL_MODS}" | rg -v "${2}" | sd '.*/|\.ko.*$' ''
+        rg "${3}" <<< "${_ALL_MODS}" | rg -v "${2}" | sd '.*/' '' | sd '\.ko.*$' '\n'
     fi
 }
 
 _all_mods() {
-    # for loop is needed to allow globs in _all_mods
-    for i in $(_filter_mods "$@"); do
-        _mod "${i}"
-    done
+    _map  _mod "$(_filter_mods "$@")"
 }
 
 _mod() {
