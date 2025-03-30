@@ -37,7 +37,7 @@ _clear_fs_values() {
 _ssd_optimization() {
     # bcachefs, btrfs, ext4 and xfs have ssd mount option support
     _SSD_MOUNT_OPTIONS=""
-    if echo "${_FSTYPE}" | rg -q 'bcachefs|btrfs|ext4|xfs'; then
+    if rg -q 'bcachefs|btrfs|ext4|xfs' <<< "${_FSTYPE}"; then
         # check all underlying devices on ssd
         for i in $(${_LSBLK} NAME,TYPE "${_DEV}" -s 2>"${_NO_LOG}" | rg '.*/(.*) disk$' -r '$1'); do
             # check for ssd
@@ -141,7 +141,7 @@ _check_mkfs_values() {
 }
 
 _check_devices() {
-    if ! echo "${_DEVS[@]}" | rg -q /dev; then
+    if ! rg -q /dev <<< "${_DEVS[@]}"; then
         _dialog --title " ERROR " --no-mouse --infobox "All devices already in use, please fix devices and start again." 3 70
         sleep 5
         return 1
@@ -151,17 +151,17 @@ _check_devices() {
 _run_mkfs() {
     while read -r line; do
         # basic parameters
-        _DEV=$(echo "${line}" | choose -f '\|' 0)
-        _FSTYPE=$(echo "${line}" | choose -f '\|' 1)
-        _MP=$(echo "${line}" | choose -f '\|' 2)
-        _DOMKFS=$(echo "${line}" | choose -f '\|' 3)
-        _LABEL_NAME=$(echo "${line}" | choose -f '\|' 4)
-        _FS_OPTIONS=$(echo "${line}" | choose -f '\|' 5)
+        _DEV=$(choose -f '\|' 0 <<< "${line}")
+        _FSTYPE=$(choose -f '\|' 1 <<< "${line}")
+        _MP=$(choose -f '\|' 2 <<< "${line}")
+        _DOMKFS=$(choose -f '\|' 3 <<< "${line}")
+        _LABEL_NAME=$(choose -f '\|' 4 <<< "${line}")
+        _FS_OPTIONS=$(choose -f '\|' 5 <<< "${line}")
         [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
         # bcachefs, btrfs and other parameters
         if [[ ${_FSTYPE} == "bcachefs" ]]; then
-            _BCFS_USE_DEVS="$(echo "${line}" | choose -f '\|' 6)"
-            _BCFS_COMPRESS=$(echo "${line}" | choose -f '\|' 7)
+            _BCFS_USE_DEVS="$(choose -f '\|' 6 <<< "${line}")"
+            _BCFS_COMPRESS=$(choose -f '\|' 7 <<< "${line}")
             if [[ "${_BCFS_COMPRESS}" == "NONE" ]]; then
                 _BCFS_COMPRESS=""
             else
@@ -170,16 +170,16 @@ _run_mkfs() {
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
                   "${_BCFS_USE_DEVS}" "${_BCFS_COMPRESS}" || return 1
         elif [[ ${_FSTYPE} == "btrfs" ]]; then
-            _BTRFS_USE_DEVS="$(echo "${line}" | choose -f '\|' 6)"
+            _BTRFS_USE_DEVS="$(choose -f '\|' 6 <<< "${line}")"
             # remove # from array
-            _BTRFS_LEVEL="$(echo "${line}" | choose -f '\|' 7)"
+            _BTRFS_LEVEL="$(choose -f '\|' 7 <<< "${line}")"
             if [[ ! "${_BTRFS_LEVEL}" == "NONE" && "${_FSTYPE}" == "btrfs" ]];then
                 _BTRFS_LEVEL="-m ${_BTRFS_LEVEL} -d ${_BTRFS_LEVEL}"
             else
                 _BTRFS_LEVEL=""
             fi
-            _BTRFS_SUBVOLUME=$(echo "${line}" | choose -f '\|' 8)
-            _BTRFS_COMPRESS=$(echo "${line}" | choose -f '\|' 9)
+            _BTRFS_SUBVOLUME=$(choose -f '\|' 8 <<< "${line}")
+            _BTRFS_COMPRESS=$(choose -f '\|' 9 <<< "${line}")
             [[ "${_BTRFS_COMPRESS}" == "NONE" ]] && _BTRFS_COMPRESS=""
             _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
                   "${_BTRFS_USE_DEVS}" "${_BTRFS_LEVEL}" "${_BTRFS_SUBVOLUME}" "${_BTRFS_COMPRESS}" || return 1
@@ -264,7 +264,7 @@ _mountpoints() {
             _MP_DONE=""
             while [[ -z "${_MP_DONE}" ]]; do
                 # no double spaces!
-                IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "  " " ")"
+                IFS=" " read -r -a _DEVS <<< "$(sd "  " " " <<< "${_DEVS[@]}")"
                 if [[ -z "${_SWAP_DONE}" ]]; then
                     _check_devices || return 1
                     _dialog --title " Swap " --menu "" 14 55 8 "> NONE" "No Swap" "> FILE" "Swap File" "${_DEVS[@]}" 2>"${_ANSWER}" || return 1
@@ -490,7 +490,7 @@ _mkfs() {
     if [[ "${2}" == "swap" ]]; then
         swapoff -a &>"${_NO_LOG}"
         if [[ "${4}" == "1" ]]; then
-            if echo "${1}" | rg -q '^/dev'; then
+            if rg -q '^/dev' <<< "${1}"; then
                 if mkswap -L "${6}" "${1}" &>"${_LOG}"; then
                     # write to template
                     echo "mkswap -L \"${6}\" \"${1}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
@@ -532,7 +532,7 @@ _mkfs() {
                 return 1
             fi
         fi
-        if echo "${1}" | rg -q '^/dev'; then
+        if rg -q '^/dev' <<< "${1}"; then
             if swapon "${1}" &>"${_LOG}";then
                 # write to template
                 echo "swapon \"${1}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
@@ -565,7 +565,7 @@ _mkfs() {
                 _FS_CREATE=("${7}" -L "${6}" -f "${1}")
             fi
             # remove unused parameters
-            IFS=" " read -r -a _FS_CREATE <<< "$(echo "${_FS_CREATE[@]}" | sd "  " " ")"
+            IFS=" " read -r -a _FS_CREATE <<< "$(sd "  " " " <<< "${_FS_CREATE[@]}")"
             if mkfs."${2}" "${_FS_CREATE[@]}" &>"${_LOG}"; then
                 # write to template
                 echo "mkfs.${2} ${_FS_CREATE[*]} &>\"\${_LOG}\"" >> "${_TEMPLATE}"
@@ -593,7 +593,7 @@ _mkfs() {
         [[ -n "${11}" ]] && _MOUNTOPTIONS="${_MOUNTOPTIONS} ${11}"
         _MOUNTOPTIONS="${_MOUNTOPTIONS} ${_SSD_MOUNT_OPTIONS}"
         # eleminate spaces at beginning and end, replace other spaces with ,
-        _MOUNTOPTIONS="$(echo "${_MOUNTOPTIONS}" | sd '^ *| *$' '' | sd ' ' ',')"
+        _MOUNTOPTIONS="$(sd '^ *| *$' '' <<< "${_MOUNTOPTIONS}" | sd ' ' ',')"
         # mount the bad boy
         if mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" &>"${_LOG}"; then
             # write to template
