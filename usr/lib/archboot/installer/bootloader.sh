@@ -88,10 +88,10 @@ _bootloader_kernel_parameters() {
     [[ "${_NAME_SCHEME_PARAMETER}" == "FSLABEL" ]] && _getrootfslabel
     if [[ "${_NAME_SCHEME_PARAMETER}" == "SD_GPT_AUTO_GENERATOR" ]]; then
         _KERNEL_PARAMS_COMMON_UNMOD="${_RAIDARRAYS} ${_LUKSSETUP}"
-        _KERNEL_PARAMS_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sd ' +' ' ')"
+        _KERNEL_PARAMS_MOD="$(sd ' +' ' ' <<< "${_KERNEL_PARAMS_COMMON_UNMOD}")"
     else
         _KERNEL_PARAMS_COMMON_UNMOD="root=${_ROOTDEV} rootfstype=${_ROOTFS} rw ${_ROOTFLAGS} ${_RAIDARRAYS} ${_LUKSSETUP}"
-        _KERNEL_PARAMS_MOD="$(echo "${_KERNEL_PARAMS_COMMON_UNMOD}" | sd ' +' ' ')"
+        _KERNEL_PARAMS_MOD="$(sd ' +' ' ' <<< "${_KERNEL_PARAMS_COMMON_UNMOD}")"
     fi
 }
 
@@ -167,7 +167,7 @@ _uefi_efibootmgr() {
         } >> "${_TEMPLATE}"
     done
     _BOOTMGRDEV=$(${_LSBLK} PKNAME "${_ESP_DEV}" 2>"${_NO_LOG}")
-    _BOOTMGRNUM=$(echo "${_ESP_DEV}" | sd "${_BOOTMGRDEV}" '' | sd 'p' '')
+    _BOOTMGRNUM=$(sd "${_BOOTMGRDEV}" '' <<< "${_ESP_DEV}" | sd 'p' '')
     efibootmgr --quiet --create --disk "${_BOOTMGRDEV}" --part "${_BOOTMGRNUM}" --loader "${_BOOTMGR_LOADER_PATH}" --label "${_BOOTMGR_LABEL}" >> "${_LOG}"
     # write to template
      { echo "### efibootmgr"
