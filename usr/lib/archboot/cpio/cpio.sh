@@ -110,7 +110,7 @@ _filter_mods() {
 
 _all_mods() {
     # for loop is needed to allow globs in _all_mods
-    for i in "$(_filter_mods "$@")"; do
+    for i in $(_filter_mods "$@"); do
         _mod "${i}"
     done
 }
