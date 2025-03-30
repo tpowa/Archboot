@@ -109,7 +109,7 @@ _filter_mods() {
 }
 
 _all_mods() {
-    _map  _mod "$(_filter_mods "$@")"
+    _map _mod "$(_filter_mods "$@")"
 }
 
 _mod() {
