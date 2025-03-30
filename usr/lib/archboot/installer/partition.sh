@@ -14,7 +14,7 @@ _check_gpt() {
         _dialog --defaultno --yesno "Setup detected no GUID (gpt) partition table on ${_DISK}.\n\nDo you want to create a new GUID (gpt) table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
         _clean_disk "${_DISK}"
         # create fresh GPT
-        echo "label: gpt" | sfdisk --wipe always "${_DISK}" &>"${_LOG}"
+        sfdisk --wipe always "${_DISK}" <<< "label: gpt" &>"${_LOG}"
         _RUN_CFDISK=1
         _GUID_DETECTED=1
     fi
@@ -66,7 +66,7 @@ _partition() {
                 if [[ -z "${_MSDOS_DETECTED}" ]]; then
                     _dialog --defaultno --yesno "Setup detected no MBR/BIOS partition table on ${_DISK}.\nDo you want to create a MBR/BIOS partition table now on ${_DISK}?\n\n${_DISK} will be COMPLETELY ERASED!  Are you absolutely sure?" 0 0 || return 1
                     _clean_disk "${_DISK}"
-                    echo "label: dos" | sfdisk --wipe always "${_DISK}" >"${_LOG}"
+                    sfdisk --wipe always "${_DISK}" <<< "label: dos" &>"${_LOG}"
                 fi
                 # Partition disc
                 _dialog --msgbox "$(cat /usr/lib/archboot/installer/help/mbr-partition.txt)" 0 0

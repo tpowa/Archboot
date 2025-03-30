@@ -165,7 +165,7 @@ EOF
         fi
     fi
     _LINUX_UNMOD_COMMAND="linux ${_SUBDIR}/${_VMLINUZ} ${_KERNEL_PARAMS_MOD}"
-    _LINUX_MOD_COMMAND=$(echo "${_LINUX_UNMOD_COMMAND}" | sd ' +' ' ')
+    _LINUX_MOD_COMMAND=$(sd ' +' ' ' <<<"${_LINUX_UNMOD_COMMAND}")
     ## create default kernel entry
     _NUMBER=0
     cat << EOF >> "${_DESTDIR}/${_GRUB_PREFIX_DIR}/${_GRUB_CFG}"
@@ -307,7 +307,7 @@ _grub_bios() {
     # try to auto-configure GRUB(2)...
     _check_bootpart
     # check if raid, raid partition, or device devicemapper is used
-    if echo "${_BOOTDEV}" | rg -q '/dev/md|/dev/mapper'; then
+    if rg -q '/dev/md|/dev/mapper' <<< "${_BOOTDEV}"; then
         # boot from lvm, raid, partitioned and raid devices is supported
         _FAIL_COMPLEX=""
         if cryptsetup status "${_BOOTDEV}"; then
@@ -317,11 +317,11 @@ _grub_bios() {
     fi
     if [[ -z "${_FAIL_COMPLEX}" ]]; then
         # check if mapper is used
-        if  echo "${_BOOTDEV}" | rg -q '/dev/mapper'; then
+        if rg -q '/dev/mapper' <<<"${_BOOTDEV}"; then
             _RAID_ON_LVM=""
             #check if mapper contains a md device!
             for devpath in $(pvs -o pv_name --noheading); do
-                if echo "${devpath}" | rg -v "/dev/md.p" | rg -q '/dev/md'; then
+                if rg -v "/dev/md.p" <<< "${devpath}" | rg -q '/dev/md'; then
                     _DETECTEDVOLUMEGROUP="$(pvs -o vg_name --noheading "${devpath}")"
                     if echo /dev/mapper/"${_DETECTEDVOLUMEGROUP}"-* | rg -q "${_BOOTDEV}"; then
                         # change _BOOTDEV to md device!
@@ -334,7 +334,7 @@ _grub_bios() {
         fi
         #check if raid is used
         _USE_RAID=""
-        if echo "${_BOOTDEV}" | rg -q '/dev/md'; then
+        if rg -q '/dev/md' <<< "${_BOOT}"; then
             _USE_RAID=1
         fi
     fi
