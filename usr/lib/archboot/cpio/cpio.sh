@@ -102,9 +102,9 @@ _loaded_mods() {
 _filter_mods() {
     # only list the module name without extension and directory
     if [[ -z "${2}" ]]; then
-        rg "${1}" <<< "${_ALL_MODS}" | sd '.*/' '' | sd '\.ko.*$' '\n'
+        rg "${1}" <<< "${_ALL_MODS}" | rg -o '([a-zA-Z0-9-_]+).ko$' -r '$1'
     else
-        rg "${3}" <<< "${_ALL_MODS}" | rg -v "${2}" | sd '.*/' '' | sd '\.ko.*$' '\n'
+        rg "${3}" <<< "${_ALL_MODS}" | rg -v "${2}" | rg -o '([a-zA-Z0-9-_]+).ko$' -r '$1'
     fi
 }
 
@@ -230,16 +230,16 @@ _install_libs() {
     # sd '/lib//usr' '' # neovim lua lib
     # sd 'libsystemd-' 'systemd/libsystemd-' # libsystemd- libraries don't have systemd/ prefix
     echo "Adding libraries..."
-    mapfile -t _LIB_FILES < <(objdump -p "${_ROOTFS}"/usr/{bin,lib/{systemd,security}}/* 2>"${_NO_LOG}" |\
-                              rg ' *NEEDED *' -r '/lib/' | sort -u | sd '/lib//usr' '' | sd 'libsystemd-' 'systemd/libsystemd-')
+    mapfile -t _LIB_FILES < <(readelf -d "${_ROOTFS}"/usr/{bin,lib/{systemd,security}}/* 2>"${_NO_LOG}" |\
+                              rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' | sort -u | sd '/lib//usr' '' | sd 'libsystemd-' 'systemd/libsystemd-')
     _map _file "${_LIB_FILES[@]}"
     _install_files
     # loop to catch all libraries
     _LIB_COUNT="0"
     while ! [[ "${_LIB_COUNT}" == "${_LIB_COUNT2}" ]]; do
         _LIB_COUNT="${_LIB_COUNT2}"
-        mapfile -t _LIB_FILES < <(objdump -p "${_ROOTFS}"/usr/lib/* 2>"${_NO_LOG}" |\
-                                  rg ' *NEEDED *' -r '/lib/' | sort -u  | sd '/lib//usr' '')
+        mapfile -t _LIB_FILES < <(readelf -d "${_ROOTFS}"/usr/lib/* 2>"${_NO_LOG}" |\
+                                  rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' | sort -u  | sd '/lib//usr' '')
         _map _file "${_LIB_FILES[@]}"
         _install_files
         _LIB_COUNT2="${#_LIB_FILES[@]}"
