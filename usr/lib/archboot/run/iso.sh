@@ -10,18 +10,18 @@ _root_check
 _architecture_check
 _config
 _ISODIR="$(mktemp -d ISODIR.XXX)"
-if echo "${_BASENAME}" | rg -qw 'aarch64' || echo "${_BASENAME}" | rg -qw 'x86_64'; then
+if rg -qw 'aarch64' <<< "${_BASENAME}" || rg -qw 'x86_64' <<< "${_BASENAME}"; then
     # running system = aarch64 or x86_64
     echo "Starting ISO creation..."
     _prepare_kernel_initrd_files || exit 1
     _prepare_doc || exit 1
     _prepare_ucode || exit 1
-    if echo "${_BASENAME}" | rg -qw 'aarch64'; then
+    if rg -qw 'aarch64' <<< "${_BASENAME}"; then
         _prepare_fedora_shim_bootloaders_aarch64 || exit 1
         _prepare_grub_AA64 || exit 1
         _prepare_ipxe_AA64 || exit 1
     fi
-    if echo "${_BASENAME}" | rg -qw 'x86_64'; then
+    if rg -qw 'x86_64' <<< "${_BASENAME}"; then
         _prepare_fedora_shim_bootloaders_x86_64 || exit 1
         _prepare_uefi_shell_tianocore || exit 1
         _prepare_grub_X64 || exit 1
@@ -49,7 +49,7 @@ else
 fi
 _create_cksum || exit 1
 _cleanup_iso || exit 1
-if echo "${_BASENAME}" | rg -qw 'aarch64' || echo "${_BASENAME}" | rg -qw 'x86_64'; then
+if rg -qw 'aarch64' <<< "${_BASENAME}" || rg -qw 'x86_64' <<< "${_BASENAME}"; then
     echo "Finished ISO creation."
 else
     echo "Finished Image creation."

@@ -17,12 +17,12 @@ _run ()
     echo -e "|-----------|---------|--------|----------|---------|"
     echo -e "| \e[1;92mALT+F1-F4\e[m | \e[1;92mALT+F5\e[m  | \e[1;92mALT+F6\e[m | \e[1;92mALT+F11\e[m  | \e[1;92mALT+F12\e[m |"
     echo -e "-----------------------------------------------------"
-if  echo "${_HOOKS[@]}" | rg -qw net; then
+if rg -qw net <<< "${_HOOKS[@]}"; then
     echo -e "\e[1mFor Additional Wi-Fi Authentification Or Online Help:\e[m"
     echo -e "  - Use the \e[1;92m'elinks'\e[m web browser and the \e[1;92m'tiny'\e[m IRC"
     echo -e "    client for support on \e[1m#archboot\e[m channel."
 fi
-if  echo "${_HOOKS[@]}" | rg -qw installer; then
+if rg -qw installer <<< "${_HOOKS[@]}"; then
     echo -e "\e[1mManage Archboot Environment:\e[m"
     echo -e "  - Use the \e[1;92m'launcher'\e[m or the expert \e[1;92m'update'\e[m script."
     echo -e "\e[1mInstallation:\e[m"

@@ -8,7 +8,7 @@ _parameters "$@"
 _root_check
 echo "Starting container creation..."
 [[ -d "${1}" ]] || (echo "Creating directory ${1}..."; mkdir "${1}")
-if echo "${_BASENAME}" | rg -qw "${_RUNNING_ARCH}"; then
+if rg -qw "${_RUNNING_ARCH}" <<< "${_BASENAME}"; then
     # running system = creating system
     _cachedir_check
     _create_pacman_conf "${1}"
@@ -34,11 +34,11 @@ if echo "${_BASENAME}" | rg -qw "${_RUNNING_ARCH}"; then
 else
     # running system != creating system
     if [[ "${_RUNNING_ARCH}" == "x86_64"  ]]; then
-        if echo "${_BASENAME}" | rg -qw 'aarch64'; then
+        if rg -qw 'aarch64' <<< "${_BASENAME}"; then
             _pacman_container "${1}" "${_ARCHBOOT_AARCH64_CHROOT_PUBLIC}" \
                            "${_ISO_HOME}/${_PACMAN_AARCH64_CHROOT}" || exit 1
         fi
-        if echo "${_BASENAME}" | rg -qw 'riscv64'; then
+        if rg -qw 'riscv64' <<< "${_BASENAME}"; then
             _pacman_container "${1}" "${_ARCHBOOT_RISCV64_CHROOT_PUBLIC}" \
                            "${_ISO_HOME}/${_PACMAN_RISCV64_CHROOT}" || exit 1
         fi

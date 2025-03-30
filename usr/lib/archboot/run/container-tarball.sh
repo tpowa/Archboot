@@ -4,7 +4,7 @@
 . /etc/archboot/defaults
 . /usr/lib/archboot/common.sh
 . /usr/lib/archboot/container.sh
-if echo "${_BASENAME}" | rg -qw 'aarch64'; then
+if rg -qw 'aarch64' <<< "${_BASENAME}"; then
     _PACMAN_ARCH_CHROOT="${_PACMAN_AARCH64_CHROOT}"
     _PACMAN_ARCH="${_PACMAN_AARCH64}"
     _ARCH_VERSION="ArchLinuxARM-aarch64-latest.tar.gz"
@@ -12,7 +12,7 @@ if echo "${_BASENAME}" | rg -qw 'aarch64'; then
     _LATEST_ARCH="http://os.archlinuxarm.org/os/${_ARCH_VERSION}"
     _CAP_ARCH="AARCH64"
     _ARCH="aarch64"
-elif echo "${_BASENAME}" | rg -qw 'riscv64'; then
+elif rg -qw 'riscv64' <<< "${_BASENAME}"; then
     _PACMAN_ARCH_CHROOT="${_PACMAN_RISCV64_CHROOT}"
     _PACMAN_ARCH="${_PACMAN_RISCV64}"
     _ARCH_VERSION="archriscv-20220727.tar.zst"

@@ -170,7 +170,7 @@ EOF
 
 _autostart_vnc() {
     echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW}..." >"${_LOG}"
-    echo "${_VNC_PW}" | vncpasswd -f > /etc/tigervnc/passwd
+    vncpasswd -f <<< "${_VNC_PW}" > /etc/tigervnc/passwd
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
     echo "Autostarting tigervnc..." >"${_LOG}"
     cat << EOF > /etc/xdg/autostart/tigervnc.desktop
