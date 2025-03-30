@@ -79,7 +79,7 @@ _find_btrfs_bootloader_subvolume() {
 _subvolumes_in_use() {
     _SUBVOLUME_IN_USE=()
     while read -r i; do
-        echo "${i}" | rg -F -q "|btrfs|" && _SUBVOLUME_IN_USE+=("$(echo "${i}" | choose -f '\|' 8)")
+        rg -F -q "|btrfs|" <<< "${i}" && _SUBVOLUME_IN_USE+=("$(echo "${i}" | choose -f '\|' 8)")
     done < /tmp/.parts
 }
 
@@ -88,11 +88,11 @@ _check_btrfs_filesystem_creation() {
     _DETECT_CREATE_FILESYSTEM=""
     _SKIP_FILESYSTEM=""
     for i in $(rg "${_DEV}[|#]" /tmp/.parts); do
-        if echo "${i}" | rg -F -q "|btrfs|"; then
+        if rg -F -q "|btrfs|" <<< "${i}"; then
             _FSTYPE="btrfs"
             _SKIP_FILESYSTEM=1
             # check on filesystem creation, skip subvolume asking then!
-            echo "${i}" | choose -f '\|' 3 | rg -q 1 && _DETECT_CREATE_FILESYSTEM=1
+            choose -f '\|' 3 <<< "${i}" | rg -q 1 && _DETECT_CREATE_FILESYSTEM=1
         fi
     done
 }
@@ -149,7 +149,7 @@ _select_btrfsraid_devices () {
     for i in "${_DEVS[@]:-$(_finddevices)}"; do
         _BTRFS_RAID_DEVS+=("${i}")
     done
-    IFS=" " read -r -a _BTRFS_RAID_DEVS <<< "$(echo "${_BTRFS_RAID_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BTRFS_RAID_DEV}")" "")"
+    IFS=" " read -r -a _BTRFS_RAID_DEVS <<< "$(sd "$(${_LSBLK} NAME,SIZE -d "${_BTRFS_RAID_DEV}")" "" <<< "${_BTRFS_RAID_DEVS[@]}")"
     _RAIDNUMBER=2
     _dialog --title " Select Device ${_RAIDNUMBER} " --no-cancel --menu "" 12 50 6 "${_BTRFS_RAID_DEVS[@]}" 2>"${_ANSWER}" || return 1
     _BTRFS_RAID_DEV=$(cat "${_ANSWER}")
@@ -158,7 +158,7 @@ _select_btrfsraid_devices () {
         _BTRFS_DONE=""
         _RAIDNUMBER=$((_RAIDNUMBER + 1))
         # clean loop from used partition and options
-        IFS=" " read -r -a _BTRFS_RAID_DEVS <<< "$(echo "${_BTRFS_RAID_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_BTRFS_RAID_DEV}")" "")"
+        IFS=" " read -r -a _BTRFS_RAID_DEVS <<< "$(sd "$(${_LSBLK} NAME,SIZE -d "${_BTRFS_RAID_DEV}")" "" <<< "${_BTRFS_RAID_DEVS[@]}")"
         # add more devices
         # raid1c3 and RAID5 need 3 devices
         # raid1c4, RAID6 and RAID10 need 4 devices!
@@ -203,7 +203,7 @@ _check_btrfs_subvolume(){
     if [[ -z "${_DETECT_CREATE_FILESYSTEM}" && -z "${_CREATE_MOUNTPOINTS}" ]]; then
         _mount_btrfs
         for i in $(btrfs subvolume list "${_BTRFSMP}" | choose 8); do
-            if echo "${i}" | rg -q "${_BTRFS_SUBVOLUME}"; then
+            if rg -q "${_BTRFS_SUBVOLUME}" <<< "${i}"; then
                 _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical SUBVOLUMES!\nPlease enter another name." 4 45
                 sleep 3
                 _BTRFS_SUBVOLUME=""
@@ -213,7 +213,7 @@ _check_btrfs_subvolume(){
     else
         # existing subvolumes
         _subvolumes_in_use
-        if echo "${_SUBVOLUME_IN_USE[@]}" | rg -q "${_BTRFS_SUBVOLUME}"; then
+        if rg -q "${_BTRFS_SUBVOLUME}" <<< "${_SUBVOLUME_IN_USE[@]}"; then
             _dialog --title " ERROR " --no-mouse --infobox "You have defined 2 identical SUBVOLUMES!\nPlease enter another name." 4 45
             sleep 3
             _BTRFS_SUBVOLUME=""
@@ -245,10 +245,8 @@ _choose_btrfs_subvolume () {
     # add echo to kill hidden escapes from btrfs call
     #_SUBVOLUMES="$(echo ${_SUBVOLUMES})"
     for i in "${_SUBVOLUME_IN_USE[@]}"; do
-        IFS=" " read -r -a _SUBVOLUMES <<< "$(echo "${_SUBVOLUMES[@]}" | sd "${i} _" "")"
+        IFS=" " read -r -a _SUBVOLUMES <<< "$(sd "${i} _" "" <<< "${_SUBVOLUMES[@]}")"
     done
-    # clear end spaces
-    #_SUBVOLUMES="$(echo "${_SUBVOLUMES}" | sd ' +$' '')"
     if [[ -n "${_SUBVOLUMES[*]}" ]]; then
         _dialog --title " Subvolume " --no-cancel --menu "" 15 50 13 "${_SUBVOLUMES[@]}" 2>"${_ANSWER}" || return 1
         _BTRFS_SUBVOLUME=$(cat "${_ANSWER}")
