@@ -38,11 +38,11 @@ _blockdevices() {
         #- fakeraid ddf devices
         #  ${_LSBLK} FSTYPE ${dev} 2>"${_NO_LOG}" | rg 'ddf_raid_member'
         # - zram devices
-        #  echo "${dev}" | rg -q 'zram'
+        #   rg -q 'zram' <<< "${dev}"
         if ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | rg -q 'iso9660' &&\
             ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | rg -q 'isw_raid_member' &&\
             ! ${_LSBLK} FSTYPE "${dev}" 2>"${_NO_LOG}" | rg -q 'ddf_raid_member' &&\
-            ! echo "${dev}" | rg -q 'zram'; then
+            ! rg -q 'zram' <<< "${dev}"; then
                 ${_LSBLK} NAME,SIZE -d "${dev}"
         fi
      done
@@ -704,7 +704,7 @@ _createvg()
         while [[ "${_PV}" != "> DONE" ]]; do
             _PVNUMBER=$((_PVNUMBER + 1))
             # clean loop from used partition and options
-            IFS=" " read -r -a _PVS <<< "$(echo "${_PVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${_PV}")" "")"
+            IFS=" " read -r -a _PVS <<< "$(sd "$(${_LSBLK} NAME,SIZE -d "${_PV}")" "" <<< "${_PVS[@]}")"
             # add more devices
             _dialog --no-cancel --menu "Select additional Physical Volume ${_PVNUMBER} for ${_VGDEV}:" 13 50 10 \
                 "${_PVS[@]}" "> DONE" "Proceed To Summary" 2>"${_ANSWER}" || return 1
