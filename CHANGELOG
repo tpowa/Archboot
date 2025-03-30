@@ -18,7 +18,9 @@ cpio.sh:
 - implemented cleaner array handling
 - added file error check
 - fixed binary error check
-- added more robust library detection 
+- added more robust library detection
+- speedup library function
+- speedup kernel module function
 bootloader:
 - added check on successful container creation
 localize:
