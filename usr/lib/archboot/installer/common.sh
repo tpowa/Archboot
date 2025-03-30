@@ -171,5 +171,5 @@ _file_to_template() {
 }
 
 _remove_from_devs() {
-    IFS=" " read -r -a _DEVS <<< "$sd "$(${_LSBLK} NAME,SIZE -d "${1}")" "" <<< "${_DEVS[@]}")"
+    IFS=" " read -r -a _DEVS <<< "$(sd "$(${_LSBLK} NAME,SIZE -d "${1}")" "" <<< "${_DEVS[@]}")"
 }
