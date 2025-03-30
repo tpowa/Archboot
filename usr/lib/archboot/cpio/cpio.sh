@@ -195,26 +195,29 @@ _run_hook() {
 }
 
 _install_mods() {
-    # softdeps are not honored, add them in _mod arrays!
-    # remove duplicate modules:
-    IFS=" " read -r -a _MODS <<< "$(sd ' ' '\n' <<< "${_MODS[@]}" | sort -u | sd '\n' ' ')"
-    # Checking kernel module dependencies:
-    # first try, pull in the easy modules
-    _MOD_DEPS+=("$(modinfo -k "${_KERNELVERSION}" -F depends "${_MODS[@]}" | sd '\n' ' ')")
-    IFS=" " read -r -a _MOD_DEPS <<< "$(sd ',' ' ' <<< "${_MOD_DEPS[@]}" | sd ' ' '\n' | sort -u | sd '\n' ' ')"
-    _DEP_COUNT=0
-    # next tries, ensure to catch all modules with depends
-    while ! [[ "${_DEP_COUNT}" == "${_DEP_COUNT2}" ]]; do
-        _DEP_COUNT="${_DEP_COUNT2}"
-        _MOD_DEPS+=("$(modinfo -k "${_KERNELVERSION}" -F depends "${_MOD_DEPS[@]}" | sd '\n' ' ')")
-        IFS=" " read -r -a _MOD_DEPS <<< "$(sd ',' ' ' <<< "${_MOD_DEPS[@]}" | sd ' ' '\n' | sort -u | sd '\n' ' ')"
-        _DEP_COUNT2="${#_MOD_DEPS[@]}"
-    done
     # Adding kernel modules:
-    # - pull in all modules with depends
-    # - builtin needs to be removed
-    mapfile -t _MOD_FILES < <(modinfo  -k "${_KERNELVERSION}" -F filename "${_MODS[@]}" "${_MOD_DEPS[@]}" | rg -v builtin)
-    _map _file "${_MOD_FILES[@]}" "${_MOD_DIR}"/modules.{builtin,builtin.modinfo,order}
+    # - softdeps are not honored, add them in _mod arrays!
+    # - remove duplicate modules
+    # - remove builtin modules
+    IFS=" " read -r -a _MODS <<< "$(sd ' ' '\n' <<< "${_MODS[@]}" | sort -u | sd '\n' ' ')"
+    mapfile -t _MOD_FILES < <(modinfo  -k "${_KERNELVERSION}" -F filename "${_MODS[@]}" | rg -v builtin)
+    _map _file "${_MOD_FILES[@]}"
+    _install_files
+    # Checking kernel module dependencies:
+    # - cascading all module depends
+    # - remove duplicate modules:
+    # - remove builtin modules
+    while true; do
+        _MOD_DEPS=("$(modinfo -k "${_KERNELVERSION}" -F depends "${_MODS[@]}" | sd '\n' ' ')")
+        IFS=" " read -r -a _MOD_DEPS <<< "$(sd ',' ' ' <<< "${_MOD_DEPS[@]}" | sd ' ' '\n' | sort -u | sd '\n' ' ')"
+        [[ ${#_MOD_DEPS[@]} == 0 ]] && break
+        mapfile -t _MOD_FILES < <(modinfo  -k "${_KERNELVERSION}" -F filename "${_MOD_DEPS[@]}" | rg -v builtin)
+        _map _file "${_MOD_FILES[@]}"
+        _install_files
+        _MODS=("${_MOD_DEPS[@]}")
+    done
+    # needed files from kernel build for depmod call
+    _map _file "${_MOD_DIR}"/modules.{builtin,builtin.modinfo,order}
     _install_files
     # generate new kernel module dependencies"
     depmod -b "${_ROOTFS}" "${_KERNELVERSION}"
@@ -235,7 +238,7 @@ _install_libs() {
                               sd 'libsystemd-' 'systemd/libsystemd-')
     _map _file "${_LIB_FILES[@]}"
     _install_files
-    # loop to catch all libraries
+    # loop for cascading libraries
     while true; do
         mapfile -t _LIB_FILES < <(readelf -d "${_LIB_FILES[@]}" 2>"${_NO_LOG}" |\
                                   rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' | sort -u  | sd '/lib//usr' '' |\
