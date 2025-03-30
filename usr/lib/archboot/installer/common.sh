@@ -95,7 +95,7 @@ _auto_packages() {
     # add packages from Archboot defaults
     . /etc/archboot/defaults
     # remove linux-firmware packages first
-    IFS=" " read -r -a _PACKAGES <<< "$(echo "${_PACKAGES[@]}" | sd "linux-firmware.* " "")"
+    IFS=" " read -r -a _PACKAGES <<< "$(sd "linux-firmware.* " "" <<< "${_PACKAGES[@]}")"
     # Add filesystem packages
     if ${_LSBLK} FSTYPE | rg -q 'bcachefs'; then
         ! rg -qw 'bcachefs-tools' <<< "${_PACKAGES[@]}" && _PACKAGES+=(bcachefs-tools)
@@ -171,5 +171,5 @@ _file_to_template() {
 }
 
 _remove_from_devs() {
-    IFS=" " read -r -a _DEVS <<< "$(echo "${_DEVS[@]}" | sd "$(${_LSBLK} NAME,SIZE -d "${1}")" "")"
+    IFS=" " read -r -a _DEVS <<< "$sd "$(${_LSBLK} NAME,SIZE -d "${1}")" "" <<< "${_DEVS[@]}")"
 }
