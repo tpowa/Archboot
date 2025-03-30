@@ -225,7 +225,7 @@ _install_mods() {
 
 _install_libs() {
     # add lib files for binaries and libraries
-    # rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' -r '/lib/' # catch libs and add path
+    # rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' # catch libs and add path
     # sort -u # only one time filter
     # sd '/lib//usr' '' # neovim lua lib
     # sd 'libsystemd-' 'systemd/libsystemd-' # libsystemd- libraries don't have systemd/ prefix
