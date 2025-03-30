@@ -225,24 +225,24 @@ _install_mods() {
 
 _install_libs() {
     # add lib files for binaries and libraries
-    # rg ' *NEEDED *' -r '/lib/' # catch libs
+    # rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' -r '/lib/' # catch libs and add path
     # sort -u # only one time filter
     # sd '/lib//usr' '' # neovim lua lib
     # sd 'libsystemd-' 'systemd/libsystemd-' # libsystemd- libraries don't have systemd/ prefix
     echo "Adding libraries..."
-    mapfile -t _LIB_FILES < <(readelf -d "${_ROOTFS}"/usr/{bin,lib/{systemd,security}}/* 2>"${_NO_LOG}" |\
-                              rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' | sort -u | sd '/lib//usr' '' | sd 'libsystemd-' 'systemd/libsystemd-')
+    mapfile -t _LIB_FILES < <(readelf -d "${_ROOTFS}"/usr/{bin,lib/{,systemd,security}}/* 2>"${_NO_LOG}" |\
+                              rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' | sort -u | sd '/lib//usr' '' |\
+                              sd 'libsystemd-' 'systemd/libsystemd-')
     _map _file "${_LIB_FILES[@]}"
     _install_files
     # loop to catch all libraries
-    _LIB_COUNT="0"
-    while ! [[ "${_LIB_COUNT}" == "${_LIB_COUNT2}" ]]; do
-        _LIB_COUNT="${_LIB_COUNT2}"
-        mapfile -t _LIB_FILES < <(readelf -d "${_ROOTFS}"/usr/lib/* 2>"${_NO_LOG}" |\
-                                  rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' | sort -u  | sd '/lib//usr' '')
+    while true; do
+        mapfile -t _LIB_FILES < <(readelf -d "${_LIB_FILES[@]}" 2>"${_NO_LOG}" |\
+                                  rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' | sort -u  | sd '/lib//usr' '' |\
+                                  sd 'libsystemd-' 'systemd/libsystemd-')
+        [[ ${#_LIB_FILES[@]} == 0 ]] && break
         _map _file "${_LIB_FILES[@]}"
         _install_files
-        _LIB_COUNT2="${#_LIB_FILES[@]}"
     done
 }
 

@@ -35,6 +35,6 @@ _run ()
           {chg,ch,g}passwd group{add,del,mems,mod} grp{ck,conv,unconv} \
           newusers pw{ck,conv,unconv} user{add,del,mod} sg getsubids
     # add ncurses libs
-    _map _file /usr/lib/libncurses*
+    _map _file /usr/lib/libncurses*.so
 }
 
