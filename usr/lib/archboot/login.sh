@@ -71,7 +71,7 @@ fi
 
 _enter_shell() {
     # dbus sources profiles again
-    if ! echo "${_TTY}" | rg -q 'pts'; then
+    if ! rg -q 'pts' <<< "${_TTY}"; then
         echo ""
         echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mlogin\e[m routine or \e[1m\e[92mCTRL-C\e[m for \e[1mbash\e[m prompt."
         cd /

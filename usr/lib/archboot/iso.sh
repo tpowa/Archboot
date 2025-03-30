@@ -24,8 +24,8 @@ _parameters() {
         case ${1} in
             -g|--g) export _GENERATE="1" ;;
             -s|--s) _SAVE_INIT="1" ;;
-            -c=*|--c=*) _CONFIG="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
-            -i=*|--i=*) _IMAGENAME="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
+            -c=*|--c=*) _CONFIG="$(rg -o '=(.*)' -r '$1' <<< "${1}")" ;;
+            -i=*|--i=*) _IMAGENAME="$(rg -o '=(.*)' -r '$1' <<< "${1}")" ;;
             *) _usage ;;
         esac
         shift
@@ -78,8 +78,8 @@ _prepare_kernel_initrd_files() {
     fi
     _INITRD="initrd-${_ARCH}.img"
     _FW="firmware"
-    echo "${_CONFIG}" | rg -qw local && _INITRD="initrd-local-${_ARCH}.img" && _FW="firmware-local"
-    echo "${_CONFIG}" | rg -qw latest && _INITRD="initrd-latest-${_ARCH}.img" && _FW="firmware-latest"
+    rg -qw local <<< "${_CONFIG}" && _INITRD="initrd-local-${_ARCH}.img" && _FW="firmware-local"
+    rg -qw latest <<< "${_CONFIG}" && _INITRD="initrd-latest-${_ARCH}.img" && _FW="firmware-latest"
     if [[ -f "${_INITRD}" ]]; then
         echo "Using existing ${_INITRD}..."
         mv "./${_INITRD}" "${_ISODIR}/boot/initrd-${_ARCH}.img"

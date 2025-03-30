@@ -22,7 +22,7 @@ _parameters() {
         case ${1} in
             -cc|--cc) _CLEANUP_CONTAINER="1" ;;
             -cp|--cp) _CLEANUP_CACHE="1" ;;
-            -install-source=*|--install-source=*) _INSTALL_SOURCE="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
+            -install-source=*|--install-source=*) _INSTALL_SOURCE="$(rg -o '=(.*)' -r '$1' <<< "${1}")" ;;
         esac
         shift
     done
@@ -123,7 +123,7 @@ _create_pacman_conf() {
               echo "Server = https://pkg.archboot.com"
             } >> "${_PACMAN_CONF}"
         fi
-        [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(echo "${_PACMAN_CONF}" | sd "^${1}" '')"
+        [[ "${2}" == "use_binfmt" ]] && _PACMAN_CONF="$(sd "^${1}" '' <<< "${_PACMAN_CONF}")"
     else
         echo "Using custom pacman.conf..."
         _PACMAN_CONF="$(mktemp "${1}"/pacman.conf.XXX)"

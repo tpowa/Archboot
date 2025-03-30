@@ -99,18 +99,18 @@ _create_iso() {
     mv init-* boot/init/
     if [[ "${_ARCH}" == "riscv64" ]]; then
         for i in *.img; do
-            if  echo "${i}" | rg -v 'local' | rg -vq 'latest'; then
+            if rg -v 'local' <<< "${i}" | rg -vq 'latest'; then
                 mv "${_KERNEL}" boot/kernel/
                 mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD_NORMAL}"
-            elif echo "${i}" | rg -q 'latest'; then
+            elif rg -q 'latest' <<< "${i}"; then
                 mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD_LATEST}"
-            elif echo "${i}" | rg -q 'local'; then
+            elif rg -q 'local' <<< "${i}"; then
                 mcopy -m -i "${i}"@@1048576 ::/"${_INITRD}" ./"${_INITRD_LOCAL}"
             fi
         done
     else
         for i in *.iso; do
-            if  echo "${i}" | rg -v 'local' | rg -vq 'latest'; then
+            if rg -v 'local' <<< "${i}" | rg -vq 'latest'; then
                 mv "${_W_DIR}/${_AMD_UCODE}" boot/ucode/
                 mv "${_KERNEL}" boot/kernel/
                 if [[ "${_ARCH}" == "aarch64" ]]; then
@@ -124,10 +124,10 @@ _create_iso() {
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD_NORMAL}"
                 mcopy -m -i  mcopy -m -i efi.img ::/boot/firmware boot/
-            elif echo "${i}" | rg -q 'latest'; then
+            elif rg -q 'latest' <<< "${i}"; then
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD_LATEST}"
-            elif echo "${i}" | rg -q 'local'; then
+            elif rg -q 'local' <<< "${i}"; then
                 isoinfo -R -i "${i}" -x /efi.img 2>"${_NO_LOG}" > efi.img
                 mcopy -m -i efi.img ::/"${_INITRD}" ./"${_INITRD_LOCAL}"
             fi

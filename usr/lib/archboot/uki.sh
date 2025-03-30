@@ -22,9 +22,9 @@ _parameters() {
     while [ $# -gt 0 ]; do
         case ${1} in
             -g|--g) export _GENERATE="1" ;;
-            -c=*|--c=*) _CONFIG="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
-            -cli=*) _CMDLINE="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
-            -i=*|--i=*) _UKI="$(echo "${1}" | rg -o '=(.*)' -r '$1')" ;;
+            -c=*|--c=*) _CONFIG="$(rg -o '=(.*)' -r '$1' <<< "${1}")" ;;
+            -cli=*) _CMDLINE="$(rg -o '=(.*)' -r '$1' <<< "${1}")" ;;
+            -i=*|--i=*) _UKI="$(rg -o '=(.*)' -r '$1' <<< "${1}")" ;;
             *) _usage ;;
         esac
         shift

@@ -70,11 +70,11 @@ _BASENAME=${0##*/}
 _ANSWER="/.${_BASENAME}"
 _VC_NUM="${_LOG/\/dev\/tty/}"
 _VC="VC${_VC_NUM}"
-if echo "${_BASENAME}" | rg -qw aarch64; then
+if rg -qw aarch64 <<< "${_BASENAME}"; then
     _ARCHBOOT=(archboot-arm)
     _KEYRING+=(archlinuxarm-keyring)
     _ARCH="aarch64"
-elif echo "${_BASENAME}" | rg -qw riscv64; then
+elif rg -qw riscv64 <<< "${_BASENAME}"; then
     _ARCHBOOT=(archboot-riscv)
     _ARCH="riscv64"
 else
@@ -179,7 +179,7 @@ _show_login() {
 }
 
 _abort() {
-    if _dialog --yesno "Abort$(echo "${_TITLE}" | choose -f '\|' 4) ?" 5 45; then
+    if _dialog --yesno "Abort$(choose -f '\|' 4 <<< "${_TITLE}") ?" 5 45; then
         [[ -e "${_ANSWER}-running" ]] && rm "${_ANSWER}-running"
         [[ -e "${_ANSWER}" ]] && rm "${_ANSWER}"
         clear
@@ -229,9 +229,9 @@ _kver() {
 
 ### check architecture
 _architecture_check() {
-    echo "${_BASENAME}" | rg -qw aarch64 && _aarch64_check
-    echo "${_BASENAME}" | rg -qw riscv64 && _riscv64_check
-    echo "${_BASENAME}" | rg -qw x86_64 && _x86_64_check
+    rg -qw aarch64 <<< "${_BASENAME}" && _aarch64_check
+    rg -qw riscv64 <<< "${_BASENAME}" && _riscv64_check
+    rg -qw x86_64 <<< "${_BASENAME}" && _x86_64_check
 }
 
 ### check if running in container
