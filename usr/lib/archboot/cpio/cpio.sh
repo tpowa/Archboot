@@ -254,6 +254,14 @@ _iwl_rt_fw() {
     fi
 }
 
+_move_fw() {
+    # those from firmware basedir belong to corresponding chipsets
+    rg -q mediatek <<< "${i}" && mv "${_FW_SRC}"/{mt76*,vpu_*} "${1}"
+    rg -q ath9k_htc <<< "${i}" && mv "${_FW_SRC}"/htc_* "${1}"
+    rg -q ath11k <<< "${i}" && mv "${_FW_SRC}"/wil6210* "${1}"
+    mv "${_FW_SRC}/${i}" "${1}"
+}
+
 _cpio_fw() {
     # divide firmware in cpio images
     if [[ -n "${_FW_CPIO}" ]]; then
@@ -272,11 +280,7 @@ _cpio_fw() {
             fi
             for i in $(fd --type d --base-directory "${_FW_SRC}" --path-separator '' -d 1); do
                 if [[ -n "${_GENERATE_IMAGE}" ]]; then
-                    # those from firmware basedir belong to corresponding chipsets
-                    rg -q mediatek <<< "${i}" && mv "${_FW_SRC}"/{mt76*,vpu_*} "${_FW_TMP_SRC}/"
-                    rg -q ath9k_htc <<< "${i}" && mv "${_FW_SRC}"/htc_* "${_FW_TMP_SRC}/"
-                    rg -q ath11k <<< "${i}" && mv "${_FW_SRC}"/wil6210* "${_FW_TMP_SRC}/"
-                    mv "${_FW_SRC}/${i}" "${_FW_TMP_SRC}/"
+                   _move_fw "${_FW_TMP_SRC}/"
                     echo "Preparing ${i}.img firmware..."
                     _create_cpio "${_FW_TMP}" "${_FW_DEST}/${i}.img" &>"${_NO_LOG}" || exit 1
                     # remove directory
@@ -284,17 +288,13 @@ _cpio_fw() {
                 elif [[ -n "${_TARGET_DIR}" ]]; then
                     echo "Saving firmware files to ${_FW_TMP}/${i}..."
                     [[ -d "${_FW_TMP}/${i}/${_FW}" ]] || mkdir -p "${_FW_TMP}/${i}/${_FW}"
-                    # those from firmware basedir belong to corresponding chipsets
-                    rg -q mediatek <<< "${i}" && mv "${_FW_SRC}"/{mt76*,vpu_*} "${_FW_TMP}/${i}/${_FW}/"
-                    rg -q ath9k_htc <<< "${i}" && mv "${_FW_SRC}"/htc_* "${_FW_TMP}/${i}/${_FW}/"
-                    rg -q ath11k <<< "${i}" && mv "${_FW_SRC}"/wil6210* "${_FW_TMP}/${i}/${_FW}/"
-                    mv "${_FW_SRC}/${i}" "${_FW_TMP}/${i}/${_FW}/"
+                    _move_fw "${_FW_TMP}/${i}/${_FW}/"
                 fi
             done
             # intel wireless
-            _iwl_rt_fw "iwl*" "iwlwifi" || exit 1
+            _iwl_rt_fw 'iwl*' 'iwlwifi' || exit 1
             # ralink wireless
-            _iwl_rt_fw "rt*" "ralink" || exit 1
+            _iwl_rt_fw 'rt*' 'ralink' || exit 1
         fi
     fi
 }
