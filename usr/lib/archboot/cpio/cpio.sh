@@ -195,9 +195,9 @@ _run_hook() {
 }
 
 _install_mods() {
-    # Adding kernel modules and kernel module dependencies:
-    # - cascading all module depends
+# Adding kernel modules and dependencies:
     # - softdeps are not honored, add them in _mod arrays!
+    # - cascading all module depends
     # - remove duplicate modules
     # - remove builtin modules
     IFS=" " read -r -a _MODS <<< "$(sd ' ' '\n' <<< "${_MODS[@]}" | sort -u | sd '\n' ' ')"
