@@ -221,7 +221,8 @@ _install_mods() {
 }
 
 _install_libs() {
-    # Cascade all libraries:
+    # Cascade libraries::
+    # - /lib subdirs are mostly ignored!
     # rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' # catch libs and add path
     # sort -u # only one time filter
     # sd '/lib//usr' '' # neovim lua lib
