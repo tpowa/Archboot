@@ -195,9 +195,8 @@ _run_hook() {
 }
 
 _install_mods() {
-# Adding kernel modules and dependencies:
+    # Cascade kernel modules and dependencies:
     # - softdeps are not honored, add them in _mod arrays!
-    # - cascading all module depends
     # - remove duplicate modules
     # - remove builtin modules
     IFS=" " read -r -a _MODS <<< "$(sd ' ' '\n' <<< "${_MODS[@]}" | sort -u | sd '\n' ' ')"
@@ -222,18 +221,13 @@ _install_mods() {
 }
 
 _install_libs() {
-    # add lib files for binaries and libraries
+    # Cascade all libraries:
     # rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' # catch libs and add path
     # sort -u # only one time filter
     # sd '/lib//usr' '' # neovim lua lib
     # sd 'libsystemd-' 'systemd/libsystemd-' # libsystemd- libraries don't have systemd/ prefix
     echo "Adding libraries..."
-    mapfile -t _LIB_FILES < <(readelf -d "${_ROOTFS}"/usr/{bin,lib/{,systemd,security}}/* 2>"${_NO_LOG}" |\
-                              rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' | sort -u | sd '/lib//usr' '' |\
-                              sd 'libsystemd-' 'systemd/libsystemd-')
-    _map _file "${_LIB_FILES[@]}"
-    _install_files
-    # loop for cascading libraries
+    _LIB_FILES="("${_ROOTFS}"/usr/{bin,lib/{,systemd,security}}/*)"
     while true; do
         mapfile -t _LIB_FILES < <(readelf -d "${_LIB_FILES[@]}" 2>"${_NO_LOG}" |\
                                   rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' | sort -u  | sd '/lib//usr' '' |\
