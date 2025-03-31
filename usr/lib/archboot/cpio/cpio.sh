@@ -292,9 +292,9 @@ _cpio_fw() {
                 fi
             done
             # intel wireless
-            _iwl_rt_fw 'iwl*' 'iwlwifi' || exit 1
+            _iwl_rt_fw "iwl*" "iwlwifi" || exit 1
             # ralink wireless
-            _iwl_rt_fw 'rt*' 'ralink' || exit 1
+            _iwl_rt_fw "rt*" "ralink" || exit 1
         fi
     fi
 }
