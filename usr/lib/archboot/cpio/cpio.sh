@@ -199,6 +199,7 @@ _install_mods() {
     # - softdeps are not honored, add them in _mod arrays!
     # - remove duplicate modules
     # - remove builtin modules
+    _MOD_FILES=()
     IFS=" " read -r -a _MODS <<< "$(sd ' ' '\n' <<< "${_MODS[@]}" | sort -u | sd '\n' ' ')"
     while true; do
         if [[ -n "${_MOD_FILES[*]}" ]]; then
