@@ -240,6 +240,20 @@ _install_libs() {
     done
 }
 
+_iwl_rt_fw() {
+    if ls "${_FW_SRC}/${1}" &>"${_NO_LOG}"; then
+        if [[ -n ${_GENERATE_IMAGE} ]]; then
+            echo "Preparing ${2}.img firmware..."
+            mv "${_FW_SRC}/${1}" "${_FW_TMP_SRC}/"
+            _create_cpio "${_FW_TMP}" "${_FW_DEST}/${2}.img" &>"${_NO_LOG}" || exit 1
+        elif [[ -n "${_TARGET_DIR}" ]]; then
+            echo "Saving firmware files to ${_FW_TMP}/${2}..."
+            [[ -d "${_FW_TMP}/${2}/${_FW}" ]] || mkdir -p "${_FW_TMP}/${2}/${_FW}"
+            mv "${_FW_SRC}/${1}" "${_FW_TMP}/${2}/${_FW}/"
+        fi
+    fi
+}
+
 _cpio_fw() {
     # divide firmware in cpio images
     if [[ -n "${_FW_CPIO}" ]]; then
@@ -278,29 +292,9 @@ _cpio_fw() {
                 fi
             done
             # intel wireless
-            if ls "${_FW_SRC}"/iwl* &>"${_NO_LOG}"; then
-                if [[ -n ${_GENERATE_IMAGE} ]]; then
-                    echo "Preparing iwlwifi.img firmware..."
-                    mv "${_FW_SRC}"/iwl* "${_FW_TMP_SRC}/"
-                    _create_cpio "${_FW_TMP}" "${_FW_DEST}/iwlwifi.img" &>"${_NO_LOG}" || exit 1
-                elif [[ -n "${_TARGET_DIR}" ]]; then
-                    echo "Saving firmware files to ${_FW_TMP}/iwlwifi..."
-                    [[ -d "${_FW_TMP}/iwlwifi/${_FW}" ]] || mkdir -p "${_FW_TMP}/iwlwifi/${_FW}"
-                    mv "${_FW_SRC}"/iwl* "${_FW_TMP}/iwlwifi/${_FW}/"
-                fi
-            fi
+            _iwl_rt_fw "iwl*" "iwlwifi" || exit 1
             # ralink wireless
-            if ls "${_FW_SRC}"/rt* &>"${_NO_LOG}"; then
-                if [[ -n ${_GENERATE_IMAGE} ]]; then
-                    echo "Preparing ralink.img firmware..."
-                    mv "${_FW_SRC}"/rt* "${_FW_TMP_SRC}/"
-                    _create_cpio "${_FW_TMP}" "${_FW_DEST}/ralink.img" &>"${_NO_LOG}" || exit 1
-                elif [[ -n "${_TARGET_DIR}" ]]; then
-                    echo "Saving firmware files to ${_FW_TMP}/ralink..."
-                    [[ -d "${_FW_TMP}/ralink/${_FW}" ]] || mkdir -p "${_FW_TMP}/ralink/${_FW}"
-                    mv "${_FW_SRC}"/rt* "${_FW_TMP}/ralink/${_FW}/"
-                fi
-            fi
+            _iwl_rt_fw "rt*" "ralink" || exit 1
         fi
     fi
 }
