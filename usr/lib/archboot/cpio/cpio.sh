@@ -280,7 +280,7 @@ _cpio_fw() {
             fi
             for i in $(fd --type d --base-directory "${_FW_SRC}" --path-separator '' -d 1); do
                 if [[ -n "${_GENERATE_IMAGE}" ]]; then
-                   _move_fw "${_FW_TMP_SRC}/"
+                    _move_fw "${_FW_TMP_SRC}/"
                     echo "Preparing ${i}.img firmware..."
                     _create_cpio "${_FW_TMP}" "${_FW_DEST}/${i}.img" &>"${_NO_LOG}" || exit 1
                     # remove directory
