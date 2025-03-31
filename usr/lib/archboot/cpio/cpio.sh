@@ -195,26 +195,21 @@ _run_hook() {
 }
 
 _install_mods() {
-    # Adding kernel modules:
+    # Adding kernel modules and kernel module dependencies:
+    # - cascading all module depends
     # - softdeps are not honored, add them in _mod arrays!
     # - remove duplicate modules
     # - remove builtin modules
     IFS=" " read -r -a _MODS <<< "$(sd ' ' '\n' <<< "${_MODS[@]}" | sort -u | sd '\n' ' ')"
-    mapfile -t _MOD_FILES < <(modinfo  -k "${_KERNELVERSION}" -F filename "${_MODS[@]}" | rg -v builtin)
-    _map _file "${_MOD_FILES[@]}"
-    _install_files
-    # Checking kernel module dependencies:
-    # - cascading all module depends
-    # - remove duplicate modules:
-    # - remove builtin modules
     while true; do
-        _MOD_DEPS=("$(modinfo -k "${_KERNELVERSION}" -F depends "${_MODS[@]}" | sd '\n' ' ')")
-        IFS=" " read -r -a _MOD_DEPS <<< "$(sd ',' ' ' <<< "${_MOD_DEPS[@]}" | sd ' ' '\n' | sort -u | sd '\n' ' ')"
-        [[ ${#_MOD_DEPS[@]} == 0 ]] && break
-        mapfile -t _MOD_FILES < <(modinfo  -k "${_KERNELVERSION}" -F filename "${_MOD_DEPS[@]}" | rg -v builtin)
+        if [[ -n "${_MOD_FILES[*]}" ]]; then
+            _MODS=("$(modinfo -k "${_KERNELVERSION}" -F depends "${_MODS[@]}" | sd '\n' ' ')")
+            IFS=" " read -r -a _MODS <<< "$(sd ',' ' ' <<< "${_MODS[@]}" | sd ' ' '\n' | sort -u | sd '\n' ' ')"
+        fi
+        [[ ${#_MODS[@]} == 0 ]] && break
+        mapfile -t _MOD_FILES < <(modinfo  -k "${_KERNELVERSION}" -F filename "${_MODS[@]}" | rg -v builtin)
         _map _file "${_MOD_FILES[@]}"
         _install_files
-        _MODS=("${_MOD_DEPS[@]}")
     done
     # needed files from kernel build for depmod call
     _map _file "${_MOD_DIR}"/modules.{builtin,builtin.modinfo,order}
