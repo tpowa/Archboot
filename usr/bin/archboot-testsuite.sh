@@ -136,6 +136,8 @@ done
 _result license-error.log
 _run_test "filesystems"
 losetup -f "${_IMG}"
+dd if=/dev/zero of="${_IMG}" bs=1M count=1000 &>"${_NO_LOG}"
+sync
 for i in bcachefs btrfs ext4 swap vfat xfs; do
     if [[ "${i}" == "swap" ]]; then
         echo -n "${i} "
@@ -152,7 +154,7 @@ for i in bcachefs btrfs ext4 swap vfat xfs; do
         fi
     fi
     wipefs -a "${_LOOP}" &>"${_NO_LOG}"
-    dd if=/dev/zero of="${_IMG}" bs=1M count=1000 &>"${_NO_LOG}"
+    dd if=/dev/zero of="${_IMG}" bs=1M count=10 &>"${_NO_LOG}"
     sync
 done
 _result filesystems-error.log
