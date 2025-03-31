@@ -102,9 +102,9 @@ _loaded_mods() {
 _filter_mods() {
     # only list the module name without extension and directory
     if [[ -z "${2}" ]]; then
-        rg "${1}" <<< "${_ALL_MODS}" | rg -o '([a-zA-Z0-9-_]+).ko$' -r '$1'
+        rg "${1}" <<< "${_ALL_MODS}" | rg -o '([a-zA-Z0-9\-_]+).ko$' -r '$1'
     else
-        rg "${3}" <<< "${_ALL_MODS}" | rg -v "${2}" | rg -o '([a-zA-Z0-9-_]+).ko$' -r '$1'
+        rg "${3}" <<< "${_ALL_MODS}" | rg -v "${2}" | rg -o '([a-zA-Z0-9\-_]+).ko$' -r '$1'
     fi
 }
 
