@@ -244,14 +244,12 @@ _iwl_rt_fw() {
     if ls "${_FW_SRC}/${1}" &>"${_NO_LOG}"; then
         if [[ -n ${_GENERATE_IMAGE} ]]; then
             echo "Preparing ${2}.img firmware..."
-            # shellcheck disable=SC2086  # $1 has a glob! no double quotes!
-            mv "${_FW_SRC}"/${1} "${_FW_TMP_SRC}/"
+            mv "${_FW_SRC}/${1}"* "${_FW_TMP_SRC}/"
             _create_cpio "${_FW_TMP}" "${_FW_DEST}/${2}.img" &>"${_NO_LOG}" || exit 1
         elif [[ -n "${_TARGET_DIR}" ]]; then
             echo "Saving firmware files to ${_FW_TMP}/${2}..."
             [[ -d "${_FW_TMP}/${2}/${_FW}" ]] || mkdir -p "${_FW_TMP}/${2}/${_FW}"
-            # shellcheck disable=SC2086 # $1 has a glob! no double quotes!
-            mv "${_FW_SRC}"/${1} "${_FW_TMP}/${2}/${_FW}/"
+            mv "${_FW_SRC}/${1}"* "${_FW_TMP}/${2}/${_FW}/"
         fi
     fi
 }
@@ -294,9 +292,9 @@ _cpio_fw() {
                 fi
             done
             # intel wireless
-            _iwl_rt_fw "iwl*" "iwlwifi" || exit 1
+            _iwl_rt_fw "iwl" "iwlwifi" || exit 1
             # ralink wireless
-            _iwl_rt_fw "rt*" "ralink" || exit 1
+            _iwl_rt_fw "rt" "ralink" || exit 1
         fi
     fi
 }
