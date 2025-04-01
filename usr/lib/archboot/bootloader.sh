@@ -22,7 +22,7 @@ _usage() {
 }
 
 _grub_mkstandalone() {
-    "${1[@]}" "${2[@]}" grub-mkstandalone -d "/usr/lib/grub/${_GRUB_ARCH}" -O "${_GRUB_ARCH}" \
+    "${1}" "${2}" grub-mkstandalone -d "/usr/lib/grub/${_GRUB_ARCH}" -O "${_GRUB_ARCH}" \
     --sbat=/usr/share/grub/sbat.csv --fonts=ter-u16n --locales="" --themes="" \
     -o "grub-efi/${_GRUB_EFI}" "boot/grub/grub.cfg=${_GRUB_ISO}"
 }
