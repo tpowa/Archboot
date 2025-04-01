@@ -556,8 +556,6 @@ _mkfs() {
         # if we were tasked to create the filesystem, do so
         if [[ "${4}" == "1" ]]; then
             if [[ "${2}" == "bcachefs" ]] || [[ "${2}" == "btrfs" ]]; then
-                ### TODO: bcachefs fix, remove when bcachefs-tools bumps!
-                modprobe bcachefs &>"${_NO_LOG}"
                 _FS_CREATE=(-f "${7}" -L "${6}" "${8}" "${9}")
             elif [[ "${2}" == "ext4" ]] ; then
                 _FS_CREATE=(-F "${7}" -L "${6}" "${1}")
