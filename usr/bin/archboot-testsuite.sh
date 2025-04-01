@@ -138,6 +138,8 @@ _run_test "filesystems"
 dd if=/dev/zero of="${_IMG}" bs=1M count=500 &>"${_NO_LOG}"
 sync
 losetup -f "${_IMG}"
+### TODO: bcachefs fix, remove when bcachefs-tools bumps!
+modprobe bcachefs
 for i in bcachefs btrfs ext4 swap vfat xfs; do
     if [[ "${i}" == "swap" ]]; then
         echo -n "${i} "
