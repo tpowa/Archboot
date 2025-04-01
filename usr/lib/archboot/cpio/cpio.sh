@@ -241,7 +241,7 @@ _install_libs() {
 }
 
 _iwl_rt_fw() {
-    if ls "${_FW_SRC}/${1}" &>"${_NO_LOG}"; then
+    if ls "${_FW_SRC}/${1}"* &>"${_NO_LOG}"; then
         if [[ -n ${_GENERATE_IMAGE} ]]; then
             echo "Preparing ${2}.img firmware..."
             mv "${_FW_SRC}/${1}"* "${_FW_TMP_SRC}/"
