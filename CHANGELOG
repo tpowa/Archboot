@@ -1,6 +1,8 @@
 On the road to 2025.04:
 - kernel 6.14.x
 - grub 2.12.r260.gaae2ea61-1
+testsuite:
+- speedup hwsim routine
 ---
 Highlights 2025.03:
 - added automatic installation archboot-autorun.template support
