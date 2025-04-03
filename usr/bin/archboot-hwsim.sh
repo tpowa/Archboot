@@ -17,16 +17,18 @@ _usage()
 }
 [[ -z "${1}" ]] && _usage
 _archboot_check
-echo "Waiting for pacman keyring..."
-_pacman_keyring
-echo "Installing kernel..."
-pacman -Sydd --noconfirm --noscriptlet linux &>"${_LOG}"
-depmod -a
 if ! rg -qw 'mac80211_hwsim' /proc/modules; then
     # kernel module mismatch needs to be checked
     if ! modprobe mac80211_hwsim; then
-        echo "Error: Module mismatch detected!"
-        exit 1
+        echo "Waiting for pacman keyring..."
+        _pacman_keyring
+        echo "Installing kernel..."
+        pacman -Sydd --noconfirm --noscriptlet linux &>"${_LOG}"
+        depmod -a
+        if ! modprobe mac80211_hwsim; then
+            echo "Error: Module mismatch detected!"
+            exit 1
+        fi
     fi
 fi
 iwctl ap wlan0 stop
