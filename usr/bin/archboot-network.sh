@@ -45,7 +45,10 @@ _wireless() {
     rm -f /var/lib/iwd/* &>"${_NO_LOG}"
     _CONTINUE=""
     while [[ -z "${_CONTINUE}" ]]; do
-        mapfiles -t _REGDOM < <(rg -o '"(.*)"$' -r '${1} _' /etc/conf.d/wireless-regdom)
+        for i in rg -o '"(.*)"$' -r '${1}' /etc/conf.d/wireless-regdom; do
+            _REGDOM+="${i}"
+            _REGDOM+="_"
+        done
         if _dialog --cancel-label "${_LABEL}" --title " Wireless Regulatory Domain " --menu "Select your country to conform local regulations:" 13 40 6 \
             "${_REGDOM[@]}" 2>"${_ANSWER}"; then
             _WIRELESS_REGDOM="$(cat "${_ANSWER}")"
