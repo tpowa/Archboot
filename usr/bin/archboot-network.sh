@@ -45,6 +45,7 @@ _wireless() {
     rm -f /var/lib/iwd/* &>"${_NO_LOG}"
     _CONTINUE=""
     while [[ -z "${_CONTINUE}" ]]; do
+        _REGDOM=()
         for i in $(rg -o '"(.*)"$' -r '${1}' /etc/conf.d/wireless-regdom); do
             _REGDOM+="${i}"
             _REGDOM+="_"
