@@ -51,7 +51,7 @@ _wireless() {
             _REGDOM+=("${i}")
             _REGDOM+=("_")
         done
-        if _dialog --cancel-label "${_LABEL}" --title " Wireless Regulatory Domain " --menu "Select your country to conform local regulations:" 13 50 6 \
+        if _dialog --cancel-label "${_LABEL}" --title " Wireless Regulatory Domain " --menu "Select your country to conform local regulations:" 13 55 6 \
             "${_REGDOM[@]}" 2>"${_ANSWER}"; then
             _WIRELESS_REGDOM="$(cat "${_ANSWER}")"
             _CONTINUE=1
