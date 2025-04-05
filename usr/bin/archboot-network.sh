@@ -56,7 +56,7 @@ _wireless() {
             _WIRELESS_REGDOM="$(cat "${_ANSWER}")"
             _CONTINUE=1
             sd '^WIRELESS' '#WIRELESS' /etc/conf.d/wireless-regdom
-            sd "^#WIRELESS_REGDOM\=\"${_WIRELESS_REGDOM}\"" "WIRELESS_REGDOM\=\"${_WIRELESS_REGDOM}\"" /etc/conf.d/wireless-regdom
+            sd "^#WIRELESS_REGDOM=\"${_WIRELESS_REGDOM}\"" "WIRELESS_REGDOM=\"${_WIRELESS_REGDOM}\"" /etc/conf.d/wireless-regdom
         else
             _abort
         fi
