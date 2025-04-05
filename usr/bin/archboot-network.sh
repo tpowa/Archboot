@@ -47,8 +47,8 @@ _wireless() {
     while [[ -z "${_CONTINUE}" ]]; do
         _REGDOM=()
         for i in $(rg -o '"(.*)"$' -r '${1}' /etc/conf.d/wireless-regdom); do
-            _REGDOM+="${i}"
-            [[ "${i}" ]] && _REGDOM+="_"
+            _REGDOM+=("${i}")
+            [[ "${i}" ]] && _REGDOM+=("_")
         done
         if _dialog --cancel-label "${_LABEL}" --title " Wireless Regulatory Domain " --menu "Select your country to conform local regulations:" 13 40 6 \
             "${_REGDOM[@]}" 2>"${_ANSWER}"; then
