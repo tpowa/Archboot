@@ -45,6 +45,19 @@ _wireless() {
     rm -f /var/lib/iwd/* &>"${_NO_LOG}"
     _CONTINUE=""
     while [[ -z "${_CONTINUE}" ]]; do
+        mapfiles -t _REGDOM < <(rg -o '"(.*)"$' -r '${1} _' /etc/conf.d/wireless-regdom)
+        if _dialog --cancel-label "${_LABEL}" --title " Wireless Regulatory Domain " --menu "Select your country to conform local regulations:" 13 40 6 \
+            "${_REGDOM[@]}" 2>"${_ANSWER}"; then
+            _WIRELESS_REGDOM="$(cat "${_ANSWER}")"
+            _CONTINUE=1
+            sd '^WIRELESS' '#WIRELESS' /etc/conf.d/wireless-regdom
+            sd "^#WIRELESS_REGDOM\=\"${_WIRELESS_REGDOM}\"" "WIRELESS_REGDOM\=\"${_WIRELESS_REGDOM}\"" /etc/conf.d/wireless-regdom
+        else
+            _abort
+        fi
+    done
+    _CONTINUE=""
+    while [[ -z "${_CONTINUE}" ]]; do
         # scan the area
         _essid_scan | _dialog --title " Network Configuration " --no-mouse --gauge "Scanning 5 second(s) for SSIDs with interface ${_INTERFACE}..." 6 60
         # only show lines with signal '*'
