@@ -115,6 +115,8 @@ _wireless() {
         { echo "### wireless authentification"
         echo "rfkill unblock all"
         echo "iwctl station \"${_INTERFACE}\" disconnect &>\"\${_NO_LOG}\""
+        echo "sd '^WIRELESS' '#WIRELESS' /etc/conf.d/wireless-regdom"
+        echo "sd \"^#WIRELESS_REGDOM=\\\"${_WIRELESS_REGDOM}\\\"\" \"WIRELESS_REGDOM=\\\"${_WIRELESS_REGDOM}\\\"\" /etc/conf.d/wireless-regdom"
         if [[ -z "${_WLAN_KEY}" ]]; then
             echo "echo \"\" | iwctl station \"${_INTERFACE}\" \"${_WLAN_CONNECT}\" \"${_WLAN_SSID}\" &>\"\${_NO_LOG}\""
         else

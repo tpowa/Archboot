@@ -127,6 +127,7 @@ _auto_packages() {
         ! rg -qw 'iwd' <<< "${_PACKAGES[@]}" && _PACKAGES+=(iwd)
     fi
     rg -q '^FONT=ter' /etc/vconsole.conf && _PACKAGES+=(terminus-font)
+    rg -q '^WIRELESS' /etc/conf.d/wireless-regdom && _PACKAGES+=(wireless-regdom)
     # only add firmware if already used
     _linux_firmware
     _marvell_firmware
