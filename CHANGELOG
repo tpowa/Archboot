@@ -3,6 +3,10 @@ On the road to 2025.04:
 - grub 2.12.r260.gaae2ea61-1
 testsuite:
 - speedup hwsim routine
+network:
+- added wireless regulatory domain configuration
+setup:
+- added wireless regulatory domain copying
 ---
 Highlights 2025.03:
 - added automatic installation archboot-autorun.template support
