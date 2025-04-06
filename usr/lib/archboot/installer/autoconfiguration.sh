@@ -32,7 +32,7 @@ _auto_network()
     if [[ ! -e  /.network ]]; then
         return 1
     fi
-    _progress "13" "Enable network, proxy settings and disable wifi powersave on installed system..."
+    _progress "13" "Enable network and disable wifi powersave on installed system..."
     # write to template
     echo "echo \"Enable network and proxy settings on installed system...\"" >> "${_TEMPLATE}"
     # copy iwd keys and enable iwd
@@ -42,8 +42,7 @@ _auto_network()
         cp /etc/conf.d/wireless-regdom "${_DESTDIR}"/etc/conf.d/wireless-regdom
         cp /etc/udev/rules.d/60-wifi-disable-powersave.rules  "${_DESTDIR}"/etc/udev/rules.d/60-wifi-disable-powersave.rules
         # write to template
-        { echo "echo \"Enable network,proxy settings and disable wifi powersave on installed system...\""
-        echo "cp -r /var/lib/iwd \"\${_DESTDIR}\"/var/lib"
+        { echo "cp -r /var/lib/iwd \"\${_DESTDIR}\"/var/lib"
         echo "chroot \"\${_DESTDIR}\" systemctl enable iwd &>\"\${_NO_LOG}\""
         echo "cp /etc/conf.d/wireless-regdom \"\${_DESTDIR}\"/etc/conf.d/wireless-regdom"
         echo "cp /etc/udev/rules.d/60-wifi-disable-powersave.rules \"\${_DESTDIR}\"/etc/udev/rules.d/"
