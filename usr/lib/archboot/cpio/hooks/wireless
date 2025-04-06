@@ -13,5 +13,8 @@ _run ()
     _binary archboot-hwsim.sh
     # crda support
     _map _file /etc/conf.d/wireless-regdom /usr/lib/crda/{regulatory.bin,pubkeys/wens.key.pub.pem}
+    # disable powersave by default on wifi devices
+    _file_rename /usr/share/archboot/wireless/etc/udev/rules.d/60-wifi-disable-powersave.rules \
+            /etc/udev/rules.d/60-wifi-disable-powersave.rules
 }
 
