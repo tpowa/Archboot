@@ -34,7 +34,7 @@ _auto_network()
     fi
     _progress "13" "Enable network and disable wifi powersave on installed system..."
     # write to template
-    echo "echo \"Enable network and proxy settings on installed system...\"" >> "${_TEMPLATE}"
+    echo "echo \"Enable network and disable wifi on installed system...\"" >> "${_TEMPLATE}"
     # copy iwd keys and enable iwd
     if rg -q 'wlan' /.network-interface 2>"${_NO_LOG}"; then
         cp -r /var/lib/iwd "${_DESTDIR}"/var/lib
