@@ -8,8 +8,8 @@ testsuite:
 network:
 - added wireless regulatory domain configuration
 setup:
-- added wireless regulatory domain copying
-- added WiFi powersave disable by default
+- added wireless regulatory domain to autoconfiguration
+- added WiFi powersave disable by default to autoconfiguration
 ---
 Highlights 2025.03:
 - added automatic installation archboot-autorun.template support
