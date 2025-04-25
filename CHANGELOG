@@ -3,7 +3,7 @@ On the road to 2025.04:
 - grub 2.12.r283.ga4da71da 
 Environment:
 - disabled WiFi powersave by default
-- 3cpio 0.5.0
+- 3cpio 0.5.1
 testsuite:
 - speedup hwsim routine
 network:
