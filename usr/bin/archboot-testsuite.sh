@@ -5,7 +5,7 @@
 _LOOP="/dev/loop0"
 _IMG="/test.img"
 _PASS="/passphrase"
-_usage () {
+_usage() {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Testsuite\e[m"
     echo -e "\e[1m--------------------\e[m"
     echo "Run automatic tests to detect errors/changes."
@@ -13,7 +13,7 @@ _usage () {
     echo -e "Usage: \e[1m${_BASENAME} run\e[m"
     exit 0
 }
-_run_test () {
+_run_test() {
     echo -e "\e[1mTestsuite checking ${1}...\e[m"
 }
 _result() {
@@ -23,6 +23,15 @@ _result() {
     else
         echo -e "\e[1;94m=> \e[1;92mOK\e[m"
     fi
+}
+_losetup() {
+    dd if=/dev/zero of="${_IMG}" bs=1M count=500 &>"${_NO_LOG}"
+    sync
+    losetup -f "${_IMG}"
+}
+_losetup_stop() {
+    losetup -D
+    rm "${_IMG}"
 }
 [[ -z "${1}" || "${1}" != "run" ]] && _usage
 _archboot_check
@@ -135,10 +144,8 @@ for i in $(pacman -Ql "${_ALL_PACKAGES[@]}" | rg -o '/usr/share/licenses/.*'); d
 done
 _result license-error.log
 _run_test "filesystems"
-dd if=/dev/zero of="${_IMG}" bs=1M count=1000 &>"${_NO_LOG}"
-sync
-losetup -f "${_IMG}"
 for i in bcachefs btrfs ext4 swap vfat xfs; do
+    _losetup
     if [[ "${i}" == "swap" ]]; then
         echo -n "${i} "
         mkswap "${_LOOP}" &>"${_NO_LOG}" ||\
@@ -153,19 +160,19 @@ for i in bcachefs btrfs ext4 swap vfat xfs; do
             umount /mnt &>"${_NO_LOG}" || echo "Unmount error: ${i}" >> filesystems-error.log
         fi
     fi
-    wipefs -a "${_LOOP}" &>"${_NO_LOG}"
+    _losetup_stop
 done
 _result filesystems-error.log
 _run_test "blockdevices"
 echo -n "mdadm "
+_losetup
 mdadm --create /dev/md0 --run --level=1 --raid-devices=2 "${_LOOP}" missing &>"${_NO_LOG}" ||\
 echo "Creation error: mdadm" >> blockdevices-error.log
 mdadm --manage --stop /dev/md0 &>"${_NO_LOG}" ||\
 echo "Remove error: mdadm" >> blockdevices-error.log
-wipefs -a -f "${_LOOP}" &>"${_NO_LOG}"
-dd if=/dev/zero of="${_IMG}" bs=1M count=10 &>"${_NO_LOG}"
-sync
+_losetup_stop
 echo -n "lvm "
+_losetup
 pvcreate -y "${_LOOP}" &>"${_NO_LOG}" ||\
 echo "Creation error: lvm pv" >> blockdevices-error.log
 vgcreate /dev/mapper/test "${_LOOP}" &>"${_NO_LOG}" ||\
@@ -178,10 +185,9 @@ vgremove -f test &>"${_NO_LOG}" ||\
 echo "Remove error: lvm vg" >> blockdevices-error.log
 pvremove -f "${_LOOP}" &>"${_NO_LOG}" ||\
 echo "Remove error: lvm pv" >> blockdevices-error.log
-wipefs -a -f "${_LOOP}" &>"${_NO_LOG}"
-dd if=/dev/zero of="${_IMG}" bs=1M count=10 &>"${_NO_LOG}"
-sync
+_losetup_stop
 echo -n "cryptsetup "
+_losetup
 echo "12345678" >"${_PASS}"
 cryptsetup -q luksFormat "${_LOOP}" <"${_PASS}" ||\
 echo "Creation error: cryptsetup" >> blockdevices-error.log
@@ -189,8 +195,7 @@ cryptsetup luksOpen "${_LOOP}" testluks <"${_PASS}" ||\
 echo "Creation error: cryptsetup open" >> blockdevices-error.log
 cryptsetup remove testluks ||\
 echo "Remove error: cryptsetup" >> blockdevices-error.log
-losetup -D
-rm "${_IMG}"
+_losetup_stop
 _result blockdevices-error.log
 echo -e "Starting Wi-Fi check in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
 sleep 10
