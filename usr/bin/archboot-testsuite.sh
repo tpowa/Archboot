@@ -135,7 +135,7 @@ for i in $(pacman -Ql "${_ALL_PACKAGES[@]}" | rg -o '/usr/share/licenses/.*'); d
 done
 _result license-error.log
 _run_test "filesystems"
-dd if=/dev/zero of="${_IMG}" bs=1M count=750 &>"${_NO_LOG}"
+dd if=/dev/zero of="${_IMG}" bs=1M count=1000 &>"${_NO_LOG}"
 sync
 losetup -f "${_IMG}"
 for i in bcachefs btrfs ext4 swap vfat xfs; do
