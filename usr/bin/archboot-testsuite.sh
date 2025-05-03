@@ -160,7 +160,6 @@ _run_test "blockdevices"
 echo -n "mdadm "
 mdadm --create /dev/md0 --run --level=1 --raid-devices=2 "${_LOOP}" missing &>"${_NO_LOG}" ||\
 echo "Creation error: mdadm" >> blockdevices-error.log
-wipefs -a -f /dev/md0  &>"${_NO_LOG}"
 mdadm --manage --stop /dev/md0 &>"${_NO_LOG}" ||\
 echo "Remove error: mdadm" >> blockdevices-error.log
 wipefs -a -f "${_LOOP}" &>"${_NO_LOG}"
@@ -179,6 +178,9 @@ vgremove -f test &>"${_NO_LOG}" ||\
 echo "Remove error: lvm vg" >> blockdevices-error.log
 pvremove -f "${_LOOP}" &>"${_NO_LOG}" ||\
 echo "Remove error: lvm pv" >> blockdevices-error.log
+wipefs -a -f "${_LOOP}" &>"${_NO_LOG}"
+dd if=/dev/zero of="${_IMG}" bs=1M count=10 &>"${_NO_LOG}"
+sync
 echo -n "cryptsetup "
 echo "12345678" >"${_PASS}"
 cryptsetup -q luksFormat "${_LOOP}" <"${_PASS}" ||\
