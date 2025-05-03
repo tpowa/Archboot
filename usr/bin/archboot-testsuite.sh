@@ -182,6 +182,8 @@ echo "Remove error: lvm pv" >> blockdevices-error.log
 wipefs -a -f "${_LOOP}" &>"${_NO_LOG}"
 dd if=/dev/zero of="${_IMG}" bs=1M count=10 &>"${_NO_LOG}"
 sync
+losetup -D
+losetup -f "${_IMG}"
 echo -n "cryptsetup "
 echo "12345678" >"${_PASS}"
 cryptsetup -q luksFormat "${_LOOP}" <"${_PASS}" ||\
