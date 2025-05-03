@@ -25,7 +25,7 @@ _result() {
     fi
 }
 _losetup() {
-    dd if=/dev/zero of="${_IMG}" bs=1M count=500 &>"${_NO_LOG}"
+    dd if=/dev/zero of="${_IMG}" bs=1M count=300 &>"${_NO_LOG}"
     sync
     losetup -f "${_IMG}"
 }
