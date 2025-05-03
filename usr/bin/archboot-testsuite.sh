@@ -135,7 +135,7 @@ for i in $(pacman -Ql "${_ALL_PACKAGES[@]}" | rg -o '/usr/share/licenses/.*'); d
 done
 _result license-error.log
 _run_test "filesystems"
-dd if=/dev/zero of="${_IMG}" bs=1M count=500 &>"${_NO_LOG}"
+dd if=/dev/zero of="${_IMG}" bs=1M count=750 &>"${_NO_LOG}"
 sync
 losetup -f "${_IMG}"
 for i in bcachefs btrfs ext4 swap vfat xfs; do
@@ -179,11 +179,6 @@ vgremove -f test &>"${_NO_LOG}" ||\
 echo "Remove error: lvm vg" >> blockdevices-error.log
 pvremove -f "${_LOOP}" &>"${_NO_LOG}" ||\
 echo "Remove error: lvm pv" >> blockdevices-error.log
-wipefs -a -f "${_LOOP}" &>"${_NO_LOG}"
-dd if=/dev/zero of="${_IMG}" bs=1M count=10 &>"${_NO_LOG}"
-sync
-losetup -D
-losetup -f "${_IMG}"
 echo -n "cryptsetup "
 echo "12345678" >"${_PASS}"
 cryptsetup -q luksFormat "${_LOOP}" <"${_PASS}" ||\
