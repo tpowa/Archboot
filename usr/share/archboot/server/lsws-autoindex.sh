@@ -27,8 +27,8 @@ for i in ./{,aarch64,riscv64,x86_64}; do
     ln -s ~/public_html/release/"${i}"/HEADER.html \
           ~/release/"${i}"/HEADER.html
 done
-# keep 4 versions on mirrors
-for i in $(seq 0 3); do
+# keep 3 versions on mirrors
+for i in $(seq 0 2); do
     _SYMLINK=$(date -d "$(date +) - ${i} Months" +%Y.%m)
     for k in aarch64 riscv64 x86_64; do
         if [[ -d ~/public_html/release/"${k}"/"${_SYMLINK}" && ! -L ~/release/"${k}"/"${_SYMLINK}" ]]; then
