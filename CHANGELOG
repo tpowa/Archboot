@@ -1,4 +1,5 @@
 On the road to 2025.05:
+- grub 2.12.r292.g73d1c959
 testsuite:
 - better loopback routine
 ---
