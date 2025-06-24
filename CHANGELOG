@@ -1,5 +1,7 @@
 On the road to 2025.06:
 - kernel 6.15.x
+Environment:
+- added mmc-utils
 ---
 Highlights 2025.05:
 - grub 2.12.r292.g73d1c959
