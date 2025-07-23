@@ -1,6 +1,8 @@
 On the road to 2025.07:
 - updated IPXE to 20250719
 - updated bash to 5.3.x
+testsuite:
+- better firmware routine
 ---
 Highlights 2025.06:
 - kernel 6.15.x
