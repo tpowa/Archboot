@@ -39,7 +39,7 @@ _LICENSES=(
   krb5/LICENSE
   less/LICENSE
   libarchive/COPYING
-  libbpf/LICENSE{,.BSD-2-Clause,.LGPL-2.1}
+  libbpf/LICENSE.BSD-2-Clause
   libbsd/LICENSE
   libcap/License
   libcss/COPYING
@@ -72,7 +72,6 @@ _LICENSES=(
   libwapcaplet/COPYING
   libwebsockets/LICENSE
   libxml2/Copyright
-  linux-firmware-whence/WHENCE
   llhttp/LICENSE-MIT
   lua/LICENSE
   lua51-lpeg/LICENSE
@@ -140,6 +139,6 @@ _LICENSES=(
     for i in "${_LICENSES[@]}";do
         _file /usr/share/licenses/"${i}"
     done
-    _map _full_dir /usr/share/licenses/{spdx,linux-firmware}
+    _map _full_dir /usr/share/licenses/{spdx,linux-firmware-*}
 }
 
