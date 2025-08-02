@@ -3,7 +3,7 @@
 
 [Unit]
 Description=Ensure systemd-tmpfiles is run, else race condition experienced
-Before=sysinit.target
+Before=multi-user.target
 
 [Service]
 Type=oneshot
