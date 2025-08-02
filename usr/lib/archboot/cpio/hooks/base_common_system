@@ -137,8 +137,8 @@ linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz} \
     # add swapiness sysctl config file
     _file_rename /usr/share/archboot/base/etc/sysctl.d/99-sysctl.conf /etc/sysctl.d/99-sysctl.conf
     # ensure all tmpfiles are created
-    _file_rename /usr/share/archboot/base/etc/systemd/system/archboot-tmpfiles.service \
-                 /etc/systemd/system/archboot-tmpfiles.service
+    _file_rename /usr/share/archboot/base/etc/systemd/system/run-tmpfiles.service \
+                 /etc/systemd/system/run-tmpfiles.service
     # add pacman
     _map _dir /var/{cache/pacman/pkg,lib/pacman}
     _map _file /etc/{pacman.conf,pacman.d/mirrorlist}
