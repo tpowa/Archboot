@@ -12,3 +12,5 @@ ExecStart=/usr/bin/ttyd -W ssh -q -o StrictHostKeychecking=no -o UserKnownHostsF
 Type=simple
 Restart=always
 
+[Install]
+WantedBy=multi-user.target

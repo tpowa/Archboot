@@ -9,3 +9,6 @@ After=systemd-udev-trigger.service
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/bin/detect-vconsole.sh run
+
+[Install]
+WantedBy=sysinit.target
