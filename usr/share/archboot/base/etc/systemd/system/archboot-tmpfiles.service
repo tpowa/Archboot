@@ -3,10 +3,12 @@
 
 [Unit]
 Description=Ensure systemd-tmpfiles is run
+Before=sysinit.target
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-Before=sysinit.target
 ExecStart=/usr/bin/systemd-tmpfiles --boot --create
 
+[Install]
+WantedBy=sysinit.target
