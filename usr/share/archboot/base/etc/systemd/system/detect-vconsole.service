@@ -11,4 +11,4 @@ RemainAfterExit=yes
 ExecStart=/usr/bin/detect-vconsole.sh run
 
 [Install]
-WantedBy=sysinit.target
+WantedBy=getty.target
