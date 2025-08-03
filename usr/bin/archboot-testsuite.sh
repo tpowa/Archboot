@@ -210,9 +210,7 @@ else
     echo "Hwsim setup failed." >> iwctl-error.log
 fi
 _result iwctl-error.log
-echo -e "Starting none tracked files in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
-sleep 10
-_run_test "none tracked files in /usr/lib... this takes a while"
+_run_test "none tracked files in /usr/lib"
 for i in $(fd -u -E '/modules/' -E '/udev/' -E 'gconv-modules.cache' -E 'locale-archive' . /usr/lib); do
     pacman -Qo "${i}" &>"${_LOG}" || echo "${i}" >> pacman-error.log
 done
