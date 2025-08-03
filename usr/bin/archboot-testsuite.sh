@@ -197,9 +197,7 @@ cryptsetup remove testluks ||\
 echo "Remove error: cryptsetup" >> blockdevices-error.log
 _losetup_stop
 _result blockdevices-error.log
-echo -e "Starting Wi-Fi check in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."
-sleep 10
-_run_test "Wi-Fi... this takes a while"
+_run_test "Wi-Fi"
 echo -n "Setting up hwsim... "
 if archboot-hwsim.sh test &>"${_LOG}"; then
     echo -n "iwctl tests running... "
