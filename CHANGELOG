@@ -3,6 +3,7 @@ On the road to 2025.08:
 Environment:
 - fixed tmpfiles not being created correctly
 - updated getty and serial getty systemd service files
+- removed custom systemd-user-session.service
 testsuite:
 - speedup Wi-Fi routine
 - speedup non tracked files routine
