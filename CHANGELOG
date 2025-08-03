@@ -2,6 +2,9 @@ On the road to 2025.08:
 - 3cpio 0.8.1
 Environment:
 - fixed tmpfiles not being created correctly
+testsuite:
+- speedup Wi-Fi routine
+- speedup non tracked files routine
 ---
 Highlights 2025.07:
 - updated IPXE to 20250723
