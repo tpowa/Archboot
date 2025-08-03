@@ -3,7 +3,7 @@
 
 [Unit]
 Description=Ensure systemd-tmpfiles is run, else race condition experienced
-Before=network.target
+Before=network.target getty.target
 
 [Service]
 Type=oneshot
