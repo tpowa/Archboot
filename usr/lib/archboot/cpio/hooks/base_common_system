@@ -105,11 +105,11 @@ protocols,request-key.conf,securetty,services}
                  /usr/bin/detect-vconsole.sh
     _file_rename /usr/share/archboot/base/etc/systemd/system/detect-vconsole.service \
                  /etc/systemd/system/detect-vconsole.service
-    _symlink /etc/systemd/system/sysinit.target.wants/detect-vconsole.service \
+    _symlink /etc/systemd/system/getty.target.wants/detect-vconsole.service \
              /etc/systemd/system/detect-vconsole.service
     _symlink /etc/systemd/system/multi-user.target.wants/windowkeys.service \
              /etc/systemd/system/windowkeys.service
-    _symlink /etc/systemd/system/sysinit.target.wants/run-tmpfiles.service \
+    _symlink /etc/systemd/system/getty.target.wants/run-tmpfiles.service \
              /etc/systemd/system/run-tmpfiles.service
     # disable systemd targets:
     for i in remote-{veritysetup,cryptsetup} sockets timers; do

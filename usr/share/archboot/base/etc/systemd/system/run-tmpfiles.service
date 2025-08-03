@@ -3,7 +3,7 @@
 
 [Unit]
 Description=Ensure systemd-tmpfiles is run, else race condition experienced
-Before=network.target getty.target
+Before=detect-vconsole.service getty@tty1.service serial-getty@ttyS0.service 
 
 [Service]
 Type=oneshot
@@ -11,4 +11,4 @@ RemainAfterExit=yes
 ExecStart=/usr/bin/systemd-tmpfiles --boot --create
 
 [Install]
-WantedBy=sysinit.target
+WantedBy=getty.target
