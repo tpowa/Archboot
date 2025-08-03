@@ -10,4 +10,4 @@ RemainAfterExit=Yes
 ExecStart=loadkeys windowkeys
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=getty.target

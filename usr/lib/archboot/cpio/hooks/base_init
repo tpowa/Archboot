@@ -21,7 +21,7 @@ _run ()
     _map _file /usr/lib/sysusers.d/{arch,basic}.conf
     # disable systemd services:
     for i in lvm2-{lvmpolld,monitor} systemd-{boot,random-seed,sysusers\
-,update-{done,utmp},vconsole-setup}; do
+,tmpfiles-setup{,-dev,-dev-early},update-{done,utmp},vconsole-setup}; do
         _symlink "/etc/systemd/system/${i}.service" /dev/null
     done
     # disable systemd sockets:
