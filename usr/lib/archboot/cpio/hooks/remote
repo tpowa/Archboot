@@ -4,7 +4,7 @@
 
 _run ()
 {
-    _map _binary exportfs findssl.sh gssproxy nfsstat nfsd{cld,clddb,clnts,ctl} \
+    _map _binary exportfs findssl.sh gssproxy nfs{stat,rahead} nfsd{cld,clddb,clnts,ctl} \
                  rpc.{gssd,idmapd,mountd,nfsd,statd} rpcdebug rsync showmount \
                  scp screen sftp sm-notify ssh-{add,agent,copy-id,keygen,keyscan} \
                  sshd start-statd tmux ttyd

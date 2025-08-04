@@ -118,6 +118,7 @@ _BASE_BLACKLIST=(
   systemd-cryptsetup
   systemd-delta
   systemd-home-fallback-shell
+  systemd-pty-forward
   systemd-repart
   systemd-run
   systemd-vmspawn
