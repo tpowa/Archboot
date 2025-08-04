@@ -18,7 +18,7 @@ _run ()
     for i in $(pacman -Ql systemd | rg '/usr/lib/systemd/system/.' | choose 1); do
         _file "${i}"
     done
-    _map _file /usr/lib/sysusers.d/{arch,basic}.conf
+    _map _file /usr/lib/sysusers.d/{arch,basic}.conf /usr/lib/libbpf.so
     # disable systemd services:
     for i in lvm2-{lvmpolld,monitor} systemd-{boot,random-seed,sysusers\
 ,tmpfiles-setup{,-dev,-dev-early},update-{done,utmp},vconsole-setup}; do
