@@ -1,11 +1,11 @@
 On the road to 2025.08:
-- 3cpio 0.8.1
 Environment:
 - systemd 258
 - kernel 6.16.x
 - fixed tmpfiles not being created correctly
 - updated getty and serial getty systemd service files
 - removed custom systemd-user-session.service
+- 3cpio 0.10.2
 testsuite:
 - speedup Wi-Fi routine
 - speedup non tracked files routine
