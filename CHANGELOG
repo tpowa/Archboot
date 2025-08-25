@@ -11,6 +11,7 @@ init:
 setup:
 - fixed pacman secureboot hook
 testsuite:
+- disabled kernel messages during filesystem tests
 - speedup Wi-Fi routine
 - speedup non tracked files routine
 ---
