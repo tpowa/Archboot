@@ -199,7 +199,7 @@ _initrd_stage() {
     _progress "100" "The boot medium can be safely removed now."
 }
 # not all devices trigger autoload!
-for i in atkbd cdrom i8042 usb-storage zram zstd; do
+for i in atkbd cdrom i8042 loop usb-storage zram zstd; do
     modprobe -q "${i}"
 done
 # systemd >= 256 mounts /usr ro by default

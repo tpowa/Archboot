@@ -6,6 +6,10 @@ Environment:
 - updated getty and serial getty systemd service files
 - removed custom systemd-user-session.service
 - 3cpio 0.10.2
+init:
+- added loop module to manual module loading array
+setup:
+- fixed pacman secureboot hook
 testsuite:
 - speedup Wi-Fi routine
 - speedup non tracked files routine
@@ -15,8 +19,6 @@ Highlights 2025.07:
 - updated bash to 5.3.x
 testsuite:
 - better firmware routine
-setup:
-- fixed pacman secureboot hook
 ---
 Highlights 2025.06:
 - kernel 6.15.x
