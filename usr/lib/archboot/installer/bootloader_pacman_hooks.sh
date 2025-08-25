@@ -125,7 +125,7 @@ _pacman_sign() {
     cat << EOF >> "${_HOOKNAME}"
 Description = Signing kernel with Machine Owner Key for Secure Boot
 When = PostTransaction
-Exec = /usr/bin/sh -c 'for i in /boot/vmlinuz-*; do /usr/lib/systemd/systemd-sbsign --private-key=/${_KEYDIR}/keys/MOK/MOK.key --certificate=/${_KEYDIR}/MOK/MOK.crt --output "${i}" sign "${i}"; done'
+Exec = /usr/bin/sh -c 'for i in /boot/vmlinuz-*; do /usr/lib/systemd/systemd-sbsign --private-key=/${_KEYDIR}/keys/MOK/MOK.key --certificate=/${_KEYDIR}/MOK/MOK.crt --output "\${i}" sign "\${i}"; done'
 Depends = systemd
 Depends = grep
 EOF
