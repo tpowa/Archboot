@@ -215,16 +215,7 @@ _run_update_environment() {
     fi
 }
 
-_printk()
-{
-    case ${1} in
-        "on")  echo 4 >/proc/sys/kernel/printk ;;
-        "off") echo 0 >/proc/sys/kernel/printk ;;
-    esac
-}
-
-_printk()
-{
+_printk() {
     case ${1} in
         "on")  echo 4 >/proc/sys/kernel/printk ;;
         "off") echo 0 >/proc/sys/kernel/printk ;;
