@@ -147,7 +147,7 @@ _result license-error.log
 _run_test "filesystems"
 # disable kernel messages
 # bcachefs prints kernel messages
-echo 0 > /proc/sys/kernel/printk
+_printk off
 for i in bcachefs btrfs ext4 swap vfat xfs; do
     _losetup
     if [[ "${i}" == "swap" ]]; then
@@ -167,7 +167,7 @@ for i in bcachefs btrfs ext4 swap vfat xfs; do
     _losetup_stop
 done
 # enable kernel messages
-echo 4 > /proc/sys/kernel/printk
+_printk on
 _result filesystems-error.log
 _run_test "blockdevices"
 echo -n "mdadm "

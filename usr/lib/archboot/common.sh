@@ -215,6 +215,22 @@ _run_update_environment() {
     fi
 }
 
+_printk()
+{
+    case ${1} in
+        "on")  echo 4 >/proc/sys/kernel/printk ;;
+        "off") echo 0 >/proc/sys/kernel/printk ;;
+    esac
+}
+
+_printk()
+{
+    case ${1} in
+        "on")  echo 4 >/proc/sys/kernel/printk ;;
+        "off") echo 0 >/proc/sys/kernel/printk ;;
+    esac
+}
+
 _kver() {
     # x86_64: rg -Noazm 1 'ABCDEF\x00+(.*) \(.*@' -r '$1' ${1}
     # aarch64 compressed and uncompressed:

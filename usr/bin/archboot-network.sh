@@ -4,14 +4,6 @@
 . /usr/lib/archboot/common.sh
 _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Network Configuration"
 
-_printk()
-{
-    case ${1} in
-        "on")  echo 4 >/proc/sys/kernel/printk ;;
-        "off") echo 0 >/proc/sys/kernel/printk ;;
-    esac
-}
-
 _online_switch() {
     if _dialog --title " Offline Mode " --defaultno --yesno "Do you want to switch to Online Mode?" 5 45; then
         rm /var/cache/pacman/pkg/archboot.db

@@ -13,14 +13,6 @@ _set_title() {
     fi
 }
 
-_printk()
-{
-    case ${1} in
-        "on")  echo 4 >/proc/sys/kernel/printk ;;
-        "off") echo 0 >/proc/sys/kernel/printk ;;
-    esac
-}
-
 _abort_running_system() {
     _dialog --msgbox "This function is not available on System Setup Mode." 5 60
 }
