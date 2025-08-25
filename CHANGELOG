@@ -8,6 +8,8 @@ Environment:
 - 3cpio 0.10.2
 init:
 - added loop module to manual module loading array
+pacsetup:
+- fixed download URL for mirrorlist
 setup:
 - fixed pacman secureboot hook
 testsuite:
