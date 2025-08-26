@@ -17,13 +17,13 @@
 <h1>Archboot Home | <a href="gallery.html">Gallery</a> | <a href="https://donate.stripe.com/fZu6oHc9T48TeTrg5HcV200"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2025 Fundraise: 0% <progress max="100" value="35">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2025 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 30.07.2025 07:31</strong></p>
+<strong>Last update: 26.08.2025 14:34</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
 <li><a href="#releases" id="toc-releases"><strong><span class="toc-section-number">2.</span> Releases</strong></a></li>
 <li><ul>
-<li><a href="#image-types" id="toc-features-of-the-images"><span class="toc-section-number">2.1</span> ISO / Initrd / UKI Types</a></li>
+<li><a href="#image-types" id="toc-features-of-the-images"><span class="toc-section-number">2.1</span> ISO / Initramdisk / UKI Types</a></li>
 <li><a href="#ipxe-boot" id="toc-ipxe-boot"><span class="toc-section-number">2.2</span> Netboot - IPXE</a></li>
 <li><a href="#boot-modes" id="toc-boot-modes"><span class="toc-section-number">2.3</span> Boot Modes</a></li>
 <li><a href="#writing-to-usb-cd" id="toc-writing-to-usb-cd"><span class="toc-section-number">2.4</span> ISO Writing To USB / CD</a></li>
@@ -81,7 +81,7 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 <li><a href="https://www.reddit.com/r/archboot/"><strong>Latest News</strong></a>, <a href="https://gitlab.archlinux.org/tpowa/archboot/-/blob/master/CHANGELOG"><strong>Changelog</strong></a>, <a href="https://source.archboot.com"><strong>Build Sources</strong></a></li>
 <li><strong>IRC Support Channel</strong>: <strong>#archboot</strong> on irc.libera.chat</li>
 <li><strong>Automatic Release System</strong>: Packages for triggering a new release are listed <a href="https://gitlab.archlinux.org/tpowa/archboot/-/blob/master/etc/archboot/server-update.conf"><strong>here</strong></a>.</li>
-<li><a href="https://wiki.syslinux.org/wiki/index.php?title=Isohybrid"><strong>Hybrid images</strong></a>, <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Images</strong></a>, <a href="https://wiki.archlinux.org/title/Netboot" title="Netboot"><strong>Netboot images</strong></a>, <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernels</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initrd</strong></a>, and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcodes</strong></a> are provided.</li>
+<li><a href="https://wiki.syslinux.org/wiki/index.php?title=Isohybrid"><strong>Hybrid images</strong></a>, <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Images</strong></a>, <a href="https://wiki.archlinux.org/title/Netboot" title="Netboot"><strong>Netboot images</strong></a>, <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernels</strong></a>, <a href="https://wiki.archlinux.org/title/Initramdisk" title="Initramdisk"><strong>Initramdisk</strong></a>, and <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcodes</strong></a> are provided.</li>
 <li><strong>PGP KEY</strong>: <a href="https://keyserver.ubuntu.com/pks/lookup?op=vindex&amp;fingerprint=on&amp;exact=on&amp;search=0x5B7E3FB71B7F10329A1C03AB771DF6627EDF681F"><strong>5B7E 3FB7 1B7F 1032 9A1C 03AB 771D F662 7EDF 681F</strong></a> for file verification is provided.</li>
 <li><strong>Supported Glibc Locales</strong>: be, bg, cs, da, de, en, el, es, fi, fr, hu, it, lt, lv, mk, nl, nn, pl, pt, ro, ru, sk, sr, sv, tr, uk</li>
 </ul>
@@ -164,11 +164,11 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 </table>
 <ul>
 <li>The <a href="https://wiki.archlinux.org/title/Unified_kernel_image" title="UKI"><strong>Unified Kernel Image / UKI</strong></a> can be booted from your <a href="https://wiki.archlinux.org/title/UEFI" title="UEFI"><strong>UEFI</strong></a> firmware or <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a> like any other <strong>&lt;EFI&gt;</strong> file.</li>
-<li>For <strong>rescue booting</strong>, add an entry pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initrd</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> and <strong>Firmware</strong> to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a>.</li>
-<li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting, add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initrd" title="Initrd"><strong>Initrd</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> and <strong>Firmware</strong> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong></a> setup.</li>
+<li>For <strong>rescue booting</strong>, add an entry pointing to the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initramdisk" title="Initramdisk"><strong>Initramdisk</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> and <strong>Firmware</strong> to your <a href="https://wiki.archlinux.org/title/Bootloader" title="Bootloader"><strong>bootloader</strong></a>.</li>
+<li>For <a href="https://wiki.archlinux.org/title/PXE" title="PXE"><strong>PXE</strong></a> booting, add the <a href="https://wiki.archlinux.org/title/Kernel" title="Kernel"><strong>Kernel</strong></a>, <a href="https://wiki.archlinux.org/title/Initramdisk" title="Initramdisk"><strong>Initramdisk</strong></a>, <a href="https://wiki.archlinux.org/title/Microcode" title="Microcode"><strong>Microcode</strong></a> and <strong>Firmware</strong> to your <a href="https://wiki.archlinux.org/title/TFTP" title="TFTP"><strong>TFTP</strong></a> setup.</li>
 </ul>
 <p style="page-break-after: always"></p>
-<h3 data-number="2.1" id="image-types"><span class="header-section-number">2.1</span> <strong>ISO / Initrd / UKI Types</strong></h3>
+<h3 data-number="2.1" id="image-types"><span class="header-section-number">2.1</span> <strong>ISO / Initramdisk / UKI Types</strong></h3>
 <table>
 <thead>
 <tr class="header">
@@ -771,7 +771,7 @@ The AARCH64 <strong>kernel </strong> does not seem to support this feature. This
 <ul>
 <li>How much <strong>RAM</strong> is needed to boot <strong>&lt;EFI&gt;</strong> or <strong>&lt;INITRD&gt;</strong>?<br>
 The calculated size to boot the image follows the formula:<br>
-<strong>Initrd + Kernel + Unpackedkernel + Unpackedinitrd = minimum RAM to boot</strong>
+<strong>Initramdisk + Kernel + Unpackedkernel + Unpackedinitramdisk = minimum RAM to boot</strong>
 </li>
 </ul>
 <p style="page-break-after: always"></p>
@@ -1094,22 +1094,22 @@ The calculated size to boot the image follows the formula:<br>
 <table>
 <thead>
 <tr class="header">
-<th>Create the initrd with your chosen profile:</th>
+<th>Create the initramdisk with your chosen profile:</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code># archboot-cpio.sh -c /etc/archboot/&lt;profile&gt;.conf -g initrd.img</code></td>
+<td><code># archboot-cpio.sh -c /etc/archboot/&lt;profile&gt;.conf -g initramdisk.img</code></td>
 </tr>
 </tbody>
 </table>
-<p>Add your used <strong>kernel</strong> and <strong>initrd</strong> to your bootloader.</p>
+<p>Add your used <strong>kernel</strong> and <strong>initramdisk</strong> to your bootloader.</p>
 <p style="page-break-after: always"></p>
 <h2 data-number="8.2" id="create-image-files"><span class="header-section-number">8.2</span> Create Image Files</h2>
 <h3 data-number="8.2.1" id="requirements"><span class="header-section-number">8.2.1</span> <strong>Requirement</strong></h3>
 <p>In order to build images you will need around <strong>3G</strong> free space on disk.</p>
 <h3 data-number="8.2.2" id="create-image-files-without-modifications"><span class="header-section-number">8.2.2</span> <strong>Create Image Files Without Modifications</strong></h3>
-<p>This script creates every installation media with latest available core/extra packages and boot/ directory with kernel and initrds.</p>
+<p>This script creates every installation media with latest available core/extra packages and boot/ directory with kernel and initramdisks.</p>
 <strong>Custom OpenSSH Key</strong>: Place your public key to <strong>/etc/archboot/ssh/archboot-key.pub</strong>
 <table>
 <thead>
@@ -1168,7 +1168,7 @@ The calculated size to boot the image follows the formula:<br>
 There are the following configuration files for ISO creation:
 <ul>
 <li><strong>/etc/archboot/defaults</strong>: defaults for packages, bootloader config and server setup.</li>
-<li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the _KERNEL and the _HOOKS, which are used for the initrd.</li>
+<li><strong>/etc/archboot/&lt;profile&gt;.conf</strong>: contains the _KERNEL and the _HOOKS, which are used for the initramdisk.</li>
 </ul>
 <h4 data-number="8.2.3.3" id="archboot-cpio.sh"><span class="header-section-number">8.2.3.3</span> <strong>archboot-cpio.sh</strong></h4>
 The Archboot initramfs toolchain uses its <strong>own</strong> cpio generator. Some differences to other initcpio creators:
@@ -1459,12 +1459,12 @@ Functions supported in <strong>/usr/lib/archboot/cpio/hooks/&lt;hook&gt;</strong
 <table>
 <thead>
 <tr class="header">
-<th>kernel and initrd testing:</th>
+<th>kernel and initramdisk testing:</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$ qemu-system-x86_64 -kernel &lt;kernel&gt; -initrd &lt;initrd&gt; \<br>-append &quot;rootfstype=ramfs&quot; \<br>-machine type=q35,accel=kvm -usb -usbdevice tablet -m &lt;memory&gt;</code></td>
+<td><code>$ qemu-system-x86_64 -kernel &lt;kernel&gt; -initramdisk &lt;initramdisk&gt; \<br>-append &quot;rootfstype=ramfs&quot; \<br>-machine type=q35,accel=kvm -usb -usbdevice tablet -m &lt;memory&gt;</code></td>
 </tr>
 </tbody>
 </table>
