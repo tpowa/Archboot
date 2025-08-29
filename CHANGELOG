@@ -15,7 +15,6 @@ setup:
 - fixed pacman secureboot hook
 - removed bcachefs support
 testsuite:
-- disabled kernel messages during filesystem tests
 - speedup Wi-Fi routine
 - speedup non tracked files routine
 - removed bcachefs support
