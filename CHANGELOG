@@ -5,7 +5,7 @@ Environment:
 - fixed tmpfiles not being created correctly
 - updated getty and serial getty systemd service files
 - removed custom systemd-user-session.service
-- 3cpio 0.10.2
+- 3cpio 0.11.0
 - removed bcachefs support
 init:
 - added loop module to manual module loading array
