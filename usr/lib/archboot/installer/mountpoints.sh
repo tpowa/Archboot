@@ -8,7 +8,6 @@ _destdir_mounts(){
     _CREATE_MOUNTPOINTS=""
     _ROOTDEV=""
     # check if something is mounted on ${_DESTDIR}
-    # bcachefs uses : array for raid devices, kill this one
     _ROOTDEV="$(mount | rg -o "(.*)[:.*, ]on ${_DESTDIR} " -r '$1')"
     # Run mountpoints, if nothing is mounted on ${_DESTDIR}
     if [[ -z "${_ROOTDEV}" ]]; then
@@ -35,9 +34,9 @@ _clear_fs_values() {
 
 # add ssd mount options
 _ssd_optimization() {
-    # bcachefs, btrfs, ext4 and xfs have ssd mount option support
+    # btrfs, ext4 and xfs have ssd mount option support
     _SSD_MOUNT_OPTIONS=""
-    if rg -q 'bcachefs|btrfs|ext4|xfs' <<< "${_FSTYPE}"; then
+    if rg -q 'btrfs|ext4|xfs' <<< "${_FSTYPE}"; then
         # check all underlying devices on ssd
         for i in $(${_LSBLK} NAME,TYPE "${_DEV}" -s 2>"${_NO_LOG}" | rg '.*/(.*) disk$' -r '$1'); do
             # check for ssd
@@ -55,7 +54,6 @@ _select_filesystem() {
     command -v mkfs.ext4 &>"${_NO_LOG}" && _FSOPTS+=(ext4 Ext4)
     command -v mkfs.xfs &>"${_NO_LOG}" && _FSOPTS+=(xfs XFS)
     command -v mkfs.vfat &>"${_NO_LOG}" && [[ ! ${_MP} == "/" ]] && _FSOPTS+=(vfat FAT32)
-    command -v mkfs.bcachefs &>"${_NO_LOG}" && modinfo bcachefs >"${_NO_LOG}" && _FSOPTS+=(bcachefs Bcachefs)
     _dialog --title " Filesystem on ${_DEV} " --no-cancel --menu "" 12 50 10 "${_FSOPTS[@]}" 2>"${_ANSWER}" || return 1
     _FSTYPE=$(cat "${_ANSWER}")
 }
@@ -158,18 +156,8 @@ _run_mkfs() {
         _LABEL_NAME=$(choose -f '\|' 4 <<< "${line}")
         _FS_OPTIONS=$(choose -f '\|' 5 <<< "${line}")
         [[ "${_FS_OPTIONS}" == "NONE" ]] && _FS_OPTIONS=""
-        # bcachefs, btrfs and other parameters
-        if [[ ${_FSTYPE} == "bcachefs" ]]; then
-            _BCFS_USE_DEVS="$(choose -f '\|' 6 <<< "${line}")"
-            _BCFS_COMPRESS=$(choose -f '\|' 7 <<< "${line}")
-            if [[ "${_BCFS_COMPRESS}" == "NONE" ]]; then
-                _BCFS_COMPRESS=""
-            else
-                _BCFS_COMPRESS="--compression=${_BCFS_COMPRESS} --background_compression=${_BCFS_COMPRESS}"
-            fi
-            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-                  "${_BCFS_USE_DEVS}" "${_BCFS_COMPRESS}" || return 1
-        elif [[ ${_FSTYPE} == "btrfs" ]]; then
+        # btrfs and other parameters
+        if [[ ${_FSTYPE} == "btrfs" ]]; then
             _BTRFS_USE_DEVS="$(choose -f '\|' 6 <<< "${line}")"
             # remove # from array
             _BTRFS_LEVEL="$(choose -f '\|' 7 <<< "${line}")"
@@ -213,9 +201,6 @@ _create_filesystem() {
         done
         if [[ "${_FSTYPE}" == "btrfs" ]]; then
             _prepare_btrfs || return 1
-        fi
-        if [[ "${_FSTYPE}" == "bcachefs" ]]; then
-            _prepare_bcfs || return 1
         fi
         _dialog --no-cancel --title " Custom Options " --inputbox "Options passed to filesystem creator, else just leave it empty." 8 70  2>"${_ANSWER}" || return 1
         _FS_OPTIONS="$(cat "${_ANSWER}")"
@@ -403,15 +388,6 @@ _mountpoints() {
                     _check_mkfs_values
                     if [[ "${_FSTYPE}" == "btrfs" ]]; then
                         echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BTRFS_DEVS[*]}|${_BTRFS_LEVEL}|${_BTRFS_SUBVOLUME}|${_BTRFS_COMPRESS}" >>/tmp/.parts
-                    elif [[ "${_FSTYPE}" == "bcachefs" ]]; then
-                        echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}|${_BCFS_DEVS[*]}|${_BCFS_COMPRESS}" >>/tmp/.parts
-                        # remove members of multi devices
-                        if [[ "${_DOMKFS}" == "0" ]]; then
-                            _BCFS_UUID="$(${_LSBLK} UUID -d "${_DEV}")"
-                            for i in $(${_LSBLK} NAME,UUID | rg -o "(.*) ${_BCFS_UUID}" -r '$1'); do
-                                _remove_from_devs "${i}"
-                            done
-                        fi
                     else
                         echo "${_DEV}|${_FSTYPE}|${_MP}|${_DOMKFS}|${_LABEL_NAME}|${_FS_OPTIONS}" >>/tmp/.parts
                     fi
@@ -455,7 +431,6 @@ _mountpoints() {
         return 1
     fi
     _printk on
-    # bcachefs uses : array for raid devices, kill this one
      _ROOTDEV="$(mount | rg -o "(.*)[:.*, ]on ${_DESTDIR} " -r '$1')"
      # write to template
      echo "" >> "${_TEMPLATE}"
@@ -555,7 +530,7 @@ _mkfs() {
     else
         # if we were tasked to create the filesystem, do so
         if [[ "${4}" == "1" ]]; then
-            if [[ "${2}" == "bcachefs" ]] || [[ "${2}" == "btrfs" ]]; then
+            if [[ "${2}" == "btrfs" ]]; then
                 _FS_CREATE=(-f "${7}" -L "${6}" "${8}" "${9}")
             elif [[ "${2}" == "ext4" ]] ; then
                 _FS_CREATE=(-F "${7}" -L "${6}" "${1}")

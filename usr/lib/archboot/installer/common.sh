@@ -97,9 +97,6 @@ _auto_packages() {
     # remove linux-firmware packages first
     IFS=" " read -r -a _PACKAGES <<< "$(sd "linux-firmware.* " "" <<< "${_PACKAGES[@]}")"
     # Add filesystem packages
-    if ${_LSBLK} FSTYPE | rg -q 'bcachefs'; then
-        ! rg -qw 'bcachefs-tools' <<< "${_PACKAGES[@]}" && _PACKAGES+=(bcachefs-tools)
-    fi
     if ${_LSBLK} FSTYPE | rg -q 'btrfs'; then
         ! rg -qw 'btrfs-progs' <<< "${_PACKAGES[@]}" && _PACKAGES+=(btrfs-progs)
     fi

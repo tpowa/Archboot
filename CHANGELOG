@@ -6,16 +6,19 @@ Environment:
 - updated getty and serial getty systemd service files
 - removed custom systemd-user-session.service
 - 3cpio 0.10.2
+- removed bcachefs support
 init:
 - added loop module to manual module loading array
 pacsetup:
 - fixed download URL for mirrorlist
 setup:
 - fixed pacman secureboot hook
+- removed bcachefs support
 testsuite:
 - disabled kernel messages during filesystem tests
 - speedup Wi-Fi routine
 - speedup non tracked files routine
+- removed bcachefs support
 ---
 Highlights 2025.07:
 - updated IPXE to 20250723

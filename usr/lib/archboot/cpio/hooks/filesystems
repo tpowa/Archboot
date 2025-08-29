@@ -4,13 +4,13 @@
 
 _run ()
 {
-    _map _binary badblocks bcachefs blkmapd btrfs-{find-root,image,map-logical,select-super} btrfs{,ck,tune} \
+    _map _binary badblocks blkmapd btrfs-{find-root,image,map-logical,select-super} btrfs{,ck,tune} \
                  chattr cifscreds cifs.{idmap,upcall} compile_et debugfs \
                  dosfsck dosfslabel dump.exfat dumpe2fs e2{freefrag,fsck,image,label,\
 mmpstatus,scrub,scrub_all,undo} e4{crypt,defrag} exfatlabel fatlabel findfs fsck \
-                 logsave resize2fs lsattr filefrag fsck.{bcachefs,btrfs,exfat,ext4,\
-msdos,vfat,xfs} fs{freeze,trim} getcifsacl mk{_cmds,dosfs,e2fs,swap} mkfs.{bcachefs,\
-exfat,ext4,msdos,vfat,xfs} mount.{bcachefs,cifs,smb3} nfs{conf,idmap} mmc nfsv4.exportd \
+                 logsave resize2fs lsattr filefrag fsck.{btrfs,exfat,ext4,\
+msdos,vfat,xfs} fs{freeze,trim} getcifsacl mk{_cmds,dosfs,e2fs,swap} mkfs.{exfat,\
+ext4,msdos,vfat,xfs} mount.{cifs,smb3} nfs{conf,idmap} mmc nfsv4.exportd \
                  nvme setcifsacl tune.exfat tune2fs wipefs xfs_{admin,bmap,copy,db,estimate,freeze,fsr,\
 growfs,info,io,logprint,metadump,mdrestore,mkfile,ncheck,property,protofile,quota,repair,rtcp,spaceman}
     _map _full_dir /etc/{cifs-utils,request-key.d,nvme}
@@ -19,4 +19,3 @@ growfs,info,io,logprint,metadump,mdrestore,mkfile,ncheck,property,protofile,quot
     # add partclone
     _map _binary partclone.{btrfs,chkimg,dd,exfat,ext4,ext4dev,extfs,fat,fat12,fat16,fat32,imager,info,restore,vfat,xfs}
 }
-

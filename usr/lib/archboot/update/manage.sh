@@ -237,7 +237,7 @@ _download_latest_task() {
         ${_DLPROG} -o "${_RUN}/${i}" "${_SOURCE}${_RUN}/${i}?inline=false"
     done
     # setup libs
-    LIBS="autoconfiguration.sh quicksetup.sh base.sh bcachefs.sh blockdevices.sh bootloader.sh \
+    LIBS="autoconfiguration.sh quicksetup.sh base.sh blockdevices.sh bootloader.sh \
             bootloader_sb.sh bootloader_grub.sh bootloader_uki.sh bootloader_systemd_bootd.sh \
             bootloader_limine.sh bootloader_pacman_hooks.sh bootloader_refind.sh \
             bootloader_uboot.sh btrfs.sh common.sh \

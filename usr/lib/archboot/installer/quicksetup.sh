@@ -78,13 +78,8 @@ _auto_create_filesystems() {
         _BTRFS_LEVEL=""
         _BTRFS_SUBVOLUME=""
         _BTRFS_COMPRESS=""
-        # bcachefs, btrfs and other parameters
-        if [[ "${_FSTYPE}" == "bcachefs" ]]; then
-            _BCFS_DEVS="${_DEV}"
-            _BCFS_COMPRESS=""
-            _mkfs "${_DEV}" "${_FSTYPE}" "${_DESTDIR}" "${_DOMKFS}" "${_MP}" "${_LABEL_NAME}" "${_FS_OPTIONS}" \
-                   "${_BCFS_DEVS}" "${_BCFS_COMPRESS}" || return 1
-        elif [[ "${_FSTYPE}" == "btrfs" ]]; then
+        # btrfs and other parameters
+        if [[ "${_FSTYPE}" == "btrfs" ]]; then
             _BTRFS_DEVS="${_DEV}"
             [[ "${_MP}" == "/" ]] && _BTRFS_SUBVOLUME="root"
             [[ "${_MP}" == "/home" ]] && _BTRFS_SUBVOLUME="home"
@@ -158,7 +153,6 @@ _autoprepare() {
         command -v mkfs.btrfs &>"${_NO_LOG}" && _FSOPTS+=(btrfs Btrfs)
         command -v mkfs.ext4 &>"${_NO_LOG}" && _FSOPTS+=(ext4 Ext4)
         command -v mkfs.xfs &>"${_NO_LOG}" && _FSOPTS+=(xfs XFS)
-        command -v mkfs.bcachefs &>"${_NO_LOG}" && modinfo bcachefs >"${_NO_LOG}" && _FSOPTS+=(bcachefs Bcachefs)
         _DEV_NUM=0
         # create 2M bios_grub partition for grub BIOS GPT support
         if [[ -n "${_GUIDPARAMETER}" ]]; then

@@ -145,10 +145,7 @@ for i in $(pacman -Ql "${_ALL_PACKAGES[@]}" | rg -o '/usr/share/licenses/.*'); d
 done
 _result license-error.log
 _run_test "filesystems"
-# disable kernel messages
-# bcachefs prints kernel messages
-_printk off
-for i in bcachefs btrfs ext4 swap vfat xfs; do
+for i in btrfs ext4 swap vfat xfs; do
     _losetup
     if [[ "${i}" == "swap" ]]; then
         echo -n "${i} "
@@ -166,8 +163,6 @@ for i in bcachefs btrfs ext4 swap vfat xfs; do
     fi
     _losetup_stop
 done
-# enable kernel messages
-_printk on
 _result filesystems-error.log
 _run_test "blockdevices"
 echo -n "mdadm "
