@@ -9,6 +9,8 @@ Environment:
 - removed bcachefs support
 init:
 - added loop module to manual module loading array
+manage:
+- switch to kexec autodetection of supported mode
 pacsetup:
 - fixed download URL for mirrorlist
 setup:

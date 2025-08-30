@@ -348,8 +348,8 @@ _new_environment() {
         [[ "$(($(stat -c %s "${_RAM}/${_INITRD}")*200/100000))" -lt "$(_available_ram)" ]] && break
         sleep 1
     done
-    _progress "100" "Restarting with KEXEC_LOAD..."
-    kexec -c -f "${_RAM}/${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
+    _progress "100" "Restarting with KEXEC..."
+    kexec -a -f "${_RAM}/${_VMLINUZ}" --initrd="${_RAM}/${_INITRD}" --reuse-cmdline &
     while true; do
         _clean_kernel_cache
         sleep 1
