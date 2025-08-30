@@ -8,7 +8,7 @@ Environment:
 - 3cpio 0.11.0
 - removed bcachefs support
 grub:
-- rename and reorder menu points
+- updated grub menu points
 init:
 - added loop module to manual module loading array
 manage:
