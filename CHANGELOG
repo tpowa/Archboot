@@ -1,6 +1,10 @@
-On the road to 2025.08:
-Environment:
+On the road to 2025.09:
+ISO:
+- updated ISO grub config
+---
+Highlights 2025.08:
 - kernel 6.16.x
+Environment:
 - added systemd 258.x compatibility
 - fixed tmpfiles not being created correctly
 - updated getty and serial getty systemd service files
