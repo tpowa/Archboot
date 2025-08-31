@@ -2,7 +2,7 @@ On the road to 2025.09:
 ISO:
 - updated ISO grub config
 manage:
-- switch to kexec autodetection of supported mode
+- switched to kexec autodetection of supported mode
 ---
 Highlights 2025.08:
 - kernel 6.16.x
