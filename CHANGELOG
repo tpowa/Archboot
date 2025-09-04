@@ -1,7 +1,9 @@
 On the road to 2025.09:
+Environment:
+- updated IPXE to 20250829
 ISO:
 - updated ISO grub config
-- limit memory to 4G in UEFI MIX MODE
+- limit memory to 4G in UEFI MIX MODE to avoid NX issue
 manage:
 - switched to kexec autodetection of supported mode
 ---
