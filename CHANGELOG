@@ -1,7 +1,7 @@
 On the road to 2025.09:
 ISO:
 - updated ISO grub config
-- disable NX kernel protection in UEFI MIX MODE
+- limit memory to 4G in UEFI MIX MODE
 manage:
 - switched to kexec autodetection of supported mode
 ---
