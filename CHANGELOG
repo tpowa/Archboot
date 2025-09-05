@@ -7,6 +7,9 @@ ISO:
 - switched to build ISO grub during image assembling
 manage:
 - switched to kexec autodetection of supported mode
+tools:
+- removed archboot-bootloader.sh script
+- removed archboot-qemu.sh script
 ---
 Highlights 2025.08:
 - kernel 6.16.x
