@@ -109,12 +109,12 @@ _prepare_doc() {
 _prepare_ucode() {
     # only x86_64
     if [[ "${_ARCH}" == "x86_64" ]]; then
-        echo "Preparing intel-ucode..."
+        echo "Preparing UCODE Intel..."
         cp "/${_INTEL_UCODE}" "${_ISODIR}/boot/"
     fi
     # both x86_64 and aarch64
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
-        echo "Preparing amd-ucode..."
+        echo "Preparing UCODE AMD..."
         cp "/${_AMD_UCODE}" "${_ISODIR}/boot/"
     fi
 }
@@ -163,7 +163,7 @@ _prepare_bootloaders() {
 }
 
 _prepare_uefi_image() {
-    echo "Preparing UEFI VFAT image..."
+    echo "Generating UEFI VFAT image..."
     ## get size of boot files
     # 2048 first sector
     # 8192 to avoid disk full errors
@@ -200,7 +200,7 @@ EOF
 }
 
 _prepare_release_txt() {
-    echo "Preparing Release.txt..."
+    echo "Generating Release.txt..."
     (echo "ARCHBOOT - ARCH LINUX INSTALLATION / RESCUE SYSTEM"
     echo "archboot.com | (c) 2006 - $(date +%Y)"
     echo "Tobias Powalowski <tpowa@archlinux.org>"
