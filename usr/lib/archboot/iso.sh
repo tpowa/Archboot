@@ -149,7 +149,7 @@ _prepare_efi_bootloaders() {
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim x64 signed files from fedora
     for i in ${_UEFI_ARCH}; do
-        _CAP_I=$(tr '[:lower:]' '[:upper:]' "${i}")
+        _CAP_I=$(echo "${i}" | tr '[:lower:]' '[:upper:]')
         echo "Preparing ${_CAP_I} Fedora SHIM and IPXE..."
         cp "${_BOOTLOADER}/ipxe${i}.efi" "${_ISODIR}/EFI/BOOT/IPXE${_CAP_I}.EFI"
         cp "${_BOOTLOADER}/mm${i}.efi" "${_ISODIR}/EFI/BOOT/MM${_CAP_I}.EFI"
