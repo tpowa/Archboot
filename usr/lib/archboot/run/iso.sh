@@ -16,18 +16,10 @@ if rg -qw 'aarch64' <<< "${_BASENAME}" || rg -qw 'x86_64' <<< "${_BASENAME}"; th
     _prepare_kernel_initrd_files || exit 1
     _prepare_doc || exit 1
     _prepare_ucode || exit 1
-    if rg -qw 'aarch64' <<< "${_BASENAME}"; then
-        _prepare_fedora_shim_bootloaders_aarch64 || exit 1
-        _prepare_grub || exit 1
-        _prepare_ipxe_AA64 || exit 1
-    fi
+    _prepare_efi_bootloaders || exit 1
     if rg -qw 'x86_64' <<< "${_BASENAME}"; then
-        _prepare_fedora_shim_bootloaders_x86_64 || exit 1
+        _prepare_bios_ipxe || exit 1
         _prepare_uefi_shell_tianocore || exit 1
-        _prepare_grub || exit 1
-        _prepare_ipxe_IA32 || exit 1
-        _prepare_ipxe_X64 || exit 1
-        _prepare_ipxe || exit 1
         _prepare_memtest || exit 1
     fi
     _prepare_background || exit 1

@@ -119,24 +119,6 @@ _prepare_ucode() {
     fi
 }
 
-_prepare_fedora_shim_bootloaders_x86_64 () {
-    echo "Preparing fedora shim..."
-    # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
-    # add shim x64 signed files from fedora
-    cp "${_BOOTLOADER}/mmx64.efi" "${_ISODIR}/EFI/BOOT/MMX64.EFI"
-    cp "${_BOOTLOADER}/bootx64.efi" "${_ISODIR}/EFI/BOOT/BOOTX64.EFI"
-    cp "${_BOOTLOADER}/mmia32.efi" "${_ISODIR}/EFI/BOOT/MMIA32.EFI"
-    cp "${_BOOTLOADER}/bootia32.efi" "${_ISODIR}/EFI/BOOT/BOOTIA32.EFI"
-}
-
-_prepare_fedora_shim_bootloaders_aarch64 () {
-    echo "Preparing fedora shim..."
-    # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
-    # add shim aa64 signed files from fedora
-    cp "${_BOOTLOADER}/mmaa64.efi" "${_ISODIR}/EFI/BOOT/MMAA64.EFI"
-    cp "${_BOOTLOADER}/bootaa64.efi" "${_ISODIR}/EFI/BOOT/BOOTAA64.EFI"
-}
-
 _prepare_uefi_shell_tianocore() {
     echo "Preparing UEFI shell..."
     ## Installing Tianocore UDK/EDK2 UEFI X64 "Full Shell"
@@ -145,12 +127,15 @@ _prepare_uefi_shell_tianocore() {
     cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLIA32.EFI"
 }
 
-_prepare_grub() {
+_prepare_efi_bootloaders() {
     if [[ ${_ARCH} == "x86_64" ]]; then
         _GRUB_ARCH="i386-efi x86_64-efi"
+        _UEFI_ARCH="ia32 x64"
     elif [[ ${_ARCH} == "aarch64" ]]; then
         _GRUB_ARCH="arm64-efi"
+        _UEFI_ARCH="aa64"
     fi
+    # Grub
     for i in ${_GRUB_ARCH}; do
         [[ "${i}" == "i386-efi" ]] && _GRUB_EFI="${_ISODIR}/EFI/BOOT/GRUBIA32.EFI"
         [[ "${i}" == "x86_64-efi" ]] && _GRUB_EFI="${_ISODIR}/EFI/BOOT/GRUBX64.EFI"
@@ -158,27 +143,22 @@ _prepare_grub() {
         echo "Preparing ${i} grub..."
         grub-mkstandalone -d "/usr/lib/grub/${i}" -O "${i}" \
         --sbat=/usr/share/grub/sbat.csv --fonts=ter-u16n --locales="" --themes="" \
-        -o "${_GRUB_EFI}" "boot/grub/grub.cfg=${_GRUB_ISO}" &>${_NO_LOG}
+        -o "${_GRUB_EFI}" "boot/grub/grub.cfg=${_GRUB_ISO}" &>"${_NO_LOG}"
+    done
+    # SHIM and IPXE
+    # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
+    # add shim x64 signed files from fedora
+    for i in ${_UEFI_ARCH}; do
+        _CAP_I=$(tr '[:lower:]' '[:upper:]' "${i}")
+        echo "Preparing ${_CAP_I} Fedora SHIM and IPXE..."
+        cp "${_BOOTLOADER}/ipxe${i}.efi" "${_ISODIR}/EFI/BOOT/IPXE${_CAP_I}.EFI"
+        cp "${_BOOTLOADER}/mm${i}.efi" "${_ISODIR}/EFI/BOOT/MM${_CAP_I}.EFI"
+        cp "${_BOOTLOADER}/boot${i}.efi" "${_ISODIR}/EFI/BOOT/BOOT${_CAP_I}.EFI"
     done
 }
 
-_prepare_ipxe_IA32() {
-    echo "Preparing IA32 IPXE..."
-    cp "${_BOOTLOADER}/ipxeia32.efi" "${_ISODIR}/EFI/BOOT/IPXEIA32.EFI"
-}
-
-_prepare_ipxe_X64() {
-    echo "Preparing X64 IPXE..."
-    cp "${_BOOTLOADER}/ipxex64.efi" "${_ISODIR}/EFI/BOOT/IPXEX64.EFI"
-}
-
-_prepare_ipxe_AA64() {
-    echo "Preparing AA64 IPXE..."
-    cp "${_BOOTLOADER}/ipxeaa64.efi" "${_ISODIR}/EFI/BOOT/IPXEAA64.EFI"
-}
-
-_prepare_ipxe() {
-    echo "Preparing IPXE..."
+_prepare_bios_ipxe() {
+    echo "Preparing Bios IPXE..."
     cp "${_BOOTLOADER}/ipxe.lkrn" "${_ISODIR}/boot/"
 }
 
