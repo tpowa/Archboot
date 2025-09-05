@@ -1,1 +1,0 @@
-../lib/archboot/run/server-release.sh

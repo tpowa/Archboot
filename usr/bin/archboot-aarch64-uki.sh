@@ -1,1 +1,0 @@
-../lib/archboot/run/uki.sh

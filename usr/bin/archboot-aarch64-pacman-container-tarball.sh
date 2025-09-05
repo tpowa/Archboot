@@ -1,1 +1,0 @@
-../lib/archboot/run/container-tarball.sh
