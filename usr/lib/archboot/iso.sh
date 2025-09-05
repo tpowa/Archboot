@@ -128,10 +128,10 @@ _prepare_bootloaders() {
         echo "Preparing BIOS Memtest86+..."
         cp /boot/memtest86+/memtest.bin "${_ISODIR}/boot/"
         # Installing Tianocore UDK/EDK2 UEFI X64 "Full Shell"
-        echo "Preparing UEFI EDK2 Shell X64..."
-        cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLX64.EFI"
         echo "Preparing UEFI EDK2 Shell IA32..."
         cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLIA32.EFI"
+        echo "Preparing UEFI EDK2 Shell X64..."
+        cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLX64.EFI"
         echo "Preparing UEFI Memtest86+..."
         cp /boot/memtest86+/memtest.efi "${_ISODIR}/EFI/TOOLS/MEMTEST.EFI"
     elif [[ ${_ARCH} == "aarch64" ]]; then
