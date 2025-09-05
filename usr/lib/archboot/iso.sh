@@ -107,15 +107,15 @@ _prepare_doc() {
 }
 
 _prepare_ucode() {
-    # only x86_64
-    if [[ "${_ARCH}" == "x86_64" ]]; then
-        echo "Preparing UCODE Intel..."
-        cp "/${_INTEL_UCODE}" "${_ISODIR}/boot/"
-    fi
     # both x86_64 and aarch64
     if ! [[ "${_ARCH}" == "riscv64" ]]; then
         echo "Preparing UCODE AMD..."
         cp "/${_AMD_UCODE}" "${_ISODIR}/boot/"
+    fi
+    # only x86_64
+    if [[ "${_ARCH}" == "x86_64" ]]; then
+        echo "Preparing UCODE Intel..."
+        cp "/${_INTEL_UCODE}" "${_ISODIR}/boot/"
     fi
 }
 
@@ -127,12 +127,13 @@ _prepare_bootloaders() {
         cp "${_BOOTLOADER}/ipxe.lkrn" "${_ISODIR}/boot/"
         echo "Preparing BIOS Memtest86+..."
         cp /boot/memtest86+/memtest.bin "${_ISODIR}/boot/"
+        # Installing Tianocore UDK/EDK2 UEFI X64 "Full Shell"
+        echo "Preparing UEFI EDK2 Shell X64..."
+        cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLX64.EFI"
+        echo "Preparing UEFI EDK2 Shell IA32..."
+        cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLIA32.EFI"
         echo "Preparing UEFI Memtest86+..."
         cp /boot/memtest86+/memtest.efi "${_ISODIR}/EFI/TOOLS/MEMTEST.EFI"
-        # Installing Tianocore UDK/EDK2 UEFI X64 "Full Shell"
-        echo "Preparing UEFI EDK2 Shell X64 and IA32..."
-        cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLX64.EFI"
-        cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLIA32.EFI"
     elif [[ ${_ARCH} == "aarch64" ]]; then
         _GRUB_ARCH="arm64-efi"
         _UEFI_ARCH="aa64"
@@ -147,7 +148,6 @@ _prepare_bootloaders() {
         --sbat=/usr/share/grub/sbat.csv --fonts=ter-u16n --locales="" --themes="" \
         -o "${_GRUB_EFI}" "boot/grub/grub.cfg=${_GRUB_ISO}" &>"${_NO_LOG}"
     done
-    echo "Preparing Grub background..."
     [[ -d "${_ISODIR}/boot/grub" ]] || mkdir -p "${_ISODIR}/boot/grub"
     cp "${_GRUB_BACKGROUND}" "${_ISODIR}/boot/grub/archboot-background.png"
     # UEFI SHIM and UEFI IPXE
@@ -155,8 +155,9 @@ _prepare_bootloaders() {
     # use Microsoft signed SHIM files from Fedora
     for i in ${_UEFI_ARCH}; do
         _CAP_I=$(echo "${i}" | tr '[:lower:]' '[:upper:]')
-        echo "Preparing UEFI SHIM Fedora ${_CAP_I} and UEFI IPXE ${_CAP_I}..."
+        echo "Preparing UEFI IPXE ${_CAP_I}..."
         cp "${_BOOTLOADER}/ipxe${i}.efi" "${_ISODIR}/EFI/BOOT/IPXE${_CAP_I}.EFI"
+        echo "Preparing UEFI SHIM Fedora ${_CAP_I}..."
         cp "${_BOOTLOADER}/mm${i}.efi" "${_ISODIR}/EFI/BOOT/MM${_CAP_I}.EFI"
         cp "${_BOOTLOADER}/boot${i}.efi" "${_ISODIR}/EFI/BOOT/BOOT${_CAP_I}.EFI"
     done
