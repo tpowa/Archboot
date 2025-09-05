@@ -124,9 +124,9 @@ _prepare_fedora_shim_bootloaders_x86_64 () {
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim x64 signed files from fedora
     cp "${_BOOTLOADER}/mmx64.efi" "${_ISODIR}/EFI/BOOT/MMX64.EFI"
-    cp "${_BOOTLOADER}/BOOTX64.efi" "${_ISODIR}/EFI/BOOT/BOOTX64.EFI"
+    cp "${_BOOTLOADER}/bootx64.efi" "${_ISODIR}/EFI/BOOT/BOOTX64.EFI"
     cp "${_BOOTLOADER}/mmia32.efi" "${_ISODIR}/EFI/BOOT/MMIA32.EFI"
-    cp "${_BOOTLOADER}/BOOTIA32.efi" "${_ISODIR}/EFI/BOOT/BOOTIA32.EFI"
+    cp "${_BOOTLOADER}/bootia32.efi" "${_ISODIR}/EFI/BOOT/BOOTIA32.EFI"
 }
 
 _prepare_fedora_shim_bootloaders_aarch64 () {
@@ -134,7 +134,7 @@ _prepare_fedora_shim_bootloaders_aarch64 () {
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim aa64 signed files from fedora
     cp "${_BOOTLOADER}/mmaa64.efi" "${_ISODIR}/EFI/BOOT/MMAA64.EFI"
-    cp "${_BOOTLOADER}/BOOTAA64.efi" "${_ISODIR}/EFI/BOOT/BOOTAA64.EFI"
+    cp "${_BOOTLOADER}/bootaa64.efi" "${_ISODIR}/EFI/BOOT/BOOTAA64.EFI"
 }
 
 _prepare_uefi_shell_tianocore() {
