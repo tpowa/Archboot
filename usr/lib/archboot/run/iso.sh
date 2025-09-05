@@ -11,10 +11,14 @@ _architecture_check
 _config
 _ISODIR="$(mktemp -d ISODIR.XXX)"
 if rg -qw 'aarch64' <<< "${_BASENAME}" || rg -qw 'x86_64' <<< "${_BASENAME}"; then
-    # running system = aarch64 or x86_64
     echo "Starting ISO creation..."
-    _prepare_kernel_initrd_files || exit 1
-    _prepare_doc || exit 1
+else
+    echo "Starting Image creation..."
+fi
+_prepare_kernel_initrd_files || exit 1
+_prepare_doc || exit 1
+if rg -qw 'aarch64' <<< "${_BASENAME}" || rg -qw 'x86_64' <<< "${_BASENAME}"; then
+    # running system = aarch64 or x86_64
     _prepare_ucode || exit 1
     _prepare_bootloaders || exit 1
     _reproducibility "${_ISODIR}"
@@ -25,9 +29,6 @@ if rg -qw 'aarch64' <<< "${_BASENAME}" || rg -qw 'x86_64' <<< "${_BASENAME}"; th
     _unify_gpt_partitions || exit 1
 else
     # running system = riscv64
-    echo "Starting Image creation..."
-    _prepare_kernel_initrd_files || exit 1
-    _prepare_doc || exit 1
     _prepare_extlinux_conf || exit 1
     _reproducibility "${_ISODIR}"
     _uboot || exit 1
