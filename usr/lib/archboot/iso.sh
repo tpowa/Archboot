@@ -150,9 +150,9 @@ _prepare_bootloaders() {
     echo "Preparing Grub background..."
     [[ -d "${_ISODIR}/boot/grub" ]] || mkdir -p "${_ISODIR}/boot/grub"
     cp "${_GRUB_BACKGROUND}" "${_ISODIR}/boot/grub/archboot-background.png"
-    # SHIM and IPXE
+    # UEFI SHIM and UEFI IPXE
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
-    # add shim x64 signed files from fedora
+    # use Microsoft signed SHIM files from Fedora
     for i in ${_UEFI_ARCH}; do
         _CAP_I=$(echo "${i}" | tr '[:lower:]' '[:upper:]')
         echo "Preparing UEFI SHIM Fedora ${_CAP_I} and UEFI IPXE ${_CAP_I}..."
@@ -268,7 +268,7 @@ _grub_mkrescue() {
                   --modification-date=1970010100000000 --compress=xz --fonts="ter-u16n" \
                   --locales="" --themes="" -o "${_IMAGENAME}.iso" "${_ISODIR}"/ \
                   "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" \
-                  "boot/grub/grub.cfg=/usr/share/archboot/grub/archboot-iso-grub.cfg" \
+                  "boot/grub/grub.cfg=${_GRUB_ISO}" \
                   -volid "ARCHBOOT" -J -- -rm_r /boot/{firmware,grub/{roms,locale}} /efi .disk/ \
                   "${_RESCUE_REMOVE[@]}" &> "${_IMAGENAME}.log"
 }
