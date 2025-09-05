@@ -16,13 +16,7 @@ if rg -qw 'aarch64' <<< "${_BASENAME}" || rg -qw 'x86_64' <<< "${_BASENAME}"; th
     _prepare_kernel_initrd_files || exit 1
     _prepare_doc || exit 1
     _prepare_ucode || exit 1
-    _prepare_efi_bootloaders || exit 1
-    if rg -qw 'x86_64' <<< "${_BASENAME}"; then
-        _prepare_bios_ipxe || exit 1
-        _prepare_uefi_shell_tianocore || exit 1
-        _prepare_memtest || exit 1
-    fi
-    _prepare_background || exit 1
+    _prepare_bootloaders || exit 1
     _reproducibility "${_ISODIR}"
     _prepare_uefi_image || exit 1
     _prepare_release_txt || exit 1

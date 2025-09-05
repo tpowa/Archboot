@@ -119,59 +119,47 @@ _prepare_ucode() {
     fi
 }
 
-_prepare_uefi_shell_tianocore() {
-    echo "Preparing UEFI shell..."
-    ## Installing Tianocore UDK/EDK2 UEFI X64 "Full Shell"
-    cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLX64.EFI"
-    ## Installing Tianocore UDK/EDK2 UEFI IA32 "Full Shell"
-    cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLIA32.EFI"
-}
-
-_prepare_efi_bootloaders() {
+_prepare_bootloaders() {
     if [[ ${_ARCH} == "x86_64" ]]; then
         _GRUB_ARCH="i386-efi x86_64-efi"
         _UEFI_ARCH="ia32 x64"
+        echo "Preparing BIOS IPXE..."
+        cp "${_BOOTLOADER}/ipxe.lkrn" "${_ISODIR}/boot/"
+        echo "Preparing BIOS Memtest86+..."
+        cp /boot/memtest86+/memtest.bin "${_ISODIR}/boot/"
+        echo "Preparing UEFI Memtest86+..."
+        cp /boot/memtest86+/memtest.efi "${_ISODIR}/EFI/TOOLS/MEMTEST.EFI"
+        # Installing Tianocore UDK/EDK2 UEFI X64 "Full Shell"
+        echo "Preparing EDK2 UEFI Shell X64 and IA32..."
+        cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLX64.EFI"
+        cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLIA32.EFI"
     elif [[ ${_ARCH} == "aarch64" ]]; then
         _GRUB_ARCH="arm64-efi"
         _UEFI_ARCH="aa64"
     fi
-    # Grub
+    # UEFI Grub
     for i in ${_GRUB_ARCH}; do
         [[ "${i}" == "i386-efi" ]] && _GRUB_EFI="${_ISODIR}/EFI/BOOT/GRUBIA32.EFI"
         [[ "${i}" == "x86_64-efi" ]] && _GRUB_EFI="${_ISODIR}/EFI/BOOT/GRUBX64.EFI"
         [[ "${i}" == "arm64-efi" ]] && _GRUB_EFI="${_ISODIR}/EFI/BOOT/GRUBAA64.EFI"
-        echo "Preparing ${i} grub..."
+        echo "Preparing UEFI Grub ${i}..."
         grub-mkstandalone -d "/usr/lib/grub/${i}" -O "${i}" \
         --sbat=/usr/share/grub/sbat.csv --fonts=ter-u16n --locales="" --themes="" \
         -o "${_GRUB_EFI}" "boot/grub/grub.cfg=${_GRUB_ISO}" &>"${_NO_LOG}"
     done
+    echo "Preparing Grub background..."
+    [[ -d "${_ISODIR}/boot/grub" ]] || mkdir -p "${_ISODIR}/boot/grub"
+    cp "${_GRUB_BACKGROUND}" "${_ISODIR}/boot/grub/archboot-background.png"
     # SHIM and IPXE
     # Details on shim https://www.rodsbooks.com/efi-bootloaders/secureboot.html#initial_shim
     # add shim x64 signed files from fedora
     for i in ${_UEFI_ARCH}; do
         _CAP_I=$(echo "${i}" | tr '[:lower:]' '[:upper:]')
-        echo "Preparing ${_CAP_I} Fedora SHIM and IPXE..."
+        echo "Preparing UEFI SHIM Fedora ${_CAP_I} and UEFI IPXE ${_CAP_I}..."
         cp "${_BOOTLOADER}/ipxe${i}.efi" "${_ISODIR}/EFI/BOOT/IPXE${_CAP_I}.EFI"
         cp "${_BOOTLOADER}/mm${i}.efi" "${_ISODIR}/EFI/BOOT/MM${_CAP_I}.EFI"
         cp "${_BOOTLOADER}/boot${i}.efi" "${_ISODIR}/EFI/BOOT/BOOT${_CAP_I}.EFI"
     done
-}
-
-_prepare_bios_ipxe() {
-    echo "Preparing Bios IPXE..."
-    cp "${_BOOTLOADER}/ipxe.lkrn" "${_ISODIR}/boot/"
-}
-
-_prepare_memtest() {
-    echo "Preparing memtest86+..."
-    cp /boot/memtest86+/memtest.bin "${_ISODIR}/boot/"
-    cp /boot/memtest86+/memtest.efi "${_ISODIR}/EFI/TOOLS/MEMTEST.EFI"
-}
-
-_prepare_background() {
-    echo "Preparing grub background..."
-    [[ -d "${_ISODIR}/boot/grub" ]] || mkdir -p "${_ISODIR}/boot/grub"
-    cp "${_GRUB_BACKGROUND}" "${_ISODIR}/boot/grub/archboot-background.png"
 }
 
 _prepare_uefi_image() {
