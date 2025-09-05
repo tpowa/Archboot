@@ -130,7 +130,7 @@ _prepare_bootloaders() {
         echo "Preparing UEFI Memtest86+..."
         cp /boot/memtest86+/memtest.efi "${_ISODIR}/EFI/TOOLS/MEMTEST.EFI"
         # Installing Tianocore UDK/EDK2 UEFI X64 "Full Shell"
-        echo "Preparing EDK2 UEFI Shell X64 and IA32..."
+        echo "Preparing UEFI EDK2 Shell X64 and IA32..."
         cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLX64.EFI"
         cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLIA32.EFI"
     elif [[ ${_ARCH} == "aarch64" ]]; then
@@ -163,7 +163,7 @@ _prepare_bootloaders() {
 }
 
 _prepare_uefi_image() {
-    echo "Preparing UEFI image..."
+    echo "Preparing UEFI VFAT image..."
     ## get size of boot files
     # 2048 first sector
     # 8192 to avoid disk full errors
