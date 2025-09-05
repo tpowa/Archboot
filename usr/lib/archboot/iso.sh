@@ -3,6 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
 _BOOTLOADER="/usr/share/archboot/bootloader"
+_GRUB_ISO="/usr/share/archboot/grub/archboot-iso-grub.cfg"
 
 _usage () {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create ${_ARCH} ISO Image\e[m"
@@ -144,21 +145,21 @@ _prepare_uefi_shell_tianocore() {
     cp /usr/share/edk2-shell/ia32/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLIA32.EFI"
 }
 
-# build grubXXX with all modules: http://bugs.archlinux.org/task/71382
-_prepare_grub_X64() {
-    echo "Preparing X64 grub..."
-    cp "${_BOOTLOADER}/grubx64.efi" "${_ISODIR}/EFI/BOOT/GRUBX64.EFI"
-}
-
-_prepare_grub_IA32() {
-    echo "Preparing IA32 grub..."
-    cp "${_BOOTLOADER}/grubia32.efi" "${_ISODIR}/EFI/BOOT/GRUBIA32.EFI"
-}
-
-# build grubXXX with all modules: http://bugs.archlinux.org/task/71382
-_prepare_grub_AA64() {
-    echo "Preparing AA64 grub..."
-    cp "${_BOOTLOADER}/grubaa64.efi" "${_ISODIR}/EFI/BOOT/GRUBAA64.EFI"
+_prepare_grub() {
+    if [[ ${_ARCH} == "x86_64" ]]; then
+        _GRUB_ARCH="i386-efi x86_64-efi"
+    elif [[ ${_ARCH} == "aarch64" ]]; then
+        _GRUB_ARCH="arm64-efi"
+    fi
+    for i in ${_GRUB_ARCH}; do
+        [[ "${i}" == "i386-efi" ]] && _GRUB_EFI="${_ISODIR}/EFI/BOOT/GRUBIA32.EFI"
+        [[ "${i}" == "x86_64-efi" ]] && _GRUB_EFI="${_ISODIR}/EFI/BOOT/GRUBX64.EFI"
+        [[ "${i}" == "arm64-efi" ]] && _GRUB_EFI="${_ISODIR}/EFI/BOOT/GRUBAA64.EFI"
+        echo "Preparing ${i} grub..."
+        grub-mkstandalone -d "/usr/lib/grub/${i}" -O "${i}" \
+        --sbat=/usr/share/grub/sbat.csv --fonts=ter-u16n --locales="" --themes="" \
+        -o "${_GRUB_EFI}" "boot/grub/grub.cfg=${_GRUB_ISO}" &>${_NO_LOG}
+    done
 }
 
 _prepare_ipxe_IA32() {
