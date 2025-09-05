@@ -11,13 +11,14 @@ _architecture_check
 _config
 _ISODIR="$(mktemp -d ISODIR.XXX)"
 if rg -qw 'aarch64' <<< "${_BASENAME}" || rg -qw 'x86_64' <<< "${_BASENAME}"; then
-    echo "Starting ISO creation..."
+    _I_TYPE="ISO"
 else
-    echo "Starting Image creation..."
+    _I_TYPE="Image"
 fi
+echo "Starting ${_I_TYPE} creation..."
 _prepare_kernel_initrd_files || exit 1
 _prepare_doc || exit 1
-if rg -qw 'aarch64' <<< "${_BASENAME}" || rg -qw 'x86_64' <<< "${_BASENAME}"; then
+if [[ "${_I_TYPE}" == "ISO" ]]; then
     # running system = aarch64 or x86_64
     _prepare_ucode || exit 1
     _prepare_bootloaders || exit 1
@@ -35,8 +36,4 @@ else
 fi
 _create_cksum || exit 1
 _cleanup_iso || exit 1
-if rg -qw 'aarch64' <<< "${_BASENAME}" || rg -qw 'x86_64' <<< "${_BASENAME}"; then
-    echo "Finished ISO creation."
-else
-    echo "Finished Image creation."
-fi
+echo "Finished ${_I_TYPE} creation."
