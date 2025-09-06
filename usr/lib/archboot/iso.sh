@@ -41,7 +41,7 @@ _config() {
     . "${_CONFIG}"
     #shellcheck disable=SC2116,2086
     _KERNEL="$(echo ${_KERNEL})"
-    [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver "${_KERNEL}")-${_ARCH}"
+    [[ -z "${_IMAGENAME}" ]] && _IMAGENAME="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver ${_KERNEL})-${_ARCH}"
 }
 
 ### EFI status of RISCV64:
