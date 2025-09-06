@@ -38,8 +38,9 @@ _config() {
     #shellcheck disable=SC1090
     . "${_CONFIG}"
     # aarch64 .gz kernel is not supported!
+    #shellcheck disable=SC2086
     _KERNEL="$(echo ${_KERNEL} | sd '\.gz' '')"
-    [[ -z "${_UKI}" ]] && export _UKI="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver ${_KERNEL})-${_ARCH}"
+    [[ -z "${_UKI}" ]] && _UKI="archboot-$(date +%Y.%m.%d-%H.%M)-$(_kver "${_KERNEL}")-${_ARCH}"
 }
 
 _prepare_initramfs() {

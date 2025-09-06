@@ -116,7 +116,8 @@ _create_iso() {
                 if [[ "${_ARCH}" == "aarch64" ]]; then
                     # replace aarch64 Image.gz with Image kernel for UKI
                     # compressed image is not working at the moment
-                    _KERNEL="$(echo "${_KERNEL}" | sd '\.gz' '')"
+                    #shellcheck disable=SC2086
+                    _KERNEL="$(echo ${_KERNEL} | sd '\.gz' '')"
                     mv "${_KERNEL}" boot/kernel/
                 else
                     mv "${_W_DIR}/${_INTEL_UCODE}" boot/ucode/
