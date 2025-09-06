@@ -34,6 +34,6 @@ else
     _reproducibility "${_ISODIR}"
     _uboot || exit 1
 fi
-_create_cksum || exit 1
+_create_cksum
 _cleanup_iso || exit 1
 echo "Finished ${_I_TYPE} creation."

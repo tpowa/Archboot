@@ -428,6 +428,6 @@ _reproducibility() {
 
 _create_cksum() {
     echo "Generating cksum..."
-    _ck_files=($(fd -t f -t l))
-    cksum -a blake2b ${_ck_files[@]} > b2sum.txt
+    rm -f b2sum.txt
+    cksum -a blake2b $(fd -t f -t l) > b2sum.txt
 }
