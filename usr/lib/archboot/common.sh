@@ -429,5 +429,6 @@ _reproducibility() {
 _create_cksum() {
     echo "Generating b2sum.txt..."
     rm -f b2sum.txt
+    #shellcheck disable=SC2046
     cksum -a blake2b $(fd -t f -t l) > b2sum.txt
 }
