@@ -12,6 +12,10 @@ tools:
 - removed archboot-qemu.sh script
 iso.sh:
 - cleanup and unify text messages
+ipxe:
+- fixed background image
+server:
+- update background image on upload
 ---
 Highlights 2025.08:
 - kernel 6.16.x

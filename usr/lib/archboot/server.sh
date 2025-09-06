@@ -71,6 +71,8 @@ mkdir -p "${_PUB}"/."${1}"/"${_ARCH}"
 fi
 EOF
     run0 -u "${_USER}" -D "${2}" "${_RSYNC[@]}" "${_DIR}" "${_SERVER}":"${_PUB}/.${1}/${_ARCH}/" || exit 1
+    # IPXE background sync
+    run0 -u "${_USER}" "${_RSYNC[@]}" "${_GRUB_BACKGROUND}" "${_SERVER}":"${_PUB}/" || exit 1
     # move files on server, create symlink and removing ${_PURGE_DATE} old release
     run0 -u "${_USER}" ssh "${_SERVER}" <<EOF
 echo "Removing old purge date reached ${_PUB}/.${1}/${_ARCH}/$(date -d "$(date +) - ${_PURGE_DATE}" +%Y.%m) directory..."

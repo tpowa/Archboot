@@ -10,8 +10,7 @@ iseq ${_arch} aarch64 && set _kernel Image.gz && _cmdline nr_cpus=1 console=ttyA
 # aarch64 framebuffer breaks parallels
 iseq ${_arch} x86_64 && goto _console || goto _menu
 :_console
-console --keep --picture https://gitlab.archlinux.org/tpowa/archboot/-/raw/master/usr/share/archboot/grub/archboot-background.png ||
-cpair --foreground 7 --background 6 2
+console --keep --picture https://archboot.com/archboot-background.png || cpair --foreground 7 --background 6 2
 :_menu
 menu Archboot | Arch Linux ${_arch} | IPXE - Netboot
 item --gap -- -- Boot Options --
