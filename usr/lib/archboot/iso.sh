@@ -290,14 +290,6 @@ _unify_gpt_partitions() {
     done
 }
 
-_create_cksum() {
-    ## create b2sums.txt
-    echo "Generating b2sum..."
-    [[ -f  "b2sums.txt" ]] && rm "b2sums.txt"
-    [[ "$(echo ./*.iso)" == "./*.iso" ]] || cksum -a blake2b ./*.iso > "b2sums.txt"
-    [[ "$(echo ./*.img)" == "./*.img" ]] || cksum -a blake2b ./*.img > "b2sums.txt"
-}
-
 _cleanup_iso() {
     # cleanup
     echo "Removing ${_ISODIR}..."
