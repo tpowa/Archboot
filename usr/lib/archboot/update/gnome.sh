@@ -30,14 +30,14 @@ _install_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
         _prepare_graphic "${_WAYLAND_PACKAGE[@]}" "${_STANDARD_PACKAGES[@]}" "${_GNOME_PACKAGES[@]}"
     fi
-    _prepare_browser >"${_LOG}" 2>&1
-    _configure_gnome >"${_LOG}" 2>&1
+    _prepare_browser &>"${_LOG}"
+    _configure_gnome &>"${_LOG}"
 }
 
 _start_gnome() {
     _progress "100" "Launching GNOME Wayland now, logging is done on ${_LOG}..."
     sleep 2
-    echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session gnome-session >${_LOG} 2>&1" > /usr/bin/gnome-wayland
+    echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland XDG_SESSION_TYPE=wayland exec dbus-run-session gnome-session &>${_LOG}" > /usr/bin/gnome-wayland
     chmod 755 /usr/bin/gnome-wayland
     gnome-wayland
 }

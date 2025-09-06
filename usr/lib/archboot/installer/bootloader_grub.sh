@@ -387,7 +387,7 @@ _grub_install_uefi() {
         --efi-directory="/${_ESP_MP}" \
         --bootloader-id="GRUB" \
         --recheck \
-        --debug &> "/tmp/grub_uefi_${_UEFI_ARCH}_install.log"
+        --debug &>"/tmp/grub_uefi_${_UEFI_ARCH}_install.log"
     cat "/tmp/grub_uefi_${_UEFI_ARCH}_install.log" >>"${_LOG}"
     # write to template
     echo "chroot \"\${_DESTDIR}\" grub-install --directory=\"/usr/lib/grub/${_GRUB_ARCH}-efi\" --target=\"${_GRUB_ARCH}-efi\" --efi-directory=\"/${_ESP_MP}\" --bootloader-id=\"GRUB\" --recheck --debug &>\"\${_LOG}\"" >> "${_TEMPLATE}"

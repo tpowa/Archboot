@@ -65,14 +65,14 @@ _install_plasma() {
     if ! [[ -e /usr/bin/startplasma-x11 ]]; then
         _prepare_graphic "${_WAYLAND_PACKAGE[@]}" "${_STANDARD_PACKAGES[@]}" "${_PLASMA_PACKAGES[@]}"
     fi
-    _prepare_browser >"${_LOG}" 2>&1
-    _configure_plasma >"${_LOG}" 2>&1
+    _prepare_browser &>"${_LOG}"
+    _configure_plasma &>"${_LOG}"
 }
 
 _start_plasma() {
     _progress "100" "Launching Plasma/KDE Wayland now, logging is done on ${_LOG}..."
     sleep 2
-    echo "/usr/lib/plasma-dbus-run-session-if-needed /usr/bin/startplasma-wayland >${_LOG} 2>&1" > /usr/bin/plasma-wayland
+    echo "/usr/lib/plasma-dbus-run-session-if-needed /usr/bin/startplasma-wayland &>${_LOG}" > /usr/bin/plasma-wayland
     chmod 755 /usr/bin/plasma-wayland
     plasma-wayland
 }

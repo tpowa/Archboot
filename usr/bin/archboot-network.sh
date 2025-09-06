@@ -288,7 +288,7 @@ _network() {
       echo "systemctl restart systemd-resolved"
       echo "echo \"Waiting for network link...\""
       echo "while true; do"
-      echo "  if getent hosts www.google.com &> \"\${_LOG}\"; then"
+      echo "  if getent hosts www.google.com &>\"\${_LOG}\"; then"
       echo "      break"
       echo "  else"
       echo "      sleep 1"

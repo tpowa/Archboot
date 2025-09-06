@@ -271,7 +271,7 @@ _grub_mkrescue() {
                   "boot/grub/archboot-main-grub.cfg=${_GRUB_CONFIG}" \
                   "boot/grub/grub.cfg=${_GRUB_ISO}" \
                   -volid "ARCHBOOT" -J -- -rm_r /boot/{firmware,grub/{roms,locale}} /efi .disk/ \
-                  "${_RESCUE_REMOVE[@]}" &> "${_IMAGENAME}.log"
+                  "${_RESCUE_REMOVE[@]}" &>"${_IMAGENAME}.log"
 }
 
 _unify_gpt_partitions() {

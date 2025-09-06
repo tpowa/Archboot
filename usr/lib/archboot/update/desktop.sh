@@ -80,7 +80,7 @@ _prepare_graphic() {
     systemd-sysusers &>"${_LOG}"
     # add --boot to really create all tmpfiles!
     # Check: /tmp/.X11-unix, may have wrong permission on startup error!
-    systemd-tmpfiles --boot --create >"${_LOG}" 2>&1
+    systemd-tmpfiles --boot --create &>"${_LOG}"
     # fixing dbus requirements
     for i in dbus dbus-org.freedesktop.login1.service; do
         systemctl reload ${i}
