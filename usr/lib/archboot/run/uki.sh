@@ -13,6 +13,6 @@ _UKIDIR="$(mktemp -d UKIDIR.XXX)"
 echo "Starting UKI creation..."
 _prepare_initramfs || exit 1
 _systemd_ukify || exit 1
-_create_cksum
+_create_cksum "-d 1 .efi"
 _cleanup_uki || exit 1
 echo "Finished UKI creation."
