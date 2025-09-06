@@ -122,9 +122,8 @@ _server_release() {
         gpg --chuid "${_USER}" "${_GPG[@]}" "${i}"
     done
     # recreate and sign b2sums
-    rm b2sum.txt
+    _create_cksum
     for i in $(fd -t f -t l); do
-        cksum -a blake2b "${i}" >> b2sum.txt
         chown -R "${_USER}:${_GROUP}" "${i}"
         touch "${i}"
     done

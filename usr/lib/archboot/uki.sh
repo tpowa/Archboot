@@ -60,13 +60,6 @@ _systemd_ukify() {
         --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}.efi" &>"${_NO_LOG}" || exit 1
 }
 
-_create_cksum() {
-    ## create b2sums.txt
-    echo "Generating b2sum..."
-    [[ -f  "b2sums.txt" ]] && rm "b2sums.txt"
-    [[ "$(echo ./*.iso)" == "./*.efi" ]] || cksum -a blake2b ./*.efi > "b2sums.txt"
-}
-
 _cleanup_uki() {
     # cleanup
     echo "Removing ${_UKIDIR}..."

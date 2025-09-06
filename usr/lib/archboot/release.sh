@@ -201,8 +201,5 @@ _create_iso() {
         mv ./*.iso iso/
         mv boot/*.efi uki/
     fi
-    echo "Generating b2sum..."
-    for i in $(fd -t f); do
-        cksum -a blake2b "${i}" >> b2sum.txt
-    done
+    _create_cksum
 }

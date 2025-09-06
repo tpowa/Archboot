@@ -425,3 +425,9 @@ _reproducibility() {
     # Reproducibility: set all timestamps to 0
     fd . "${1}" -u --min-depth 1 -X touch -hcd "@0"
 }
+
+_create_cksum() {
+    echo "Generating cksum..."
+    _ck_files=($(fd -t f -t l))
+    cksum -a blake2b ${_ck_files[@]} > b2sum.txt
+}
