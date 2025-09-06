@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 . /etc/archboot/defaults
-_GPG_KEY="/usr/share/archboot/gpg/tpowa.gpg"
 
 _usage () {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Create Repository\e[m"
