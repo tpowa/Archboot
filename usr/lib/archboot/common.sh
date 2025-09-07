@@ -40,7 +40,6 @@ _PUB="public_html"
 _RSYNC=(rsync -a -q --delete --delete-delay)
 _RUNNING_ARCH="$(uname -m)"
 _RUNNING_KERNEL="$(uname -r)"
-_SPLASH="/usr/share/archboot/uki/archboot-background.bmp"
 _STANDARD_PACKAGES=(
   gparted
   mtools

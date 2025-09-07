@@ -12,6 +12,8 @@ _PACKAGES=(
 # grub setup
 _GRUB_CONFIG="/usr/share/archboot/grub/archboot-main-grub.cfg"
 _GRUB_BACKGROUND="/usr/share/archboot/grub/archboot-background.png"
+# UKI setup
+_SPLASH="/usr/share/archboot/uki/archboot-background.bmp"
 ### Graphical environment defaults
 # ignore packages to upgrade before graphical startup eg. kernel and firmware
 _GRAPHIC_IGNORE=(

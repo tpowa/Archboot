@@ -16,6 +16,8 @@ ipxe:
 - fixed background image
 server:
 - update background image on upload
+defaults:
+- added _SPLASH option for custom uki splash
 ---
 Highlights 2025.08:
 - kernel 6.16.x
