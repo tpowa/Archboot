@@ -11,6 +11,7 @@ _usage () {
     echo "Options:"
     echo -e " \e[1m-cc\e[m    Cleanup container eg. removing manpages, includes..."
     echo -e " \e[1m-cp\e[m    Cleanup container package cache"
+    echo -e " \e[1m-cp\e[m    Enable firmware package autodetection"
     echo -e " \e[1m-install-source=<server>\e[m    Use <server> containing Archboot repository"
     echo
     echo -e "Usage: \e[1m${_BASENAME} <directory> <options>\e[m"
@@ -22,6 +23,7 @@ _parameters() {
         case ${1} in
             -cc|--cc) _CLEANUP_CONTAINER="1" ;;
             -cp|--cp) _CLEANUP_CACHE="1" ;;
+            -fw|--fw) _FW_AUTODETECT="1" ;;
             -install-source=*|--install-source=*) _INSTALL_SOURCE="$(rg -o '=(.*)' -r '$1' <<< "${1}")" ;;
         esac
         shift
@@ -179,6 +181,59 @@ _install_base_packages() {
         else
             ${_PACMAN} -Syw "${_KEYRING[@]}" "${_PACKAGES[@]}" "${_PACMAN_DEFAULTS[@]}" \
                        "${_PACMAN_DB[@]}" &>"${_NO_LOG}" || exit 1
+        fi
+    fi
+    if [[ "${_FW_AUTODETECT}" = "1" ]]; then
+        _PACKAGES="($(echo ${_PACKAGES[@]} | sd 'linux-firmware|linux-firmware-marvell' ''))"
+        _VGA="VGA compatible controller"
+        _ETH="Ethernet controller"
+        _WIFI="Network controller"
+        _PCI=/tmp/lspci.txt
+        lspci -mm >"${_PCI}"
+        if rg -q "${_VGA}" "${_PCI}"; then
+            if rg "${_VGA}" "${_PCI}" | rg -q 'AMD'; then
+                _PACKAGES+=(linux-firmware-amdgpu)
+            fi
+            if rg "${_VGA}" "${_PCI}" | rg -q 'Intel'; then
+                _PACKAGES+=(linux-firmware-intel)
+            fi
+            if rg "${_VGA}" "${_PCI}" | rg -q 'NVIDIA'; then
+                _PACKAGES+=(linux-firmware-nvidia)
+            fi
+            if rg "${_VGA}" "${_PCI}" | rg -q 'RADEON|Radeon'; then
+                _PACKAGES+=(linux-firmware-radeon)
+            fi
+        fi
+        if rg -q "${_ETH}" "${_PCI}"; then
+            if rg "${_ETH}" "${_PCI}" | rg -q 'Broadcom'; then
+                _PACKAGES+=(linux-firmware-broadcom)
+            fi
+            if rg "${_ETH}" "${_PCI}" | rg -q 'Realtek'; then
+               _PACKAGES+=(linux-firmware-realtek)
+            fi
+        fi
+        if rg -q "${_WIFI}" "${_PCI}"; then
+            if rg "${_WIFI}" "${_PCI}" | rg -q 'Atheros'; then
+                _PACKAGES+=(linux-firmware-atheros)
+            fi
+            if rg "${_WIFI}" "${_PCI}" | rg -q 'Intel'; then
+                _PACKAGES+=(linux-firmware-intel)
+            fi
+            if rg "${_WIFI}" "${_PCI}" | rg -q 'Marvell'; then
+                _PACKAGES+=(linux-firmware-marvell)
+            fi
+            if rg "${_WIFI}" "${_PCI}" | rg -q 'Mediatek'; then
+                _PACKAGES+=(linux-firmware-mediatek)
+            fi
+            if rg "${_WIFI}" "${_PCI}" | rg -q 'Ralink'; then
+                _PACKAGES+=(linux-firmware-other)
+            fi
+            if rg "${_WIFI}" "${_PCI}" | rg -q 'Realtek'; then
+                _PACKAGES+=(linux-firmware-realtek)
+            fi
+            if rg "${_WIFI}" "${_PCI}" | rg -q 'Texas'; then
+               _PACKAGES+=(linux-firmware-other)
+            fi
         fi
     fi
     echo "Installing ${_KEYRING[*]} ${_PACKAGES[*]} to ${1}..."

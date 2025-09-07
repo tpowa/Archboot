@@ -22,7 +22,7 @@ _kill_w_dir() {
 _create_container() {
     # create container without package cache
     if [[ -n "${_L_COMPLETE}" ]]; then
-        "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp &>"${_LOG}" || exit 1
+        "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp -fw &>"${_LOG}" || exit 1
     fi
     # create container with package cache
     if [[ -e "${_LOCAL_DB}" ]]; then
@@ -30,14 +30,14 @@ _create_container() {
         # add the db too on reboot
         install -D -m644 "${_LOCAL_DB}" "${_W_DIR}""${_LOCAL_DB}"
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
-            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc --install-source=file://"${_CACHEDIR}" &>"${_LOG}" || exit 1
+            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -fw --install-source=file://"${_CACHEDIR}" &>"${_LOG}" || exit 1
         fi
         # needed for checks
         cp "${_W_DIR}""${_LOCAL_DB}" "${_LOCAL_DB}"
     else
         # online mode
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
-            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc &>"${_LOG}" || exit 1
+            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -fw &>"${_LOG}" || exit 1
         fi
     fi
     rm "${_W_DIR}"/.archboot
