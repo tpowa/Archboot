@@ -182,7 +182,7 @@ _clean_fw() {
         fi
     fi
     mv "${_FW}"/{amd-ucode,intel-ucode,regulatory*} ${_FW_NEW}/
-    rm -r "${_FW}"
+    rm -rf "${_FW}"
     mv "${_FW_NEW}" "${_W_DIR}"/lib
     rm -r new/
 }
