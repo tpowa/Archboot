@@ -184,7 +184,7 @@ _install_base_packages() {
         fi
     fi
     if [[ "${_FW_AUTODETECT}" = "1" ]]; then
-        _PACKAGES="($(echo ${_PACKAGES[@]} | sd 'linux-firmware.* ' ''))"
+        _PACKAGES=($(echo ${_PACKAGES[@]} | sd 'linux-firmware.* ' ''))
         _VGA="VGA compatible controller"
         _ETH="Ethernet controller"
         _WIFI="Network controller"
