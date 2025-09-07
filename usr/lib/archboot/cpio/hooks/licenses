@@ -140,7 +140,7 @@ _LICENSES=(
     done
     _full_dir /usr/share/licenses/spdx
     for i in /usr/share/licenses/linux-firmware*; do
-        [[ -d "${i}" ]] && _full_dir /usr/share/licenses/"${i}"
+        [[ -d "${i}" ]] && _full_dir "${i}"
     done
 }
 
