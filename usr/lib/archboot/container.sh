@@ -76,12 +76,14 @@ _clean_container() {
              . "${1}"/usr/share/locale/ -X rm &>"${_NO_LOG}"
         fd -u -t f -E 'UTF-8.gz' . "${1}"/usr/share/i18n/charmaps -X rm &>"${_NO_LOG}"
         # not needed firmware files
-        rm -r "${1}"/lib/firmware/{3com,acenic,advansys,agere_*,adaptec,airoha,amdtee,amlogic,amphion,ar3k,ar5523*,ar70*,ar9[0-9]*,arm,as102*,\
+        if [[ -z "${_FW_AUTODETECT}" ]]; then
+            rm -r "${1}"/lib/firmware/{3com,acenic,advansys,agere_*,adaptec,airoha,amdtee,amlogic,amphion,ar3k,ar5523*,ar70*,ar9[0-9]*,arm,as102*,\
 ath3k*,atmel,atusb,av7110,brcm,cadence,carl*,cavium,cirrus,cis,cpia2,cnm,cs42l43*,ct*,cxgb*,cmmb*,cypress,dabusb,dpaa2,dsp56k,dvb*,e100,\
 edgeport,emi26,emi62,ene-ub6250,ess,f2255usb*,go7007,hfi1*,INT*,imx,inside-secure,isci,isdbt*,intel,ixp4xx,kaweth,keyspan*,\
 korg,lbtf*,lgs8g75*,lt9611uxc*,matrox,meson,microchip,moxa,mrvl/prestera,mts*,myri10ge*,myricom,nxp,ositech,phanfw*,powervr,qat*,\
 qca,r128,r8a*,realtek,rockchip,rp2*,rtl_bt,rsi*,sb16,s2250*,s5p-*,sdd_*,slicoss,sms1*,sun,sxg,tdmb*,ttusb-budget,ueagle-atm,usbdux*,\
 TAS*,TIAS*,tehuti,ti,ti_*,ti-keystone,tlg2300*,tsse_*,v4l*,vicam,vntw*,vxge,wsm_*,wfx,whiteheat*,yam,yamaha}
+        fi
     fi
 }
 
@@ -183,7 +185,7 @@ _install_base_packages() {
                        "${_PACMAN_DB[@]}" &>"${_NO_LOG}" || exit 1
         fi
     fi
-    if [[ "${_FW_AUTODETECT}" = "1" ]]; then
+    if [[ -n "${_FW_AUTODETECT}" ]]; then
         _PACKAGES=($(echo ${_PACKAGES[@]} | sd 'linux-firmware.* ' ''))
         _VGA="VGA compatible controller"
         _ETH="Ethernet controller"
