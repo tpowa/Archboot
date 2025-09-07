@@ -138,6 +138,9 @@ _LICENSES=(
     for i in "${_LICENSES[@]}";do
         _file /usr/share/licenses/"${i}"
     done
-    _map _full_dir /usr/share/licenses/{spdx,linux-firmware-*}
+    _full_dir /usr/share/licenses/spdx
+    for i in /usr/share/licenses/linux-firmware*; do
+        [[ -d "${i}" ]] && _full_dir /usr/share/licenses/"${i}"
+    done
 }
 
