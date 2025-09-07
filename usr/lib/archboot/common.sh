@@ -431,3 +431,57 @@ _create_cksum() {
     #shellcheck disable=SC2046,SC2086
     cksum -a blake2b $(fd -t f -t l ${1}) > b2sum.txt
 }
+
+_auto_fw() {
+     IFS=" " read -r -a _PACKAGES <<< "$(sd 'linux-firmware.* ' '' <<< "${_PACKAGES[@]}")"
+    _VGA="VGA compatible controller"
+    _ETH="Ethernet controller"
+    _WIFI="Network controller"
+    _PCI=/tmp/lspci.txt
+    lspci -mm >"${_PCI}"
+    if rg -q "${_VGA}" "${_PCI}"; then
+        if rg "${_VGA}" "${_PCI}" | rg -q 'AMD'; then
+            _PACKAGES+=(linux-firmware-amdgpu)
+        fi
+        if rg "${_VGA}" "${_PCI}" | rg -q 'Intel'; then
+            _PACKAGES+=(linux-firmware-intel)
+        fi
+        if rg "${_VGA}" "${_PCI}" | rg -q 'NVIDIA'; then
+            _PACKAGES+=(linux-firmware-nvidia)
+        fi
+        if rg "${_VGA}" "${_PCI}" | rg -q 'RADEON|Radeon'; then
+            _PACKAGES+=(linux-firmware-radeon)
+        fi
+    fi
+    if rg -q "${_ETH}" "${_PCI}"; then
+        if rg "${_ETH}" "${_PCI}" | rg -q 'Broadcom'; then
+            _PACKAGES+=(linux-firmware-broadcom)
+        fi
+        if rg "${_ETH}" "${_PCI}" | rg -q 'Realtek'; then
+            _PACKAGES+=(linux-firmware-realtek)
+        fi
+    fi
+    if rg -q "${_WIFI}" "${_PCI}"; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Atheros'; then
+            _PACKAGES+=(linux-firmware-atheros)
+        fi
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Intel'; then
+            _PACKAGES+=(linux-firmware-intel)
+        fi
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Marvell'; then
+            _PACKAGES+=(linux-firmware-marvell)
+        fi
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Mediatek'; then
+            _PACKAGES+=(linux-firmware-mediatek)
+        fi
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Ralink'; then
+            _PACKAGES+=(linux-firmware-other)
+        fi
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Realtek'; then
+            _PACKAGES+=(linux-firmware-realtek)
+        fi
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Texas'; then
+            _PACKAGES+=(linux-firmware-other)
+        fi
+    fi
+}
