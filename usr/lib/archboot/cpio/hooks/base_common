@@ -10,11 +10,12 @@ _run ()
                  mkfs.btrfs modprobe less mount mountpoint poweroff \
                  reboot rg setfont sh shutdown sulogin systemctl \
                  systemd-tmpfiles udevadm umount zstd
-    # rust coreutils
+    # use rust coreutils
     _binary uu-coreutils
     for i in $(uu-coreutils --list); do
         _symlink "/usr/bin/${i}" /usr/bin/uu-coreutils
     done
+    _file /usr/lib/libstdbuf.so
     # rdinit= kernel parameter defaults to /init
     # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/init/main.c
     _symlink /init bin/init
