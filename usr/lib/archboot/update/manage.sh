@@ -130,7 +130,7 @@ _clean_fw() {
     _ETH="Ethernet controller"
     _WIFI="Network controller"
     _PCI=/tmp/lspci.txt
-    mkdir -p new/firmware
+    mkdir -p "${_FW_NEW}"
     lspci -mm >"${_PCI}"
     if rg -q "${_VGA}" "${_PCI}"; then
         if rg "${_VGA}" "${_PCI}" | rg -q 'AMD'; then
@@ -182,9 +182,9 @@ _clean_fw() {
         fi
     fi
     mv "${_FW}"/{amd-ucode,intel-ucode,regulatory*} ${_FW_NEW}/
-    rm -r "${_FW}"
+    rm -rf "${_FW}"
     mv "${_FW_NEW}" "${_W_DIR}"/lib
-    rm -r new/
+    rm -rf new/
 }
 
 _collect_files() {
