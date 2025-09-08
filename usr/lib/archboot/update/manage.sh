@@ -15,7 +15,7 @@ _ram_check() {
 
 _kill_w_dir() {
     if [[ -d "${_W_DIR}" ]]; then
-        rm -r "${_W_DIR}"
+        rm -rf "${_W_DIR}"
     fi
 }
 
