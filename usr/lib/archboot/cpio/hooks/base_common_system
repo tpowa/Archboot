@@ -35,11 +35,11 @@ usr/share/{locale/{be,bg,cs,da,de,en_US,el,es,fi,fr,hu,it,lt,lv,mk,nl,nn,pl,pt,r
 var/lib/pacman/local \
 | tar -C "${_ROOTFS}" -xpf -
     fi
-    _map _binary agetty archlinux-keyring-wkd-sync awk bat basename bits brotli bsdtar \
+    _map _binary agetty archlinux-keyring-wkd-sync awk bat bits brotli bsdtar \
                  {bus,coredump,hostname,locale,login,machine,network,\
 timedate,userdb,home,oom,portable}ctl btm certutil choose clear cmsutil coresched crlutil curl \
                  dbus-{broker{,-launch},cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
-update-activation-environment,uuidgen} dir dust dysk exa eza faillock fd fzf fzf-tmux gawk gpg{,-agent,conf,-connect-agent} \
+update-activation-environment,uuidgen} dust dysk exa eza faillock fd fzf fzf-tmux gawk gpg{,-agent,conf,-connect-agent} \
                  gpgme-{tool,json} hugetop insmod kernel-install killall loadkeys ldconfig \
                  login lspci mkhomedir_helper modutil more mount.ddi mount.nfs{,4} \
                  nano nologin nss-config ouch p11-kit pk12util pam_{namespace_helper,timestamp_check} pacman{,-conf,-key,-db-upgrade} \
