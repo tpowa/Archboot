@@ -297,7 +297,7 @@ _new_environment() {
         mv "${_ROOTFS_DIR}"/* "${_RAM}/"
         # cleanup mkinitcpio directories and files
         _progress "95" "Cleanup ${_RAM}..."
-        rm -r "${_RAM}"/sysroot &>"${_NO_LOG}"
+        rm -rf "${_RAM}"/sysroot &>"${_NO_LOG}"
         rm "${_RAM}"/{init,"${_VMLINUZ}"} &>"${_NO_LOG}"
         _progress "100" "Switching to rootfs ${_RAM}..."
         sleep 2

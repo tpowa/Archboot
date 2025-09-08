@@ -5,6 +5,6 @@
 _run ()
 {
     ! rg -qw 'archboot' /etc/hostname && return
-    rm -r /lib/firmware
+    rm -rf /lib/firmware
 }
 
