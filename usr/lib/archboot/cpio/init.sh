@@ -65,7 +65,7 @@ _task() {
         done
     fi
     if [[ "${1}" == check ]]; then
-        if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]] ; then
+        if ! [[ -f "/mnt/efi/boot/initrd-${_ARCH}.img" ]]; then
             if ! mount /mnt/cdrom/efi.img /mnt/efi &>"${_NO_LOG}"; then
                 _clear
                 _wrn "Archboot Emergeny Shell:"
