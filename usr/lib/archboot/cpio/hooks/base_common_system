@@ -40,7 +40,7 @@ var/lib/pacman/local \
 timedate,userdb,home,oom,portable}ctl btm certutil choose clear cmsutil coresched crlutil curl \
                  dbus-{broker{,-launch},cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
 update-activation-environment,uuidgen} dust dysk exa eza faillock fd fzf fzf-tmux gawk gpg{,-agent,conf,-connect-agent} \
-                 gpgme-{tool,json} hugetop insmod kernel-install killall loadkeys ldconfig \
+                 gpgme-{tool,json} hugetop insmod kernel-install kill{,all} loadkeys ldconfig \
                  login lspci mkhomedir_helper modutil more mount.ddi mount.nfs{,4} \
                  nano nologin nss-config ouch p11-kit pk12util pam_{namespace_helper,timestamp_check} pacman{,-conf,-key,-db-upgrade} \
                  passwd pgrep pidof pinentry{,-curses} pk{action,check,exec,ttyagent} pwhistory_helper pluginviewer procs ps \
@@ -48,7 +48,7 @@ update-activation-environment,uuidgen} dust dysk exa eza faillock fd fzf fzf-tmu
                  shlibsign sign{tool,ver} ssltap symkeyutil systemd-{ac-power,analyze,ask-password,cat,\
 cgls,cgtop,confext,delta,detect-virt,escape,firstboot,hwdb,inhibit,machine-id-setup,mount,notify,nspawn,path,\
 resolve,repart,run,socket-activate,stdio-bridge,sysusers,tty-ask-password-agent,umount,creds,cryptenroll,dissect,\
-id128,sysext} tar testpkg top trust unix_chkpwd umount.nfs{,4} update-ca-trust vercmp zoxide
+id128,sysext} tar testpkg top trust umount.nfs{,4} unix_chkpwd up{time,date-ca-trust} vercmp zoxide
     # add C.UTF-8 locale
     _dir /usr/lib/locale
     [[ -d /usr/lib/locale/C.utf8 ]] && _full_dir /usr/lib/locale/C.utf8
