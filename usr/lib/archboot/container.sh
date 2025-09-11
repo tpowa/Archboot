@@ -11,7 +11,7 @@ _usage () {
     echo "Options:"
     echo -e " \e[1m-cc\e[m    Cleanup container eg. removing manpages, includes..."
     echo -e " \e[1m-cp\e[m    Cleanup container package cache"
-    echo -e " \e[1m-cp\e[m    Enable firmware package autodetection"
+    echo -e " \e[1m-fw\e[m    Enable firmware package autodetection"
     echo -e " \e[1m-install-source=<server>\e[m    Use <server> containing Archboot repository"
     echo
     echo -e "Usage: \e[1m${_BASENAME} <directory> <options>\e[m"
