@@ -19,7 +19,6 @@ _run ()
     for i in $(pacman -Ql coreutils | rg -o 'bin/(.*)' -r '$1'); do
         _binary "${i}"
     done
-    _file /usr/lib/libstdbuf.so
     # rdinit= kernel parameter defaults to /init
     # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/init/main.c
     _symlink /init bin/init
