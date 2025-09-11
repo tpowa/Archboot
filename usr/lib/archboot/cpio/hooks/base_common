@@ -12,9 +12,12 @@ _run ()
                  systemd-tmpfiles udevadm umount zstd
     # prepare rust coreutils
     #_binary uu-coreutils
-    for i in $(uu-coreutils --list); do
-        [[ -e "/usr/bin/${i}" ]] && _binary "${i}"
+    #for i in $(uu-coreutils --list); do
+    #   [[ -e "/usr/bin/${i}" ]] && _binary "${i}"
         #_symlink "/usr/bin/${i}" /usr/bin/uu-coreutils
+    #done
+    for i in $(pacman -Ql coreutils | rg -o 'bin/(.*)' -r '$1'); do
+        _binary "${i}"
     done
     _file /usr/lib/libstdbuf.so
     # rdinit= kernel parameter defaults to /init
