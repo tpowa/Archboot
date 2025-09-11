@@ -232,7 +232,7 @@ _install_libs() {
     _LIB_FILES=("${_ROOTFS}"/usr/{bin,lib/{,systemd,security}}/*)
     while true; do
         mapfile -t _LIB_FILES < <(readelf -d "${_LIB_FILES[@]}" 2>"${_NO_LOG}" |\
-                                  rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' | sort -u  | sd '/lib//usr' '' |\
+                                  rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' | sort -u | sd '/lib//usr' '' |\
                                   sd 'libsystemd-' 'systemd/libsystemd-')
         [[ ${#_LIB_FILES[@]} == 0 ]] && break
         _map _file "${_LIB_FILES[@]}"
