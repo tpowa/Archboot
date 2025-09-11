@@ -5,20 +5,21 @@
 _run ()
 {
     # add basic apps
-    _map _binary 3cpio bash blkid dialog find grep \
-                 gzip halt init journalctl kmod loadkeys logger ls{blk,mod} \
-                 mkfs.btrfs modprobe less mount mountpoint poweroff \
-                 reboot rg setfont sh shutdown sulogin systemctl \
-                 systemd-tmpfiles udevadm umount zstd
+    _map _binary 3cpio basename bash blkid cat cp cut dialog echo env find grep \
+                 gzip halt head init journalctl kmod ln loadkeys logger ls{,blk,mod} \
+                 mkdir mkfs.btrfs modprobe less mount mountpoint mv poweroff \
+                 realpath reboot rg rm setfont sh shutdown sleep sulogin systemctl \
+                 systemd-tmpfiles udevadm umount uname zstd
+
     # prepare rust coreutils
     #_binary uu-coreutils
     #for i in $(uu-coreutils --list); do
     #   [[ -e "/usr/bin/${i}" ]] && _binary "${i}"
         #_symlink "/usr/bin/${i}" /usr/bin/uu-coreutils
     #done
-    for i in $(pacman -Ql coreutils | rg -o 'bin/(.*)' -r '$1'); do
-        _binary "${i}"
-    done
+    #for i in $(pacman -Ql coreutils | rg -o 'bin/(.*)' -r '$1'); do
+    #    _binary "${i}"
+    #done
     # rdinit= kernel parameter defaults to /init
     # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/init/main.c
     _symlink /init bin/init

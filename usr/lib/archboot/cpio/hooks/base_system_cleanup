@@ -6,24 +6,25 @@ _run ()
 {
     ! rg -qw 'archboot' /etc/hostname && return
     _install_files
-    rm /usr/bin/{addpart,attr,b2sum,blk{discard,pr,zone},blockdev,bunzip2,\
-bz{cat,diff,grep,ip2,ip2recover,more},cal,capsh,ch{acl,con,cpu,mem,oom,rt},\
-cfdisk,cksum,col{,crt,rm,umn},ctrlaltdel,delpart,depmod,diff,\
-dir{name,colors},dmesg,eject,egrep,fallocate,fadvise,\
-fdisk,fgrep,file,fincore,findmnt,flock,free,fuser,\
-get{cap,facl,fattr,opt,pcaps},gunzip,gzexe,hardlink,hdparm,hexdump,\
+    rm /usr/bin/{\[,addpart,attr,b2sum,base{32,64},basenc,blk{discard,pr,zone},blockdev,bunzip2,\
+bz{cat,diff,grep,ip2,ip2recover,more},cal,capsh,ch{acl,con,cpu,grp,mem,oom,own,root,rt},\
+cfdisk,cksum,col{,crt,rm,umn},comm,csplit,ctrlaltdel,delpart,depmod,diff,\
+dir{name,colors},dmesg,eject,egrep,expand,expr,fallocate,factor,fadvise,\
+fdisk,fgrep,file,fincore,findmnt,flock,fmt,fold,free,fuser,\
+get{cap,facl,fattr,opt,pcaps},gunzip,gzexe,hardlink,hdparm,hexdump,hostid,\
 id,ionice,ipc{mk,rm,s},irqtop,isosize,join,keyctl,last{,b},ldattach,ldd,\
-linux{32,64},logname,look,losetup,ls{cpu,fd,ipc,irq,locks,logins,mem,ns},\
+link,linux{32,64},logname,look,losetup,ls{cpu,fd,ipc,irq,locks,logins,mem,ns},\
 lz4{,c,cat},lz{cat,cmp,diff,egrep,fgrep,grep,less,more,ma,madec,mainfo,op},\
-mcookie,md5sum,mesg,mkfs,modinfo,namei,new{grp,gidmap,uidmap},\
-nsenter,partx,paste,pidwait,pinky,\
-pg,pipesz,pkill,pmap,prlimit,prtstat,pslog,\
-pstree,pwdx,pzstd,readprofile,rename,renice,request-key,\
+mcookie,md5sum,mesg,mk{fifo,fs,nod},modinfo,namei,new{grp,gidmap,uidmap},\
+nice,nl,nohup,nproc,nsenter,numfmt,partx,paste,pathchk,pidwait,pinky,\
+pg,pipesz,pkill,pmap,pr,printenv,prlimit,prtstat,pslog,\
+pstree,ptx,pwdx,pzstd,read{link,profile},rename,renice,request-key,\
 resizepart,reset,rev,rtcwake,run{con,user},script{,live,replay},sdparm,\
-set{arch,cap,facl,fattr,priv,sid,term},sfdisk,slabtop,su,swap{label,off,on},\
-sysctl,taskset,tload,tput,tunelp,uclampset,ul,\
-un{ame26,compress,lz4,lzma,share,xz,zstd},utmpdump,uuidd,\
-uuidgen,uuidparse,vigr,vipw,vmstat,w,wall,watch,wdctl,whereis,\
+seq,set{arch,cap,facl,fattr,priv,sid,term},sfdisk,sha{1sum,224sum,256sum,\
+384sum,512sum},shred,shuf,slabtop,split,stdbuf,stty,su,sum,swap{label,off,on},sync,\
+sysctl,tac,tail,taskset,test,timeout,tload,tput,truncate,tsort,tunelp,uclampset,ul,\
+un{ame26,compress,expand,iq,link,lz4,lzma,share,xz,zstd},uptime,users,utmpdump,uuidd,\
+uuidgen,uuidparse,vdir,vigr,vipw,vmstat,w,wall,watch,wdctl,whereis,who,whoami,\
 write,xargs,xz{,cat,cmp,dec,grep,egrep,fgrep},z{cat,cmp,diff,egrep,fgrep,force,\
 grep,less,more,new,ramctl},zstd{cat,grep,less,mt}}
     if [[ "${_RUNNING_ARCH}" == "x86_64" ]]; then
