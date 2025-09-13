@@ -35,5 +35,5 @@ for i in aarch64 x86_64; do
 done
 mkdir -p "${_comp_dir}"
 for i in ${_completion[@]}; do
-    ln -s ${i} "${_comp_dir}/${i}"
+    ln -s archboot "${_comp_dir}/${i}"
 done
