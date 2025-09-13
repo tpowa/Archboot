@@ -2,7 +2,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # written by Tobias Powalowski <tpowa@archlinux.org>
 _dir="../lib/archboot/run"
+_comp_dir="${1}/usr/share/bash-completion/completions"
 _dest="${1}/usr/bin"
+_completion=(
+    archboot-{aarch,riscv,x86_}64-create-container.sh
+    archboot-{aarch,riscv,x86_}64-iso.sh
+    archboot-{aarch,x86_}64-uki.sh
+)
+
 if [[ -z "${1}" ]]; then
     echo "Error: No directory given!"
     exit 1
@@ -25,4 +32,8 @@ for i in aarch64 riscv64; do
 done
 for i in aarch64 x86_64; do
     ln -s "${_dir}"/uki.sh "${_dest}"/archboot-${i}-uki.sh
+done
+mkdir -p "${_comp_dir}"
+for i in ${_completion[@]}; do
+    ln -s ${i} "${_comp_dir}/${i}"
 done

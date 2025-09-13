@@ -12,5 +12,7 @@ _run ()
     _file /usr/share/archboot/gpg/tpowa.gpg
     # use /etc/profile to launch login.sh
     echo ". /usr/lib/archboot/login.sh" >> "${_ROOTFS}/root/.bashrc"
+    # bash completion
+     _COMP_DIR="/usr/share/bash-completion/completions"
+    _symlink "${_COMP_DIR}/update" "${_COMP_DIR}"/archboot
 }
-

@@ -20,5 +20,10 @@ _run ()
     _full_dir /usr/lib/archboot/installer
     _file /etc/archboot/defaults
     _file /usr/share/archboot/grub/archboot-background.png
+    # bash completion
+    _COMP_DIR="/usr/share/bash-completion/completions"
+    for i in {clean-usbstick.sh,restore-usbstick.sh,testsuite}; do
+        _symlink "${_COMP_DIR}/${i}" "${_COMP_DIR}"/archboot
+    done
 }
 

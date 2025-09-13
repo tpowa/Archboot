@@ -1,0 +1,131 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# created by Tobias Powalowski <tpowa@archlinux.org>
+
+_clean_parameters() {
+    for i in $OPTS; do
+        if echo "${COMP_WORDS[@]}" | grep -Fq -e "$i"; then
+            OPTS=${OPTS/$i/}
+        elif echo "${COMP_WORDS[@]}" | grep -Fq -e "$(echo $i | tr '=' ' =')"; then
+            OPTS=${OPTS/$i/}
+        fi
+    done
+}
+
+_clean_blockdevice()
+{
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    compopt -o bashdefault -o default
+    COMPREPLY=( $(compgen -W "$(lsblk -pnro NAME,TYPE | rg '(.*) disk$' -r '$1')" -- $cur) )
+    return 0
+}
+
+_container()
+{
+    local cur OPTS
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    OPTS="-cc -cp -fw -install-server="
+    _clean_parameters
+    if [[ ${#COMP_WORDS[@]} -gt 2 ]]; then
+        COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
+        return 0
+    fi
+    compopt -o bashdefault -o default
+    return 0
+}
+
+_iso()
+{
+    local cur OPTS
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    OPTS="-config= -g -iso= -s"
+    _clean_parameters
+    if [[ $cur == -c* ]]; then
+        COMPREPLY=( -config=/etc/archboot/$(uname -m).conf )
+    elif [[ "$cur" == -i* ]]; then
+        COMPREPLY=( -iso=archboot-$(date +%Y.%m.%d-%H.%M)-$(uname -r)-$(uname -m).iso )
+    else
+        COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
+    fi
+    return 0
+}
+
+_restore_usbstick()
+{
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    compopt -o bashdefault -o default
+    COMPREPLY=( $(compgen -W "$(lsblk -pnro NAME,TRAN,TYPE | rg '(.*) disk$' -r '$1' | rg '(.*) usb$' -r '$1')" -- $cur) )
+    return 0
+}
+
+_uki()
+{
+    local cur OPTS
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    OPTS="-cli= -config= -g -i="
+    _clean_parameters
+    if [[ $cur == -co* ]]; then
+        COMPREPLY=( -config=/etc/archboot/$(uname -m).conf )
+    elif [[ "$cur" == -i* ]]; then
+        COMPREPLY=( -i=archboot-$(date +%Y.%m.%d-%H.%M)-$(uname -r)-$(uname -m).uki )
+    else
+        COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
+    fi
+    return 0
+}
+
+_testsuite()
+{
+    local cur prev OPTS
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    case $prev in
+        run)
+            return 0
+            ;;
+    esac
+    case $cur in
+        *)
+            OPTS="run"
+            COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
+            return 0
+            ;;
+    esac
+    compopt -o bashdefault -o default
+    return 0
+}
+
+_update()
+{
+    local cur prev OPTS
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    case $prev in
+        -*)
+            return 0
+            ;;
+    esac
+    case $cur in
+        *)
+            OPTS="$(update | rg '\-[a-z]' | choose 0 | sd '\x1B\[[0-9;]*[a-zA-Z]' '')"
+            COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
+            return 0
+            ;;
+    esac
+    compopt -o bashdefault -o default
+    return 0
+}
+
+complete -F _clean_blockdevice clean-blockdevice.sh
+complete -F _container archboot-{aarch,riscv,x86_}64-create-container.sh
+complete -F _iso archboot-{aarch,riscv,x86_}64-iso.sh
+complete -F _restore_usbstick restore-usbstick.sh
+complete -F _uki archboot-{aarch,x86_}64-uki.sh
+complete -F _testsuite testsuite
+complete -F _update update
