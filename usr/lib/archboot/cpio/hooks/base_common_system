@@ -40,7 +40,7 @@ var/lib/pacman/local \
 timedate,userdb,home,oom,portable}ctl btm certutil chmod choose clear cmsutil coresched crlutil curl date \
                  dbus-{broker{,-launch},cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
 update-activation-environment,uuidgen} dd df dir du dust dysk exa eza faillock false fd fmt fold fzf \
-                 fzf-tmux gawk gpg{,-agent,conf,-connect-agent} gpgme-{tool,json} group hugetop insmod install \
+                 fzf-tmux gawk gpg{,-agent,conf,-connect-agent} gpgme-{tool,json} groups hugetop insmod install \
                  kernel-install kill{,all} loadkeys ldconfig login lspci mktemp mkhomedir_helper modutil \
                  more mount.ddi mount.nfs{,4} nano nologin nss-config od ouch p11-kit pk12util \
                  pam_{namespace_helper,timestamp_check} pacman{,-conf,-key,-db-upgrade} passwd pgrep pidof \
