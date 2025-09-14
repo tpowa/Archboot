@@ -61,23 +61,6 @@ _restore_usbstick()
     return 0
 }
 
-_uki()
-{
-    local cur OPTS
-    COMPREPLY=()
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    OPTS="-cli= -config= -g -i="
-    _clean_parameters
-    if [[ $cur == -co* ]]; then
-        COMPREPLY=( -config=/etc/archboot/$(uname -m).conf )
-    elif [[ "$cur" == -i* ]]; then
-        COMPREPLY=( -i=archboot-$(date +%Y.%m.%d-%H.%M)-$(uname -r)-$(uname -m).uki )
-    else
-        COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
-    fi
-    return 0
-}
-
 _testsuite()
 {
     local cur prev OPTS
@@ -97,6 +80,23 @@ _testsuite()
             ;;
     esac
     compopt -o bashdefault -o default
+    return 0
+}
+
+_uki()
+{
+    local cur OPTS
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    OPTS="-cli= -config= -g -i="
+    _clean_parameters
+    if [[ $cur == -co* ]]; then
+        COMPREPLY=( -config=/etc/archboot/$(uname -m).conf )
+    elif [[ "$cur" == -i* ]]; then
+        COMPREPLY=( -i=archboot-$(date +%Y.%m.%d-%H.%M)-$(uname -r)-$(uname -m).uki )
+    else
+        COMPREPLY=( $(compgen -W "${OPTS[*]}" -- $cur) )
+    fi
     return 0
 }
 

@@ -1,0 +1,9 @@
+#compdef archboot-aarch64-create-container.sh archboot-riscv64-create-container.sh archboot-x86_64-create-container.sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+# created by Tobias Powalowski <tpowa@archlinux.org>
+
+_arguments \
+    -cc'[clean container]' \
+    -cp'[clean package cache]' \
+    -fw'[enables firmware autodetection]' \
+    -install-server='[use custom package server]'
