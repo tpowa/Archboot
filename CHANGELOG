@@ -2,6 +2,7 @@ On the road to 2025.09:
 Environment:
 - updated IPXE to 20250829
 - updated grub to 2.12.r359.g19c698d12
+- systemd 258
 - enabled firmware autodetection on -latest and local image
   --> 12% faster bootup on both media types :)
 - added additional bash_completions
