@@ -295,6 +295,12 @@ _new_environment() {
     if [[ -e "${_LOCAL_DB}" ]]; then
         _progress "86" "Moving rootfs to ${_RAM}..."
         mv "${_ROOTFS_DIR}"/* "${_RAM}/"
+        # check for custom autorun.sh
+        if [[ -e /.autorun ]]; then
+            mv /.autorun "${_RAM}/"
+            [[ -d "${_RAM}/etc/archboot/run" ]] || mkdir -p "${_RAM}/etc/archboot/run"
+            mv /etc/archboot/run/autorun.sh "${_RAM}/etc/archboot/run/autorun.sh"
+        fi
         # cleanup mkinitcpio directories and files
         _progress "95" "Cleanup ${_RAM}..."
         rm -rf "${_RAM}"/sysroot &>"${_NO_LOG}"
