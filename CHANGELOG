@@ -7,7 +7,7 @@ Environment:
   --> 12% faster bootup on both media types :)
 - added additional bash_completions
 - added zsh completion
-- enable custom autorun.sh on local image
+- added custom autorun.sh on local image
 ISO:
 - updated ISO grub config
 - limit memory to 4G in UEFI MIX MODE to avoid NX issue
