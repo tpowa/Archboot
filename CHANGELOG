@@ -3,6 +3,8 @@ Environment:
 - kernel 6.17.x
 - updated IPXE to 20251001
 - fixed bash history escape sequence MR #1
+setup:
+- disabled microcode mkinitcpio hook on aarch64
 ---
 Highlights 2025.09:
 - systemd 258
