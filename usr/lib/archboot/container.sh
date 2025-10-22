@@ -118,8 +118,8 @@ _create_pacman_conf() {
             sd '^Server = http://mirror.archlinuxarm.org/$arch/$repo' \
                '# Server = http://mirror.archlinuxarm.org/$arch/$repo' "${1}"/etc/pacman.d/mirrorlist
             # shellcheck disable=SC2016
-            sd '# Server = http://de3.mirror.archlinuxarm.org/$arch/$repo' \
-               'Server = http://de3.mirror.archlinuxarm.org/$arch/$repo' "${1}"/etc/pacman.d/mirrorlist
+            sd '# Server = http://de4.mirror.archlinuxarm.org/$arch/$repo' \
+               'Server = http://de4.mirror.archlinuxarm.org/$arch/$repo' "${1}"/etc/pacman.d/mirrorlist
         fi
         if ! rg -qw "\[archboot\]" "${_PACMAN_CONF}"; then
             echo "Adding Archboot repository to ${_PACMAN_CONF}..."
