@@ -5,6 +5,8 @@ Environment:
 - fixed bash history escape sequence MR #1
 cpio.sh:
 - fixed iwlwifi firmware inclusion
+manage.sh:
+- fixed iwlwifi firmware inclusion
 setup:
 - disabled microcode mkinitcpio hook on aarch64
 ---
