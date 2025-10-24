@@ -3,6 +3,8 @@ Environment:
 - kernel 6.17.x
 - updated IPXE to 20251001
 - fixed bash history escape sequence MR #1
+cpio.sh:
+- fixed iwlwifi firmware inclusion
 setup:
 - disabled microcode mkinitcpio hook on aarch64
 ---
