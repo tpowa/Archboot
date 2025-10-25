@@ -247,7 +247,7 @@ _iwl_rt_fw() {
             mv "${_FW_SRC}/${1}"* "${_FW_TMP_SRC}/"
             if [[ "${1}" == "iwl" ]]; then
                 mkdir -p "${_FW_TMP_SRC}/intel"
-                mv "${_FW_SRC}/intel/iwlwifi" "${_FW_TMP_SRC}/intel"
+                mv "${_FW_SRC}/intel/iwlwifi" "${_FW_TMP_SRC}/intel/"
             fi
             _create_cpio "${_FW_TMP}" "${_FW_DEST}/${2}.img" &>"${_NO_LOG}" || exit 1
         elif [[ -n "${_TARGET_DIR}" ]]; then
