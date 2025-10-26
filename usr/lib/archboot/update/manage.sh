@@ -165,6 +165,7 @@ _clean_fw() {
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Intel'; then
             mkdir -p "${_FW_NEW}/intel"
             mv "${_FW}/intel/iwlwifi" "${_FW_NEW}/intel/"
+            mv "${_FW}"/iwl* ${_FW_NEW}/
         fi
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Marvell'; then
             mv "${_FW}"/{mwl*,libertas,mrvl} ${_FW_NEW}/
