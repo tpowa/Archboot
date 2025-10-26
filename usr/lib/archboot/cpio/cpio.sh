@@ -278,7 +278,7 @@ _cpio_fw() {
                 _FW_TMP="/tmp/archboot-firmware"
                 [[ -d "${_FW_TMP}" ]] && rm -r "${_FW_TMP}"
             fi
-            for i in $(fd --type d --base-directory "${_FW_SRC}" --path-separator '' -E 'intel' -d 1); do
+            for i in $(fd --type d --base-directory "${_FW_SRC}" --path-separator '' -d 1); do
                 if [[ -n "${_GENERATE_IMAGE}" ]]; then
                     _move_fw "${_FW_TMP_SRC}/"
                     [[ "${i}" == "intel" ]] && i=iwlwifi
