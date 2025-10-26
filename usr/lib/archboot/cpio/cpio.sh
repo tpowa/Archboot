@@ -240,24 +240,16 @@ _install_libs() {
     done
 }
 
-_iwl_rt_fw() {
+_basedir_fw() {
     if ls "${_FW_SRC}/${1}"* &>"${_NO_LOG}"; then
         if [[ -n ${_GENERATE_IMAGE} ]]; then
             echo "Preparing ${2}.img firmware..."
             mv "${_FW_SRC}/${1}"* "${_FW_TMP_SRC}/"
-            if [[ "${1}" == "iwl" ]]; then
-                mkdir -p "${_FW_TMP_SRC}/intel"
-                mv "${_FW_SRC}/intel/iwlwifi" "${_FW_TMP_SRC}/intel/"
-            fi
             _create_cpio "${_FW_TMP}" "${_FW_DEST}/${2}.img" &>"${_NO_LOG}" || exit 1
         elif [[ -n "${_TARGET_DIR}" ]]; then
             echo "Saving firmware files to ${_FW_TMP}/${2}..."
             [[ -d "${_FW_TMP}/${2}/${_FW}" ]] || mkdir -p "${_FW_TMP}/${2}/${_FW}"
             mv "${_FW_SRC}/${1}"* "${_FW_TMP}/${2}/${_FW}/"
-            if [[ "${1}" == "iwl" ]]; then
-                mkdir -p "${_FW_TMP}/${2}/${_FW}/intel"
-                mv "${_FW_SRC}/intel/iwlwifi" "${_FW_TMP}/${2}/${_FW}/intel/"
-            fi
         fi
     fi
 }
@@ -286,9 +278,10 @@ _cpio_fw() {
                 _FW_TMP="/tmp/archboot-firmware"
                 [[ -d "${_FW_TMP}" ]] && rm -r "${_FW_TMP}"
             fi
-            for i in $(fd --type d --base-directory "${_FW_SRC}" --path-separator '' -d 1); do
+            for i in $(fd --type d --base-directory "${_FW_SRC}" --path-separator '' -E 'intel' -d 1); do
                 if [[ -n "${_GENERATE_IMAGE}" ]]; then
                     _move_fw "${_FW_TMP_SRC}/"
+                    [[ "${i}" == "intel" ]] && i=iwlwifi
                     echo "Preparing ${i}.img firmware..."
                     _create_cpio "${_FW_TMP}" "${_FW_DEST}/${i}.img" &>"${_NO_LOG}" || exit 1
                     # remove directory
@@ -299,10 +292,8 @@ _cpio_fw() {
                     _move_fw "${_FW_TMP}/${i}/${_FW}/"
                 fi
             done
-            # intel wireless
-            _iwl_rt_fw "iwl" "iwlwifi" || exit 1
             # ralink wireless
-            _iwl_rt_fw "rt" "ralink" || exit 1
+            _basedir_fw "rt" "ralink" || exit 1
         fi
     fi
 }
