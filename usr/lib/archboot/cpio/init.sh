@@ -165,7 +165,7 @@ _initrd_stage() {
             done
         fi
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Intel'; then
-            _FW_RUN+=("${_FW}/iwlwifi.img")
+            _FW_RUN+=("${_FW}/intel.img")
         fi
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Marvell'; then
             for i in "${_FW}"/libertas "${_FW}"/mrvl "${_FW}"/mwl*; do
