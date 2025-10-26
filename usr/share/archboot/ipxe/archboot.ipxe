@@ -75,6 +75,8 @@ initrd ${_base}/i915.img || goto _shell
 imgverify i915.img ${_base}/i915.img.sig || goto _shell
 initrd ${_base}/intel.img || goto _shell
 imgverify intel.img ${_base}/intel.img.sig || goto _shell
+initrd ${_base}/iwlwifi.img || goto _shell
+imgverify iwlwifi.img ${_base}/iwlwifi.img.sig || goto _shell
 initrd ${_base}/libertas.img || goto _shell
 imgverify libertas.img ${_base}/libertas.img.sig || goto _shell
 initrd ${_base}/mediatek.img || goto _shell

@@ -291,6 +291,8 @@ _cpio_fw() {
                     _move_fw "${_FW_TMP}/${i}/${_FW}/"
                 fi
             done
+            # iwlwifi wireless symlinks
+            _basedir_fw "iwl" "iwlwifi" || exit 1
             # ralink wireless
             _basedir_fw "rt" "ralink" || exit 1
         fi
