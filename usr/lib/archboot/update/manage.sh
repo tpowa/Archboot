@@ -163,7 +163,6 @@ _clean_fw() {
             mv "${_FW}"/{ath*,htc_*,wil6210*} ${_FW_NEW}/
         fi
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Intel'; then
-            mv "${_FW}"/iwl* ${_FW_NEW}/
             mkdir -p "${_FW_NEW}/intel"
             mv "${_FW}/intel/iwlwifi" "${_FW_NEW}/intel/"
         fi
