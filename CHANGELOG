@@ -3,10 +3,9 @@ Environment:
 - kernel 6.17.x
 - updated IPXE to 20251001
 - fixed bash history escape sequence MR #1
-cpio.sh:
-- fixed iwlwifi firmware inclusion
-manage.sh:
-- fixed iwlwifi firmware inclusion
+firmware:
+- removed aeonsemi, dell, HP, and Lenovo
+- fixed iwlwifi 
 setup:
 - disabled microcode mkinitcpio hook on aarch64
 ---
