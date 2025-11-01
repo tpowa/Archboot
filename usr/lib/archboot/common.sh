@@ -433,7 +433,6 @@ _create_cksum() {
 }
 
 _auto_fw() {
-     IFS=" " read -r -a _PACKAGES <<< "$(sd 'linux-firmware.* ' '' <<< "${_PACKAGES[@]}")"
     _VGA="VGA compatible controller"
     _ETH="Ethernet controller"
     _WIFI="Network controller"

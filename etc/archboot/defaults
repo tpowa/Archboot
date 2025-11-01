@@ -5,8 +5,6 @@ _PACKAGES=(
   base
   iptables-nft
   linux
-  linux-firmware
-  linux-firmware-marvell
   polkit
 )
 # grub setup
