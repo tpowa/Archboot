@@ -1,5 +1,9 @@
 On the road to 2025.11:
 - updated IPXE to 20251101
+setup:
+- fixed firmware autodetection
+- fixed autodetection of additional packages to install
+- reenable microcode mkinitcpio hook on aarch64
 Highlights 2025.10:
 Environment:
 - kernel 6.17.x
