@@ -1,5 +1,7 @@
 On the road to 2025.11:
 - updated IPXE to 20251101
+defaults:
+- removed linux-firmware packages from _PACKAGE array
 setup:
 - fixed firmware autodetection
 - fixed autodetection of additional packages to install
