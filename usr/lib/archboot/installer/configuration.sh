@@ -6,13 +6,10 @@ _mkinitcpio() {
         # disable error out on kms install hook
         sd ' add_checked_modules_from_symbol' ' #add_checked_modules_from_symbol' \
             "${_DESTDIR}"/usr/lib/initcpio/install/kms
-        # disable microcode, not supported on aarch64
-        sd ' microcode' '' "${_DESTDIR}"/etc/mkinitcpio.conf
         if chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}"-"${_RUNNING_ARCH}" &>"${_LOG}"; then
             : > /tmp/.mkinitcpio-success
             # write to template
             { echo "sd ' add_checked_modules_from_symbol' ' #add_checked_modules_from_symbol' \"\${_DESTDIR}\"/usr/lib/initcpio/install/kms"
-            echo "sd ' microcode' '' \"\${_DESTDIR}\"/etc/mkinitcpio.conf"
             echo "chroot \"\${_DESTDIR}\" mkinitcpio -p \"${_KERNELPKG}\"-\"${_RUNNING_ARCH}\" &>\"\${_LOG}\""
             } >> "${_TEMPLATE}"
         fi
