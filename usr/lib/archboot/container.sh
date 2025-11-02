@@ -191,12 +191,12 @@ _install_base_packages() {
     echo "Installing ${_KEYRING[*]} ${_PACKAGES[*]} to ${1}..."
     if rg -qw 'archboot' /etc/hostname; then
         ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} "${_KEYRING[@]}" "${_PACKAGES[@]}" \
-                   "${_PACMAN_DEFAULTS[@]}" &>"${_LOG}" || exit 1
+                   "${_FIRMWARE[@]}" "${_PACMAN_DEFAULTS[@]}" &>"${_LOG}" || exit 1
         echo "Downloading mkinitcpio to ${1}..."
         ${_PACMAN} -Syw mkinitcpio "${_PACMAN_DEFAULTS[@]}" &>"${_LOG}" || exit 1
     else
         ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} "${_KEYRING[@]}" "${_PACKAGES[@]}" \
-                   "${_PACMAN_DEFAULTS[@]}" &>"${_NO_LOG}" || exit 1
+                   "${_FIRMWARE[@]}" "${_PACMAN_DEFAULTS[@]}" &>"${_NO_LOG}" || exit 1
         echo "Downloading mkinitcpio to ${1}..."
         ${_PACMAN} -Syw mkinitcpio "${_PACMAN_DEFAULTS[@]}" &>"${_NO_LOG}" || exit 1
     fi
