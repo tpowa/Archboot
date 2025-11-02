@@ -19,8 +19,8 @@ _download_packages() {
         _pacman_key_system
     fi
     _PACKAGES+=("${_KEYRING[@]}" "${_ARCHBOOT[@]}" "${_MAN_INFO_PACKAGES[@]}")
-    echo "Downloading ${_PACKAGES[*]} to ${1}..."
-    ${_PACMAN} -Syw "${_PACKAGES[@]}" "${_PACMAN_DEFAULTS[@]}" "${_PACMAN_DB[@]}" &>"${_NO_LOG}" || exit 1
+    echo "Downloading ${_PACKAGES[*]} ${_FIRMWARE[*]} to ${1}..."
+    ${_PACMAN} -Syw "${_PACKAGES[@]}" "${_FIRMWARE[@]}" "${_PACMAN_DEFAULTS[@]}" "${_PACMAN_DB[@]}" &>"${_NO_LOG}" || exit 1
 }
 
 _move_packages() {
