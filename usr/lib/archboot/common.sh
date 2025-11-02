@@ -22,7 +22,10 @@ _FIX_PACKAGES=(
 _INTEL_UCODE="boot/intel-ucode.img"
 _KERNELPKG="linux"
 _KEYRING=(archlinux-keyring)
-_FIRMWARE=(linux-firmware linux-firmware-marvell)
+_FIRMWARE=(
+  linux-firmware
+  linux-firmware-marvell
+)
 _LABEL="Exit"
 _LOCAL_DB="${_CACHEDIR}/archboot.db"
 _LOG="/dev/tty11"
