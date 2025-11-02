@@ -176,7 +176,7 @@ _install_base_packages() {
         _MKINITCPIO=initramfs
     fi
     if [[ "${2}" == "use_binfmt" ]]; then
-        echo "Downloading ${_KEYRING[*]} ${_PACKAGES[*]} to ${1}..."
+        echo "Downloading ${_KEYRING[*]} ${_PACKAGES[*]} ${_FIRMWARE[*]} to ${1}..."
         if rg -qw 'archboot' /etc/hostname; then
             ${_PACMAN} -Syw "${_KEYRING[@]}" "${_PACKAGES[@]}" "${_FIRMWARE[@]}" \
                         "${_PACMAN_DEFAULTS[@]}" "${_PACMAN_DB[@]}" &>"${_LOG}" || exit 1
@@ -188,7 +188,7 @@ _install_base_packages() {
     if [[ -n "${_FW_AUTODETECT}" ]]; then
         _auto_fw
     fi
-    echo "Installing ${_KEYRING[*]} ${_PACKAGES[*]} to ${1}..."
+    echo "Installing ${_KEYRING[*]} ${_PACKAGES[*]} ${_FIRMWARE[*]} to ${1}..."
     if rg -qw 'archboot' /etc/hostname; then
         ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} "${_KEYRING[@]}" "${_PACKAGES[@]}" \
                    "${_FIRMWARE[@]}" "${_PACMAN_DEFAULTS[@]}" &>"${_LOG}" || exit 1
