@@ -178,11 +178,11 @@ _install_base_packages() {
     if [[ "${2}" == "use_binfmt" ]]; then
         echo "Downloading ${_KEYRING[*]} ${_PACKAGES[*]} to ${1}..."
         if rg -qw 'archboot' /etc/hostname; then
-            ${_PACMAN} -Syw "${_KEYRING[@]}" "${_PACKAGES[@]}" "${_PACMAN_DEFAULTS[@]}" \
-                        "${_PACMAN_DB[@]}" &>"${_LOG}" || exit 1
+            ${_PACMAN} -Syw "${_KEYRING[@]}" "${_PACKAGES[@]}" "${_FIRMWARE[@]}" \
+                        "${_PACMAN_DEFAULTS[@]}" "${_PACMAN_DB[@]}" &>"${_LOG}" || exit 1
         else
-            ${_PACMAN} -Syw "${_KEYRING[@]}" "${_PACKAGES[@]}" "${_PACMAN_DEFAULTS[@]}" \
-                       "${_PACMAN_DB[@]}" &>"${_NO_LOG}" || exit 1
+            ${_PACMAN} -Syw "${_KEYRING[@]}" "${_PACKAGES[@]}" "${_FIRMWARE[@]}" \
+                        "${_PACMAN_DEFAULTS[@]}" "${_PACMAN_DB[@]}" &>"${_NO_LOG}" || exit 1
         fi
     fi
     if [[ -n "${_FW_AUTODETECT}" ]]; then
