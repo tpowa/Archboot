@@ -3,14 +3,10 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _mkinitcpio() {
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        # disable error out on kms install hook
-        sd ' add_checked_modules_from_symbol' ' #add_checked_modules_from_symbol' \
-            "${_DESTDIR}"/usr/lib/initcpio/install/kms
         if chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}"-"${_RUNNING_ARCH}" &>"${_LOG}"; then
             : > /tmp/.mkinitcpio-success
             # write to template
-            { echo "sd ' add_checked_modules_from_symbol' ' #add_checked_modules_from_symbol' \"\${_DESTDIR}\"/usr/lib/initcpio/install/kms"
-            echo "chroot \"\${_DESTDIR}\" mkinitcpio -p \"${_KERNELPKG}\"-\"${_RUNNING_ARCH}\" &>\"\${_LOG}\""
+            { echo "chroot \"\${_DESTDIR}\" mkinitcpio -p \"${_KERNELPKG}\"-\"${_RUNNING_ARCH}\" &>\"\${_LOG}\""
             } >> "${_TEMPLATE}"
         fi
     else
