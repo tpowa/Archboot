@@ -7,6 +7,7 @@ setup:
 - fixed autodetection of additional packages to install
 - reenable microcode mkinitcpio hook on aarch64
 - fixed mkinitcpio run on aarch64
+- removed mkinitcpio fallback, disabled by default now
 Highlights 2025.10:
 Environment:
 - kernel 6.17.x

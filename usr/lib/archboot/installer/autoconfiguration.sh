@@ -366,20 +366,6 @@ _auto_mkinitcpio() {
         _AUTO_MKINITCPIO=""
         _dialog --no-mouse --infobox "" 3 70
         _auto_hwdetect | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Preconfiguring mkinitcpio settings on installed system..." 6 75 0
-        # disable fallpack preset
-        sd " 'fallback'" '' "${_DESTDIR}"/etc/mkinitcpio.d/*.preset
-        # write to template
-        { echo "### mkinitcpio disable fallback"
-        echo "sd \" 'fallback'\" '' \"\${_DESTDIR}\"/etc/mkinitcpio.d/*.preset"
-        } >> "${_TEMPLATE}"
-        # remove fallback initramfs
-        if [[ -e "${_DESTDIR}/boot/initramfs-linux-fallback.img" ]]; then
-            rm -f "${_DESTDIR}/boot/initramfs-linux-fallback.img"
-            # write to template
-            { echo "rm -f \"\${_DESTDIR}/boot/initramfs-linux-fallback.img\""
-            echo ""
-            } >> "${_TEMPLATE}"
-        fi
         sleep 2
         _AUTO_MKINITCPIO=1
         _run_mkinitcpio | _dialog --title " Logging to ${_VC} | ${_LOG} " --gauge "Running mkinitcpio on installed system..." 6 75 0
