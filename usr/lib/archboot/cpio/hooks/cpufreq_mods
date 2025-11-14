@@ -4,6 +4,6 @@
 
 _run ()
 {
-    _all_mods 'arch/x86/kernel/cpu/cpufreq|drivers/cpufreq'
+    _all_mods 'arch/x86/kernel/cpu/cpufreq|drivers/cpufreq|thermal'
 }
 
