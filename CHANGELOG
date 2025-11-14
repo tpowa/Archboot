@@ -1,5 +1,6 @@
 On the road to 2025.11:
 - updated IPXE to 20251101
+- added PHY network modules
 defaults:
 - removed linux-firmware packages from _PACKAGE array
 setup:
