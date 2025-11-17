@@ -5,6 +5,8 @@ On the road to 2025.11:
 - removed runcon and chcon
 defaults:
 - removed linux-firmware packages from _PACKAGE array
+detect-vconsole:
+- add timeout accordingly to fit to cpio detection method
 setup:
 - fixed firmware autodetection
 - fixed autodetection of additional packages to install
