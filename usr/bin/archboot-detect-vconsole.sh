@@ -15,8 +15,8 @@ _usage() {
 }
 [[ -z "${1}" || "${1}" != "run" ]] && _usage
 _root_check
-# wait for modules to initialize completely
-udevadm wait --settle /dev/fb0
+# wait for modules to initialize completely, timeout after 10 seconds to avoid hang on some systems
+udevadm wait --settle /dev/fb0 -t 10
 # get screen setting mode from /sys
 _FB_SIZE="$(rg -o ':(.*)x' -r '$1' /sys/class/graphics/fb0/modes 2>/dev/null)"
 if [[ "${_FB_SIZE}" -gt '1900' ]]; then
