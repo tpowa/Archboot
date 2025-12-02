@@ -17,7 +17,6 @@ _LICENSES=(
   duktape/LICENSE.txt
   dust/LICENSE
   dysk/LICENSE
-  e2fsprogs/MIT-LICENSE
   expat/COPYING
   eza/LICENSE.txt
   fd/LICENSE-MIT
