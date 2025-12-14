@@ -89,8 +89,9 @@ TAS*,TIAS*,tehuti,ti,ti_*,ti-keystone,tlg2300*,tsse_*,v4l*,vicam,vntw*,vxge,wsm_
 
 _prepare_pacman() {
     # prepare pacman dirs
-    echo "Creating directory in ${1}..."
+    echo "Creating directories in ${1}..."
     mkdir -p "${1}${_PACMAN_LIB}"
+    mkdir -p "${1}/${_CACHEDIR}"
     for i in dev proc sys; do
     [[ -e "${1}/${i}" ]] || mkdir -m 555 "${1}/${i}"
     done
