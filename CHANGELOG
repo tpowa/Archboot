@@ -1,4 +1,5 @@
 On the road to 2025.12:
+- fixed pacman CACHEDIR creation
 ---
 Highlights 2025.11:
 - updated IPXE to 20251101
