@@ -46,6 +46,9 @@ _update_pacman_container() {
     # fix mirrorlist
     [[ "${_ARCH}" == "riscv64" ]] && sd '^#Server = https://riscv' 'Server = https://riscv' \
                                      "${_ARCH_DIR}"/etc/pacman.d/mirrorlist
+    # fix alpm user for aarch64 container
+    [[ -f /usr/lib/sysusers.d/alpm.conf ]] && cp /usr/lib/sysusers.d/alpm.conf \
+                                                 "${_ARCH_DIR}"/usr/lib/sysusers.d/alpm.conf
     ${_NSPAWN} "${_ARCH_DIR}" systemd-sysusers &>"${_NO_LOG}"
     ${_NSPAWN} "${_ARCH_DIR}" pacman -Syu --noconfirm &>"${_NO_LOG}" || exit 1
     _fix_network "${_ARCH_DIR}"
