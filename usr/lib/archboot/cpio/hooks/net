@@ -13,7 +13,7 @@ _run ()
     _map _binary arptables{,-nft,-nft-restore,-nft-save,-restore,-save,-translate} \
                  ebtables{,-nft,-nft-restore,-nft-save,-restore,-save,-translate} \
                  ip{,6}tables{,-apply,-legacy,-legacy-restore,-legacy-save,-nft,-nft-restore,-nft-save,-restore,-restore-translate,-save,-translate} \
-                 iptables-xml netshape nfbpf_compile nfnl_osf nft xtables-{legacy-multi,monitor,nft-multi}
+                 iptables-xml netshaper nfbpf_compile nfnl_osf nft xtables-{legacy-multi,monitor,nft-multi}
     _map _full_dir /etc/iptables /usr/lib/xtables /usr/share/{iptables,nftables,xtables}
     _map _file /etc/{arptables.conf,ebtables.conf,ethertypes,nftables.conf} /usr/lib/libnetfilter_conntrack*
     # add config for rustmap, no nmap available
