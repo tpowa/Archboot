@@ -8,7 +8,7 @@ _run ()
     tar -C / --exclude=etc/{skel/.zshrc,systemd/system/multi-user.target.wants/remote-fs.target} \
 --exclude=usr/share/{bash-completion/completions/grub,systemd/bootctl} \
 --exclude=usr/lib/{modules-load.d/cdrecord.conf,systemd/{boot,systemd-journal-{gatewayd,remote},{system/{blk-availability.service,lvm2*,mkinitcpio*,\
-rpcbind*,{halt,kexec,poweroff,reboot}.target.wants,sysinit.target.wants/lvm2*},ukify}},sysusers.d/rpcbind*,tmpfiles.d/{mkinitcpio*,rpcbind*},udev/rules.d/99-fuse.rules} \
+rpcbind*,{halt,kexec,poweroff,reboot}.target.wants,sysinit.target.wants/lvm2*},ukify}},sysusers.d/rpcbind*,tmpfiles.d/{*mkinitcpio*,rpcbind*},udev/rules.d/99-fuse.rules} \
 --hard-dereference -cpf - \
 etc/{bash_completion.d,ca-certificates/extracted,default,pam.d,profile.d,security,skel,ssl/certs,sysctl.d,systemd,tpm2-tss,xdg} \
 usr/lib/{coreutils,cryptsetup,gconv,modules-load.d,p11-kit,pam.d,pkcs11,polkit-1,security,sysctl.d,systemd,sysusers.d,tmpfiles.d,udev} \
