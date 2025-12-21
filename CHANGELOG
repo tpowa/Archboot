@@ -1,4 +1,5 @@
 On the road to 2025.12:
+- added systemd 259 support
 - fixed pacman CACHEDIR creation
 - disable alpm DownloadUser on container tarball
 - added netshaper binary
