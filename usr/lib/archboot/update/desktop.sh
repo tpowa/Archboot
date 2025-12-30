@@ -87,7 +87,7 @@ _prepare_graphic() {
     done
     # start polkit, most desktop environments expect it running!
     systemctl restart polkit
-    # retrigger udev events
+    # retrigger udev events, for correct drm initialization!
     udevadm trigger
 }
 
