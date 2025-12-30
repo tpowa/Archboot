@@ -2,7 +2,7 @@ On the road to 2026.01:
 ---
 Highlights 2025.12:
 - kernel 6.18.x
-- added systemd 259.x support
+- systemd 259.x 
 Environment:
 - added netshaper binary
 - removed efi_pstore values from modprobe.conf
