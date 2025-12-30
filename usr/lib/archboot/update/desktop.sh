@@ -87,6 +87,8 @@ _prepare_graphic() {
     done
     # start polkit, most desktop environments expect it running!
     systemctl restart polkit
+    # retrigger udev events
+    udevadm trigger
 }
 
 _prepare_browser() {
