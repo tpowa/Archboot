@@ -1,14 +1,21 @@
-On the road to 2025.12:
-- kernel 6.18.x s
+On the road to 2026.01:
+---
+Highlights 2025.12:
+- kernel 6.18.x
 - added systemd 259.x support
-- fixed pacman CACHEDIR creation
-- disable alpm DownloadUser on container tarball
+Environment:
 - added netshaper binary
 - removed efi_pstore values from modprobe.conf
 - added XDG_SESSION_TYPE=wayland to tty1 systemd service file
 - retrigger udev events before starting desktop environment
+defaults:
 - increased ZRAM disk size to 6G to fit for full system and gnome desktop
-- ensure same names for network devices
+network:
+- ensure same persistent names for network devices
+setup/quickinst:
+- fixed pacman CACHEDIR creation
+tarball:
+- disable alpm DownloadUser on container tarball
 ---
 Highlights 2025.11:
 - updated IPXE to 20251101
