@@ -87,8 +87,6 @@ _prepare_graphic() {
     done
     # start polkit, most desktop environments expect it running!
     systemctl restart polkit
-    # load virtio-gpu module for KMS support to avoid wayland not starting!
-    systemd-detect-virt &>"${_LOG}" && modprobe virtio-gpu
 }
 
 _prepare_browser() {
