@@ -6,8 +6,6 @@ On the road to 2025.12:
 - added netshaper binary
 - removed efi_pstore values from modprobe.conf
 - added XDG_SESSION_TYPE=wayland to tty1 systemd service file
-- load virtio-gpu module on virtualized systems, 
-  before launching desktop environment
 ---
 Highlights 2025.11:
 - updated IPXE to 20251101
