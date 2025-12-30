@@ -128,6 +128,10 @@ _network() {
     if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
         _online_switch
     fi
+    # ensure to get correct names for network devices
+    udevadm trigger --action=add --type=subsystems
+    udevadm trigger --action=add --type=devices
+    udevadm settle
     _NETPARAMETERS=""
     while [[ -z "${_NETPARAMETERS}" ]]; do
         _INTERFACES=()
