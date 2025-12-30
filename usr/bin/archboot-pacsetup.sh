@@ -4,8 +4,14 @@
 . /usr/lib/archboot/common.sh
 _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Pacman Configuration"
 _task_download_mirror() {
+    _DL_COUNT=0
     while true; do
-        ${_DLPROG} -o /tmp/pacman_mirrorlist.txt "https://archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" && break
+        ${_DLPROG} -o /tmp/pacman_mirrorlist.txt \
+            "https://archlinux.org/mirrorlist/?country=${_COUNTRY}&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on" \
+            && break
+        [[ "${_DL_COUNT}" == 10 ]] && break
+        sleep 1
+        _DL_COUNT=$((_DL_COUNT+1))
     done
     rm /.archboot
 }
