@@ -29,7 +29,7 @@ _create_btrfs() {
     modprobe -q zstd
     echo "1" >/sys/block/zram0/reset
     echo "zstd" >/sys/block/zram0/comp_algorithm
-    echo "5G" >/sys/block/zram0/disksize
+    echo "6G" >/sys/block/zram0/disksize
     mkfs.btrfs /dev/zram0 &>"${_NO_LOG}"
     mount -o discard /dev/zram0 /run/nextroot
     rm /.archboot

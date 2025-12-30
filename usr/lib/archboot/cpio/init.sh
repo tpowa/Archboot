@@ -80,7 +80,7 @@ _task() {
     if [[ "${1}" == btrfs ]]; then
         # if available, use zstd as compression algorithm
         rg -qw 'zstd' /sys/block/zram0/comp_algorithm && echo "zstd" >/sys/block/zram0/comp_algorithm
-        echo "5G" >/sys/block/zram0/disksize
+        echo "6G" >/sys/block/zram0/disksize
         mkfs.btrfs /dev/zram0 &>"${_NO_LOG}"
         # use discard to get immediate remove of files
         mount -o discard /dev/zram0 /sysroot
