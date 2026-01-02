@@ -23,6 +23,20 @@ _GRAPHIC_IGNORE=(
 _VNC_PW="archboot"
 ### Standard Web Browser: chromium or firefox
 _STANDARD_BROWSER="firefox"
+### Cosmic defaults
+# Cosmic packages
+_COSMIC_PACKAGES=(
+  vulkan-intel
+  vulkan-nouveau
+  vulkan-radeon
+  vulkan-swrast
+  vulkan-virtio
+  cosmic-session
+  cosmic-terminal
+  cosmic-text-editor
+  gvfs-smb
+  upower
+)
 ### GNOME defaults
 # GNOME packages
 _GNOME_PACKAGES=(

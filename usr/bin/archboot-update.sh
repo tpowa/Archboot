@@ -8,6 +8,7 @@
 . /usr/lib/archboot/update/manage.sh
 . /usr/lib/archboot/update/desktop.sh
 . /usr/lib/archboot/update/xfce.sh
+. /usr/lib/archboot/update/cosmic.sh
 . /usr/lib/archboot/update/gnome.sh
 . /usr/lib/archboot/update/plasma.sh
 . /usr/lib/archboot/update/sway.sh
@@ -17,11 +18,12 @@ while [ $# -gt 0 ]; do
     case ${1} in
         -u|--u|-update|--update) _D_SCRIPTS="1" ;;
         -latest|--latest) _L_COMPLETE="1" ;;
-        -latest-install|--latest-install) _L_INSTALL_COMPLETE="1";;
+        -latest-install|--latest-install) _L_INSTALL_COMPLETE="1" ;;
         -latest-image|--latest-image) _G_RELEASE="1"
-                                      _L_INSTALL_COMPLETE="1";;
-        -xfce|--xfce) _L_XFCE="1" ;;
+                                      _L_INSTALL_COMPLETE="1" ;;
+        -cosmic|--cosmic) _L_COSMIC="1" ;;
         -sway|--sway) _L_SWAY="1" ;;
+        -xfce|--xfce) _L_XFCE="1" ;;
         -gnome|--gnome) _L_GNOME="1";;
         -plasma|--plasma) _L_PLASMA="1" ;;
         -custom-xorg|--custom-xorg) _CUSTOM_X="1" ;;
@@ -62,8 +64,8 @@ fi
 if [[ -n "${_CUSTOM_X}" || -n "${_CUSTOM_WL}" ]]; then
     _custom_wayland_xorg
 fi
-# Gnome, KDE/PLASMA or XFCE launch
-if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]]; then
+# Cosmic, Gnome, KDE/PLASMA or XFCE launch
+if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_COSMIC}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]]; then
     : > /.update
     _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Desktop Environment"
     [[ -e /var/cache/pacman/pkg/archboot.db ]] && : > /.graphic_installed
@@ -76,6 +78,9 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
     elif [[ -n "${_L_PLASMA}" ]];then
         _ENVIRONMENT="Plasma/KDE"
         _install_plasma | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
+    elif [[ -n "${_L_COSMIC}" ]]; then
+        _ENVIRONMENT="Cosmic"
+        _install_cosmic | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
     elif [[ -n "${_L_SWAY}" ]]; then
         _ENVIRONMENT="Sway"
         _install_sway | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
@@ -109,6 +114,10 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}
         _start_plasma | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
         clear
         echo -e "To relaunch \e[1mKDE/Plasma Wayland\e[m use: \e[92mplasma-wayland\e[m"
+    elif [[ -n "${_L_COSMIC}" ]]; then
+        _start_cosmic | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        clear
+        echo -e "To relaunch \e[1mCosmic\e[m use: \e[92mcosmic-wayland\e[m"
     elif [[ -n "${_L_SWAY}" ]]; then
         _start_sway | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
         clear

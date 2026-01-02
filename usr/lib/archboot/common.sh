@@ -67,7 +67,6 @@ if [[ ! -e "${_TEMPLATE}" ]]; then
     } >> "${_TEMPLATE}"
 fi
 _VNC_PACKAGE=(tigervnc)
-_WAYLAND_PACKAGE=(egl-wayland)
 _XORG_PACKAGE=(xorg)
 
 _BASENAME=${0##*/}
@@ -487,4 +486,10 @@ _auto_fw() {
             _PACKAGES+=(linux-firmware-other)
         fi
     fi
+}
+
+_udev_trigger() {
+    udevadm trigger --action=add --type=subsystems
+    udevadm trigger --action=add --type=devices
+    udevadm settle
 }

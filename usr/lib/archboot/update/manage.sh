@@ -229,7 +229,7 @@ _download_latest_task() {
         ${_DLPROG} -o "${_LIB}/${i}" "${_SOURCE}${_LIB}/${i}?inline=false"
     done
     # update libs
-    LIBS="update.sh manage.sh desktop.sh xfce.sh gnome.sh plasma.sh sway.sh"
+    LIBS="update.sh manage.sh desktop.sh xfce.sh gnome.sh plasma.sh cosmic.sh sway.sh"
     for i in ${LIBS}; do
         ${_DLPROG} -o "${_UPDATE}/${i}" "${_SOURCE}${_UPDATE}/${i}?inline=false"
     done
@@ -398,9 +398,7 @@ _full_system() {
         _progress "99" "Skipping kernel module loading..."
     else
         _progress "99" "Trigger kernel module loading..."
-        udevadm trigger --action=add --type=subsystems
-        udevadm trigger --action=add --type=devices
-        udevadm settle
+        _udev_trigger
     fi
     _progress "100" "Full Arch Linux system is ready now."
     sleep 2

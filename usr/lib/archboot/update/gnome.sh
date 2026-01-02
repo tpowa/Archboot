@@ -28,16 +28,17 @@ EOF
 
 _install_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
-        _prepare_graphic "${_WAYLAND_PACKAGE[@]}" "${_STANDARD_PACKAGES[@]}" "${_GNOME_PACKAGES[@]}"
+        _prepare_graphic "${_STANDARD_PACKAGES[@]}" "${_GNOME_PACKAGES[@]}"
     fi
     _prepare_browser &>"${_LOG}"
     _configure_gnome &>"${_LOG}"
 }
 
 _start_gnome() {
-    _progress "100" "Launching GNOME Wayland now, logging is done on ${_LOG}..."
+    _progress "100" "Launching GNOME now, logging is done on ${_LOG}..."
     sleep 2
-    echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland exec gnome-session --no-reexec &>${_LOG}" > /usr/bin/gnome-wayland
+    echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland exec gnome-session --no-reexec &>${_LOG}" \
+          > /usr/bin/gnome-wayland
     chmod 755 /usr/bin/gnome-wayland
     gnome-wayland
 }

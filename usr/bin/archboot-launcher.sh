@@ -6,10 +6,11 @@ _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Lau
 
 _check_desktop() {
     _DESKTOP=()
+    update | rg -q 'Cosmic' && _DESKTOP+=( "cosmic" "Leightweight Desktop" )
     update | rg -q 'Gnome' && _DESKTOP+=( "gnome" "Simple Beautiful Elegant" )
     update | rg -q 'KDE' && _DESKTOP+=( "plasma" "Simple By Default" )
     update | rg -q 'Sway' && _DESKTOP+=( "sway" "Tiling Wayland Compositor" )
-    update | rg -q 'Xfce' && _DESKTOP+=( "xfce" "Leightweight Desktop" )
+    update | rg -q 'Xfce' && _DESKTOP+=( "xfce" "Leightweight X11 Desktop" )
 }
 
 _check_manage() {
@@ -20,7 +21,7 @@ _check_manage() {
 }
 
 _desktop () {
-    _dialog  --title " Desktop Menu " --menu "" 10 40 6 "${_DESKTOP[@]}" 2>"${_ANSWER}" || return 1
+    _dialog  --title " Desktop Menu " --menu "" 11 40 7 "${_DESKTOP[@]}" 2>"${_ANSWER}" || return 1
     [[ -e /.launcher-running ]] && rm /.launcher-running
     _EXIT=$(cat "${_ANSWER}")
     _dialog  --title " Internet Browser " --menu "" 8 40 4 \

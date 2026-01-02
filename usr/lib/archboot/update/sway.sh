@@ -104,17 +104,21 @@ EOF
 
 _install_sway() {
     if ! [[ -e /usr/bin/sway ]]; then
-        _prepare_graphic "${_WAYLAND_PACKAGE[@]}" "${_STANDARD_PACKAGES[@]}" "${_SWAY_PACKAGES[@]}"
+        _prepare_graphic "${_STANDARD_PACKAGES[@]}" "${_SWAY_PACKAGES[@]}"
     fi
     _prepare_browser &>"${_LOG}"
     _configure_sway &>"${_LOG}"
 }
 
 _start_sway() {
+    _progress "100" "Launching Sway now, logging is done on ${_LOG}..."
+    sleep 2
     # list available layouts:
     # localectl list-x11-keymap-layouts
+    _KEYMAP=$(rg -o '^KEYMAP=(\w+)-' -r '$1' /etc/vconsole.conf)
+    [[ -z ${_KEYMAP} ]] && _KEYMAP=us
     echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland \
-        XKB_DEFAULT_LAYOUT=$(rg -o '^KEYMAP=(\w+)-' -r '$1' /etc/vconsole.conf) \
+        XKB_DEFAULT_LAYOUT=${_KEYMAP} \
         exec sway &>${_LOG}" > /usr/bin/sway-wayland
     chmod 755 /usr/bin/sway-wayland
     sway-wayland

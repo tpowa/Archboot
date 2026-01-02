@@ -81,14 +81,14 @@ _prepare_graphic() {
     # add --boot to really create all tmpfiles!
     # Check: /tmp/.X11-unix, may have wrong permission on startup error!
     systemd-tmpfiles --boot --create &>"${_LOG}"
+    # retrigger udev events, for correct drm initialization!
+    _udev_trigger
     # fixing dbus requirements
     for i in dbus dbus-org.freedesktop.login1.service; do
         systemctl reload ${i}
     done
     # start polkit, most desktop environments expect it running!
     systemctl restart polkit
-    # retrigger udev events, for correct drm initialization!
-    udevadm trigger
 }
 
 _prepare_browser() {
@@ -129,7 +129,7 @@ _custom_wayland_xorg() {
     if [[ -n "${_CUSTOM_WL}" ]]; then
         echo -e "\e[1mStep 1/2:\e[m Installing custom wayland..."
         echo "          This will need some time..."
-        _prepare_graphic "${_WAYLAND_PACKAGE[@]}" "${_CUSTOM_WAYLAND[@]}" &>"${_LOG}"
+        _prepare_graphic "${_CUSTOM_WAYLAND[@]}" &>"${_LOG}"
     fi
     if [[ -n "${_CUSTOM_X}" ]]; then
         echo -e "\e[1mStep 1/2:\e[m Installing custom xorg..."
