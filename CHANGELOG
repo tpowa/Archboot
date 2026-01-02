@@ -1,5 +1,6 @@
 On the road to 2026.01:#
-.added Cosmic desktop environment
+- added Cosmic desktop environment
+- fixed keyboard layout on sway startup
 ---
 Highlights 2025.12:
 - kernel 6.18.x

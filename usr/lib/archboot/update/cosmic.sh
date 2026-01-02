@@ -41,7 +41,6 @@ GenericName=Installer
 Exec=cosmic-term -- /usr/bin/setup
 Icon=system-software-install
 EOF
-
 }
 
 _install_cosmic() {
