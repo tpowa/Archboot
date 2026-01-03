@@ -128,7 +128,7 @@ _network() {
     if [[ -e "/var/cache/pacman/pkg/archboot.db" ]]; then
         _online_switch
     fi
-    # ensure to get correct names for network devices
+    # ensure to get all network devices with same persistent names
     _udev_trigger
     _NETPARAMETERS=""
     while [[ -z "${_NETPARAMETERS}" ]]; do
