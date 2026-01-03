@@ -1,6 +1,10 @@
 On the road to 2026.01:
+launcher:
 - added Cosmic desktop environment
+sway:
 - fixed keyboard layout on sway startup
+pacsetup:
+- added timeout on mirrorlist fetching
 ---
 Highlights 2025.12:
 - kernel 6.18.x
