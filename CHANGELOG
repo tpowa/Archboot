@@ -1,4 +1,6 @@
 On the road to 2026.01:
+container:
+- fixed clean cache function
 launcher:
 - added Cosmic desktop environment
 sway:
