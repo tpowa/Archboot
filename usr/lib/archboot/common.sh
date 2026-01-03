@@ -436,6 +436,7 @@ _create_cksum() {
 }
 
 _auto_fw() {
+    _FIRMWARE=()
     _VGA="VGA compatible controller"
     _ETH="Ethernet controller"
     _WIFI="Network controller"
