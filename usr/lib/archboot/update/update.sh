@@ -66,7 +66,7 @@ _usage () {
                 echo -e " \e[1m-latest\e[m          Launch latest Archboot Environment (using kexec)."
             fi
         fi
-        if [[ "${_MEM_TOTAL}" -gt 4061000 ]]; then
+        if [[ "${_MEM_TOTAL}" -gt 2961000 ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
                 echo -e " \e[1m-latest-install\e[m  Launch latest Archboot Environment with"
                 echo -e "                  package cache (using kexec)."

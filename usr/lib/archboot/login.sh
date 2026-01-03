@@ -91,20 +91,10 @@ _run_latest_install() {
 _run_update_installer() {
     cd /
     if [[ "${_TTY}" == "tty1" ]]; then
-        if [[ "${_MEM_TOTAL}" -lt 2971000 ]]; then
-            _run_latest
+        if update | rg -q 'latest-install'; then
+            _run_latest_install
         else
-            # local image
-            if [[ -e "${_LOCAL_DB}" ]]; then
-                _run_latest_install
-            else
-                # latest image
-                if update | rg -q 'latest-install'; then
-                    _run_latest_install
-                else
-                    _run_latest
-                fi
-            fi
+            _run_latest
         fi
     fi
 }
@@ -211,13 +201,13 @@ if [[ -e /usr/bin/setup ]]; then
     if ! [[ -e /.launcher ]]; then
         launcher
     fi
-# latest image, fail if less than 2.3GB RAM available
+# latest image, fail if less than 2.1GB RAM available
 elif [[ "${_MEM_TOTAL}" -lt 2070000 ]]; then
     _welcome
     _memory_error "2.1GB"
     _enter_shell
 # local image, fail if less than 3.0GB  RAM available
-elif [[ "${_MEM_TOTAL}" -lt 2971000 &&\
+elif [[ "${_MEM_TOTAL}" -lt 2961000 &&\
 -e "${_LOCAL_DB}" ]]; then
     _welcome
     _memory_error "2.9GB"
