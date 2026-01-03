@@ -1,4 +1,6 @@
 On the road to 2026.01:
+Environment:
+- lower package cache requirement to 3G RAM
 container:
 - fixed clean cache function
 launcher:
