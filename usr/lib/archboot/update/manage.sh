@@ -37,7 +37,11 @@ _create_container() {
     else
         # online mode
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
-            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -fw &>"${_LOG}" || exit 1
+            if [[ -n "${_G_RELEASE}" ]]; then
+                "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc &>"${_LOG}" || exit 1
+            else
+                "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -fw &>"${_LOG}" || exit 1
+            fi
         fi
     fi
     rm "${_W_DIR}"/.archboot
