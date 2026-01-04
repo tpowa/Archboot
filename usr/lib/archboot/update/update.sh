@@ -72,7 +72,7 @@ _usage () {
                 echo -e "                  package cache (using kexec)."
             fi
         fi
-        if [[ "${_MEM_TOTAL}" -gt 4216000 ]]; then
+        if [[ "${_MEM_TOTAL}" -gt 5516000 ]]; then
             echo -e " \e[1m-latest-image\e[m    Generate latest image files in /archboot directory."
         fi
     fi

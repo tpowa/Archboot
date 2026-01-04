@@ -1,6 +1,4 @@
 On the road to 2026.01:
-Environment:
-- lower package cache requirement to 3G RAM
 container:
 - fixed clean cache function
 launcher:
@@ -9,10 +7,11 @@ sway:
 - fixed keyboard layout on sway startup
 pacsetup:
 - added timeout on mirrorlist fetching
-common:
-- don't install firmware packages, if autodetection is enabled
-manage:
-- don't strip firmware from new images
+update:
+- lower package cache requirement on new environment routine to 3G RAM
+- don't install firmware packages on new environment routine
+- don't strip firmware from new images routine
+- higher requirement of new images routine to 5.5G RAM
 ---
 Highlights 2025.12:
 - kernel 6.18.x
