@@ -1,6 +1,9 @@
 On the road to 2026.01:
 defaults:
-- added all supported firmware files to _GRAPHIC_IGNORE list
+- added all supported firmware packages to _GRAPHIC_IGNORE list
+init:
+- added checks for intel firmware to only extract it one time
+  --> improved boot time on intel systems
 clock:
 - added 10 seconds timeout for _ZONE detection
 container:
