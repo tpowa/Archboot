@@ -153,6 +153,9 @@ _initrd_stage() {
         if rg "${_ETH}" "${_PCI}" | rg -q 'Broadcom'; then
             _FW_RUN+=("${_FW}/bnx2.img" "${_FW}/tigon.img")
         fi
+        if rg "${_ETH}" "${_PCI}" | rg -q 'Intel'; then
+             rg -q intel <<<"${_FW_RUN[@]}" || _FW_RUN+=("${_FW}/intel.img")
+        fi
         if rg "${_ETH}" "${_PCI}" | rg -q 'Realtek'; then
              _FW_RUN+=("${_FW}/rtl_nic.img")
         fi
@@ -165,7 +168,7 @@ _initrd_stage() {
             done
         fi
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Intel'; then
-            _FW_RUN+=("${_FW}/intel.img")
+            rg -q intel <<<"${_FW_RUN[@]}" || _FW_RUN+=("${_FW}/intel.img")
             _FW_RUN+=("${_FW}/iwlwifi.img")
         fi
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Marvell'; then

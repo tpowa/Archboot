@@ -68,7 +68,6 @@ if [[ ! -e "${_TEMPLATE}" ]]; then
 fi
 _VNC_PACKAGE=(tigervnc)
 _XORG_PACKAGE=(xorg)
-
 _BASENAME=${0##*/}
 _ANSWER="/.${_BASENAME}"
 _VC_NUM="${_LOG/\/dev\/tty/}"
@@ -459,6 +458,9 @@ _auto_fw() {
     if rg -q "${_ETH}" "${_PCI}"; then
         if rg "${_ETH}" "${_PCI}" | rg -q 'Broadcom'; then
             _PACKAGES+=(linux-firmware-broadcom)
+        fi
+        if rg "${_ETH}" "${_PCI}" | rg -q 'Intel'; then
+            _PACKAGES+=(linux-firmware-intel)
         fi
         if rg "${_ETH}" "${_PCI}" | rg -q 'Realtek'; then
             _PACKAGES+=(linux-firmware-realtek)
