@@ -5,6 +5,9 @@ clock:
 - added 10 seconds timeout for _ZONE detection
 container:
 - fixed clean cache function
+firmware:
+- added broadcom wireless firmware
+- removed sdca firmware
 launcher:
 - added Cosmic desktop environment
 login:

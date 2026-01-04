@@ -470,6 +470,9 @@ _auto_fw() {
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Atheros'; then
             _PACKAGES+=(linux-firmware-atheros)
         fi
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Broadcom'; then
+            _PACKAGES+=(linux-firmware-broadcom)
+        fi
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Intel'; then
             _PACKAGES+=(linux-firmware-intel)
         fi

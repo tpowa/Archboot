@@ -71,6 +71,8 @@ initrd ${_base}/ath9k_htc.img || goto _shell
 imgverify ath9k_htc.img ${_base}/ath9k_htc.img.sig || goto _shell
 initrd ${_base}/bnx2.img || goto _shell
 imgverify bnx2.img ${_base}/bnx2.img.sig || goto _shell
+initrd ${_base}/brcm.img || goto _shell
+imgverify brcm.img ${_base}/brcm.img.sig || goto _shell
 initrd ${_base}/i915.img || goto _shell
 imgverify i915.img ${_base}/i915.img.sig || goto _shell
 initrd ${_base}/intel.img || goto _shell
