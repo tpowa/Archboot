@@ -80,21 +80,13 @@ _enter_shell() {
     fi
 }
 
-_run_latest() {
-    update -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
-}
-
-_run_latest_install() {
-    update -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
-}
-
 _run_update_installer() {
     cd /
     if [[ "${_TTY}" == "tty1" ]]; then
         if update | rg -q 'latest-install'; then
-            _run_latest_install
+            update -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
         else
-            _run_latest
+            update -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
         fi
     fi
 }
@@ -108,20 +100,11 @@ _run_autorun() {
         echo "Trying 30 seconds to download:"
         echo -n "${_REMOTE_AUTORUN} --> autorun.sh..."
         [[ -d /etc/archboot/run ]] || mkdir -p /etc/archboot/run
-        _COUNT=""
-        while true; do
-            sleep 1
-            if ${_DLPROG} -o /etc/archboot/run/autorun.sh "${_REMOTE_AUTORUN}"; then
+        if ${_DLPROG} --max-time 30 -o /etc/archboot/run/autorun.sh "${_REMOTE_AUTORUN}"; then
                 echo -e "\e[1;94m => \e[1;92mSuccess.\e[m"
-                break
-            fi
-            _COUNT=$((_COUNT+1))
-            if [[ "${_COUNT}" == 30 ]]; then
+        else
                 echo -e "\e[1;94m => \e[1;91mERROR: Download failed.\e[m"
-                sleep 5
-                break
-            fi
-        done
+        fi
     fi
     if [[ -f /etc/archboot/run/autorun.sh ]]; then
         # don't run on pre environment

@@ -5,6 +5,8 @@ container:
 - fixed clean cache function
 launcher:
 - added Cosmic desktop environment
+login:
+- added 30 second maximal timeout to download autorun.sh
 sway:
 - fixed keyboard layout on sway startup
 pacsetup:
