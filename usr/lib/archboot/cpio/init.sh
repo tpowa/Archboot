@@ -168,7 +168,7 @@ _initrd_stage() {
             done
         fi
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Broadcom'; then
-            _FW_RUN+=("${_FW}/brcm.img")
+            _FW_RUN+=("${_FW}/brcm.img" "${_FW}/cypress.img")
         fi
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Intel'; then
             rg -q intel <<<"${_FW_RUN[@]}" || _FW_RUN+=("${_FW}/intel.img")
