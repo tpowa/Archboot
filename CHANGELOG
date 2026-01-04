@@ -1,4 +1,6 @@
 On the road to 2026.01:
+defaults:
+- added all supported firmware files to _GRAPHIC_IGNORE list
 container:
 - fixed clean cache function
 launcher:
