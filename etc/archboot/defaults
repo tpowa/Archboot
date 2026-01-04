@@ -17,7 +17,17 @@ _SPLASH="/usr/share/archboot/uki/archboot-background.bmp"
 _GRAPHIC_IGNORE=(
   linux
   linux-firmware
+  linux-firmware-amdgpu
+  linux-firmware-atheros
+  linux-firmware-broadcom
+  linux-firmware-intel
   linux-firmware-marvell
+  linux-firmware-mediatek
+  linux-firmware-nvidia
+  linux-firmware-other
+  linux-firmware-radeon
+  linux-firmware-realtek
+  linux-firmware-whence
 )
 # VNC password
 _VNC_PW="archboot"
