@@ -97,7 +97,7 @@ _check
 _SET_TIME=""
 # automatic setup
 if ping -c1 www.google.com &>"${_NO_LOG}"; then
-    _ZONE="$(${_DLPROG} "http://ip-api.com/csv/?fields=timezone")"
+    _ZONE="$(${_DLPROG} --max-time 10 "http://ip-api.com/csv/?fields=timezone")"
     _auto_clock |  _dialog --title " Clock Configuration " --no-mouse --gauge "Using ${_ZONE} and enable NTP timesyncd..." 6 70 0
     _SET_TIME="1"
 fi

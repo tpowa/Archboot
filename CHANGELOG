@@ -1,16 +1,18 @@
 On the road to 2026.01:
 defaults:
 - added all supported firmware files to _GRAPHIC_IGNORE list
+clock:
+- added 10 seconds timeout for ZONE detection
 container:
 - fixed clean cache function
 launcher:
 - added Cosmic desktop environment
 login:
-- added 30 second maximal timeout to download autorun.sh
+- added 30 second timeout to download autorun.sh
 sway:
 - fixed keyboard layout on sway startup
 pacsetup:
-- added 10 seconds max timeout on mirrorlist and country fetching
+- added 10 seconds timeout on geoip and mirrorlist fetching
 update:
 - lower package cache requirement on new environment routine to 3G RAM
 - don't install firmware packages on new environment routine
