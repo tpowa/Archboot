@@ -2,7 +2,7 @@ On the road to 2026.01:
 defaults:
 - added all supported firmware files to _GRAPHIC_IGNORE list
 clock:
-- added 10 seconds timeout for ZONE detection
+- added 10 seconds timeout for _ZONE detection
 container:
 - fixed clean cache function
 launcher:
@@ -14,10 +14,11 @@ sway:
 pacsetup:
 - added 10 seconds timeout on geoip and mirrorlist fetching
 update:
-- lower package cache requirement on new environment routine to 3G RAM
-- don't install firmware packages on new environment routine
-- don't strip firmware from new images routine
-- higher requirement of new images routine to 5.5G RAM
+- lowered requirement of package cache inclusion on 
+  new environment routine to 3G RAM
+- highered requirement of creation of new images routine to 5.5G RAM
+- added autodetection of firmware packages on new environment routine
+- added all supported firmware packages in new images routine
 - added 10 seconds timeout on geoip and mirrorlist fetching
 ---
 Highlights 2025.12:
