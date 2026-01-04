@@ -6,6 +6,7 @@ clock:
 container:
 - fixed clean cache function
 firmware:
+- removed bnx2x firmware
 - added broadcom wireless firmware
 - removed sdca firmware
 launcher:
