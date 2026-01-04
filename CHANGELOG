@@ -10,7 +10,7 @@ login:
 sway:
 - fixed keyboard layout on sway startup
 pacsetup:
-- added timeout on mirrorlist fetching
+- added 10 seconds max timeout on mirrorlist and country fetching
 update:
 - lower package cache requirement on new environment routine to 3G RAM
 - don't install firmware packages on new environment routine
