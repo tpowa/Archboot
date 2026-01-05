@@ -158,6 +158,9 @@ _clean_fw() {
         if rg "${_ETH}" "${_PCI}" | rg -q 'Broadcom'; then
             mv "${_FW}"/{bnx2,tigon} ${_FW_NEW}/
         fi
+        if rg "${_ETH}" "${_PCI}" | rg -q 'Intel'; then
+            mv "${_FW}"/intel ${_FW_NEW}/
+        fi
         if rg "${_ETH}" "${_PCI}" | rg -q 'Realtek'; then
             mv "${_FW}"/rtl_nic ${_FW_NEW}/
         fi
@@ -166,8 +169,11 @@ _clean_fw() {
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Atheros'; then
             mv "${_FW}"/{ath*,htc_*,wil6210*} ${_FW_NEW}/
         fi
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'Broadcom'; then
+             mv "${_FW}"/{brcm,cypress} ${_FW_NEW}/
+        fi
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Intel'; then
-            mkdir -p "${_FW_NEW}/intel"
+            [[ -d "${_FW_NEW}/intel" ]] || mkdir -p "${_FW_NEW}/intel"
             mv "${_FW}/intel/iwlwifi" "${_FW_NEW}/intel/"
             mv "${_FW}"/iwl* ${_FW_NEW}/
         fi
