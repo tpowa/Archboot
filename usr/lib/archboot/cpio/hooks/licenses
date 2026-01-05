@@ -90,6 +90,7 @@ _LICENSES=(
   ouch/LICENSE
   p11-kit/COPYING
   pcre2/{BSD-{2,3}-Clause.txt,PCRE2-exception.txt}
+  pigz/README
   popt/LICENSE
   procs/LICENSE
   ripgrep/{COPYING,LICENSE-MIT,UNLICENSE}
