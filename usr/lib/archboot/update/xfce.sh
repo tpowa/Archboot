@@ -10,7 +10,7 @@ _install_xfce() {
 }
 
 _configure_xfce() {
-    echo "Configuring xfce panel..."
+    echo "Configuring Xfce Panel..."
     cat << EOF >/etc/xdg/xfce4/panel/default.xml
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -247,7 +247,7 @@ EOF
 }
 
 _start_xfce() {
-    _progress "100" "Launching XFCE now, logging is done on ${_LOG}..."
+    _progress "100" "Launching Xfce now, logging is done on ${_LOG}..."
     sleep 2
     startxfce4 &>"${_LOG}"
 }

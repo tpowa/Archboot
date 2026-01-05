@@ -8,7 +8,7 @@ _check_desktop() {
     _DESKTOP=()
     update | rg -q 'Cosmic' && _DESKTOP+=( "cosmic" "Leightweight Desktop" )
     update | rg -q 'Gnome' && _DESKTOP+=( "gnome" "Simple Beautiful Elegant" )
-    update | rg -q 'KDE' && _DESKTOP+=( "plasma" "Simple By Default" )
+    update | rg -q 'Plasma' && _DESKTOP+=( "plasma" "Simple By Default" )
     update | rg -q 'Sway' && _DESKTOP+=( "sway" "Tiling Wayland Compositor" )
     update | rg -q 'Xfce' && _DESKTOP+=( "xfce" "Leightweight X11 Desktop" )
 }

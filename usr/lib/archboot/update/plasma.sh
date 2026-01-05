@@ -3,7 +3,7 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 
 _configure_plasma() {
-    echo "Configuring KDE..."
+    echo "Configuring Plasma..."
     echo "Replacing wallpaper..."
     for i in /usr/share/wallpapers/Next/contents/images/*; do
         cp /usr/share/archboot/grub/archboot-background.png "${i}"
@@ -70,7 +70,7 @@ _install_plasma() {
 }
 
 _start_plasma() {
-    _progress "100" "Launching Plasma/KDE now, logging is done on ${_LOG}..."
+    _progress "100" "Launching Plasma now, logging is done on ${_LOG}..."
     sleep 2
     echo "/usr/lib/plasma-dbus-run-session-if-needed /usr/bin/startplasma-wayland &>${_LOG}" \
          > /usr/bin/plasma-wayland

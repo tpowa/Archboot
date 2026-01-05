@@ -64,19 +64,19 @@ fi
 if [[ -n "${_CUSTOM_X}" || -n "${_CUSTOM_WL}" ]]; then
     _custom_wayland_xorg
 fi
-# Cosmic, Gnome, KDE/PLASMA or XFCE launch
+# Cosmic, Gnome, Plasma or Xfce launch
 if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_COSMIC}" || -n "${_L_PLASMA}" || -n "${_L_GNOME}" ]]; then
     : > /.update
     _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Desktop Environment"
     [[ -e /var/cache/pacman/pkg/archboot.db ]] && : > /.graphic_installed
     if [[ -n "${_L_XFCE}" ]]; then
-        _ENVIRONMENT="XFCE"
+        _ENVIRONMENT="Xfce"
         _install_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
     elif [[ -n "${_L_GNOME}" ]]; then
-        _ENVIRONMENT="GNOME"
+        _ENVIRONMENT="Gnome"
         _install_gnome | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
     elif [[ -n "${_L_PLASMA}" ]];then
-        _ENVIRONMENT="Plasma/KDE"
+        _ENVIRONMENT="Plasma"
         _install_plasma | _dialog --title "${_MENU_TITLE}" --gauge "Initializing ${_ENVIRONMENT}..." 6 75 0
     elif [[ -n "${_L_COSMIC}" ]]; then
         _ENVIRONMENT="Cosmic"
@@ -105,15 +105,15 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_COSMIC}" || -n "${_L_PLASMA
     if [[ -n "${_L_XFCE}" ]]; then
         _start_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
         clear
-        echo -e "To relaunch \e[1mXFCE\e[m desktop use: \e[92mstartxfce4\e[m"
+        echo -e "To relaunch \e[1mXfce\e[m desktop use: \e[92mstartxfce4\e[m"
     elif [[ -n "${_L_GNOME}" ]]; then
         _start_gnome | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
         clear
-        echo -e "To relaunch \e[1mGNOME Wayland\e[m use: \e[92mgnome-wayland\e[m"
+        echo -e "To relaunch \e[1mGnome Wayland\e[m use: \e[92mgnome-wayland\e[m"
     elif [[ -n "${_L_PLASMA}" ]]; then
         _start_plasma | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
         clear
-        echo -e "To relaunch \e[1mKDE/Plasma Wayland\e[m use: \e[92mplasma-wayland\e[m"
+        echo -e "To relaunch \e[1mPlasma Wayland\e[m use: \e[92mplasma-wayland\e[m"
     elif [[ -n "${_L_COSMIC}" ]]; then
         _start_cosmic | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
         clear

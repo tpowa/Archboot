@@ -24,7 +24,7 @@ _graphic_options() {
     if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
         echo -e " \e[1m-cosmic\e[m          Launch Cosmic desktop"
         echo -e " \e[1m-gnome\e[m           Launch Gnome desktop"
-        echo -e " \e[1m-plasma\e[m          Launch KDE Plasma desktop"
+        echo -e " \e[1m-plasma\e[m          Launch Plasma desktop"
     fi
 }
 

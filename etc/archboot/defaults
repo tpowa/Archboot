@@ -34,7 +34,6 @@ _VNC_PW="archboot"
 ### Standard Web Browser: chromium or firefox
 _STANDARD_BROWSER="firefox"
 ### Cosmic defaults
-# Cosmic packages
 _COSMIC_PACKAGES=(
   vulkan-intel
   vulkan-nouveau
@@ -47,8 +46,7 @@ _COSMIC_PACKAGES=(
   gvfs-smb
   upower
 )
-### GNOME defaults
-# GNOME packages
+### Gnome defaults
 _GNOME_PACKAGES=(
   file-roller
   gedit
@@ -61,8 +59,7 @@ _GNOME_PACKAGES=(
   gvfs-smb
   nautilus
 )
-### KDE/Plasma defaults
-# KDE/Plasma packages
+### Plasma defaults
 _PLASMA_PACKAGES=(
   ark
   dolphin
@@ -74,8 +71,7 @@ _PLASMA_PACKAGES=(
   plasma-wayland-session
   powerdevil
 )
-### SWAY defaults
-# Sway packages
+### Sway defaults
 _SWAY_PACKAGES=(
   bemenu-wayland
   foot
@@ -86,8 +82,7 @@ _SWAY_PACKAGES=(
   waybar
   wayvnc
 )
-### XFCE defaults
-# Xfce packages
+### Xfce defaults
 _XFCE_PACKAGES=(
   breeze-icons
   file-roller
