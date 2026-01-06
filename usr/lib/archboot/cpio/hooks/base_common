@@ -29,7 +29,7 @@ _run ()
     _map _file /etc/{bash.bash_logout,bash.bashrc,profile,shells}
     # add kmod related config file(s)
     _file /usr/lib/depmod.d/search.conf
-    for i in dialogrc hostname modprobe.d/modprobe.conf os-release; do
+    for i in dialogrc hostname os-release; do
         _file_rename "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done
     # add bash configuration, use color bash prompt, use color grep and ls output
