@@ -1,6 +1,7 @@
 On the road to 2026.01:
 Environment:
 - added pigz to packages
+- added /usr/lib/gnupg programs
 defaults:
 - added all supported firmware packages to _GRAPHIC_IGNORE list
 init:

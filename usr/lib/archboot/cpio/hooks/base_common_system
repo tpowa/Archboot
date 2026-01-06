@@ -142,6 +142,8 @@ linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz} \
     _dir /etc/pacman.d/gnupg
     _file_rename /usr/share/archboot/base/etc/systemd/system/pacman-init.service \
                  /etc/systemd/system/pacman-init.service
+    # add gnupg programs
+    _full_dir /usr/lib/gnupg
     # add nss p11-kit and ca certificates
     _symlink "/etc/ssl/cert.pem" "../ca-certificates/extracted/tls-ca-bundle.pem"
     _symlink "/etc/ssl/certs/ca-certificates.crt" "../../ca-certificates/extracted/tls-ca-bundle.pem"
