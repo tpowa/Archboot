@@ -229,7 +229,7 @@ _install_libs() {
     # sd '/lib//usr' '' # neovim lua lib
     # sd 'libsystemd-' 'systemd/libsystemd-' # libsystemd- libraries don't have systemd/ prefix
     echo "Adding libraries..."
-    _LIB_FILES=("${_ROOTFS}"/usr/{bin,lib/{,systemd,security}}/*)
+    _LIB_FILES=("${_ROOTFS}"/usr/{bin,lib/{,gnupg,systemd,security}}/*)
     while true; do
         mapfile -t _LIB_FILES < <(readelf -d "${_LIB_FILES[@]}" 2>"${_NO_LOG}" |\
                                   rg -o 'NEEDED.*\[(.*)\]' -r '/lib/$1' | sort -u | sd '/lib//usr' '' |\
