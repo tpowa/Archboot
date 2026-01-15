@@ -1,4 +1,5 @@
 On the road to 2026.01:
+- grub 2.14
 Environment:
 - added pigz to packages
 - added /usr/lib/gnupg programs
