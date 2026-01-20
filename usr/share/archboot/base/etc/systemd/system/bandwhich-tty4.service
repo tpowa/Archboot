@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# by Tobias Powalowski <tpowa@archlinux.org>
+
+[Unit]
+Description=Launch bandwhich on VC4
+ConditionPathExists=/usr/bin/bandwhich
+
+[Service]
+ExecStart=/usr/bin/kmscon --no-switchvt --vt /dev/tty4 --login /usr/bin/bandwhich
+
+[Install]
+WantedBy=getty.target
