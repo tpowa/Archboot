@@ -106,6 +106,8 @@ protocols,request-key.conf,services}
         /etc/systemd/system/btm-tty5.service
     _file_rename /usr/share/archboot/base/etc/systemd/system/journal-tty12.service \
         /etc/systemd/system/journal-tty12.service
+    _file_rename /usr/share/archboot/base/etc/systemd/system/log-tty11.service \
+        /etc/systemd/system/log-tty11.service
     # disable systemd targets:
     for i in remote-{veritysetup,cryptsetup} sockets timers; do
         _symlink "/etc/systemd/system/${i}.target" /dev/null
