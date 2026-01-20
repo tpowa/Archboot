@@ -80,7 +80,7 @@ id128,sysext} tar tee testpkg top touch trust tty unix_chkpwd unpigz umount.nfs{
     _symlink /usr/lib/terminfo ../share/terminfo
     # add needed files from running system
     _map _file /etc/{crypttab,fstab,host.conf,hosts,inputrc,mke2fs.conf,nsswitch.conf,\
-protocols,request-key.conf,securetty,services}
+protocols,request-key.conf,services}
     for i in issue tmpfiles.d/var.conf; do
         _file_rename "/usr/share/archboot/base/etc/${i}" "/etc/${i}"
     done
@@ -98,18 +98,16 @@ protocols,request-key.conf,securetty,services}
                  /etc/systemd/system/getty@tty1.service.d/wayland.conf
     _file_rename /usr/share/archboot/base/etc/systemd/system/serial-getty@.service \
                  /etc/systemd/system/serial-getty@.service
-    _file_rename /usr/share/archboot/base/etc/systemd/system/windowkeys.service \
-                 /etc/systemd/system/windowkeys.service
-    _file_rename /usr/share/archboot/base/etc/systemd/journald.conf.d/fw-tty12.conf \
-                 /etc/systemd/journald.conf.d/fw-tty12.conf
-    _file_rename /usr/bin/archboot-detect-vconsole.sh \
-                 /usr/bin/detect-vconsole.sh
-    _file_rename /usr/share/archboot/base/etc/systemd/system/detect-vconsole.service \
-                 /etc/systemd/system/detect-vconsole.service
-    _symlink /etc/systemd/system/getty.target.wants/detect-vconsole.service \
-             /etc/systemd/system/detect-vconsole.service
-    _symlink /etc/systemd/system/getty.target.wants/windowkeys.service \
-             /etc/systemd/system/windowkeys.service
+    #_file_rename /usr/share/archboot/base/etc/systemd/system/windowkeys.service \
+     #            /etc/systemd/system/windowkeys.service
+    #_file_rename /usr/share/archboot/base/etc/systemd/journald.conf.d/fw-tty12.conf \
+     #            /etc/systemd/journald.conf.d/fw-tty12.conf
+    #_file_rename /usr/bin/archboot-detect-vconsole.sh \
+    #             /usr/bin/detect-vconsole.sh
+    #_file_rename /usr/share/archboot/base/etc/systemd/system/detect-vconsole.service \
+    #             /etc/systemd/system/detect-vconsole.service
+    #_symlink /etc/systemd/system/getty.target.wants/getty@tty1.service \
+    #         /etc/systemd/system/getty@.service
     # disable systemd targets:
     for i in remote-{veritysetup,cryptsetup} sockets timers; do
         _symlink "/etc/systemd/system/${i}.target" /dev/null
@@ -152,5 +150,7 @@ linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz} \
     if [[ -f /etc/archboot/run/autorun.sh ]]; then
         _file /etc/archboot/run/autorun.sh
     fi
+    mkdir -p "${_ROOTFS}"/root
+    : > "${_ROOTFS}"/root/.hushlogin
 }
 

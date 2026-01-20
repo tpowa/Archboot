@@ -24,58 +24,25 @@ _locale_menu() {
 }
 
 _vconsole_keymap() {
-    _LIST_MAPS="localectl list-keymaps --no-pager"
+    _LIST_MAPS="localectl list-x11-keymap-layouts --no-pager"
     _KEYMAPS="us de es fr pt be bg br ca cz dk et fi gr hu it lt lv mk nl no pl ro ru sk sr sv tr ua"
     _LOW_LOCALE="$(tr "[:upper:]" "[:lower:]" <<< "${_LOCALE}")"
     for i in ${_KEYMAPS}; do
         rg -q "${i}" <<< "${_LOW_LOCALE}" && _DETECTED_KEYMAP="${i}"
         [[ -n ${_DETECTED_KEYMAP} ]] && break
     done
-    _KEYMAP=""
-    # Germany and Estonian
-    if ${_LIST_MAPS} | rg "^${_DETECTED_KEYMAP}" | rg -q "nodeadkeys"; then
-        _KEYMAP="$(${_LIST_MAPS} | rg "^${_DETECTED_KEYMAP}" | rg "nodeadkeys")"
-    # Europe
-    elif ${_LIST_MAPS} | rg "^${_DETECTED_KEYMAP}" | rg -q "^${_DETECTED_KEYMAP}-latin1$"; then
-        _KEYMAP="$(${_LIST_MAPS} | rg "^${_DETECTED_KEYMAP}" | rg "^${_DETECTED_KEYMAP}-latin1$")"
-    # Bulgarian
-    elif ${_LIST_MAPS} | rg "^${_DETECTED_KEYMAP}" | rg -q "^${_DETECTED_KEYMAP}_pho-utf8$"; then
-        _KEYMAP="$(${_LIST_MAPS} | rg "^${_DETECTED_KEYMAP}" | rg "^${_DETECTED_KEYMAP}_pho-utf8$")"
-    # Czech and Slovak
-    elif ${_LIST_MAPS} | rg "^${_DETECTED_KEYMAP}" | rg -q "^${_DETECTED_KEYMAP}-qwertz"; then
-        _KEYMAP="$(${_LIST_MAPS} | rg "^${_DETECTED_KEYMAP}" | rg "^${_DETECTED_KEYMAP}-qwertz$")"
-    # Serbian
-    elif ${_LIST_MAPS} | rg "^${_DETECTED_KEYMAP}" | rg -q "^${_DETECTED_KEYMAP}-latin"; then
-        _KEYMAP="$(${_LIST_MAPS} | rg "^${_DETECTED_KEYMAP}" | rg "^${_DETECTED_KEYMAP}-latin$")"
-    # Turkish
-    elif ${_LIST_MAPS} | rg "^${_DETECTED_KEYMAP}" | rg -q "^${_DETECTED_KEYMAP}q$"; then
-        _KEYMAP="$(${_LIST_MAPS} | rg "^${_DETECTED_KEYMAP}" | rg "^${_DETECTED_KEYMAP}q$")"
-    # Ukrainian
-    elif ${_LIST_MAPS} | rg "^${_DETECTED_KEYMAP}" | rg -q "^${_DETECTED_KEYMAP}-utf"; then
-        _KEYMAP="$(${_LIST_MAPS} | rg "^${_DETECTED_KEYMAP}" | rg "^${_DETECTED_KEYMAP}-utf$")"
-    # fallback to plain  ${_KEYMAP}
-    elif ${_LIST_MAPS} | rg -q "^${_DETECTED_KEYMAP}$"; then
-        _KEYMAP="$(${_LIST_MAPS} | rg "^${_DETECTED_KEYMAP}$")"
-    fi
 }
 
 _localize_task() {
     echo "LANG=${_LOCALE}.UTF-8" > /etc/locale.conf
     echo LC_COLLATE=C >> /etc/locale.conf
     localectl set-locale "${_LOCALE}.UTF-8" &>"${_NO_LOG}"
+    localectl set-x11-keymap ${_DETECTED_KEYMAP} &>"${_NO_LOG}"
+    localectl set-keymap ${_DETECTED_KEYMAP} &>"${_NO_LOG}"
     #shellcheck disable=SC2016
     sd '(^[a-z])' '#$1' /etc/locale.gen
     sd "^#${_LOCALE}.UTF-8" "${_LOCALE}.UTF-8" /etc/locale.gen
     locale-gen &>"${_NO_LOG}"
-    # Terminus font size detection
-    if rg -q '^FONT=.*32' /etc/vconsole.conf; then
-        _FONT="ter-v32n"
-    else
-        _FONT="ter-v16n"
-    fi
-    echo KEYMAP="${_KEYMAP}" > /etc/vconsole.conf
-    echo FONT="${_FONT}" >> /etc/vconsole.conf
-    systemctl restart systemd-vconsole-setup
     # set running VC too
     export LANG="${_LOCALE}.UTF-8"
     : > /.localize
@@ -88,9 +55,9 @@ _localize_task() {
     echo "sd '(^[a-z])' '#\$1' /etc/locale.gen"
     echo "sd \"^#${_LOCALE}.UTF-8\" \"${_LOCALE}.UTF-8\" /etc/locale.gen"
     echo "locale-gen &>\"\${_NO_LOG}\""
-    echo "echo KEYMAP=\"${_KEYMAP}\" > /etc/vconsole.conf"
-    echo "echo FONT=\"${_FONT}\" >> /etc/vconsole.conf"
-    echo "systemctl restart systemd-vconsole-setup"
+    echo "localectl set-locale \"\${_LOCALE}.UTF-8\" &>\"\${_NO_LOG}\""
+    echo "localectl set-x11-keymap \"\${_DETECTED_KEYMAP}\" &>\"\${_NO_LOG}\""
+    echo "localectl set-keymap \"\${_DETECTED_KEYMAP}\" &>\"\${_NO_LOG}\""
     # set running VC too
     echo "export LANG=\"${_LOCALE}.UTF-8\""
     echo ": > /.localize"
@@ -117,4 +84,6 @@ while [[ -z "${_LOCALE}" ]]; do
     _vconsole_keymap
 done
 _localize
-_cleanup
+[[ -e "${_ANSWER}-running" ]] && rm "${_ANSWER}-running"
+# enable xkb settings on running VCs
+systemctl restart getty@tty*

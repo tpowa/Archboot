@@ -204,7 +204,7 @@ _check() {
 
 _cleanup() {
     [[ -e "${_ANSWER}-running" ]] && rm "${_ANSWER}-running"
-    clear
+    reset
     exit 0
 }
 
@@ -495,7 +495,6 @@ _auto_fw() {
 }
 
 _udev_trigger() {
-    udevadm trigger --action=add --type=subsystems
-    udevadm trigger --action=add --type=devices
+    udevadm trigger --action=add
     udevadm settle
 }

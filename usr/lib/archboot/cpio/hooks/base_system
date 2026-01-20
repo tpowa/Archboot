@@ -36,5 +36,18 @@ _run ()
           newusers pw{ck,conv,unconv} user{add,del,mod} sg getsubids
     # add ncurses libs
     _map _file /usr/lib/libncurses*.so
+    # add kmscon
+    _map _full_dir /etc/fonts /usr/share/{fontconfig,xkeyboard-config-2,X11} /usr/lib/{kmscon,xkbcommon}
+    _map _binary kmscon kmscon-launch-gui fc-{cache,cat,conflist,list,match,pattern,query,scan,validate} xkbcli
+    _map _file /usr/share/fonts/TTF/HackNerdFontMono-Regular.ttf 
+    _file_rename /etc/kmscon/kmscon.conf /etc/kmscon/kmscon.conf
+    sd '^#mouse' 'mouse' ${_ROOTFS}/etc/kmscon/kmscon.conf
+    sd '^#switchvt' 'switchvt' ${_ROOTFS}/etc/kmscon/kmscon.conf
+    _file_rename /usr/share/archboot/base/etc/systemd/system/bandwhich-tty4.service \
+	    /etc/systemd/system/bandwhich-tty4.service
+    _file_rename /usr/share/archboot/base/etc/systemd/system/btm-tty5.service \
+            /etc/systemd/system/btm-tty5.service
+    _file_rename /usr/share/archboot/base/etc/systemd/system/journal-tty12.service \
+            /etc/systemd/system/journal-tty12.service
+    _symlink /etc/systemd/system/multi-user.target.wants/getty@tty1.service /etc/systemd/system/getty@.service
 }
-

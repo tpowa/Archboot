@@ -211,7 +211,7 @@ _mainmenu() {
              "3" "Poweroff System" 2>"${_ANSWER}"
             case $(cat "${_ANSWER}") in
                 "1") [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
-                     clear
+                     reset
                      if mountpoint -q /install; then
                          echo ""
                          echo "If the installation finished successfully:"
@@ -243,7 +243,7 @@ _mainmenu() {
             esac ;;
         *) if _dialog --yesno "Abort Program?" 5 20; then
               [[ -e /tmp/.setup-running ]] && rm /tmp/.setup-running
-              clear
+              reset
               exit 1
            fi ;;
     esac

@@ -58,6 +58,7 @@ _exit() {
         _EXIT=$(cat "${_ANSWER}")
     if [[ "${_EXIT}" == "1" ]]; then
         [[ -e /.launcher-running ]] && rm /.launcher-running
+        reset
         _show_login
         exit 0
     elif [[ "${_EXIT}" == "2" ]]; then

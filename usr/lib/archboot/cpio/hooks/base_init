@@ -27,7 +27,7 @@ _run ()
     # disable systemd sockets:
     _symlink /etc/systemd/system/lvm2-lvmpolld.socket /dev/null
     # add udev
-    _map _file /usr/lib/udev/rules.d/{50-udev-default,60-persistent-storage,64-btrfs,80-drivers,99-systemd}.rules \
+    _map _file /usr/lib/udev/rules.d/{50-udev-default,60-drm,60-persistent-storage,64-btrfs,80-drivers,99-systemd}.rules \
     /usr/lib/udev/{ata,scsi}_id
     # run initrd service
     _file /usr/lib/archboot/cpio/init.sh

@@ -47,7 +47,7 @@ _copy_root() {
 # fstrim <mountpoint> for manual action
 # it needs some seconds to get RAM free on delete!
 _switch_root_zram() {
-if [[ "${_TTY}" = "tty1" ]]; then
+if [[ "${_TTY}" = "pts/0" ]]; then
     clear
     [[ -d /run/nextroot ]] || mkdir /run/nextroot
     : > /.archboot
@@ -71,18 +71,18 @@ fi
 
 _enter_shell() {
     # dbus sources profiles again
-    if ! rg -q 'pts' <<< "${_TTY}"; then
+    if ! [[ -e /.shell ]]; then
         echo ""
         echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mlogin\e[m routine or \e[1m\e[92mCTRL-C\e[m for \e[1mbash\e[m prompt."
         cd /
-        read -r
+        read -r && : > /.shell
         clear
     fi
 }
 
 _run_update_installer() {
     cd /
-    if [[ "${_TTY}" == "tty1" ]]; then
+    if [[ "${_TTY}" == "pts/0" ]]; then
         if update | rg -q 'latest-install'; then
             update -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
         else
@@ -120,19 +120,25 @@ _run_autorun() {
             /etc/archboot/run/./autorun.sh
             echo "Finished autorun.sh."
             echo
-            echo "Relogin on tty1 in 5 seconds..."
+            echo "Relogin on pts/0 in 5 seconds..."
             sleep 5
             exit
         fi
     fi
 }
-
-if [[ "${_TTY}" = "tty1" ]] ; then
+if [[ "${_TTY}" = "pts/0" ]] ; then
+    # fix mouse support on first VC
+    if ! [[ -e /.restart-tty1 ]]; then
+        : > /.restart-tty1
+	_udev_trigger
+	rm /root/.hushlogin
+        exit
+    fi  
     if ! mount | rg -q 'zram0'; then
         _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | ZRAM"
         _switch_root_zram | _dialog --title " Initializing System " --gauge "Creating btrfs on /dev/zram0..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
         # fix clear screen on all terminals
-        printf "\ec" | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
+        printf "\ec" | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/1 2>"${_NO_LOG}"
         echo "Launching systemd $(udevadm --version)..."
         systemctl soft-reboot
     else
@@ -145,23 +151,11 @@ if [[ "${_TTY}" = "tty1" ]] ; then
     fi
     # only run autorun.sh once!
     ! [[ -e /.autorun ]] && _run_autorun
+    systemctl start journal-tty12.service
+    systemctl start bandwhich-tty4.service
+    systemctl start btm-tty5.service
 fi
-# start bottom on VC6
-while [[ "${_TTY}" = "tty6" ]] ; do
-    if command -v btm &>"${_NO_LOG}"; then
-        btm --battery
-    else
-        break
-    fi
-done
-# start bandwhich on VC5 on online medium
-while [[ "${_TTY}" = "tty5" && ! -e "${_LOCAL_DB}" ]] ; do
-    if command -v bandwhich &>"${_NO_LOG}"; then
-        bandwhich
-    else
-        break
-    fi
-done
+
 if [[ -e /usr/bin/setup ]]; then
     _local_mode
     # wait on user interaction!
