@@ -154,6 +154,8 @@ if [[ "${_TTY}" = "pts/0" ]] ; then
     systemctl start journal-tty12.service
     systemctl start bandwhich-tty4.service
     systemctl start btm-tty5.service
+    : > /tmp/archboot.log
+    systemctl start log-tty11.service
 fi
 
 if [[ -e /usr/bin/setup ]]; then
