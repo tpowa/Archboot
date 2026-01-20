@@ -273,20 +273,6 @@ _auto_set_locale() {
     sleep 2
 }
 
-_auto_windowkeys() {
-    if ! [[ -e "${_DESTDIR}/etc/systemd/system/windowkeys.service" ]]; then
-        # enable windowkeys on console
-        _progress "98" "Enable windowkeys in console on installed system..."
-        cp "/etc/systemd/system/windowkeys.service" "${_DESTDIR}/etc/systemd/system/windowkeys.service"
-        chroot "${_DESTDIR}" systemctl enable windowkeys &>"${_NO_LOG}"
-        # write to template
-        { echo "echo \"Enable windowkeys in console on installed system...\""
-        echo "cp \"/etc/systemd/system/windowkeys.service\" \"\${_DESTDIR}/etc/systemd/system/windowkeys.service\""
-        echo "chroot \"\${_DESTDIR}\" systemctl enable windowkeys &>\"\${_NO_LOG}\""
-        } >> "${_TEMPLATE}"
-    fi
-}
-
 _auto_bash(){
     if [[ ! -f ${_DESTDIR}/etc/profile.d/custom-bash-prompt.sh ]]; then
         _progress "99" "Setup bash with custom options on installed system..."

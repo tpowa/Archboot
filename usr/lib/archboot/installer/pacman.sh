@@ -78,7 +78,6 @@ _run_autoconfig() {
     _auto_hostname
     _auto_locale
     _auto_set_locale
-    _auto_windowkeys
     _auto_bash
 }
 

@@ -49,5 +49,4 @@ _run ()
             /etc/systemd/system/btm-tty5.service
     _file_rename /usr/share/archboot/base/etc/systemd/system/journal-tty12.service \
             /etc/systemd/system/journal-tty12.service
-    _symlink /etc/systemd/system/multi-user.target.wants/getty@tty1.service /etc/systemd/system/getty@.service
 }

@@ -98,16 +98,8 @@ protocols,request-key.conf,services}
                  /etc/systemd/system/getty@tty1.service.d/wayland.conf
     _file_rename /usr/share/archboot/base/etc/systemd/system/serial-getty@.service \
                  /etc/systemd/system/serial-getty@.service
-    #_file_rename /usr/share/archboot/base/etc/systemd/system/windowkeys.service \
-     #            /etc/systemd/system/windowkeys.service
-    #_file_rename /usr/share/archboot/base/etc/systemd/journald.conf.d/fw-tty12.conf \
-     #            /etc/systemd/journald.conf.d/fw-tty12.conf
-    #_file_rename /usr/bin/archboot-detect-vconsole.sh \
-    #             /usr/bin/detect-vconsole.sh
-    #_file_rename /usr/share/archboot/base/etc/systemd/system/detect-vconsole.service \
-    #             /etc/systemd/system/detect-vconsole.service
-    #_symlink /etc/systemd/system/getty.target.wants/getty@tty1.service \
-    #         /etc/systemd/system/getty@.service
+    _symlink /etc/systemd/system/getty.target.wants/getty@tty1.service \
+             /etc/systemd/system/getty@.service
     # disable systemd targets:
     for i in remote-{veritysetup,cryptsetup} sockets timers; do
         _symlink "/etc/systemd/system/${i}.target" /dev/null
