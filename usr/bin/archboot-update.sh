@@ -104,22 +104,27 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_COSMIC}" || -n "${_L_PLASMA
         /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml 2>"${_NO_LOG}"
     if [[ -n "${_L_XFCE}" ]]; then
         _start_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        kmscon-launch-gui /usr/bin/startxfce4
         clear
-        echo -e "To relaunch \e[1mXfce\e[m desktop use: \e[92mstartxfce4\e[m"
+        echo -e "To relaunch \e[1mXfce\e[m desktop use: \e[92mkmscon-launch-gui /usr/bin/startxfce4\e[m"
     elif [[ -n "${_L_GNOME}" ]]; then
         _start_gnome | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        gnome-wayland
         clear
         echo -e "To relaunch \e[1mGnome Wayland\e[m use: \e[92mgnome-wayland\e[m"
     elif [[ -n "${_L_PLASMA}" ]]; then
         _start_plasma | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        plasma-wayland
         clear
         echo -e "To relaunch \e[1mPlasma Wayland\e[m use: \e[92mplasma-wayland\e[m"
     elif [[ -n "${_L_COSMIC}" ]]; then
         _start_cosmic | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        cosmic-wayland
         clear
         echo -e "To relaunch \e[1mCosmic\e[m use: \e[92mcosmic-wayland\e[m"
     elif [[ -n "${_L_SWAY}" ]]; then
         _start_sway | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        sway-wayland
         clear
         echo -e "To relaunch \e[1mSway\e[m use: \e[92msway-wayland\e[m"
     fi

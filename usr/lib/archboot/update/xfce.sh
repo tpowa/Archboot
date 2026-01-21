@@ -249,5 +249,4 @@ EOF
 _start_xfce() {
     _progress "100" "Launching Xfce now, logging is done on ${_LOG}..."
     sleep 2
-    startxfce4 &>"${_LOG}"
 }

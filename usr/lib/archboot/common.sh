@@ -7,26 +7,29 @@ _CACHEDIR="/var/cache/pacman/pkg"
 _CONFIG_DIR="/etc/archboot"
 _DLPROG="curl -L -s"
 _FIX_PACKAGES=(
+  fuse3
+  gcc-libs
+  glib2
+  glibc
+  icu
+  libelf
+  libevent
+  nss
+  pcre2
+  talloc
+  terminus-font
   cairo
   default-cursors
   fontconfig
   freetype2
   fribidi
-  fuse3
-  gcc-libs
-  glib2
-  glibc
   graphite
   harfbuzz
-  icu
   libdatrie
   libdrm
-  libelf
-  libevent
   libglvnd
   libpciaccess
   libpng
-  libshmfence
   libthai
   libtsm
   libx11
@@ -36,19 +39,15 @@ _FIX_PACKAGES=(
   libxdmcp
   libxext
   libxft
-  libxhmfence
   libxrender
+  libxshmfence
   libxxf86vm
   llvm-libs
   lm_sensors
   mesa
-  nss
   pango
-  pcre2
   pixman
   spirv-tools
-  talloc
-  terminus-font
   wayland
   xcb-proto
   xkeyboard-config
@@ -105,8 +104,7 @@ _VNC_PACKAGE=(tigervnc)
 _XORG_PACKAGE=(xorg)
 _BASENAME=${0##*/}
 _ANSWER="/.${_BASENAME}"
-_VC_NUM="${_LOG/\/dev\/tty/}"
-_VC="VC${_VC_NUM}"
+_VC="VC11"
 if rg -qw aarch64 <<< "${_BASENAME}"; then
     _ARCHBOOT=(archboot-arm)
     _KEYRING+=(archlinuxarm-keyring)
@@ -530,6 +528,7 @@ _auto_fw() {
 }
 
 _udev_trigger() {
-    udevadm trigger --action=add
+    udevadm trigger --action=add --type=subsystems
+    udevadm trigger --action=add --type=devices
     udevadm settle
 }

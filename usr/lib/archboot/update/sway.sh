@@ -115,11 +115,11 @@ _start_sway() {
     sleep 2
     # list available layouts:
     # localectl list-x11-keymap-layouts
-    _KEYMAP=$(rg -o '^KEYMAP=(\w+)-' -r '$1' /etc/vconsole.conf)
+    _KEYMAP=$(rg -o '^KEYMAP=(\w+)' -r '$1' /etc/vconsole.conf)
     [[ -z ${_KEYMAP} ]] && _KEYMAP=us
-    echo "MOZ_ENABLE_WAYLAND=1 QT_QPA_PLATFORM=wayland \
-        XKB_DEFAULT_LAYOUT=${_KEYMAP} \
-        exec sway &>${_LOG}" > /usr/bin/sway-wayland
+    echo "export MOZ_ENABLE_WAYLAND=1
+export QT_QPA_PLATFORM=wayland
+ecport XKB_DEFAULT_LAYOUT=${_KEYMAP}
+exec kmscon-launch-gui /usr/bin/sway" > /usr/bin/sway-wayland
     chmod 755 /usr/bin/sway-wayland
-    sway-wayland
 }
