@@ -37,13 +37,11 @@ _install_gnome() {
 _start_gnome() {
     _progress "100" "Launching Gnome now, logging is done on ${_LOG}..."
     sleep 2
-    # gnome-session --reexec is broken atm!
-    # https://github.com/kmscon/kmscon/issues/239
     echo "export MOZ_ENABLE_WAYLAND=1
 export QT_QPA_PLATFORM=wayland
 export XDG_SESSION_TYPE=wayland
 systemctl --user import-environment XDG_SESSION_TYPE
-exec kmscon-launch-gui gnome-shell" \
+exec kmscon-launch-gui gnome-session --no-reexec" \
           > /usr/bin/gnome-wayland
     chmod 755 /usr/bin/gnome-wayland
 }

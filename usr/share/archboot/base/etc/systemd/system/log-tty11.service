@@ -5,7 +5,7 @@
 Description=Monitor Archboot log on VC11
 
 [Service]
-ExecStart=kmscon --no-switchvt --vt /dev/tty11 --login -- /usr/bin/bash -c "tail -F /tmp/archboot.log 2>/dev/null"
+ExecStart=kmscon --no-switchvt --vt /dev/tty11 --login -- /usr/bin/bash -c "tail -F /tmp/archboot.log 2>/dev/null | bat -l log -pp"
 
 [Install]
 WantedBy=getty.target
