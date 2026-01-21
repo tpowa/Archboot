@@ -22,7 +22,7 @@ _cleanup() {
 }
 
 _run_pacman() {
-    LC_ALL=C.UTF-8 pacman -Sy $@ --noconfirm &>"${_LOG}"
+    LC_ALL=C.UTF-8 pacman -Sy "$@" --noconfirm &>"${_LOG}"
     if [[ ! -e "/.full_system" ]]; then
         _cleanup
     fi
