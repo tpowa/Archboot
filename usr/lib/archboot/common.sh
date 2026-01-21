@@ -7,17 +7,52 @@ _CACHEDIR="/var/cache/pacman/pkg"
 _CONFIG_DIR="/etc/archboot"
 _DLPROG="curl -L -s"
 _FIX_PACKAGES=(
+  cairo
+  default-cursors
+  fontconfig
+  freetype2
+  fribidi
   fuse3
   gcc-libs
   glib2
   glibc
+  graphite
+  harfbuzz
   icu
+  libdatrie
+  libdrm
   libelf
   libevent
+  libglvnd
+  libpciaccess
+  libpng
+  libshmfence
+  libthai
+  libtsm
+  libx11
+  libxau
+  libxbkcommon
+  libxcb
+  libxdmcp
+  libxext
+  libxft
+  libxhmfence
+  libxrender
+  libxxf86vm
+  llvm-libs
+  lm_sensors
+  mesa
   nss
+  pango
   pcre2
+  pixman
+  spirv-tools
   talloc
   terminus-font
+  wayland
+  xcb-proto
+  xkeyboard-config
+  xorgproto
 )
 _INTEL_UCODE="boot/intel-ucode.img"
 _KERNELPKG="linux"
@@ -28,7 +63,7 @@ _FIRMWARE=(
 )
 _LABEL="Exit"
 _LOCAL_DB="${_CACHEDIR}/archboot.db"
-_LOG="/dev/tty11"
+_LOG="/tmp/archboot.log"
 _MAN_INFO_PACKAGES=(
   man-db
   man-pages
