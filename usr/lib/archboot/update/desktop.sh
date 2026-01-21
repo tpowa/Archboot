@@ -22,13 +22,11 @@ _cleanup() {
 }
 
 _run_pacman() {
-    for i in "$@"; do
-        LC_ALL=C.UTF-8 pacman -Sy "${i}" --noconfirm &>"${_LOG}"
-        if [[ ! -e "/.full_system" ]]; then
-            _cleanup
-        fi
-        rm -f /var/log/pacman.log
-    done
+    LC_ALL=C.UTF-8 pacman -Sy $@ --noconfirm &>"${_LOG}"
+    if [[ ! -e "/.full_system" ]]; then
+        _cleanup
+    fi
+    rm -f /var/log/pacman.log
 }
 
 _update_packages() {

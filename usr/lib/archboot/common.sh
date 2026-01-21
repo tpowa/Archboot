@@ -34,7 +34,7 @@ _FIX_PACKAGES=(
   libtsm
   libx11
   libxau
-  libxbkcommon
+  libxkbcommon
   libxcb
   libxdmcp
   libxext
