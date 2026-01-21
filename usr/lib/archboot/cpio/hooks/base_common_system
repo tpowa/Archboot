@@ -157,8 +157,6 @@ linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz} \
     _file_rename /etc/kmscon/kmscon.conf /etc/kmscon/kmscon.conf
     sd '^#mouse' 'mouse' ${_ROOTFS}/etc/kmscon/kmscon.conf
     sd '^#switchvt' 'switchvt' ${_ROOTFS}/etc/kmscon/kmscon.conf
-    mkdir -p "${_ROOTFS}"/root
-    : > "${_ROOTFS}"/root/.hushlogin
     # fix XDG_SESSION_TYPE=wayland on pam.d level
     sd 'pam_systemd.so' 'pam_systemd.so type=wayland' ${_ROOTFS}/etc/pam.d/system-login
 }

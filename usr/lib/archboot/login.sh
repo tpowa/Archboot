@@ -130,8 +130,7 @@ if [[ "${_TTY}" = "pts/0" ]] ; then
     # fix mouse support on first VC
     if ! [[ -e /.restart-tty1 ]]; then
         : > /.restart-tty1
-	_udev_trigger
-	rm /root/.hushlogin
+	    _udev_trigger
         exit
     fi  
     if ! mount | rg -q 'zram0'; then
