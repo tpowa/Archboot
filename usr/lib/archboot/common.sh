@@ -14,44 +14,12 @@ _FIX_PACKAGES=(
   icu
   libelf
   libevent
+  mesa
   nss
   pcre2
   talloc
   terminus-font
-  cairo
-  default-cursors
-  fontconfig
-  freetype2
-  fribidi
-  graphite
-  harfbuzz
-  libdatrie
-  libdrm
-  libglvnd
-  libpciaccess
-  libpng
-  libthai
-  libtsm
-  libx11
-  libxau
-  libxbkcommon
-  libxcb
-  libxdmcp
-  libxext
-  libxft
-  libxrender
-  libxshmfence
-  libxxf86vm
-  llvm-libs
-  lm_sensors
-  mesa
-  pango
-  pixman
-  spirv-tools
   wayland
-  xcb-proto
-  xkeyboard-config
-  xorgproto
 )
 _INTEL_UCODE="boot/intel-ucode.img"
 _KERNELPKG="linux"

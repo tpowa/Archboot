@@ -120,6 +120,6 @@ _start_sway() {
     echo "export MOZ_ENABLE_WAYLAND=1
 export QT_QPA_PLATFORM=wayland
 ecport XKB_DEFAULT_LAYOUT=${_KEYMAP}
-exec kmscon-launch-gui /usr/bin/sway" > /usr/bin/sway-wayland
+exec kmscon-launch-gui sway" > /usr/bin/sway-wayland
     chmod 755 /usr/bin/sway-wayland
 }

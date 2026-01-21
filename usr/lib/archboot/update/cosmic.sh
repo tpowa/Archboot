@@ -60,7 +60,7 @@ _start_cosmic() {
     [[ -z ${_KEYMAP} ]] && _KEYMAP=us
     echo \
 "export XKB_DEFAULT_LAYOUT=${_KEYMAP}
-exec kmscon-launch-gui /usr/bin/start-cosmic" \
+exec kmscon-launch-gui start-cosmic" \
          > /usr/bin/cosmic-wayland
     chmod 755 /usr/bin/cosmic-wayland
     mkdir -p /root/.local/state
