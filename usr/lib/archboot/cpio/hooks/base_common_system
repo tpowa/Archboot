@@ -94,8 +94,6 @@ protocols,request-key.conf,services}
     _file_rename /usr/share/archboot/base/etc/vconsole.conf /etc/vconsole.conf
     _file_rename /usr/share/archboot/base/etc/systemd/system/getty@.service \
                  /etc/systemd/system/getty@.service
-    _file_rename /usr/share/archboot/base/etc/systemd/system/getty@tty1.service.d/wayland.conf \
-                 /etc/systemd/system/getty@tty1.service.d/wayland.conf
     _file_rename /usr/share/archboot/base/etc/systemd/system/serial-getty@.service \
                  /etc/systemd/system/serial-getty@.service
     _symlink /etc/systemd/system/getty.target.wants/getty@tty1.service \
