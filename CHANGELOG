@@ -5,8 +5,8 @@ Environment:
 - new MOTD
 - colored journal on VC12
 - colored log on VC11 and saved to /tmp/archboot.log
-- moved btm to VC4
-- moved bandwhich to VC5
+- moved bandwhich network status to VC4
+- moved btm system status to VC5
 - added pigz to packages
 - added /usr/lib/gnupg programs
 - removed custom modprobe.conf
