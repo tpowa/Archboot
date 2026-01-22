@@ -139,6 +139,7 @@ if [[ "${_TTY}" = "pts/0" ]] ; then
         if ! [[ -e "${_LOCAL_DB}" ]]; then
             systemctl start systemd-networkd
             systemctl start systemd-resolved
+            systemctl start bandwhich-tty4.service
         fi
         # initialize pacman keyring
         [[ -e /etc/systemd/system/pacman-init.service ]] && systemctl start pacman-init
@@ -146,7 +147,6 @@ if [[ "${_TTY}" = "pts/0" ]] ; then
     # only run autorun.sh once!
     ! [[ -e /.autorun ]] && _run_autorun
     systemctl start journal-tty12.service
-    systemctl start bandwhich-tty4.service
     systemctl start btm-tty5.service
     : > /tmp/archboot.log
     systemctl start log-tty11.service
