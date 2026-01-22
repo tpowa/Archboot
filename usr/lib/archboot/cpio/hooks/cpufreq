@@ -5,6 +5,6 @@
 _run ()
 {
     _map _binary cpupower cpufreq-bench_plot.sh
-    _file /etc/defaults/cpufreq-bench.conf
+    _file /etc/default/cpufreq-bench.conf
 }
 
