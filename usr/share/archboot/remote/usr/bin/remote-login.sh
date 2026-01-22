@@ -4,6 +4,7 @@
 
 # simulate login from tty on first screen session
 if ! screen -ls &>/dev/null; then
+    : > /.shell
     LOGIN=ssh
     clear
     echo -e "\e[1mLogin on ${_LOGIN} | $(uname -r) | $(date)\e[m"
