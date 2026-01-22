@@ -84,9 +84,9 @@ _run_update_installer() {
     cd /
     if [[ "${_TTY}" == "pts/0" ]]; then
         if update | rg -q 'latest-install'; then
-            update -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
+            update -latest-install | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/1 2>"${_NO_LOG}"
         else
-            update -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
+            update -latest | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/1 2>"${_NO_LOG}"
         fi
     fi
 }
@@ -130,7 +130,7 @@ if [[ "${_TTY}" = "pts/0" ]] ; then
     _udev_trigger
     if ! mount | rg -q 'zram0'; then
         _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | ZRAM"
-        _switch_root_zram | _dialog --title " Initializing System " --gauge "Creating btrfs on /dev/zram0..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
+        _switch_root_zram | _dialog --title " Initializing System " --gauge "Creating btrfs on /dev/zram0..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/1 2>"${_NO_LOG}"
         # fix clear screen on all terminals
         printf "\ec" | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/1 2>"${_NO_LOG}"
         echo "Launching systemd $(udevadm --version)..."
