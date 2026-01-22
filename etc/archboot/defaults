@@ -68,7 +68,6 @@ _PLASMA_PACKAGES=(
   konsole
   kscreen
   plasma-desktop
-  plasma-wayland-session
   powerdevil
 )
 ### Sway defaults

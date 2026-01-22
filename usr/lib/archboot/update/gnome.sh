@@ -39,8 +39,6 @@ _start_gnome() {
     sleep 2
     echo "export MOZ_ENABLE_WAYLAND=1
 export QT_QPA_PLATFORM=wayland
-export XDG_SESSION_TYPE=wayland
-systemctl --user import-environment XDG_SESSION_TYPE
 exec kmscon-launch-gui gnome-session --no-reexec" \
           > /usr/bin/gnome-wayland
     chmod 755 /usr/bin/gnome-wayland
