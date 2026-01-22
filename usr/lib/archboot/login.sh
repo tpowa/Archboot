@@ -127,12 +127,7 @@ _run_autorun() {
     fi
 }
 if [[ "${_TTY}" = "pts/0" ]] ; then
-    # fix mouse support on first VC
-    if ! [[ -e /.restart-tty1 ]]; then
-        : > /.restart-tty1
-	    _udev_trigger
-        exit
-    fi  
+    _udev_trigger
     if ! mount | rg -q 'zram0'; then
         _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | ZRAM"
         _switch_root_zram | _dialog --title " Initializing System " --gauge "Creating btrfs on /dev/zram0..." 6 75 0 | tee -a /dev/ttyS0 /dev/ttyAMA0 /dev/ttyUSB0 /dev/pts/0 2>"${_NO_LOG}"
@@ -178,6 +173,10 @@ if [[ -e /usr/bin/setup ]]; then
     fi
     if ! [[ -e /.launcher ]]; then
         launcher
+    fi
+    if [[ -e /.gnome-wayland ]]; then
+        rm /.gnome-wayland
+        gnome-wayland
     fi
 # latest image, fail if less than 2.1GB RAM available
 elif [[ "${_MEM_TOTAL}" -lt 2070000 ]]; then
