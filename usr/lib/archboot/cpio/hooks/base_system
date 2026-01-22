@@ -20,7 +20,7 @@ _run ()
                  resizepart reset rev rtcwake runuser script{,live,replay} sdparm \
                  seq set{arch,cap,facl,fattr,priv,sid,term} sfdisk \
                  sha{1sum,224sum,256sum,384sum,512sum} shred shuf slabtop split stdbuf stty \
-                 su sum swap{label,off,on} sync sysctl tabs tac tail taskset test tic timeout tload \
+                 su sum swap{label,off,on} sync sysctl tabs tac taskset test tic timeout tload \
                  toe tput truncate tsort tunelp uclampset ul \
                  un{ame26,compress,expand,iq,link,lz4,lzma,share,xz,zstd} uptime users utmpdump \
                  uuidd uuidgen uuidparse vdir vigr vipw vmstat w waitpid wall watch wdctl whereis who \
