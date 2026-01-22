@@ -5,7 +5,7 @@
 Description=Launch journal on VC12
 
 [Service]
-ExecStart=kmscon --no-switchvt --vt /dev/tty12 --login -- /usr/bin/bash -c "journalctl --no-pager --follow --no-tail -k | bat -l syslog -pp"
+ExecStart=kmscon --no-switchvt --vt /dev/tty12 --login -- /usr/bin/bash -c "journalctl --no-pager --follow --no-tail | bat -l syslog -pp"
 
 [Install]
 WantedBy=getty.target
