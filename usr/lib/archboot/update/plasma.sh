@@ -65,8 +65,8 @@ _install_plasma() {
     if ! [[ -e /usr/bin/startplasma-x11 ]]; then
         _prepare_graphic "${_STANDARD_PACKAGES[@]}" "${_PLASMA_PACKAGES[@]}"
     fi
-    _prepare_browser &>"${_LOG}"
-    _configure_plasma &>"${_LOG}"
+    _prepare_browser &>>"${_LOG}"
+    _configure_plasma &>>"${_LOG}"
 }
 
 _start_plasma() {

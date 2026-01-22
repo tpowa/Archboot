@@ -180,7 +180,7 @@ _install_base_packages() {
         echo "Downloading ${_KEYRING[*]} ${_PACKAGES[*]} ${_FIRMWARE[*]} to ${1}..."
         if rg -qw 'archboot' /etc/hostname; then
             ${_PACMAN} -Syw "${_KEYRING[@]}" "${_PACKAGES[@]}" "${_FIRMWARE[@]}" \
-                        "${_PACMAN_DEFAULTS[@]}" "${_PACMAN_DB[@]}" &>"${_LOG}" || exit 1
+                        "${_PACMAN_DEFAULTS[@]}" "${_PACMAN_DB[@]}" &>>"${_LOG}" || exit 1
         else
             ${_PACMAN} -Syw "${_KEYRING[@]}" "${_PACKAGES[@]}" "${_FIRMWARE[@]}" \
                         "${_PACMAN_DEFAULTS[@]}" "${_PACMAN_DB[@]}" &>"${_NO_LOG}" || exit 1
@@ -192,9 +192,9 @@ _install_base_packages() {
     echo "Installing ${_KEYRING[*]} ${_PACKAGES[*]} ${_FIRMWARE[*]} to ${1}..."
     if rg -qw 'archboot' /etc/hostname; then
         ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} "${_KEYRING[@]}" "${_PACKAGES[@]}" \
-                   "${_FIRMWARE[@]}" "${_PACMAN_DEFAULTS[@]}" &>"${_LOG}" || exit 1
+                   "${_FIRMWARE[@]}" "${_PACMAN_DEFAULTS[@]}" &>>"${_LOG}" || exit 1
         echo "Downloading mkinitcpio to ${1}..."
-        ${_PACMAN} -Syw mkinitcpio "${_PACMAN_DEFAULTS[@]}" &>"${_LOG}" || exit 1
+        ${_PACMAN} -Syw mkinitcpio "${_PACMAN_DEFAULTS[@]}" &>>"${_LOG}" || exit 1
     else
         ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} "${_KEYRING[@]}" "${_PACKAGES[@]}" \
                    "${_FIRMWARE[@]}" "${_PACMAN_DEFAULTS[@]}" &>"${_NO_LOG}" || exit 1
@@ -211,10 +211,10 @@ _install_archboot() {
     fi
     echo "Installing ${_ARCHBOOT[*]} to ${1}..."
     if rg -qw 'archboot' /etc/hostname; then
-        ${_PACMAN} -Sy "${_ARCHBOOT[@]}" "${_PACMAN_DEFAULTS[@]}" &>"${_LOG}" || exit 1
+        ${_PACMAN} -Sy "${_ARCHBOOT[@]}" "${_PACMAN_DEFAULTS[@]}" &>>"${_LOG}" || exit 1
         echo "Downloading ${_MAN_INFO_PACKAGES[*]} to ${1}..."
         ${_PACMAN} -Syw "${_MAN_INFO_PACKAGES[@]}" "${_PACMAN_DEFAULTS[@]}" \
-                   "${_PACMAN_DB[@]}" &>"${_LOG}" || exit 1
+                   "${_PACMAN_DB[@]}" &>>"${_LOG}" || exit 1
     else
         ${_PACMAN} -Sy "${_ARCHBOOT[@]}" "${_PACMAN_DEFAULTS[@]}" &>"${_NO_LOG}" || exit 1
         echo "Downloading ${_MAN_INFO_PACKAGES[*]} to ${1}..."

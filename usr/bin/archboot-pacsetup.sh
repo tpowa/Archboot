@@ -48,11 +48,11 @@ _select_mirror() {
         # get URL from _PACMAN_MIRROR and only show 1 result
         _SYNC_URL=$(rg -m1 -o "${_SERVER}.*" "${_PACMAN_MIRROR}")
     fi
-    echo "Using mirror: ${_SYNC_URL}" >"${_LOG}"
+    echo "Using mirror: ${_SYNC_URL}" >>"${_LOG}"
     # comment already existing entries
     sd '^Server' '#Server' "${_PACMAN_MIRROR}"
     repo=\$repo arch=\$arch echo "Server = ${_SYNC_URL}" >> "${_PACMAN_MIRROR}"
-    if ! pacman -Sy &>"${_LOG}"; then
+    if ! pacman -Sy &>>"${_LOG}"; then
         _dialog --title " ERROR " --no-mouse --infobox "Your selected mirror is not working correctly, please configure again!" 3 75
         sleep 3
         _SYNC_URL=""
@@ -86,7 +86,7 @@ _enable_testing() {
 }
 _task_pacman_keyring_install() {
     _pacman_keyring
-    pacman -Sy --noconfirm --noprogressbar "${_KEYRING[@]}" &>"${_LOG}"
+    pacman -Sy --noconfirm --noprogressbar "${_KEYRING[@]}" &>>"${_LOG}"
     # write to template
     { echo "### pacman keyring"
     echo "echo \"Pacman keyring...\""
@@ -109,7 +109,7 @@ _task_update_environment() {
     _UPDATE_ENVIRONMENT=""
     _LOCAL_KERNEL=""
     _ONLINE_KERNEL=""
-    pacman -Sy &>"${_LOG}"
+    pacman -Sy &>>"${_LOG}"
     _LOCAL_KERNEL="$(pacman -Qi "${_KERNELPKG}" | rg 'Version.*: (.*)' -r '$1')"
     if  [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
         _ONLINE_KERNEL="$(pacman -Si "${_KERNELPKG}"-"${_RUNNING_ARCH}" | rg 'Version.*: (.*)' -r '$1')"
@@ -121,7 +121,7 @@ _task_update_environment() {
             _ONLINE_KERNEL="$(pacman -Si "${_KERNELPKG}" | rg 'Version.*: (.*)' -r '$1')"
         fi
     fi
-    echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >"${_LOG}"
+    echo "${_LOCAL_KERNEL} local kernel version and ${_ONLINE_KERNEL} online kernel version." >>"${_LOG}"
     if ! [[ "${_LOCAL_KERNEL}" == "${_ONLINE_KERNEL}" ]]; then
         echo "${_ONLINE_KERNEL}" > /.new_kernel
     fi

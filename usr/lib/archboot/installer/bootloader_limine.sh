@@ -51,7 +51,7 @@ _limine_bios() {
     echo "_chroot_mount"
     echo "cp \"\${_DESTDIR}/usr/share/limine/limine-bios.sys\" \"\${_DESTDIR}/boot/\""
     } >> "${_TEMPLATE}"
-    if chroot "${_DESTDIR}" limine bios-install "${_PARENT_BOOTDEV}" &>"${_LOG}"; then
+    if chroot "${_DESTDIR}" limine bios-install "${_PARENT_BOOTDEV}" &>>"${_LOG}"; then
         _pacman_hook_limine_bios
         # write to template
         { echo "chroot \"\${_DESTDIR}\" limine bios-install \"${_PARENT_BOOTDEV}\" &>\"\${_LOG}\""

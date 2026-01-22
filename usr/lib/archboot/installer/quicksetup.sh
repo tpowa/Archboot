@@ -6,50 +6,50 @@ _auto_partition() {
     if [[ -n "${_GUIDPARAMETER}" ]]; then
         # create fresh GPT
         # GUID codes: https://en.wikipedia.org/wiki/GUID_Partition_Table
-        sfdisk --wipe always "${_DISK}" <<< "label: gpt" &>"${_LOG}"
+        sfdisk --wipe always "${_DISK}" <<< "label: gpt" &>>"${_LOG}"
         # create actual partitions
         _progress "20" "Creating BIOS_GRUB partition..."
-        sfdisk -a "${_DISK}" <<< "size=+${_GPT_BIOS_GRUB_DEV_SIZE}M, type=21686148-6449-6E6F-744E-656564454649, name=BIOS_GRUB" &>"${_LOG}"
+        sfdisk -a "${_DISK}" <<< "size=+${_GPT_BIOS_GRUB_DEV_SIZE}M, type=21686148-6449-6E6F-744E-656564454649, name=BIOS_GRUB" &>>"${_LOG}"
         if [[ -n "${_UEFI_BOOT}" ]]; then
             _progress "25" "Creating EFI System partition..."
-            sfdisk -a "${_DISK}" <<< "size=+${_ESP_DEV_SIZE}M, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B, name=ESP" &>"${_LOG}"
+            sfdisk -a "${_DISK}" <<< "size=+${_ESP_DEV_SIZE}M, type=C12A7328-F81F-11D2-BA4B-00A0C93EC93B, name=ESP" &>>"${_LOG}"
         fi
         if [[ -z "${_ESP_BOOTDEV}" ]]; then
             _progress "40" "Creating Extended Boot Loader partition..."
-            sfdisk -a "${_DISK}" <<< "size=+${_BOOTDEV_SIZE}M, type=BC13C2FF-59E6-4262-A352-B275FD6F7172, name=XBOOTLDR" &>"${_LOG}"
+            sfdisk -a "${_DISK}" <<< "size=+${_BOOTDEV_SIZE}M, type=BC13C2FF-59E6-4262-A352-B275FD6F7172, name=XBOOTLDR" &>>"${_LOG}"
         fi
         if [[ -z "${_SKIP_SWAP}" ]]; then
             _progress "65" "Creating SWAP partition..."
-            sfdisk -a "${_DISK}" <<< "size=+${_SWAPDEV_SIZE}M, type=0657FD6D-A4AB-43C4-84E5-0933C84B4F4F, name=SWAP" &>"${_LOG}"
+            sfdisk -a "${_DISK}" <<< "size=+${_SWAPDEV_SIZE}M, type=0657FD6D-A4AB-43C4-84E5-0933C84B4F4F, name=SWAP" &>>"${_LOG}"
         fi
         _progress "70" "Creating ROOT partition..."
         [[ "${_RUNNING_ARCH}" == "aarch64" ]] && _GUID_TYPE=B921B045-1DF0-41C3-AF44-4C6F280D3FAE
         [[ "${_RUNNING_ARCH}" == "riscv64" ]] && _GUID_TYPE=BEAEC34B-8442-439B-A40B-984381ED097D
         [[ "${_RUNNING_ARCH}" == "x86_64" ]] && _GUID_TYPE=4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709
         if [[ -z "${_SKIP_HOME}" ]]; then
-            sfdisk -a "${_DISK}" <<< "size=+${_ROOTDEV_SIZE}M, type=${_GUID_TYPE}, name=ARCH_LINUX_ROOT" &>"${_LOG}"
+            sfdisk -a "${_DISK}" <<< "size=+${_ROOTDEV_SIZE}M, type=${_GUID_TYPE}, name=ARCH_LINUX_ROOT" &>>"${_LOG}"
             _progress "85" "Creating HOME partition..."
-            sfdisk -a "${_DISK}" <<< "type=933AC7E1-2EB4-4F13-B844-0E14E2AEF915, name=ARCH_LINUX_HOME" &>"${_LOG}"
+            sfdisk -a "${_DISK}" <<< "type=933AC7E1-2EB4-4F13-B844-0E14E2AEF915, name=ARCH_LINUX_HOME" &>>"${_LOG}"
         else
-            sfdisk -a "${_DISK}" <<<  "type=${_GUID_TYPE}, name=ARCH_LINUX_ROOT" &>"${_LOG}"
+            sfdisk -a "${_DISK}" <<<  "type=${_GUID_TYPE}, name=ARCH_LINUX_ROOT" &>>"${_LOG}"
         fi
     else
         # create DOS MBR with sfdisk
         _progress "20" "Creating BIOS MBR..."
-        sfdisk --wipe always "${_DISK}" <<< "label: dos" &>"${_LOG}"
+        sfdisk --wipe always "${_DISK}" <<< "label: dos" &>>"${_LOG}"
         _progress "50" "Creating BOOT partition with bootable flag..."
-        sfdisk -a "${_DISK}" <<< ",+${_BOOTDEV_SIZE}M,L,*" &>"${_LOG}"
+        sfdisk -a "${_DISK}" <<< ",+${_BOOTDEV_SIZE}M,L,*" &>>"${_LOG}"
         if [[ -z "${_SKIP_SWAP}" ]]; then
             _progress "60" "Creating SWAP partition..."
-            sfdisk -a "${_DISK}" <<< ",+${_SWAPDEV_SIZE}M,S,-" &>"${_LOG}"
+            sfdisk -a "${_DISK}" <<< ",+${_SWAPDEV_SIZE}M,S,-" &>>"${_LOG}"
         fi
         _progress "70" "Creating ROOT partition..."
         if [[ -z "${_SKIP_HOME}" ]]; then
-            sfdisk -a "${_DISK}" <<< ",+${_ROOTDEV_SIZE}M,L,-" &>"${_LOG}"
+            sfdisk -a "${_DISK}" <<< ",+${_ROOTDEV_SIZE}M,L,-" &>>"${_LOG}"
             _progress "85" "Creating HOME partition..."
-            sfdisk -a "${_DISK}" <<< ",+,L,-" &>"${_LOG}"
+            sfdisk -a "${_DISK}" <<< ",+,L,-" &>>"${_LOG}"
         else
-            sfdisk -a "${_DISK}" <<< ",+,L,-" &>"${_LOG}"
+            sfdisk -a "${_DISK}" <<< ",+,L,-" &>>"${_LOG}"
         fi
     fi
     _progress "100" "Partitions created successfully."

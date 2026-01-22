@@ -47,8 +47,8 @@ _install_cosmic() {
     if ! [[ -e /usr/bin/start-cosmic ]]; then
         _prepare_graphic "${_STANDARD_PACKAGES[@]}" "${_COSMIC_PACKAGES[@]}"
     fi
-    _prepare_browser &>"${_LOG}"
-    _configure_cosmic &>"${_LOG}"
+    _prepare_browser &>>"${_LOG}"
+    _configure_cosmic &>>"${_LOG}"
 }
 
 _start_cosmic() {

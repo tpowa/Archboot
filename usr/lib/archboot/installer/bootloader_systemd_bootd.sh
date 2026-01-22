@@ -33,7 +33,7 @@ BOOTDEOF
     _chroot_mount
     # systemd-boot https://www.freedesktop.org/software/systemd/man/latest/systemd-gpt-auto-generator.html
     # /boot XBOOTLDR in vfat format can be booted by systemd-boot
-    chroot "${_DESTDIR}" bootctl install &>"${_LOG}"
+    chroot "${_DESTDIR}" bootctl install &>>"${_LOG}"
     _chroot_umount
     # write to template
     { echo "_chroot_mount"

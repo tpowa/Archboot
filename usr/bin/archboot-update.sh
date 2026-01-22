@@ -87,9 +87,9 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_COSMIC}" || -n "${_L_PLASMA
     fi
     rm /.update
     # only start vnc on xorg environment
-    echo "Setting up VNC and browser..." >"${_LOG}"
+    echo "Setting up VNC and browser..." >>"${_LOG}"
     [[ -n "${_L_XFCE}" ]] && _autostart_vnc
-    echo "Setting ${_STANDARD_BROWSER} as default browser..." >"${_LOG}"
+    echo "Setting ${_STANDARD_BROWSER} as default browser..." >>"${_LOG}"
     # gnome
     if command -v gsettings &>"${_NO_LOG}"; then
         [[ "${_STANDARD_BROWSER}" == "firefox" ]] && gsettings set org.gnome.shell favorite-apps "['org.gnome.Settings.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'firefox.desktop', 'org.gnome.DiskUtility.desktop', 'gparted.desktop', 'archboot.desktop']"

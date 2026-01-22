@@ -15,7 +15,7 @@ _secureboot_keys() {
             _dialog --title " Setup Keys " --no-cancel --inputbox "Enter a common name(CN) for your keys, eg. Your Name" 8 65 "" 2>"${_ANSWER}" || return 1
             _CN=$(cat "${_ANSWER}")
         done
-        secureboot-keys.sh -name="${_CN}" "${_DESTDIR}/${_KEYDIR}" &>"${_LOG}" || return 1
+        secureboot-keys.sh -name="${_CN}" "${_DESTDIR}/${_KEYDIR}" &>>"${_LOG}" || return 1
         # write to template
         { echo "### secureboot keys"
         echo "secureboot-keys.sh -name=\"${_CN}\" \"\${_DESTDIR}/${_KEYDIR}\" &>\"\${_LOG}\""
@@ -59,7 +59,7 @@ _mok_sign () {
             sleep 3
         fi
     done
-    mokutil -i "${_DESTDIR}"/"${_KEYDIR}"/MOK/MOK.cer < ${_MOK_PW} >"${_LOG}"
+    mokutil -i "${_DESTDIR}"/"${_KEYDIR}"/MOK/MOK.cer < ${_MOK_PW} >>"${_LOG}"
     rm /tmp/.password
     # write to template
     { echo "mokutil -i \"\${_DESTDIR}\"/\"${_KEYDIR}\"/MOK/MOK.cer < ${_MOK_PW} >\"\${_LOG}\""
@@ -73,12 +73,12 @@ _mok_sign () {
                --private-key=/"${_KEYDIR}"/MOK/MOK.key \
                --certificate=/"${_KEYDIR}"/MOK/MOK.crt \
                --output=/boot/"${_VMLINUZ}" \
-               sign /boot/"${_VMLINUZ}" &>"${_LOG}"
+               sign /boot/"${_VMLINUZ}" &>>"${_LOG}"
     ${_NSPAWN} /usr/lib/systemd/systemd-sbsign \
                --private-key=/"${_KEYDIR}"/MOK/MOK.key \
                --certificate=/"${_KEYDIR}"/MOK/MOK.crt \
                --output="${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi \
-               sign "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>"${_LOG}"
+               sign "${_UEFI_BOOTLOADER_DIR}"/grub"${_SPEC_UEFI_ARCH}".efi &>>"${_LOG}"
     # write to template
     { echo "### sign kernel and grub"
     echo "${_NSPAWN} /usr/lib/systemd/systemd-sbsign --private-key=/\"${_KEYDIR}\"/MOK/MOK.key --certificate=/\"${_KEYDIR}\"/MOK/MOK.crt --output=/boot/\"${_VMLINUZ}\" sign /boot/\"${_VMLINUZ}\" &>\"\${_LOG}\""

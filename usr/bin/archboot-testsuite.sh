@@ -37,7 +37,7 @@ _losetup_stop() {
 _archboot_check
 echo "Waiting for pacman keyring..."
 _pacman_keyring
-pacman -Sy &>"${_LOG}"
+pacman -Sy &>>"${_LOG}"
 echo -e "\e[1mArchboot Environment Stats:\e[m"
 echo "Bootup speed (seconds): $(systemd-analyze | rg -o '= (.*)s' -r '$1') |\
  Packages: $(pacman -Q | wc -l)"
@@ -200,7 +200,7 @@ _losetup_stop
 _result blockdevices-error.log
 _run_test "Wi-Fi"
 echo -n "Setting up hwsim... "
-if archboot-hwsim.sh test &>"${_LOG}"; then
+if archboot-hwsim.sh test &>>"${_LOG}"; then
     echo -n "iwctl tests running... "
     iwctl station wlan1 scan
     sleep 5
@@ -213,7 +213,7 @@ fi
 _result iwctl-error.log
 _run_test "none tracked files in /usr/lib"
 for i in $(fd -u -E '/modules/' -E '/udev/' -E 'gconv-modules.cache' -E 'locale-archive' . /usr/lib); do
-    pacman -Qo "${i}" &>"${_LOG}" || echo "${i}" >> pacman-error.log
+    pacman -Qo "${i}" &>>"${_LOG}" || echo "${i}" >> pacman-error.log
 done
 _result pacman-error.log
 echo -e "Starting pacman database check in \e[1m10\e[m seconds... \e[1;92mCTRL-C\e[m to stop now."

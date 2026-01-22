@@ -114,7 +114,7 @@ _run_autorun() {
             echo "Waiting for pacman keyring..."
             _pacman_keyring
             echo "Updating pacman keyring..."
-            pacman -Sy --noconfirm "${_KEYRING[@]}" &>"${_LOG}"
+            pacman -Sy --noconfirm "${_KEYRING[@]}" &>>"${_LOG}"
             chmod 755 /etc/archboot/run/autorun.sh
             echo "Running custom autorun.sh..."
             /etc/archboot/run/./autorun.sh

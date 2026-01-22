@@ -3,14 +3,14 @@
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _mkinitcpio() {
     if [[ "${_RUNNING_ARCH}" == "aarch64" ]]; then
-        if chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}"-"${_RUNNING_ARCH}" &>"${_LOG}"; then
+        if chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}"-"${_RUNNING_ARCH}" &>>"${_LOG}"; then
             : > /tmp/.mkinitcpio-success
             # write to template
             { echo "chroot \"\${_DESTDIR}\" mkinitcpio -p \"${_KERNELPKG}\"-\"${_RUNNING_ARCH}\" &>\"\${_LOG}\""
             } >> "${_TEMPLATE}"
         fi
     else
-        if chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}" &>"${_LOG}"; then
+        if chroot "${_DESTDIR}" mkinitcpio -p "${_KERNELPKG}" &>>"${_LOG}"; then
         : > /tmp/.mkinitcpio-success
         # write to template
         echo "chroot \"\${_DESTDIR}\" mkinitcpio -p \"${_KERNELPKG}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
@@ -189,7 +189,7 @@ _user_management() {
                     echo "sd '^SHELL=.*' \"SHELL=/usr/bin/${_SHELL}\" \"\${_DESTDIR}\"/etc/default/useradd"
                     } >> "${_TEMPLATE}"
                     for i in root $(rg -o '(.*):x:10[0-9][0-9]' -r '$1' "${_DESTDIR}"/etc/passwd); do
-                        usermod -R "${_DESTDIR}" -s "/usr/bin/${_SHELL}" "${i}" &>"${_LOG}"
+                        usermod -R "${_DESTDIR}" -s "/usr/bin/${_SHELL}" "${i}" &>>"${_LOG}"
                         # write to template
                         echo "usermod -R \"\${_DESTDIR}\" -s \"/usr/bin/${_SHELL}\" \"${i}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
                     done
@@ -215,7 +215,7 @@ _user_management() {
                          fi
                          _set_comment || break
                          _prepare_password user || break
-                         if useradd -R "${_DESTDIR}" "${_WHEEL_ATTR[@]}" -c "${_FN}" -m "${_USER}" &>"${_LOG}"; then
+                         if useradd -R "${_DESTDIR}" "${_WHEEL_ATTR[@]}" -c "${_FN}" -m "${_USER}" &>>"${_LOG}"; then
                             # write to template
                             { echo "### add user"
                             echo "useradd -R \"\${_DESTDIR}\" \"${_ADMIN_ATTR[*]}\" -c \"${_FN}\" -m \"${_USER}\" &>\"\${_LOG}\""
@@ -312,7 +312,7 @@ _user_management() {
                                 "4") if _NEXTITEM=4
                                         _dialog --defaultno --yesno \
                                             "${_USER} will be COMPLETELY ERASED!\nALL USER DATA OF ${_USER} WILL BE LOST.\n\nAre you absolutely sure?" 0 0 && \
-                                        userdel -R "${_DESTDIR}" -r "${_USER}" &>"${_LOG}"; then
+                                        userdel -R "${_DESTDIR}" -r "${_USER}" &>>"${_LOG}"; then
                                         # write to template
                                          { echo "### delete user"
                                          echo "userdel -R \"\${_DESTDIR}\" -r \"${_USER}\" &>\"\${_LOG}\""

@@ -11,7 +11,7 @@ _refind_uefi() {
     _chroot_mount
     # refind-install mounts devices again
     umount -q "${_DESTDIR}"/{boot,efi}
-    chroot "${_DESTDIR}" refind-install &>"${_LOG}"
+    chroot "${_DESTDIR}" refind-install &>>"${_LOG}"
     _chroot_umount
     # write to template
     { echo "### refind"

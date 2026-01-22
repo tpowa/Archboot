@@ -22,7 +22,7 @@ _cleanup() {
 }
 
 _run_pacman() {
-    LC_ALL=C.UTF-8 pacman -Sy "$@" --noconfirm &>"${_LOG}"
+    LC_ALL=C.UTF-8 pacman -Sy "$@" --noconfirm &>>"${_LOG}"
     if [[ ! -e "/.full_system" ]]; then
         _cleanup
     fi
@@ -36,7 +36,7 @@ _update_packages() {
             _IGNORE+=(--ignore "${i}")
         done
     fi
-    LC_ALL=C.UTF-8 pacman -Syu "${_IGNORE[@]}" --noconfirm &>"${_LOG}"
+    LC_ALL=C.UTF-8 pacman -Syu "${_IGNORE[@]}" --noconfirm &>>"${_LOG}"
     if [[ ! -e "/.full_system" ]]; then
         _cleanup
     fi
@@ -75,10 +75,10 @@ _prepare_graphic() {
     _install_graphic &
     _progress_wait "${_COUNT}" "97" "Installing ${_ENVIRONMENT}..." "3"
     _progress "98" "Restart dbus..."
-    systemd-sysusers &>"${_LOG}"
+    systemd-sysusers &>>"${_LOG}"
     # add --boot to really create all tmpfiles!
     # Check: /tmp/.X11-unix, may have wrong permission on startup error!
-    systemd-tmpfiles --boot --create &>"${_LOG}"
+    systemd-tmpfiles --boot --create &>>"${_LOG}"
     # retrigger udev events, for correct drm initialization!
     _udev_trigger
     # fixing dbus requirements
@@ -91,7 +91,7 @@ _prepare_graphic() {
 
 _prepare_browser() {
     if [[ "${_STANDARD_BROWSER}" == "firefox" ]]; then
-        pacman -Q chromium &>"${_NO_LOG}" && pacman -R --noconfirm chromium &>"${_LOG}"
+        pacman -Q chromium &>"${_NO_LOG}" && pacman -R --noconfirm chromium &>>"${_LOG}"
         pacman -Q firefox &>"${_NO_LOG}" || _run_pacman firefox
         # install firefox langpacks
         _LANG="be bg cs da de el fi fr hu it lt lv mk nl nn pl ro ru sk sr tr uk"
@@ -117,7 +117,7 @@ _prepare_browser() {
         for i in $(pacman -Q | rg -o 'firefox.* '); do
             _FIREFOX+=("${i}")
         done
-        pacman -Q firefox &>"${_NO_LOG}" && pacman -R --noconfirm "${_FIREFOX[@]}" &>"${_LOG}"
+        pacman -Q firefox &>"${_NO_LOG}" && pacman -R --noconfirm "${_FIREFOX[@]}" &>>"${_LOG}"
         pacman -Q chromium &>"${_NO_LOG}" || _run_pacman chromium
         _chromium_flags
     fi
@@ -127,12 +127,12 @@ _custom_wayland_xorg() {
     if [[ -n "${_CUSTOM_WL}" ]]; then
         echo -e "\e[1mStep 1/2:\e[m Installing custom wayland..."
         echo "          This will need some time..."
-        _prepare_graphic "${_CUSTOM_WAYLAND[@]}" &>"${_LOG}"
+        _prepare_graphic "${_CUSTOM_WAYLAND[@]}" &>>"${_LOG}"
     fi
     if [[ -n "${_CUSTOM_X}" ]]; then
         echo -e "\e[1mStep 1/2:\e[m Installing custom xorg..."
         echo "          This will need some time..."
-        _prepare_graphic "${_XORG_PACKAGE[@]}" "${_CUSTOM_XORG[@]}" &>"${_LOG}"
+        _prepare_graphic "${_XORG_PACKAGE[@]}" "${_CUSTOM_XORG[@]}" &>>"${_LOG}"
     fi
     echo -e "\e[1mStep 2/2:\e[m Setting up browser...\e[m"
     command -v firefox &>"${_NO_LOG}"  && _firefox_flags
@@ -140,7 +140,7 @@ _custom_wayland_xorg() {
 }
 
 _chromium_flags() {
-    echo "Adding chromium flags to /etc/chromium-flags.conf..." >"${_LOG}"
+    echo "Adding chromium flags to /etc/chromium-flags.conf..." >>"${_LOG}"
     cat << EOF >/etc/chromium-flags.conf
 --no-sandbox
 --test-type
@@ -155,7 +155,7 @@ EOF
 _firefox_flags() {
     if [[ -f "/usr/lib/firefox/browser/defaults/preferences/vendor.js" ]]; then
         if ! rg -q startup /usr/lib/firefox/browser/defaults/preferences/vendor.js; then
-            echo "Adding firefox flags vendor.js..." >"${_LOG}"
+            echo "Adding firefox flags vendor.js..." >>"${_LOG}"
             cat << EOF >> /usr/lib/firefox/browser/defaults/preferences/vendor.js
 pref("browser.aboutwelcome.enabled", false, locked);
 pref("browser.startup.homepage_override.once", false, locked);
@@ -169,10 +169,10 @@ EOF
 }
 
 _autostart_vnc() {
-    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW}..." >"${_LOG}"
+    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW}..." >>"${_LOG}"
     vncpasswd -f <<< "${_VNC_PW}" > /etc/tigervnc/passwd
     cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
-    echo "Autostarting tigervnc..." >"${_LOG}"
+    echo "Autostarting tigervnc..." >>"${_LOG}"
     cat << EOF > /etc/xdg/autostart/tigervnc.desktop
 [Desktop Entry]
 Type=Application

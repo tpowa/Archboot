@@ -23,7 +23,7 @@ if ! rg -qw 'mac80211_hwsim' /proc/modules; then
         echo "Waiting for pacman keyring..."
         _pacman_keyring
         echo "Installing kernel..."
-        pacman -Sydd --noconfirm --noscriptlet linux &>"${_LOG}"
+        pacman -Sydd --noconfirm --noscriptlet linux &>>"${_LOG}"
         depmod -a
         if ! modprobe mac80211_hwsim; then
             echo "Error: Module mismatch detected!"

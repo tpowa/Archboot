@@ -4,7 +4,7 @@
 
 
 _pacman() {
-    if ${_PACMAN} -Sy "${_PACKAGES[@]}" &>"${_LOG}"; then
+    if ${_PACMAN} -Sy "${_PACKAGES[@]}" &>>"${_LOG}"; then
         # write to template
         { echo "echo \"Installing ${_PACKAGES[*]}...\""
         echo "${_PACMAN} -Sy ${_PACKAGES[*]} &>\"\${_LOG}\""

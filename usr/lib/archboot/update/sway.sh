@@ -106,8 +106,8 @@ _install_sway() {
     if ! [[ -e /usr/bin/sway ]]; then
         _prepare_graphic "${_STANDARD_PACKAGES[@]}" "${_SWAY_PACKAGES[@]}"
     fi
-    _prepare_browser &>"${_LOG}"
-    _configure_sway &>"${_LOG}"
+    _prepare_browser &>>"${_LOG}"
+    _configure_sway &>>"${_LOG}"
 }
 
 _start_sway() {

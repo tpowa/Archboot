@@ -466,7 +466,7 @@ _mkfs() {
         swapoff -a &>"${_NO_LOG}"
         if [[ "${4}" == "1" ]]; then
             if rg -q '^/dev' <<< "${1}"; then
-                if mkswap -L "${6}" "${1}" &>"${_LOG}"; then
+                if mkswap -L "${6}" "${1}" &>>"${_LOG}"; then
                     # write to template
                     echo "mkswap -L \"${6}\" \"${1}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
                 else
@@ -485,16 +485,16 @@ _mkfs() {
                     echo "rm \"${3}${1}\"" >> "${_TEMPLATE}"
                 fi
                 # btrfs needs NO_COW attribute
-                truncate -s 0 "${3}${1}" &>"${_LOG}"
-                chattr +C "${3}${1}" &>"${_LOG}"
-                fallocate "${7}" "${3}${1}" &>"${_LOG}"
-                chmod 0600 "${3}${1}" &>"${_LOG}"
+                truncate -s 0 "${3}${1}" &>>"${_LOG}"
+                chattr +C "${3}${1}" &>>"${_LOG}"
+                fallocate "${7}" "${3}${1}" &>>"${_LOG}"
+                chmod 0600 "${3}${1}" &>>"${_LOG}"
                 # write to template
                 { echo " truncate -s 0 \"${3}${1}\" &>\"\${_LOG}\""
                 echo "chattr +C \"${3}${1}\" &>\"\${_LOG}\""
                 echo "chmod 0600 \"${3}${1}\" &>\"\${_LOG}\""
                 } >> "${_TEMPLATE}"
-                if mkswap -U clear -L "${6}" "${3}${1}" &>"${_LOG}"; then
+                if mkswap -U clear -L "${6}" "${3}${1}" &>>"${_LOG}"; then
                     # write to template
                     echo "mkswap -U clear -L \"${6}\" \"${3}${1}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
                 else
@@ -508,14 +508,14 @@ _mkfs() {
             fi
         fi
         if rg -q '^/dev' <<< "${1}"; then
-            if swapon "${1}" &>"${_LOG}";then
+            if swapon "${1}" &>>"${_LOG}";then
                 # write to template
                 echo "swapon \"${1}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
             else
                 : >/tmp/.mp-error
             fi
         else
-            if swapon "${3}${1}" &>"${_LOG}";then
+            if swapon "${3}${1}" &>>"${_LOG}";then
                 # write to template
                 echo "swapon \"${3}${1}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
             else
@@ -541,7 +541,7 @@ _mkfs() {
             fi
             # remove unused parameters
             IFS=" " read -r -a _FS_CREATE <<< "$(sd "  " " " <<< "${_FS_CREATE[@]}")"
-            if mkfs."${2}" "${_FS_CREATE[@]}" &>"${_LOG}"; then
+            if mkfs."${2}" "${_FS_CREATE[@]}" &>>"${_LOG}"; then
                 # write to template
                 echo "mkfs.${2} ${_FS_CREATE[*]} &>\"\${_LOG}\"" >> "${_TEMPLATE}"
             else
@@ -570,7 +570,7 @@ _mkfs() {
         # eleminate spaces at beginning and end, replace other spaces with ,
         _MOUNTOPTIONS="$(sd '^ *| *$' '' <<< "${_MOUNTOPTIONS}" | sd ' ' ',')"
         # mount the bad boy
-        if mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" &>"${_LOG}"; then
+        if mount -t "${2}" -o "${_MOUNTOPTIONS}" "${1}" "${3}""${5}" &>>"${_LOG}"; then
             # write to template
             echo "mount -t \"${2}\" -o \"${_MOUNTOPTIONS}\" \"${1}\" \"${3}\"\"${5}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
         else
@@ -622,7 +622,7 @@ _mkfs() {
         fi
         # btrfs needs balancing on fresh created raid, else weird things could happen
         if [[ "${2}" == "btrfs" && "${4}" == "1" ]]; then
-            btrfs balance start --full-balance "${3}""${5}" &>"${_LOG}"
+            btrfs balance start --full-balance "${3}""${5}" &>>"${_LOG}"
             # write to template
             echo "btrfs balance start --full-balance \"${3}\"\"${5}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
         fi

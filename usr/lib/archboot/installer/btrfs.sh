@@ -225,7 +225,7 @@ _check_btrfs_subvolume(){
 _create_btrfs_subvolume() {
     _mount_btrfs
     if ! btrfs subvolume list "${_BTRFSMP}" | rg -q "${_BTRFS_SUBVOLUME}$"; then
-        btrfs subvolume create "${_BTRFSMP}"/"${_BTRFS_SUBVOLUME}" &>"${_LOG}"
+        btrfs subvolume create "${_BTRFSMP}"/"${_BTRFS_SUBVOLUME}" &>>"${_LOG}"
         # write to template
         echo "btrfs subvolume create \"${_BTRFSMP}\"/\"${_BTRFS_SUBVOLUME}\" &>\"\${_LOG}\"" >> "${_TEMPLATE}"
     fi

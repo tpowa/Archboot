@@ -22,7 +22,7 @@ _kill_w_dir() {
 _create_container() {
     # create container without package cache
     if [[ -n "${_L_COMPLETE}" ]]; then
-        "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp -fw &>"${_LOG}" || exit 1
+        "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -cp -fw &>>"${_LOG}" || exit 1
     fi
     # create container with package cache
     if [[ -e "${_LOCAL_DB}" ]]; then
@@ -30,7 +30,7 @@ _create_container() {
         # add the db too on reboot
         install -D -m644 "${_LOCAL_DB}" "${_W_DIR}""${_LOCAL_DB}"
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
-            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -fw --install-source=file://"${_CACHEDIR}" &>"${_LOG}" || exit 1
+            "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -fw --install-source=file://"${_CACHEDIR}" &>>"${_LOG}" || exit 1
         fi
         # needed for checks
         cp "${_W_DIR}""${_LOCAL_DB}" "${_LOCAL_DB}"
@@ -38,9 +38,9 @@ _create_container() {
         # online mode
         if [[ -n "${_L_INSTALL_COMPLETE}" ]]; then
             if [[ -n "${_G_RELEASE}" ]]; then
-                "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc &>"${_LOG}" || exit 1
+                "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc &>>"${_LOG}" || exit 1
             else
-                "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -fw &>"${_LOG}" || exit 1
+                "archboot-${_RUNNING_ARCH}-create-container.sh" "${_W_DIR}" -cc -fw &>>"${_LOG}" || exit 1
             fi
         fi
     fi
@@ -53,7 +53,7 @@ _network_check() {
     _COUNT=0
     while true; do
         sleep 1
-        if getent hosts www.google.com &>"${_LOG}"; then
+        if getent hosts www.google.com &>>"${_LOG}"; then
             break
         fi
         _COUNT=$((_COUNT+1))
@@ -200,7 +200,7 @@ _clean_fw() {
 }
 
 _collect_files() {
-    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -c ${_CONFIG} -d /tmp" &>"${_LOG}"
+    ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -c ${_CONFIG} -d /tmp" &>>"${_LOG}"
     rm "${_W_DIR}"/.archboot
 }
 
@@ -377,7 +377,7 @@ _new_environment() {
 
 _full_system() {
     _progress "1" "Refreshing pacman package database..."
-    pacman -Sy &>"${_LOG}" || exit 1
+    pacman -Sy &>>"${_LOG}" || exit 1
     _PACKAGES=()
     for i in $(pacman -Qqn); do
         _PACKAGES+=("${i}")
@@ -393,15 +393,15 @@ _full_system() {
         if [[ "$((_COUNT*100/_PACKAGE_COUNT-4))" -gt 1 ]]; then
             _progress "$((_COUNT*100/_PACKAGE_COUNT-4))" "Reinstalling all packages, installing ${i} now..."
         fi
-        pacman -S --assume-installed "${_MKINITCPIO}" --noconfirm "${i}" &>"${_LOG}" || exit 1
+        pacman -S --assume-installed "${_MKINITCPIO}" --noconfirm "${i}" &>>"${_LOG}" || exit 1
         _COUNT="$((_COUNT+1))"
     done
     : >/tmp/60-mkinitcpio-remove.hook
     : >/tmp/90-mkinitcpio-install.hook
     # install mkinitcpio as last package, without rebuild trigger
-    pacman -S --hookdir /tmp --noconfirm mkinitcpio &>"${_LOG}" || exit 1
+    pacman -S --hookdir /tmp --noconfirm mkinitcpio &>>"${_LOG}" || exit 1
     _progress "97" "Adding texinfo and man-pages..."
-    pacman -S --noconfirm man-db man-pages texinfo &>"${_LOG}" || exit 1
+    pacman -S --noconfirm man-db man-pages texinfo &>>"${_LOG}" || exit 1
     _progress "98" "Checking kernel version..."
     _INSTALLED_KERNEL="$(pacman -Qi linux | rg -o 'Version.* (.*).(arch.*)' -r '$1-$2')"
     if ! [[ "${_INSTALLED_KERNEL}" == "${_RUNNING_KERNEL}" ]]; then
