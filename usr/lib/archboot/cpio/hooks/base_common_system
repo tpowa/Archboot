@@ -28,9 +28,9 @@ libpipeline-*-[0-9]*,libsysprof-capture-*-[0-9]*,libwbclient-*-[0-9]*,limine-*-[
 linux-api-headers-*-[0-9]*,lmdb-*-[0-9]*,memtest86+-*-[0-9]*,memtest86+-efi-*-[0-9]*,memtest-*-[0-9]*,mkinitcpio-*-[0-9]*,\
 mkinitcpio-busybox-*-[0-9]*,mpdecimal-*-[0-9]*,mtools-*-[0-9]*,nettle-*-[0-9]*,nilfs-utils-*-[0-9]*,ntfs-3g-*-[0-9],\
 oniguruma-*-[0-9]*,pcre-*-[0-9]*,python-*-[0-9]*,python-pefile-*-[0-9]*,refind-*-[0-9]*,rpcbind-*-[0-9]*,\
-systemd-ukify-*-[0-9]*,zsh-*-[0-9]*,cairo*-[0-9]*,default-cursors*-[0-9]*,libpciaccess*-[0-9]*,libxau*-[0-9]*,\
-libxcb*-[0-9]*,libxdmcp*-[0-9]*,libxext*-[0-9]*,libxft*-[0-9]*,libxrender*-[0-9]*,libxshmfence*-[0-9]*,libxxf86vm*-[0-9]*,llvm-libs*-[0-9]*,\
-pixman*-[0-9]*,spirv-tools*-[0-9]*,xcb-proto*-[0-9]*,xorgproto*-[0-9]*,liburing*-[0-9]*} \
+systemd-ukify-*-[0-9]*,zsh-*-[0-9]*,cairo-*-[0-9]*,default-cursors-*-[0-9]*,libpciaccess-*-[0-9]*,libxau-*-[0-9]*,\
+libxcb-*-[0-9]*,libxdmcp-*-[0-9]*,libxext-*-[0-9]*,libxft-*-[0-9]*,libxrender-*-[0-9]*,libxshmfence-*-[0-9]*,libxxf86vm-*-[0-9]*,\
+llvm-libs-*-[0-9]*,pixman-*-[0-9]*,spirv-tools-*-[0-9]*,xcb-proto-*-[0-9]*,xorgproto-*-[0-9]*,liburing-*-[0-9]*,msgpack-c-*-[0-9]*} \
 --exclude=usr/share/locale/*/{grub*,binutils*,gdbm*,bfd*,gettext*,gas*,gnutls*,gold*,gprof*,ld*,opcodes*} \
 --hard-dereference -cpf - \
 usr/share/{locale/{be,bg,cs,da,de,en_US,el,es,fi,fr,hu,it,lt,lv,mk,nl,nn,pl,pt,ro,ru,sk,sr,sv,uk},i18n/locales} \
