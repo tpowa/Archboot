@@ -3,6 +3,8 @@
 # written by Tobias Powalowski <tpowa@archlinux.org>
 . /usr/lib/archboot/common.sh
 _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Localization"
+[[ -z $_TTY ]] && _TTY=$(tty)
+_TTY=${_TTY#/dev/}
 
 _locale_menu() {
     _LOCALE=""
@@ -85,5 +87,7 @@ while [[ -z "${_LOCALE}" ]]; do
 done
 _localize
 [[ -e "${_ANSWER}-running" ]] && rm "${_ANSWER}-running"
-# enable xkb settings on running VCs
-systemctl restart getty@tty*
+if [[ "${_TTY}" = "pts/0" ]]; then
+    # enable xkb settings on running VCs
+    systemctl restart getty@tty*
+fi
