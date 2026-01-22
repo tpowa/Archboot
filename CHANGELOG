@@ -1,7 +1,10 @@
 On the road to 2026.01:
 - updated grub to 2.14
 Environment:
-- switched to KMSCON
+- switched to KMSCON as VT provider
+- colored journal on VC12
+- colored log on VC11 and saved to /tmp/archboot.log
+- new MOTD
 - added pigz to packages
 - added /usr/lib/gnupg programs
 - removed custom modprobe.conf
