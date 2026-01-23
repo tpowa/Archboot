@@ -82,7 +82,7 @@ _VNC_PACKAGE=(tigervnc)
 _XORG_PACKAGE=(xorg)
 _BASENAME=${0##*/}
 _ANSWER="/.${_BASENAME}"
-_VC="VC11"
+_VC="VC8"
 if rg -qw aarch64 <<< "${_BASENAME}"; then
     _ARCHBOOT=(archboot-arm)
     _KEYRING+=(archlinuxarm-keyring)

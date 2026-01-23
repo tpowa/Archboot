@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="gallery.html">Gallery</a> | <a href="https://donate.stripe.com/fZu6oHc9T48TeTrg5HcV200"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2026 Fundraise: 0% <progress max="100" value="0">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2026 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 22.01.2026 21:40</strong></p>
+<strong>Last update: 23.01.2026 08:46</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -367,7 +367,7 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 <li>Start again at point <a href="#secure-iso-boot"><strong>3.1.1</strong></a>.</li>
 </ul>
 <h3 data-number="3.2" id="terminal-access"><span class="header-section-number">3.2</span> <strong>Terminal Access</strong></h3>
-<h4 data-number="3.2.1" id="vitual-console"><span class="header-section-number">3.2.1</span> <strong>Virtual Consoles - VCs</strong></h4>
+<h4 data-number="3.2.1" id="vitual-console"><span class="header-section-number">3.2.1</span> <strong>Kmscon Virtual Consoles - VCs</strong></h4>
 <table>
 <thead>
 <tr class="header">
@@ -375,8 +375,8 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 <th>VC 1-3</th>
 <th>VC 4</th>
 <th>VC 5</th>
-<th>VC 11</th>
-<th>VC 12</th>
+<th>VC 8</th>
+<th>VC 9</th>
 </tr>
 </thead>
 <tbody>
@@ -393,8 +393,8 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 <td>CTRL+ALT<br>+F1-F3</td>
 <td>CTRL+ALT<br>+F4</td>
 <td>CTRL+ALT<br>+F5</td>
-<td>CTRL+ALT<br>+F11</td>
-<td>CTRL+ALT<br>+F12</td>
+<td>CTRL+ALT<br>+F8</td>
+<td>CTRL+ALT<br>+F9</td>
 </tr>
 </tbody>
 </table>
@@ -841,6 +841,11 @@ The calculated size to boot the image follows the formula:<br>
 <td class="MyYes">&#10004;</td>
 <td class="MyNo">&#10006;</td>
 </tr>
+<tr class="even">
+<td><a href="https://wiki.archlinux.org/title/KMSCON" title="KMSCON"><strong>Kmscon</strong></a> Virtual Consoles</td>
+<td class="MyYes">&#10004;</td>
+<td class="MyNo">&#10006;</td>
+</tr>
 <tr class="odd">
 <td><a href="https://wiki.archlinux.org/title/Accessibility" title="Accessibility"><strong>Accessibility</strong></a> support</td>
 <td class="MyNo">&#10006;</td>
@@ -927,12 +932,7 @@ The calculated size to boot the image follows the formula:<br>
 <td class="MyNo">&#10006;</td>
 </tr>
 <tr class="even">
-<td>Show <a href="https://wiki.archlinux.org/title/Systemd/Journal" title="journal"><strong>journal</strong></a> on Virtual Console 12</td>
-<td class="MyYes">&#10004;</td>
-<td class="MyNo">&#10006;</td>
-</tr>
-<tr class="odd">
-<td>Enable windowkeys on Virtual Consoles</td>
+<td>Show <a href="https://wiki.archlinux.org/title/Systemd/Journal" title="journal"><strong>journal</strong></a> on Virtual Console 9</td>
 <td class="MyYes">&#10004;</td>
 <td class="MyNo">&#10006;</td>
 </tr>
