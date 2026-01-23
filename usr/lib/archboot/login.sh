@@ -146,10 +146,10 @@ if [[ "${_TTY}" = "pts/0" ]] ; then
     fi
     # only run autorun.sh once!
     ! [[ -e /.autorun ]] && _run_autorun
-    systemctl start journal-tty12.service
+    systemctl start journal-tty9.service
     systemctl start btm-tty5.service
     : > /tmp/archboot.log
-    systemctl start log-tty11.service
+    systemctl start log-tty8.service
 fi
 
 if [[ -e /usr/bin/setup ]]; then
