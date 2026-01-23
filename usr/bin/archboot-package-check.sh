@@ -14,7 +14,7 @@ _usage () {
 _archboot_check
 cd /var/lib/pacman/local
 :>/pkg-found.txt
-for i in $(fd file); do 
+for i in $(fd -f files); do
     for k in $(bat "${i}" | rg -v '/$'); do
         [[ -e /"${k}" ]] && echo "${i}" | sd '/files$' '' >>/pkg-found.txt
     done
@@ -23,4 +23,5 @@ sort -u /pkg-found.txt > /pkg-uniq.txt
 rm /pkg-found.txt
 pacman -Q >/pkg-install.txt
 sd ' ' '-' /pkg-install.txt
-diff -u /pkg-uniq.txt /pkg-install.txt > pkg-not-installed.txt
+diff -u /pkg-uniq.txt /pkg-install.txt | rg '\+' > /pkg-not-installed.txt
+rm /pkg-uniq.txt /pkg-install.txt
