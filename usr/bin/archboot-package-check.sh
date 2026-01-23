@@ -14,7 +14,7 @@ _usage () {
 _archboot_check
 cd /var/lib/pacman/local
 :>/pkg-found.txt
-for i in $(fd -f files); do
+for i in $(fd -t f files); do
     for k in $(bat "${i}" | rg -v '/$'); do
         [[ -e /"${k}" ]] && echo "${i}" | sd '/files$' '' >>/pkg-found.txt
     done
