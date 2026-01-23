@@ -39,8 +39,8 @@ _localize_task() {
     echo "LANG=${_LOCALE}.UTF-8" > /etc/locale.conf
     echo LC_COLLATE=C >> /etc/locale.conf
     localectl set-locale "${_LOCALE}.UTF-8" &>"${_NO_LOG}"
-    localectl set-x11-keymap ${_DETECTED_KEYMAP} &>"${_NO_LOG}"
-    localectl set-keymap ${_DETECTED_KEYMAP} &>"${_NO_LOG}"
+    localectl set-x11-keymap "${_DETECTED_KEYMAP}" &>"${_NO_LOG}"
+    localectl set-keymap "${_DETECTED_KEYMAP}" &>"${_NO_LOG}"
     #shellcheck disable=SC2016
     sd '(^[a-z])' '#$1' /etc/locale.gen
     sd "^#${_LOCALE}.UTF-8" "${_LOCALE}.UTF-8" /etc/locale.gen
@@ -71,13 +71,13 @@ _localize_task() {
 _run() {
     : >/.archboot
     _localize_task &
-    _progress_wait "0" "99" "Using ${_LOCALE}.UTF-8 and ${_KEYMAP}..." "0.25"
+    _progress_wait "0" "99" "Using ${_LOCALE}.UTF-8 and ${_DETECTED_KEYMAP}..." "0.25"
     _progress "100" "Localization completed successfully."
     sleep 2
 }
 
 _localize() {
-    _run | _dialog --title " Localization " --no-mouse --gauge "Using ${_LOCALE}.UTF-8 and ${_KEYMAP}..." 6 50 0
+    _run | _dialog --title " Localization " --no-mouse --gauge "Using ${_LOCALE}.UTF-8 and ${_DETECTED_KEYMAP}..." 6 50 0
 }
 
 _check
