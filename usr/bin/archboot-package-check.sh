@@ -24,5 +24,5 @@ sort -u /pkg-found.txt > /pkg-uniq.txt
 rm /pkg-found.txt
 pacman -Q >/pkg-install.txt
 sd ' ' '-' /pkg-install.txt
-diff -u /pkg-uniq.txt /pkg-install.txt | rg '\\+' > /pkg-not-installed.txt
+diff -u /pkg-uniq.txt /pkg-install.txt | rg -v '^\+\+\+' | rg '^\+' > /pkg-not-installed.txt
 rm /pkg-uniq.txt /pkg-install.txt
