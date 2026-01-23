@@ -30,14 +30,14 @@ _desktop () {
     _BROWSER=$(cat "${_ANSWER}")
     sd "STANDARD_BROWSER=.*" "STANDARD_BROWSER=${_BROWSER}" /etc/archboot/defaults
     source /etc/locale.conf
-    clear
+    reset
     update -"${_EXIT}" || exit 1
     exit 0
 }
 
 _manage() {
     _dialog  --title " Manage Archboot Menu " --menu "" 9 50 5 "${_MANAGE[@]}" 2>"${_ANSWER}" || return 1
-    clear
+    reset
     [[ -e /.launcher-running ]] && rm /.launcher-running
     _EXIT=$(cat "${_ANSWER}")
     if [[ "${_EXIT}" == "FULL" ]]; then

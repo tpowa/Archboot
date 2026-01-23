@@ -41,7 +41,7 @@ if [[ -n "${_D_SCRIPTS}" ]]; then
     : > /.update
     _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | GIT Master Scripts"
     _download_latest | _dialog --title " Archboot GIT Master " --gauge "Downloading latest GIT..." 6 75 0
-    clear
+    reset
 fi
 # Generate new environment and launch it with kexec
 if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]] && [[ -z "${_G_RELEASE}" ]]; then
@@ -50,7 +50,7 @@ if [[ -n "${_L_COMPLETE}" || -n "${_L_INSTALL_COMPLETE}" ]] && [[ -z "${_G_RELEA
     : > /.update
     _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | New Environment"
     _new_environment | _dialog --title "${_MENU_TITLE}" --gauge "Waiting for pacman keyring..." 6 75 0
-    clear
+    reset
 fi
 # Generate new images
 if [[ -n "${_G_RELEASE}" ]]; then
@@ -58,7 +58,7 @@ if [[ -n "${_G_RELEASE}" ]]; then
     : > /.update
     _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | New Images"
     _new_image | _dialog --title "${_MENU_TITLE}" --gauge "Removing not necessary files from /..." 6 75 0
-    clear
+    reset
 fi
 # install custom xorg or wayland
 if [[ -n "${_CUSTOM_X}" || -n "${_CUSTOM_WL}" ]]; then
@@ -105,7 +105,7 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_COSMIC}" || -n "${_L_PLASMA
     if [[ -n "${_L_XFCE}" ]]; then
         _start_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
         kmscon-launch-gui /usr/bin/startxfce4
-        clear
+        reset
         echo -e "To relaunch \e[1mXfce\e[m desktop use: \e[92mkmscon-launch-gui /usr/bin/startxfce4\e[m"
     elif [[ -n "${_L_GNOME}" ]]; then
         _start_gnome | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
@@ -115,17 +115,17 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_COSMIC}" || -n "${_L_PLASMA
     elif [[ -n "${_L_PLASMA}" ]]; then
         _start_plasma | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
         plasma-wayland
-        clear
+        reset
         echo -e "To relaunch \e[1mPlasma Wayland\e[m use: \e[92mplasma-wayland\e[m"
     elif [[ -n "${_L_COSMIC}" ]]; then
         _start_cosmic | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
         cosmic-wayland
-        clear
+        reset
         echo -e "To relaunch \e[1mCosmic\e[m use: \e[92mcosmic-wayland\e[m"
     elif [[ -n "${_L_SWAY}" ]]; then
         _start_sway | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
         sway-wayland
-        clear
+        reset
         echo -e "To relaunch \e[1mSway\e[m use: \e[92msway-wayland\e[m"
     fi
 fi
@@ -136,6 +136,6 @@ if [[ -n "${_FULL_SYSTEM}" ]]; then
     : > /.update
     _TITLE="archboot.com | ${_RUNNING_ARCH} | ${_RUNNING_KERNEL} | Basic Setup | Full System"
     _full_system | _dialog --title "${_MENU_TITLE}" --gauge "Refreshing pacman package database..." 6 75 0
-    clear
+    reset
 fi
 [[ -e /.update ]] && rm /.update
