@@ -13,8 +13,7 @@ _welcome () {
 
 _local_mode () {
     if [[ -e "${_LOCAL_DB}" ]]; then
-        echo -e "You are running in \e[92m\e[1mOffline Mode\e[m, with \e[1mlocal package"
-        echo -e "repository\e[m enabled.\e[m"
+        echo -e "\e[92m\e[1mOffline Mode\e[m, with \e[1mlocal package repository\e[m is enabled.\e[m"
     fi
 }
 
