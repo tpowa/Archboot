@@ -155,8 +155,6 @@ linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz} \
     _map _binary kmscon kmscon-launch-gui fc-{cache,cat,conflist,list,match,pattern,query,scan,validate} xkbcli
     _map _file /usr/share/fonts/TTF/HackNerdFontMono-Regular.ttf
     _file_rename /etc/kmscon/kmscon.conf.example /etc/kmscon/kmscon.conf
-    sd '^#mouse' 'mouse' "${_ROOTFS}"/etc/kmscon/kmscon.conf
-    sd '^#switchvt' 'switchvt' "${_ROOTFS}"/etc/kmscon/kmscon.conf
     sd '^#sb-size=10000' 'sb-size=100000' "${_ROOTFS}"/etc/kmscon/kmscon.conf
     # fix XDG_SESSION_TYPE=wayland on pam.d level
     sd 'pam_systemd.so' 'pam_systemd.so type=wayland' "${_ROOTFS}"/etc/pam.d/system-login
