@@ -4,8 +4,9 @@
 . /usr/lib/archboot/common.sh
 _usage () {
     echo -e "\e[1m\e[36mArchboot\e[m\e[1m - Check On Not Installed Packages\e[m"
-    echo "-------------------------------------------"
-    echo "This will check on packages, which don't have any files in the environment"
+    echo "------------------------------------------"
+    echo "This script will check on packages,"
+    echo "which don't have any files in the environment"
     echo ""
     echo -e "Usage: \e[1m${_BASENAME} run\e[m"
     exit 0
