@@ -15,7 +15,7 @@ _run ()
     echo -e "|-----------|---------|--------|----------|---------|"
     echo -e "| VC 1 - 3  |  VC 4   |  VC 5  |   VC 8   |  VC 9   |"
     echo -e "|-----------|---------|--------|----------|---------|"
-    echo -e "| \e[1;92m  F1-F3\e[m   |   \e[1;92mF4\e[m    |   \e[1;92mF5\e[m   |   \e[1;92mF8\e[m     |   \e[1;92mF9\e[m    |"
+    echo -e "| \e[1;92m  F1-F3\e[m   |   \e[1;92mF4\e[m    |   \e[1;92mF5\e[m   |    \e[1;92mF8\e[m    |   \e[1;92mF9\e[m    |"
     echo -e "-----------------------------------------------------"
 if rg -qw net <<< "${_HOOKS[@]}"; then
     echo -e "\e[1mFor Additional Wi-Fi Authentification Or Online Help:\e[m"
