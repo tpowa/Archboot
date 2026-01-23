@@ -183,11 +183,11 @@ elif [[ "${_MEM_TOTAL}" -lt 2070000 ]]; then
     _welcome
     _memory_error "2.1GB"
     _enter_shell
-# local image, fail if less than 3.0GB  RAM available
-elif [[ "${_MEM_TOTAL}" -lt 2961000 &&\
+# local image, fail if less than 3.6GB  RAM available
+elif [[ "${_MEM_TOTAL}" -lt 3561000 &&\
 -e "${_LOCAL_DB}" ]]; then
     _welcome
-    _memory_error "2.9GB"
+    _memory_error "3.6GB"
     _enter_shell
 else
     _welcome

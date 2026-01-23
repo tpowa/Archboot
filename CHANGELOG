@@ -1,6 +1,9 @@
 On the road to 2026.01:
 - updated grub to 2.14
 Environment:
+- higherd RAM requirement of local image to 3.6G
+- highered RAM requirement of package cache to 3.6G
+- highered RAM requirement of normal image to 650M
 - switched to KMSCON as Virtual Console VC/VT provider
 - new MOTD
 - moved bandwhich network status to VC4
