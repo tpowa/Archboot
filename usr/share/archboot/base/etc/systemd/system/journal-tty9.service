@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# by Tobias Powalowski <tpowa@archlinux.org>
+
+[Unit]
+Description=Launch journal on VC9
+
+[Service]
+ExecStart=kmscon --no-switchvt --vt /dev/tty9 --login -- /usr/bin/bash -c "journalctl --no-pager --follow --no-tail | bat -l syslog -pp"
+
+[Install]
+WantedBy=getty.target
