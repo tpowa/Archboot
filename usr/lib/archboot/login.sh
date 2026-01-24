@@ -151,32 +151,37 @@ if [[ "${_TTY}" = "pts/0" ]] ; then
     : > /tmp/archboot.log
     systemctl start log-tty8.service
 fi
-
 if [[ -e /usr/bin/setup ]]; then
-    _local_mode
-    # wait on user interaction!
-    _enter_shell
-    # Basic Setup on archboot:
-    # localization, network, clock, pacman
-    if ! [[ -e /.localize ]]; then
-        localize
-        . /etc/locale.conf
-    fi
-    if ! [[ -e /.network ]]; then
-        network
-    fi
-    if ! [[ -e /.clock ]]; then
-        clock
-    fi
-    if ! [[ -e /.pacsetup ]]; then
-        pacsetup
-    fi
-    if ! [[ -e /.launcher ]]; then
-        launcher
-    fi
-    if [[ -e /.gnome-wayland ]]; then
-        rm /.gnome-wayland
-        gnome-wayland
+    if [[ "${_MEM_TOTAL}" -lt 750000 ]]; then
+        _local_mode
+        # wait on user interaction!
+        _enter_shell
+        # Basic Setup on archboot:
+        # localization, network, clock, pacman
+        if ! [[ -e /.localize ]]; then
+            localize
+            . /etc/locale.conf
+        fi
+        if ! [[ -e /.network ]]; then
+            network
+        fi
+        if ! [[ -e /.clock ]]; then
+            clock
+        fi
+        if ! [[ -e /.pacsetup ]]; then
+            pacsetup
+        fi
+        if ! [[ -e /.launcher ]]; then
+            launcher
+        fi
+        if [[ -e /.gnome-wayland ]]; then
+            rm /.gnome-wayland
+            gnome-wayland
+        fi
+    else
+        _welcome
+        _memory_error "750M"
+        _enter_shell
     fi
 # latest image, fail if less than 2.1GB RAM available
 elif [[ "${_MEM_TOTAL}" -lt 2070000 ]]; then
