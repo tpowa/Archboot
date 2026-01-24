@@ -152,7 +152,7 @@ if [[ "${_TTY}" = "pts/0" ]] ; then
     systemctl start log-tty8.service
 fi
 if [[ -e /usr/bin/setup ]]; then
-    if [[ "${_MEM_TOTAL}" -lt 696900 ]]; then
+    if [[ "${_MEM_TOTAL}" -gt 696900 ]]; then
         _local_mode
         # wait on user interaction!
         _enter_shell
