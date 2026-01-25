@@ -89,7 +89,7 @@ protocols,request-key.conf,services}
     # fixing network support from glibc
     _map _file /usr/lib/{libnss_files.so.2,libnss_dns.so.2}
     ## add shadow
-    _map _file /etc/login.defs
+    _file /etc/login.defs
     # systemd files
     _map _dir /etc/tmpfiles.d /etc/modules-load.d /etc/binfmt.d
     _file_rename /usr/share/archboot/base/etc/locale.conf /etc/locale.conf
