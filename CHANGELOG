@@ -37,7 +37,7 @@ pacsetup:
 - added 10 seconds timeout on geoip and mirrorlist fetching
 update:
 - lowered requirement of package cache inclusion on 
-  new environment routine to 3.6G RAM
+  new environment routine to 3200M RAM
 - highered requirement of creation of new images routine to 5.5G RAM
 - added autodetection of firmware packages on new environment routine
 - added all supported firmware packages in new images routine
