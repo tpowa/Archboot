@@ -2,7 +2,7 @@ On the road to 2026.01:
 - updated grub to 2.14
 Environment:
 - added memory check for 750M RAM on normal image
-- higherd RAM requirement of local image to 3.6G
+- higherd RAM requirement of local image to 3200M
 - highered RAM requirement of normal image to 750M
 - switched to KMSCON as Virtual Console VC/VT provider
 - new MOTD
