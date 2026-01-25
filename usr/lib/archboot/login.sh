@@ -7,7 +7,7 @@ _TTY=${_TTY#/dev/}
 
 _welcome () {
     echo -e "\e[1mWelcome to \e[36mArchboot\e[m\e[1m - Arch Linux ${_RUNNING_ARCH^^}\e[m"
-    echo -e "\e[1m--------------------------------------------------------------------\e[m"
+    echo -e "\e[1m----------------------------------------------------------------\e[m"
     _local_mode
 }
 
@@ -152,7 +152,7 @@ if [[ "${_TTY}" = "pts/0" ]] ; then
     systemctl start log-tty8.service
 fi
 if [[ -e /usr/bin/setup ]]; then
-    if [[ "${_MEM_TOTAL}" -gt 696900 ]]; then
+    if [[ "${_MEM_TOTAL}" -gt "${_MEM_LIMIT_BARE_MINIMUM}" ]]; then
         _local_mode
         # wait on user interaction!
         _enter_shell
@@ -180,19 +180,17 @@ if [[ -e /usr/bin/setup ]]; then
         fi
     else
         _welcome
-        _memory_error "750M"
+        _memory_error "${_MEM_LIMIT_BARE_MINIMUM}"
         _enter_shell
     fi
-# latest image, fail if less than 2.1GB RAM available
-elif [[ "${_MEM_TOTAL}" -lt 2070000 ]]; then
+elif [[ "${_MEM_TOTAL}" -lt "${_MEM_LIMIT_LATEST}" ]]; then
     _welcome
-    _memory_error "2.1GB"
+    _memory_error "${_MEM_LIMIT_LATEST}"
     _enter_shell
-# local image, fail if less than 3.6GB  RAM available
-elif [[ "${_MEM_TOTAL}" -lt 3561000 &&\
+elif [[ "${_MEM_TOTAL}" -lt "${_MEM_LIMIT_PACKAGE_CACHE}" &&\
 -e "${_LOCAL_DB}" ]]; then
     _welcome
-    _memory_error "3.6GB"
+    _memory_error "${_MEM_LIMIT_PACKAGE_CACHE}"
     _enter_shell
 else
     _welcome

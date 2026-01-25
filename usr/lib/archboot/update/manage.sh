@@ -8,8 +8,7 @@ _available_ram() {
 
 _ram_check() {
     while true; do
-        # continue when 1 GB RAM is free
-        [[ "$(_available_ram)" -gt "1000000" ]] && break
+        [[ "$(_available_ram)" -gt "${_MEM_LIMIT_FREE_RAM}" ]] && break
     done
 }
 

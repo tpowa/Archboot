@@ -38,41 +38,41 @@ _usage () {
         echo -e " \e[1m-update\e[m          Update scripts: setup, quickinst, network, clock and helpers."
     fi
     # latest image
-    if [[ "${_MEM_TOTAL}" -gt 2000000 && ! -e "/.full_system" && ! -e "${_LOCAL_DB}" ]]; then
+    if [[ "${_MEM_TOTAL}" -gt "${_MEM_LIMIT_FULL}" && ! -e "/.full_system" && ! -e "${_LOCAL_DB}" ]]; then
         echo -e " \e[1m-full-system\e[m     Switch to full Arch Linux system."
     # local image
-    elif [[ "${_MEM_TOTAL}" -gt 2571000 && ! -e "/.full_system" && -e "${_LOCAL_DB}" && -e "/usr/bin/setup" ]]; then
+    elif [[ ! -e "/.full_system" && -e "${_LOCAL_DB}" && -e "/usr/bin/setup" ]]; then
         echo -e " \e[1m-full-system\e[m     Switch to full Arch Linux system."
     fi
     echo
     if [[ -e "/usr/bin/setup" ]]; then
         # works only on latest image
         if ! [[ -e "${_LOCAL_DB}" ]]; then
-            if [[ "${_MEM_TOTAL}" -gt 2400000 ]] ; then
+            if [[ "${_MEM_TOTAL}" -gt "${_MEM_LIMIT_GRAPHIC}" ]] ; then
                 _graphic_options
             fi
-            if [[ "${_MEM_TOTAL}" -gt 1500000 ]]; then
+            if [[ "${_MEM_TOTAL}" -gt "${_MEM_LIMIT_LOW_GRAPHIC}" ]]; then
                 echo -e " \e[1m-sway\e[m            Launch Sway desktop with VNC sharing enabled."
                 echo -e " \e[1m-xfce\e[m            Launch Xfce desktop with VNC sharing enabled."
                 echo -e " \e[1m-custom-xorg\e[m     Install custom X environment."
-               [[ "${_MEM_TOTAL}" -gt 2400000 ]] && echo -e " \e[1m-custom-wayland\e[m  Install custom Wayland environment."
+               [[ "${_MEM_TOTAL}" -gt "${_MEM_LIMIT_GRAPHIC}" ]] && echo -e " \e[1m-custom-wayland\e[m  Install custom Wayland environment."
                 echo ""
             fi
         fi
     fi
     if ! [[ -e "${_LOCAL_DB}" ]] || [[ -e "${_LOCAL_DB}" && ! -e "/usr/bin/setup" ]]; then
-        if [[ "${_MEM_TOTAL}" -gt 2270000 ]]; then
+        if [[ "${_MEM_TOTAL}" -gt "${_MEM_LIMIT_LATEST}" ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
                 echo -e " \e[1m-latest\e[m          Launch latest Archboot Environment (using kexec)."
             fi
         fi
-        if [[ "${_MEM_TOTAL}" -gt 3561000 ]]; then
+        if [[ "${_MEM_TOTAL}" -gt "${_MEM_LIMIT_PACKAGE_CACHE}" ]]; then
             if ! [[ "${_RUNNING_ARCH}" == "riscv64" ]]; then
                 echo -e " \e[1m-latest-install\e[m  Launch latest Archboot Environment with"
                 echo -e "                  package cache (using kexec)."
             fi
         fi
-        if [[ "${_MEM_TOTAL}" -gt 5516000 ]]; then
+        if [[ "${_MEM_TOTAL}" -gt "${_MEM_LIMIT_ISO}" ]]; then
             echo -e " \e[1m-latest-image\e[m    Generate latest image files in /archboot directory."
         fi
     fi
