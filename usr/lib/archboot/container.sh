@@ -149,7 +149,7 @@ _ssh_keys() {
     mkdir "${1}"/ssh-keys
     if [[ -f '/etc/archboot/ssh/archboot-key.pub' ]]; then
         echo "Using custom OpenSSH Key..."
-        cp /etc/archboot/ssh/archboot-key.pub "${1}"/etc/archboot/ssh/
+        cp /etc/archboot/ssh/archboot-key{.pub} "${1}"/etc/archboot/ssh/
     else
         # don't run on local image
         if ! [[ -f "${_LOCAL_DB}" ]]; then

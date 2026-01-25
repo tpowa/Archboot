@@ -37,7 +37,7 @@ _usage () {
     if [[ ! -e "${_LOCAL_DB}" || -e "/usr/bin/setup" ]]; then
         echo -e " \e[1m-update\e[m          Update scripts: setup, quickinst, network, clock and helpers."
     fi
-    # latest image
+    # latest/normal image
     if [[ "${_MEM_TOTAL}" -gt "${_MEM_LIMIT_FULL}" && ! -e "/.full_system" && ! -e "${_LOCAL_DB}" ]]; then
         echo -e " \e[1m-full-system\e[m     Switch to full Arch Linux system."
     # local image
