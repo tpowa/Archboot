@@ -189,14 +189,14 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 </tr>
 <tr class="even">
 <td><strong><em>date</em>-latest</strong></td>
-<td>2100M</td>
+<td>2300M</td>
 <td class="MyNo">&#10006;</td>
 <td class="MyOpt">local DHCP<br>server needed</td>
-<td class="MyOpt">&gt;= 3.6G RAM<br>needed</td>
+<td class="MyOpt">&gt;= 3200M RAM<br>needed</td>
 </tr>
 <tr class="odd">
 <td><strong><em>date</em>-local</strong></td>
-<td>3600M</td>
+<td>3200M</td>
 <td class="MyYes">&#10004;</td>
 <td class="MyYes">&#10004;</td>
 <td class="MyYes">&#10004;</td>
@@ -205,7 +205,7 @@ utility to generate <strong>reproducible</strong> bootable media for <strong>UKI
 </table>
 <ul>
 <li>During boot, all <strong>ethernet</strong> network interfaces will try to obtain an IP address through <a href="https://wiki.archlinux.org/title/Network_configuration#DHCP" title="DHCP"><strong>DHCP</strong></a>, <strong>except</strong> -local image files.</li>
-<li><strong>With</strong> a fast <strong>ethernet</strong> internet connection <strong>and</strong> a running <a href="https://wiki.archlinux.org/title/DHCP" title="DHCP"><strong>DHCP</strong></a> server, go for the <strong>latest</strong> image. If your system holds at least 3.6G RAM the package cache will be preserved.</li>
+<li><strong>With</strong> a fast <strong>ethernet</strong> internet connection <strong>and</strong> a running <a href="https://wiki.archlinux.org/title/DHCP" title="DHCP"><strong>DHCP</strong></a> server, go for the <strong>latest</strong> image. If your system holds at least 3200M RAM the package cache will be preserved.</li>
 <li><strong>Without</strong> an internet connection you should use the <strong>local</strong> image. It includes a <strong>local package repository</strong> for installation. It will <strong>not</strong> use any network interfaces/services, until you explicitly switch to <strong>Online</strong> mode.</li>
 </ul>
 <h3 data-number="2.2" id="ipxe-boot"><span class="header-section-number">2.2</span> <strong>Netboot - IPXE</strong></h3>
