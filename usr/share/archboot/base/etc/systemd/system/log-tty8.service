@@ -5,7 +5,7 @@
 Description=Monitor Archboot log on VC8
 
 [Service]
-ExecStart=kmscon --no-switchvt --vt /dev/tty8 --login -- /usr/bin/bash -c "tail -F /tmp/archboot.log 2>/dev/null | bat -l log -pp"
+ExecStart=kmscon --no-switchvt --vt /dev/tty8 --login -- /usr/bin/bash -c "tail -n +1 -F /tmp/archboot.log 2>/dev/null | bat -l log -pp"
 
 [Install]
 WantedBy=getty.target

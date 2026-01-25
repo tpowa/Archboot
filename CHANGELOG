@@ -13,6 +13,7 @@ Environment:
 - added pigz to packages
 - added /usr/lib/gnupg programs
 - removed custom modprobe.conf
+- fixed ttyd/sshd login on -latest image
 defaults:
 - added all supported firmware packages to _GRAPHIC_IGNORE list
 init:
