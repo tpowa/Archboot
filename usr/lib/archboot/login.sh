@@ -27,6 +27,7 @@ _memory_error () {
 _create_btrfs() {
     modprobe -q zram
     modprobe -q zstd
+    udevadm settle
     echo "zstd" >/sys/block/zram0/comp_algorithm
     echo "6G" >/sys/block/zram0/disksize
     mkfs.btrfs /dev/zram0 &>"${_NO_LOG}"
