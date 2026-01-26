@@ -159,7 +159,7 @@ _create_iso() {
             fi
             # python is cleaned out in container.dh
             if ! [[ -e /usr/bin/python ]]; then
-                pacman -Sy python
+                pacman -Sy python python-cryptography python-pefile
             fi
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
                 "${_UCODE[@]}" --initrd="${initrd}" "${_FW_IMG[@]}" --cmdline="${_CMDLINE}" \
