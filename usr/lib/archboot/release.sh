@@ -137,7 +137,7 @@ _create_iso() {
         # python is cleaned out in container.dh
         if ! [[ -e /usr/bin/python ]]; then
             echo "Installing ukify depends..."
-            ${_NSPAWN} "${_W_DIR}" pacman -Sy python python-cryptography python-pefile &>"${_NO_LOG}" || exit 1
+            ${_NSPAWN} "${_W_DIR}" pacman -Sy --noconfirm python python-cryptography python-pefile &>"${_NO_LOG}" || exit 1
         fi
         echo "Generating Unified Kernel Images..."
         _KERNEL="boot/kernel/${_KERNEL##*/}"
