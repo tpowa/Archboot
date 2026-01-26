@@ -159,7 +159,8 @@ _create_iso() {
             fi
             # python is cleaned out in container.dh
             if ! [[ -e /usr/bin/python ]]; then
-                pacman -Sy python python-cryptography python-pefile
+                echo "Installing ukify depends..."
+                pacman -Sy python python-cryptography python-pefile &>"${_NO_LOG}" || exit 1
             fi
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
                 "${_UCODE[@]}" --initrd="${initrd}" "${_FW_IMG[@]}" --cmdline="${_CMDLINE}" \

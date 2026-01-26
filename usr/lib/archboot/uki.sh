@@ -58,7 +58,8 @@ _systemd_ukify() {
     _AMD_UCODE=(--initrd=/"${_AMD_UCODE}")
     # python is cleaned out in container.dh
     if ! [[ -e /usr/bin/python ]]; then
-        pacman -Sy python python-cryptography python-pefile
+        echo "Installing ukify depends..."
+        pacman -Sy python python-cryptography python-pefile &>"${_NO_LOG}" || exit 1
     fi
     /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
         "${_INTEL_UCODE[@]}" "${_AMD_UCODE[@]}" --initrd="${_INITRD}" --cmdline="${_CMDLINE}" \
