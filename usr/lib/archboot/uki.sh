@@ -56,6 +56,10 @@ _systemd_ukify() {
     echo "Generating ${_ARCH} UKI image..."
     [[ -n "${_INTEL_UCODE}" ]] && _INTEL_UCODE=(--initrd=/"${_INTEL_UCODE}")
     _AMD_UCODE=(--initrd=/"${_AMD_UCODE}")
+    # python is cleaned out in container.dh
+    if ! [[ -e /usr/bin/python ]]; then
+        pacman -Sy python
+    fi
     /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
         "${_INTEL_UCODE[@]}" "${_AMD_UCODE[@]}" --initrd="${_INITRD}" --cmdline="${_CMDLINE}" \
         --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="${_UKI}.efi" &>"${_NO_LOG}" || exit 1

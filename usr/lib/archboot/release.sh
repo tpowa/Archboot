@@ -157,6 +157,10 @@ _create_iso() {
                     _FW_IMG+=(--initrd=/boot/firmware/"${i}".img)
                 done
             fi
+            # python is cleaned out in container.dh
+            if ! [[ -e /usr/bin/python ]]; then
+                pacman -Sy python
+            fi
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
                 "${_UCODE[@]}" --initrd="${initrd}" "${_FW_IMG[@]}" --cmdline="${_CMDLINE}" \
                 --os-release=@"${_OSREL}" --splash="${_SPLASH}" --output="/boot/${_UKI}.efi" &>"${_NO_LOG}" || exit 1
