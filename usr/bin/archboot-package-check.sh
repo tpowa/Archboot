@@ -24,5 +24,6 @@ sort -u /pkg-found.txt > /pkg-uniq.txt
 rm /pkg-found.txt
 pacman -Q >/pkg-install.txt
 sd ' ' '-' /pkg-install.txt
-diff -u /pkg-uniq.txt /pkg-install.txt | rg -v '^\+\+\+' | rg '^\+' > /pkg-no-files.log
+diff -u /pkg-uniq.txt /pkg-install.txt | rg -v '^\+\+\+' | rg '^\+' > /pkg-no-files-error.orig.log
 rm /pkg-uniq.txt /pkg-install.txt
+rg -v "ca-certificates|dbus-units|linux-firmware" /pkg-no-files-error.orig.log > /pkg-no-files-error.log
