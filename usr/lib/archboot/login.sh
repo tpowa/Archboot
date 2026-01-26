@@ -25,6 +25,7 @@ _memory_error () {
 }
 
 _create_btrfs() {
+    # reinitialize zram0 device, else busy errors may happen.
     rmmod zram
     modprobe -q zram
     modprobe -q zstd
