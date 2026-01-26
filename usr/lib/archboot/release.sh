@@ -135,7 +135,7 @@ _create_iso() {
             rm efi.img
         done
         # python is cleaned out in container.dh
-        if ! [[ -e /usr/bin/python ]]; then
+        if ! [[ -e "${_W_DIR}"/usr/bin/python ]]; then
             echo "Installing ukify depends..."
             ${_NSPAWN} "${_W_DIR}" pacman -Sy --noconfirm python python-cryptography python-pefile &>"${_NO_LOG}" || exit 1
         fi
