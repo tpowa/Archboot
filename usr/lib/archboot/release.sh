@@ -134,6 +134,11 @@ _create_iso() {
             fi
             rm efi.img
         done
+        # python is cleaned out in container.dh
+        if ! [[ -e /usr/bin/python ]]; then
+            echo "Installing ukify depends..."
+            ${_NSPAWN} "${_W_DIR}" pacman -Sy python python-cryptography python-pefile &>"${_NO_LOG}" || exit 1
+        fi
         echo "Generating Unified Kernel Images..."
         _KERNEL="boot/kernel/${_KERNEL##*/}"
         [[ -n "${_INTEL_UCODE}" ]] && _UCODE+=(--initrd=/boot/ucode/intel-ucode.img)
@@ -156,11 +161,6 @@ _create_iso() {
                 for i in amdgpu i915 nvidia radeon xe; do
                     _FW_IMG+=(--initrd=/boot/firmware/"${i}".img)
                 done
-            fi
-            # python is cleaned out in container.dh
-            if ! [[ -e /usr/bin/python ]]; then
-                echo "Installing ukify depends..."
-                pacman -Sy python python-cryptography python-pefile &>"${_NO_LOG}" || exit 1
             fi
             ${_NSPAWN} "${_W_DIR}" /usr/lib/systemd/ukify build --linux="${_KERNEL}" \
                 "${_UCODE[@]}" --initrd="${initrd}" "${_FW_IMG[@]}" --cmdline="${_CMDLINE}" \
