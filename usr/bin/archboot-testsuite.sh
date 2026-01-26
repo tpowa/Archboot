@@ -217,7 +217,7 @@ for i in $(fd -u -E '/modules/' -E '/udev/' -E 'gconv-modules.cache' -E 'locale-
 done
 _result pacman-error.log
 _run_test "packages with no files in environment"
-archboot-package-check run 2>"${_NO_LOG}"
+archboot-package-check.sh run 2>"${_NO_LOG}"
 _result /pkg-no-files-error.log
 echo -e "Starting pacman database check in \e[1m10\e[m seconds...\n\e[1;92mCTRL-C\e[m to stop now."
 sleep 10
