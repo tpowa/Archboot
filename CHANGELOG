@@ -1,16 +1,19 @@
-On the road to 2026.01:
+On the road to 2026.02:
+---
+Highlights 2026.01:
 - updated grub to 2.14
-Environment:
-- highered RAM requirement of local image to 3200M
-- highered RAM requirement of normal image to 750M
-- added additional memory check for at least 750M RAM       
 - switched to KMSCON as Virtual Console VC/VT provider
+- added Cosmic desktop environment
+Environment:
+- added additional memory check for at least 750M RAM
+- increased RAM requirement of normal image to 750M RAM
+- increased RAM requirement of local image to 3200M
 - updated MOTD
 - moved bandwhich network status to VC4
 - moved btm system status to VC5
 - moved log to VC8 and save it to /tmp/archboot.log 
 - moved journal to VC9
-- moved kbd, fbset and terminus-font to init process
+- moved kbd, fbset and terminus-font to base_init only
 - added colors to log and journal
 - added pigz to packages
 - added /usr/lib/gnupg programs
@@ -29,8 +32,6 @@ firmware:
 - removed bnx2x firmware
 - added broadcom wireless firmware
 - removed sdca firmware
-launcher:
-- added Cosmic desktop environment
 login:
 - added 30 second timeout to download autorun.sh
 sway:
@@ -40,9 +41,9 @@ pacsetup:
 testsuite:
 - added check for packages which don't have any files on environment
 update:
-- lowered requirement of package cache inclusion on 
+- decreased requirement of package cache inclusion on
   new environment routine to 3200M RAM
-- highered requirement of creation of new images routine to 5.5G RAM
+- increased requirement of creation of new images routine to 5.5G RAM
 - added autodetection of firmware packages on new environment routine
 - added all supported firmware packages in new images routine
 - added 10 seconds timeout on geoip and mirrorlist fetching
