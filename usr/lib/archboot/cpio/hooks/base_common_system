@@ -119,6 +119,8 @@ protocols,request-key.conf,services}
     done
     # disable systemd-gpt-auto-generator, errors out on initramfs usage
     _symlink /etc/systemd/system-generators/systemd-gpt-auto-generator /dev/null
+    # disable vconsole
+    _symlink /etc/systemd/system/systemd-vconsole-setup /dev/null
     # disable lastlog
     _symlink /var/log/lastlog /dev/null
     # add missing libsystemd files
@@ -128,10 +130,6 @@ protocols,request-key.conf,services}
     # add schedule rules file
     _file_rename /usr/share/archboot/base/etc/udev/rules.d/60-ioschedulers.rules \
                  /etc/udev/rules.d/60-ioschedulers.rules
-    # add minimal vconsole
-    _map _file /usr/share/kbd/keymaps/i386/{include/{qwerty-layout,compose,\
-linux-with-alt-and-altgr,linux-keys-bare}.inc,qwerty/us.map.gz} \
-    /usr/share/kbd/keymaps/{include/compose.latin1,i386/include/{euro{,1},windowkeys}.map.gz}
     # add swapiness sysctl config file
     _file_rename /usr/share/archboot/base/etc/sysctl.d/99-sysctl.conf /etc/sysctl.d/99-sysctl.conf
     # add pacman
