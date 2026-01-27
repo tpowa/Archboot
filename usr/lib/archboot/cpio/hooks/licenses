@@ -100,7 +100,6 @@ _LICENSES=(
   shadow/COPYING
   sqlite/license.txt
   systemd/MIT-0.txt
-  terminus-font/LICENSE
   tiny/LICENSE
   tmux/LICENSE
   tpm2-tss/LICENSE

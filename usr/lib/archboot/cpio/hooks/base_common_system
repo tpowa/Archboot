@@ -119,9 +119,10 @@ protocols,request-key.conf,services}
     done
     # disable systemd-gpt-auto-generator, errors out on initramfs usage
     _symlink /etc/systemd/system-generators/systemd-gpt-auto-generator /dev/null
-    # disable vconsole and remove kbd pam
+    # disable vconsole, remove kbd and terminus font
     _symlink /etc/systemd/system/systemd-vconsole-setup.service /dev/null
     rm ${_ROOTFS}/etc/pam.d/vlock
+    rm ${_ROOTFS} /usr/share/fontconfig/{conf.avail,conf.default}/75-yes-terminus.conf
     # disable lastlog
     _symlink /var/log/lastlog /dev/null
     # add missing libsystemd files
