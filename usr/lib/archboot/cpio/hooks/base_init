@@ -35,4 +35,6 @@ _run ()
                  /etc/systemd/system/archboot-init.service
     _file_rename /usr/share/archboot/base/etc/systemd/system/initrd-cleanup.service \
                  /etc/systemd/system/initrd-cleanup.service
+    # vconsole terminus font
+    _map _file /usr/share/{kbd/consolefonts/ter-v{16,32}n.psf.gz,terminfo/l/linux}
 }
