@@ -23,7 +23,7 @@ usr/share/{bash-completion,dbus-1,factory,hwdata,i18n/locales,makepkg,nano,pacma
         tar -C / --exclude=var/lib/pacman/local/{amd-ucode-*-[0-9]*,archboot-ipxe-*-[0-9]*,base-*-[0-9]*,binutils-*-[0-9]*,\
 cairo-*-[0-9]*,cdrtools-*-[0-9]*,db5.3-*-[0-9]*,db-*-[0-9]*,default-cursors-*-[0-9]*,edk2-shell-*-[0-9]*,fbset-*-[0-9]*,\
 fuse-common-*-[0-9]*,fuse2-*-[0-9]*,gc-*-[0-9]*,gettext-*-[0-9]*,gnutls-*-[0-9]*,grml-zsh-config-*-[0-9]*,\
-groff-*-[0-9]*,grub-*-[0-9]*,intel-ucode-*-[0-9]*,leancrypto-*-[0-9]*,libburn-*-[0-9]*,libev-*-[0-9]*,\
+groff-*-[0-9]*,grub-*-[0-9]*,intel-ucode-*-[0-9]*,kbd-*-[0-9]*,leancrypto-*-[0-9]*,libburn-*-[0-9]*,libev-*-[0-9]*,\
 libisoburn-*-[0-9]*,libisofs-*-[0-9]*,libpciaccess-*-[0-9]*,libpipeline-*-[0-9]*,libsysprof-capture-*-[0-9]*,\
 liburing-*-[0-9]*,libwbclient-*-[0-9]*,libxau-*-[0-9]*,libxcb-*-[0-9]*,libxdmcp-*-[0-9]*,libxext-*-[0-9]*,\
 libxft-*-[0-9]*,libxrender-*-[0-9]*,libxshmfence-*-[0-9]*,libxxf86vm-*-[0-9]*,limine-*-[0-9]*,llvm-libs-*-[0-9]*,\
@@ -44,7 +44,7 @@ timedate,userdb,home,oom,portable}ctl btm certutil chmod choose clear cmsutil co
                  dbus-{broker{,-launch},cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
 update-activation-environment,uuidgen} dd df dir du dust dysk exa eza faillock false fd fmt fold fzf \
                  fzf-tmux gawk gpg{,-agent,conf,-connect-agent} gpgme-{tool,json} groups hugetop insmod install \
-                 installkernel kernel-install kill{,all} loadkeys ldconfig login lspci mktemp mkhomedir_helper \
+                 installkernel kernel-install kill{,all} ldconfig login lspci mktemp mkhomedir_helper \
                  modutil more mount.ddi mount.nfs{,4} nano nologin nss-config od ouch p11-kit pk12util \
                  pam_{namespace_helper,timestamp_check} pacman{,-conf,-key,-db-upgrade} passwd pgrep pidof pigz \
                  pinentry{,-curses} pk{action,check,exec,ttyagent} pwhistory_helper pluginviewer printf procs ps pwd \
@@ -119,8 +119,9 @@ protocols,request-key.conf,services}
     done
     # disable systemd-gpt-auto-generator, errors out on initramfs usage
     _symlink /etc/systemd/system-generators/systemd-gpt-auto-generator /dev/null
-    # disable vconsole
+    # disable vconsole and remove kbd pam
     _symlink /etc/systemd/system/systemd-vconsole-setup.service /dev/null
+    rm ${_ROOTFS}/etc/pam.d/vlock
     # disable lastlog
     _symlink /var/log/lastlog /dev/null
     # add missing libsystemd files
