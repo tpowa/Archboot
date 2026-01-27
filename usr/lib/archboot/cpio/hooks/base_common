@@ -6,9 +6,9 @@ _run ()
 {
     # add basic apps
     _map _binary 3cpio basename bash blkid cat cp cut dialog echo env find grep \
-                 gzip halt head init journalctl kmod ln loadkeys logger ls{,blk,mod} \
+                 gzip halt head init journalctl kmod ln logger ls{,blk,mod} \
                  mkdir mkfs.btrfs modprobe less mount mountpoint mv poweroff \
-                 realpath reboot rg rm setfont sh shutdown sleep sulogin systemctl \
+                 realpath reboot rg rm sh shutdown sleep sulogin systemctl \
                  systemd-tmpfiles udevadm umount uname zstd
 
     # prepare rust coreutils
@@ -69,7 +69,5 @@ _run ()
     done
     # disable systemd automount:
     _symlink /etc/systemd/system/proc-sys-fs-binfmt_misc.automount /dev/null
-    # vconsole terminus font
-    _map _file /usr/share/{kbd/consolefonts/ter-v{16,32}n.psf.gz,terminfo/l/linux}
 }
 
