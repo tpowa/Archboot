@@ -119,10 +119,9 @@ protocols,request-key.conf,services}
     done
     # disable systemd-gpt-auto-generator, errors out on initramfs usage
     _symlink /etc/systemd/system-generators/systemd-gpt-auto-generator /dev/null
-    # disable vconsole, remove kbd and terminus font
+    # disable vconsole and remove kbd
     _symlink /etc/systemd/system/systemd-vconsole-setup.service /dev/null
     rm ${_ROOTFS}/etc/pam.d/vlock
-    rm ${_ROOTFS}/usr/share/fontconfig/{conf.avail,conf.default}/75-yes-terminus.conf
     # disable lastlog
     _symlink /var/log/lastlog /dev/null
     # add missing libsystemd files
@@ -155,6 +154,8 @@ protocols,request-key.conf,services}
     _map _full_dir /etc/fonts /usr/share/{fontconfig,xkeyboard-config-2,X11} /usr/lib/{kmscon,xkbcommon}
     _map _binary kmscon kmscon-launch-gui fc-{cache,cat,conflist,list,match,pattern,query,scan,validate} xkbcli
     _map _file /usr/share/fonts/TTF/HackNerdFontMono-Regular.ttf
+    # remove terminus font
+    rm ${_ROOTFS}/usr/share/fontconfig/{conf.avail,conf.default}/75-yes-terminus.conf
     _file_rename /etc/kmscon/kmscon.conf.example /etc/kmscon/kmscon.conf
     sd '^#sb-size=10000' 'sb-size=100000' "${_ROOTFS}"/etc/kmscon/kmscon.conf
     # fix XDG_SESSION_TYPE=wayland on pam.d level
