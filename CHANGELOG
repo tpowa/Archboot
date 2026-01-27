@@ -7,7 +7,7 @@ Highlights 2026.01:
 Environment:
 - added additional memory check for at least 750M RAM
 - increased RAM requirement of normal image to 750M RAM
-- increased RAM requirement of local image to 3200M
+- increased RAM requirement of local image to 3200M RAM
 - updated MOTD
 - moved bandwhich network status to VC4
 - moved btm system status to VC5
@@ -43,7 +43,7 @@ testsuite:
 update:
 - decreased requirement of package cache inclusion on
   new environment routine to 3200M RAM
-- increased requirement of creation of new images routine to 5.5G RAM
+- increased requirement of creation of new images routine to 5500M RAM
 - added autodetection of firmware packages on new environment routine
 - added all supported firmware packages in new images routine
 - added 10 seconds timeout on geoip and mirrorlist fetching
