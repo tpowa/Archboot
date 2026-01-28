@@ -40,7 +40,6 @@ _localize_task() {
     echo LC_COLLATE=C >> /etc/locale.conf
     localectl set-locale "${_LOCALE}.UTF-8" &>"${_NO_LOG}"
     localectl set-x11-keymap "${_DETECTED_KEYMAP}" &>"${_NO_LOG}"
-    localectl set-keymap "${_DETECTED_KEYMAP}" &>"${_NO_LOG}"
     #shellcheck disable=SC2016
     sd '(^[a-z])' '#$1' /etc/locale.gen
     sd "^#${_LOCALE}.UTF-8" "${_LOCALE}.UTF-8" /etc/locale.gen
@@ -59,7 +58,6 @@ _localize_task() {
     echo "locale-gen &>\"\${_NO_LOG}\""
     echo "localectl set-locale \"\${_LOCALE}.UTF-8\" &>\"\${_NO_LOG}\""
     echo "localectl set-x11-keymap \"\${_DETECTED_KEYMAP}\" &>\"\${_NO_LOG}\""
-    echo "localectl set-keymap \"\${_DETECTED_KEYMAP}\" &>\"\${_NO_LOG}\""
     # set running VC too
     echo "export LANG=\"${_LOCALE}.UTF-8\""
     echo ": > /.localize"
