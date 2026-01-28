@@ -38,6 +38,13 @@ _vconsole_keymap() {
 _localize_task() {
     echo "LANG=${_LOCALE}.UTF-8" > /etc/locale.conf
     echo LC_COLLATE=C >> /etc/locale.conf
+    _FB_SIZE="$(rg -o ':(.*)x' -r '$1' /sys/class/graphics/fb0/modes 2>/dev/null)"
+    if [[ "${_FB_SIZE}" -gt '1900' ]]; then
+        _SIZE="32"
+    else
+        _SIZE="16"
+    fi
+    echo FONT=ter-v${_SIZE}n >/etc/vconsole.conf
     localectl set-locale "${_LOCALE}.UTF-8" &>"${_NO_LOG}"
     localectl set-x11-keymap "${_DETECTED_KEYMAP}" &>"${_NO_LOG}"
     #shellcheck disable=SC2016

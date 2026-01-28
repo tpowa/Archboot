@@ -230,6 +230,10 @@ _auto_vconsole() {
             cp "${_DESTDIR}"/etc/kmscon/kmscon.conf.example "${_DESTDIR}"/etc/kmscon/kmscon.conf
             echo "\"\${_DESTDIR}\"/etc/kmscon/kmscon.conf.example \"\${_DESTDIR}\"/etc/kmscon/kmscon.conf" >> "${_TEMPLATE}"
         fi
+        if [[ -e "${_DESTDIR}"/etc/systemd/system/getty.target.wants/getty@tty1.service ]]; then
+            rm "${_DESTDIR}"/etc/systemd/system/getty.target.wants/getty@tty1.service
+            echo "rm \"\${_DESTDIR}\"/etc/systemd/system/getty.target.wants/getty@tty1.service" >> "${_TEMPLATE}"
+        fi
         # enable hardware acceleration
         sd '^#hwaccel' 'hwaccel' "${_DESTDIR}"/etc/kmscon/kmscon.conf
         # write to template
