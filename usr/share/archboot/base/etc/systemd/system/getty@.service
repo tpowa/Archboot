@@ -44,4 +44,7 @@ TTYVHangup=yes
 TTYVTDisallocate=yes
 
 [Install]
+Alias=autovt@.service
+
 WantedBy=getty.target
+DefaultInstance=tty1
