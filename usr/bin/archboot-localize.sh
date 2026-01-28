@@ -89,5 +89,5 @@ _localize
 [[ -e "${_ANSWER}-running" ]] && rm "${_ANSWER}-running"
 if [[ "${_TTY}" = "pts/0" ]]; then
     # enable xkb settings on running VCs
-    systemctl restart getty@tty*
+    systemctl restart kmsconvt@tty*
 fi
