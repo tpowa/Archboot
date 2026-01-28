@@ -141,9 +141,10 @@ _configure_system() {
     # main menu loop
     while true; do
         [[ -n "${_FILE}" ]] && _DEFAULT=(--default-item "${_FILE}")
-        if ! _dialog --title " System Configuration " --no-cancel "${_DEFAULT[@]}" --menu "" 19 60 13 \
+        if ! _dialog --title " System Configuration " --no-cancel "${_DEFAULT[@]}" --menu "" 20 60 14 \
                 "> User Management"             "User Configuration" \
                 "/etc/vconsole.conf"            "Virtual Console" \
+                "/etc/kmscon/kmscon.conf"       "Kmscon Console" \
                 "/etc/locale.conf"              "Locale Setting" \
                 "/etc/locale.gen"               "Glibc Locales" \
                 "/etc/fstab"                    "Filesystem Mountpoints" \
