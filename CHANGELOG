@@ -34,6 +34,8 @@ firmware:
 - removed sdca firmware
 login:
 - added 30 second timeout to download autorun.sh
+setup:
+- enable kmscon as default VT/VC provider
 sway:
 - fixed keyboard layout on sway startup
 pacsetup:

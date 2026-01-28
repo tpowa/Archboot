@@ -217,10 +217,18 @@ EOF
 
 _auto_vconsole() {
     if [[ ! -f ${_DESTDIR}/etc/vconsole.conf ]]; then
-        _progress "69" "Setting keymap and font on installed system..."
+        _progress "69" "Setting keymap, font and kmscon on installed system..."
         cp /etc/vconsole.conf "${_DESTDIR}"/etc/vconsole.conf
+        ln -s /usr/lib/systemd/system/kmsconvt@.service "${_DESTDIR}"/etc/systemd/system/autovt@.service
+        [[ -d "${_DESTDIR}"/etc/systemd/system/getty.target.wants ]] || \
+               mkdir -p "${_DESTDIR}"/etc/systemd/system/getty.target.wants
+        ln -s /usr/lib/systemd/system/kmsconvt@.service \
+              "${_DESTDIR}"/etc/systemd/system/getty.target.wants/kmsconvt@tty1.service
         # write to template
-        { echo "echo \"Setting keymap and font on installed system...\""
+        { echo "echo \"Setting keymap,font and kmscon on installed system...\""
+        echo "ln -s /usr/lib/systemd/system/kmsconvt@.service \"\${_DESTDIR}\"/etc/systemd/system/autovt@.service"
+        echo "mkdir -p \"\${_DESTDIR}\"/etc/systemd/system/getty.target.wants"
+        echo "ln -s /usr/lib/systemd/system/kmsconvt@.service \"\${_DESTDIR}\"/etc/systemd/system/getty.target.wants/kmsconvt@tty1.service"
         echo "cp /etc/vconsole.conf \"\${_DESTDIR}\"/etc/vconsole.conf"
         } >> "${_TEMPLATE}"
         sleep 2

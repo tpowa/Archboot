@@ -4,6 +4,7 @@
 _PACKAGES=(
   base
   iptables-nft
+  kmscon
   linux
   polkit
 )
