@@ -95,7 +95,7 @@ protocols,request-key.conf,services}
     _map _dir /etc/tmpfiles.d /etc/modules-load.d /etc/binfmt.d
     _file_rename /usr/share/archboot/base/etc/locale.conf /etc/locale.conf
     _file_rename /usr/share/archboot/base/etc/vconsole.conf /etc/vconsole.conf
-    _file_rename /usr/share/archboot/base/etc//systemd/system/kmsconvt@.service \
+    _file_rename /usr/share/archboot/base/etc/systemd/system/kmsconvt@.service \
                  /etc/systemd/system/kmsconvt@.service
     _symlink /etc/systemd/system/getty.target.wants/kmsconvt@tty1.service \
              /etc/systemd/system/kmsconvt@.service
