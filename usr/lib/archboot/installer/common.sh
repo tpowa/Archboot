@@ -99,6 +99,7 @@ _auto_packages() {
         ! rg -qw 'iwd' <<< "${_PACKAGES[@]}" && _PACKAGES+=(iwd)
     fi
     rg -q '^FONT=ter' /etc/vconsole.conf && _PACKAGES+=(terminus-font)
+    rg -q '^FONT' /etc/vconsole.conf || _PACKAGES+=(ttf-nerd-font)
     rg -q '^WIRELESS' /etc/conf.d/wireless-regdom && _PACKAGES+=(wireless-regdb)
     _auto_fw
 }
