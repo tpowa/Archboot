@@ -95,10 +95,12 @@ protocols,request-key.conf,services}
     _map _dir /etc/tmpfiles.d /etc/modules-load.d /etc/binfmt.d
     _file_rename /usr/share/archboot/base/etc/locale.conf /etc/locale.conf
     _file_rename /usr/share/archboot/base/etc/vconsole.conf /etc/vconsole.conf
+    _file_rename /usr/share/archboot/base/etc//systemd/system/kmsconvt@.service \
+                 /etc/systemd/system/kmsconvt@.service
     _symlink /etc/systemd/system/getty.target.wants/kmsconvt@tty1.service \
-             /usr/lib/systemd/system/kmsconvt@.service
+             /etc/systemd/system/kmsconvt@.service
     _symlink /etc/systemd/system/autovt@.service \
-             /usr/lib/systemd/system/kmsconvt@.service
+             /etc/systemd/system/kmsconvt@.service
     _file_rename /usr/share/archboot/base/etc/systemd/system/serial-getty@.service \
                  /etc/systemd/system/serial-getty@.service
     _file_rename /usr/share/archboot/base/etc/systemd/system/bandwhich-tty4.service \
@@ -109,6 +111,8 @@ protocols,request-key.conf,services}
         /etc/systemd/system/journal-tty9.service
     _file_rename /usr/share/archboot/base/etc/systemd/system/log-tty8.service \
         /etc/systemd/system/log-tty8.service
+    sd '/sbin/agetty -o '-p -- \\u' --noclear -- - $$TERM' '/sbin/agetty --skip-login -o '-f root -p -- \\u' - $$TERM' \
+        ${_ROOTFS}/etc/systemd/system/kmsconvt@.service
     # disable systemd targets:
     for i in remote-{veritysetup,cryptsetup} sockets timers; do
         _symlink "/etc/systemd/system/${i}.target" /dev/null
