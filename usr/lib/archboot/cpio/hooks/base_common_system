@@ -111,8 +111,6 @@ protocols,request-key.conf,services}
         /etc/systemd/system/journal-tty9.service
     _file_rename /usr/share/archboot/base/etc/systemd/system/log-tty8.service \
         /etc/systemd/system/log-tty8.service
-    sd '/sbin/agetty -o '-p -- \\u' --noclear -- - $$TERM' '/sbin/agetty --skip-login -o '-f root -p -- \\u' - $$TERM' \
-        ${_ROOTFS}/etc/systemd/system/kmsconvt@.service
     # disable systemd targets:
     for i in remote-{veritysetup,cryptsetup} sockets timers; do
         _symlink "/etc/systemd/system/${i}.target" /dev/null
