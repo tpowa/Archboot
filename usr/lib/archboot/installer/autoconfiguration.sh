@@ -229,6 +229,7 @@ _auto_vconsole() {
         if [[ -e "${_DESTDIR}"/etc/kmscon/kmscon.conf ]]; then
             cp "${_DESTDIR}"/etc/kmscon/kmscon.conf.example "${_DESTDIR}"/etc/kmscon/kmscon.conf
             echo "\"\${_DESTDIR}\"/etc/kmscon/kmscon.conf.example \"\${_DESTDIR}\"/etc/kmscon/kmscon.conf" >> "${_TEMPLATE}"
+        fi
         # enable hardware acceleration
         sd '^#hwaccel' 'hwaccel' "${_DESTDIR}"/etc/kmscon/kmscon.conf
         # write to template
