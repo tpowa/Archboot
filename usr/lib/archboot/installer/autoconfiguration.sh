@@ -220,16 +220,23 @@ _auto_vconsole() {
         _progress "69" "Setting keymap, font and kmscon on installed system..."
         cp /etc/vconsole.conf "${_DESTDIR}"/etc/vconsole.conf
         ln -s /usr/lib/systemd/system/kmsconvt@.service "${_DESTDIR}"/etc/systemd/system/autovt@.service
-        [[ -d "${_DESTDIR}"/etc/systemd/system/getty.target.wants ]] || \
-               mkdir -p "${_DESTDIR}"/etc/systemd/system/getty.target.wants
+        if ! [[ -d "${_DESTDIR}"/etc/systemd/system/getty.target.wants ]]; then
+            mkdir -p "${_DESTDIR}"/etc/systemd/system/getty.target.wants
+            echo "mkdir -p \"\${_DESTDIR}\"/etc/systemd/system/getty.target.wants" >> "${_TEMPLATE}"
+        fi
         ln -s /usr/lib/systemd/system/kmsconvt@.service \
               "${_DESTDIR}"/etc/systemd/system/getty.target.wants/kmsconvt@tty1.service
+        if [[ -e "${_DESTDIR}"/etc/kmscon/kmscon.conf ]]; then
+            cp "${_DESTDIR}"/etc/kmscon/kmscon.conf.example "${_DESTDIR}"/etc/kmscon/kmscon.conf
+            echo "\"\${_DESTDIR}\"/etc/kmscon/kmscon.conf.example \"\${_DESTDIR}\"/etc/kmscon/kmscon.conf" >> "${_TEMPLATE}"
+        # enable hardware acceleration
+        sd '^#hwaccel' 'hwaccel' "${_DESTDIR}"/etc/kmscon/kmscon.conf
         # write to template
         { echo "echo \"Setting keymap,font and kmscon on installed system...\""
-        echo "ln -s /usr/lib/systemd/system/kmsconvt@.service \"\${_DESTDIR}\"/etc/systemd/system/autovt@.service"
-        echo "mkdir -p \"\${_DESTDIR}\"/etc/systemd/system/getty.target.wants"
-        echo "ln -s /usr/lib/systemd/system/kmsconvt@.service \"\${_DESTDIR}\"/etc/systemd/system/getty.target.wants/kmsconvt@tty1.service"
         echo "cp /etc/vconsole.conf \"\${_DESTDIR}\"/etc/vconsole.conf"
+        echo "ln -s /usr/lib/systemd/system/kmsconvt@.service \"\${_DESTDIR}\"/etc/systemd/system/autovt@.service"
+        echo "ln -s /usr/lib/systemd/system/kmsconvt@.service \"\${_DESTDIR}\"/etc/systemd/system/getty.target.wants/kmsconvt@tty1.service"
+        echo "sd '^#hwaccel' 'hwaccel' \"\${_DESTDIR}\"/etc/kmscon/kmscon.conf"
         } >> "${_TEMPLATE}"
         sleep 2
     fi
