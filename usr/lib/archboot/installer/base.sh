@@ -144,7 +144,7 @@ _configure_system() {
         if ! _dialog --title " System Configuration " --no-cancel "${_DEFAULT[@]}" --menu "" 20 60 14 \
                 "> User Management"             "User Configuration" \
                 "/etc/vconsole.conf"            "Virtual Console" \
-                "/etc/kmscon/kmscon.conf"       "Kmscon Console" \
+                "/etc/kmscon/kmscon.conf"       "Kmscon Setting" \
                 "/etc/locale.conf"              "Locale Setting" \
                 "/etc/locale.gen"               "Glibc Locales" \
                 "/etc/fstab"                    "Filesystem Mountpoints" \

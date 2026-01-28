@@ -216,7 +216,7 @@ EOF
 }
 
 _auto_vconsole() {
-    if [[ ! -f ${_DESTDIR}/etc/vconsole.conf ]]; then
+    if [[ ! -f "${_DESTDIR}/etc/vconsole.conf" ]]; then
         _progress "69" "Setting keymap, font and kmscon on installed system..."
         cp /etc/vconsole.conf "${_DESTDIR}"/etc/vconsole.conf
         ln -s /usr/lib/systemd/system/kmsconvt@.service "${_DESTDIR}"/etc/systemd/system/autovt@.service
@@ -226,7 +226,7 @@ _auto_vconsole() {
         fi
         ln -s /usr/lib/systemd/system/kmsconvt@.service \
               "${_DESTDIR}"/etc/systemd/system/getty.target.wants/kmsconvt@tty1.service
-        if ! [[ -e "${_DESTDIR}"/etc/kmscon/kmscon.conf ]]; then
+        if ! [[ -f "${_DESTDIR}/etc/kmscon/kmscon.conf" ]]; then
             cp "${_DESTDIR}"/etc/kmscon/kmscon.conf.example "${_DESTDIR}"/etc/kmscon/kmscon.conf
             echo "\"\${_DESTDIR}\"/etc/kmscon/kmscon.conf.example \"\${_DESTDIR}\"/etc/kmscon/kmscon.conf" >> "${_TEMPLATE}"
         fi
