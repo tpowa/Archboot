@@ -13,11 +13,12 @@ Environment:
 - moved btm system status to VC5
 - moved log to VC8 and save it to /tmp/archboot.log 
 - moved journal to VC9
-- moved kbd, fbset and terminus-font to base_init only
+- moved kbd and terminus-font to base_init only
 - added colors to log and journal
 - added pigz to packages
 - added /usr/lib/gnupg programs
 - removed custom modprobe.conf
+- removed fbset
 - fixed ttyd/sshd login on -latest image
 - removed archboot-detect-vconsole script
 defaults:
