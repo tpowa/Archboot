@@ -21,6 +21,7 @@ _run ()
     echo "scripts = \"None\"" >> "${_ROOTFS}"/root/.rustscan.toml
     # add elinks defaults
     _file_rename /usr/share/archboot/net/etc/elinks/bookmarks /etc/elinks/bookmarks
+    _file_rename /usr/share/archboot/net/etc/elinks/elinks.conf /etc/elinks/elinks.conf
     _file_rename /usr/share/archboot/net/etc/profile.d/elinks.sh /etc/profile.d/elinks.sh
     # tiny config
     _file_rename /usr/share/archboot/net/usr/share/tiny/config.yml /usr/share/tiny/config.yml
