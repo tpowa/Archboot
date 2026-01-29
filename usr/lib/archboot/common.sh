@@ -223,7 +223,7 @@ _check() {
 
 _cleanup() {
     [[ -e "${_ANSWER}-running" ]] && rm "${_ANSWER}-running"
-    reset
+    clear
     exit 0
 }
 

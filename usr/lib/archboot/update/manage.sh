@@ -61,7 +61,7 @@ _network_check() {
         [[ "${_COUNT}" == 20 ]] && break
     done | _dialog --title " Network Configuration " --no-mouse --gauge "Waiting 20 seconds for network link to come up..." 6 75 0
     if ! getent hosts www.google.com &>"${_NO_LOG}"; then
-        reset
+        clear
         echo -e "\e[91mAborting:\e[m"
         echo -e "Network not yet ready."
         echo -e "Please configure your network first."
@@ -71,7 +71,7 @@ _network_check() {
 
 _update_installer_check() {
     if [[ -f /.update ]]; then
-        reset
+        clear
         echo -e "\e[91mAborting:\e[m"
         echo "update is already running on other tty..."
         echo "If you are absolutly sure it's not running, you need to remove /.update"
@@ -101,7 +101,7 @@ _geoip_mirrorlist() {
 
 _full_system_check() {
     if [[ -e "/.full_system" ]]; then
-        reset
+        clear
         echo -e "\e[1mFull Arch Linux system already setup.\e[m"
         exit 0
     fi
