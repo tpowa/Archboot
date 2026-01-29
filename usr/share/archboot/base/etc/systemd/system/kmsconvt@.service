@@ -38,7 +38,7 @@ IgnoreOnIsolate=yes
 ConditionPathExists=/dev/tty0
 
 [Service]
-ExecStart=/usr/bin/kmscon --vt=%I --seats=seat0 --no-switchvt --login -- /sbin/agetty --skip-login -o '-f root -p -- \\u' - $$TERM 
+ExecStart=/usr/bin/kmscon --vt=%I --seats=seat0 --no-switchvt --login -- /sbin/agetty -8 --skip-login -o '-f root -p -- \\u' - $$TERM 
 UtmpIdentifier=%I
 TTYPath=/dev/%I
 TTYReset=yes
