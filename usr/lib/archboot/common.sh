@@ -14,6 +14,7 @@ _FIX_PACKAGES=(
   icu
   libelf
   libevent
+  libngtcp2
   nss
   pcre2
   talloc
