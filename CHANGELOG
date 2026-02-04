@@ -1,5 +1,6 @@
 On the road to 2026.02:
 - added all ttf-hack-nerd mono fonts
+- replaced default noto fonts with ttf-hack-nerd font
 ---
 Highlights 2026.01:
 - updated grub to 2.14
