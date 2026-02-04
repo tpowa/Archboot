@@ -175,7 +175,7 @@ if [[ -e /usr/bin/setup ]]; then
         if ! [[ -e /.launcher ]]; then
             launcher
         fi
-        if [[ -e /.gnome-wayland ]]; then
+        if [[ -e /.gnome-wayland && "${_TTY}" == "pts/0" ]]; then
             rm /.gnome-wayland
             gnome-wayland
         fi
