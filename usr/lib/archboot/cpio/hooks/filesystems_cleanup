@@ -6,7 +6,7 @@ _run ()
 {
     ! rg -qw 'archboot' /etc/hostname && return
     _install_files
-    rm /usr/bin/{badblocks,blkmapd,btrfs-{find-root,image,map-logical,select-super},btrfs{,ck,tune},\
+    rm /usr/bin/{badblocks,btrfs-{find-root,image,map-logical,select-super},btrfs{,ck,tune},\
 chattr,cifscreds,cifs.{idmap,upcall},compile_et,debugfs,\
 dosfsck,dosfslabel,dump.exfat,dumpe2fs,e2{freefrag,fsck,image,label,\
 mmpstatus,scrub,scrub_all,undo},e4{crypt,defrag},exfatlabel,fatlabel,findfs,fsck,\

@@ -4,7 +4,7 @@
 
 _run ()
 {
-    _map _binary badblocks blkmapd btrfs-{find-root,image,map-logical,select-super} btrfs{,ck,tune} \
+    _map _binary badblocks btrfs-{find-root,image,map-logical,select-super} btrfs{,ck,tune} \
                  chattr cifscreds cifs.{idmap,upcall} compile_et debugfs \
                  dosfsck dosfslabel dump.exfat dumpe2fs e2{freefrag,fsck,image,label,\
 mmpstatus,scrub,scrub_all,undo} e4{crypt,defrag} exfatlabel fatlabel findfs fsck \

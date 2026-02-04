@@ -3,6 +3,7 @@ On the road to 2026.02:
 - replaced default noto fonts with ttf-hack-nerd font
 - replaced nautilus with pcmanfm in gnome
 - fixed gnome startup
+- removed blkmapd
 ---
 Highlights 2026.01:
 - updated grub to 2.14
