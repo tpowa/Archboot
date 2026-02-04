@@ -155,7 +155,8 @@ protocols,request-key.conf,services}
     # add kmscon
     _map _full_dir /etc/fonts /usr/share/{fontconfig,xkeyboard-config-2,X11} /usr/lib/{kmscon,xkbcommon}
     _map _binary kmscon kmscon-launch-gui fc-{cache,cat,conflist,list,match,pattern,query,scan,validate} xkbcli
-    _map _file /usr/share/fonts/TTF/HackNerdFontMono-Regular.ttf
+    _map _file /usr/share/fonts/TTF/HackNerdFontMono-{Regular,Bold,BoldItalic,Italic}.ttf
+
     # remove terminus font
     rm ${_ROOTFS}/usr/share/fontconfig/{conf.avail,conf.default}/75-yes-terminus.conf
     _file_rename /etc/kmscon/kmscon.conf.example /etc/kmscon/kmscon.conf
