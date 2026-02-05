@@ -1,9 +1,11 @@
 On the road to 2026.02:
+Environment:
 - added all ttf-hack-nerd mono fonts
+- removed blkmapd
+Desktop Environments:
 - replaced default noto fonts with ttf-hack-nerd font
 - replaced nautilus with pcmanfm in gnome
-- fixed gnome startup
-- removed blkmapd
+- fixed gnome startup on pts/0
 ---
 Highlights 2026.01:
 - updated grub to 2.14
