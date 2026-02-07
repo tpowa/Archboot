@@ -11,7 +11,7 @@ if ! screen -ls &>/dev/null; then
     echo ""
     cat /etc/motd
     echo ""
-    echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mshell\e[m login."
+    echo -e "Hit \e[1m\e[92mENTER\e[m for \e[1mscreen\e[m login or \e[1m\e[92mCTRL-C\e[m for \e[1mbash\e[m prompt.."
     read -r
 fi
 # define /bin/bash, else /bin/sh is the screen default
