@@ -7,6 +7,7 @@ Desktop Environments:
 - replaced nautilus with pcmanfm in gnome
 - fixed gnome startup on pts/0
 - fixed xfce shutdown
+- enabled VNC support on Gnome and Plasma
 ---
 Highlights 2026.01:
 - updated grub to 2.14
