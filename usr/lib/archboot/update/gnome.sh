@@ -40,6 +40,7 @@ _start_gnome() {
     echo "export MOZ_ENABLE_WAYLAND=1
 export QT_QPA_PLATFORM=wayland
 export XDG_CURRENT_DESKTOP=GNOME
+systemctl --user restart pipewire
 exec kmscon-launch-gui gnome-session --no-reexec" \
           > /usr/bin/gnome-wayland
     chmod 755 /usr/bin/gnome-wayland

@@ -72,7 +72,8 @@ _install_plasma() {
 _start_plasma() {
     _progress "100" "Launching Plasma now, logging is done on ${_LOG}..."
     sleep 2
-    echo "kmscon-launch-gui /usr/lib/plasma-dbus-run-session-if-needed /usr/bin/startplasma-wayland" \
+    echo "systemctl --user restart pipewire
+kmscon-launch-gui /usr/lib/plasma-dbus-run-session-if-needed /usr/bin/startplasma-wayland" \
          > /usr/bin/plasma-wayland
     chmod 755 /usr/bin/plasma-wayland
 }
