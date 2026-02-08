@@ -95,11 +95,6 @@ EOF
             sd "$i" '' /etc/xdg/waybar/config.jsonc
         done
     fi
-    echo "Configuring wayvnc..."
-     if ! rg -q wayvnc /etc/sway/config; then
-        echo "address=0.0.0.0" > /etc/wayvnc
-        echo "exec wayvnc -C /etc/wayvnc &" >> /etc/sway/config
-    fi
 }
 
 _install_sway() {

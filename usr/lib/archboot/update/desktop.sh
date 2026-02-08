@@ -180,3 +180,16 @@ Name=Tigervnc
 Exec=x0vncserver -rfbauth /etc/tigervnc/passwd
 EOF
 }
+
+_autostart_wayland_vnc() {
+    echo "Setting VNC password /etc/tigervnc/passwd to ${_VNC_PW}..." >>"${_LOG}"
+    vncpasswd -f <<< "${_VNC_PW}" > /etc/tigervnc/passwd
+    cp /etc/xdg/autostart/archboot.desktop /usr/share/applications/archboot.desktop
+    echo "Autostarting wayland tigervnc..." >>"${_LOG}"
+    cat << EOF > /etc/xdg/autostart/tigervnc-wayland.desktop
+[Desktop Entry]
+Type=Application
+Name=Tigervnc
+Exec=w0vncserver -rfbauth /etc/tigervnc/passwd
+EOF
+}

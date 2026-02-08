@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+f#!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 # created by Tobias Powalowski <tpowa@archlinux.org>
 _D_SCRIPTS=""
@@ -52,8 +52,8 @@ _usage () {
                 _graphic_options
             fi
             if [[ "${_MEM_TOTAL}" -gt "${_MEM_LIMIT_LOW_GRAPHIC}" ]]; then
-                echo -e " \e[1m-sway\e[m            Launch Sway desktop with VNC sharing enabled."
-                echo -e " \e[1m-xfce\e[m            Launch Xfce desktop with VNC sharing enabled."
+                echo -e " \e[1m-sway\e[m            Launch Sway desktop"
+                echo -e " \e[1m-xfce\e[m            Launch Xfce desktop"
                 echo -e " \e[1m-custom-xorg\e[m     Install custom X environment."
                [[ "${_MEM_TOTAL}" -gt "${_MEM_LIMIT_GRAPHIC}" ]] && echo -e " \e[1m-custom-wayland\e[m  Install custom Wayland environment."
                 echo ""

@@ -110,21 +110,25 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_COSMIC}" || -n "${_L_PLASMA
 \e[92mkmscon-launch-gui startxfce4 --wayland\e[m"
     elif [[ -n "${_L_GNOME}" ]]; then
         _start_gnome | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        _autostart_wayland_vnc
         # gnome-session needs a fresh login to get the correct wayland device, else it only runs headless!
         : > /.gnome-wayland
         loginctl terminate-user root
     elif [[ -n "${_L_PLASMA}" ]]; then
         _start_plasma | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        _autostart_wayland_vnc
         plasma-wayland
         clear
         echo -e "To relaunch \e[1mPlasma Wayland\e[m use: \e[92mplasma-wayland\e[m"
     elif [[ -n "${_L_COSMIC}" ]]; then
         _start_cosmic | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        _autostart_wayland_vnc
         cosmic-wayland
         clear
         echo -e "To relaunch \e[1mCosmic\e[m use: \e[92mcosmic-wayland\e[m"
     elif [[ -n "${_L_SWAY}" ]]; then
         _start_sway | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
+        _autostart_wayland_vnc
         sway-wayland
         clear
         echo -e "To relaunch \e[1mSway\e[m use: \e[92msway-wayland\e[m"
