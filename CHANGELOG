@@ -6,6 +6,7 @@ Desktop Environments:
 - replaced default noto fonts with ttf-hack-nerd font
 - replaced nautilus with pcmanfm in gnome
 - fixed gnome startup on pts/0
+- fixed xfce shutdown
 ---
 Highlights 2026.01:
 - updated grub to 2.14
