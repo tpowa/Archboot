@@ -23,8 +23,8 @@ if command -v nvim >/dev/null; then
     alias vim='nvim'
     alias edit='nvim'
 fi
-# run remote-login.sh on ssh connection
-if [[ -n "${SSH_TTY}" && "$(grep -w 'archboot' /etc/hostname)" ]]; then
+# run remote-login.sh on ssh connection and ignore on rsync usage
+if [[ -n "${SSH_TTY}" && ! "$BASH_EXECUTION_STRING" =~ rsync ]] && grep -qw 'archboot' /etc/hostname; then
     /usr/bin/remote-login.sh
     exit 0
 fi
