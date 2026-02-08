@@ -27,6 +27,6 @@ fi
 # run remote-login.sh on ssh connection and ignore on remote rsync usage
 # https://github.com/tpowa/Archboot/issues/14
 if [[ -n "${SSH_TTY}" && ! "$BASH_EXECUTION_STRING" =~ rsync ]] && grep -qw 'archboot' /etc/hostname; then
-    /usr/bin/remote-login.sh
+    remote-login.sh
     exit 0
 fi
