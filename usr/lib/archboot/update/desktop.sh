@@ -195,4 +195,5 @@ EOF
     mkdir -p  /etc/systemd/user/
     rg -v 'root' /usr/lib/systemd/user/pipewire.service > /etc/systemd/user/pipewire.service
     systemctl --user daemon-reload
+    systemctl --user start pipewire
 }
