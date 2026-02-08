@@ -24,7 +24,7 @@ if command -v nvim >/dev/null; then
     alias edit='nvim'
 fi
 # run remote-login.sh on ssh connection
-if [[ -z "${STY}" && -n "${SSH_TTY}" && "$(grep -w 'archboot' /etc/hostname)" ]]; then
+if [[ -n "${SSH_TTY}" && "$(grep -w 'archboot' /etc/hostname)" ]]; then
     /usr/bin/remote-login.sh
     exit 0
 fi
