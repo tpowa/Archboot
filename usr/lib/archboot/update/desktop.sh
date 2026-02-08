@@ -192,4 +192,7 @@ Type=Application
 Name=Tigervnc
 Exec=w0vncserver -rfbauth /etc/tigervnc/passwd
 EOF
+    mkdir -p  /etc/systemd/user/
+    rg -v 'root' /usr/lib/systemd/user/pipewire.service > /etc/systemd/user/pipewire.service
+    systemctl --user daemon-reload
 }
