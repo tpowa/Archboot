@@ -45,7 +45,7 @@ EOF
 
 _install_cosmic() {
     if ! [[ -e /usr/bin/start-cosmic ]]; then
-        _prepare_graphic "${_STANDARD_PACKAGES[@]}" "${_COSMIC_PACKAGES[@]}"
+        _prepare_graphic "${_STANDARD_PACKAGES[@]}" "${_VNC_PACKAGE[@]}"  "${_COSMIC_PACKAGES[@]}"
     fi
     _prepare_browser &>>"${_LOG}"
     _configure_cosmic &>>"${_LOG}"

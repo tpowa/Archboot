@@ -28,7 +28,7 @@ EOF
 
 _install_gnome() {
     if ! [[ -e /usr/bin/gnome-session ]]; then
-        _prepare_graphic "${_STANDARD_PACKAGES[@]}" "${_GNOME_PACKAGES[@]}"
+        _prepare_graphic "${_STANDARD_PACKAGES[@]}" "${_VNC_PACKAGE[@]}"  "${_GNOME_PACKAGES[@]}"
     fi
     _prepare_browser &>>"${_LOG}"
     _configure_gnome &>>"${_LOG}"

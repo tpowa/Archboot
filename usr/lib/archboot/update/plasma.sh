@@ -63,7 +63,7 @@ EOF
 
 _install_plasma() {
     if ! [[ -e /usr/bin/startplasma-x11 ]]; then
-        _prepare_graphic "${_STANDARD_PACKAGES[@]}" "${_PLASMA_PACKAGES[@]}"
+        _prepare_graphic "${_STANDARD_PACKAGES[@]}" "${_VNC_PACKAGE[@]}"  "${_PLASMA_PACKAGES[@]}"
     fi
     _prepare_browser &>>"${_LOG}"
     _configure_plasma &>>"${_LOG}"
