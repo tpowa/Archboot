@@ -177,7 +177,7 @@ _autostart_vnc() {
 [Desktop Entry]
 Type=Application
 Name=Tigervnc
-Exec=x0vncserver -rfbauth /etc/tigervnc/passwd
+Exec=bash -c 'sleep 3;x0vncserver -rfbauth /etc/tigervnc/passwd'
 EOF
 }
 
