@@ -17,7 +17,7 @@
 <h1>Archboot Home | <a href="gallery.html">Gallery</a> | <a href="https://donate.stripe.com/fZu6oHc9T48TeTrg5HcV200"><img src="donate.png" alt="Donate"></a></h1>
 <h2>2026 Fundraise: 0% <progress max="100" value="0">0%</progress> 100%</h2>
 <p><strong>&copy; 2006 - 2026 | <a href=mailto:tpowa@archlinux.org>Tobias Powalowski</a></strong> | Arch Linux Developer <strong><a href="https://archlinux.org/people/developers/#tpowa">tpowa</a></strong><br>
-<strong>Last update: 08.02.2026 11:38</strong></p>
+<strong>Last update: 08.02.2026 20:54</strong></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction"><strong><span class="toc-section-number">1.</span> Introduction</strong></a></li>
@@ -538,15 +538,11 @@ $ ssh -i &lt;yourkeyfile&gt; -p 11838 -o StrictHostKeychecking=no \
 <h4 data-number="3.5.1" id="desktop-environments"><span class="header-section-number">3.5.1</span> <strong>Launch Desktop Environment / Remote VNC Access</strong></h4>
 <p><a href="https://wiki.archlinux.org/title/Gnome" title="Gnome"><strong>Gnome</strong></a>, <a href="https://wiki.archlinux.org/title/Plasma" title="Plasma"><strong>Plasma</strong></a>, <a href="https://wiki.archlinux.org/title/Sway" title="Sway"><strong>Sway</strong></a> and <a href="https://wiki.archlinux.org/title/Xfce" title="XFCE"><strong>Xfce</strong></a> are supported.</p>
 <ul>
-<li>On <a href="https://wiki.archlinux.org/title/Xorg" title="Xorg"><strong>Xorg</strong></a> environments <a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a> is automatically launched.
-<ul>
 <li><a href="https://wiki.archlinux.org/title/Edit" title="Edit"><strong>Edit</strong></a> <strong>/etc/archboot/defaults</strong> to change default vnc password.</li>
-</ul></li>
-<li>On <a href="https://wiki.archlinux.org/title/Wayland" title="Wayland"><strong>Wayland</strong></a> environments <a href="https://wiki.archlinux.org/title/VNC" title="VNC"><strong>VNC</strong></a> is <strong>only</strong> available in <strong>Sway</strong>.
+</ul>
 <ul>
 <li>On <strong>MacOS/Windows</strong> you can use <a href="https://www.realvnc.com/en/connect/download/viewer/" title="RealVNC"><strong>RealVNC</strong></a> for passwordless login.</li>
 </ul>
-</li></ul>
 <table>
 <thead>
 <tr class="header">
@@ -560,11 +556,11 @@ $ ssh -i &lt;yourkeyfile&gt; -p 11838 -o StrictHostKeychecking=no \
 <td><code>archboot.local</code></td>
 </tr>
 <tr class="even">
-<td><strong>Xorg Password</strong></td>
+<td><strong>Tigervnc Password</strong></td>
 <td><code>archboot</code></td>
 </tr>
 <tr class="even">
-<td><strong>Wayland Password</strong></td>
+<td><strong>Wayvnc Password</strong></td>
 <td><code>&lt;none&gt;</code></td>
 </tr>
 </tbody>
