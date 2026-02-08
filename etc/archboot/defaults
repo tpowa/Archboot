@@ -88,6 +88,7 @@ _XFCE_PACKAGES=(
   file-roller
   gnome-keyring
   gvfs-smb
+  labwc
   mousepad
   ristretto
   thunar-archive-plugin

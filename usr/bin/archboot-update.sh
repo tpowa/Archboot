@@ -104,7 +104,7 @@ if [[ -n "${_L_XFCE}" || -n "${_L_SWAY}" || -n "${_L_COSMIC}" || -n "${_L_PLASMA
         /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml 2>"${_NO_LOG}"
     if [[ -n "${_L_XFCE}" ]]; then
         _start_xfce | _dialog --title "${_MENU_TITLE}" --gauge "Starting ${_ENVIRONMENT}..." 6 75 99
-        kmscon-launch-gui startxfce4
+        kmscon-launch-gui startxfce4 --wayland
         clear
         echo -e "To relaunch \e[1mXfce\e[m desktop use: \e[92mkmscon-launch-gui startxfce4\e[m"
     elif [[ -n "${_L_GNOME}" ]]; then

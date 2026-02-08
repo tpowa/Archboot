@@ -24,9 +24,8 @@ if command -v nvim >/dev/null; then
     alias edit='nvim'
 fi
 # only run this check on archboot environment,
-# run remote-login.sh on ssh connection and ignore on remote rsync usage
-# https://github.com/tpowa/Archboot/issues/14
-if [[ -n "${SSH_TTY}" && ! "$BASH_EXECUTION_STRING" =~ rsync ]] && grep -qw 'archboot' /etc/hostname; then
+# run remote-login.sh on ssh connection 
+if [[ -n "${SSH_TTY}" ]] && grep -qw 'archboot' /etc/hostname; then
     remote-login.sh
     exit 0
 fi
