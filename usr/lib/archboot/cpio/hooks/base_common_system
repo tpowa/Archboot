@@ -52,7 +52,8 @@ update-activation-environment,uuidgen} dd df dir du dust dysk exa eza faillock f
                  shlibsign sign{tool,ver} sort ssltap stat symkeyutil systemd-{ac-power,analyze,ask-password,cat,\
 cgls,cgtop,confext,delta,detect-virt,escape,firstboot,hwdb,inhibit,machine-id-setup,mount,mute-console,notify,nspawn,path,\
 resolve,repart,run,socket-activate,stdio-bridge,sysusers,tty-ask-password-agent,umount,creds,cryptenroll,dissect,\
-id128,sysext} tail tar tee testpkg top touch trust tty unix_chkpwd unpigz umount.nfs{,4} update-ca-trust vercmp wc yes zoxide
+id128,sysext} tail tar tee testpkg top touch trust tty unix_chkpwd unpigz umount.nfs{,4} update-ca-trust updatectl \
+                 vercmp wc yes zoxide
     # add C.UTF-8 locale
     _dir /usr/lib/locale
     [[ -d /usr/lib/locale/C.utf8 ]] && _full_dir /usr/lib/locale/C.utf8
