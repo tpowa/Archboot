@@ -3,6 +3,8 @@ Environment:
 - added all ttf-hack-nerd mono fonts
 - removed blkmapd
 - added inotify-tools, updatectl
+- set TERM to linux
+- enable true colors in elinks
 Desktop Environments:
 - replaced default noto fonts with ttf-hack-nerd font
 - replaced nautilus with pcmanfm in gnome
