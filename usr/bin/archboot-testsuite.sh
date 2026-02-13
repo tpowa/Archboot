@@ -136,6 +136,11 @@ for i in $(rg '/usr/bin/(.*)' -r '$1' binary.log | rg -v gawk-*); do
     fi
 done
 _result base-binary-error.log
+_run_test "none tracked files in /usr/lib"
+for i in $(fd -u -E '/modules/' -E '/udev/' -E 'gconv-modules.cache' -E 'locale-archive' . /usr/lib); do
+    pacman -Qo "${i}" &>>"${_LOG}" || echo "${i}" >> pacman-error.log
+done
+_result pacman-error.log
 _run_test "modules included /usr/lib/firmware"
 archboot-fw-check.sh run
 _result fw-error.log
@@ -214,11 +219,6 @@ else
     echo "Hwsim setup failed." >> iwctl-error.log
 fi
 _result iwctl-error.log
-_run_test "none tracked files in /usr/lib"
-for i in $(fd -u -E '/modules/' -E '/udev/' -E 'gconv-modules.cache' -E 'locale-archive' . /usr/lib); do
-    pacman -Qo "${i}" &>>"${_LOG}" || echo "${i}" >> pacman-error.log
-done
-_result pacman-error.log
 echo -e "Starting pacman database check in \e[1m10\e[m seconds...\n\e[1;92mCTRL-C\e[m to stop now."
 sleep 10
 _run_test "pacman database... this takes a while"
