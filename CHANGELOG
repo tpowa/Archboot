@@ -1,5 +1,7 @@
 On the road to 2026.02:
 Environment:
+- fedora shim 16.1-6
+- IPXE to 20260213
 - added all ttf-hack-nerd mono fonts
 - removed blkmapd
 - added inotify-tools, updatectl
