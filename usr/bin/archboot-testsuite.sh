@@ -71,10 +71,10 @@ for i in $(fd -u '.so' /usr/lib); do
     fi
 done
 _result ldd-error.log
-_run_test "on missing base binaries"
 _run_test "packages with no files in environment"
 archboot-package-check.sh run 2>"${_NO_LOG}"
 _result /pkg-no-files-error.log
+_run_test "on missing base binaries"
 # not needed binaries, that are tolerated
 _BASE_BLACKLIST=(
   arpd
