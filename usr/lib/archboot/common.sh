@@ -8,7 +8,6 @@ _CONFIG_DIR="/etc/archboot"
 _DLPROG="curl -L -s"
 _FIX_PACKAGES=(
   fuse3
-  gcc-libs
   glib2
   glibc
   icu
