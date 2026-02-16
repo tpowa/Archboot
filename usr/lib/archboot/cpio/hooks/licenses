@@ -22,7 +22,6 @@ _LICENSES=(
   fd/LICENSE-MIT
   file/COPYING
   fzf/LICENSE
-  gcc-libs/RUNTIME.LIBRARY.EXCEPTION
   gpgme/MIT.txt
   gnupg/BSD-{2,3,4}-Clause.txt
   gnupg/MIT.txt
