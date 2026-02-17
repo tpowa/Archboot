@@ -69,7 +69,7 @@ _LICENSES=(
   libwapcaplet/COPYING
   libwebsockets/LICENSE
   libxml2/Copyright
-  llhttp/LICENSE-MIT
+  llhttp/LICENSE
   lua/LICENSE
   lua51-lpeg/LICENSE
   luajit/COPYRIGHT
