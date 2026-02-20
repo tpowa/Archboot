@@ -20,16 +20,7 @@ _FIX_PACKAGES=(
   terminus-font
   fontconfig
   freetype2
-  fribidi
-  graphite
-  harfbuzz
   libdrm
-  libglvnd
-  libx11
-  lm_sensors
-  mesa
-  pango
-  wayland
 )
 _INTEL_UCODE="boot/intel-ucode.img"
 _KERNELPKG="linux"

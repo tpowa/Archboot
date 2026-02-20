@@ -155,7 +155,8 @@ protocols,request-key.conf,services}
         _file /etc/archboot/run/autorun.sh
     fi
     # add kmscon
-    _map _full_dir /etc/fonts /usr/share/{fontconfig,xkeyboard-config-2,X11} /usr/lib/{kmscon,xkbcommon}
+    _map _full_dir /etc/fonts /usr/share/{fontconfig,xkeyboard-config-2,X11} /usr/lib/xkbcommon
+    _map _file /usr/lib/kmscon/{kmscon,mod-freetype.so}
     _map _binary fsnotify{wait,watch} inotify{wait,watch} kmscon kmscon-launch-gui \
                  fc-{cache,cat,conflist,list,match,pattern,query,scan,validate} xkbcli
     _map _file /usr/share/fonts/TTF/HackNerdFontMono-{Regular,Bold,BoldItalic,Italic}.ttf
@@ -163,6 +164,7 @@ protocols,request-key.conf,services}
     rm ${_ROOTFS}/usr/share/fontconfig/{conf.avail,conf.default}/75-yes-terminus.conf
     _file_rename /etc/kmscon/kmscon.conf.example /etc/kmscon/kmscon.conf
     sd '^#sb-size=10000' 'sb-size=100000' "${_ROOTFS}"/etc/kmscon/kmscon.conf
+    sd '^#font-engine=pango' 'font-engine=freetype' "${_ROOTFS}"/etc/kmscon/kmscon.conf
     # fix XDG_SESSION_TYPE=wayland on pam.d level
     sd 'pam_systemd.so' 'pam_systemd.so type=wayland' "${_ROOTFS}"/etc/pam.d/system-login
 }
