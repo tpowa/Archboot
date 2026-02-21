@@ -3,6 +3,7 @@ Environment:
 - fedora shim 16.1-6
 - IPXE to 20260213
 - plasma 6.6.x
+- switched kmscon to freetype font engine
 - added all ttf-hack-nerd mono fonts
 - removed blkmapd
 - added inotify-tools, updatectl
