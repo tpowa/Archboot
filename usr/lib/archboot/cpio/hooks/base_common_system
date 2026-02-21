@@ -156,7 +156,7 @@ protocols,request-key.conf,services}
     fi
     # add kmscon
     _map _full_dir /etc/fonts /usr/share/{fontconfig,xkeyboard-config-2,X11}
-    _map _file /usr/lib/kmscon/{kmscon,mod-freetype.so} /usr/lib/xkbcommon/xbkcli-{compile-{compose,keymap},\
+    _map _file /usr/lib/kmscon/{kmscon,mod-freetype.so} /usr/lib/xkbcommon/xkbcli-{compile-{compose,keymap},\
 dump-keymap,how-to-type,xkbcli-interactive{,-evdev}}
     _map _binary fsnotify{wait,watch} inotify{wait,watch} kmscon kmscon-launch-gui \
                  fc-{cache,cat,conflist,list,match,pattern,query,scan,validate} xkbcli
