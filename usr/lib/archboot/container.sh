@@ -64,7 +64,7 @@ _clean_container() {
         echo "Cleaning container, delete not needed files from ${1}..."
         rm -r "${1}"/usr/include
         rm -r "${1}"/usr/share/{aclocal,applications,audit-rules,awk,common-lisp,emacs,et,fish,gettext,gettext-[0-9]*,glib-[0-9]*,gnupg,gtk-doc,iana-etc,icons,icu,keyutils,libalpm,libgpg-error,makepkg-template,misc,pixmaps,pkgconfig,screen,smartmontools,ss,tabset,vala,xml,man,info}
-        rm -r "${1}"/usr/lib/{audit,awk,binfmt.d,cmake,dracut,e2fsprogs,environment.d,gawk,getconf,gettext,glib-[0-9]*,gssproxy,icu,krb5,ldscripts,lib{nl,gallium*,LLVM*},pkgconfig,python*,siconv,tar,xfsprogs}
+        rm -r "${1}"/usr/lib/{audit,awk,binfmt.d,cmake,dracut,e2fsprogs,environment.d,gawk,getconf,gettext,glib-[0-9]*,gssproxy,icu,krb5,ldscripts,lib{nl,pkgconfig,python*,siconv,tar,xfsprogs}
         rm "${1}"/usr/bin/python
         # locale cleaning
         fd -u --min-depth 2 -E '/be/' -E '/bg/' \
