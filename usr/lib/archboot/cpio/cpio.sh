@@ -200,11 +200,11 @@ _install_mods() {
     # - remove duplicate modules
     # - remove builtin modules
     _MOD_FILES=()
-    IFS=" " read -r -a _MODS <<< "$(sd ' ' '\n' <<< "${_MODS[@]}" | sort -u | sd '\n' ' ')"
+    IFS=" " read -r -a _MODS <<< "$(sd -A ' ' '\n' <<< "${_MODS[@]}" | sort -u | sd -A '\n' ' ')"
     while true; do
         if [[ -n "${_MOD_FILES[*]}" ]]; then
             _MODS=("$(modinfo -k "${_KERNELVERSION}" -F depends "${_MODS[@]}" | sd '\n' ' ')")
-            IFS=" " read -r -a _MODS <<< "$(sd ',' ' ' <<< "${_MODS[@]}" | sd ' ' '\n' | sort -u | sd '\n' ' ')"
+            IFS=" " read -r -a _MODS <<< "$(sd -A ',' ' ' <<< "${_MODS[@]}" | sd -A ' ' '\n' | sort -u | sd -A '\n' ' ')"
         fi
         [[ ${#_MODS[@]} == 0 ]] && break
         mapfile -t _MOD_FILES < <(modinfo  -k "${_KERNELVERSION}" -F filename "${_MODS[@]}" | rg -v builtin)
