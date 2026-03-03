@@ -219,9 +219,10 @@ else
     echo "Hwsim setup failed." >> iwctl-error.log
 fi
 _result iwctl-error.log
+_run_test "pacman database..."
 echo -e "Starting pacman database check in \e[1m10\e[m seconds...\n\e[1;92mCTRL-C\e[m to stop now."
 sleep 10
-_run_test "pacman database... this takes a while"
+echo -e "Test now running... this takes a while..."
 archboot-not-installed.sh run &>>"${_LOG}"
 _result not-installed.log
 echo -e "\e[1mResult:\e[m"
