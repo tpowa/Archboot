@@ -1,5 +1,6 @@
 On the road to 2026.03:
 - kernel 6.19.x
+- removed 99-nfs.rules file
 ---
 Highlights 2026.02:
 - switched kmscon to freetype font engine
