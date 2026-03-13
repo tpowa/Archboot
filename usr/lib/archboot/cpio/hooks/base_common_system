@@ -46,12 +46,12 @@ timedate,userdb,home,oom,portable}ctl btm certutil chmod choose clear cmsutil co
 update-activation-environment,uuidgen} dd df dir du dust dysk exa eza faillock false fd fmt fold fzf \
                  fzf-tmux gawk gpg{,-agent,conf,-connect-agent} gpgme-{tool,json} groups hugetop insmod install \
                  installkernel kernel-install kill{,all} ldconfig login lspci mktemp mkhomedir_helper \
-                 modutil more mount.ddi mount.nfs{,4} nano nologin nss-config od ouch p11-kit pk12util \
+                 modutil more mount.ddi mount.{mstack,nfs{,4}} nano nologin nss-config od ouch p11-kit pk12util \
                  pam_{namespace_helper,timestamp_check} pacman{,-conf,-key,-db-upgrade} passwd pgrep pidof pigz \
                  pinentry{,-curses} pk{action,check,exec,ttyagent} pwhistory_helper pluginviewer printf procs ps pwd \
                  rmdir sasldblistusers2 saslpasswd2 tr true repo-{add,elephant,remove} rbash rg rmmod sd sed secret-tool \
                  shlibsign sign{tool,ver} sort ssltap stat symkeyutil systemd-{ac-power,analyze,ask-password,cat,\
-cgls,cgtop,confext,delta,detect-virt,escape,firstboot,hwdb,inhibit,machine-id-setup,mount,mute-console,notify,nspawn,path,\
+cgls,cgtop,confext,delta,detect-virt,escape,firstboot,hwdb,inhibit,machine-id-setup,mount,mstack,mute-console,notify,nspawn,path,\
 resolve,repart,run,socket-activate,stdio-bridge,sysusers,tty-ask-password-agent,umount,creds,cryptenroll,dissect,\
 id128,sysext} tail tar tee testpkg top touch trust tty unix_chkpwd unpigz umount.nfs{,4} update-ca-trust updatectl \
                  vercmp wc yes zoxide
