@@ -41,10 +41,10 @@ var/lib/pacman/local \
     fi
     _map _binary agetty archlinux-keyring-wkd-sync awk bat bits brotli bsdtar \
                  {bus,coredump,hostname,locale,login,machine,network,\
-timedate,userdb,home,oom,portable}ctl btm certutil chmod choose clear cmsutil coresched crlutil curl date \
+timedate,userdb,home,oom,portable}ctl btm certutil chmod choose clear cmsutil copyfilerange coresched crlutil curl date \
                  dbus-{broker{,-launch},cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
 update-activation-environment,uuidgen} dd df dir du dust dysk exa eza faillock false fd fmt fold fzf \
-                 fzf-tmux gawk gpg{,-agent,conf,-connect-agent} gpgme-{tool,json} groups hugetop insmod install \
+                 fzf-tmux gawk getino gpg{,-agent,conf,-connect-agent} gpgme-{tool,json} groups hugetop insmod install \
                  installkernel kernel-install kill{,all} ldconfig login lspci mktemp mkhomedir_helper \
                  modutil more mount.ddi mount.{mstack,nfs{,4}} nano nologin nss-config od ouch p11-kit pk12util \
                  pam_{namespace_helper,timestamp_check} pacman{,-conf,-key,-db-upgrade} passwd pgrep pidof pigz \
