@@ -3,6 +3,7 @@ On the road to 2026.03:
 - systemd 260.x
 - util-linux 2.42.x
 - removed 99-nfs.rules file
+- removed /usr/share/zoneinfo-leaps
 ---
 Highlights 2026.02:
 - switched kmscon to freetype font engine
