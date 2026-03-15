@@ -287,7 +287,7 @@ _new_environment() {
     _ram_check
     _progress "41" "Copying kernel ${_VMLINUZ} to ${_RAM}/..."
     # use ramfs to get immediate free space on file deletion
-    mkdir "${_RAM}"
+    [[ -d "${_RAM}" ]] || mkdir "${_RAM}"
     mount -t ramfs none "${_RAM}"
     #shellcheck disable=SC2116,2086
     [[ "${_RUNNING_ARCH}" == "x86_64" || "${_RUNNING_ARCH}" == "riscv64" ]] && _VMLINUZ="$(echo ${_W_DIR}/usr/lib/modules/*/vmlinuz)"
