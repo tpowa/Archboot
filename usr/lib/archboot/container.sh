@@ -78,7 +78,7 @@ _clean_container() {
         fd -u -t f -E 'UTF-8.gz' . "${1}"/usr/share/i18n/charmaps -X rm &>"${_NO_LOG}"
         # not needed firmware files
         if [[ -z "${_FW_AUTODETECT}" ]]; then
-            rm -r "${1}"/lib/firmware/{3com,acenic,advansys,agere_*,adaptec,airoha,amdtee,amlogic,amphion,ar3k,ar5523*,ar70*,ar9[0-9]*,arm,as102*,\
+            rm -r "${1}"/lib/firmware/{3com,8E*,acenic,advansys,agere_*,adaptec,airoha,amdtee,amlogic,amphion,ar3k,ar5523*,ar70*,ar9[0-9]*,arm,as102*,\
 ath3k*,atmel,atusb,av7110,bnx2x,cadence,carl*,cavium,cirrus,cis,cpia2,cnm,cs42l43*,ct*,cxgb*,cmmb*,dabusb,dpaa2,dsp56k,dvb*,e100,\
 edgeport,emi26,emi62,ene-ub6250,ess,f2255usb*,go7007,hfi1*,INT*,imx,inside-secure,isci,isdbt*,ixp4xx,kaweth,keyspan*,\
 korg,lbtf*,lgs8g75*,lt8713sx*,lt9611uxc*,matrox,meson,microchip,moxa,mrvl/prestera,mts*,myri10ge*,myricom,nxp,ositech,phanfw*,powervr,qat*,\
