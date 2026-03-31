@@ -1,13 +1,17 @@
-On the road to 2026.03:
+On the road to 2026.04:
+---
+Highlights 2026.03:
 - kernel 6.19.x
 - systemd 260.x
 - util-linux 2.42.x
-- added check for /run/nextroot directory
+Environment:
 - removed unneccessary 8E* firmware
 - removed unneccessary /lib/firmware/amd-,intel-ucode
 - added regulatory db file to wireless hook
 - removed 99-nfs.rules file
 - removed /usr/share/zoneinfo-leaps
+update:   
+- added check for /run/nextroot directory
 ---
 Highlights 2026.02:
 - switched kmscon to freetype font engine
