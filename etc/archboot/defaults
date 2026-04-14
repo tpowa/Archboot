@@ -58,6 +58,7 @@ _GNOME_PACKAGES=(
   gnome-terminal
   gthumb
   gvfs-smb
+  libxkbcommon
   pcmanfm
 )
 ### Plasma defaults
