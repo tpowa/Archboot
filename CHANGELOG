@@ -2,6 +2,7 @@ On the road to 2026.04:
 - added Gnome 50 support
 - updated IPXE to 20260414
 - updated fedora's shim to 16.1-7
+- removed ia32 EFI shell
 ---
 Highlights 2026.03:
 - kernel 6.19.x
