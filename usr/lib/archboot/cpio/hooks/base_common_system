@@ -170,5 +170,7 @@ dump-keymap,how-to-type,interactive{,-evdev}}
     sd '^#term.*' 'term=xterm-256color' "${_ROOTFS}"/etc/kmscon/kmscon.conf
     # fix XDG_SESSION_TYPE=wayland on pam.d level
     sd 'pam_systemd.so' 'pam_systemd.so type=wayland' "${_ROOTFS}"/etc/pam.d/system-login
+    # fix mmc block module loading
+    _file_rename  "/usr/share/archboot/base/etc/modprobe.d/mmc.conf" "/etc/modprobe.d/mmc.conf"
 }
 

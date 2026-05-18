@@ -69,5 +69,9 @@ _run ()
     done
     # disable systemd automount:
     _symlink /etc/systemd/system/proc-sys-fs-binfmt_misc.automount /dev/null
+    # fix mmc block module loading
+    _file_rename  "/usr/share/archboot/base/etc/modprobe.d/mmc.conf" "/etc/modprobe.d/mmc.conf"
+    mkdir -p "${_ROOTFS}"/etc/modprobe.d/
+    echo 'softdep mmc_core post: mmc_block' >> "${_ROOTFS}"/etc/modprobe.d/mmc.conf
 }
 
