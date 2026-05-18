@@ -293,6 +293,16 @@ _auto_set_locale() {
     sleep 2
 }
 
+_auto_modprobe.d() {
+    _progress "90" "Copy custom modprobe.d files to installed system..."
+    cp /etc/modprobe.d/*  "${_DESTDIR}"/etc/modprobe.d/
+    # write to template
+    { echo "echo \"Copy custom modprobe.d files to installed system...\""
+        echo "cp /etc/modprobe.d/* \"\${_DESTDIR}\"/etc/modprobe.d/"
+    } >> "${_TEMPLATE}"
+    sleep 2
+}
+
 _auto_bash(){
     if [[ ! -f ${_DESTDIR}/etc/profile.d/custom-bash-prompt.sh ]]; then
         _progress "99" "Setup bash with custom options on installed system..."

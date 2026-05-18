@@ -2,6 +2,8 @@ On the road to 2026.05:
 ---
 Envinronment:
 - fixed mmc_block module loading
+Setup:
+- added custom modprobe.d file copying to installed system 
 Highlights 2026.04:
 - kernel 7.0.x
 - added Gnome 50 support

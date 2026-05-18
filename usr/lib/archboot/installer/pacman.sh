@@ -78,6 +78,7 @@ _run_autoconfig() {
     _auto_hostname
     _auto_locale
     _auto_set_locale
+    _auto_modprobe.d
     _auto_bash
 }
 
