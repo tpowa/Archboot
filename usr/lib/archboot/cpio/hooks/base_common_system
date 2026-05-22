@@ -166,8 +166,6 @@ dump-keymap,how-to-type,interactive{,-evdev}}
     _file_rename /etc/kmscon/kmscon.conf.example /etc/kmscon/kmscon.conf
     sd '^#sb-size=10000' 'sb-size=100000' "${_ROOTFS}"/etc/kmscon/kmscon.conf
     sd '^#font-engine=pango' 'font-engine=freetype' "${_ROOTFS}"/etc/kmscon/kmscon.conf
-    # fix UTF-8 encoding
-    sd '^#term.*' 'term=xterm-256color' "${_ROOTFS}"/etc/kmscon/kmscon.conf
     # fix XDG_SESSION_TYPE=wayland on pam.d level
     sd 'pam_systemd.so' 'pam_systemd.so type=wayland' "${_ROOTFS}"/etc/pam.d/system-login
     # fix mmc block module loading
