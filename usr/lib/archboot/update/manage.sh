@@ -180,7 +180,7 @@ _clean_fw() {
             mv "${_FW}"/{mwl*,libertas,mrvl} ${_FW_NEW}/
         fi
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Mediatek'; then
-            mv "${_FW}"/{mt76*,mediatek,vpu_*} ${_FW_NEW}/
+            mv "${_FW}"/{mt76*,mediatek,amphion} ${_FW_NEW}/
         fi
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Ralink'; then
             mv "${_FW}"/rt*bin* ${_FW_NEW}/

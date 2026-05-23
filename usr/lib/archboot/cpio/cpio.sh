@@ -256,7 +256,7 @@ _basedir_fw() {
 
 _move_fw() {
     # those from firmware basedir belong to corresponding chipsets
-    rg -q mediatek <<< "${i}" && mv "${_FW_SRC}"/{mt76*,vpu_*} "${1}"
+    rg -q mediatek <<< "${i}" && mv "${_FW_SRC}"/{mt76*,amphion} "${1}"
     rg -q ath9k_htc <<< "${i}" && mv "${_FW_SRC}"/htc_* "${1}"
     rg -q ath11k <<< "${i}" && mv "${_FW_SRC}"/wil6210* "${1}"
     mv "${_FW_SRC}/${i}" "${1}"
