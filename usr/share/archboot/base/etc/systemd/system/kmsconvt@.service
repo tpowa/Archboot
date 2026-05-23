@@ -40,6 +40,7 @@ ConditionPathExists=/dev/tty0
 [Service]
 User=root
 PAMName=kmscon
+ExecStartPre=sleep 1
 ExecStart=kmscon --vt=%I --no-switchvt --login -- /bin/login -p -f root
 UtmpIdentifier=%I
 TTYPath=/dev/%I

@@ -158,7 +158,7 @@ protocols,request-key.conf,services}
     _map _full_dir /etc/fonts /usr/share/{fontconfig,xkeyboard-config-2,X11} /usr/lib/xkbcommon
     _map _file /usr/lib/kmscon/{kmscon,mod-freetype.so}
     _map _binary fsnotify{wait,watch} inotify{wait,watch} kmscon kmscon-launch-gui \
-                 fc-{cache,cat,conflist,list,match,pattern,query,scan,validate} seatd{,launch} xkbcli
+                 fc-{cache,cat,conflist,list,match,pattern,query,scan,validate} seatd{,-launch} xkbcli
     _map _file /usr/share/fonts/TTF/HackNerdFontMono-{Regular,Bold,BoldItalic,Italic}.ttf
     # remove terminus font
     rm ${_ROOTFS}/usr/share/fontconfig/{conf.avail,conf.default}/75-yes-terminus.conf
@@ -169,5 +169,7 @@ protocols,request-key.conf,services}
     sd 'pam_systemd.so' 'pam_systemd.so type=wayland' "${_ROOTFS}"/etc/pam.d/system-login
     # fix mmc block module loading
     _file_rename  "/usr/share/archboot/base/etc/modprobe.d/mmc.conf" "/etc/modprobe.d/mmc.conf"
+    # remove vconsole rules
+    rm "${_ROOTFS}"/usr/lib/udev/rules.d/90-vconsole.rules
 }
 
