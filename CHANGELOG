@@ -2,8 +2,8 @@ On the road to 2026.05:
 ---
 Envinronment:
 - fixed mmc_block module loading
-- kmscon 10.0.0 
-- added seatd binaries 
+- kmscon 10.0.0 disabled libseat on all ttys
+- added seatd binaries
 Setup:
 - added custom modprobe.d file copying to installed system 
 Highlights 2026.04:
