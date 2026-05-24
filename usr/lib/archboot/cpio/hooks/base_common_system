@@ -164,10 +164,13 @@ dump-keymap,how-to-type,interactive{,-evdev}}
     _map _file /usr/share/fonts/TTF/HackNerdFontMono-{Regular,Bold,BoldItalic,Italic}.ttf
     # remove terminus font
     rm ${_ROOTFS}/usr/share/fontconfig/{conf.avail,conf.default}/75-yes-terminus.conf
+    # modify kmscon.conf
     _file_rename /etc/kmscon/kmscon.conf.example /etc/kmscon/kmscon.conf
     sd '^#sb-size=10000' 'sb-size=100000' "${_ROOTFS}"/etc/kmscon/kmscon.conf
     sd '^#font-engine=pango' 'font-engine=freetype' "${_ROOTFS}"/etc/kmscon/kmscon.conf
     sd '^#libseat' 'no-libseat' "${_ROOTFS}"/etc/kmscon/kmscon.conf
+    # add libx11 locales for compose support
+    _full_dir /usr/share/X11/locale
     # fix XDG_SESSION_TYPE=wayland on pam.d level
     sd 'pam_systemd.so' 'pam_systemd.so type=wayland' "${_ROOTFS}"/etc/pam.d/system-login
     # fix mmc block module loading
