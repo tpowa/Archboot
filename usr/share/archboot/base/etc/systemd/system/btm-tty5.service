@@ -6,7 +6,7 @@ Description=Launch btm on VC5
 ConditionPathExists=/usr/bin/btm
 
 [Service]
-ExecStart=/usr/bin/kmscon --no-switchvt --vt /dev/tty5 --login -- /usr/bin/btm --battery
+ExecStart=/usr/bin/kmscon --no-switchvt --no-switchvt --vt /dev/tty5 --login -- /usr/bin/btm --battery
 
 [Install]
 WantedBy=getty.target
