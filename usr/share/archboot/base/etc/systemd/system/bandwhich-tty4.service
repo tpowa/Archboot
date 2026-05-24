@@ -6,7 +6,7 @@ Description=Launch bandwhich on VC4
 ConditionPathExists=/usr/bin/bandwhich
 
 [Service]
-ExecStart=/usr/bin/kmscon --no-switchvt --no-switchvt --vt /dev/tty4 --login /usr/bin/bandwhich
+ExecStart=/usr/bin/kmscon --no-switchvt --no-libseat --vt /dev/tty4 --login /usr/bin/bandwhich
 
 [Install]
 WantedBy=getty.target
