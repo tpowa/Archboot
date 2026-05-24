@@ -21,6 +21,7 @@ _FIX_PACKAGES=(
   fontconfig
   freetype2
   libdrm
+  libx11
 )
 _INTEL_UCODE="boot/intel-ucode.img"
 _KERNELPKG="linux"
