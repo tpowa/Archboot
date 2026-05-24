@@ -38,7 +38,7 @@ IgnoreOnIsolate=yes
 ConditionPathExists=/dev/tty0
 
 [Service]
-ExecStart=kmscon --vt=%I --no-libseat --login -- /bin/login -p -f root
+ExecStart=kmscon --vt=%I --login -- /bin/login -p -f root
 UtmpIdentifier=%I
 TTYPath=/dev/%I
 TTYReset=yes
