@@ -219,6 +219,7 @@ _auto_vconsole() {
     if [[ ! -f "${_DESTDIR}/etc/vconsole.conf" ]]; then
         _progress "69" "Setting keymap, font and kmscon on installed system..."
         cp /etc/vconsole.conf "${_DESTDIR}"/etc/vconsole.conf
+        rm "${_DESTDIR}"/etc/systemd/system/autovt@.service
         ln -s /etc/systemd/system/kmsconvt@.service "${_DESTDIR}"/etc/systemd/system/autovt@.service
         if ! [[ -d "${_DESTDIR}"/etc/systemd/system/getty.target.wants ]]; then
             mkdir -p "${_DESTDIR}"/etc/systemd/system/getty.target.wants
@@ -251,6 +252,7 @@ _auto_vconsole() {
         # write to template
         { echo "echo \"Setting keymap,font and kmscon on installed system...\""
         echo "cp /etc/vconsole.conf \"\${_DESTDIR}\"/etc/vconsole.conf"
+        echo "rm \"\${_DESTDIR}\"/etc/systemd/system/autovt@.service"
         echo "ln -s /etc/systemd/system/kmsconvt@.service \"\${_DESTDIR}\"/etc/systemd/system/autovt@.service"
         echo "ln -s /etc/systemd/system/kmsconvt@.service \"\${_DESTDIR}\"/etc/systemd/system/getty.target.wants/kmsconvt@tty1.service"
         echo "sd '^#hwaccel' 'hwaccel' \"\${_DESTDIR}\"/etc/kmscon/kmscon.conf"
