@@ -219,7 +219,7 @@ _auto_vconsole() {
     if [[ ! -f "${_DESTDIR}/etc/vconsole.conf" ]]; then
         _progress "69" "Setting keymap, font and kmscon on installed system..."
         cp /etc/vconsole.conf "${_DESTDIR}"/etc/vconsole.conf
-        ln -s /usr/lib/systemd/system/kmsconvt@.service "${_DESTDIR}"/etc/systemd/system/autovt@.service
+        ln -s /etc/systemd/system/kmsconvt@.service "${_DESTDIR}"/etc/systemd/system/autovt@.service
         if ! [[ -d "${_DESTDIR}"/etc/systemd/system/getty.target.wants ]]; then
             mkdir -p "${_DESTDIR}"/etc/systemd/system/getty.target.wants
             echo "mkdir -p \"\${_DESTDIR}\"/etc/systemd/system/getty.target.wants" >> "${_TEMPLATE}"
@@ -234,7 +234,7 @@ _auto_vconsole() {
         echo "sd '^User' '#User' \"\${_DESTDIR}\"/etc/systemd/system/kmsconvt@.service"
         echo "sd '^PAMName' '#PAMName' \"\${_DESTDIR}\"/etc/systemd/system/kmsconvt@.service"
         } >> "${_TEMPLATE}"
-        ln -s /usr/lib/systemd/system/kmsconvt@.service \
+        ln -s /etc/systemd/system/kmsconvt@.service \
               "${_DESTDIR}"/etc/systemd/system/getty.target.wants/kmsconvt@tty1.service
         if ! [[ -f "${_DESTDIR}/etc/kmscon/kmscon.conf" ]]; then
             cp "${_DESTDIR}"/etc/kmscon/kmscon.conf.example "${_DESTDIR}"/etc/kmscon/kmscon.conf
@@ -251,8 +251,8 @@ _auto_vconsole() {
         # write to template
         { echo "echo \"Setting keymap,font and kmscon on installed system...\""
         echo "cp /etc/vconsole.conf \"\${_DESTDIR}\"/etc/vconsole.conf"
-        echo "ln -s /usr/lib/systemd/system/kmsconvt@.service \"\${_DESTDIR}\"/etc/systemd/system/autovt@.service"
-        echo "ln -s /usr/lib/systemd/system/kmsconvt@.service \"\${_DESTDIR}\"/etc/systemd/system/getty.target.wants/kmsconvt@tty1.service"
+        echo "ln -s /etc/systemd/system/kmsconvt@.service \"\${_DESTDIR}\"/etc/systemd/system/autovt@.service"
+        echo "ln -s /etc/systemd/system/kmsconvt@.service \"\${_DESTDIR}\"/etc/systemd/system/getty.target.wants/kmsconvt@tty1.service"
         echo "sd '^#hwaccel' 'hwaccel' \"\${_DESTDIR}\"/etc/kmscon/kmscon.conf"
         echo "sd '^#libseat' 'no-libseat'  \"\${_DESTDIR}\"/etc/kmscon/kmscon.conf"
         } >> "${_TEMPLATE}"
