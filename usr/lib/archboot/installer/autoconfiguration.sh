@@ -247,14 +247,14 @@ _auto_vconsole() {
         # enable hardware acceleration
         sd '^#hwaccel' 'hwaccel' "${_DESTDIR}"/etc/kmscon/kmscon.conf
         # disable libseat in kmscon 10.0.0 due to issues
-        sd '^libseat' 'no-libseat'  "${_DESTDIR}"/etc/kmscon/kmscon.conf
+        sd '^#libseat' 'no-libseat'  "${_DESTDIR}"/etc/kmscon/kmscon.conf
         # write to template
         { echo "echo \"Setting keymap,font and kmscon on installed system...\""
         echo "cp /etc/vconsole.conf \"\${_DESTDIR}\"/etc/vconsole.conf"
         echo "ln -s /usr/lib/systemd/system/kmsconvt@.service \"\${_DESTDIR}\"/etc/systemd/system/autovt@.service"
         echo "ln -s /usr/lib/systemd/system/kmsconvt@.service \"\${_DESTDIR}\"/etc/systemd/system/getty.target.wants/kmsconvt@tty1.service"
         echo "sd '^#hwaccel' 'hwaccel' \"\${_DESTDIR}\"/etc/kmscon/kmscon.conf"
-        echo "sd '^libseat' 'no-libseat'  \"\${_DESTDIR}\"/etc/kmscon/kmscon.conf"
+        echo "sd '^#libseat' 'no-libseat'  \"\${_DESTDIR}\"/etc/kmscon/kmscon.conf"
         } >> "${_TEMPLATE}"
         sleep 2
     fi
