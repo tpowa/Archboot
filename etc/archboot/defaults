@@ -5,6 +5,7 @@ _PACKAGES=(
   base
   fontconfig
   kmscon
+  less
   libglvnd
   libx11
   linux
