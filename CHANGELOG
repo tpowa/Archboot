@@ -1,5 +1,7 @@
 On the road to 2026.05:
 ---
+Defaults:
+- added more optional kmscon 10.0.0 depends to PACKAGES array
 Envinronment:
 - fixed mmc_block module loading
 - kmscon 10.0.0 disabled libseat on all ttys
@@ -7,6 +9,7 @@ Envinronment:
 - removed Lontium firmware
 Setup:
 - added custom modprobe.d file copying to installed system 
+- added kmscon 10.0.0 workarounds to auto vconsole setup
 Highlights 2026.04:
 - kernel 7.0.x
 - added Gnome 50 support

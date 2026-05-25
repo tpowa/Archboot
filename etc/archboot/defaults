@@ -3,10 +3,14 @@
 # packages to install (eg. firmware, kernel packages)
 _PACKAGES=(
   base
+  fontconfig
   iptables-nft
   kmscon
+  libglvnd
+  libx11
   linux
   polkit
+  ttf-hack-nerd
 )
 # grub setup
 _GRUB_CONFIG="/usr/share/archboot/grub/archboot-main-grub.cfg"
