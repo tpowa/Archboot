@@ -7,6 +7,7 @@ Envinronment:
 - kmscon 10.0.0 disabled libseat on all ttys
 - added seatd binaries
 - removed Lontium firmware
+- IPXE to 20260521
 Setup:
 - added custom modprobe.d file copying to installed system 
 - added kmscon 10.0.0 workarounds to auto vconsole setup
