@@ -59,7 +59,6 @@ _RUNNING_KERNEL="$(uname -r)"
 _STANDARD_PACKAGES=(
   gparted
   mtools
-  ttf-hack-nerd
   xorg-xhost
 )
 _TEMPLATE="/tmp/archboot-autorun.template"
