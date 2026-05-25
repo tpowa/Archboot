@@ -9,6 +9,7 @@ Envinronment:
 - added seatd binaries
 - removed Lontium firmware
 - IPXE to 20260521
+- updated fedora's shim to 16.1-8
 Setup:
 - added custom modprobe.d file copying to installed system 
 - added kmscon 10.0.0 workarounds to auto vconsole setup
