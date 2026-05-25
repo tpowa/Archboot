@@ -2,6 +2,7 @@ On the road to 2026.05:
 ---
 Defaults:
 - added more optional kmscon 10.0.0 depends to PACKAGES array
+- removed iptables-nft from default packages
 Envinronment:
 - fixed mmc_block module loading
 - kmscon 10.0.0 disabled libseat on all ttys

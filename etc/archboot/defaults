@@ -4,7 +4,6 @@
 _PACKAGES=(
   base
   fontconfig
-  iptables-nft
   kmscon
   libglvnd
   libx11
