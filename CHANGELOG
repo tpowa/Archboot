@@ -1,6 +1,7 @@
 On the road to 2026.06:
+Environment:
 - fixed mediatek firmware detection
-- added usb devices for firmware detection
+- added firmware detection for usb devices
 ---
 Highlights 2026.05:
 Defaults:
