@@ -489,7 +489,7 @@ _auto_fw() {
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Marvell'; then
             _PACKAGES+=(linux-firmware-marvell)
         fi
-        if rg "${_WIFI}" "${_PCI}" | rg -q 'Mediatek'; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'MediaTek'; then
             _PACKAGES+=(linux-firmware-mediatek)
         fi
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Ralink'; then

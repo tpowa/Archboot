@@ -179,7 +179,7 @@ _initrd_stage() {
                 _FW_RUN+=("${i}")
             done
         fi
-        if rg "${_WIFI}" "${_PCI}" | rg -q 'Mediatek'; then
+        if rg "${_WIFI}" "${_PCI}" | rg -q 'MediaTek'; then
             _FW_RUN+=("${_FW}/mediatek.img")
         fi
         if rg "${_WIFI}" "${_PCI}" | rg -q 'Ralink'; then

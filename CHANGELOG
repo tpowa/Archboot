@@ -1,4 +1,5 @@
-On the road to 2026.05:
+On the road to 2026.06:
+- fixed mediatek firmware detection
 ---
 Defaults:
 - added more optional kmscon 10.0.0 depends to PACKAGES array
