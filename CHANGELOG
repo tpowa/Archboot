@@ -1,6 +1,8 @@
 On the road to 2026.06:
 - fixed mediatek firmware detection
+- added usb devices for firmware detection
 ---
+Highlights 2026.05:
 Defaults:
 - added more optional kmscon 10.0.0 depends to PACKAGES array
 - removed iptables-nft from default packages

@@ -45,7 +45,7 @@ timedate,userdb,home,oom,portable}ctl btm certutil chmod choose clear cmsutil co
                  dbus-{broker{,-launch},cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
 update-activation-environment,uuidgen} dd df dir du dust dysk exa eza faillock false fd fmt fold fzf \
                  fzf-tmux gawk getino gpg{,-agent,conf,-connect-agent} gpgme-{tool,json} groups hugetop insmod install \
-                 installkernel kernel-install kill{,all} ldconfig login lspci mktemp mkhomedir_helper \
+                 installkernel kernel-install kill{,all} ldconfig login ls{pci,usb} mktemp mkhomedir_helper \
                  modutil more mount.ddi mount.{mstack,nfs{,4}} nano nologin nss-config od ouch p11-kit pk12util \
                  pam_{namespace_helper,timestamp_check} pacman{,-conf,-key,-db-upgrade} passwd pgrep pidof pigz \
                  pinentry{,-curses} pk{action,check,exec,ttyagent} pwhistory_helper pluginviewer printf procs ps pwd \

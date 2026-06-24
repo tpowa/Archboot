@@ -7,10 +7,10 @@ _TITLE="archboot.com | ${_ARCH} | ${_KVER} | Basic Setup | Early Userspace"
 _KEEP="Please keep the boot medium inserted..."
 _NO_LOG=/dev/null
 _FW=/mnt/efi/boot/firmware
-_PCI=/tmp/lspci.txt
-_ETH="Ethernet controller"
 _VGA="VGA compatible controller"
-_WIFI="Network controller"
+_ETH="Ethernet controller|Ethernet"
+_WIFI="Network controller|Network|Wireless"
+_HWDATA=/tmp/hwdata.txt
 _dialog() {
     dialog --backtitle "${_TITLE}" "$@"
     return $?
@@ -126,72 +126,73 @@ _initrd_stage() {
     _task system &
     _progress_wait "0" "99" "\n${_KEEP}\n\nCopying rootfs to /sysroot..."
     : >/.archboot
-    lspci -mm >"${_PCI}"
+    lspci -mm >"${_HWDATA}"
+    lsusb >>"${_HWDATA}"
     # Graphic firmware
-    if rg -q "${_VGA}" "${_PCI}"; then
-        if rg "${_VGA}" "${_PCI}" | rg -q 'AMD'; then
+    if rg -q "${_VGA}" "${_HWDATA}"; then
+        if rg "${_VGA}" "${_HWDATA}" | rg -q 'AMD'; then
             for i in "${_FW}"/amd*; do
                 _FW_RUN+=("${i}")
             done
         fi
-        if rg "${_VGA}" "${_PCI}" | rg -q 'Intel'; then
-            if rg "${_VGA}" "${_PCI}" | rg 'Intel' | rg -q 'Xe'; then
+        if rg "${_VGA}" "${_HWDATA}" | rg -q 'Intel'; then
+            if rg "${_VGA}" "${_HWDATA}" | rg 'Intel' | rg -q 'Xe'; then
                 _FW_RUN+=("${_FW}/xe.img")
             else
                 _FW_RUN+=("${_FW}/i915.img")
             fi
         fi
-        if rg "${_VGA}" "${_PCI}" | rg -q 'NVIDIA'; then
+        if rg "${_VGA}" "${_HWDATA}" | rg -q 'NVIDIA'; then
             _FW_RUN+=("${_FW}/nvidia.img")
         fi
-        if rg "${_VGA}" "${_PCI}" | rg -q 'RADEON|Radeon'; then
+        if rg "${_VGA}" "${_HWDATA}" | rg -q 'RADEON|Radeon'; then
             _FW_RUN+=("${_FW}/radeon.img")
         fi
     fi
     # Ethernet firmware
-    if rg -q "${_ETH}" "${_PCI}"; then
-        if rg "${_ETH}" "${_PCI}" | rg -q 'Broadcom'; then
+    if rg -q "${_ETH}" "${_HWDATA}"; then
+        if rg "${_ETH}" "${_HWDATA}" | rg -q 'Broadcom'; then
             _FW_RUN+=("${_FW}/bnx2.img" "${_FW}/tigon.img")
         fi
-        if rg "${_ETH}" "${_PCI}" | rg -q 'Intel'; then
+        if rg "${_ETH}" "${_HWDATA}" | rg -q 'Intel'; then
             _FW_RUN+=("${_FW}/intel.img")
         fi
-        if rg "${_ETH}" "${_PCI}" | rg -q 'Realtek'; then
+        if rg "${_ETH}" "${_HWDATA}" | rg -q 'Realtek'; then
             _FW_RUN+=("${_FW}/rtl_nic.img")
         fi
     fi
     # Wifi firmware
-    if rg -q "${_WIFI}" "${_PCI}"; then
-        if rg "${_WIFI}" "${_PCI}" | rg -q 'Atheros'; then
+    if rg -q "${_WIFI}" "${_HWDATA}"; then
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Atheros'; then
             for i in "${_FW}"/ath*; do
                 _FW_RUN+=("${i}")
             done
         fi
-        if rg "${_WIFI}" "${_PCI}" | rg -q 'Broadcom'; then
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Broadcom'; then
             _FW_RUN+=("${_FW}/brcm.img" "${_FW}/cypress.img")
         fi
-        if rg "${_WIFI}" "${_PCI}" | rg -q 'Intel'; then
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Intel'; then
             rg -q intel <<<"${_FW_RUN[@]}" || _FW_RUN+=("${_FW}/intel.img")
             _FW_RUN+=("${_FW}/iwlwifi.img")
         fi
-        if rg "${_WIFI}" "${_PCI}" | rg -q 'Marvell'; then
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Marvell'; then
             for i in "${_FW}"/libertas "${_FW}"/mrvl "${_FW}"/mwl*; do
                 _FW_RUN+=("${i}")
             done
         fi
-        if rg "${_WIFI}" "${_PCI}" | rg -q 'MediaTek'; then
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'MediaTek'; then
             _FW_RUN+=("${_FW}/mediatek.img")
         fi
-        if rg "${_WIFI}" "${_PCI}" | rg -q 'Ralink'; then
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Ralink'; then
             _FW_RUN+=("${_FW}/ralink.img")
         fi
-        if rg "${_WIFI}" "${_PCI}" | rg -q 'Realtek'; then
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Realtek'; then
             _FW_RUN+=("${_FW}/rtlwifi.img")
             for i in "${_FW}"/rtw*; do
                 _FW_RUN+=("${i}")
             done
         fi
-        if rg "${_WIFI}" "${_PCI}" | rg -q 'Texas'; then
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Texas'; then
             _FW_RUN+=("${_FW}/ti-connectivity.img")
         fi
     fi
