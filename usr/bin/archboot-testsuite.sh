@@ -46,6 +46,8 @@ echo "Available Memory (M): $(rg -o 'Ava.* (.*)[0-9]{3} k' -r '$1' </proc/meminf
 _run_test "journal"
 if ! journalctl -p3 -xb | rg -q 'No entries'; then
     journalctl -p3 -xb >>journal-error.log
+    rg -v TDX journal-error.log > journal-error.log
+    [[ -z /journal-error.log ]] && rm journal-error.log
 fi
 _result journal-error.log
 _run_test "ldd"
