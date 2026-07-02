@@ -59,7 +59,7 @@ _LICENSES=(
   libparserutils/COPYING
   libpsl/COPYING
   libsasl/COPYING
-  libssh2/LICENSE
+  libssh2/COPYING
   libtasn1/COPYING
   libtirpc/LICENSE
   libutf8proc/LICENSE.md

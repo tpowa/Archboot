@@ -10,7 +10,7 @@ _run ()
                  depmod dir{name,colors} dmesg eject egrep expand expr fallocate factor fadvise \
                  fdisk fgrep file fincore findmnt flock free fuser \
                  get{cap,facl,fattr,opt,pcaps} gunzip gzexe hardlink hdparm hexdump hostid \
-                 id info{cmp,tocap} ionice ipc{mk,rm,s} irqtop isosize join keyctl last{,b} ldattach ldd \
+                 id info{cmp,tocap} ionice ipc{mk,rm,s} irqtop isosize join keyctl last{,b,log2} ldattach ldd \
                  link linux{32,64} logname look losetup ls{cpu,fd,ipc,irq,locks,logins,mem,ns} \
                  lz4{,c,cat} lz{cat,cmp,diff,egrep,fgrep,grep,less,more,ma,madec,mainfo,op} \
                  mcookie md5sum mesg mk{fifo,fs,nod} modinfo namei new{grp,gidmap,uidmap} \
@@ -31,7 +31,7 @@ _run ()
     # add file magic file
     _file /usr/share/file/misc/magic.mgc
     # add shadow
-    _map _binary ch{age,fn,sh} expiry {fail,last}log \
+    _map _binary ch{age,fn,sh} expiry faillog \
           {chg,ch,g}passwd group{add,del,mems,mod} grp{ck,conv,unconv} \
           newusers pw{ck,conv,unconv} user{add,del,mod} sg getsubids
     # add ncurses libs
