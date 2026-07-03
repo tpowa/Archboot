@@ -1,5 +1,7 @@
 On the road to 2026.07:
-Highlights 2026.07:
+Environment:
+- kmscon 10.0.1
+Highlights 2026.06:
 Environment:
 - fixed mediatek firmware detection
 - added firmware detection for usb devices
