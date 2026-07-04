@@ -126,7 +126,8 @@ _initrd_stage() {
     _task system &
     _progress_wait "0" "99" "\n${_KEEP}\n\nCopying rootfs to /sysroot..."
     : >/.archboot
-    lspci -mm >"${_HWDATA}"
+    # disable wrong Network cards from list
+    lspci -mm | rg -v 'Accelerator' >"${_HWDATA}"
     lsusb 2>"${_NO_LOG}" >>"${_HWDATA}"
     # Graphic firmware
     if rg -q "${_VGA}" "${_HWDATA}"; then
@@ -198,7 +199,7 @@ _initrd_stage() {
             fi
             # add all WiFi firmwares if no hw vendor was specified on lsusb or lspci output
             if [[ -z "${_FW_WIFI[*]}" ]]; then
-                echo 'Atheros Broadcom Intel Marvell MediaTek Ralink Realtek Texas' >> "${_HWDATA}"
+                echo '802 Atheros Broadcom Intel Marvell MediaTek Ralink Realtek Texas' >> "${_HWDATA}"
             else
                 #shellcheck disable=SC2206
                 _FW_RUN+=(${_FW_WIFI[@]})

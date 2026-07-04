@@ -450,7 +450,7 @@ _auto_fw() {
     _ETH="Ethernet controller|Ethernet"
     _WIFI="802|Network controller|Network|Wireless"
     _HWDATA=/tmp/hwdata.txt
-    lspci -mm >"${_HWDATA}"
+    lspci -mm | rg -v 'Accelerator' >"${_HWDATA}"
     lsusb 2>"${_NO_LOG}" >>"${_HWDATA}"
     if rg -q "${_VGA}" "${_HWDATA}"; then
         if rg "${_VGA}" "${_HWDATA}" | rg -q 'AMD'; then
