@@ -505,7 +505,7 @@ _auto_fw() {
             fi
             # add all WiFi firmwares if no hw vendor was specified on lsusb or lspci output
             if [[ -z "${_WIFI_PACKAGES[*]}" ]]; then
-                echo 'Atheros Broadcom Intel Marvell MediaTek Ralink Realtek Texas' >> "${_HWDATA}"
+                echo '802 Atheros Broadcom Intel Marvell MediaTek Ralink Realtek Texas' >> "${_HWDATA}"
             else
                 #shellcheck disable=SC2206
                 _PACKAGES+=(${_WIFI_PACKAGES[@]})
