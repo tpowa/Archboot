@@ -2,7 +2,7 @@ On the road to 2026.07:
 Environment:
 - kmscon 10.0.1
 - include all WiFi firmware if no hardware vendor is specified
-- usb devices may use 802 hardware indentifier for wireless
+- usb devices may use 802 hardware indentifier for wireless devices
 Highlights 2026.06:
 Environment:
 - fixed mediatek firmware detection
