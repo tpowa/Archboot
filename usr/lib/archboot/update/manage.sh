@@ -131,7 +131,7 @@ _clean_fw() {
     _FW_NEW="new/firmware"
     _VGA="VGA compatible controller"
     _ETH="Ethernet controller|Ethernet"
-    _WIFI="Network controller|Network|Wireless"
+    _WIFI="802|Network controller|Network|Wireless"
     _HWDATA=/tmp/hwdata.txt
     mkdir -p "${_FW_NEW}"
     lspci -mm >"${_HWDATA}"
