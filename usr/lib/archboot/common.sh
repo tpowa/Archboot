@@ -503,7 +503,7 @@ _auto_fw() {
             if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Texas'; then
                 _WIFI_PACKAGES+=(linux-firmware-other)
             fi
-            # add all WiFi firmwares if no company was specified on lsusb or lspci output
+            # add all WiFi firmwares if no hw vendor was specified on lsusb or lspci output
             if [[ -z "${_WIFI_PACKAGES[*]}" ]]; then
                 echo 'Atheros Broadcom Intel Marvell MediaTek Ralink Realtek Texas' >> "${_HWDATA}"
             else

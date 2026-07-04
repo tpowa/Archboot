@@ -201,7 +201,7 @@ _clean_fw() {
                 _FW_WIFI+=(Texas)
                 mv "${_FW}"/ti-connectivity ${_FW_NEW}/
             fi
-            # add all WiFi firmwares if no company was specified on lsusb or lspci output
+            # add all WiFi firmwares if no hw vendor was specified on lsusb or lspci output
             if [[ -z "${_FW_WIFI[*]}" ]]; then
                 echo 'Atheros Broadcom Intel Marvell MediaTek Ralink Realtek Texas' >> "${_HWDATA}"
             else
