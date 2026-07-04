@@ -163,38 +163,48 @@ _initrd_stage() {
     fi
     # Wifi firmware
     if rg -q "${_WIFI}" "${_HWDATA}"; then
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Atheros'; then
-            for i in "${_FW}"/ath*; do
-                _FW_RUN+=("${i}")
-            done
-        fi
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Broadcom'; then
-            _FW_RUN+=("${_FW}/brcm.img" "${_FW}/cypress.img")
-        fi
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Intel'; then
-            rg -q intel <<<"${_FW_RUN[@]}" || _FW_RUN+=("${_FW}/intel.img")
-            _FW_RUN+=("${_FW}/iwlwifi.img")
-        fi
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Marvell'; then
-            for i in "${_FW}"/libertas "${_FW}"/mrvl "${_FW}"/mwl*; do
-                _FW_RUN+=("${i}")
-            done
-        fi
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'MediaTek'; then
-            _FW_RUN+=("${_FW}/mediatek.img")
-        fi
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Ralink'; then
-            _FW_RUN+=("${_FW}/ralink.img")
-        fi
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Realtek'; then
-            _FW_RUN+=("${_FW}/rtlwifi.img")
-            for i in "${_FW}"/rtw*; do
-                _FW_RUN+=("${i}")
-            done
-        fi
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Texas'; then
-            _FW_RUN+=("${_FW}/ti-connectivity.img")
-        fi
+        while true; do
+            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Atheros'; then
+                for i in "${_FW}"/ath*; do
+                    _FW_WIFI+=("${i}")
+                done
+            fi
+            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Broadcom'; then
+                _FW_WIFI+=("${_FW}/brcm.img" "${_FW}/cypress.img")
+            fi
+            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Intel'; then
+                rg -q intel <<<"${_FW_RUN[@]}" || _FW_RUN+=("${_FW}/intel.img")
+                _FW_WIFI+=("${_FW}/iwlwifi.img")
+            fi
+            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Marvell'; then
+                for i in "${_FW}"/libertas "${_FW}"/mrvl "${_FW}"/mwl*; do
+                    _FW_WIFI+=("${i}")
+                done
+            fi
+            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'MediaTek'; then
+                _FW_WIFI+=("${_FW}/mediatek.img")
+            fi
+            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Ralink'; then
+                _FW_WIFI+=("${_FW}/ralink.img")
+            fi
+            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Realtek'; then
+                _FW_WIFI+=("${_FW}/rtlwifi.img")
+                for i in "${_FW}"/rtw*; do
+                    _FW_WIFI+=("${i}")
+                done
+            fi
+            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Texas'; then
+                _FW_WIFI+=("${_FW}/ti-connectivity.img")
+            fi
+            # add all WiFi firmwares if no hw vendor was specified on lsusb or lspci output
+            if [[ -z "${_FW_WIFI[*]}" ]]; then
+                echo 'Atheros Broadcom Intel Marvell MediaTek Ralink Realtek Texas' >> "${_HWDATA}"
+            else
+                #shellcheck disable=SC2206
+                _FW_RUN+=(${_FW_WIFI[@]})
+                break
+            fi
+        done
     fi
     for i in "${_FW_RUN[@]}"; do
         : >/.archboot

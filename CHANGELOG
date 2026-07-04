@@ -1,6 +1,7 @@
 On the road to 2026.07:
 Environment:
 - kmscon 10.0.1
+- include all WiFi firmware if no hardware vendor is specified 
 Highlights 2026.06:
 Environment:
 - fixed mediatek firmware detection
