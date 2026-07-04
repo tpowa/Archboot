@@ -203,7 +203,7 @@ _clean_fw() {
             fi
             # add all WiFi firmwares if no hw vendor was specified on lsusb or lspci output
             if [[ -z "${_FW_WIFI[*]}" ]]; then
-                echo 'Atheros Broadcom Intel Marvell MediaTek Ralink Realtek Texas' >> "${_HWDATA}"
+                echo '802 Atheros Broadcom Intel Marvell MediaTek Ralink Realtek Texas' >> "${_HWDATA}"
             else
                 break
             fi
