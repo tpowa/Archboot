@@ -134,7 +134,7 @@ _clean_fw() {
     _WIFI="802|Network controller|WiFi|Wireless"
     _HWDATA=/tmp/hwdata.txt
     mkdir -p "${_FW_NEW}"
-    lspci -mm | rg -v 'Network Accelerator' >"${_HWDATA}"
+    lspci -mm >"${_HWDATA}"
     lsusb 2>"${_NO_LOG}" >>"${_HWDATA}"
     if rg -q "${_VGA}" "${_HWDATA}"; then
         if rg "${_VGA}" "${_HWDATA}" | rg -q 'AMD'; then

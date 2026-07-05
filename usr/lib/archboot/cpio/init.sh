@@ -127,7 +127,7 @@ _initrd_stage() {
     _progress_wait "0" "99" "\n${_KEEP}\n\nCopying rootfs to /sysroot..."
     : >/.archboot
     # disable wrong Network cards from list
-    lspci -mm | rg -v 'Network Accelerator' >"${_HWDATA}"
+    lspci -mm >"${_HWDATA}"
     lsusb 2>"${_NO_LOG}" >>"${_HWDATA}"
     # Graphic firmware
     if rg -q "${_VGA}" "${_HWDATA}"; then
