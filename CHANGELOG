@@ -1,6 +1,7 @@
 On the road to 2026.07:
 Environment:
 - kernel 7.1.x
+- updated IPXE to 20260703
 - kmscon 10.0.1
 - added load all WiFi firmwares if no detectable hardware vendor is specified
 - added WiFi devices may use 802 hardware identifier
