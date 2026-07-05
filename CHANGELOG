@@ -1,8 +1,9 @@
 On the road to 2026.07:
 Environment:
+- kernel 7.1.x
 - kmscon 10.0.1
-- include all WiFi firmware if no hardware vendor is specified
-- usb devices may use 802 hardware indentifier for wireless devices
+- added load all WiFi firmwares if no detectable hardware vendor is specified
+- added WiFi devices may use 802 hardware identifier
 Highlights 2026.06:
 Environment:
 - fixed mediatek firmware detection
@@ -14,7 +15,7 @@ Defaults:
 - added more optional kmscon 10.0.0 depends to PACKAGES array
 - removed iptables-nft from default packages
 - added less as default pager to default packages
-Envinronment:
+Environment:
 - fixed mmc_block module loading
 - kmscon 10.0.0 disabled libseat on all ttys
 - added seatd binaries
