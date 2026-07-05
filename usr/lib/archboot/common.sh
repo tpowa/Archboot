@@ -448,7 +448,7 @@ _auto_fw() {
     _FIRMWARE=()
     _VGA="VGA compatible controller"
     _ETH="Ethernet controller|Ethernet"
-    _WIFI="802|Network controller|Network|Wireless"
+    _WIFI="802|Network controller|Wireless"
     _HWDATA=/tmp/hwdata.txt
     lspci -mm | rg -v 'Network Accelerator' >"${_HWDATA}"
     lsusb 2>"${_NO_LOG}" >>"${_HWDATA}"

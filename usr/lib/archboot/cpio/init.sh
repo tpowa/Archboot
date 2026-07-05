@@ -9,7 +9,7 @@ _NO_LOG=/dev/null
 _FW=/mnt/efi/boot/firmware
 _VGA="VGA compatible controller"
 _ETH="Ethernet controller|Ethernet"
-_WIFI="802|Network controller|Network|Wireless"
+_WIFI="802|Network controller|WiFi|Wireless"
 _HWDATA=/tmp/hwdata.txt
 _dialog() {
     dialog --backtitle "${_TITLE}" "$@"
