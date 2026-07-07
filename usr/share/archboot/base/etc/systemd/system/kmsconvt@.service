@@ -33,11 +33,12 @@ After=plymouth-quit-wait.service
 After=rc-local.service
 Before=getty.target
 Conflicts=getty@%i.service
-OnFailure=getty@%i.service
 IgnoreOnIsolate=yes
 ConditionPathExists=/dev/tty0
 
 [Service]
+Restart=on-failure
+RestartSec=3s
 ExecStart=kmscon --vt=%I --no-switchvt --login -- /sbin/agetty -8 --skip-login -o '-f root -p -- \\u' -- - $$TERM
 UtmpIdentifier=%I
 TTYPath=/dev/%I
