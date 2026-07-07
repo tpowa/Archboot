@@ -169,8 +169,6 @@ dump-keymap,how-to-type,interactive{,-evdev}}
     # modify kmscon.conf
     _file_rename /etc/kmscon/kmscon.conf.example /etc/kmscon/kmscon.conf
     sd '^#sb-size=10000' 'sb-size=100000' "${_ROOTFS}"/etc/kmscon/kmscon.conf
-    sd '^#font-engine=pango' 'font-engine=freetype' "${_ROOTFS}"/etc/kmscon/kmscon.conf
-    sd '^#libseat' 'no-libseat' "${_ROOTFS}"/etc/kmscon/kmscon.conf
     # add libx11 locales for compose support
     _full_dir /usr/share/X11/locale
     # fix XDG_SESSION_TYPE=wayland on pam.d level
