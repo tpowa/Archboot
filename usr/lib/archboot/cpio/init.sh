@@ -125,8 +125,6 @@ _initrd_stage() {
     : >/.archboot
     _task system &
     _progress_wait "0" "99" "\n${_KEEP}\n\nCopying rootfs to /sysroot..."
-    : >/.archboot
-    udevadm settle
     lspci -mm >"${_HWDATA}"
     lsusb 2>"${_NO_LOG}" >>"${_HWDATA}"
     # Graphic firmware
@@ -167,35 +165,35 @@ _initrd_stage() {
         # no udev hwdb is available in early userspace
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Atheros'; then
             for i in "${_FW}"/ath*; do
-                _FW_WIFI+=("${i}")
+                _FW_RUN+=("${i}")
             done
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Broadcom'; then
-            _FW_WIFI+=("${_FW}/brcm.img" "${_FW}/cypress.img")
+            _FW_RUN+=("${_FW}/brcm.img" "${_FW}/cypress.img")
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Intel'; then
             rg -q intel <<<"${_FW_RUN[@]}" || _FW_RUN+=("${_FW}/intel.img")
-            _FW_WIFI+=("${_FW}/iwlwifi.img")
+            _FW_RUN+=("${_FW}/iwlwifi.img")
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Marvell'; then
             for i in "${_FW}"/libertas "${_FW}"/mrvl "${_FW}"/mwl*; do
-                _FW_WIFI+=("${i}")
+                _FW_RUN+=("${i}")
             done
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'MediaTek'; then
-            _FW_WIFI+=("${_FW}/mediatek.img")
+            _FW_RUN+=("${_FW}/mediatek.img")
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Ralink'; then
-            _FW_WIFI+=("${_FW}/ralink.img")
+            _FW_RUN+=("${_FW}/ralink.img")
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Realtek'; then
-            _FW_WIFI+=("${_FW}/rtlwifi.img")
+            _FW_RUN+=("${_FW}/rtlwifi.img")
             for i in "${_FW}"/rtw*; do
-                _FW_WIFI+=("${i}")
+                _FW_RUN+=("${i}")
             done
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Texas'; then
-            _FW_WIFI+=("${_FW}/ti-connectivity.img")
+            _FW_RUN+=("${_FW}/ti-connectivity.img")
         fi
     fi
     for i in "${_FW_RUN[@]}"; do

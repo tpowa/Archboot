@@ -481,28 +481,28 @@ _auto_fw() {
         # get manufacturer by removing udev hwdb
         rm -f /usr/lib/udev/hwdb.bin /etc/udev/hwdb.bin
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Atheros'; then
-            _WIFI_PACKAGES+=(linux-firmware-atheros)
+            _PACKAGES+=(linux-firmware-atheros)
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Broadcom'; then
-            _WIFI_PACKAGES+=(linux-firmware-broadcom)
+            _PACKAGES+=(linux-firmware-broadcom)
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Intel'; then
-            _WIFI_PACKAGES+=(linux-firmware-intel)
+            _PACKAGES+=(linux-firmware-intel)
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Marvell'; then
-            _WIFI_PACKAGES+=(linux-firmware-marvell)
+            _PACKAGES+=(linux-firmware-marvell)
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'MediaTek'; then
-            _WIFI_PACKAGES+=(linux-firmware-mediatek)
+            _PACKAGES+=(linux-firmware-mediatek)
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Ralink'; then
-            _WIFI_PACKAGES+=(linux-firmware-other)
+            _PACKAGES+=(linux-firmware-other)
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Realtek'; then
-            _WIFI_PACKAGES+=(linux-firmware-realtek)
+            _PACKAGES+=(linux-firmware-realtek)
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Texas'; then
-            _WIFI_PACKAGES+=(linux-firmware-other)
+            _PACKAGES+=(linux-firmware-other)
         fi
         # restore udev hwdb
         systemd-hwdb update
