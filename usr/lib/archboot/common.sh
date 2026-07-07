@@ -450,6 +450,8 @@ _auto_fw() {
     _ETH="Ethernet controller|Ethernet"
     _WIFI="802|Network controller|WiFi|Wireless"
     _HWDATA=/tmp/hwdata.txt
+    # get manufacturer by removing udev hwdb
+    rm -f /usr/lib/udev/hwdb.bin /etc/udev/hwdb.bin
     lspci -mm >"${_HWDATA}"
     lsusb 2>"${_NO_LOG}" >>"${_HWDATA}"
     if rg -q "${_VGA}" "${_HWDATA}"; then
@@ -478,8 +480,6 @@ _auto_fw() {
         fi
     fi
     if rg -q "${_WIFI}" "${_HWDATA}"; then
-        # get manufacturer by removing udev hwdb
-        rm -f /usr/lib/udev/hwdb.bin /etc/udev/hwdb.bin
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Atheros'; then
             _PACKAGES+=(linux-firmware-atheros)
         fi

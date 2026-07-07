@@ -128,12 +128,14 @@ _clean_archboot() {
 
 _clean_fw() {
     _FW="${_W_DIR}/lib/firmware"
-    _FW_NEW="new/firmware"
+    _FW_NEW="${_W_DIR}/new/firmware"
     _VGA="VGA compatible controller"
     _ETH="Ethernet controller|Ethernet"
     _WIFI="802|Network controller|WiFi|Wireless"
     _HWDATA=/tmp/hwdata.txt
     mkdir -p "${_FW_NEW}"
+    # get manufacturer by removing udev hwdb
+    rm -f /usr/lib/udev/hwdb.bin /etc/udev/hwdb.bin
     lspci -mm >"${_HWDATA}"
     lsusb 2>"${_NO_LOG}" >>"${_HWDATA}"
     if rg -q "${_VGA}" "${_HWDATA}"; then
@@ -166,8 +168,6 @@ _clean_fw() {
         fi
     fi
     if rg -q "${_WIFI}" "${_HWDATA}"; then
-        # get manufacturer by removing udev hwdb
-        rm -f /usr/lib/udev/hwdb.bin /etc/udev/hwdb.bin
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Atheros'; then
             mv "${_FW}"/{ath*,htc_*,wil6210*} ${_FW_NEW}/
         fi
@@ -200,8 +200,8 @@ _clean_fw() {
     # copy wireless regdb files
     mv "${_FW}"/regulatory.db "${_FW}"/regulatory.db.p7s ${_FW_NEW}/
     rm -r "${_FW}"
-    mv "${_FW_NEW}" "${_W_DIR}"/lib
-    rm -r new/
+    mv "${_FW_NEW}" "${_W_DIR}"/lib/
+    rm -r "${_W_DIR}/new"
 }
 
 _collect_files() {
