@@ -198,7 +198,7 @@ _clean_fw() {
         systemd-hwdb update
     fi
     # copy wireless regdb files
-    mv "${_FW}"/regulatory.db "${_FW}"/regulatory.db.p7s "${_FW_NEW}"
+    mv "${_FW}"/regulatory.db "${_FW}"/regulatory.db.p7s ${_FW_NEW}/
     rm -r "${_FW}"
     mv "${_FW_NEW}" "${_W_DIR}"/lib
     rm -r new/
