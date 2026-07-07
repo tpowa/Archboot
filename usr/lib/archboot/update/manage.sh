@@ -194,9 +194,9 @@ _clean_fw() {
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Texas'; then
             mv "${_FW}"/ti-connectivity ${_FW_NEW}/
         fi
-        # restore udev hwdb
-        systemd-hwdb update
     fi
+    # restore udev hwdb
+    systemd-hwdb update
     # copy wireless regdb files
     mv "${_FW}"/regulatory.db "${_FW}"/regulatory.db.p7s ${_FW_NEW}/
     rm -r "${_FW}"
@@ -288,7 +288,7 @@ _new_environment() {
     : > "${_W_DIR}"/.archboot
     _create_container &
     _progress_wait "2" "40" "Generating container in ${_W_DIR}..." "5.5"
-    _clean_fw
+    #_clean_fw
     _clean_kernel_cache
     _ram_check
     _progress "41" "Copying kernel ${_VMLINUZ} to ${_RAM}/..."

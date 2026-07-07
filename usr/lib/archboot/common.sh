@@ -504,9 +504,9 @@ _auto_fw() {
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Texas'; then
             _PACKAGES+=(linux-firmware-other)
         fi
-        # restore udev hwdb
-        systemd-hwdb update
     fi
+    # restore udev hwdb
+    systemd-hwdb update
 }
 
 _udev_trigger() {
