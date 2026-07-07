@@ -43,14 +43,14 @@ var/lib/pacman/local \
                  {bus,coredump,hostname,locale,login,machine,network,\
 timedate,userdb,home,oom,portable}ctl btm certutil chmod choose clear cmsutil copyfilerange coresched crlutil curl date \
                  dbus-{broker{,-launch},cleanup-sockets,daemon,launch,monitor,run-session,send,test-tool,\
-update-activation-environment,uuidgen} dd df dir du dust dysk exa eza faillock false fd fmt fold fzf \
-                 fzf-tmux gawk getino gpg{,-agent,conf,-connect-agent} gpgme-{tool,json} groups hugetop insmod install \
-                 installkernel kernel-install kill{,all} ldconfig login ls{pci,usb} mktemp mkhomedir_helper \
+update-activation-environment,uuidgen} dd df dir du dust dysk exa eza faillock false fancontrol fd fmt fold fzf \
+                 fzf-tmux gawk getino gpg{,-agent,conf,-connect-agent} gpgme-{tool,json} groups healthd hugetop insmod install \
+                 installkernel isadump isaset kernel-install kill{,all} ldconfig login ls{pci,usb} mktemp mkhomedir_helper \
                  modutil more mount.{ddi,mstack,nfs{,4},storage} nano nologin nss-config od ouch p11-kit pk12util \
                  pam_{namespace_helper,timestamp_check} pacman{,-conf,-key,-db-upgrade} passwd pgrep pidof pigz \
-                 pinentry{,-curses} pk{action,check,exec,ttyagent} pwhistory_helper pluginviewer printf procs ps pwd \
+                 pinentry{,-curses} pk{action,check,exec,ttyagent} pluginviewer printf procs ps pwd pwhistory_helper pwmconfig \
                  rmdir sasldblistusers2 saslpasswd2 tr true repo-{add,elephant,remove} rbash rg rmmod sd sed secret-tool \
-                 shlibsign sign{tool,ver} sort ssltap stat symkeyutil systemd-{ac-power,analyze,ask-password,cat,\
+                 sensord sensors{,-conf-conver,-detect} shlibsign sign{tool,ver} sort ssltap stat symkeyutil systemd-{ac-power,analyze,ask-password,cat,\
 cgls,cgtop,confext,delta,detect-virt,escape,firstboot,hwdb,inhibit,machine-id-setup,mount,mstack,mute-console,notify,nspawn,path,\
 resolve,repart,run,socket-activate,stdio-bridge,sys{install,update,users},tty-ask-password-agent,umount,creds,cryptenroll,dissect,\
 id128,sysext} storagectl tail tar tee testpkg top touch trust tty unix_chkpwd unpigz umount.nfs{,4} update-ca-trust updatectl \
@@ -154,6 +154,9 @@ protocols,request-key.conf,services}
     if [[ -f /etc/archboot/run/autorun.sh ]]; then
         _file /etc/archboot/run/autorun.sh
     fi
+    # add sensors
+    _map _file /etc/conf.d/sensord /etc/healthd.conf /etc/sensors3.conf
+    _dir /etc/sensors.d
     # add kmscon
     _map _full_dir /etc/fonts /usr/share/{fontconfig,xkeyboard-config-2,X11}
     _map _file /usr/lib/kmscon/mod-freetype.so /usr/lib/xkbcommon/xkbcli-{compile-{compose,keymap},\

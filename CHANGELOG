@@ -6,6 +6,7 @@ Environment:
 - added detect WiFi hardware manufacturer
 - added WiFi devices may use 802 hardware identifier
 - added WiFi to firmware detection
+- added lm_sensors
 Highlights 2026.06:
 Environment:
 - fixed mediatek firmware detection
