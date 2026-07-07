@@ -5,6 +5,9 @@
 _run ()
 {
     ! rg -qw 'archboot' /etc/hostname && return
+    mv /lib/firmware/regulatory.db /lib/firmware/regulatory.db.p7s /tmp/
     rm -rf /lib/firmware
+    mkdir -p /lib/firmware
+    mv /tmp/regulatory.db /tmp/regulatory.db.p7s /lib/firmware
 }
 
