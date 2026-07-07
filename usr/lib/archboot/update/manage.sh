@@ -166,48 +166,44 @@ _clean_fw() {
         fi
     fi
     if rg -q "${_WIFI}" "${_HWDATA}"; then
-        while true; do
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Atheros'; then
-                _FW_WIFI+=(Atheros)
-                mv "${_FW}"/{ath*,htc_*,wil6210*} ${_FW_NEW}/
-            fi
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Broadcom'; then
-                _FW_WIFI+=(Broadcom)
-                mv "${_FW}"/{brcm,cypress} ${_FW_NEW}/
-            fi
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Intel'; then
-                _FW_WIFI+=(Intel)
-                [[ -d "${_FW_NEW}/intel" ]] || mkdir -p "${_FW_NEW}/intel"
-                mv "${_FW}/intel/iwlwifi" "${_FW_NEW}/intel/"
-                mv "${_FW}"/iwl* ${_FW_NEW}/
-            fi
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Marvell'; then
-                _FW_WIFI+=(Marvell)
-                mv "${_FW}"/{mwl*,libertas,mrvl} ${_FW_NEW}/
-            fi
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'MediaTek'; then
-                _FW_WIFI+=(MediaTek)
-                mv "${_FW}"/{mt76*,mediatek} ${_FW_NEW}/
-            fi
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Ralink'; then
-                _FW_WIFI+=(Ralink)
-                mv "${_FW}"/rt*bin* ${_FW_NEW}/
-            fi
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Realtek'; then
-                _FW_WIFI+=(Realtek)
-                mv "${_FW}"/{rtw*,rtlwifi} ${_FW_NEW}/
-            fi
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Texas'; then
-                _FW_WIFI+=(Texas)
-                mv "${_FW}"/ti-connectivity ${_FW_NEW}/
-            fi
-            # add all WiFi firmwares if no hw vendor was specified on lsusb or lspci output
-            if [[ -z "${_FW_WIFI[*]}" ]]; then
-                echo '802 Atheros Broadcom Intel Marvell MediaTek Ralink Realtek Texas' >> "${_HWDATA}"
-            else
-                break
-            fi
-        done
+        # get manufacturer by removing udev hwdb
+        rm -f /usr/lib/udev/hwdb.bin /etc/udev/hwdb.bin
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Atheros'; then
+            _FW_WIFI+=(Atheros)
+            mv "${_FW}"/{ath*,htc_*,wil6210*} ${_FW_NEW}/
+        fi
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Broadcom'; then
+            _FW_WIFI+=(Broadcom)
+            mv "${_FW}"/{brcm,cypress} ${_FW_NEW}/
+        fi
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Intel'; then
+            _FW_WIFI+=(Intel)
+            [[ -d "${_FW_NEW}/intel" ]] || mkdir -p "${_FW_NEW}/intel"
+            mv "${_FW}/intel/iwlwifi" "${_FW_NEW}/intel/"
+            mv "${_FW}"/iwl* ${_FW_NEW}/
+        fi
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Marvell'; then
+            _FW_WIFI+=(Marvell)
+            mv "${_FW}"/{mwl*,libertas,mrvl} ${_FW_NEW}/
+        fi
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'MediaTek'; then
+            _FW_WIFI+=(MediaTek)
+            mv "${_FW}"/{mt76*,mediatek} ${_FW_NEW}/
+        fi
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Ralink'; then
+            _FW_WIFI+=(Ralink)
+            mv "${_FW}"/rt*bin* ${_FW_NEW}/
+        fi
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Realtek'; then
+            _FW_WIFI+=(Realtek)
+            mv "${_FW}"/{rtw*,rtlwifi} ${_FW_NEW}/
+        fi
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Texas'; then
+            _FW_WIFI+=(Texas)
+            mv "${_FW}"/ti-connectivity ${_FW_NEW}/
+        fi
+        # restore udev hwdb
+        systemd-hwdb update
     fi
     rm -r "${_FW}"
     mv "${_FW_NEW}" "${_W_DIR}"/lib

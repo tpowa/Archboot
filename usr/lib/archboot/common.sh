@@ -478,40 +478,34 @@ _auto_fw() {
         fi
     fi
     if rg -q "${_WIFI}" "${_HWDATA}"; then
-        while true; do
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Atheros'; then
-                _WIFI_PACKAGES+=(linux-firmware-atheros)
-            fi
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Broadcom'; then
-                _WIFI_PACKAGES+=(linux-firmware-broadcom)
-            fi
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Intel'; then
-                _WIFI_PACKAGES+=(linux-firmware-intel)
-            fi
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Marvell'; then
-                _WIFI_PACKAGES+=(linux-firmware-marvell)
-            fi
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'MediaTek'; then
-                _WIFI_PACKAGES+=(linux-firmware-mediatek)
-            fi
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Ralink'; then
-                _WIFI_PACKAGES+=(linux-firmware-other)
-            fi
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Realtek'; then
-                _WIFI_PACKAGES+=(linux-firmware-realtek)
-            fi
-            if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Texas'; then
-                _WIFI_PACKAGES+=(linux-firmware-other)
-            fi
-            # add all WiFi firmwares if no hw vendor was specified on lsusb or lspci output
-            if [[ -z "${_WIFI_PACKAGES[*]}" ]]; then
-                echo '802 Atheros Broadcom Intel Marvell MediaTek Ralink Realtek Texas' >> "${_HWDATA}"
-            else
-                #shellcheck disable=SC2206
-                _PACKAGES+=(${_WIFI_PACKAGES[@]})
-                break
-            fi
-        done
+        # get manufacturer by removing udev hwdb
+        rm -f /usr/lib/udev/hwdb.bin /etc/udev/hwdb.bin
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Atheros'; then
+            _WIFI_PACKAGES+=(linux-firmware-atheros)
+        fi
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Broadcom'; then
+            _WIFI_PACKAGES+=(linux-firmware-broadcom)
+        fi
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Intel'; then
+            _WIFI_PACKAGES+=(linux-firmware-intel)
+        fi
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Marvell'; then
+            _WIFI_PACKAGES+=(linux-firmware-marvell)
+        fi
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'MediaTek'; then
+            _WIFI_PACKAGES+=(linux-firmware-mediatek)
+        fi
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Ralink'; then
+            _WIFI_PACKAGES+=(linux-firmware-other)
+        fi
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Realtek'; then
+            _WIFI_PACKAGES+=(linux-firmware-realtek)
+        fi
+        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Texas'; then
+            _WIFI_PACKAGES+=(linux-firmware-other)
+        fi
+        # restore udev hwdb
+        systemd-hwdb update
     fi
 }
 
