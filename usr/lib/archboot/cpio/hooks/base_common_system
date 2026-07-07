@@ -50,7 +50,7 @@ update-activation-environment,uuidgen} dd df dir du dust dysk exa eza faillock f
                  pam_{namespace_helper,timestamp_check} pacman{,-conf,-key,-db-upgrade} passwd pgrep pidof pigz \
                  pinentry{,-curses} pk{action,check,exec,ttyagent} pluginviewer printf procs ps pwd pwhistory_helper pwmconfig \
                  rmdir sasldblistusers2 saslpasswd2 tr true repo-{add,elephant,remove} rbash rg rmmod sd sed secret-tool \
-                 sensord sensors{,-conf-conver,-detect} shlibsign sign{tool,ver} sort ssltap stat symkeyutil systemd-{ac-power,analyze,ask-password,cat,\
+                 sensors{,-conf-convert,-detect} shlibsign sign{tool,ver} sort ssltap stat symkeyutil systemd-{ac-power,analyze,ask-password,cat,\
 cgls,cgtop,confext,delta,detect-virt,escape,firstboot,hwdb,inhibit,machine-id-setup,mount,mstack,mute-console,notify,nspawn,path,\
 resolve,repart,run,socket-activate,stdio-bridge,sys{install,update,users},tty-ask-password-agent,umount,creds,cryptenroll,dissect,\
 id128,sysext} storagectl tail tar tee testpkg top touch trust tty unix_chkpwd unpigz umount.nfs{,4} update-ca-trust updatectl \
