@@ -126,82 +126,6 @@ _clean_archboot() {
     done
 }
 
-_clean_fw() {
-    _FW="${_W_DIR}/lib/firmware"
-    _FW_NEW="${_W_DIR}/new/firmware"
-    _VGA="VGA compatible controller"
-    _ETH="Ethernet controller|Ethernet"
-    _WIFI="802|Network controller|WiFi|Wireless"
-    _HWDATA=/tmp/hwdata.txt
-    mkdir -p "${_FW_NEW}"
-    # get manufacturer by removing udev hwdb
-    rm -f /usr/lib/udev/hwdb.bin /etc/udev/hwdb.bin
-    lspci -mm >"${_HWDATA}"
-    lsusb 2>"${_NO_LOG}" >>"${_HWDATA}"
-    if rg -q "${_VGA}" "${_HWDATA}"; then
-        if rg "${_VGA}" "${_HWDATA}" | rg -q 'AMD'; then
-            mv "${_FW}"/amd* ${_FW_NEW}/
-        fi
-        if rg "${_VGA}" "${_HWDATA}" | rg -q 'Intel'; then
-            if rg "${_VGA}" "${_HWDATA}" | rg 'Intel' | rg -q 'Xe'; then
-                mv "${_FW}"/xe ${_FW_NEW}/
-            else
-                mv "${_FW}"/i915 ${_FW_NEW}/
-            fi
-        fi
-        if rg "${_VGA}" "${_HWDATA}" | rg -q 'NVIDIA'; then
-             mv "${_FW}"/nvidia ${_FW_NEW}/
-        fi
-        if rg "${_VGA}" "${_HWDATA}" | rg -q 'RADEON|Radeon'; then
-            mv "${_FW}"/radeon ${_FW_NEW}/
-        fi
-    fi
-    if rg -q "${_ETH}" "${_HWDATA}"; then
-        if rg "${_ETH}" "${_HWDATA}" | rg -q 'Broadcom'; then
-            mv "${_FW}"/{bnx2,tigon} ${_FW_NEW}/
-        fi
-        if rg "${_ETH}" "${_HWDATA}" | rg -q 'Intel'; then
-            mv "${_FW}"/intel ${_FW_NEW}/
-        fi
-        if rg "${_ETH}" "${_HWDATA}" | rg -q 'Realtek'; then
-            mv "${_FW}"/rtl_nic ${_FW_NEW}/
-        fi
-    fi
-    if rg -q "${_WIFI}" "${_HWDATA}"; then
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Atheros'; then
-            mv "${_FW}"/{ath*,htc_*,wil6210*} ${_FW_NEW}/
-        fi
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Broadcom'; then
-            mv "${_FW}"/{brcm,cypress} ${_FW_NEW}/
-        fi
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Intel'; then
-            [[ -d "${_FW_NEW}/intel" ]] || mkdir -p "${_FW_NEW}/intel"
-            mv "${_FW}/intel/iwlwifi" "${_FW_NEW}/intel/"
-            mv "${_FW}"/iwl* ${_FW_NEW}/
-        fi
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Marvell'; then
-            mv "${_FW}"/{mwl*,libertas,mrvl} ${_FW_NEW}/
-        fi
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'MediaTek'; then
-            mv "${_FW}"/{mt76*,mediatek} ${_FW_NEW}/
-        fi
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Ralink'; then
-            mv "${_FW}"/rt*bin* ${_FW_NEW}/
-        fi
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Realtek'; then
-            mv "${_FW}"/{rtw*,rtlwifi} ${_FW_NEW}/
-        fi
-        if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Texas'; then
-            mv "${_FW}"/ti-connectivity ${_FW_NEW}/
-        fi
-    fi
-    # restore udev hwdb
-    systemd-hwdb update
-    rm -r "${_FW}"
-    mv "${_FW_NEW}" "${_W_DIR}"/lib/
-    rm -r "${_W_DIR}/new"
-}
-
 _collect_files() {
     ${_NSPAWN} "${_W_DIR}" /bin/bash -c "umount tmp;archboot-cpio.sh -c ${_CONFIG} -d /tmp" &>>"${_LOG}"
     rm "${_W_DIR}"/.archboot
@@ -286,7 +210,6 @@ _new_environment() {
     : > "${_W_DIR}"/.archboot
     _create_container &
     _progress_wait "2" "40" "Generating container in ${_W_DIR}..." "5.5"
-    #_clean_fw
     _clean_kernel_cache
     _ram_check
     _progress "41" "Copying kernel ${_VMLINUZ} to ${_RAM}/..."
