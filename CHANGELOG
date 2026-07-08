@@ -3,11 +3,12 @@ Environment:
 - kernel 7.1.x
 - updated IPXE to 20260703
 - kmscon 10.0.1
-- added detect WiFi hardware manufacturer
-- added WiFi devices may use 802 hardware identifier
-- added WiFi to firmware detection
+- added detect WiFi by hardware manufacturer
+- added WiFi devices, that may use '802' and 'WiFi' hardware identifier
 - added lm_sensors
 - fixed wireless regdb on local/latest image
+- fixed kmscon race condition by restarting kmscon on failure
+- 
 Highlights 2026.06:
 Environment:
 - fixed mediatek firmware detection
