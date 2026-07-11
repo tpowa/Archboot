@@ -78,9 +78,6 @@ _auto_clean_fw() {
         if rg "${_ETH}" "${_HWDATA}" | rg -q 'Broadcom'; then
             mv "${_FW}"/{bnx2,tigon} "${_FW_NEW}"/
         fi
-        if rg "${_ETH}" "${_HWDATA}" | rg -q 'Intel'; then
-            mv "${_FW}"/intel "${_FW_NEW}"/
-        fi
         if rg "${_ETH}" "${_HWDATA}" | rg -q 'Realtek'; then
             mv "${_FW}"/rtl_nic "${_FW_NEW}"/
         fi
@@ -93,7 +90,7 @@ _auto_clean_fw() {
             mv "${_FW}"/{brcm,cypress} "${_FW_NEW}"/
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Intel'; then
-            [[ -d "${_FW_NEW}"/intel ]] || mkdir -p "${_FW_NEW}"/intel
+            mkdir -p "${_FW_NEW}"/intel
             mv "${_FW}/intel/iwlwifi" "${_FW_NEW}/intel/"
             mv "${_FW}"/iwl* "${_FW_NEW}"/
         fi
@@ -115,7 +112,6 @@ _auto_clean_fw() {
     fi
     # restore udev hwdb
     systemd-hwdb update
-    cp -af "${_FW}"/regulatory* "${_FW_NEW}"/
     rm -r "${_FW}"
     mv "${_FW_NEW}" "${1}"/lib/
     rm -r "${1}/new"
@@ -274,14 +270,14 @@ _install_base_packages() {
                    "${_FIRMWARE[@]}" "${_PACMAN_DEFAULTS[@]}" &>>"${_LOG}" || exit 1
         echo "Downloading mkinitcpio to ${1}..."
         ${_PACMAN} -Syw mkinitcpio "${_PACMAN_DEFAULTS[@]}" &>>"${_LOG}" || exit 1
-        if [[ -n "${_FW_AUTODETECT}" ]]; then
-            _auto_clean_fw
-        fi
     else
         ${_PACMAN} -Sy --assume-installed ${_MKINITCPIO} "${_KEYRING[@]}" "${_PACKAGES[@]}" \
                    "${_FIRMWARE[@]}" "${_PACMAN_DEFAULTS[@]}" &>"${_NO_LOG}" || exit 1
         echo "Downloading mkinitcpio to ${1}..."
         ${_PACMAN} -Syw mkinitcpio "${_PACMAN_DEFAULTS[@]}" &>"${_NO_LOG}" || exit 1
+    fi
+    if [[ -n "${_FW_AUTODETECT}" ]]; then
+        _auto_clean_fw "${1}"
     fi
 }
 
