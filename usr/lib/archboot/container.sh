@@ -154,8 +154,8 @@ _clean_container() {
         if [[ -z "${_FW_AUTODETECT}" ]]; then
             rm -r "${1}"/lib/firmware/{[0-9]*-*-0x*,3com,advansys,agere_*,adaptec,airoha,amdtee,amlogic,amphion,ar3k,ar5523*,ar70*,\
 ar9[0-9]*,arm,as102*,ath3k*,atmel,atusb,av7110,bnx2x,cadence,carl*,cavium,cirrus,cis,cpia2,cnm,cs42l43*,ct*,cxgb*,cmmb*,dabusb,dpaa2,\
-dsp56k,dvb*,e100,edgeport,emi26,ene-ub6250,f2255usb*,go7007,hfi1*,INT*,intel/{avs,catpt,dsp*,ibt*,ice,ipu,irci*,ish,qat,vpu,vsc},imx,\
-inside-secure,isci,isdbt*,ixp4xx,kaweth,keyspan*,lbtf*,lt8713sx*,lt9611uxc*,matrox,meson,microchip,moxa,\
+dsp56k,dvb*,e100,edgeport,emi26,ene-ub6250,f2255usb*,go7007,hfi1*,INT*,ntel/{Int*,avs,catpt,dsp*,fw_sst*,ibt*,ice,ipu*,irci*,ish,qat,vpu,vsc},\
+imx,inside-secure,isci,isdbt*,ixp4xx,kaweth,keyspan*,lbtf*,lt8713sx*,lt9611uxc*,matrox,meson,microchip,moxa,\
 mrvl/prestera,mts*,myri10ge*,nxp,ositech,phanfw*,powervr,qat*,qca,r128,r8a*,rcar_*,realtek,rockchip,rp2*,rtl_bt,rsi*,sb16,s2250*,\
 s5p-*,sdca,sdd_*,slicoss,sms1*,sxg,tdmb*,ueagle-atm,usbdux*,tas25*,TAS*,TIAS*,tehuti,ti,ti_*,\
 ti-keystone,tlg2300*,tsse_*,v4l*,vntw*,vxge,wsm_*,wfx,whiteheat*,yamaha}
