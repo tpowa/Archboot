@@ -151,7 +151,7 @@ _initrd_stage() {
     # Ethernet firmware
     if rg -q "${_ETH}" "${_HWDATA}"; then
         if rg "${_ETH}" "${_HWDATA}" | rg -q 'Broadcom'; then
-            _FW_RUN+=("${_FW}/bnx2.img" "${_FW}/tigon.img")
+            _FW_RUN+=("${_FW}"/{bnx2,tigon}.img)
         fi
         if rg "${_ETH}" "${_HWDATA}" | rg -q 'Realtek'; then
             _FW_RUN+=("${_FW}/rtl_nic.img")
@@ -161,20 +161,16 @@ _initrd_stage() {
     if rg -q "${_WIFI}" "${_HWDATA}"; then
         # no udev hwdb is available in early userspace
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Atheros'; then
-            for i in "${_FW}"/ath*; do
-                _FW_RUN+=("${i}")
-            done
+            _FW_RUN+=("${_FW}"/ath*)
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Broadcom'; then
-            _FW_RUN+=("${_FW}/brcm.img" "${_FW}/cypress.img")
+            _FW_RUN+=("${_FW}"/{brcm,cypress}.img)
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Intel'; then
-            _FW_RUN+=("${_FW}"/{intel.img,iwlwifi.img})
+            _FW_RUN+=("${_FW}"/{intel,iwlwifi}.img)
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Marvell'; then
-            for i in "${_FW}"/libertas "${_FW}"/mrvl "${_FW}"/mwl*; do
-                _FW_RUN+=("${i}")
-            done
+            _FW_RUN+=("${_FW}"/libertas* "${_FW}"/mrvl* "${_FW}"/mwl*)
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'MediaTek'; then
             _FW_RUN+=("${_FW}/mediatek.img")
@@ -183,10 +179,7 @@ _initrd_stage() {
             _FW_RUN+=("${_FW}/ralink.img")
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Realtek'; then
-            _FW_RUN+=("${_FW}/rtlwifi.img")
-            for i in "${_FW}"/rtw*; do
-                _FW_RUN+=("${i}")
-            done
+            _FW_RUN+=("${_FW}/rtlwifi.img" "${_FW}"/rtw*)
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Texas'; then
             _FW_RUN+=("${_FW}/ti-connectivity.img")
