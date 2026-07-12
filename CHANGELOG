@@ -8,7 +8,8 @@ Environment:
 - added lm_sensors
 - fixed wireless regdb on local/latest image
 - fixed kmscon race condition by restarting kmscon on failure
-- 
+- only include Intel Wifi firmware
+- only include AMD graphic firmware
 Highlights 2026.06:
 Environment:
 - fixed mediatek firmware detection
