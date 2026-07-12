@@ -472,9 +472,6 @@ _auto_fw() {
         if rg "${_ETH}" "${_HWDATA}" | rg -q 'Broadcom'; then
             _PACKAGES+=(linux-firmware-broadcom)
         fi
-        if rg "${_ETH}" "${_HWDATA}" | rg -q 'Intel'; then
-            _PACKAGES+=(linux-firmware-intel)
-        fi
         if rg "${_ETH}" "${_HWDATA}" | rg -q 'Realtek'; then
             _PACKAGES+=(linux-firmware-realtek)
         fi

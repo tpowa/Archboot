@@ -112,9 +112,9 @@ _auto_clean_fw() {
     fi
     # restore udev hwdb
     systemd-hwdb update
-    rm -r "${_FW}"
+    rm -rf "${_FW}"
     mv "${_FW_NEW}" "${1}"/lib/
-    rm -r "${1}/new"
+    rm -rf "${1}/new"
 }
 
 _pacman_container() {
