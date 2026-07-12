@@ -169,8 +169,7 @@ _initrd_stage() {
             _FW_RUN+=("${_FW}/brcm.img" "${_FW}/cypress.img")
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Intel'; then
-            rg -q intel <<<"${_FW_RUN[@]}" || _FW_RUN+=("${_FW}/intel.img")
-            _FW_RUN+=("${_FW}/iwlwifi.img")
+            _FW_RUN+=("${_FW}"/{intel.img,iwlwifi.img})
         fi
         if rg "${_WIFI}" "${_HWDATA}" | rg -q 'Marvell'; then
             for i in "${_FW}"/libertas "${_FW}"/mrvl "${_FW}"/mwl*; do
