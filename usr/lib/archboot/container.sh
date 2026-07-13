@@ -48,7 +48,7 @@ _auto_clean_fw() {
     _FW="${1}/lib/firmware"
     _FW_NEW="${1}/new/firmware"
     _VGA="VGA compatible controller"
-    _ETH="Ethernet controller|Ethernet"
+    _ETH="Ethernet"
     _WIFI="802|Network controller|WiFi|Wireless"
     _HWDATA=/tmp/hwdata.txt
     mkdir -p "${_FW_NEW}"

@@ -447,7 +447,7 @@ _create_cksum() {
 _auto_fw() {
     _FIRMWARE=()
     _VGA="VGA compatible controller"
-    _ETH="Ethernet controller|Ethernet"
+    _ETH="Ethernet"
     _WIFI="802|Network controller|WiFi|Wireless"
     _HWDATA=/tmp/hwdata.txt
     # get manufacturer by removing udev hwdb

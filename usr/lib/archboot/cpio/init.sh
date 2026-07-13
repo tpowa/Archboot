@@ -8,7 +8,7 @@ _KEEP="Please keep the boot medium inserted..."
 _NO_LOG=/dev/null
 _FW=/mnt/efi/boot/firmware
 _VGA="VGA compatible controller"
-_ETH="Ethernet controller|Ethernet"
+_ETH="Ethernet"
 _WIFI="802|Network controller|WiFi|Wireless"
 _HWDATA=/tmp/hwdata.txt
 _dialog() {
