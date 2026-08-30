@@ -39,7 +39,7 @@ ConditionPathExists=/dev/tty0
 [Service]
 Restart=on-failure
 RestartSec=3s
-ExecStart=kmscon --vt=%I --no-switchvt --login -- /bin/login -p -f root
+ExecStart=kmscon --vt=%I --no-switchvt --login
 UtmpIdentifier=%I
 TTYPath=/dev/%I
 TTYReset=yes
