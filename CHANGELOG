@@ -1,10 +1,13 @@
 On the road to 2026.09:
 Environment:
 - kernel 7.2.x
+- downgraded shim to fedora 16.1-7
+- updated ipxe to 20260830
+- kmscon 10.0.3
 ---
 Highlights 2026.08:
 Environment:
-- kmscon 10.0.
+- kmscon 10.0.2
 ---
 Highlights 2026.07:
 Environment:
