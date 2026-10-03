@@ -81,6 +81,7 @@ _SWAY_PACKAGES=(
   bemenu-wayland
   foot
   j4-dmenu-desktop
+  libxkbcommon
   sway
   swaybg
   ttf-font-awesome
