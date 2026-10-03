@@ -38,7 +38,6 @@ _configure_xfce() {
         <value type="int" value="9"/>
         <value type="int" value="10"/>
         <value type="int" value="11"/>
-        <value type="int" value="12"/>
       </property>
     </property>
     <property name="panel-2" type="empty">
@@ -48,6 +47,7 @@ _configure_xfce() {
       <property name="position-locked" type="bool" value="true"/>
       <property name="size" type="uint" value="48"/>
       <property name="plugin-ids" type="array">
+        <value type="int" value="12"/>
         <value type="int" value="13"/>
         <value type="int" value="14"/>
         <value type="int" value="15"/>
@@ -55,7 +55,6 @@ _configure_xfce() {
         <value type="int" value="17"/>
         <value type="int" value="18"/>
         <value type="int" value="19"/>
-        <value type="int" value="20"/>
       </property>
     </property>
   </property>
