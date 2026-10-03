@@ -1,4 +1,6 @@
 On the road to 2026.10:
+Envinronment:
+update ipxe to 20261003
 Sway:
 - fixed sway waybar
 - fixed colors on foot
