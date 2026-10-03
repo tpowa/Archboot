@@ -76,39 +76,38 @@ _configure_xfce() {
         <property name="square-icons" type="bool" value="true"/>
     </property>
     <property name="plugin-7" type="string" value="power-manager-plugin"/>
-    <property name="plugin-8" type="string" value="notification-plugin"/>
-    <property name="plugin-9" type="string" value="separator">
+    <property name="plugin-8" type="string" value="separator">
       <property name="style" type="uint" value="0"/>
     </property>
-    <property name="plugin-10" type="string" value="clock"/>
-    <property name="plugin-11" type="string" value="separator">
+    <property name="plugin-9" type="string" value="clock"/>
+    <property name="plugin-10" type="string" value="separator">
       <property name="style" type="uint" value="0"/>
     </property>
-    <property name="plugin-12" type="string" value="actions"/>
-    <property name="plugin-13" type="string" value="showdesktop"/>
-    <property name="plugin-14" type="string" value="separator"/>
-    <property name="plugin-15" type="string" value="launcher">
+    <property name="plugin-11" type="string" value="actions"/>
+    <property name="plugin-12" type="string" value="showdesktop"/>
+    <property name="plugin-13" type="string" value="separator"/>
+    <property name="plugin-14" type="string" value="launcher">
       <property name="items" type="array">
         <value type="string" value="xfce4-terminal-emulator.desktop"/>
       </property>
     </property>
-    <property name="plugin-16" type="string" value="launcher">
+    <property name="plugin-15" type="string" value="launcher">
       <property name="items" type="array">
         <value type="string" value="xfce4-file-manager.desktop"/>
       </property>
     </property>
-    <property name="plugin-17" type="string" value="launcher">
+    <property name="plugin-16" type="string" value="launcher">
       <property name="items" type="array">
         <value type="string" value="xfce4-web-browser.desktop"/>
       </property>
     </property>
-    <property name="plugin-18" type="string" value="launcher">
+    <property name="plugin-17" type="string" value="launcher">
       <property name="items" type="array">
         <value type="string" value="gparted.desktop"/>
       </property>
     </property>
-    <property name="plugin-19" type="string" value="separator"/>
-    <property name="plugin-20" type="string" value="launcher">
+    <property name="plugin-18" type="string" value="separator"/>
+    <property name="plugin-19" type="string" value="launcher">
       <property name="items" type="array">
         <value type="string" value="archboot.desktop"/>
       </property>
