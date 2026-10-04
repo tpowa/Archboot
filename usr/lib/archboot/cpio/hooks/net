@@ -4,11 +4,13 @@
 
 _run ()
 {
-    _map _binary arping bandwhich bridge clockdiff ctstat dpll dcb dog devlink \
-                 elinks ethtool genl ifstat lnstat netscanner nstat miniserve rdma \
+    _map _binary arping bandwhich bridge cha clockdiff ctstat dpll dcb dog devlink \
+                 ethtool genl ifstat lnstat netscanner nstat mancha miniserve rdma \
                  rtacct rtmon rtstat rustscan ss ssh tc tiny tipc tracepath trip vdpa
     # add iproute 2, add openssl helper libraries
     _map _full_dir /usr/lib/engines-3 /usr/share/tc
+    # add chawan
+    _map _full_dir /usr/lib/chawan
     # iptables-nft / nftables
     _map _binary arptables{,-nft,-nft-restore,-nft-save,-restore,-save,-translate} \
                  ebtables{,-nft,-nft-restore,-nft-save,-restore,-save,-translate} \
@@ -19,12 +21,6 @@ _run ()
     # add config for rustmap, no nmap available
     echo "ulimit = 5000" >> "${_ROOTFS}"/root/.rustscan.toml
     echo "scripts = \"None\"" >> "${_ROOTFS}"/root/.rustscan.toml
-    # add elinks defaults
-    _file_rename /usr/share/archboot/net/etc/elinks/bookmarks /etc/elinks/bookmarks
-    _file_rename /usr/share/archboot/net/etc/elinks/elinks.conf /etc/elinks/elinks.conf
-    _file_rename /usr/share/archboot/net/etc/profile.d/elinks.sh /etc/profile.d/elinks.sh
-    # fix console charmap after elinks exit
-    echo "alias elinks='elinks;reset'" >> "${_ROOTFS}"/root/.bashrc
     # tiny config
     _file_rename /usr/share/archboot/net/usr/share/tiny/config.yml /usr/share/tiny/config.yml
     _symlink /root/.config/tiny/config.yml /usr/share/tiny/config.yml

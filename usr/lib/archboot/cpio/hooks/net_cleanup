@@ -6,8 +6,8 @@ _run ()
 {
     ! rg -qw 'archboot' /etc/hostname && return
     _install_files
-    rm /usr/bin/{arpd,arping,bridge,clockdiff,ctstat,dcb,devlink,\
-elinks,ethtool,genl,ifstat,lnstat,nstat,ssh,tracepath,rdma,rtacct,\
+    rm /usr/bin/{arpd,arping,bridge,cha,clockdiff,ctstat,dcb,devlink,\
+elinks,ethtool,genl,ifstat,lnstat,macha,nstat,ssh,tracepath,rdma,rtacct,\
 rtmon,rtstat,ss,tc,tipc,vdpa}
 }
 
