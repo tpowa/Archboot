@@ -31,9 +31,9 @@ _run ()
     # add file magic file
     _file /usr/share/file/misc/magic.mgc
     # add shadow
-    _map _binary ch{age,fn,sh} expiry faillog \
+    _map _binary ch{age,fn,sh} faillog \
           {chg,ch,g}passwd group{add,del,mod} grp{ck,conv,unconv} \
-          newusers pw{ck,conv,unconv} user{add,del,mod} sg getsubids
+          newusers pw{ck,conv,unconv} user{add,del,mod} getsubids
     # add ncurses libs
     _map _file /usr/lib/libncurses*.so
 }
