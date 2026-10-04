@@ -11,6 +11,7 @@ _run ()
     _map _full_dir /usr/lib/engines-3 /usr/share/tc
     # add chawan
     _map _full_dir /usr/lib/chawan
+    _file_rename /usr/share/archboot/net/etc/profile.d/chawan.sh /etc/profile.d/chawan.sh
     # iptables-nft / nftables
     _map _binary arptables{,-nft,-nft-restore,-nft-save,-restore,-save,-translate} \
                  ebtables{,-nft,-nft-restore,-nft-save,-restore,-save,-translate} \
