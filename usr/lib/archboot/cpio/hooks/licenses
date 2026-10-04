@@ -36,7 +36,7 @@ _LICENSES=(
   known_spdx_license_identifiers.txt
   krb5/LICENSE
   less/LICENSE
-  libarchive/BSD-{2-Clause,BSD-4-Clause-UC}.txt
+  libarchive/BSD-{2-Clause,4-Clause-UC}.txt
   libbpf/LICENSE.BSD-2-Clause
   libbsd/LICENSE
   libcap/License
