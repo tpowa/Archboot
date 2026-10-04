@@ -36,12 +36,10 @@ _LICENSES=(
   known_spdx_license_identifiers.txt
   krb5/LICENSE
   less/LICENSE
-  libarchive/COPYING
+  libarchive/BSD-{2-Clause,BSD-4-Clause-UC}.txt
   libbpf/LICENSE.BSD-2-Clause
   libbsd/LICENSE
   libcap/License
-  libcss/COPYING
-  libdom/COPYING
   libedit/COPYING
   libevent/LICENSE
   libffi/LICENSE
@@ -49,14 +47,12 @@ _LICENSES=(
   libgit2/COPYING
   libgpg-error/COPYING
   libgpg-error/COPYING.LIB
-  libhubbub/COPYING
   libinih/LICENSE.txt
   libldap/LICENSE
   libmd/COPYING
   libnghttp2/COPYING
   libnghttp3/COPYING
   libp11-kit/COPYING
-  libparserutils/COPYING
   libpsl/COPYING
   libsasl/COPYING
   libssh2/COPYING
@@ -66,11 +62,8 @@ _LICENSES=(
   libuv/LICENSE
   libverto/COPYING
   libvterm/LICENSE
-  libwapcaplet/COPYING
-  libwebsockets/LICENSE
   libxml2/Copyright
   llhttp/LICENSE
-  lua/LICENSE
   lua51-lpeg/LICENSE
   luajit/COPYRIGHT
   miniserve/LICENSE
@@ -102,7 +95,6 @@ _LICENSES=(
   tiny/LICENSE
   tmux/LICENSE
   tpm2-tss/LICENSE
-  tre/LICENSE
   tree-sitter-c/LICENSE
   tree-sitter-lua/LICENSE.md
   tree-sitter-markdown/LICENSE
