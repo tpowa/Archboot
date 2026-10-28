@@ -22,6 +22,7 @@ _SPLASH="/usr/share/archboot/uki/archboot-background.bmp"
 _GRAPHIC_IGNORE=(
   linux
   linux-firmware
+  linux-firmware-amd
   linux-firmware-amdgpu
   linux-firmware-atheros
   linux-firmware-broadcom

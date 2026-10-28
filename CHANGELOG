@@ -2,6 +2,8 @@ On the road to 2026.10:
 Environment:
 - switched to chawan text mode browser
 - update ipxe to 20261003
+- kmscon 10.1.0
+- added linux-firmware-amd
 Sway:
 - fixed sway waybar
 - fixed colors on foot

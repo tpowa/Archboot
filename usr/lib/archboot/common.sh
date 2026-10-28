@@ -28,6 +28,7 @@ _KERNELPKG="linux"
 _KEYRING=(archlinux-keyring)
 _FIRMWARE=(
   linux-firmware
+  linux-firmware-amd
   linux-firmware-marvell
 )
 _LABEL="Exit"
@@ -456,7 +457,7 @@ _auto_fw() {
     lsusb 2>"${_NO_LOG}" >>"${_HWDATA}"
     if rg -q "${_VGA}" "${_HWDATA}"; then
         if rg "${_VGA}" "${_HWDATA}" | rg -q 'AMD'; then
-            _PACKAGES+=(linux-firmware-amdgpu)
+            _PACKAGES+=(linux-firmware-amd linux-firmware-amdgpu)
         fi
         if rg "${_VGA}" "${_HWDATA}" | rg -q 'Intel'; then
             _PACKAGES+=(linux-firmware-intel)
