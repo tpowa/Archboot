@@ -4,6 +4,7 @@ Environment:
 - update ipxe to 20261003
 - kmscon 10.1.0
 - added linux-firmware-amd
+- fixed memtest86+-efi
 Sway:
 - fixed sway waybar
 - fixed colors on foot
