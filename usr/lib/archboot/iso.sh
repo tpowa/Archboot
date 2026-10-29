@@ -131,7 +131,7 @@ _prepare_bootloaders() {
         echo "Preparing UEFI EDK2 Shell X64..."
         cp /usr/share/edk2-shell/x64/Shell_Full.efi "${_ISODIR}/EFI/TOOLS/SHELLX64.EFI"
         echo "Preparing UEFI Memtest86+..."
-        cp /boot/memtest86+/memtestx64.efi "${_ISODIR}/EFI/TOOLS/MEMTEST.EFI"
+        cp /boot/memtest86+/memtest86x64.efi "${_ISODIR}/EFI/TOOLS/MEMTEST.EFI"
     elif [[ ${_ARCH} == "aarch64" ]]; then
         _GRUB_ARCH="arm64-efi"
         _UEFI_ARCH="aa64"
